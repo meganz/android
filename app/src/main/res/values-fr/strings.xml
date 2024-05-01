@@ -1085,9 +1085,9 @@
     <string name="chat_error_open_message">Il n’a pas été possible d’ouvrir la conversation</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
-        <item quantity="one">%1$d contact</item>
-        <item quantity="many">%1$d contacts</item>
-        <item quantity="other">%1$d contacts</item>
+        <item quantity="one">%1$d&#160;contact</item>
+        <item quantity="many">%1$d de contacts</item>
+        <item quantity="other">%1$d&#160;contacts</item>
     </plurals>
     <!-- Message shown when the folder sharing process fails -->
     <string name="error_sharing_folder">Erreur de partage du dossier. Veuillez réessayer.</string>
@@ -1142,7 +1142,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">Persistance de l’état</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">Conserver mon apparence d’état choisie, même si aucun de mes appareils n’est connecté</string>
+    <string name="settings_persistence_subtitle">Toujours afficher l’état choisi, même quand je me déconnecte</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">Définir une limite de temps</string>
     <!-- Button to set a value -->
@@ -1273,7 +1273,7 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s a déjà été invité. Consultez les demandes en attente.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Si une erreur s’est glissée dans votre adresse courriel, corrigez-la et touchez [A] Renvoyer[A].</string>
+    <string name="confirm_email_misspelled">Si une erreur s’est glissée dans votre adresse courriel, corrigez-la et touchez [A]Renvoyer[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Renvoyer</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -2282,9 +2282,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">nom du fichier</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">Afficher Vu pour la dernière fois&#8230;</string>
+    <string name="option_enable_last_green_chat">Afficher «&#160;Vu pour la dernière fois&#160;»</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">Permettre à vos contacts de voir l’heure de votre dernière activité sur MEGA.</string>
+    <string name="subtitle_option_enable_last_green_chat">Permettre à vos contacts de voir la date et l’heure de votre dernière activité sur MEGA</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">L’espace de stockage est insuffisant</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -3250,12 +3250,6 @@
         <item quantity="one">Le lien a été copié dans le presse-papiers</item>
         <item quantity="many">Les liens ont été copiés dans le presse-papiers</item>
         <item quantity="other">Les liens ont été copiés dans le presse-papiers</item>
-    </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="one">Obtenir le lien</item>
-        <item quantity="many">Obtenir les liens</item>
-        <item quantity="other">Obtenir les liens</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Vider tous les fichiers hors ligne ?</string>
@@ -5418,12 +5412,6 @@
         <item quantity="one">Le dossier a été partagé</item>
         <item quantity="many">%1$d de dossiers ont été partagés</item>
         <item quantity="other">%1$d&#160;dossiers ont été partagés</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one">Le dossier a été partagé,&#160;</item>
-        <item quantity="many">%1$d de dossiers ont été partagés,&#160;</item>
-        <item quantity="other">%1$d&#160;dossiers ont été partagés,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">

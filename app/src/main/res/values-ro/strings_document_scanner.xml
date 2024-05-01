@@ -3,11 +3,11 @@
     <!-- Screen title for cropping current scan (Document scanner) -->
     <string name="scan_title_crop">Decupează</string>
     <!-- Screen title for saving current scan (Document scanner) -->
-    <string name="scan_title_save_scan">Salvează scanarea</string>
+    <string name="scan_title_save_scan">Salvare scanarea</string>
     <!-- Label of the button to add a new page to the current document scan -->
     <string name="scan_action_add">Adaugă</string>
     <!-- Action of a button to save something -->
-    <string name="scan_action_save">Salvează</string>
+    <string name="scan_action_save">Salvați</string>
     <!-- Action text to retake current scan picture (Document scanner) -->
     <string name="scan_action_retake">Refă</string>
     <!-- Document scanner file name -->

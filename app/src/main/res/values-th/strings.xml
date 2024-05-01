@@ -47,7 +47,7 @@
     <!-- state while importing the file -->
     <string name="general_forwarding">กำลังส่งต่อ</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">เพิ่มไปยังคลาวด์ไดร์ฟ</string>
+    <string name="general_import">เพิ่มไปที่คลาวด์ไดร์ฟ</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">ผิดพลาด</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -135,7 +135,7 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">สร้างบัญชี</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">กรอกอีเมลของคุณ</string>
+    <string name="error_enter_email">กรอกที่อยู่อีเมลของคุณ</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">ที่อยู่อีเมลไม่ถูกต้อง</string>
     <!-- when the user tries to log in MEGA without typing the password -->
@@ -784,7 +784,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">ขยับขยายคลาวด์ของคุณ[A]รับพื้นที่เก็บข้อมูลที่เพิ่มขึ้นและโควต้าการถ่ายโอนด้วยบัญชี Pro</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">อีเมลนี้ถูกใช้งานแล้ว กรุณากรอกอีเมลอื่น</string>
+    <string name="mail_already_used">ที่อยู่อีเมลนี้ถูกใช้งานแล้ว กรอกอีเมลอื่น</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">คุณได้ส่งคำขอลิงก์ยืนยันสำหรับที่อยู่อีเมลนั้นแล้ว</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -1102,7 +1102,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">สถานะคงอยู่</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">รักษาลักษณะที่ปรากฏของฉันไว้แม้จะไม่มีอุปกรณ์เชื่อมต่อก็ตาม</string>
+    <string name="settings_persistence_subtitle">แสดงสถานะที่เลือกไว้เสมอ แม้ว่าฉันจะตัดการเชื่อมต่อแล้ว</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">ตั้งค่าขีดจำกัดเวลา</string>
     <!-- Button to set a value -->
@@ -1205,7 +1205,7 @@
     <!-- Menu option -->
     <string name="general_view">ดูไฟล์</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">เพิ่มไปยังคลาวด์ไดร์ฟ</string>
+    <string name="add_to_cloud">เพิ่มไปที่คลาวด์ไดร์ฟ</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">เพิ่มไปยังคลาวด์ไดร์ฟ</string>
     <!-- Menu option -->
@@ -2188,9 +2188,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">ชื่อไฟล์</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">แสดงดูครั้งล่าสุด&#8230;</string>
+    <string name="option_enable_last_green_chat">แสดงดูครั้งล่าสุด</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">อนุญาตให้ผู้ติดต่อของคุณเห็นว่า เป็นครั้งสุดท้ายที่คุณใช้งาน MEGA</string>
+    <string name="subtitle_option_enable_last_green_chat">อนุญาตให้ผู้ติดต่อของคุณเห็นเวลาใช้งาน MEGA ล่าสุดของคุณ</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">พื้นที่เก็บข้อมูลไม่เพียงพอ</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -3068,10 +3068,6 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
         <item quantity="other">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</item>
-    </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="other">รับลิงก์</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">ล้างไฟล์ออฟไลน์ทั้งหมดหรือไม่</string>
@@ -4878,11 +4874,11 @@
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
     <string name="dialog_onboarding_get_pro_description">อัปเกรดเป็นแผน Pro เพิ่มพื้นที่เก็บข้อมูลและเข้าถึงฟีเจอร์ Pro เริ่มต้นเพียง %1$s ต่อเดือน</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
+    <string name="dialog_onboarding_some_features_title">แผน MEGA&#160;Pro ประกอบไปด้วย:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">เก็บข้อมูลได้อย่างจุใจ</string>
+    <string name="dialog_onboarding_feature_title_storage">เก็บข้อมูลได้จุใจ</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
+    <string name="dialog_onboarding_feature_description_storage">เริ่มต้นที่ %1$s เลือกขนาดพื้นที่เก็บข้อมูลที่เหมาะกับคุณ</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">อัปเกรดเป็นแผน Pro วันนี้เลย</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
@@ -4955,10 +4951,6 @@
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
         <item quantity="other">แชร์โฟลเดอร์ %1$d รายการแล้ว</item>
     </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other">แชร์โฟลเดอร์ %1$d รายการแล้ว&#160;</item>
-    </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
         <item quantity="other">มี %1$d โฟลเดอร์ที่ไม่สามารถแชร์ได้</item>
@@ -4980,7 +4972,7 @@
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">เมื่อสมัครใช้งานแล้ว ระบบจะต่ออายุสมาชิกให้อัตโนมัติตามระยะเวลาและราคาเดิมที่เลือกไว้ คุณสามารถยกเลิกการต่ออายุสมาชิก MEGA&#160;Pro อัตโนมัติได้ไม่เกิน 24 ชั่วโมงก่อนวันครบกำหนดชำระค่าสมาชิกครั้งต่อไปผ่านระบบสมาชิกใน [A]Google Play[/A]</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
-    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your Gallery</string>
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">อนุญาตให้เข้าถึงแกลเลอรี่ของคุณ</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">อนุญาตให้เข้าถึง</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
@@ -4992,13 +4984,13 @@
     <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_cancel_button">ปิด</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">มอบหมายให้คนอื่นเป็นผู้จัดการประชุมก่อนที่จะวางสาย</string>
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">มอบหมายให้คนอื่นเป็นผู้จัดการประชุมก่อนที่จะออกจากการโทร</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">คุณเป็นผู้จัดการประชุมเพียงคนเดียวในสาย กรุณาเลือกผู้จัดการประชุมคนอื่นก่อนออกจากการโทร เพื่อให้มีผู้จัดการประชุมในสายต่อไป ส่วนคุณยังเป็นผู้จัดการประชุมในกลุ่มนี้เช่นเดิม</string>
     <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">มอบหมายและออกจากการเป็นผู้จัดการประชุม</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
-    <string name="meeting_call_screen_bottom_panel_leave_option">ยืนยันที่จะออก</string>
+    <string name="meeting_call_screen_bottom_panel_leave_option">ยืนยันที่จะออกจากการโทร</string>
     <!-- Camera uploads updated info in Photos screen. -->
     <string name="photos_camera_uploads_updated">การอัปโหลดจากกล้องได้อัปเดตล่าสุดแล้ว</string>
     <!-- Camera uploads no internet info in Photos screen. -->
@@ -5108,7 +5100,7 @@
         <item quantity="other">%1$d รายการถูกซ่อน</item>
     </plurals>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priority support</string>
+    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;การสนับสนุนแบบพิเศษ</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">อัปเกรดเป็นแผน Pro เพื่อโทรได้ไม่อั้น</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
@@ -5142,21 +5134,21 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">เก่ากว่า</string>
     <!-- String below login button next to button for reporting a login issue -->
-    <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
+    <string name="general_login_label_trouble_logging_in">พบปัญหาการเข้าสู่ระบบหรือไม่</string>
     <!-- Button text for reporting an issue on the login screen -->
-    <string name="general_login_button_report_your_issue">Report your issue</string>
+    <string name="general_login_button_report_your_issue">รายงานปัญหาของคุณ</string>
     <!-- Hidden nodes show items -->
     <string name="hidden_nodes_show_items">แสดงรายการที่ถูกซ่อนไว้</string>
     <!-- Hidden nodes show items description -->
-    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
+    <string name="hidden_nodes_show_items_description">รายการที่ซ่อนอยู่ทั้งหมดจะแสดงเป็นภาพเบลอเพื่อแสดงสถานะ “ซ่อนอยู่“</string>
     <!-- Button text for photo option in camera screen -->
-    <string name="camera_photo_button">Photo</string>
+    <string name="camera_photo_button">รูปภาพ</string>
     <!--  -->
-    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_on">เปิดโหมดแฟลช</string>
     <!--  -->
-    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_off">ปิดโหมดแฟลช</string>
     <!--  -->
-    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_flash_mode_auto">โหมดแฟลชอัตโนมัติ</string>
     <!--  -->
-    <string name="camera_send_to">Send to %1$s</string>
+    <string name="camera_send_to">ส่งไปที่ %1$s</string>
 </resources>

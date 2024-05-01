@@ -1102,7 +1102,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">ステータスの永続性</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">接続された端末がない場合でも、選択したステータスの状態を維持します</string>
+    <string name="settings_persistence_subtitle">接続していなくても、常に選択したステータスの状態を表示します</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">時間制限を設定</string>
     <!-- Button to set a value -->
@@ -2188,9 +2188,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">ファイル名</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">最終ログインを表示&#8230;</string>
+    <string name="option_enable_last_green_chat">最終ログインを表示</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">あなたの連絡先がMEGAであなたが最後に活動していた時間を見れるようにします。</string>
+    <string name="subtitle_option_enable_last_green_chat">あなたの連絡先が、MEGAであなたが最後に活動していた時間を見れるようにします</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">ストレージ容量が足りません</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -3068,10 +3068,6 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
         <item quantity="other">リンクをクリップボードにコピーしました</item>
-    </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="other">リンクを取得</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">オフラインファイルをすべて消去しますか？</string>
@@ -4954,10 +4950,6 @@
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
         <item quantity="other">%1$d個のフォルダが共有されました</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other">%1$d個のフォルダが共有されましたが、&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">

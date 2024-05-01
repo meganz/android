@@ -221,15 +221,67 @@
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">Ajouter un dossier synchronisé&#160;:</string>
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
-    <string name="general_size_giga_byte">%1$s&#160;GB</string>
+    <string name="general_size_giga_byte">%1$s&#160;Go</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">Free</string>
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
-    <string name="dialog_onboarding_transfer_quota_free_limited">Limité</string>
+    <string name="dialog_onboarding_transfer_quota_free_limited">limités</string>
     <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
     <string name="dialog_onboarding_free_account_price">Gratuit</string>
     <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
     <string name="dialog_onboarding_button_continue">Poursuivre</string>
     <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
+    <string name="dialog_onboarding_app_bar_title">Choisir votre abonnement MEGA</string>
+    <!-- Header of the Info view field for what is the content of a device/folder -->
+    <string name="info_content">Comprend</string>
+    <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
+    <string name="info_total_size">Taille totale</string>
+    <!-- Header of the Info view field for the date and time a folder was added -->
+    <string name="info_added">Ajouté</string>
+    <!-- String which indicates the number of files contained into a device/folder -->
+    <plurals name="info_num_files">
+        <item quantity="one">%1$d&#160;fichier</item>
+        <item quantity="many">%1$d de fichiers</item>
+        <item quantity="other">%1$d&#160;fichiers</item>
+    </plurals>
+    <!-- String which indicates the number of folders contained into a device/folder -->
+    <plurals name="info_num_folders">
+        <item quantity="one">%1$d&#160;dossier</item>
+        <item quantity="many">%1$d de dossiers</item>
+        <item quantity="other">%1$d&#160;dossiers</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="info_num_folders_and_files">
+        <item quantity="one">%1$d&#160;dossier&#160;·&#160;</item>
+        <item quantity="many">%1$d de dossiers&#160;·&#160;</item>
+        <item quantity="other">%1$d&#160;dossiers&#160;·&#160;</item>
+    </plurals>
+    <!-- Text of button label or title of the screen to share only one or several links -->
+    <plurals name="label_share_links">
+        <item quantity="one">Partager un lien</item>
+        <item quantity="many">Partagez des liens</item>
+        <item quantity="other">Partager des liens</item>
+    </plurals>
+    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
+    <string name="transfers_dialog_save_download_location_title">Télécharger vers cet emplacement \?</string>
+    <!-- Option to don't use the selected location as default location for next downloads-->
+    <string name="transfers_dialog_save_download_location_only_this_time_option">Cette fois seulement</string>
+    <!-- Option to use the selected location as default location for next downloads-->
+    <string name="transfers_dialog_save_download_location_always_here_option">Toujours enregistrer ici</string>
+    <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
+    <string name="transfers_dialog_save_download_location_always_ask_option">Toujours demander la destination</string>
+    <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
+    <string name="general_giga_byte_standalone">Go</string>
+    <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
+    <string name="general_tera_byte_standalone">To</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
+    <string name="dialog_onboarding_feature_storage_description">À partir de %1$s&#160;%2$s, trouvez la réponse idéale à vos besoins de stockage.</string>
+    <!-- Title of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_title">L’espace de stockage est insuffisant</string>
+    <!-- Body text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_body">La taille de ce dossier fera dépasser la limite d’espace de stockage de votre compte MEGA. Afin de synchroniser, vous devrez soit libérer de l’espace soit surclasser votre compte MEGA.</string>
+    <!-- Confirm button text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_confirm_button">Voir les abonnements</string>
+    <!-- Cancel button text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_cancel_button">Pas maintenant</string>
 </resources>

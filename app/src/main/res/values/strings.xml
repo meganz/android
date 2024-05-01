@@ -3160,11 +3160,6 @@
         <item quantity="one">Copied link to clipboard</item>
         <item quantity="other">Copied links to clipboard</item>
     </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="one">Get Link</item>
-        <item quantity="other">Get Links</item>
-    </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Clear all offline files?</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -5192,11 +5187,6 @@
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
         <item quantity="one">Folder shared</item>
         <item quantity="other">%1$d folders shared</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one">Folder shared,&#160;</item>
-        <item quantity="other">%1$d folders shared,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">

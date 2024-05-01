@@ -255,7 +255,7 @@
         <item quantity="other">Share links</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_title">Download to this location?</string>
+    <string name="transfers_dialog_save_download_location_title">Download to this location\?</string>
     <!-- Option to don't use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_only_this_time_option">Only this time</string>
     <!-- Option to use the selected location as default location for next downloads-->

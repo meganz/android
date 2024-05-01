@@ -125,7 +125,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Impossibile spostare o rinominare</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">L\’eliminazione o spostamento è in attesa della scansione</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Impossibile eliminare ora</string>
     <!-- Sync stalled issue reason is upload issue-->

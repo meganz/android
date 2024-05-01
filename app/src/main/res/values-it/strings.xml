@@ -1142,7 +1142,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">Persistenza dello stato</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">Mantieni il mio stato scelto anche se non ho dispositivi connessi</string>
+    <string name="settings_persistence_subtitle">Mostra sempre lo stato selezionato, anche se mi disconnetto</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">Imposta limite di tempo</string>
     <!-- Button to set a value -->
@@ -2282,9 +2282,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">nome file</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">Mostra Ultima visita&#8230;</string>
+    <string name="option_enable_last_green_chat">Mostra l’ultima visita</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">Permetti ai tuoi contatti di vedere l’ultima volta in cui sei stato attivo su MEGA.</string>
+    <string name="subtitle_option_enable_last_green_chat">Permetti ai tuoi contatti di vedere l\’ultima volta in cui sei stato attivo su MEGA</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">Non abbastanza spazio di archiviazione</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -3250,12 +3250,6 @@
         <item quantity="one">Link copiato negli appunti</item>
         <item quantity="many">Link copiati negli appunti</item>
         <item quantity="other">Link copiati negli appunti</item>
-    </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="one">Ottieni link</item>
-        <item quantity="many">Ottieni link</item>
-        <item quantity="other">Ottieni link</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Eliminare tutti i file salvati offline?</string>
@@ -5418,12 +5412,6 @@
         <item quantity="one">Cartella condivisa</item>
         <item quantity="many">%1$d di cartelle condivise</item>
         <item quantity="other">%1$d cartelle condivise</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one">Cartella condivisa,&#160;</item>
-        <item quantity="many">%1$d di cartelle condivise,&#160;</item>
-        <item quantity="other">%1$d cartelle condivise,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">

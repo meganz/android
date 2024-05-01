@@ -1,5 +1,5 @@
-import mega.privacy.android.build.shouldUsePrebuiltSdk
 import mega.privacy.android.build.isServerBuild
+import mega.privacy.android.build.shouldUsePrebuiltSdk
 
 plugins {
     alias(plugin.plugins.ksp) apply false
@@ -74,7 +74,7 @@ tasks.register("clean", Delete::class) {
 
 // Define versions in a single place
 // App
-extra["appVersion"] = "13.0"
+extra["appVersion"] = "13.1"
 
 // Sdk and tools
 extra["compileSdkVersion"] = 34
@@ -83,7 +83,7 @@ extra["targetSdkVersion"] = 34
 extra["buildTools"] = "34.0.0"
 
 // Prebuilt MEGA SDK version
-extra["megaSdkVersion"] = "20240428.221613-dev"
+extra["megaSdkVersion"] = "20240501.070524-rel"
 
 //JDK and Java Version
 extra["jdk"] = "17"

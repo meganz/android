@@ -1102,7 +1102,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">保持状态</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">即使我没有连接设备仍保持我已选择的状态</string>
+    <string name="settings_persistence_subtitle">即使我断开连接，也始终显示选定的状态</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">设置时间限制</string>
     <!-- Button to set a value -->
@@ -2188,9 +2188,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">文件名</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">显示上次登录时间&#8230;</string>
+    <string name="option_enable_last_green_chat">显示上次登录时间</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">允许您的联系人查看您在MEGA的上次登录时间。</string>
+    <string name="subtitle_option_enable_last_green_chat">允许您的联系人查看您上次在MEGA的活跃时间</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">存储空间不足</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -3068,10 +3068,6 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
         <item quantity="other">已复制链接到剪贴板</item>
-    </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="other">获取链接</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">清除所有离线文件？</string>
@@ -4954,10 +4950,6 @@
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
         <item quantity="other">已共享%1$d个文件夹</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other">已共享%1$d个文件夹，&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">

@@ -1122,7 +1122,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">Status aanhouden</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">Mijn status weergave aanhouden zelfs als ik geen verbonden apparaten heb</string>
+    <string name="settings_persistence_subtitle">De geselecteerde status wordt altijd weergegeven, zelfs als ik de verbinding verbreek</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">Tijd limiet invoeren</string>
     <!-- Button to set a value -->
@@ -2235,9 +2235,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">bestandsnaam</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">Laatst Gezien weergeven&#8230;</string>
+    <string name="option_enable_last_green_chat">Laatst gezien weergeven</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">Contacten toestaan om te zien wanneer u de laatste keer actief was op MEGA.</string>
+    <string name="subtitle_option_enable_last_green_chat">Laat uw contacten zien wanneer u voor het laatst actief was op MEGA</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">Niet genoeg opslagruimte</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -3159,11 +3159,6 @@
     <plurals name="links_copied_clipboard">
         <item quantity="one">Link gekopieerd naar klembord</item>
         <item quantity="other">Links gekopieerd naar klembord</item>
-    </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="one">Link Ophalen</item>
-        <item quantity="other">Links Ophalen</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Alle Offline bestanden wissen?</string>
@@ -5186,11 +5181,6 @@
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
         <item quantity="one">Map gedeeld</item>
         <item quantity="other">%1$dmappen gedeeld</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one">Map gedeeld, &#160;</item>
-        <item quantity="other">%1$dmappen gedeeld,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">

@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Synchronizacja [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">MEGA needs to access your device storage in order to sync your local folder. Tap here to allow access.</string>
+    <string name="sync_storage_permission_banner">MEGA musi uzyskać dostęp do pamięci urządzenia, aby zsynchronizować katalog lokalny. Kliknij tutaj, aby zezwolić na dostęp.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Aby stale synchronizować pliki i katalogi, pozwól MEGA działać w tle</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -129,7 +129,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Nie można przenieść ani zmienić nazwy</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Akcja usuwania lub przeniesienia czeka na skanowanie</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Nie można jeszcze usunąć</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -169,7 +169,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Wybierz</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">An item has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">Element ma problem, który wymaga podjęcia decyzji, aby go rozwiązać</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Oczekiwanie na zakończenie innych procesów</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -193,7 +193,7 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">Akcja przeniesienia lub zmiany nazwy została wykryta w MEGA, ale nie można jej powielić lokalnie.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename action was detected locally, but couldn’t be replicated in MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">Akcja przeniesienia lub zmiany nazwy została wykryta lokalnie, ale nie można jej powtórzyć w MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Oczekiwanie na zakończenie skanowania w celu ustalenia, czy plik został przeniesiony lub usunięty.</string>
     <!-- Sync subtitle for sync screen to choose folders-->

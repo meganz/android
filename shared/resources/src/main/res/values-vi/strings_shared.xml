@@ -3,7 +3,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="general_sync_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported</string>
+    <string name="general_sync_unsupported_file_system">MEGA không thể đồng&#160;bộ hoặc sao lưu thư&#160;mục này bởi vì hệ&#160;thống tệp trên thiết&#160;bị của bạn không được hỗ&#160;trợ</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="general_sync_invalid_remote_type">Thư&#160;mục bạn đã chọn không thể đồng&#160;bộ được</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -23,7 +23,7 @@
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">Thư&#160;mục không thể đồng&#160;bộ được vì thư&#160;mục này đã chia&#160;sẻ mà không có cấp quyền truy&#160;cập toàn quyền cho bạn</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="general_sync_put_nodes_error">Files in this folder can’t be synced or backed up. You’ll need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_put_nodes_error">Các tệp&#160;tin trong thư&#160;mục này không thể đồng&#160;bộ hóa hoặc sao lưu được. Bạn sẽ cần phải kích&#160;hoạt lại đồng&#160;bộ hoặc sao lưu từ app cho máy&#160;tính.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="general_sync_active_sync_below_path">Thư&#160;mục không thể đồng&#160;bộ được bởi vì nó đang nằm ở trong một thư&#160;mục được đồng&#160;bộ</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
@@ -35,7 +35,7 @@
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="general_sync_too_many_action_packets">Đã tải lại tài&#160;khoản. Mọi cập&#160;nhật bị bỏ lỡ đối với các bản sao&#160;lưu hoặc đồng&#160;bộ hóa của bạn chưa có được áp&#160;dụng.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="general_sync_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
+    <string name="general_sync_logged_out">Đồng&#160;bộ hóa hoặc sao&#160;lưu đã bị dừng do có vẻ như bạn đã đăng&#160;xuất khỏi app cho máy&#160;tính. Đăng&#160;nhập vào lại app cho máy&#160;tính để tiếp&#160;tục đồng&#160;bộ hóa hoặc sao&#160;lưu.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
@@ -43,13 +43,13 @@
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
     <string name="general_sync_active_sync_same_path">Đã có một thư&#160;mục được đồng&#160;bộ hóa với cùng vị&#160;trí</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="general_sync_could_not_move_cloud_nodes">Renaming failed</string>
+    <string name="general_sync_could_not_move_cloud_nodes">Đổi tên không thành&#160;công</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="general_sync_could_not_create_ignore_file">Không thể tạo tệp .megaignore cho việc đồng bộ này</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="general_sync_config_read_failure">Không thể đọc cấu hình đồng bộ hóa. Thử lại sau hoặc kiểm tra quyền hạn của thư mục.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="general_sync_unknown_drive_path">Sync location is unknown</string>
+    <string name="general_sync_unknown_drive_path">Không xác&#160;định được vị&#160;trí của đồng&#160;bộ</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="general_sync_invalid_scan_interval">Khoảng thời&#160;gian quét khởi&#160;đầu không hợp&#160;lệ. Kiểm&#160;tra thiết&#160;lập khoảng thời&#160;gian quét và thử lại.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -69,7 +69,7 @@
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
+    <string name="general_sync_message_node_in_rubbish_bin">Thư&#160;mục không thể đồng&#160;bộ hoặc sao&#160;lưu được bởi vì thư&#160;mục tương&#160;ứng trên MEGA đang nằm trong Thùng&#160;Rác</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="general_sync_message_cannot_locate_local_drive_now">Hiện không thể xác&#160;định vị&#160;trí thư&#160;mục trong thiết&#160;bị của bạn. Hãy thử lại sau.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
@@ -79,11 +79,11 @@
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue">Có sự&#160;cố khi đồng&#160;bộ hóa hoặc sao&#160;lưu thư&#160;mục này. Hãy thử dừng đồng&#160;bộ hóa hoặc sao&#160;lưu và thử thiết&#160;lập lại trong Ứng&#160;dụng cho máy&#160;tính hoặc liên&#160;hệ với bộ&#160;phận Hỗ&#160;Trợ.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Thư&#160;mục không thể đồng&#160;bộ được bởi vì nó đang nằm ở trong một thư&#160;mục được đồng&#160;bộ</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="general_sync_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_local_filesystem_mismatch">Các tệp&#160;tin trong thư&#160;mục này không thể đồng&#160;bộ hóa hoặc sao lưu được. Bạn sẽ cần phải kích&#160;hoạt lại đồng&#160;bộ hoặc sao lưu từ ứng&#160;dụng cho máy&#160;tính.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
-    <string name="general_message_sync_paused_low_battery_level">Syncing paused, battery level too low. Charge battery to resume syncing.</string>
+    <string name="general_message_sync_paused_low_battery_level">Đồng&#160;bộ hóa tạm dừng, mức pin quá thấp. Sạc pin để tiếp&#160;tục đồng&#160;bộ.</string>
     <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_file_sharing">Chia&#160;sẻ tệp&#160;tin dễ&#160;dàng và an&#160;toàn</string>
     <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -153,50 +153,48 @@
     <!-- Duration filter title of the video section  -->
     <string name="video_section_videos_duration_filter_title">Thời&#160;lượng</string>
     <!-- All Duration option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_all_duration">All durations</string>
+    <string name="video_section_videos_duration_option_all_duration">Tất cả thời&#160;lượng</string>
     <!-- Less than 10 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_less_than_10_seconds">Less than 10 seconds</string>
+    <string name="video_section_videos_duration_option_less_than_10_seconds">Ít hơn 10 giây</string>
     <!-- Between 10 and 60 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Between 10 and 60 seconds</string>
+    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Từ 10 đến 60 giây</string>
     <!-- Between 1 and 4 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Between 1 and 4 minutes</string>
+    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Từ 1 đến 4 phút</string>
     <!-- Between 4 and 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Between 4 and 20 minutes</string>
+    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Từ 4 đến 20 phút</string>
     <!-- More than 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_more_than_20_minutes">More than 20 minutes</string>
+    <string name="video_section_videos_duration_option_more_than_20_minutes">Hơn 20 phút</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_create_playlist_dialog_title">Đặt tên danh&#160;sách phát</string>
     <!-- Rename playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_rename_playlist_dialog_title">Đổi tên</string>
     <!-- Error message when the playlist name already exists -->
-    <string name="video_section_playlists_error_message_playlist_name_exists">A playlist with this name already exists. Enter a different name.</string>
+    <string name="video_section_playlists_error_message_playlist_name_exists">Đã có một danh&#160;sách phát với tên này rồi. Nhập một tên khác.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_delete_playlist_dialog_title">Delete playlist\?</string>
+    <string name="video_section_playlists_delete_playlist_dialog_title">Xóa danh&#160;sách phát\?</string>
     <!-- Delete button title of the video section playlists tab delete playlist dialog -->
     <string name="video_section_playlists_delete_playlist_dialog_delete_button">Xóa</string>
     <!-- Text that indicates that there’s no playlist to show. -->
-    <string name="video_section_playlists_empty_hint_playlist">No playlists found</string>
+    <string name="video_section_playlists_empty_hint_playlist">Không tìm thấy danh&#160;sách phát nào</string>
     <!-- Delete option title of the video section playlist bottom sheet -->
-    <string name="video_section_playlist_bottom_sheet_option_title_delete">Delete playlist</string>
+    <string name="video_section_playlist_bottom_sheet_option_title_delete">Xóa danh&#160;sách phát</string>
     <!-- Remove videos dialog title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_title">Remove from playlist\?</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">Loại khỏi danh&#160;sách phát\?</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
     <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Loại bỏ</string>
     <!-- Play all button title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_play_all_button">Play all</string>
+    <string name="video_section_playlist_detail_play_all_button">Phát tất cả</string>
     <!-- Text that indicates that there’s no videos in the video playlist detail to show. -->
     <string name="video_section_playlist_detail_empty_hint_videos">Không có video</string>
     <!-- Top bar title of the video section video selected page -->
     <string name="video_section_video_selected_top_bar_title">Chọn tệp tin</string>
     <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
     <plurals name="video_section_playlists_delete_playlists_message">
-        <item quantity="one">Deleted %1$d playlist</item>
-        <item quantity="other">Deleted %1$d playlists</item>
+        <item quantity="other">Đã xóa %1$d danh&#160;sách phát</item>
     </plurals>
     <!-- Message when adding the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_add_videos_message">
-        <item quantity="one">Added %1$d item to “%2$s”</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
+        <item quantity="other">Đã thêm %1$d mục vào “%2$s”</item>
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_remove_videos_message">
@@ -204,15 +202,14 @@
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
-        <item quantity="one">%1$d video</item>
         <item quantity="other">%1$d videos</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
-    <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
+    <string name="chat_click_link_in_message_intent_not_available">Bạn có thể không có ứng&#160;dụng nào đã được cài để mở trang web này</string>
     <!-- Message when deleting a singular playlist of the video section playlists tab. %1$s will be replaced the name of deleted playlist -->
-    <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” deleted</string>
+    <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” đã bị xóa</string>
     <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_name">Chỉ tải lên trong khi sạc</string>
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">Thêm thư&#160;mục đồng&#160;bộ hóa:</string>
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
@@ -226,5 +223,49 @@
     <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
     <string name="dialog_onboarding_button_continue">Tiếp tục</string>
     <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
+    <string name="dialog_onboarding_app_bar_title">Chọn gói MEGA bạn muốn</string>
+    <!-- Header of the Info view field for what is the content of a device/folder -->
+    <string name="info_content">Chứa đựng</string>
+    <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
+    <string name="info_total_size">Tổng kích thước</string>
+    <!-- Header of the Info view field for the date and time a folder was added -->
+    <string name="info_added">Đã thêm</string>
+    <!-- String which indicates the number of files contained into a device/folder -->
+    <plurals name="info_num_files">
+        <item quantity="other">%1$d tệp tin</item>
+    </plurals>
+    <!-- String which indicates the number of folders contained into a device/folder -->
+    <plurals name="info_num_folders">
+        <item quantity="other">%1$d thư&#160;mục</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="info_num_folders_and_files">
+        <item quantity="other">%1$d thư&#160;mục&#160;·&#160;</item>
+    </plurals>
+    <!-- Text of button label or title of the screen to share only one or several links -->
+    <plurals name="label_share_links">
+        <item quantity="other">Chia&#160;sẻ đường liên&#160;kết</item>
+    </plurals>
+    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
+    <string name="transfers_dialog_save_download_location_title">Tải xuống vào vị&#160;trí này\?</string>
+    <!-- Option to don't use the selected location as default location for next downloads-->
+    <string name="transfers_dialog_save_download_location_only_this_time_option">Chỉ lần này</string>
+    <!-- Option to use the selected location as default location for next downloads-->
+    <string name="transfers_dialog_save_download_location_always_here_option">Luôn lưu vào đây</string>
+    <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
+    <string name="transfers_dialog_save_download_location_always_ask_option">Luôn hỏi vị&#160;trí lưu</string>
+    <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
+    <string name="general_giga_byte_standalone">GB</string>
+    <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
+    <string name="general_tera_byte_standalone">TB</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
+    <string name="dialog_onboarding_feature_storage_description">Bắt đầu từ %1$s %2$s, tìm gói phù&#160;hợp hoàn&#160;hảo cho nhu&#160;cầu lưu&#160;trữ của bạn.</string>
+    <!-- Title of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_title">Không&#160;gian lưu&#160;trữ không đủ</string>
+    <!-- Body text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_body">Kích&#160;thước của thư&#160;mục này sẽ khiến tài&#160;khoản MEGA của bạn vượt quá giới&#160;hạn lưu&#160;trữ. Để có thể đồng&#160;bộ hóa thư&#160;mục này, bạn sẽ cần giải&#160;phóng một khoảng dung&#160;lượng hoặc nâng&#160;cấp tài&#160;khoản MEGA của mình.</string>
+    <!-- Confirm button text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_confirm_button">Xem các gói thuê bao</string>
+    <!-- Cancel button text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_cancel_button">Không phải lúc này</string>
 </resources>

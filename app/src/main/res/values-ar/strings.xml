@@ -1202,7 +1202,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">استمرار الحالة</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">الحفاظ على حالتي المختارة حتى عندما لا يكون لدي أية أجهزة متصلة بالانترنت</string>
+    <string name="settings_persistence_subtitle">عرض مظهر الحالة المحدد دائما، حتى عند إلغاء الاتصال</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">ضع المهلة الزمنية</string>
     <!-- Button to set a value -->
@@ -2423,9 +2423,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">اسم الملف</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">إظهار آخر ظهور&#8230;</string>
+    <string name="option_enable_last_green_chat">إظهار تاريخ اخر ظهور</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">السماح لجهات الاتصال خاصتك بمعرفة آخر وقت ظهور كنت فيه متصلاً مع MEGA.</string>
+    <string name="subtitle_option_enable_last_green_chat">السماح لجهات الاتصال خاصتك بمعرفة آخر وقت ظهور كنت فيه متصلاً مع MEGA</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">لا يوجد مساحة تخزين كافية</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -3523,15 +3523,6 @@
         <item quantity="few">تم نسخ الروابط الى الحافظة</item>
         <item quantity="many">تم نسخ الروابط الى الحافظة</item>
         <item quantity="other">تم نسخ الروابط الى الحافظة</item>
-    </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="zero">احصل على رابط</item>
-        <item quantity="one">احصل على رابط</item>
-        <item quantity="two">احصل على رابطين</item>
-        <item quantity="few">احصل على روابط</item>
-        <item quantity="many">احصل على رابطاً</item>
-        <item quantity="other">احصل على رابط</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">مسح كافة الملفات في دون اتصال؟</string>
@@ -6114,15 +6105,6 @@
         <item quantity="few">%1$d مجلدات مشاركة</item>
         <item quantity="many">%1$d مجلداً مشاركاً</item>
         <item quantity="other">%1$d مجلد مشارك</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="zero">%1$dمجلد مشارك،&#160;</item>
-        <item quantity="one">مجلد مشارك،&#160;</item>
-        <item quantity="two">%1$d مجلدان مشاركان،&#160;</item>
-        <item quantity="few">%1$d مجلدات مشاركة،&#160;</item>
-        <item quantity="many">%1$d مجلداً مشاركاً،&#160;</item>
-        <item quantity="other">%1$d مجلد مشارك،&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">

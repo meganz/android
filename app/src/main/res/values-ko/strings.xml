@@ -1102,7 +1102,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">상태 지속</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">연결된 장치가 없을 때 내 상태를 선택한 상태로 유지</string>
+    <string name="settings_persistence_subtitle">접속을 종료해도 선택된 상태로 항상 보이게 함</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">시간 제한 설정</string>
     <!-- Button to set a value -->
@@ -2188,9 +2188,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">파일명</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">최근 접속 시간 보기&#8230;</string>
+    <string name="option_enable_last_green_chat">최근 연락 시간 보기</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">당신의 연락처가 당신이 최근에 MEGA에서 활동한 시간을 볼 수 있도록 합니다.</string>
+    <string name="subtitle_option_enable_last_green_chat">당신의 연락처가 당신이 최근에 MEGA에서 활동한 시간을 볼 수 있도록 합니다</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">저장 공간 부족</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -3068,10 +3068,6 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
         <item quantity="other">클립보드에 링크를 복사함</item>
-    </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="other">링크 가져오기</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">모든 오프라인 파일을 삭제할까요?</string>
@@ -4954,10 +4950,6 @@
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
         <item quantity="other">%1$d개의 폴더를 공유하였습니다</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other">%1$d개의 폴더를 공유하였습니다.&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">

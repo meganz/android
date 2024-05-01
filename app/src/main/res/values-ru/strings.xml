@@ -1162,7 +1162,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">Сохранение статуса</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">Поддерживать выбранный статус даже при отсутствии интернет-соединения</string>
+    <string name="settings_persistence_subtitle">Всегда показывать выбранный статус, даже когда я отключаюсь</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">Установить длительность</string>
     <!-- Button to set a value -->
@@ -2329,9 +2329,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">Название файла</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">Показать участников не в сети&#8230;</string>
+    <string name="option_enable_last_green_chat">Показывать «был в сети»</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">Разрешать контактам видеть, когда я был активен в MEGA последний раз.</string>
+    <string name="subtitle_option_enable_last_green_chat">Разрешать контактам видеть, когда вы были активны в MEGA последний раз</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">Недостаточно места</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -3341,13 +3341,6 @@
         <item quantity="few">Ссылки скопированы в буфер обмена</item>
         <item quantity="many">Ссылки скопированы в буфер обмена</item>
         <item quantity="other">Ссылки скопированы в буфер обмена</item>
-    </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="one">Получить ссылку</item>
-        <item quantity="few">Получить ссылки</item>
-        <item quantity="many">Получить ссылки</item>
-        <item quantity="other">Получить ссылки</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Очистить все локальные файлы?</string>
@@ -5650,13 +5643,6 @@
         <item quantity="few">Открыт доступ к %1$d папкам</item>
         <item quantity="many">Открыт доступ к %1$d папкам</item>
         <item quantity="other">Открыт доступ к %1$d папки</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one">Открыт доступ к папке,&#160;</item>
-        <item quantity="few">Открыт доступ к %1$d папкам,&#160;</item>
-        <item quantity="many">Открыт доступ к %1$d папкам,&#160;</item>
-        <item quantity="other">Открыт доступ к %1$d папки,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">

@@ -259,15 +259,15 @@
     <!-- shows the owner of an incoming shared folder -->
     <string name="file_properties_owner">Proprietar</string>
     <!-- positive button on dialog to invite a contact -->
-    <string name="contact_invite">Invită</string>
+    <string name="contact_invite">Invitați</string>
     <!-- option to reinvite a contact -->
-    <string name="contact_reinvite">Reinvită</string>
+    <string name="contact_reinvite">Reinvitați</string>
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
-    <string name="contact_ignore">Ignoră</string>
+    <string name="contact_ignore">Ignorați</string>
     <!-- option to decline a contact invitation -->
-    <string name="contact_decline">Respinge</string>
+    <string name="contact_decline">Respingeți</string>
     <!-- option to accept a contact invitation -->
-    <string name="contact_accept">Acceptă</string>
+    <string name="contact_accept">Acceptați</string>
     <!-- Label for the option of the sliding panel to show the contact info -->
     <string name="contact_properties_activity">Informații de contact</string>
     <!-- Adding new relationships (contacts) using the actions. -->
@@ -742,9 +742,9 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Un atacator extern nu poate obține acces la contul dvs. doar cu cheia dvs. O resetare a parolei necesită atât cheia, cât și accesul la adresa dvs. de e-mail.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Copiază cheia de recuperare în clipboard sau salveaz-o ca fișier text.</string>
+    <string name="backup_action">Copiați cheia de recuperare în clipboard sau salvați-o ca fișier text.</string>
     <!-- Action of a button to save something -->
-    <string name="save_action">Salvează</string>
+    <string name="save_action">Salvați</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
     <string name="copy_MK_confirmation">Cheie de recuperare copiată în clipboard. Salveaz-o într-un loc sigur unde o poți accesa cu ușurință mai târziu.</string>
     <!-- Button to change the password -->
@@ -1142,7 +1142,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">Persistența statusului</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">Menține înfățișarea statusului meu ales chiar dacă nu am dispozitive conectate</string>
+    <string name="settings_persistence_subtitle">Afișează mereu înfățișarea selectată de stare, chiar și când mă deconectez</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">Setează o limită de timp</string>
     <!-- Button to set a value -->
@@ -2282,9 +2282,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">numele fișierului</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">Afișează văzut(ă) ultima dată&#8230;</string>
+    <string name="option_enable_last_green_chat">Afișează văzut(ă) ultima dată</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">Permite contactelor tale să vadă ultima dată când ai fost activ(ă) pe MEGA.</string>
+    <string name="subtitle_option_enable_last_green_chat">Permiteți contactelor dvs. să vadă data și ora ultimei dvs. activități pe MEGA</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">Spațiu de stocare insuficient</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -3074,7 +3074,7 @@
     <!-- Option of color theme, follow the system setting. -->
     <string name="theme_system_default">Implicită a sistemului</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
-    <string name="theme_battery_saver">Setează în funcție de economisirea bateriei</string>
+    <string name="theme_battery_saver">Setat în funcție de economisirea bateriei</string>
     <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
     <string name="cloud_drive_select_destination">Selectează destinația</string>
     <!-- Warning which alerts the user before discard changes -->
@@ -3250,12 +3250,6 @@
         <item quantity="one">Link copiat în clipboard</item>
         <item quantity="few">Link-uri copiate în clipboard</item>
         <item quantity="other">Link-uri copiate în clipboard</item>
-    </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="one">Obține linkul</item>
-        <item quantity="few">Obține linkurile</item>
-        <item quantity="other">Obține linkurile</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Ștergi toate fișierele offline?</string>
@@ -4811,9 +4805,9 @@
     <string name="album_share_share_link_dialog_button_link_and_key">Partajează linkul și cheia</string>
     <!-- Title for the Album Get Link(s) Page -->
     <plurals name="album_share_get_links">
-        <item quantity="one">Partajează linkul</item>
-        <item quantity="few">Partajează linkurile</item>
-        <item quantity="other">Partajează linkurile</item>
+        <item quantity="one">Partajați linkul</item>
+        <item quantity="few">Partajați linkurile</item>
+        <item quantity="other">Partajați linkurile</item>
     </plurals>
     <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
     <plurals name="album_share_links_copied">
@@ -5418,12 +5412,6 @@
         <item quantity="one">Folderul a fost partajat</item>
         <item quantity="few">%1$d&#160;foldere au fost partajate</item>
         <item quantity="other">%1$d de foldere au fost partajate</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one">Folderul a fost partajat&#160;</item>
-        <item quantity="few">%1$d&#160;foldere partajate,&#160;</item>
-        <item quantity="other">%1$d de foldere partajate,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">

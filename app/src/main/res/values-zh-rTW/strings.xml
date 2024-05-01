@@ -179,7 +179,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">密碼不相符</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">此電子郵件已在MEGA註冊過</string>
+    <string name="error_email_registered">此電子郵件地址已在MEGA註冊過帳戶</string>
     <!--  -->
     <string name="create_account_creating_account">正在連接到伺服器：正在建立帳戶</string>
     <!--  -->
@@ -1102,7 +1102,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">狀態持續</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">即使在沒有連線至裝置的情況下，也維持我所選擇的狀態</string>
+    <string name="settings_persistence_subtitle">即使斷開連線，也始終顯示選定的狀態外觀</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">設定時間限制</string>
     <!-- Button to set a value -->
@@ -2188,9 +2188,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">檔案名稱</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">顯示上次上線時間⋯</string>
+    <string name="option_enable_last_green_chat">顯示最後上線</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">允許您的聯絡人查看您上次在MEGA上線是什麼時候。</string>
+    <string name="subtitle_option_enable_last_green_chat">允許您的聯絡人檢視您上次在MEGA上活動的時間</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">沒有足夠的儲存空間</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -3069,10 +3069,6 @@
     <plurals name="links_copied_clipboard">
         <item quantity="other">已複製連結到剪貼簿</item>
     </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="other">取得連結</item>
-    </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">清除所有離線存取檔案？</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -3774,7 +3770,7 @@
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">說明</string>
     <!-- Dialog confirmation text for removing photos in an album -->
-    <string name="photos_album_remove_from_album_confirmation_text">要從相簿中移除嗎？</string>
+    <string name="photos_album_remove_from_album_confirmation_text">要從相簿中移除？</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
     <string name="settings_camera_uploads_grant_media_permissions_body">若要啟用相機上傳，請允許予MEGA存取您裝置上的相片和其它媒體。</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
@@ -4882,7 +4878,7 @@
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_storage">終極的儲存彈性</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">從%1$s起，找到最適合您儲存需求的方案。</string>
+    <string name="dialog_onboarding_feature_description_storage">從%1$s起，找到最適合您的儲存需求方案。</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">立即升級到Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
@@ -4954,10 +4950,6 @@
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
         <item quantity="other">已共享%1$d個資料夾</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other">已共享%1$d個資料夾，&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">

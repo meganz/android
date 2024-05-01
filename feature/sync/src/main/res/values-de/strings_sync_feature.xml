@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Synchronisierungen [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">MEGA needs to access your device storage in order to sync your local folder. Tap here to allow access.</string>
+    <string name="sync_storage_permission_banner">Um Ihren lokalen Ordner zu synchronisieren, muss MEGA auf Ihren Gerätespeicher zugreifen. Tippen Sie hier, um Zugriff zu gewähren.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
+    <string name="sync_battery_optimisation_banner">Um Ihre Dateien und Ordner fortlaufend zu synchronisieren, erlauben Sie das Ausführen von MEGA im Hintergrund</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d Datei</item>
@@ -107,7 +107,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Nur via WLAN</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
+    <string name="sync_empty_state_message">Sie müssen einen lokalen Ordner auf Ihrem Gerät einrichten, der mit einem ausgewählten Ordner in Ihrem Cloud Drive synchronisiert wird</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">Synchronisierungsüberwachung</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
@@ -121,7 +121,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Verschieben oder Umbenennen nicht möglich</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Lösch- oder Verschiebeaktion wartet auf Scan</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Löschen noch nicht möglich</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -161,7 +161,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Auswählen</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">An item has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">Ein Problem mit einem Objekt erfordert Ihren Eingriff</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Es wird auf den Abschluss anderer Prozesse gewartet</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -183,9 +183,9 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">Mehrere Elemente mit demselben Namen auf der einen Seite Ihrer Synchronisierung würden einem einzigen Element auf der anderen Seite der Synchronisierung entsprechen</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">Ein Verschiebe- oder Umbenennungsvorgang wurde auf MEGA erkannt, konnte jedoch lokal nicht repliziert werden.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename action was detected locally, but couldn’t be replicated in MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">Ein Verschiebe- oder Umbenennungsvorgang wurde lokal erkannt, konnte jedoch auf MEGA nicht repliziert werden.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Abschluss des Scanvorgangs wird abgewartet, um zu bestimmen, ob die Datei verschoben oder gelöscht wurde.</string>
     <!-- Sync subtitle for sync screen to choose folders-->

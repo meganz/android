@@ -77,7 +77,7 @@
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
     <string name="device_center_list_view_item_sub_state_remote_path_has_changed">無法找到MEGA中的資料夾，因為它已被移動或刪除，或者您可能無權權存取。</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="device_center_list_view_item_sub_state_share_non_full_access">資料夾無法同步，因為它是沒有完全存取權限的共享資料夾</string>
+    <string name="device_center_list_view_item_sub_state_share_non_full_access">資料夾無法同步，因為它是沒有完全存取權限的共享資料夾。</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
     <string name="device_center_list_view_item_sub_state_put_nodes_error">此資料夾中的檔案無法同步或備份。您需要從桌面應用程式重新啟用同步或備份。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->

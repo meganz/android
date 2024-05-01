@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Синхронизации [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">MEGA needs to access your device storage in order to sync your local folder. Tap here to allow access.</string>
+    <string name="sync_storage_permission_banner">MEGA нужен доступ к памяти устройства, чтобы синхронизировать локальную папку. Нажмите здесь, чтобы предоставить доступ.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
+    <string name="sync_battery_optimisation_banner">Чтобы непрерывно синхронизировать файлы и папки, разрешите MEGA работать в фоновом режиме</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d файл</item>
@@ -115,7 +115,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Только Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
+    <string name="sync_empty_state_message">Вам нужно будет настроить локальную папку на устройстве, которая будет синхронизироваться с выбранной папкой на Облачном диске</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">Отслеживание синхронизаций</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
@@ -129,7 +129,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Невозможно переместить или переименовать</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Поиск ожидающих операций удаления или перемещения</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Пока нельзя удалить</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -169,7 +169,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Выбрать</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">An item has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">С элементом связана ошибка, для исправления которой требуется ваше решение</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Ожидание завершения других процессов</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->

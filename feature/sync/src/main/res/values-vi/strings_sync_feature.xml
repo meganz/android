@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Đồng bộ [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">MEGA needs to access your device storage in order to sync your local folder. Tap here to allow access.</string>
+    <string name="sync_storage_permission_banner">MEGA cần truy&#160;cập bộ nhớ thiết&#160;bị để đồng&#160;bộ hóa thư&#160;mục cục&#160;bộ của bạn. Chạm vào đây để cho phép quyền truy&#160;cập.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Để liên&#160;tục đồng&#160;bộ hóa các tệp&#160;tin và thư&#160;mục của bạn, cho phép MEGA chạy trong nền</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -117,7 +117,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Không thể di&#160;chuyển hoặc đổi tên</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Việc xóa hoặc di&#160;chuyển đang chờ quét</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Chưa thể xóa</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -157,7 +157,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Chọn</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">An item has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">Một mục gặp phải vấn&#160;đề và cần quyết&#160;định giải&#160;quyết của bạn</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Đang chờ các quy trình khác được hoàn&#160;thành</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -181,7 +181,7 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">Một việc di chuyển hoặc đổi tên đã được phát&#160;hiện trên MEGA, nhưng không thể phỏng&#160;y&#160;theo trong cục&#160;bộ.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename action was detected locally, but couldn’t be replicated in MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">Một việc di&#160;chuyển hoặc đổi tên đã được phát hiện tại cục&#160;bộ, nhưng không thể phỏng&#160;y&#160;theo trên MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Đang chờ cho quá&#160;trình quét kết&#160;thúc để xác&#160;định xem có tệp&#160;tin nào đã di chuyển hay bị xóa.</string>
     <!-- Sync subtitle for sync screen to choose folders-->

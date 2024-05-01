@@ -193,7 +193,7 @@
     <!-- The name of every users root drive in the cloud of MEGA. -->
     <string name="section_cloud_drive">Ổ&#160;Mây</string>
     <!-- Label to reference a recents section -->
-    <string name="section_recents">Sử Dụng Gần Đây</string>
+    <string name="section_recents">Gần Đây</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Đăng tải phương&#160;tiện&#160;số</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
@@ -511,11 +511,11 @@
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">Nếu được bật. thông tin vị trí đã chụp sẽ được đính kèm với hình ảnh của bạn. Xin xem xét trước mỗi lần chia sẻ.</string>
     <!-- Settings category title for cache and offline files -->
-    <string name="settings_advanced_features">Nâng Cao</string>
+    <string name="settings_advanced_features">Nâng cao</string>
     <!-- Settings preference title for cache -->
-    <string name="settings_advanced_features_cache">Dọn Bộ Nhớ Tạm</string>
+    <string name="settings_advanced_features_cache">Dọn bộ nhớ tạm</string>
     <!-- Settings preference title for offline files -->
-    <string name="settings_advanced_features_offline">Dọn Các Tệp Ngoại Tuyến</string>
+    <string name="settings_advanced_features_offline">Dọn các tệp tin Ngoại&#160;Tuyến</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Xóa tài khoản</string>
     <!-- Size of files in offline or cache folders -->
@@ -579,7 +579,7 @@
         <item>Chuyển từ danh bạ của điện thoại</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Bật tính năng Đăng Tải Camêra</string>
+    <string name="settings_camera_upload_on">Bật Đăng Tải Camêra</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Tự tải lên khi</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -746,7 +746,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">Xác&#160;thực địa&#160;chỉ email</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Check your email inbox to proceed.</string>
+    <string name="email_verification_text">Kiểm&#160;tra hộp&#160;thư email của bạn để tiếp&#160;tục.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Phát sinh lỗi, xin thử lại sau.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -790,7 +790,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">Đây là địa chỉ e-mail hiện tại của bạn.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">This is the last step to change your email address. Enter your password below.</string>
+    <string name="change_mail_text_last_step">Đây là bước cuối&#160;cùng để thay đổi địa&#160;chỉ email của bạn. Nhập mật&#160;khẩu của bạn vào dưới đây.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Đổi e-mail</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -806,7 +806,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Đang lấy thông tin&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">Your new email address needs to be validated. Check the inbox of the new email address to proceed.</string>
+    <string name="email_verification_text_change_mail">Địa&#160;chỉ email mới của bạn cần được xác&#160;thực. Kiểm&#160;tra hộp&#160;thư đến của địa&#160;chỉ email mới để tiếp&#160;tục.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">Xóa ảnh đại&#160;diện?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -1102,7 +1102,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">Cố định trạng thái</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">Giữ nguyên trạng thái hoạt động online như ở trên ngay cả khi tôi không có thiết bị nào đang bật</string>
+    <string name="settings_persistence_subtitle">Giữ nguyên trạng&#160;thái được chọn như ở trên, ngay cả khi ngắt kết&#160;nối</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">Đặt giới hạn thời gian</string>
     <!-- Button to set a value -->
@@ -1343,7 +1343,7 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Chuyển vào Thùng Rác?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Bạn có muốn di&#160;chuyển thư&#160;mục này vào Thùng&#160;Rác không? Một thư&#160;mục mới sẽ được tự&#160;động tạo ra cho Đăng&#160;tải camêra.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Bạn có muốn di&#160;chuyển thư&#160;mục này vào Thùng&#160;Rác không? Một thư&#160;mục mới sẽ được tự&#160;động tạo ra cho Đăng&#160;Tải Camêra.</string>
     <!-- Confirmation message before removing MU folder -->
     <string name="confirmation_move_mu_folder_to_rubbish">Bạn có muốn di&#160;chuyển thư&#160;mục này vào Thùng&#160;Rác không? Một thư&#160;mục mới sẽ được tự&#160;động tạo ra cho Đăng&#160;tải phương&#160;tiện.</string>
     <!-- confirmation message before removing a file -->
@@ -1712,7 +1712,7 @@
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">Tiến hành đăng xuất</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="recovery_key_bottom_sheet">Chìa&#160;Khóa Phục&#160;Hồi</string>
+    <string name="recovery_key_bottom_sheet">Chìa&#160;khóa phục&#160;hồi</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Lưu vào File System</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
@@ -1724,7 +1724,7 @@
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]Đang tải các[/A] [B]Tin Nhắn&#8230;[/B]</string>
     <!-- Title of the category Security options on Settings section -->
-    <string name="settings_security_options_title">Bảo Mật</string>
+    <string name="settings_security_options_title">Bảo mật</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="settings_recovery_key_title">Sao&#160;lưu Chìa&#160;Khóa Phục&#160;Hồi</string>
     <!-- Summary of the preference Recovery key on Settings section -->
@@ -2188,9 +2188,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">tên tệp&#160;tin</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">Hiện Lần thấy cuối&#8230;</string>
+    <string name="option_enable_last_green_chat">Hiện lần thấy cuối</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">Cho phép các tên trong liên lạc biết được lần thấy cuối bạn ở MEGA.</string>
+    <string name="subtitle_option_enable_last_green_chat">Cho phép các tên trong sổ liên&#160;lạc biết được thấy cuối bạn dùng MEGA</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">Không đủ không gian lưu trữ</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -2270,7 +2270,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Thực hiện cuộc gọi</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Allow access to your address book</string>
+    <string name="allow_acces_contact_title">Cho phép quyền truy&#160;cập vào sổ danh&#160;bạ</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Dễ dàng tìm thêm người để kết nối trên MEGA từ sổ danh bạ của bạn.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -2494,7 +2494,7 @@
     <!-- Title of the create account screen -->
     <string name="create_account_title">Tạo tài khoản MEGA</string>
     <!-- Label to reference a recents section -->
-    <string name="recents_label">Sử Dụng Gần Đây</string>
+    <string name="recents_label">Gần Đây</string>
     <!-- Label to reference a chats section -->
     <string name="chats_label">Cuộc chát</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
@@ -3069,10 +3069,6 @@
     <plurals name="links_copied_clipboard">
         <item quantity="other">Đã sao&#160;chép các đường liên&#160;kết vào bảng&#160;nhớ&#160;tạm</item>
     </plurals>
-    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
-    <plurals name="get_links">
-        <item quantity="other">Lấy Liên Kết</item>
-    </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Dọn tất cả các tệp ngoại tuyến?</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -3298,7 +3294,7 @@
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Bạn đã có đăng ký một gói dịch vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng ký gói hiện tại bằng cách vào MEGA với trình duyệt web trên máy tính hoặc điện thoại. Tới trang Thư Viện Hướng Dẫn để có thêm chi tiết.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">Go to Settings to allow MEGA permission to access your nearby devices using Bluetooth.</string>
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Đi tới Cài&#160;đặt và cấp quyền cho MEGA truy&#160;cập vào các thiết&#160;bị gần bạn thông qua Bluetooth.</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">Chúng tôi không tiến hành được việc thanh toán. Nếu quý khách đang sử dụng ứng dụng kép, vui lòng đăng nhập vào MEGA mà không có ứng dụng đó. Còn không, hãy thử nâng cấp thông qua trình duyệt web.</string>
     <!-- Title for subscription dialog that shows before delete account -->
@@ -3650,7 +3646,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Đây là thư mục chứa các tệp tin và thư mục đã được sao lưu dự phòng. Các mục lưu dự phòng là dạng “chỉ-được-xem” để phòng tránh bị chỉnh sửa trong Ổ&#160;Mây của bạn.Bạn có thể lưu dự phòng dữ liệu của mình từ máy tính lên MEGA bằng cách sử dụng App MEGA cho Máy&#160;Tính.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck your email inbox for more information on how to file a counter-notice.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;đối.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Tài&#160;khoản của quý&#160;vị đã bị chấm&#160;dứt do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ của MEGA.\nQuý&#160;vị sẽ không thể lấy lại quyền truy&#160;cập vào dữ&#160;liệu đã được lưu&#160;trữ của mình hoặc được phép đăng&#160;ký tài&#160;khoản MEGA mới.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -3776,7 +3772,7 @@
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">Loại bỏ khỏi album?</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">To enable camera uploads, allow MEGA access to your photos and other media on your device.</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">Để bật đăng&#160;tải camêra, cấp quyền cho MEGA truy&#160;cập vào kho hình&#160;ảnh và các nội&#160;dung đa phương&#160;tiện khác có trong thiết&#160;bị của bạn.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">Cho phép quyền truy&#160;cập</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
@@ -4876,13 +4872,13 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Nhận được nhiều hơn với gói Pro</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month.</string>
+    <string name="dialog_onboarding_get_pro_description">Nâng&#160;cấp lên gói Pro và nhận thêm không&#160;gian lưu&#160;trữ và quyền truy&#160;cập vào các tính&#160;năng Pro. Gói có giá từ mức thấp nhất là %1$s một tháng</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_some_features_title">Các gói MEGA&#160;Pro có bao&#160;gồm:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_storage">Tính linh&#160;hoạt không&#160;gian tối&#160;ưu</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
+    <string name="dialog_onboarding_feature_description_storage">Bắt đầu từ %1$s, tìm gói phù&#160;hợp hoàn&#160;hảo cho nhu&#160;cầu lưu&#160;trữ của bạn.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">Nâng cấp lên Pro ngay hôm nay</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
@@ -4954,10 +4950,6 @@
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
         <item quantity="other">%1$d thư&#160;mục đã được chia&#160;sẻ</item>
-    </plurals>
-    <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
-    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other">%1$d thư&#160;mục đã được chia&#160;sẻ,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
