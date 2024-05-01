@@ -2,6 +2,8 @@ package test.mega.privacy.android.app.usecase
 
 import androidx.core.net.toUri
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
@@ -84,12 +86,14 @@ class GetContactGroupsUseCaseTest {
         ),
     )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeEach
     fun setup() {
         underTest = GetContactGroupsUseCase(
             chatRepository = chatRepository,
             avatarRepository = avatarRepository,
             contactsRepository = contactsRepository,
+            UnconfinedTestDispatcher()
         )
     }
 

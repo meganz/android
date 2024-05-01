@@ -52,7 +52,7 @@ class ContactGroupsViewModel @Inject constructor(
 
     fun setQuery(query: String?) {
         queryString = query
-        groups.notifyObserver()
+        groups.takeIf { it.value != null }?.notifyObserver()
     }
 
     /**
