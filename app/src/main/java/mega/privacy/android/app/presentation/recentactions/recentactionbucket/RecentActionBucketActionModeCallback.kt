@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.recentactions.recentactionbucket
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
@@ -51,10 +52,20 @@ class RecentActionBucketActionModeCallback constructor(
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         Timber.d("ActionBarCallBack::onPrepareActionMode")
 
-        menu!!.findItem(R.id.cab_menu_select_all).isVisible =
-            (viewModel.getSelectedNodesCount() < viewModel.getNodesCount())
+        menu?.let {
+            it.findItem(R.id.cab_menu_select_all).isVisible =
+                (viewModel.getSelectedNodesCount() < viewModel.getNodesCount())
 
-        handleHiddenNodes(menu)
+            it.findItem(R.id.cab_menu_share_link)?.let { item ->
+                item.title = recentActionBucketFragment.context?.resources?.getQuantityString(
+                    sharedR.plurals.label_share_links,
+                    viewModel.getSelectedNodesCount()
+                )
+            }
+
+            handleHiddenNodes(it)
+        }
+
         return true
     }
 

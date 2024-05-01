@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.favourites
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -42,6 +43,13 @@ class FavouriteActionModeCallback(
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         menu?.let {
+            it.findItem(R.id.cab_menu_share_link)?.let { item ->
+                item.title = fragment.context?.resources?.getQuantityString(
+                    sharedR.plurals.label_share_links,
+                    viewModel.getItemsSelected().size
+                )
+            }
+
             handleHiddenNodes(it)
         }
         return true
