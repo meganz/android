@@ -21,6 +21,21 @@ android {
         kotlinCompilerExtensionVersion = androidx.versions.compose.compiler.get()
     }
 
+    kotlinOptions {
+        val jdk: String by rootProject.extra
+        jvmTarget = jdk
+
+        val shouldSuppressWarnings: Boolean by rootProject.extra
+        suppressWarnings = shouldSuppressWarnings
+
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+    }
+
+    kotlin {
+        val jdk: String by rootProject.extra
+        jvmToolchain(jdk.toInt())
+    }
+
     lint {
         abortOnError = false
         xmlOutput = file("build/reports/lint-results.xml")
