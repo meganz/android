@@ -21,6 +21,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -106,6 +110,9 @@ internal fun VariantBOnboardingDialogColumn(
     var isPreselectedPlanOnce by rememberSaveable { mutableStateOf(false) }
     val isPaymentMethodAvailable = uiState.isPaymentMethodAvailable
     val coroutineScope = rememberCoroutineScope()
+    val configuration = LocalConfiguration.current
+    var isProIIIPlanCardViewed by rememberSaveable { mutableStateOf(false) }
+    val density = LocalDensity.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -247,6 +254,29 @@ internal fun VariantBOnboardingDialogColumn(
                             isClicked = isClicked,
                             showCurrentPlanLabel = false,
                             testTag = PRO_PLAN_CARD_VARIANT_B,
+                            modifier = Modifier
+                                .onGloballyPositioned { layoutCoordinates ->
+                                    if (localisedSubscription.accountType == AccountType.PRO_III && !isProIIIPlanCardViewed) {
+                                        with(density) {
+                                            // height of the Pro III plan card
+                                            val proIIIPlanCardHeight = layoutCoordinates.size.height
+                                            // vertical position of the Pro III plan card in Compose
+                                            val proIIIPlanCardVerticalPosition =
+                                                layoutCoordinates.positionInRoot().y
+                                            // vertical position Pro III plan card in Compose including its height
+                                            val proIIICardFullVerticalPosition =
+                                                proIIIPlanCardVerticalPosition.toDp().value.toInt() + proIIIPlanCardHeight.toDp().value.toInt()
+                                            val screenHeight =
+                                                configuration.screenHeightDp
+                                            val isFullyVisible =
+                                                proIIICardFullVerticalPosition <= screenHeight
+                                            if (isFullyVisible && !isProIIIPlanCardViewed) {
+                                                onProIIIVisible()
+                                                isProIIIPlanCardViewed = true
+                                            }
+                                        }
+                                    }
+                                }
                         )
                     }
                     RaisedDefaultMegaButton(
