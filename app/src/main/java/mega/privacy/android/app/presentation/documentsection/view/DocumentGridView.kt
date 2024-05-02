@@ -8,16 +8,20 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.core.ui.controls.lists.NodeGridViewItem
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 
 @Composable
 internal fun DocumentGridView(
     items: List<DocumentUiEntity>,
+    accountType: AccountType?,
     lazyGridState: LazyGridState,
     sortOrder: String,
     modifier: Modifier,
@@ -58,7 +62,14 @@ internal fun DocumentGridView(
         items(count = items.size, key = { items[it].id.longValue }) {
             val documentItem = items[it]
             NodeGridViewItem(
-                modifier = Modifier.testTag("$DOCUMENT_SECTION_GRID_ITEM_VIEW_TEST_TAG$it"),
+                modifier = Modifier
+                    .testTag("$DOCUMENT_SECTION_GRID_ITEM_VIEW_TEST_TAG$it")
+                    .alpha(0.5f.takeIf {
+                        accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
+                    } ?: 1f)
+                    .blur(16.dp.takeIf {
+                        accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
+                    } ?: 0.dp),
                 isSelected = documentItem.isSelected,
                 name = documentItem.name,
                 iconRes = documentItem.icon,

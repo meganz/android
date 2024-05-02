@@ -55,6 +55,7 @@ class DocumentListViewTest {
         composeTestRule.setContent {
             DocumentListView(
                 items = items,
+                accountType = null,
                 lazyListState = lazyListState,
                 sortOrder = sortOrder,
                 modifier = modifier,

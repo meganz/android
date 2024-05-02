@@ -22,6 +22,8 @@ import java.io.File
  * @property label the document's label
  * @property nodeAvailableOffline the document if is available for offline
  * @property isSelected the document if is selected
+ * @property isMarkedSensitive the document if is marked as sensitive
+ * @property isSensitiveInherited the document if is sensitive inherited
  */
 data class DocumentUiEntity(
     val id: NodeId,
@@ -38,4 +40,6 @@ data class DocumentUiEntity(
     val label: Int,
     val nodeAvailableOffline: Boolean = false,
     val isSelected: Boolean = false,
+    val isMarkedSensitive: Boolean = false,
+    val isSensitiveInherited: Boolean = false,
 )

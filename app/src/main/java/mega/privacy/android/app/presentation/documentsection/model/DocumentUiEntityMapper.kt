@@ -33,6 +33,8 @@ class DocumentUiEntityMapper @Inject constructor(
         hasVersions = typedFileNode.hasVersion,
         modificationTime = typedFileNode.modificationTime,
         label = typedFileNode.label,
-        nodeAvailableOffline = typedFileNode.isAvailableOffline
+        nodeAvailableOffline = typedFileNode.isAvailableOffline,
+        isMarkedSensitive = typedFileNode.isMarkedSensitive,
+        isSensitiveInherited = typedFileNode.isSensitiveInherited,
     )
 }

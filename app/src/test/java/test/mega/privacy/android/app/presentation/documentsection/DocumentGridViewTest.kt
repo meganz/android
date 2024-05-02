@@ -56,6 +56,7 @@ class DocumentGridViewTest {
         composeTestRule.setContent {
             DocumentGridView(
                 items = items,
+                accountType = null,
                 lazyGridState = lazyGridState,
                 sortOrder = sortOrder,
                 modifier = modifier,

@@ -5,17 +5,20 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.documentsection.model.DocumentSectionUiState
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntityMapper
@@ -24,6 +27,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -31,12 +35,14 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.documentsection.GetAllDocumentsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
@@ -66,12 +72,16 @@ class DocumentSectionViewModel @Inject constructor(
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DocumentSectionUiState())
     internal val uiState = _uiState.asStateFlow()
 
     private var searchQuery = ""
     private val originalData = mutableListOf<DocumentUiEntity>()
+    private var showHiddenItems: Boolean? = null
 
     /**
      * Is network connected
@@ -82,23 +92,64 @@ class DocumentSectionViewModel @Inject constructor(
     init {
         checkViewType()
         viewModelScope.launch {
-            merge(
-                monitorNodeUpdatesUseCase(),
-                monitorOfflineNodeUpdatesUseCase()
-            ).conflate()
-                .catch {
-                    Timber.e(it)
-                }.collect {
-                    refreshDocumentNodes()
-                }
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                handleHiddenNodeUIFlow()
+                monitorIsHiddenNodesOnboarded()
+            } else {
+                merge(
+                    monitorNodeUpdatesUseCase(),
+                    monitorOfflineNodeUpdatesUseCase()
+                ).conflate()
+                    .catch {
+                        Timber.e(it)
+                    }.collect {
+                        refreshDocumentNodes()
+                    }
+            }
         }
-        monitorAccountDetail()
-        monitorIsHiddenNodesOnboarded()
+    }
+
+    private fun handleHiddenNodeUIFlow() {
+        combine(
+            monitorNodeUpdatesUseCase(),
+            monitorOfflineNodeUpdatesUseCase(),
+            monitorAccountDetailUseCase(),
+            monitorShowHiddenItemsUseCase(),
+        ) { _, _, accountDetail, showHiddenItems ->
+            this@DocumentSectionViewModel.showHiddenItems = showHiddenItems
+            _uiState.update {
+                it.copy(
+                    accountDetail = accountDetail,
+                )
+            }
+            refreshDocumentNodes()
+        }.catch {
+            Timber.e(it)
+        }.launchIn(viewModelScope)
+    }
+
+    private suspend fun filterNonSensitiveItems(
+        items: List<DocumentUiEntity>,
+        showHiddenItems: Boolean?,
+        isPaid: Boolean?,
+    ) = withContext(defaultDispatcher) {
+        showHiddenItems ?: return@withContext items
+        isPaid ?: return@withContext items
+
+        return@withContext if (showHiddenItems || !isPaid) {
+            items
+        } else {
+            items.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
+        }
     }
 
     internal suspend fun refreshDocumentNodes() =
         runCatching {
-            getDocumentUIEntityList().updateOriginalData().filterDocumentsBySearchQuery()
+            filterNonSensitiveItems(
+                items = getDocumentUIEntityList(),
+                showHiddenItems = showHiddenItems,
+                isPaid = _uiState.value.accountDetail?.levelDetail?.accountType?.isPaid,
+            ).updateOriginalData().filterDocumentsBySearchQuery()
         }.onSuccess { documentList ->
             val sortOrder = getCloudSortOrder()
             _uiState.update {
@@ -310,39 +361,31 @@ class DocumentSectionViewModel @Inject constructor(
             }
         }
 
-    private fun List<DocumentUiEntity>.updateItemSelectedState(index: Int, isSelected: Boolean) =
+    private fun List<DocumentUiEntity>.updateItemSelectedState(
+        index: Int,
+        isSelected: Boolean,
+    ) =
         if (index in indices) {
             toMutableList().also { list ->
                 list[index] = list[index].copy(isSelected = isSelected)
             }
         } else this
 
-    internal fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) = viewModelScope.launch {
-        for (nodeId in nodeIds) {
-            async {
-                runCatching {
-                    updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
-                }.onFailure { Timber.e("Update sensitivity failed: $it") }
-            }
-        }
-    }
-
-    private fun monitorAccountDetail() {
-        monitorAccountDetailUseCase()
-            .onEach { accountDetail ->
-                _uiState.update {
-                    it.copy(accountDetail = accountDetail)
+    internal fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) =
+        viewModelScope.launch {
+            for (nodeId in nodeIds) {
+                async {
+                    runCatching {
+                        updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
+                    }.onFailure { Timber.e("Update sensitivity failed: $it") }
                 }
             }
-            .launchIn(viewModelScope)
-    }
+        }
 
-    private fun monitorIsHiddenNodesOnboarded() {
-        viewModelScope.launch {
-            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-            _uiState.update {
-                it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
-            }
+    private suspend fun monitorIsHiddenNodesOnboarded() {
+        val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+        _uiState.update {
+            it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
         }
     }
 
