@@ -63,6 +63,7 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -794,24 +795,42 @@ internal class NodeRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             (megaChatApiGateway.getMessage(chatId, messageId)
                 ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId))
-                ?.let { messageChat ->
-                    val node = messageChat.megaNodeList.get(messageIndex)
-                    val chat = megaChatApiGateway.getChatRoom(chatId)
-
-                    if (chat?.isPreview == true) {
-                        megaApiGateway.authorizeChatNode(node, chat.authorizationToken)
-                    } else {
-                        node
-                    }
-                }
-                ?.let {
-                    fileNodeMapper(
-                        megaNode = it,
-                        requireSerializedData = false,
-                        offline = null,
+                ?.let { message ->
+                    getChatFile(
+                        megaNode = message.megaNodeList.get(messageIndex),
+                        chat = megaChatApiGateway.getChatRoom(chatId)
                     )
                 }
         }
+
+    override suspend fun getNodesFromChatMessage(chatId: Long, messageId: Long) =
+        withContext(ioDispatcher) {
+            (megaChatApiGateway.getMessage(chatId, messageId)
+                ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId))
+                ?.let { message ->
+                    val nodes = message.megaNodeList
+                    val chat = megaChatApiGateway.getChatRoom(chatId)
+                    (0 until nodes.size()).mapNotNull { index ->
+                        nodes.get(index)?.let {
+                            getChatFile(megaNode = it, chat = chat)
+                        }
+                    }
+                } ?: emptyList()
+        }
+
+    private suspend fun getChatFile(megaNode: MegaNode, chat: MegaChatRoom?): FileNode? {
+        return if (chat?.isPreview == true) {
+            megaApiGateway.authorizeChatNode(megaNode, chat.authorizationToken)
+        } else {
+            megaNode
+        }?.let {
+            fileNodeMapper(
+                megaNode = it,
+                requireSerializedData = false,
+                offline = null
+            )
+        }
+    }
 
     override suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode> {
         val offlineMap = getAllOfflineNodeHandle()

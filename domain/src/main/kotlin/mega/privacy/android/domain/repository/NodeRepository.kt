@@ -518,6 +518,17 @@ interface NodeRepository {
     ): FileNode?
 
     /**
+     * Get list of files attached to a chat message by its chat and message id
+     *
+     * @param chatId
+     * @param messageId
+     */
+    suspend fun getNodesFromChatMessage(
+        chatId: Long,
+        messageId: Long,
+    ): List<FileNode>
+
+    /**
      * Get nodes by handles
      *
      * @param handles handle list

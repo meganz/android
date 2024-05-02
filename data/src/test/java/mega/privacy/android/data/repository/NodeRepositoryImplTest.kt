@@ -989,6 +989,80 @@ class NodeRepositoryImplTest {
     }
 
     @Test
+    fun `test that getNodesFromChatMessage returns correct nodes from gateway`() = runTest {
+        val chatId = 11L
+        val messageId = 22L
+        val megaNode = mockMegaNodeForConversion()
+        val megaChatMessage = mock<MegaChatMessage>()
+        val megaNodeList = mock<MegaNodeList>()
+        whenever(megaNodeList.get(0)).thenReturn(megaNode)
+        whenever(megaNodeList.size()).thenReturn(1)
+        whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
+        whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(megaChatMessage)
+        val result = underTest.getNodesFromChatMessage(chatId, messageId)
+        assertThat(result.firstOrNull()?.id?.longValue).isEqualTo(megaNode.handle)
+    }
+
+    @Test
+    fun `test that getNodesFromChatMessage returns non-null nodes from gateway`() = runTest {
+        val chatId = 11L
+        val messageId = 22L
+        val megaNode = mockMegaNodeForConversion()
+        val megaChatMessage = mock<MegaChatMessage>()
+        val megaNodeList = mock<MegaNodeList>()
+        whenever(megaNodeList.get(0)).thenReturn(megaNode)
+        whenever(megaNodeList.get(1)).thenReturn(null)
+        whenever(megaNodeList.size()).thenReturn(2)
+        whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
+        whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(megaChatMessage)
+        val result = underTest.getNodesFromChatMessage(chatId, messageId)
+        assertThat(result.size).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that chat node history is used as a fallback when nodes are not found`() = runTest {
+        val chatId = 11L
+        val messageId = 22L
+        val megaNode = mockMegaNodeForConversion()
+        val megaChatMessage = mock<MegaChatMessage>()
+        val megaNodeList = mock<MegaNodeList>()
+        whenever(megaNodeList.get(0)).thenReturn(megaNode)
+        whenever(megaNodeList.size()).thenReturn(1)
+        whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
+        whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(null)
+        whenever(megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId))
+            .thenReturn(megaChatMessage)
+        assertThat(
+            underTest.getNodesFromChatMessage(chatId, messageId).firstOrNull()?.id?.longValue
+        ).isEqualTo(megaNode.handle)
+    }
+
+    @Test
+    fun `test that chat nodes are authorized if nodes are in chat preview`() = runTest {
+        val chatId = 11L
+        val messageId = 22L
+        val authorizationToken = "authorizationToken"
+        val megaNode = mockMegaNodeForConversion()
+        val megaNode2 = mock<MegaNode>()
+        val megaChatMessage = mock<MegaChatMessage>()
+        val megaNodeList = mock<MegaNodeList>()
+        val chat = mock<MegaChatRoom>()
+        whenever(megaNodeList.get(0)).thenReturn(megaNode2)
+        whenever(megaNodeList.size()).thenReturn(1)
+        whenever(megaChatMessage.megaNodeList).thenReturn(megaNodeList)
+        whenever(megaChatApiGateway.getMessage(chatId, messageId)).thenReturn(megaChatMessage)
+        whenever(megaChatApiGateway.getChatRoom(chatId)).thenReturn(chat)
+        whenever(chat.isPreview).thenReturn(true)
+        whenever(chat.authorizationToken).thenReturn(authorizationToken)
+        whenever(megaApiGateway.authorizeChatNode(megaNode2, chat.authorizationToken))
+            .thenReturn(megaNode)
+        assertThat(
+            underTest.getNodesFromChatMessage(chatId, messageId).firstOrNull()?.id?.longValue
+        ).isEqualTo(megaNode.handle)
+        verify(megaApiGateway).authorizeChatNode(megaNode2, chat.authorizationToken)
+    }
+
+    @Test
     fun `test that getOfflineFolderInfo should return correct OfflineFolderInfo`() = runTest {
         val parentId = 1
         val offlineNodes = listOf(
