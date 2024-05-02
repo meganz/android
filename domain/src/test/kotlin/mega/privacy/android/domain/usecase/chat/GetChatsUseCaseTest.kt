@@ -30,7 +30,6 @@ import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdate
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
@@ -61,6 +60,7 @@ internal class GetChatsUseCaseTest {
     private val monitorScheduledMeetingOccurrencesUpdatesUseCase =
         mock<MonitorScheduledMeetingOccurrencesUpdatesUseCase>()
     private val notificationsRepository = mock<NotificationsRepository>()
+    private val getArchivedChatRoomsUseCase = mock<GetArchivedChatRoomsUseCase>()
 
     private val lastMessage: suspend (Long) -> String = { "test" }
     private val lastTimeMapper: (Long) -> String = { "test" }
@@ -109,12 +109,13 @@ internal class GetChatsUseCaseTest {
             monitorScheduledMeetingUpdatesUseCase,
             monitorScheduledMeetingOccurrencesUpdatesUseCase,
             notificationsRepository,
+            getArchivedChatRoomsUseCase
         )
 
         runBlocking {
             whenever(chatRepository.getNonMeetingChatRooms()).thenReturn(chatRooms)
             whenever(chatRepository.getMeetingChatRooms()).thenReturn(chatRooms)
-            whenever(chatRepository.getArchivedChatRooms()).thenReturn(chatRooms)
+            whenever(getArchivedChatRoomsUseCase()).thenReturn(chatRooms)
             whenever(chatRepository.isChatNotifiable(any())).thenReturn(Random.nextBoolean())
             whenever(getChatCallUseCase(any())).thenReturn(null)
             whenever(getChatGroupAvatarUseCase(any())).thenReturn(null)
@@ -180,7 +181,7 @@ internal class GetChatsUseCaseTest {
                 headerTimeMapper = headerTimeMapper,
             ).first()
 
-            verify(chatRepository).getArchivedChatRooms()
+            verify(getArchivedChatRoomsUseCase).invoke()
         }
 
     @Test

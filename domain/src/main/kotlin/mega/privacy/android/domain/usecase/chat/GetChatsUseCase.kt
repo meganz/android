@@ -63,6 +63,7 @@ class GetChatsUseCase @Inject constructor(
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
     private val monitorScheduledMeetingOccurrencesUpdatesUseCase: MonitorScheduledMeetingOccurrencesUpdatesUseCase,
     private val notificationsRepository: NotificationsRepository,
+    private val getArchivedChatRoomsUseCase: GetArchivedChatRoomsUseCase,
 ) {
 
     companion object {
@@ -143,7 +144,7 @@ class GetChatsUseCase @Inject constructor(
         when (chatRoomType) {
             ChatRoomType.MEETINGS -> chatRepository.getMeetingChatRooms()
             ChatRoomType.NON_MEETINGS -> chatRepository.getNonMeetingChatRooms()
-            ChatRoomType.ARCHIVED_CHATS -> chatRepository.getArchivedChatRooms()
+            ChatRoomType.ARCHIVED_CHATS -> getArchivedChatRoomsUseCase()
         }
             .sortedByDescending(CombinedChatRoom::lastTimestamp)
             .forEach { chatRoom ->
