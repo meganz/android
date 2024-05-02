@@ -18,10 +18,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 
 /**
@@ -39,6 +39,8 @@ internal fun LocationInfoView(
     Text(
         text = stringResource(id = R.string.file_properties_info_location),
         style = MaterialTheme.typography.subtitle2medium.copy(color = MaterialTheme.colors.textColorPrimary),
+        modifier = Modifier
+            .testTag(TEST_TAG_LOCATION_TITLE)
     )
     Text(
         text = location,
