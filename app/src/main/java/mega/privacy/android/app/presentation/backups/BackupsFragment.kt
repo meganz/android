@@ -180,6 +180,7 @@ class BackupsFragment : RotatableFragment() {
     override fun activateActionMode() {
         Timber.d("activateActionMode()")
         megaNodeAdapter?.let {
+            it.notifyDataSetChanged()
             if (!it.isMultipleSelect) {
                 it.isMultipleSelect = true
                 actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
@@ -296,6 +297,7 @@ class BackupsFragment : RotatableFragment() {
         override fun onDestroyActionMode(arg0: ActionMode) {
             Timber.d("onDestroyActionMode()")
             clearSelections()
+            megaNodeAdapter?.notifyDataSetChanged()
             megaNodeAdapter?.isMultipleSelect = false
             checkScroll()
         }
