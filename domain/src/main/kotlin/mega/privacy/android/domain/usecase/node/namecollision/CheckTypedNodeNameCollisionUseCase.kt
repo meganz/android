@@ -54,7 +54,7 @@ class CheckTypedNodeNameCollisionUseCase @Inject constructor(
         currentNode: TypedNode,
         parent: UnTypedNode,
         conflictNode: UnTypedNode,
-    ) = NodeNameCollision(
+    ) = NodeNameCollision.Default(
         collisionHandle = conflictNode.id.longValue,
         nodeHandle = currentNode.id.longValue,
         parentHandle = parent.id.longValue,

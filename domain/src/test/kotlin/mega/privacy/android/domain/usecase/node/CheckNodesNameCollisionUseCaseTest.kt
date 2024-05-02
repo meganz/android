@@ -123,7 +123,7 @@ internal class CheckNodesNameCollisionUseCaseTest {
             NodeNameCollisionResult(
                 mapOf(1L to 100L, 3L to 102L),
                 mapOf(
-                    2L to NodeNameCollision(
+                    2L to NodeNameCollision.Default(
                         collisionHandle = conflictNode.id.longValue,
                         nodeHandle = 2L,
                         parentHandle = 101L,

@@ -39,7 +39,7 @@ internal class ContactFileListViewModelTest {
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
     private val moveNodesUseCase: MoveNodesUseCase = mock()
     private val copyNodesUseCase: CopyNodesUseCase = mock()
-    private val nodeNameCollision = mock<NodeNameCollision> {
+    private val nodeNameCollision = mock<NodeNameCollision.Default> {
         on { nodeHandle }.thenReturn(2L)
         on { collisionHandle }.thenReturn(123L)
         on { name }.thenReturn("node")

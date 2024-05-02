@@ -46,7 +46,7 @@ internal class MoveCollidedNodesUseCaseTest {
                 .thenThrow(ForeignNodeException::class.java)
             assertThrows<ForeignNodeException> {
                 underTest(
-                    listOf(mock<NodeNameCollision> {
+                    listOf(mock<NodeNameCollision.Default> {
                         on { renameName } doReturn "new name"
                     }),
                     rename = true
@@ -63,7 +63,7 @@ internal class MoveCollidedNodesUseCaseTest {
                 }
             assertThrows<NotEnoughQuotaMegaException> {
                 underTest(
-                    listOf(mock<NodeNameCollision> {
+                    listOf(mock<NodeNameCollision.Default> {
                         on { renameName } doReturn "new name"
                     }),
                     rename = true
@@ -80,7 +80,7 @@ internal class MoveCollidedNodesUseCaseTest {
                 }
             assertThrows<QuotaExceededMegaException> {
                 underTest(
-                    listOf(mock<NodeNameCollision> {
+                    listOf(mock<NodeNameCollision.Default> {
                         on { renameName } doReturn "new name"
                     }),
                     rename = true
@@ -91,8 +91,8 @@ internal class MoveCollidedNodesUseCaseTest {
     @Test
     fun `test that return MoveRequestResult correctly when at least one node moved successfully`() =
         runTest {
-            val nodeNameCollision = mock<NodeNameCollision>()
-            val nodeNameCollision2 = mock<NodeNameCollision>()
+            val nodeNameCollision = mock<NodeNameCollision.Default>()
+            val nodeNameCollision2 = mock<NodeNameCollision.Default>()
             whenever(
                 moveCollidedNodeUseCase(
                     nodeNameCollision,
@@ -118,8 +118,8 @@ internal class MoveCollidedNodesUseCaseTest {
     @Test
     fun `test that return MoveRequestResult correctly when at all nodes moved successfully`() =
         runTest {
-            val nodeNameCollision = mock<NodeNameCollision>()
-            val nodeNameCollision2 = mock<NodeNameCollision>()
+            val nodeNameCollision = mock<NodeNameCollision.Default>()
+            val nodeNameCollision2 = mock<NodeNameCollision.Default>()
             whenever(
                 moveCollidedNodeUseCase(
                     nodeNameCollision,
@@ -145,8 +145,8 @@ internal class MoveCollidedNodesUseCaseTest {
     @Test
     fun `test that return MoveRequestResult correctly when moving all nodes failed`() =
         runTest {
-            val nodeNameCollision = mock<NodeNameCollision>()
-            val nodeNameCollision2 = mock<NodeNameCollision>()
+            val nodeNameCollision = mock<NodeNameCollision.Default>()
+            val nodeNameCollision2 = mock<NodeNameCollision.Default>()
             whenever(
                 moveCollidedNodeUseCase(
                     nodeNameCollision,

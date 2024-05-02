@@ -571,27 +571,44 @@ class NameCollisionViewModel @Inject constructor(
      * @return The mapped NodeNameCollision.
      */
     private fun mapToNodeNameCollision(result: NameCollisionResult): NodeNameCollision {
-        return NodeNameCollision(
-            collisionHandle = result.nameCollision.collisionHandle,
-            nodeHandle = when (result.nameCollision) {
-                is NameCollision.Copy -> result.nameCollision.nodeHandle
-                is NameCollision.Movement -> result.nameCollision.nodeHandle
-                is NameCollision.Import -> result.nameCollision.nodeHandle
-                else -> -1L
-            },
-            name = result.collisionName ?: "",
-            size = result.collisionSize ?: 0L,
-            childFolderCount = result.nameCollision.childFileCount,
-            childFileCount = result.nameCollision.childFileCount,
-            lastModified = result.collisionLastModified ?: 0L,
-            parentHandle = result.nameCollision.parentHandle ?: -1L,
-            isFile = result.nameCollision.isFile,
-            serializedData = when (result.nameCollision) {
-                is NameCollision.Copy -> result.nameCollision.serializedNode
-                else -> null
-            },
-            renameName = result.renameName
-        )
+        return if (result.nameCollision is NameCollision.Import)
+            with(result.nameCollision) {
+                NodeNameCollision.Chat(
+                    collisionHandle = collisionHandle,
+                    nodeHandle = nodeHandle,
+                    name = result.collisionName ?: "",
+                    size = result.collisionSize ?: 0L,
+                    childFolderCount = childFileCount,
+                    childFileCount = childFileCount,
+                    lastModified = result.collisionLastModified ?: 0L,
+                    parentHandle = parentHandle,
+                    isFile = isFile,
+                    serializedData = null,
+                    renameName = result.renameName,
+                    chatId = chatId,
+                    messageId = messageId
+                )
+            }
+        else
+            with(result.nameCollision) {
+                NodeNameCollision.Default(
+                    collisionHandle = collisionHandle,
+                    nodeHandle = when (this) {
+                        is NameCollision.Copy -> nodeHandle
+                        is NameCollision.Movement -> nodeHandle
+                        else -> -1L
+                    },
+                    name = result.collisionName ?: "",
+                    size = result.collisionSize ?: 0L,
+                    childFolderCount = childFileCount,
+                    childFileCount = childFileCount,
+                    lastModified = result.collisionLastModified ?: 0L,
+                    parentHandle = parentHandle ?: -1L,
+                    isFile = isFile,
+                    serializedData = (this as? NameCollision.Copy)?.serializedNode,
+                    renameName = result.renameName
+                )
+            }
     }
 
     /**

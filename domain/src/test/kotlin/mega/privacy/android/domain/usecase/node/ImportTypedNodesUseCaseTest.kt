@@ -31,7 +31,7 @@ class ImportTypedNodesUseCaseTest {
     private val node1 = mock<TypedNode> {
         on { name } doReturn "node1"
     }
-    private val collision1 = NodeNameCollision(
+    private val collision1 = NodeNameCollision.Default(
         collisionHandle = 0,
         nodeHandle = 0,
         parentHandle = 0,
@@ -45,7 +45,7 @@ class ImportTypedNodesUseCaseTest {
     private val node2 = mock<TypedNode> {
         on { name } doReturn "node2"
     }
-    private val collision2 = NodeNameCollision(
+    private val collision2 = NodeNameCollision.Default(
         collisionHandle = 0,
         nodeHandle = 0,
         parentHandle = 0,
@@ -59,7 +59,7 @@ class ImportTypedNodesUseCaseTest {
     private val node3 = mock<TypedNode> {
         on { name } doReturn "node3"
     }
-    private val collision3 = NodeNameCollision(
+    private val collision3 = NodeNameCollision.Default(
         collisionHandle = 0,
         nodeHandle = 0,
         parentHandle = 0,

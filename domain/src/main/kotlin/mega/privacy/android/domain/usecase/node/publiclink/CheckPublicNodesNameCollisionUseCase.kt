@@ -60,7 +60,7 @@ class CheckPublicNodesNameCollisionUseCase @Inject constructor(
         currentNode: UnTypedNode,
         parent: Node,
         conflictNode: UnTypedNode,
-    ) = NodeNameCollision(
+    ) = NodeNameCollision.Default(
         collisionHandle = conflictNode.id.longValue,
         nodeHandle = currentNode.id.longValue,
         parentHandle = parent.id.longValue,

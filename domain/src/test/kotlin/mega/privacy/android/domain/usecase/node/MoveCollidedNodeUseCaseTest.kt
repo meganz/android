@@ -51,7 +51,7 @@ internal class MoveCollidedNodeUseCaseTest {
                 .thenThrow(ForeignNodeException::class.java)
             assertThrows<ForeignNodeException> {
                 underTest(
-                    nodeNameCollision = mock<NodeNameCollision> {
+                    nodeNameCollision = mock<NodeNameCollision.Default> {
                         on { renameName } doReturn "new name"
                     },
                     rename = true
@@ -68,7 +68,7 @@ internal class MoveCollidedNodeUseCaseTest {
                 }
             assertThrows<NotEnoughQuotaMegaException> {
                 underTest(
-                    nodeNameCollision = mock<NodeNameCollision> {
+                    nodeNameCollision = mock<NodeNameCollision.Default> {
                         on { renameName } doReturn "new name"
                     },
                     rename = true
@@ -85,7 +85,7 @@ internal class MoveCollidedNodeUseCaseTest {
                 }
             assertThrows<QuotaExceededMegaException> {
                 underTest(
-                    nodeNameCollision = mock<NodeNameCollision> {
+                    nodeNameCollision = mock<NodeNameCollision.Default> {
                         on { renameName } doReturn "new name"
                     },
                     rename = true
@@ -96,7 +96,7 @@ internal class MoveCollidedNodeUseCaseTest {
     @Test
     fun `test that return MoveRequestResult correctly when moved successfully`() =
         runTest {
-            val nodeNameCollision = mock<NodeNameCollision> {
+            val nodeNameCollision = mock<NodeNameCollision.Default> {
                 on { renameName } doReturn "new name"
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
@@ -120,7 +120,7 @@ internal class MoveCollidedNodeUseCaseTest {
     @Test
     fun `test that node is moved to rubbish bin when rename is false and node is a file`() =
         runTest {
-            val nodeNameCollision = mock<NodeNameCollision> {
+            val nodeNameCollision = mock<NodeNameCollision.Default> {
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
                 on { isFile } doReturn true
@@ -147,7 +147,7 @@ internal class MoveCollidedNodeUseCaseTest {
     @Test
     fun `test that return MoveRequestResult correctly when node move failed`() =
         runTest {
-            val nodeNameCollision = mock<NodeNameCollision> {
+            val nodeNameCollision = mock<NodeNameCollision.Default> {
                 on { renameName } doReturn "new name"
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
