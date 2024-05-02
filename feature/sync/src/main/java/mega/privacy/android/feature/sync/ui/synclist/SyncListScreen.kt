@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -36,7 +37,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.core.ui.controls.banners.ActionBanner
 import mega.privacy.android.core.ui.controls.banners.WarningBanner
+import mega.privacy.android.core.ui.controls.dividers.DividerType
+import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -71,6 +75,7 @@ internal fun SyncListScreen(
     syncPermissionsManager: SyncPermissionsManager,
     actions: List<MenuAction>,
     onActionPressed: (MenuAction) -> Unit,
+    onOpenUpgradeAccountClicked: () -> Unit,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -147,7 +152,8 @@ internal fun SyncListScreen(
                         }
                     },
                     addFolderClicked = addFolderClicked,
-                    syncPermissionsManager = syncPermissionsManager
+                    syncPermissionsManager = syncPermissionsManager,
+                    onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked
                 )
             },
             snackbarHost = {
@@ -176,13 +182,14 @@ private fun SyncListScreenContent(
     moreClicked: (StalledIssueUiItem) -> Unit,
     addFolderClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
+    onOpenUpgradeAccountClicked: () -> Unit,
     syncFoldersViewModel: SyncFoldersViewModel = hiltViewModel(),
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel = hiltViewModel(),
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel = hiltViewModel(),
 ) {
     var checkedChip by rememberSaveable { mutableStateOf(SYNC_FOLDERS) }
 
-    val syncFoldersState by syncFoldersViewModel.state.collectAsStateWithLifecycle()
+    val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
 
     val pullToRefreshState = rememberPullRefreshState(
         refreshing = syncFoldersState.isRefreshing,
@@ -194,7 +201,18 @@ private fun SyncListScreenContent(
         SyncPermissionWarningBanner(
             syncPermissionsManager = syncPermissionsManager
         )
-        if (syncFoldersState.syncUiItems.isNotEmpty() && syncFoldersState.isLowBatteryLevel) {
+        if (syncFoldersState.isStorageOverQuota) {
+            ActionBanner(
+                mainText = stringResource(sharedR.string.sync_error_storage_over_quota_banner_title),
+                leftActionText = stringResource(sharedR.string.sync_error_storage_over_quota_banner_action),
+                leftActionClicked = onOpenUpgradeAccountClicked,
+                modifier = Modifier.padding(top = 20.dp)
+            )
+            MegaDivider(
+                dividerType = DividerType.FullSize,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        } else if (syncFoldersState.syncUiItems.isNotEmpty() && syncFoldersState.isLowBatteryLevel) {
             WarningBanner(
                 textString = stringResource(id = mega.privacy.android.shared.resources.R.string.general_message_sync_paused_low_battery_level),
                 onCloseClick = null
@@ -308,8 +326,8 @@ private fun SyncListScreenPreview() {
             snackBarHostState = SnackbarHostState(),
             syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
             actions = listOf(),
-            onActionPressed = {
-            }
+            onActionPressed = {},
+            onOpenUpgradeAccountClicked = {}
         )
     }
 }

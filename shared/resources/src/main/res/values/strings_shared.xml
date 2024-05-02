@@ -278,4 +278,8 @@
     <string name="sync_error_dialog_insufficient_storage_cancel_button">Not now</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
     <string name="account_confirm_email_misspelled_email_description">If you have misspelt your email address, correct it and tap [A]Resend[/A].</string>
+    <!-- Title of the insufficient storage error banner -->
+    <string name="sync_error_storage_over_quota_banner_title">Syncing paused, your MEGA plan has run out of storage. Please upgrade.</string>
+    <!-- Title of the insufficient storage error action -->
+    <string name="sync_error_storage_over_quota_banner_action">Upgrade</string>
 </resources>

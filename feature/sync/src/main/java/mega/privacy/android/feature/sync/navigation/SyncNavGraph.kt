@@ -80,7 +80,8 @@ internal fun NavGraphBuilder.syncNavGraph(
                 addFolderClicked = {
                     Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
                     navController.navigate(syncNewFolderRoute)
-                }
+                },
+                onOpenUpgradeAccountClicked = { openUpgradeAccountPage() }
             )
         }
     }

@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.feature.sync.data.service.SyncBackgroundService
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -23,8 +24,8 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUse
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.RemoveFolderClicked
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.PauseRunClicked
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.RemoveFolderClicked
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -41,10 +42,11 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFolderTreeInfo: GetFolderTreeInfo,
+    private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(SyncFoldersState(emptyList()))
-    val state: StateFlow<SyncFoldersState> = _state.asStateFlow()
+    private val _uiState = MutableStateFlow(SyncFoldersState(emptyList()))
+    val uiState: StateFlow<SyncFoldersState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -93,7 +95,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                     }
                 }
                 .collect { syncs ->
-                    _state.update {
+                    _uiState.update {
                         it.copy(
                             syncUiItems = syncs,
                             isRefreshing = false
@@ -103,8 +105,22 @@ internal class SyncFoldersViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            runCatching {
+                isStorageOverQuotaUseCase()
+            }.onSuccess { isStorageOverQuota ->
+                _uiState.update {
+                    it.copy(
+                        isStorageOverQuota = isStorageOverQuota,
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+
+        viewModelScope.launch {
             monitorBatteryInfoUseCase().collect { batteryInfo ->
-                _state.update { state ->
+                _uiState.update { state ->
                     state.copy(isLowBatteryLevel = batteryInfo.level < SyncBackgroundService.LOW_BATTERY_LEVEL && !batteryInfo.isCharging)
                 }
             }
@@ -117,9 +133,9 @@ internal class SyncFoldersViewModel @Inject constructor(
                 val syncUiItem = action.syncUiItem
                 val expanded = action.expanded
 
-                _state.update { state ->
+                _uiState.update { state ->
                     state.copy(
-                        syncUiItems = _state.value.syncUiItems.map {
+                        syncUiItems = _uiState.value.syncUiItems.map {
                             if (it.id == syncUiItem.id) {
                                 it.copy(expanded = expanded)
                             } else {

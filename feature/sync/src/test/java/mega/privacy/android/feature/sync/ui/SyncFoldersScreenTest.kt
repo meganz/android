@@ -7,12 +7,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_SYNC_ITEM_VIEW
 import org.junit.Rule
@@ -53,7 +53,7 @@ class SyncFoldersScreenTest {
         whenever(state.value).thenReturn(
             syncFoldersState
         )
-        whenever(viewModel.state).thenReturn(state)
+        whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
                 viewModel = viewModel,
@@ -70,7 +70,7 @@ class SyncFoldersScreenTest {
     @Test
     fun `test that folders list is empty where there are no folders`() {
         whenever(state.value).thenReturn(SyncFoldersState(emptyList()))
-        whenever(viewModel.state).thenReturn(state)
+        whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
                 viewModel = viewModel,

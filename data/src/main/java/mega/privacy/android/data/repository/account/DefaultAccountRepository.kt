@@ -1338,7 +1338,7 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    override suspend fun getUsedStorage(): Long {
+    override suspend fun getUsedStorage(): Long = withContext(ioDispatcher) {
         val request = suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
@@ -1355,10 +1355,10 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
         val accountDetails = request.megaAccountDetails
-        return accountDetails.storageUsed
+        return@withContext accountDetails.storageUsed
     }
 
-    override suspend fun getMaxStorage(): Long {
+    override suspend fun getMaxStorage(): Long = withContext(ioDispatcher) {
         val request = suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
@@ -1375,7 +1375,7 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
         val accountDetails = request.megaAccountDetails
-        return accountDetails.storageMax
+        return@withContext accountDetails.storageMax
     }
 
     override suspend fun setCredentials(credentials: UserCredentials) = withContext(ioDispatcher) {

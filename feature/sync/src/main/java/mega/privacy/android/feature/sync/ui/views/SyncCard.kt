@@ -65,7 +65,7 @@ internal fun SyncCard(
                 method = stringResource(id = sync.method)
             )
 
-            if (errorRes != null) {
+            if (errorRes != null && errorRes != sharedR.string.general_sync_storage_overquota) {
                 WarningBanner(
                     textString = stringResource(errorRes),
                     onCloseClick = null,
@@ -234,7 +234,7 @@ private fun SyncCardDetailedInfo(
 private fun InfoRow(
     title: String,
     info: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         MegaText(

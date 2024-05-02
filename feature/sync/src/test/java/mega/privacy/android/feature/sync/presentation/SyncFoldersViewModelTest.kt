@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.sync.presentation
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -56,6 +57,7 @@ class SyncFoldersViewModelTest {
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
+    private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase = mock()
 
     private lateinit var underTest: SyncFoldersViewModel
 
@@ -103,12 +105,14 @@ class SyncFoldersViewModelTest {
             resumeSyncUseCase,
             pauseSyncUseCase,
             getSyncStalledIssuesUseCase,
-            setUserPausedSyncsUseCase
+            setUserPausedSyncsUseCase,
+            isStorageOverQuotaUseCase
         )
     }
 
     @Test
     fun `test that viewmodel fetches all folder pairs upon initialization`() = runTest {
+        whenever(isStorageOverQuotaUseCase()).thenReturn(false)
         whenever(monitorSyncsUseCase()).thenReturn(flow {
             emit(folderPairs)
             awaitCancellation()
@@ -119,13 +123,14 @@ class SyncFoldersViewModelTest {
 
         initViewModel()
 
-        underTest.state.test {
-            Truth.assertThat(awaitItem()).isEqualTo(expectedState)
+        underTest.uiState.test {
+            assertThat(awaitItem()).isEqualTo(expectedState)
         }
     }
 
     @Test
     fun `test that card click change the state to expanded`() = runTest {
+        whenever(isStorageOverQuotaUseCase()).thenReturn(false)
         whenever(monitorSyncsUseCase()).thenReturn(flow {
             emit(folderPairs)
             awaitCancellation()
@@ -139,8 +144,8 @@ class SyncFoldersViewModelTest {
             SyncFoldersAction.CardExpanded(syncUiItems.first(), true)
         )
 
-        underTest.state.test {
-            Truth.assertThat(awaitItem()).isEqualTo(expectedState)
+        underTest.uiState.test {
+            assertThat(awaitItem()).isEqualTo(expectedState)
         }
     }
 
@@ -206,9 +211,37 @@ class SyncFoldersViewModelTest {
 
             initViewModel()
 
-            underTest.state.test {
-                Truth.assertThat(awaitItem()).isEqualTo(expectedState)
+            underTest.uiState.test {
+                assertThat(awaitItem()).isEqualTo(expectedState)
             }
+        }
+
+    @Test
+    fun `test that storage over quota use case returns true changes ui state to show storage overquota`() =
+        runTest {
+            whenever(isStorageOverQuotaUseCase()).thenReturn(true)
+            whenever(monitorSyncsUseCase()).thenReturn(flow {
+                emit(folderPairs)
+                awaitCancellation()
+            })
+
+            initViewModel()
+
+            assertThat(underTest.uiState.value.isStorageOverQuota).isTrue()
+        }
+
+    @Test
+    fun `test that storage over quota use case returns false changes ui state to not show storage overquota`() =
+        runTest {
+            whenever(isStorageOverQuotaUseCase()).thenReturn(false)
+            whenever(monitorSyncsUseCase()).thenReturn(flow {
+                emit(folderPairs)
+                awaitCancellation()
+            })
+
+            initViewModel()
+
+            assertThat(underTest.uiState.value.isStorageOverQuota).isFalse()
         }
 
     private fun getSyncUiItem(status: SyncStatus): SyncUiItem = SyncUiItem(
@@ -236,6 +269,7 @@ class SyncFoldersViewModelTest {
             monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getFolderTreeInfo = getFolderTreeInfo,
+            isStorageOverQuotaUseCase
         )
     }
 }
