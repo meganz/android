@@ -1042,4 +1042,13 @@ interface ChatRepository {
      * @return The current presence configuration
      */
     suspend fun getChatPresenceConfig(): ChatPresenceConfig?
+
+    /**
+     * Get the active chat list items.
+     *
+     * This function filters out archived chatrooms.
+     *
+     * @return List of active chat items
+     */
+    suspend fun getActiveChatListItems(): List<ChatListItem>
 }

@@ -1386,4 +1386,11 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getChatPresenceConfig(): ChatPresenceConfig? = withContext(ioDispatcher) {
         megaChatApiGateway.getChatPresenceConfig()?.let { chatPresenceConfigMapper(it) }
     }
+
+    override suspend fun getActiveChatListItems(): List<ChatListItem> = withContext(ioDispatcher) {
+        megaChatApiGateway.getChatListItems(
+            mask = MegaChatApi.CHAT_FILTER_BY_ACTIVE_OR_NON_ACTIVE + MegaChatApi.CHAT_FILTER_BY_ARCHIVED_OR_NON_ARCHIVED,
+            filter = MegaChatApi.CHAT_GET_ACTIVE + MegaChatApi.CHAT_GET_NON_ARCHIVED
+        )?.map(chatListItemMapper::invoke) ?: emptyList()
+    }
 }

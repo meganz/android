@@ -26,14 +26,17 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
+import mega.privacy.android.data.mapper.chat.ChatListItemChangesMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
+import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
 import mega.privacy.android.data.mapper.chat.ChatPresenceConfigMapper
 import mega.privacy.android.data.mapper.chat.ChatPreviewMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
+import mega.privacy.android.data.mapper.chat.LastMessageTypeMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.messages.reactions.ReactionUpdateMapper
 import mega.privacy.android.data.mapper.chat.update.ChatRoomMessageUpdateMapper
@@ -44,6 +47,7 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.chat.ChatPreview
@@ -101,7 +105,6 @@ class ChatRepositoryImplTest {
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val chatRoomMapper = mock<ChatRoomMapper>()
     private val combinedChatRoomMapper = mock<CombinedChatRoomMapper>()
-    private val chatListItemMapper = mock<ChatListItemMapper>()
     private val sharingScope = mock<CoroutineScope>()
     private val megaChatPeerListMapper = mock<MegaChatPeerListMapper>()
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -133,6 +136,15 @@ class ChatRepositoryImplTest {
     private val chatRoomMessageUpdateMapper = ChatRoomMessageUpdateMapper(chatMessageMapper)
     private val userChatStatusMapper = UserChatStatusMapper()
     private val chatPresenceConfigMapper = ChatPresenceConfigMapper(userChatStatusMapper)
+
+    private val chatPermissionsMapper = ChatPermissionsMapper()
+    private val lastMessageTypeMapper = LastMessageTypeMapper()
+    private val chatListItemChangesMapper = ChatListItemChangesMapper()
+    private val chatListItemMapper = ChatListItemMapper(
+        chatPermissionsMapper = chatPermissionsMapper,
+        lastMessageTypeMapper = lastMessageTypeMapper,
+        chatListItemChangesMapper = chatListItemChangesMapper
+    )
 
     @BeforeEach
     fun setUp() {
@@ -1216,4 +1228,39 @@ class ChatRepositoryImplTest {
         ),
         Arguments.of(null)
     )
+
+    @Test
+    fun `test that the correct list of chat items is returned when the list of active chat items is not NULL`() =
+        runTest {
+            val chatItem = mock<MegaChatListItem> {
+                on { chatId } doReturn 123L
+                on { title } doReturn "title"
+                on { lastMessage } doReturn "lastMessage"
+            }
+            whenever(
+                megaChatApiGateway.getChatListItems(
+                    mask = MegaChatApi.CHAT_FILTER_BY_ACTIVE_OR_NON_ACTIVE + MegaChatApi.CHAT_FILTER_BY_ARCHIVED_OR_NON_ARCHIVED,
+                    filter = MegaChatApi.CHAT_GET_ACTIVE + MegaChatApi.CHAT_GET_NON_ARCHIVED
+                )
+            ) doReturn listOf(chatItem)
+
+            val actual = underTest.getActiveChatListItems()
+
+            assertThat(actual).isEqualTo(listOf(chatListItemMapper(chatItem)))
+        }
+
+    @Test
+    fun `test that an empty list is returned when the list of active chat items is NULL`() =
+        runTest {
+            whenever(
+                megaChatApiGateway.getChatListItems(
+                    mask = MegaChatApi.CHAT_FILTER_BY_ACTIVE_OR_NON_ACTIVE + MegaChatApi.CHAT_FILTER_BY_ARCHIVED_OR_NON_ARCHIVED,
+                    filter = MegaChatApi.CHAT_GET_ACTIVE + MegaChatApi.CHAT_GET_NON_ARCHIVED
+                )
+            ) doReturn null
+
+            val actual = underTest.getActiveChatListItems()
+
+            assertThat(actual).isEqualTo(emptyList<ChatListItem>())
+        }
 }
