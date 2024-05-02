@@ -111,7 +111,6 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.StorageState;
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
@@ -137,9 +136,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     @Inject
     CopyRequestMessageMapper copyRequestMessageMapper;
-
-    @Inject
-    GetFeatureFlagValueUseCase getFeatureFlagUseCase;
 
     private NodeAttachmentHistoryViewModel viewModel;
     private StartDownloadViewModel startDownloadViewModel;
@@ -480,6 +476,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         Timber.d("activateActionMode");
         if (!adapter.isMultipleSelect()) {
             adapter.setMultipleSelect(true);
+            adapter.notifyDataSetChanged();
             actionMode = startSupportActionMode(new NodeAttachmentHistoryActivity.ActionBarCallBack());
         }
     }
@@ -895,6 +892,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         public void onDestroyActionMode(ActionMode arg0) {
             Timber.d("onDestroyActionMode");
             adapter.clearSelections();
+            adapter.notifyDataSetChanged();
             adapter.setMultipleSelect(false);
             checkScroll();
         }
