@@ -27,6 +27,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -123,7 +124,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         public ImageView fileGridIconForFile;
         public ImageButton imageButtonThreeDotsForFile;
         public TextView textViewFileNameForFile;
-        public ImageView fileGridSelected;
+        public RadioButton fileGridSelected;
     }
 
     public void toggleAllSelection(int pos) {
@@ -281,7 +282,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         ArrayList<MegaChatMessage> messages = new ArrayList<MegaChatMessage>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
-            if (selectedItems.valueAt(i) == true) {
+            if (selectedItems.valueAt(i)) {
                 MegaChatMessage message = getMessageAt(selectedItems.keyAt(i));
                 if (message != null) {
                     messages.add(message);
@@ -334,15 +335,15 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list, parent, false);
             ViewHolderBrowserList holderList = new ViewHolderBrowserList(v);
-            holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.file_list_item_layout);
-            holderList.imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
-            holderList.savedOffline = (ImageView) v.findViewById(R.id.file_list_saved_offline);
-            holderList.publicLinkImage = (ImageView) v.findViewById(R.id.file_list_public_link);
-            holderList.textViewFileName = (TextView) v.findViewById(R.id.file_list_filename);
+            holderList.itemLayout = v.findViewById(R.id.file_list_item_layout);
+            holderList.imageView = v.findViewById(R.id.file_list_thumbnail);
+            holderList.savedOffline = v.findViewById(R.id.file_list_saved_offline);
+            holderList.publicLinkImage = v.findViewById(R.id.file_list_public_link);
+            holderList.textViewFileName = v.findViewById(R.id.file_list_filename);
             holderList.textViewMessageInfo = v.findViewById(R.id.file_list_filesize);
-            holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.file_list_three_dots_layout);
-            holderList.threeDotsImageView = (ImageView) v.findViewById(R.id.file_list_three_dots);
-            holderList.versionsIcon = (ImageView) v.findViewById(R.id.file_list_versions_icon);
+            holderList.threeDotsLayout = v.findViewById(R.id.file_list_three_dots_layout);
+            holderList.threeDotsImageView = v.findViewById(R.id.file_list_three_dots);
+            holderList.versionsIcon = v.findViewById(R.id.file_list_versions_icon);
             holderList.textViewMessageInfo.setVisibility(View.VISIBLE);
 
             RelativeLayout.LayoutParams paramsThreeDotsIcon = (RelativeLayout.LayoutParams) holderList.threeDotsImageView.getLayoutParams();
@@ -377,21 +378,21 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid holderGrid = new NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid(v);
 
             holderGrid.fileLayout = v.findViewById(R.id.item_file_grid_file);
-            holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.file_grid_item_layout);
-            holderGrid.imageViewThumb = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
-            holderGrid.imageViewIcon = (ImageView) v.findViewById(R.id.file_grid_icon);
-            holderGrid.fileGridIconForFile = (ImageView) v.findViewById(R.id.file_grid_icon_for_file);
-            holderGrid.thumbLayout = (RelativeLayout) v.findViewById(R.id.file_grid_thumbnail_layout);
-            holderGrid.thumbLayoutForFile = (RelativeLayout) v.findViewById(R.id.file_grid_thumbnail_layout_for_file);
-            holderGrid.textViewFileName = (TextView) v.findViewById(R.id.file_grid_filename);
-            holderGrid.textViewFileNameForFile = (TextView) v.findViewById(R.id.file_grid_filename_for_file);
-            holderGrid.imageButtonThreeDotsForFile = (ImageButton) v.findViewById(R.id.file_grid_three_dots_for_file);
-            holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.file_grid_three_dots);
+            holderGrid.itemLayout = v.findViewById(R.id.file_grid_item_layout);
+            holderGrid.imageViewThumb = v.findViewById(R.id.file_grid_thumbnail);
+            holderGrid.imageViewIcon = v.findViewById(R.id.file_grid_icon);
+            holderGrid.fileGridIconForFile = v.findViewById(R.id.file_grid_icon_for_file);
+            holderGrid.thumbLayout = v.findViewById(R.id.file_grid_thumbnail_layout);
+            holderGrid.thumbLayoutForFile = v.findViewById(R.id.file_grid_thumbnail_layout_for_file);
+            holderGrid.textViewFileName = v.findViewById(R.id.file_grid_filename);
+            holderGrid.textViewFileNameForFile = v.findViewById(R.id.file_grid_filename_for_file);
+            holderGrid.imageButtonThreeDotsForFile = v.findViewById(R.id.file_grid_three_dots_for_file);
+            holderGrid.imageButtonThreeDots = v.findViewById(R.id.file_grid_three_dots);
 
-            holderGrid.imageViewVideoIcon = (ImageView) v.findViewById(R.id.file_grid_video_icon);
-            holderGrid.videoDuration = (TextView) v.findViewById(R.id.file_grid_title_video_duration);
-            holderGrid.videoInfoLayout = (RelativeLayout) v.findViewById(R.id.item_file_videoinfo_layout);
-            holderGrid.fileGridSelected = (ImageView) v.findViewById(R.id.file_grid_selected);
+            holderGrid.imageViewVideoIcon = v.findViewById(R.id.file_grid_video_icon);
+            holderGrid.videoDuration = v.findViewById(R.id.file_grid_title_video_duration);
+            holderGrid.videoInfoLayout = v.findViewById(R.id.item_file_videoinfo_layout);
+            holderGrid.fileGridSelected = v.findViewById(R.id.file_grid_radio_button);
 
             holderGrid.itemLayout.setTag(holderGrid);
             holderGrid.itemLayout.setOnClickListener(this);
@@ -588,6 +589,8 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         holder.textViewMessageInfo.setVisibility(View.VISIBLE);
 
         if (!multipleSelect) {
+            holder.threeDotsLayout.setVisibility(View.VISIBLE);
+            holder.threeDotsLayout.setOnClickListener(this);
             Timber.d("Not multiselect");
             holder.itemLayout.setBackground(null);
             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
@@ -608,6 +611,8 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 getThumbAndSetViewOrCreate(holder, node);
             }
         } else {
+            holder.threeDotsLayout.setOnClickListener(null);
+            holder.threeDotsLayout.setVisibility(View.GONE);
             Timber.d("Multiselection ON");
             if (this.isItemChecked(position)) {
                 RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -695,9 +700,9 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             int[] screenPosition = new int[2];
             ImageView imageView;
             if (adapterType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
-                imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+                imageView = v.findViewById(R.id.file_list_thumbnail);
             } else {
-                imageView = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+                imageView = v.findViewById(R.id.file_grid_thumbnail);
             }
             imageView.getLocationOnScreen(screenPosition);
 

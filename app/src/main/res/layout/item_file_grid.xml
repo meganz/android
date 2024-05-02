@@ -86,16 +86,6 @@
                 tools:ignore="ContentDescription" />
 
             <ImageView
-                android:id="@+id/file_grid_selected"
-                android:layout_width="23dp"
-                android:layout_height="23dp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="7dp"
-                android:layout_marginTop="7dp"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
                 android:id="@+id/file_grid_icon_for_file"
                 android:layout_width="96dp"
                 android:layout_height="96dp"
@@ -179,6 +169,14 @@
                 android:src="@drawable/ic_dots_vertical_grey"
                 app:tint="?android:attr/textColorSecondary"
                 tools:ignore="ContentDescription" />
+
+            <RadioButton
+                android:id="@+id/file_grid_radio_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:visibility="gone"/>
         </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

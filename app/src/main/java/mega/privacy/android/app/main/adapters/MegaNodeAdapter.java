@@ -53,6 +53,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -201,7 +202,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageButton imageButtonThreeDotsForFile;
         public TextView textViewFileNameForFile;
         public ImageView takenDownImageForFile;
-        public ImageView fileGridSelected;
+        public RadioButton fileGridSelected;
     }
 
     public class ViewHolderSortBy extends ViewHolderBrowser {
@@ -758,7 +759,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holderGrid.imageViewVideoIcon = v.findViewById(R.id.file_grid_video_icon);
             holderGrid.videoDuration = v.findViewById(R.id.file_grid_title_video_duration);
             holderGrid.videoInfoLayout = v.findViewById(R.id.item_file_videoinfo_layout);
-            holderGrid.fileGridSelected = v.findViewById(R.id.file_grid_selected);
+            holderGrid.fileGridSelected = v.findViewById(R.id.file_grid_radio_button);
             holderGrid.bottomContainer = v.findViewById(R.id.grid_bottom_container);
             holderGrid.bottomContainer.setTag(holderGrid);
             holderGrid.bottomContainer.setOnClickListener(this);
@@ -917,13 +918,20 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
             }
 
-            if (isMultipleSelect() && isItemChecked(position)) {
-                holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid_selected));
-                holder.fileGridSelected.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
-
+            if (isMultipleSelect()) {
+                holder.imageButtonThreeDotsForFile.setVisibility(View.GONE);
+                holder.fileGridSelected.setVisibility(View.VISIBLE);
             } else {
+                holder.imageButtonThreeDotsForFile.setVisibility(View.VISIBLE);
+                holder.fileGridSelected.setVisibility(View.GONE);
+            }
+
+            if (isMultipleSelect() && isItemChecked(position)) {
+                holder.fileGridSelected.setChecked(true);
+                holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid_selected));
+            } else {
+                holder.fileGridSelected.setChecked(false);
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
-                holder.fileGridSelected.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
             }
         }
     }
