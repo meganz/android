@@ -9,7 +9,11 @@ import org.mockito.kotlin.whenever
 
 class GetOfflineNodesByParentIdUseCaseTest {
     private val nodeRepository: NodeRepository = mock()
-    private val underTest = GetOfflineNodesByParentIdUseCase(nodeRepository = nodeRepository)
+    private val sortOfflineInfoUseCase: SortOfflineInfoUseCase = mock()
+    private val underTest = GetOfflineNodesByParentIdUseCase(
+        nodeRepository = nodeRepository,
+        sortOfflineInfoUseCase = sortOfflineInfoUseCase
+    )
 
     @Test
     fun `test that the list of offline nodes are returned`() = runTest {

@@ -427,4 +427,12 @@ interface MegaLocalRoomGateway {
      * @param chatPendingChanges [ChatPendingChanges]
      */
     suspend fun setChatPendingChanges(chatPendingChanges: ChatPendingChanges)
+
+    /**
+     * Get Offline nodes by search query sorted in ascending order with folders on top
+     * @param query
+     */
+    suspend fun getOfflineNodesByQuery(
+        query: String,
+    ): List<Offline>?
 }

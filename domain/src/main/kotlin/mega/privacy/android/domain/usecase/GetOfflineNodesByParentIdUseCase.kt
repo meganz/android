@@ -8,12 +8,14 @@ import javax.inject.Inject
  */
 class GetOfflineNodesByParentIdUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
+    private val sortOfflineInfoUseCase: SortOfflineInfoUseCase,
 ) {
     /**
      * invoke
      * @param parentId Int
      */
     suspend operator fun invoke(parentId: Int) =
-        nodeRepository.getOfflineNodeByParentId(parentId = parentId)
-
+        nodeRepository.getOfflineNodeByParentId(parentId = parentId)?.let {
+            sortOfflineInfoUseCase(it)
+        }
 }

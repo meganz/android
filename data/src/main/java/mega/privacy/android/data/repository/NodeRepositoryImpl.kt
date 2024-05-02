@@ -1154,4 +1154,11 @@ internal class NodeRepositoryImpl @Inject constructor(
                 continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
+
+    override suspend fun getOfflineByQuery(query: String): List<OfflineNodeInformation>? =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getOfflineNodesByQuery(query)?.map {
+                offlineNodeInformationMapper(it)
+            }
+        }
 }

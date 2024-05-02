@@ -408,6 +408,18 @@ internal class MegaLocalRoomFacade @Inject constructor(
         )
     }
 
+    override suspend fun getOfflineNodesByQuery(
+        query: String,
+    ): List<Offline> {
+        val encryptedQuery = encryptData(query)
+        return encryptedQuery?.let { searchQuery ->
+            offlineDao.getOfflineByQuery(searchQuery)
+                .map { offlineModelMapper(it) }
+        } ?: run {
+            emptyList()
+        }
+    }
+
     override fun monitorChatPendingChanges(chatId: Long): Flow<ChatPendingChanges?> =
         chatPendingChangesDao.getChatPendingChanges(chatId)
             .map { entity -> entity?.let { chatRoomPendingChangesModelMapper(it) } }

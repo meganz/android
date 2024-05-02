@@ -14,7 +14,6 @@ import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.mode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileTotalSizeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFolderInformationUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -23,7 +22,6 @@ import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisib
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -83,9 +81,7 @@ class OfflineComposeViewModel @Inject constructor(
             }.onSuccess {
                 val offlineNodeUiList = it?.map { offlineInfo ->
                     OfflineNodeUIItem(offlineNode = loadOfflineNodeInformation(offlineInfo))
-                } ?: run {
-                    emptyList()
-                }
+                } ?: emptyList()
                 _uiState.update {
                     it.copy(
                         offlineNodes = offlineNodeUiList

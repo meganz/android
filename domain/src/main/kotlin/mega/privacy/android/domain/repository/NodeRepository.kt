@@ -788,4 +788,12 @@ interface NodeRepository {
      * @param description [String]
      */
     suspend fun setNodeDescription(nodeHandle: NodeId, description: String?)
+
+    /**
+     * Get offline node information by query
+     *
+     * @param query
+     * @return list of offline nodes information
+     */
+    suspend fun getOfflineByQuery(query: String): List<OfflineNodeInformation>?
 }
