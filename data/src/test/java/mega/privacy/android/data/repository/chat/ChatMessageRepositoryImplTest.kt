@@ -1,8 +1,10 @@
 package mega.privacy.android.data.repository.chat
 
 import android.content.res.Resources.NotFoundException
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
@@ -547,5 +549,26 @@ class ChatMessageRepositoryImplTest {
         underTest.clearAllData()
 
         verify(chatStorageGateway).clearAllData()
+    }
+
+    @ParameterizedTest
+    @EnumSource(PendingMessageState::class)
+    fun `test that monitorPendingMessagesByState returns mapped entities from gateway`(
+        state: PendingMessageState,
+    ) = runTest {
+        val idsRange = (0..10)
+        val expected = idsRange.map { mock<PendingMessage>() }
+        val entities = idsRange.map { mock<PendingMessageEntity>() }
+        idsRange.forEach { index ->
+            whenever(pendingMessageMapper(entities[index])).thenReturn(expected[index])
+        }
+
+        whenever(chatStorageGateway.fetchPendingMessages(state)).thenReturn(flowOf(entities))
+
+        underTest.monitorPendingMessagesByState(state).test {
+            val actual = awaitItem()
+            assertThat(actual).isEqualTo(expected)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

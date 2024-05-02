@@ -1,6 +1,7 @@
 package mega.privacy.android.data.facade.chat
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.chat.ChatDatabase
 import mega.privacy.android.data.database.dao.PendingMessageDao
@@ -66,6 +67,20 @@ class ChatStorageFacadeTest {
             whenever(pendingMessageDao.getByState(state)) doReturn expected
 
             val actual = underTest.getPendingMessagesByState(state)
+
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @ParameterizedTest
+    @EnumSource(PendingMessageState::class)
+    fun `test that fetch pending messages by state returns result from pending message dao`(state: PendingMessageState) =
+        runTest {
+            val pendingMessageDao = mock<PendingMessageDao>()
+            whenever(database.pendingMessageDao()) doReturn pendingMessageDao
+            val expected = mock<Flow<List<PendingMessageEntity>>>()
+            whenever(pendingMessageDao.fetchPendingMessagesByState(state)) doReturn expected
+
+            val actual = underTest.fetchPendingMessages(state)
 
             assertThat(actual).isEqualTo(expected)
         }

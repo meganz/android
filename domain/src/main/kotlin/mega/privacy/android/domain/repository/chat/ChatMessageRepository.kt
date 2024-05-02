@@ -227,12 +227,20 @@ interface ChatMessageRepository {
     )
 
     /**
-     * Monitor pending messages
+     * Monitor pending messages for a chat
      *
      * @param chatId
      * @return flow of pending messages for the chat
      */
     fun monitorPendingMessages(chatId: Long): Flow<List<PendingMessage>>
+
+    /**
+     * Monitor pending messages of a specific state
+     *
+     * @param state
+     * @return flow of pending messages for specific state
+     */
+    fun monitorPendingMessagesByState(state: PendingMessageState): Flow<List<PendingMessage>>
 
     /**
      * Forward a message with attach contact

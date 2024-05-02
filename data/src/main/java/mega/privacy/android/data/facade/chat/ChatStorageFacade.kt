@@ -140,6 +140,9 @@ internal class ChatStorageFacade @Inject constructor(
     override fun fetchPendingMessages(chatId: Long): Flow<List<PendingMessageEntity>> =
         database.pendingMessageDao().fetchPendingMessagesForChat(chatId)
 
+    override fun fetchPendingMessages(state: PendingMessageState): Flow<List<PendingMessageEntity>> =
+        database.pendingMessageDao().fetchPendingMessagesByState(state)
+
     override suspend fun getPendingMessage(pendingMessageId: Long): PendingMessageEntity? =
         database.pendingMessageDao().get(pendingMessageId)
 

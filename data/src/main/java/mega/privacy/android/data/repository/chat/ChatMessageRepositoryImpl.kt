@@ -166,6 +166,11 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             .map { list -> list.map { pendingMessageMapper(it) } }
             .flowOn(ioDispatcher)
 
+    override fun monitorPendingMessagesByState(state: PendingMessageState) =
+        chatStorageGateway.fetchPendingMessages(state)
+            .map { list -> list.map { pendingMessageMapper(it) } }
+            .flowOn(ioDispatcher)
+
     override suspend fun forwardContact(
         sourceChatId: Long,
         msgId: Long,
