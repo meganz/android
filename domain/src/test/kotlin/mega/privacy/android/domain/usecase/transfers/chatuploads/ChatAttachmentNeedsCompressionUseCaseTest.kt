@@ -162,7 +162,7 @@ class ChatAttachmentNeedsCompressionUseCaseTest {
 
             val actual = underTest(mp4)
 
-            Truth.assertThat(actual || !ChatAttachmentNeedsCompressionUseCase.VIDEO_COMPRESSION_ISSUE_FIXED)
+            Truth.assertThat(actual)
                 .isTrue()
         }
 

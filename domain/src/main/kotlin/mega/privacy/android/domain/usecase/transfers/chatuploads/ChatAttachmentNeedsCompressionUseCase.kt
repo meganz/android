@@ -41,7 +41,7 @@ class ChatAttachmentNeedsCompressionUseCase @Inject constructor(
                         || (imageQuality == ChatImageQuality.Automatic && networkRepository.isOnWifi()))
             }
 
-            isVideoFileUseCase(path) && VIDEO_COMPRESSION_ISSUE_FIXED -> {
+            isVideoFileUseCase(path) -> {
                 if (file.extension != "mp4") return false
                 val videoQuality = defaultSettingsRepository.getChatVideoQualityPreference()
                 return videoQuality != VideoQuality.ORIGINAL
@@ -51,11 +51,4 @@ class ChatAttachmentNeedsCompressionUseCase @Inject constructor(
     }
 
     private fun File.isGif() = listOf("gif", "webp").contains(extension)
-
-    companion object {
-        /**
-         * Video compression has an issue with landscape videos, this flag will be removed once solved
-         */
-        internal const val VIDEO_COMPRESSION_ISSUE_FIXED = false
-    }
 }
