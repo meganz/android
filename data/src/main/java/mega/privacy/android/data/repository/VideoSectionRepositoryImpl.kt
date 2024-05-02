@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -30,7 +29,6 @@ import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
 import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
@@ -54,7 +52,6 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val userSetMapper: UserSetMapper,
     private val videoPlaylistMapper: VideoPlaylistMapper,
-    private val nodeRepository: NodeRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : VideoSectionRepository {
     private val videoPlaylistsMap: MutableMap<Long, UserSet> = mutableMapOf()
@@ -126,10 +123,14 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         val elementList = megaApiGateway.getSetElements(sid = id)
         val videoNodeList = (0 until elementList.size()).mapNotNull { index ->
             val element = elementList[index]
+            val elementNode = element.node()
 
-            videoSetsMap.getOrPut(NodeId(element.node())) { mutableSetOf() }.add(element.setId())
+            megaApiGateway.getMegaNodeByHandle(elementNode)?.let { megaNode ->
+                val isInRubbish = megaApiGateway.isInRubbish(megaNode)
+                if (isInRubbish) return@mapNotNull null
 
-            megaApiGateway.getMegaNodeByHandle(element.node())?.let { megaNode ->
+                videoSetsMap.getOrPut(NodeId(elementNode)) { mutableSetOf() }
+                    .add(element.setId())
                 typedVideoNodeMapper(
                     fileNode = megaNode.convertToFileNode(
                         offlineMap?.get(megaNode.handle.toString())
@@ -261,14 +262,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             }
         }
 
-    override fun monitorVideoPlaylistSetsUpdate(): Flow<List<Long>> =
-        merge(
-            monitorSetsUpdates(),
-            monitorNodeUpdates(),
-            monitorOfflineNodeUpdates()
-        )
-
-    private fun monitorSetsUpdates(): Flow<List<Long>> = megaApiGateway.globalUpdates
+    override fun monitorSetsUpdates(): Flow<List<Long>> = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnSetsUpdate>()
         .mapNotNull { it.sets }
         .map { sets ->
@@ -279,18 +273,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             }
         }
 
-    private fun monitorNodeUpdates(): Flow<List<Long>> =
-        nodeRepository.monitorNodeUpdates()
-            .mapNotNull { nodeUpdate ->
-                nodeUpdate.changes.keys.flatMap { node ->
-                    val setIds = videoSetsMap[node.id] ?: emptySet()
-                    setIds.mapNotNull { videoPlaylistsMap[it]?.id }
-                }
-            }
+    override fun getVideoSetsMap() = videoSetsMap
 
-    private fun monitorOfflineNodeUpdates(): Flow<List<Long>> =
-        nodeRepository.monitorOfflineNodeUpdates()
-            .mapNotNull { offlineList ->
-                offlineList.map { it.handle.toLong() }
-            }
+    override fun getVideoPlaylistsMap() = videoPlaylistsMap
 }

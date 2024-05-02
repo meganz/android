@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 
 /**
@@ -73,5 +74,19 @@ interface VideoSectionRepository {
      *
      * @return a flow of all new video playlist set ids update
      */
-    fun monitorVideoPlaylistSetsUpdate(): Flow<List<Long>>
+    fun monitorSetsUpdates(): Flow<List<Long>>
+
+    /**
+     * Get video sets map that is used for saving set ids and all element ids of the set
+     *
+     * @return Map<NodeId, MutableSet<Long>>
+     */
+    fun getVideoSetsMap(): Map<NodeId, MutableSet<Long>>
+
+    /**
+     * Get video playlist map that is used for saving UserSets
+     *
+     * @return Map<Long, UserSet>
+     */
+    fun getVideoPlaylistsMap(): Map<Long, UserSet>
 }
