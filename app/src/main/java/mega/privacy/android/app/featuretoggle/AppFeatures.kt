@@ -166,11 +166,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     MeetingNotificationSettings("Enable Meeting notification settings", false),
 
     /**
-     * Clean refactored search implementation
-     */
-    SearchWithChips("Advanced search implementation in clean architecture", true),
-
-    /**
      * Search implementation with dropdown chips
      */
     DropdownChips("Search implementation with dropdown chips and bottom sheet", true),

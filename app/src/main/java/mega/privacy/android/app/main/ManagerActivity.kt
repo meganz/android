@@ -3953,19 +3953,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             DrawerItem.SEARCH -> {
                 lifecycleScope.launch {
-                    if (getFeatureFlagValueUseCase(AppFeatures.SearchWithChips)) {
-                        navigateToSearchActivity()
-                    } else {
-                        showHideBottomNavigationView(true)
-                        setBottomNavigationMenuItemChecked(NO_BNV)
-                        drawerItem = DrawerItem.SEARCH
-                        if (getSearchFragment() == null) {
-                            searchFragment = SearchFragment.newInstance()
-                        }
-                        searchFragment?.let { replaceFragment(it, FragmentTag.SEARCH.tag) }
-                        showFabButton()
-                        hideAdsView()
-                    }
+                    navigateToSearchActivity()
                 }
             }
 
