@@ -40,6 +40,7 @@ internal fun LocationInfoView(
         text = stringResource(id = R.string.file_properties_info_location),
         style = MaterialTheme.typography.subtitle2medium.copy(color = MaterialTheme.colors.textColorPrimary),
         modifier = Modifier
+            .fillMaxWidth()
             .testTag(TEST_TAG_LOCATION_TITLE)
     )
     Text(
