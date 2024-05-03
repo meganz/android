@@ -32,6 +32,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
     currentPlayingPosition: String,
     duration: String,
     thumbnailData: Any?,
+    isSearchMode: Boolean,
     isHeaderVisible: Boolean,
     isFooterVisible: Boolean,
     queueItemType: MediaQueueItemType,
@@ -46,7 +47,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
             .fillMaxWidth()
             .background(
                 colorResource(
-                    id = if (queueItemType == MediaQueueItemType.Next) {
+                    id = if (!isSearchMode && queueItemType == MediaQueueItemType.Next) {
                         R.color.grey_020_grey_800
                     } else {
                         R.color.white_dark_grey
@@ -99,7 +100,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
             thumbnailData = thumbnailData,
             isPaused = isPaused,
             isItemPlaying = queueItemType == MediaQueueItemType.Playing,
-            isReorderEnabled = queueItemType == MediaQueueItemType.Next,
+            isReorderEnabled = !isSearchMode && queueItemType == MediaQueueItemType.Next,
             isSelected = isSelected,
             onClick = onClick
         )
@@ -120,13 +121,13 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
             modifier = Modifier.constrainAs(divider) {
                 top.linkTo(footer.bottom)
                 start.linkTo(parent.start)
-                visibility = if (queueItemType != MediaQueueItemType.Playing) {
+                visibility = if (isSearchMode || queueItemType != MediaQueueItemType.Playing) {
                     Visibility.Visible
                 } else {
                     Visibility.Gone
                 }
             },
-            queueItemType = queueItemType
+            isLightColor = queueItemType == MediaQueueItemType.Previous || isSearchMode
         )
     }
 }
@@ -155,13 +156,13 @@ private fun MediaQueueFooter(
 @Composable
 private fun MediaQueueItemDivider(
     modifier: Modifier,
-    queueItemType: MediaQueueItemType,
+    isLightColor: Boolean,
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                if (queueItemType == MediaQueueItemType.Previous)
+                if (isLightColor)
                     colorResource(id = R.color.white_dark_grey)
                 else
                     colorResource(id = R.color.grey_020_grey_800)
@@ -173,7 +174,7 @@ private fun MediaQueueItemDivider(
                 .fillMaxWidth()
                 .padding(start = 72.dp)
                 .testTag(MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG),
-            color = if (queueItemType == MediaQueueItemType.Previous) {
+            color = if (isLightColor) {
                 colorResource(id = R.color.grey_012_white_012)
             } else {
                 colorResource(id = R.color.grey_012_white_012)
@@ -199,7 +200,8 @@ private fun PlayingMediaQueueItemPreview() {
             queueItemType = MediaQueueItemType.Playing,
             isAudio = true,
             isPaused = false,
-            isSelected = false
+            isSelected = false,
+            isSearchMode = false
         )
     }
 }
@@ -220,7 +222,8 @@ private fun PausedPlayingMediaQueueItemPreview() {
             queueItemType = MediaQueueItemType.Playing,
             isAudio = true,
             isPaused = true,
-            isSelected = true
+            isSelected = true,
+            isSearchMode = false
         )
     }
 }
@@ -241,7 +244,8 @@ private fun FirstMediaQueueItemPreview() {
             queueItemType = MediaQueueItemType.Previous,
             isAudio = true,
             isPaused = false,
-            isSelected = false
+            isSelected = false,
+            isSearchMode = false
         )
     }
 }
@@ -262,7 +266,8 @@ private fun NextMediaQueueItemPreview() {
             queueItemType = MediaQueueItemType.Next,
             isAudio = true,
             isPaused = false,
-            isSelected = false
+            isSelected = false,
+            isSearchMode = false
         )
     }
 }

@@ -22,6 +22,7 @@ internal fun MediaQueueView(
     currentPlayingPosition: String,
     isAudio: Boolean,
     isPaused: Boolean,
+    isSearchMode: Boolean,
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
     indexOfDisabledItem: Int = -1,
@@ -33,23 +34,29 @@ internal fun MediaQueueView(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         items = items,
         indexOfDisabledItem = indexOfDisabledItem,
+        isDragDropEnabled = !isSearchMode,
         lazyListState = lazyListState,
         onDragFinished = onDragFinished,
         onMove = onMove
     ) { index, item ->
+        val isHeaderVisible =
+            isSearchMode.not() && ((index == 0 && item.type == MediaQueueItemType.Previous)
+                    || item.type == MediaQueueItemType.Playing)
+        val isFooterVisible =
+            !isSearchMode && (index != items.size - 1 && item.type == MediaQueueItemType.Playing)
         MediaQueueItemWithHeaderAndFooterView(
             icon = item.icon,
             name = item.nodeName,
             currentPlayingPosition = currentPlayingPosition,
             duration = item.duration,
             thumbnailData = item.thumbnail,
-            isHeaderVisible = (index == 0 && item.type == MediaQueueItemType.Previous)
-                    || item.type == MediaQueueItemType.Playing,
-            isFooterVisible = index != items.size - 1 && item.type == MediaQueueItemType.Playing,
+            isHeaderVisible = isHeaderVisible,
+            isFooterVisible = isFooterVisible,
             queueItemType = item.type,
             isAudio = isAudio,
             isPaused = isPaused,
             isSelected = item.isSelected,
+            isSearchMode = isSearchMode,
             onClick = { onClick(index, item) }
         )
     }
@@ -67,6 +74,7 @@ private fun MediaQueueViewPreview() {
             lazyListState = LazyListState(),
             onClick = { _, _ -> },
             onMove = { _, _ -> },
+            isSearchMode = false
         )
     }
 }
@@ -83,6 +91,7 @@ private fun MediaQueueViewWithPausedPreview() {
             lazyListState = LazyListState(),
             onClick = { _, _ -> },
             onMove = { _, _ -> },
+            isSearchMode = false
         )
     }
 }

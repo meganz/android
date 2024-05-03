@@ -42,6 +42,7 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
         isAudio: Boolean = true,
         isPaused: Boolean = false,
         isSelected: Boolean = false,
+        isSearchMode: Boolean = false,
         onClick: () -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
@@ -60,6 +61,7 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
                 onClick = onClick,
                 isSelected = isSelected,
                 modifier = modifier,
+                isSearchMode = isSearchMode
             )
         }
     }
@@ -131,6 +133,17 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
     @Test
     fun `test that the UIs are displayed correctly when queueItemType is Next`() {
         setComposeContent(queueItemType = MediaQueueItemType.Next)
+        MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
+        MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
+
+        MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.isNotDisplayed()
+        MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.isNotDisplayed()
+        MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG.isNotDisplayed()
+    }
+
+    @Test
+    fun `test that the UIs are displayed correctly when search mode is enabled`() {
+        setComposeContent(queueItemType = MediaQueueItemType.Playing, isSearchMode = true)
         MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isDisplayed()
         MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG.isDisplayed()
 

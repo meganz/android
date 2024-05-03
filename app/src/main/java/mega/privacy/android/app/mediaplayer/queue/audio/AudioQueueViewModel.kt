@@ -96,8 +96,13 @@ class AudioQueueViewModel @Inject constructor(
     }
 
     internal fun updateMediaQueueAfterMediaItemTransition(playingHandle: Long) {
-        val index = uiState.value.items.indexOfFirst { playingHandle == it.id.longValue }
-        val newItems = uiState.value.items.updateMediaQueueItemType(index).updateOriginalData()
+        val items = if (_uiState.value.isSearchMode) {
+            originalData
+        } else {
+            _uiState.value.items
+        }
+        val index = items.indexOfFirst { playingHandle == it.id.longValue }
+        val newItems = items.updateMediaQueueItemType(index).updateOriginalData()
         val playingIndex = newItems.indexOfFirst { it.type == MediaQueueItemType.Playing }
         _uiState.update { it.copy(items = newItems, indexOfCurrentPlayingItem = playingIndex) }
     }

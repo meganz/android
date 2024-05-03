@@ -49,6 +49,7 @@ fun <T : Any> DragDropListView(
     onMove: (from: Int, to: Int) -> Unit,
     onDragFinished: () -> Unit,
     modifier: Modifier = Modifier,
+    isDragDropEnabled: Boolean = true,
     indexOfDisabledItem: Int = -1,
     elevation: Dp = 10.dp,
     content: @Composable (index: Int, item: T) -> Unit,
@@ -61,6 +62,7 @@ fun <T : Any> DragDropListView(
     LazyColumn(
         modifier = modifier.setDragGesturesAfterLongPress(
             indexOfDisabledItem = indexOfDisabledItem,
+            isDragDropEnabled = isDragDropEnabled,
             dragDropListState = dragDropListState,
             scope = scope,
             overscrollJob = overscrollJob,
@@ -93,30 +95,33 @@ private fun Modifier.setDragGesturesAfterLongPress(
     scope: CoroutineScope,
     overscrollJob: MutableState<Job?>,
     onDragFinished: () -> Unit,
+    isDragDropEnabled: Boolean = true,
     indexOfDisabledItem: Int = -1,
 ) =
-    pointerInput(indexOfDisabledItem) {
-        detectDragGesturesAfterLongPress(
-            onDrag = { change, offset ->
-                dragDropListState.onDrag(offset, indexOfDisabledItem)
-                handleOverscrollJob(
-                    overscrollJob = overscrollJob,
-                    scope = scope,
-                    dragDropListState = dragDropListState
-                )
-                change.consume()
-            },
-            onDragStart = { offset ->
-                dragDropListState.onDragStart(offset, indexOfDisabledItem)
-            },
-            onDragEnd = {
-                dragDropListState.onDragInterrupted()
-                onDragFinished()
-            },
-            onDragCancel = {
-                dragDropListState.onDragInterrupted()
-            }
-        )
+    pointerInput(indexOfDisabledItem, isDragDropEnabled) {
+        if (isDragDropEnabled) {
+            detectDragGesturesAfterLongPress(
+                onDrag = { change, offset ->
+                    dragDropListState.onDrag(offset, indexOfDisabledItem)
+                    handleOverscrollJob(
+                        overscrollJob = overscrollJob,
+                        scope = scope,
+                        dragDropListState = dragDropListState
+                    )
+                    change.consume()
+                },
+                onDragStart = { offset ->
+                    dragDropListState.onDragStart(offset, indexOfDisabledItem)
+                },
+                onDragEnd = {
+                    dragDropListState.onDragInterrupted()
+                    onDragFinished()
+                },
+                onDragCancel = {
+                    dragDropListState.onDragInterrupted()
+                }
+            )
+        }
     }
 
 private fun handleOverscrollJob(
