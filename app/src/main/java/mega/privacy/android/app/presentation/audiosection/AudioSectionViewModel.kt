@@ -5,18 +5,21 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.audiosection.mapper.AudioUiEntityMapper
 import mega.privacy.android.app.presentation.audiosection.model.AudioSectionState
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
@@ -27,6 +30,7 @@ import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -34,11 +38,13 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
@@ -67,6 +73,9 @@ class AudioSectionViewModel @Inject constructor(
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AudioSectionState())
 
@@ -77,22 +86,43 @@ class AudioSectionViewModel @Inject constructor(
 
     private var searchQuery = ""
     private val originalData = mutableListOf<AudioUiEntity>()
+    private var showHiddenItems: Boolean? = null
 
     init {
         checkViewType()
         viewModelScope.launch {
-            merge(
-                monitorNodeUpdatesUseCase(),
-                monitorOfflineNodeUpdatesUseCase()
-            ).conflate()
-                .catch {
-                    Timber.e(it)
-                }.collect {
-                    setPendingRefreshNodes()
-                }
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                handleHiddenNodesUIFlow()
+                monitorIsHiddenNodesOnboarded()
+            } else {
+                merge(
+                    monitorNodeUpdatesUseCase(),
+                    monitorOfflineNodeUpdatesUseCase()
+                ).conflate()
+                    .catch { Timber.e(it) }
+                    .collect {
+                        setPendingRefreshNodes()
+                    }
+            }
         }
-        monitorAccountDetail()
-        monitorIsHiddenNodesOnboarded()
+    }
+
+    private fun handleHiddenNodesUIFlow() {
+        combine(
+            monitorNodeUpdatesUseCase(),
+            monitorOfflineNodeUpdatesUseCase(),
+            monitorAccountDetailUseCase(),
+            monitorShowHiddenItemsUseCase(),
+        ) { _, _, accountDetail, showHiddenItems ->
+            this@AudioSectionViewModel.showHiddenItems = showHiddenItems
+            _state.update {
+                it.copy(
+                    accountDetail = accountDetail,
+                    isPendingRefresh = true
+                )
+            }
+        }.catch { Timber.e(it) }
+            .launchIn(viewModelScope)
     }
 
     private fun checkViewType() {
@@ -103,10 +133,30 @@ class AudioSectionViewModel @Inject constructor(
         }
     }
 
+    private suspend fun filterNonSensitiveItems(
+        items: List<AudioUiEntity>,
+        showHiddenItems: Boolean?,
+        isPaid: Boolean?,
+    ) = withContext(defaultDispatcher) {
+        showHiddenItems ?: return@withContext items
+        isPaid ?: return@withContext items
+
+        return@withContext if (showHiddenItems || !isPaid) {
+            items
+        } else {
+            items.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
+        }
+    }
+
     private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
     internal fun refreshNodes() = viewModelScope.launch {
-        val audioList = getAudioUiEntityList().updateOriginalData().filterAudiosBySearchQuery()
+        val audioList = filterNonSensitiveItems(
+            items = getAudioUiEntityList(),
+            showHiddenItems = this@AudioSectionViewModel.showHiddenItems,
+            isPaid = _state.value.accountDetail?.levelDetail?.accountType?.isPaid,
+        ).updateOriginalData().filterAudiosBySearchQuery()
+
         val sortOrder = getCloudSortOrder()
         _state.update {
             it.copy(
@@ -334,22 +384,10 @@ class AudioSectionViewModel @Inject constructor(
         }
     }
 
-    private fun monitorAccountDetail() {
-        monitorAccountDetailUseCase()
-            .onEach { accountDetail ->
-                _state.update {
-                    it.copy(accountDetail = accountDetail)
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    private fun monitorIsHiddenNodesOnboarded() {
-        viewModelScope.launch {
-            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-            _state.update {
-                it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
-            }
+    private suspend fun monitorIsHiddenNodesOnboarded() {
+        val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+        _state.update {
+            it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
         }
     }
 

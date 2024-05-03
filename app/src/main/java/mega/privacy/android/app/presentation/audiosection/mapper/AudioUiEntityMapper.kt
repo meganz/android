@@ -31,6 +31,8 @@ class AudioUiEntityMapper @Inject constructor(
         hasVersions = typedAudioNode.hasVersion,
         modificationTime = typedAudioNode.modificationTime,
         label = typedAudioNode.label,
-        nodeAvailableOffline = typedAudioNode.isAvailableOffline
+        nodeAvailableOffline = typedAudioNode.isAvailableOffline,
+        isMarkedSensitive = typedAudioNode.isMarkedSensitive,
+        isSensitiveInherited = typedAudioNode.isSensitiveInherited,
     )
 }

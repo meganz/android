@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.audiosection.AudioSectionViewModel
@@ -27,11 +28,13 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.jupiter.api.AfterEach
@@ -78,6 +81,12 @@ class AudioSectionViewModelTest {
             runBlocking { invoke() }
         }.thenReturn(false)
     }
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase> {
+        on {
+            runBlocking { invoke() }
+        }.thenReturn(flowOf(false))
+    }
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val expectedAudio: AudioUiEntity = mock { on { name }.thenReturn("audio name") }
 
@@ -86,6 +95,7 @@ class AudioSectionViewModelTest {
         wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorOfflineNodeUpdatesUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorViewType() }.thenReturn(fakeMonitorViewTypeFlow)
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         underTest = AudioSectionViewModel(
             getAllAudioUseCase = getAllAudioUseCase,
             audioUIEntityMapper = audioUIEntityMapper,
@@ -103,6 +113,9 @@ class AudioSectionViewModelTest {
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            defaultDispatcher = UnconfinedTestDispatcher(),
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 

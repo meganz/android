@@ -21,6 +21,8 @@ import java.io.File
  * @property label the audio's label
  * @property nodeAvailableOffline the audio if is available for offline
  * @property isSelected the audio if is selected
+ * @property isMarkedSensitive the audio if is marked as sensitive
+ * @property isSensitiveInherited the audio if is sensitive inherited
  */
 data class AudioUiEntity(
     val id: NodeId,
@@ -37,4 +39,6 @@ data class AudioUiEntity(
     val label: Int,
     val nodeAvailableOffline: Boolean = false,
     val isSelected: Boolean = false,
+    val isMarkedSensitive: Boolean = false,
+    val isSensitiveInherited: Boolean = false,
 )
