@@ -151,7 +151,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 collectFlow(service.serviceGateway.metadataUpdate()) { metadata ->
                     viewModel.updateMetaData(metadata)
                     dragToExit.nodeChanged(
-                        service.playerServiceViewModelGateway.getCurrentPlayingHandle()
+                        lifecycleOwner = this@AudioPlayerActivity,
+                        handle = service.playerServiceViewModelGateway.getCurrentPlayingHandle()
                     )
                 }
 

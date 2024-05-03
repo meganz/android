@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.Constants.EVENT_DRAG_TO_EXIT_SCROLL
 import mega.privacy.android.app.utils.Constants.EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIEWER_FROM
@@ -228,9 +227,10 @@ class DragToExitSupport(
     /**
      * Notify node changes.
      *
+     * @param lifecycleOwner LifecycleOwner
      * @param handle new node handle
      */
-    fun nodeChanged(handle: Long) {
+    fun nodeChanged(lifecycleOwner: LifecycleOwner, handle: Long) {
         Timber.d("nodeChanged $handle, currentHandle $currentHandle")
 
         if (handle == currentHandle) {
@@ -247,9 +247,10 @@ class DragToExitSupport(
         }
 
         if (currentHandle != INVALID_HANDLE) {
-            LiveEventBus.get(
-                EVENT_DRAG_TO_EXIT_SCROLL, ScrollEvent::class.java
-            ).post(ScrollEvent(viewerFrom, handle))
+
+            lifecycleOwner.lifecycleScope.launch {
+                dragToExitFlow.emit(ScrollEvent(viewerFrom, handle))
+            }
 
             // When we need scroll, post the visibility event on the next UI cycle,
             // in case the item isn't scrolled up to visible at now.
@@ -358,6 +359,8 @@ class DragToExitSupport(
 
         private var thumbnailLocationFlow: MutableSharedFlow<ThumbnailLocationEvent> =
             MutableSharedFlow()
+        private var dragToExitFlow: MutableSharedFlow<ScrollEvent> =
+            MutableSharedFlow()
 
         /**
          * Put thumbnail location on screen into viewer launch intent.
@@ -465,22 +468,21 @@ class DragToExitSupport(
                 }
             }
 
-            LiveEventBus.get(
-                EVENT_DRAG_TO_EXIT_SCROLL, ScrollEvent::class.java
-            ).observe(lifecycleOwner) {
-                Timber.d("EVENT_DRAG_TO_EXIT_SCROLL $it")
+            lifecycleOwner.lifecycleScope.launch {
+                dragToExitFlow.flowWithLifecycle(lifecycleOwner.lifecycle).onEach {
+                    Timber.d("EVENT_DRAG_TO_EXIT_SCROLL $it")
+                }.filter {
+                    it.viewerFrom == viewerFrom
+                }.collectLatest {
+                    val thumbnailGetter =
+                        rv?.adapter as? DragThumbnailGetter ?: return@collectLatest
 
-                if (it.viewerFrom != viewerFrom) {
-                    return@observe
-                }
+                    val position = thumbnailGetter.getNodePosition(it.handle)
+                    Timber.d("EVENT_DRAG_TO_EXIT_SCROLL handle $it, position $position")
 
-                val thumbnailGetter = rv?.adapter as? DragThumbnailGetter ?: return@observe
-
-                val position = thumbnailGetter.getNodePosition(it.handle)
-                Timber.d("EVENT_DRAG_TO_EXIT_SCROLL handle $it, position $position")
-
-                if (position != INVALID_POSITION) {
-                    rv.scrollToPosition(position)
+                    if (position != INVALID_POSITION) {
+                        rv.scrollToPosition(position)
+                    }
                 }
             }
         }

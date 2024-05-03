@@ -770,7 +770,8 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 }
 
                 dragToExit.nodeChanged(
-                    getCurrentPlayingHandle()
+                    lifecycleOwner = this@VideoPlayerActivity,
+                    handle = getCurrentPlayingHandle()
                 )
             }
 

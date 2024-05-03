@@ -752,8 +752,6 @@ public class Constants {
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
-    public static final String EVENT_DRAG_TO_EXIT_SCROLL = "drag_to_exit_scroll";
-
     public static final String KEY_IS_SHOWED_WARNING_MESSAGE = "is_showed_meeting_warning_message_";
 
     public static final String STRING_SEPARATOR = " · ";
