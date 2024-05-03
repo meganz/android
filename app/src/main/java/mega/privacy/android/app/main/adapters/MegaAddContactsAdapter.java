@@ -19,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
@@ -101,7 +100,7 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
         String[] s;
 
         if (contact.getFullName() != null) {
-            if (contact.getMegaUser() == null && contact.getMegaContactDB() == null) {
+            if (contact.getMegaUser() == null && contact.getContact() == null) {
                 s = contact.getFullName().split("[@._]");
                 if (s != null && s.length > 0) {
                     holder.textViewName.setText(s[0]);
@@ -181,15 +180,15 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
 
         if (contact.getMegaUser() != null && contact.getMegaUser().getEmail() != null) {
             mail = contact.getMegaUser().getEmail();
-        } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getEmail() != null) {
-            mail = contact.getMegaContactDB().getEmail();
+        } else if (contact.getContact() != null && contact.getContact().getEmail() != null) {
+            mail = contact.getContact().getEmail();
         } else {
             mail = contact.getFullName();
         }
 
         int color = getColorAvatar(contact.getMegaUser());
 
-        if (contact.getMegaUser() == null && contact.getMegaContactDB() == null) {
+        if (contact.getMegaUser() == null && contact.getContact() == null) {
             return getDefaultAvatar(color, contact.getFullName(), AVATAR_SIZE, true);
         }
 

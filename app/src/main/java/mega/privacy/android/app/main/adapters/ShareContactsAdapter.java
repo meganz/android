@@ -111,7 +111,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
             }
         } else if (contact.isMegaContact()) {
             if (contact.getMegaContactAdapter().getFullName() != null) {
-                if (contact.getMegaContactAdapter().getMegaUser() == null && contact.getMegaContactAdapter().getMegaContactDB() == null) {
+                if (contact.getMegaContactAdapter().getMegaUser() == null && contact.getMegaContactAdapter().getContact() == null) {
                     s = contact.getMegaContactAdapter().getFullName().split("[@._]");
                     if (s != null && s.length > 0) {
                         holder.textViewName.setText(s[0]);

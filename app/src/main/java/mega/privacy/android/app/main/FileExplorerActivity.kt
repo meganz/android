@@ -71,7 +71,6 @@ import mega.privacy.android.app.namecollision.data.NameCollision.Upload.Companio
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException.ChildDoesNotExistsException
@@ -2353,7 +2352,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     chats.add(it)
                 }
             } else if (item.contact != null && item.contact.megaUser != null) {
-                users.add(item.contact.megaUser)
+                users.add(item.contact.megaUser ?: return)
             }
         }
         if (users.isNotEmpty()) {

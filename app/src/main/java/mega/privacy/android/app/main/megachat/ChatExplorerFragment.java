@@ -46,7 +46,6 @@ import java.util.ListIterator;
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
-import mega.privacy.android.domain.entity.Contact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -56,6 +55,7 @@ import mega.privacy.android.app.main.megachat.chatAdapters.MegaChipChatExplorerA
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.domain.entity.Contact;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -489,8 +489,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
                 handle = contact.getMegaUser().getHandle();
-            } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getEmail() != null) {
-                handle = contact.getMegaContactDB().getUserId();
+            } else if (contact.getContact() != null && contact.getContact().getEmail() != null) {
+                handle = contact.getContact().getUserId();
             }
         }
         return handle;

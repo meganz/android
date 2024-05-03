@@ -404,126 +404,22 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
     }
 
-    private class GetContactsTask extends AsyncTask<Void, Void, Void> {
+    public String getShareContactMail(ShareContactInfo contact) {
+        String mail = null;
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if (contactType == CONTACT_TYPE_MEGA) {
-                getVisibleMEGAContacts();
-                if (newGroup) {
-                    String mail;
-                    MegaContactAdapter contact;
-                    for (int i = 0; i < contactsNewGroup.size(); i++) {
-                        mail = contactsNewGroup.get(i);
-                        for (int j = 0; j < filteredContactMEGA.size(); j++) {
-                            contact = filteredContactMEGA.get(j);
-                            if ((contact.getMegaUser() != null && contact.getMegaUser().getEmail().equals(mail))
-                                    || (contact.getMegaContactDB() != null
-                                    && contact.getMegaContactDB().getEmail() != null
-                                    && contact.getMegaContactDB().getEmail().equals(mail))
-                            ) {
-                                addedContactsMEGA.add(contact);
-                                filteredContactMEGA.remove(contact);
-                                break;
-                            }
-                        }
-                    }
-                    adapterMEGAContacts.setContacts(addedContactsMEGA);
-                }
-            } else if (contactType == CONTACT_TYPE_DEVICE) {
-                if (queryPermissions) {
-                    getBothContacts();
-                    addedContactsPhone.clear();
-                    boolean found;
-                    PhoneContactInfo contactPhone;
-                    MegaContactAdapter contactMEGA;
-
-                    if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
-                        for (int i = 0; i < filteredContactsPhone.size(); i++) {
-                            found = false;
-                            contactPhone = filteredContactsPhone.get(i);
-                            for (int j = 0; j < visibleContactsMEGA.size(); j++) {
-                                contactMEGA = visibleContactsMEGA.get(j);
-                                if (contactPhone.getEmail().equals(getMegaContactMail(contactMEGA))) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (found) {
-                                filteredContactsPhone.remove(contactPhone);
-                                i--;
-                            }
-                        }
-                    }
-                }
-            } else {
-                getVisibleMEGAContacts();
-                addedContactsPhone.clear();
-                MegaContactAdapter contactMEGA;
-                ShareContactInfo contact;
-                shareContacts.clear();
-                filteredContactsShare.clear();
-
-                if (filteredContactMEGA != null && !filteredContactMEGA.isEmpty()) {
-                    shareContacts.add(new ShareContactInfoHeader(true, true, false));
-                    for (int i = 0; i < filteredContactMEGA.size(); i++) {
-                        contactMEGA = filteredContactMEGA.get(i);
-                        contact = new ShareContactInfo(null, contactMEGA, null);
-                        shareContacts.add(contact);
-                    }
-
-                    filteredContactsShare.addAll(shareContacts);
-
-                    if (queryPermissions) {
-                        filteredContactsShare.add(new ShareContactInfo());
-                    }
-                }
+        if (contact.isMegaContact() && !contact.isHeader()) {
+            if (contact.getMegaContactAdapter().getMegaUser() != null && contact.getMegaContactAdapter().getMegaUser().getEmail() != null) {
+                mail = contact.getMegaContactAdapter().getMegaUser().getEmail();
+            } else if (contact.getMegaContactAdapter().getContact() != null && contact.getMegaContactAdapter().getContact().getEmail() != null) {
+                mail = contact.getMegaContactAdapter().getContact().getEmail();
             }
-            return null;
+        } else if (contact.isPhoneContact() && !contact.isHeader()) {
+            mail = contact.getPhoneContactInfo().getEmail();
+        } else {
+            mail = contact.getMail();
         }
 
-        @Override
-        protected void onPostExecute(Void avoid) {
-            Timber.d("onPostExecute GetContactsTask");
-            progressBar.setVisibility(View.GONE);
-            if (searchExpand) {
-                if (isAsyncTaskRunning(filterContactsTask)) {
-                    filterContactsTask.cancel(true);
-                }
-                filterContactsTask = new FilterContactsTask();
-                filterContactsTask.execute();
-            } else {
-                if (contactType == CONTACT_TYPE_MEGA) {
-                    if (newGroup) {
-                        setAddedAdapterContacts();
-                    }
-                    setMegaAdapterContacts(filteredContactMEGA, MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
-                } else if (contactType == CONTACT_TYPE_DEVICE) {
-                    setPhoneAdapterContacts(filteredContactsPhone);
-                } else {
-                    setShareAdapterContacts(filteredContactsShare);
-                    if (queryPermissions) {
-                        waitingForPhoneContacts = true;
-                        getPhoneContactsTask = new GetPhoneContactsTask();
-                        getPhoneContactsTask.execute();
-                    }
-                }
-                setTitleAB();
-                setRecyclersVisibility();
-                setSendInvitationVisibility();
-                visibilityFastScroller();
-                setSearchVisibility();
-
-                if (isConfirmAddShown) {
-                    if (isAsyncTaskRunning(queryIfContactSouldBeAddedTask)) {
-                        queryIfContactSouldBeAddedTask.cancel(true);
-                    }
-                    hideKeyboard(addContactActivity, 0);
-                    queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
-                    queryIfContactSouldBeAddedTask.execute(true);
-                }
-            }
-        }
+        return mail;
     }
 
     private class FilterContactsTask extends AsyncTask<Void, Void, Void> {
@@ -2837,31 +2733,13 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         setSearchVisibility();
     }
 
-    public String getShareContactMail(ShareContactInfo contact) {
-        String mail = null;
-
-        if (contact.isMegaContact() && !contact.isHeader()) {
-            if (contact.getMegaContactAdapter().getMegaUser() != null && contact.getMegaContactAdapter().getMegaUser().getEmail() != null) {
-                mail = contact.getMegaContactAdapter().getMegaUser().getEmail();
-            } else if (contact.getMegaContactAdapter().getMegaContactDB() != null && contact.getMegaContactAdapter().getMegaContactDB().getEmail() != null) {
-                mail = contact.getMegaContactAdapter().getMegaContactDB().getEmail();
-            }
-        } else if (contact.isPhoneContact() && !contact.isHeader()) {
-            mail = contact.getPhoneContactInfo().getEmail();
-        } else {
-            mail = contact.getMail();
-        }
-
-        return mail;
-    }
-
     private String getMegaContactMail(MegaContactAdapter contact) {
         String mail = null;
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getEmail() != null) {
                 mail = contact.getMegaUser().getEmail();
-            } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getEmail() != null) {
-                mail = contact.getMegaContactDB().getEmail();
+            } else if (contact.getContact() != null && contact.getContact().getEmail() != null) {
+                mail = contact.getContact().getEmail();
             }
         }
         return mail;
@@ -2872,11 +2750,46 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
                 handle = contact.getMegaUser().getHandle();
-            } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getEmail() != null) {
-                handle = contact.getMegaContactDB().getUserId();
+            } else if (contact.getContact() != null && contact.getContact().getEmail() != null) {
+                handle = contact.getContact().getUserId();
             }
         }
         return handle;
+    }
+
+    private void setResultContacts(ArrayList<MegaContactAdapter> addedContacts, boolean megaContacts) {
+        Timber.d("setResultContacts");
+        ArrayList<String> contactsSelected = new ArrayList<String>();
+        String contactEmail;
+
+        if (addedContacts != null) {
+            for (int i = 0; i < addedContacts.size(); i++) {
+                if (addedContacts.get(i).getMegaUser() != null && addedContacts.get(i).getContact() != null) {
+                    contactEmail = addedContacts.get(i).getMegaUser().getEmail();
+                } else {
+                    contactEmail = addedContacts.get(i).getFullName();
+                }
+                if (contactEmail != null) {
+                    contactsSelected.add(contactEmail);
+                }
+            }
+        }
+        Timber.d("Contacts selected: %s", contactsSelected.size());
+
+        if (comesFromChat) {
+            addParticipants(contactsSelected);
+        } else if (onNewGroup) {
+            String chatTitle = "";
+            if (nameGroup != null && nameGroup.getText().length() > 0) {
+                chatTitle = nameGroup.getText().toString();
+                startConversation(contactsSelected, megaContacts, chatTitle);
+            } else {
+                startConversation(contactsSelected, megaContacts, null);
+            }
+        } else {
+            newGroup();
+        }
+        hideKeyboard(addContactActivity, 0);
     }
 
     private void toInviteContact() {
@@ -2976,39 +2889,126 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
     }
 
-    private void setResultContacts(ArrayList<MegaContactAdapter> addedContacts, boolean megaContacts) {
-        Timber.d("setResultContacts");
-        ArrayList<String> contactsSelected = new ArrayList<String>();
-        String contactEmail;
+    private class GetContactsTask extends AsyncTask<Void, Void, Void> {
 
-        if (addedContacts != null) {
-            for (int i = 0; i < addedContacts.size(); i++) {
-                if (addedContacts.get(i).getMegaUser() != null && addedContacts.get(i).getMegaContactDB() != null) {
-                    contactEmail = addedContacts.get(i).getMegaUser().getEmail();
-                } else {
-                    contactEmail = addedContacts.get(i).getFullName();
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (contactType == CONTACT_TYPE_MEGA) {
+                getVisibleMEGAContacts();
+                if (newGroup) {
+                    String mail;
+                    MegaContactAdapter contact;
+                    for (int i = 0; i < contactsNewGroup.size(); i++) {
+                        mail = contactsNewGroup.get(i);
+                        for (int j = 0; j < filteredContactMEGA.size(); j++) {
+                            contact = filteredContactMEGA.get(j);
+                            if ((contact.getMegaUser() != null && contact.getMegaUser().getEmail().equals(mail))
+                                    || (contact.getContact() != null
+                                    && contact.getContact().getEmail() != null
+                                    && contact.getContact().getEmail().equals(mail))
+                            ) {
+                                addedContactsMEGA.add(contact);
+                                filteredContactMEGA.remove(contact);
+                                break;
+                            }
+                        }
+                    }
+                    adapterMEGAContacts.setContacts(addedContactsMEGA);
                 }
-                if (contactEmail != null) {
-                    contactsSelected.add(contactEmail);
-                }
-            }
-        }
-        Timber.d("Contacts selected: %s", contactsSelected.size());
+            } else if (contactType == CONTACT_TYPE_DEVICE) {
+                if (queryPermissions) {
+                    getBothContacts();
+                    addedContactsPhone.clear();
+                    boolean found;
+                    PhoneContactInfo contactPhone;
+                    MegaContactAdapter contactMEGA;
 
-        if (comesFromChat) {
-            addParticipants(contactsSelected);
-        } else if (onNewGroup) {
-            String chatTitle = "";
-            if (nameGroup != null && nameGroup.getText().length() > 0) {
-                chatTitle = nameGroup.getText().toString();
-                startConversation(contactsSelected, megaContacts, chatTitle);
+                    if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
+                        for (int i = 0; i < filteredContactsPhone.size(); i++) {
+                            found = false;
+                            contactPhone = filteredContactsPhone.get(i);
+                            for (int j = 0; j < visibleContactsMEGA.size(); j++) {
+                                contactMEGA = visibleContactsMEGA.get(j);
+                                if (contactPhone.getEmail().equals(getMegaContactMail(contactMEGA))) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (found) {
+                                filteredContactsPhone.remove(contactPhone);
+                                i--;
+                            }
+                        }
+                    }
+                }
             } else {
-                startConversation(contactsSelected, megaContacts, null);
+                getVisibleMEGAContacts();
+                addedContactsPhone.clear();
+                MegaContactAdapter contactMEGA;
+                ShareContactInfo contact;
+                shareContacts.clear();
+                filteredContactsShare.clear();
+
+                if (filteredContactMEGA != null && !filteredContactMEGA.isEmpty()) {
+                    shareContacts.add(new ShareContactInfoHeader(true, true, false));
+                    for (int i = 0; i < filteredContactMEGA.size(); i++) {
+                        contactMEGA = filteredContactMEGA.get(i);
+                        contact = new ShareContactInfo(null, contactMEGA, null);
+                        shareContacts.add(contact);
+                    }
+
+                    filteredContactsShare.addAll(shareContacts);
+
+                    if (queryPermissions) {
+                        filteredContactsShare.add(new ShareContactInfo());
+                    }
+                }
             }
-        } else {
-            newGroup();
+            return null;
         }
-        hideKeyboard(addContactActivity, 0);
+
+        @Override
+        protected void onPostExecute(Void avoid) {
+            Timber.d("onPostExecute GetContactsTask");
+            progressBar.setVisibility(View.GONE);
+            if (searchExpand) {
+                if (isAsyncTaskRunning(filterContactsTask)) {
+                    filterContactsTask.cancel(true);
+                }
+                filterContactsTask = new FilterContactsTask();
+                filterContactsTask.execute();
+            } else {
+                if (contactType == CONTACT_TYPE_MEGA) {
+                    if (newGroup) {
+                        setAddedAdapterContacts();
+                    }
+                    setMegaAdapterContacts(filteredContactMEGA, MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
+                } else if (contactType == CONTACT_TYPE_DEVICE) {
+                    setPhoneAdapterContacts(filteredContactsPhone);
+                } else {
+                    setShareAdapterContacts(filteredContactsShare);
+                    if (queryPermissions) {
+                        waitingForPhoneContacts = true;
+                        getPhoneContactsTask = new GetPhoneContactsTask();
+                        getPhoneContactsTask.execute();
+                    }
+                }
+                setTitleAB();
+                setRecyclersVisibility();
+                setSendInvitationVisibility();
+                visibilityFastScroller();
+                setSearchVisibility();
+
+                if (isConfirmAddShown) {
+                    if (isAsyncTaskRunning(queryIfContactSouldBeAddedTask)) {
+                        queryIfContactSouldBeAddedTask.cancel(true);
+                    }
+                    hideKeyboard(addContactActivity, 0);
+                    queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
+                    queryIfContactSouldBeAddedTask.execute(true);
+                }
+            }
+        }
     }
 
     private void addParticipants(ArrayList<String> contacts) {
