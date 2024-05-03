@@ -220,7 +220,6 @@ import mega.privacy.android.app.presentation.recentactions.recentactionbucket.Re
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
-import mega.privacy.android.app.presentation.search.SearchFragment
 import mega.privacy.android.app.presentation.search.SearchViewModel
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
@@ -591,7 +590,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var incomingSharesComposeFragment: IncomingSharesComposeFragment? = null
     private var outgoingSharesComposeFragment: OutgoingSharesComposeFragment? = null
     private var linksComposeFragment: LinksComposeFragment? = null
-    private var searchFragment: SearchFragment? = null
     private var photosFragment: PhotosFragment? = null
     private var albumContentFragment: Fragment? = null
     private var photosFilterFragment: PhotosFilterFragment? = null
@@ -2317,9 +2315,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun onResume() {
-        if (drawerItem === DrawerItem.SEARCH && getSearchFragment() != null) {
-            searchFragment?.isWaitingForSearchedNodes = true
-        }
         super.onResume()
         queryIfNotificationsAreOn()
         if (resources.configuration.orientation != orientationSaved) {
@@ -4285,12 +4280,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 checkScrollOnSharedItemsDrawerItem()
             }
 
-            DrawerItem.SEARCH -> {
-                if (getSearchFragment() != null) {
-                    searchFragment?.checkScroll()
-                }
-            }
-
             DrawerItem.CHAT -> {
                 chatTabsFragment = chatsFragment
             }
@@ -4646,7 +4635,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                 DrawerItem.SEARCH -> if (searchExpand) {
                     openSearchView()
-                    searchFragment?.checkSelectMode()
                 } else {
                     moreMenuItem.isVisible = !isFirstNavigationLevel
                 }
@@ -4804,11 +4792,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             it.onBackPressed()
                             return true
                         }
-                    } else if (drawerItem == DrawerItem.SEARCH) {
-                        if (getSearchFragment() != null) {
-                            onBackPressedDispatcher.onBackPressed()
-                            return true
-                        }
                     } else if (drawerItem == DrawerItem.TRANSFERS) {
                         drawerItem = getStartDrawerItem()
                         selectDrawerItem(drawerItem)
@@ -4884,10 +4867,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
 
                     DrawerItem.BACKUPS -> backupsFragment?.selectAll()
-
-                    DrawerItem.SEARCH -> if (getSearchFragment() != null) {
-                        searchFragment?.selectAll()
-                    }
 
                     else -> {}
                 }
@@ -5000,8 +4979,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             onNodesBackupsUpdate()
         } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
             onNodesSharedUpdate()
-        } else if (drawerItem === DrawerItem.SEARCH) {
-            refreshSearch()
         }
         refreshRubbishBin()
         setToolbarTitle()
@@ -5009,13 +4986,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun refreshRubbishBin() {
         rubbishBinViewModel.refreshNodes()
-    }
-
-    private fun refreshSearch() {
-        if (getSearchFragment() != null) {
-            searchFragment?.hideMultipleSelect()
-            searchFragment?.refresh()
-        }
     }
 
     private fun goBack() {
@@ -5079,10 +5049,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             } else if (getPhotosFragment() == null || photosFragment?.onBackPressed() == 0) {
                 performOnBack()
-            }
-        } else if (drawerItem == DrawerItem.SEARCH) {
-            if (getSearchFragment() == null || searchFragment?.onBackPressed() == 0) {
-                closeSearchSection()
             }
         } else if (isInMainHomePage) {
             val fragment = getFragmentByType(
@@ -5555,15 +5521,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                         else -> {}
                     }
-                    searchViewModel.setSearchParentHandle(if (searchViewModel.state.value.searchDepth > 0) oldParentHandle else INVALID_HANDLE)
-                    searchViewModel.decreaseSearchDepth()
-                    refreshSearch()
-                }
-
-                DrawerItem.SEARCH -> {
-                    searchViewModel.setSearchParentHandle(if (searchViewModel.state.value.searchDepth > 0) oldParentHandle else INVALID_HANDLE)
-                    searchViewModel.decreaseSearchDepth()
-                    refreshSearch()
                 }
 
                 else -> {}
@@ -6125,7 +6082,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         refreshRubbishBin()
         backupsFragment?.refreshBackupsNodes()
         onNodesSharedUpdate()
-        refreshSearch()
     }
 
     var isFirstNavigationLevel: Boolean
@@ -7596,11 +7552,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    fun onNodesSearchUpdate() {
-        searchViewModel.setTextSubmitted(true)
-        searchFragment?.refresh()
-    }
-
     private fun refreshIncomingShares() {
         incomingSharesViewModel.refreshNodes()
     }
@@ -8107,17 +8058,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     fun homepageToSearch() {
         hideItemsWhenSearchSelected()
         searchMenuItem?.expandActionView()
-    }
-
-    fun setSearchQuery(searchQuery: String) {
-        searchViewModel.setSearchQuery(searchQuery)
-        searchView?.setQuery(searchQuery, false)
-    }
-
-    private fun getSearchFragment(): SearchFragment? {
-        return (supportFragmentManager.findFragmentByTag(FragmentTag.SEARCH.tag) as? SearchFragment).also {
-            searchFragment = it
-        }
     }
 
     /**

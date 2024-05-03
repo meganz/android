@@ -1510,7 +1510,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             DrawerItem.CLOUD_DRIVE, DrawerItem.RUBBISH_BIN -> (requireActivity() as ManagerActivity).onNodesCloudDriveUpdate()
             DrawerItem.BACKUPS -> (requireActivity() as ManagerActivity).onNodesBackupsUpdate()
             DrawerItem.SHARED_ITEMS -> (requireActivity() as ManagerActivity).refreshSharesFragments()
-            DrawerItem.SEARCH -> (requireActivity() as ManagerActivity).onNodesSearchUpdate()
 
             else -> {}
         }
