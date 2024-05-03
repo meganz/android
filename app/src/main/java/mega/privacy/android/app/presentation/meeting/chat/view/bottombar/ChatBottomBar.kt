@@ -5,10 +5,10 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -21,7 +21,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
@@ -70,7 +69,6 @@ internal fun ChatBottomBar(
     onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
     viewModel: ChatBottomBarViewModel = hiltViewModel(),
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
     var textFieldValue by rememberSaveable(
@@ -78,13 +76,14 @@ internal fun ChatBottomBar(
         stateSaver = TextFieldValue.Saver
     ) {
         mutableStateOf(
-            uiState.editingMessageContent?.let {
-                val text = uiState.sendingText
-                focusRequester.requestFocus()
-                coroutineScope.launch { keyboardController?.show() }
-                TextFieldValue(text, TextRange(text.length))
-            } ?: TextFieldValue(uiState.sendingText)
+            TextFieldValue(uiState.sendingText, TextRange(uiState.sendingText.length))
         )
+    }
+    LaunchedEffect(uiState.sendingText, uiState.editingMessageContent) {
+        if (uiState.sendingText.isNotEmpty()) {
+            focusRequester.requestFocus()
+            keyboardController?.show()
+        }
     }
     ComposableLifecycle(key = textFieldValue.text) {
         if (it == Lifecycle.Event.ON_PAUSE) {
