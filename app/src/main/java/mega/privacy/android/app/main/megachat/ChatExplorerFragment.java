@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main.megachat;
 
 import static mega.privacy.android.app.main.FileExplorerActivity.CHAT_FRAGMENT;
+import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
 import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 import static mega.privacy.android.app.utils.ContactUtil.getContactDB;
 import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
@@ -629,7 +630,16 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                     });
 
                     recents = new ArrayList<>();
-                    recents.add(new ChatExplorerListItem(true, true));
+                    recents.add(
+                            new ChatExplorerListItem(
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    true,
+                                    true
+                            )
+                    );
                     ArrayList<MegaChatListItem> removeChats = new ArrayList<>();
                     for (MegaChatListItem chat : chats) {
                         if (chat.getOwnPrivilege() < MegaChatRoom.PRIV_STANDARD) {
@@ -637,9 +647,19 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                         }
                         ChatExplorerListItem item;
                         if (chat.isGroup()) {
-                            item = new ChatExplorerListItem(chat);
+                            item = new ChatExplorerListItem(
+                                    null,
+                                    chat,
+                                    getTitleChat(chat),
+                                    String.valueOf(chat.getChatId())
+                            );
                         } else {
-                            item = new ChatExplorerListItem(chat, getContact(chat));
+                            item = new ChatExplorerListItem(
+                                    getContact(chat),
+                                    chat,
+                                    getTitleChat(chat),
+                                    String.valueOf(chat.getChatId())
+                            );
                         }
                         item.setRecent(true);
                         recents.add(item);
@@ -661,9 +681,23 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                         continue;
                     }
                     if (chat.isGroup()) {
-                        items.add(new ChatExplorerListItem(chat));
+                        items.add(
+                                new ChatExplorerListItem(
+                                        null,
+                                        chat,
+                                        getTitleChat(chat),
+                                        String.valueOf(chat.getChatId())
+                                )
+                        );
                     } else {
-                        items.add(new ChatExplorerListItem(chat, getContact(chat)));
+                        items.add(
+                                new ChatExplorerListItem(
+                                        getContact(chat),
+                                        chat,
+                                        getTitleChat(chat),
+                                        String.valueOf(chat.getChatId())
+                                )
+                        );
                     }
                 }
 
@@ -672,9 +706,23 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                         continue;
                     }
                     if (archieved.isGroup()) {
-                        items.add(new ChatExplorerListItem(archieved));
+                        items.add(
+                                new ChatExplorerListItem(
+                                        null,
+                                        archieved,
+                                        getTitleChat(archieved),
+                                        String.valueOf(archieved.getChatId())
+                                )
+                        );
                     } else {
-                        items.add(new ChatExplorerListItem(archieved, getContact(archieved)));
+                        items.add(
+                                new ChatExplorerListItem(
+                                        getContact(archieved),
+                                        archieved,
+                                        getTitleChat(archieved),
+                                        String.valueOf(archieved.getChatId())
+                                )
+                        );
                     }
                 }
 
@@ -696,7 +744,14 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                                     }
                                 }
                             }
-                            items.add(new ChatExplorerListItem(contact));
+                            items.add(
+                                    new ChatExplorerListItem(
+                                            contact,
+                                            null,
+                                            contact.getFullName(),
+                                            String.valueOf(contact.getMegaUser().getHandle())
+                                    )
+                            );
                         }
                     }
                 }
@@ -706,7 +761,17 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 //Order by title
                 sortByAlphabetical();
                 if (!items.isEmpty()) {
-                    items.add(0, new ChatExplorerListItem(true, false));
+                    items.add(
+                            0,
+                            new ChatExplorerListItem(
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    false,
+                                    true
+                            )
+                    );
                 }
 
                 if (recents != null) {
