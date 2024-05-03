@@ -111,11 +111,13 @@ class DocumentSectionViewModel @Inject constructor(
 
     private fun handleHiddenNodeUIFlow() {
         combine(
-            monitorNodeUpdatesUseCase(),
-            monitorOfflineNodeUpdatesUseCase(),
+            merge(
+                monitorNodeUpdatesUseCase(),
+                monitorOfflineNodeUpdatesUseCase(),
+            ).conflate(),
             monitorAccountDetailUseCase(),
             monitorShowHiddenItemsUseCase(),
-        ) { _, _, accountDetail, showHiddenItems ->
+        ) { _, accountDetail, showHiddenItems ->
             this@DocumentSectionViewModel.showHiddenItems = showHiddenItems
             _uiState.update {
                 it.copy(

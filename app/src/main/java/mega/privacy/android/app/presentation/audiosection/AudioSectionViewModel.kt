@@ -109,11 +109,13 @@ class AudioSectionViewModel @Inject constructor(
 
     private fun handleHiddenNodesUIFlow() {
         combine(
-            monitorNodeUpdatesUseCase(),
-            monitorOfflineNodeUpdatesUseCase(),
+            merge(
+                monitorNodeUpdatesUseCase(),
+                monitorOfflineNodeUpdatesUseCase(),
+            ).conflate(),
             monitorAccountDetailUseCase(),
             monitorShowHiddenItemsUseCase(),
-        ) { _, _, accountDetail, showHiddenItems ->
+        ) { _, accountDetail, showHiddenItems ->
             this@AudioSectionViewModel.showHiddenItems = showHiddenItems
             _state.update {
                 it.copy(
