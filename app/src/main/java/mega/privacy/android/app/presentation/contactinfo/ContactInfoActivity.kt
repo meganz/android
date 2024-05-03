@@ -63,8 +63,8 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.main.megachat.ChatExplorerActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
+import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment

@@ -15,7 +15,7 @@ import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.listeners.AttachNodesListener
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.main.megachat.ChatExplorerActivity
+import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants.EXTRA_KEY
@@ -31,7 +31,6 @@ import mega.privacy.android.app.utils.Constants.USER_HANDLES
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaHandleList

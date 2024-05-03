@@ -6,7 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import mega.privacy.android.app.main.CloudDriveExplorerFragment
 import mega.privacy.android.app.main.IncomingSharesExplorerFragment
-import mega.privacy.android.app.main.megachat.ChatExplorerFragment
+import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 
 /**
  * Adapter for FileExplorerActivity.

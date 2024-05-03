@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megachat;
+package mega.privacy.android.app.main.megachat.chat.explorer;
 
 
 import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;

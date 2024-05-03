@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megachat;
+package mega.privacy.android.app.main.megachat.chat.explorer;
 
 import static mega.privacy.android.app.main.FileExplorerActivity.CHAT_FRAGMENT;
 import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
@@ -33,6 +33,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -115,6 +116,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     private PositionDividerItemDecoration positionDividerItemDecoration;
     private SimpleDividerItemDecoration simpleDividerItemDecoration;
 
+    private ChatExplorerViewModel viewModel;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,7 +138,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         chatExplorerFragment = this;
     }
-
 
     public static ChatExplorerFragment newInstance() {
         Timber.d("newInstance");
@@ -226,6 +228,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         } else {
             addedItemsSaved = new ArrayList<>();
         }
+
+        viewModel = new ViewModelProvider(this).get(ChatExplorerViewModel.class);
 
         setChats();
 

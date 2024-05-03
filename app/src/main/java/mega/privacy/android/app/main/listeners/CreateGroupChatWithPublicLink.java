@@ -9,7 +9,7 @@ import android.util.Pair;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import mega.privacy.android.app.main.FileExplorerActivity;
-import mega.privacy.android.app.main.megachat.ChatExplorerActivity;
+import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;

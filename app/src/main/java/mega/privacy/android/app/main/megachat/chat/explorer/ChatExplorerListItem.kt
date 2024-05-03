@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megachat
+package mega.privacy.android.app.main.megachat.chat.explorer
 
 import mega.privacy.android.app.MegaContactAdapter
 import nz.mega.sdk.MegaChatListItem

@@ -256,7 +256,7 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
-        <activity android:name=".main.megachat.ChatExplorerActivity" />
+        <activity android:name=".main.megachat.chat.explorer.ChatExplorerActivity" />
         <activity android:name=".main.megachat.NodeAttachmentHistoryActivity" />
         <activity android:name=".main.CountryCodePickerActivity" />
         <activity android:name=".providers.PasscodeFileProviderActivity" />
