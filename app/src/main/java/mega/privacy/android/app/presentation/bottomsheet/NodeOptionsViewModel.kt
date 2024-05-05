@@ -18,7 +18,6 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformat
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -59,7 +58,6 @@ class NodeOptionsViewModel @Inject constructor(
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
-    private val getParentNodeUseCase: GetParentNodeUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -225,19 +223,11 @@ class NodeOptionsViewModel @Inject constructor(
     /**
      * Check if the current node can be hidden
      */
-    private suspend fun isHidingActionAllowed(handle: Long): Boolean {
-        val restrictedHandles = listOf(
-            getPrimarySyncHandleUseCase(),
-            getSecondarySyncHandleUseCase(),
-            getMyChatsFilesFolderIdUseCase().longValue,
-        )
-
-        val parentNodeHandle =
-            getParentNodeUseCase(nodeId = NodeId(handle))?.id?.longValue ?: 0
-
-        return parentNodeHandle !in restrictedHandles && handle !in restrictedHandles
-    }
-
+    private suspend fun isHidingActionAllowed(handle: Long): Boolean = handle !in listOf(
+        getPrimarySyncHandleUseCase(),
+        getSecondarySyncHandleUseCase(),
+        getMyChatsFilesFolderIdUseCase().longValue,
+    )
 
     /**
      * Retrieves the Node Information of the Unverified Node with the Contact Name

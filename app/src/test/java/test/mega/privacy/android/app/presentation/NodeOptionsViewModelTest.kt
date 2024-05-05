@@ -84,7 +84,6 @@ class NodeOptionsViewModelTest {
             runBlocking { invoke() }
         }.thenReturn(NodeId(0))
     }
-    private val getParentNodeUseCase = mock<GetParentNodeUseCase>()
 
     private val nodeIdFlow = MutableStateFlow(-1L)
 
@@ -121,7 +120,6 @@ class NodeOptionsViewModelTest {
             getNodeByHandle = getNodeByHandle,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            savedStateHandle = savedStateHandle,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
             getContactUserNameFromDatabaseUseCase = getContactUserNameFromDatabaseUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
@@ -130,7 +128,7 @@ class NodeOptionsViewModelTest {
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
-            getParentNodeUseCase = getParentNodeUseCase,
+            savedStateHandle = savedStateHandle,
         )
     }
 
