@@ -27,6 +27,7 @@ import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
+import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 
 /**
  * Scaffold for the Offline Flow Screen
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 fun OfflineFeatureScreen(
     uiState: OfflineUIState,
     fileTypeIconMapper: FileTypeIconMapper,
+    onOfflineItemClicked: (OfflineNodeUIItem) -> Unit
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -58,7 +60,10 @@ fun OfflineFeatureScreen(
                         } else {
                             fileTypeIconMapper(getFileExtension(it.offlineNode.title))
                         },
-                        thumbnailData = it.offlineNode.thumbnail
+                        thumbnailData = it.offlineNode.thumbnail,
+                        onItemClicked = {
+                            onOfflineItemClicked(it)
+                        }
                     )
                     MegaDivider(dividerType = DividerType.BigStartPadding)
                 }
@@ -150,6 +155,7 @@ private fun OfflineFeatureScreenPreview() {
                 ),
             )
         ),
-        fileTypeIconMapper = FileTypeIconMapper()
+        fileTypeIconMapper = FileTypeIconMapper(),
+        onOfflineItemClicked = {}
     )
 }

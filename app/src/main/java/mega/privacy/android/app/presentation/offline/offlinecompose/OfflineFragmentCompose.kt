@@ -6,13 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.interfaces.Scrollable
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.offline.view.OfflineFeatureScreen
 import mega.privacy.android.app.utils.callManager
@@ -34,7 +37,7 @@ class OfflineFragmentCompose : Fragment(), Scrollable {
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
-    private val viewModel: OfflineComposeViewModel by viewModels()
+    private val viewModel: OfflineComposeViewModel by activityViewModels()
     private val args: OfflineFragmentComposeArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +62,13 @@ class OfflineFragmentCompose : Fragment(), Scrollable {
                 MegaAppTheme(isDark = isDarkMode) {
                     OfflineFeatureScreen(
                         uiState = uiState,
-                        fileTypeIconMapper = fileTypeIconMapper
+                        fileTypeIconMapper = fileTypeIconMapper,
+                        onOfflineItemClicked = viewModel::onItemClicked
+                    )
+                    (requireActivity() as? ManagerActivity)?.setToolbarTitleFromFullscreenOfflineFragment(
+                        title = uiState.title.ifEmpty { stringResource(id = R.string.section_saved_for_offline_new) },
+                        firstNavigationLevel = false,
+                        showSearch = true
                     )
                 }
             }

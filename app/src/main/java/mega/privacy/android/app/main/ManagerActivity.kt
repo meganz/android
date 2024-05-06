@@ -209,6 +209,7 @@ import mega.privacy.android.app.presentation.node.NodeSourceTypeMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
 import mega.privacy.android.app.presentation.offline.OfflineFragment
+import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeViewModel
 import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineFragmentCompose
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
@@ -400,6 +401,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val transferPageViewModel: TransferPageViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by viewModels()
+    private val offlineComposeViewModel: OfflineComposeViewModel by viewModels()
+
     private val searchResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -3666,7 +3669,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     hideAdsView()
                 }
 
-                R.id.fullscreen_offline -> {
+                R.id.fullscreen_offline,
+                R.id.offlineFragmentCompose -> {
                     homepageScreen = HomepageScreen.FULLSCREEN_OFFLINE
                     hideAdsView()
                 }
@@ -5196,17 +5200,27 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun handleBackPressIfFullscreenOfflineFragmentOpened() {
-        if (fullscreenOfflineFragment == null || fullscreenOfflineFragment?.onBackPressed() == 0) {
-            // workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
-            // offline, and hide AppBarLayout when immediately on go back, we will see the flicker
-            // of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
-            if (bottomNavigationCurrentItem != HOME_BNV) {
-                goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-            } else {
-                drawerItem = DrawerItem.HOMEPAGE
+        if (enableOfflineCompose) {
+            offlineComposeViewModel.onBackClicked()?.let {
+                handleOfflineBackClick()
             }
-            handleSuperBackPressed()
+        } else {
+            if (fullscreenOfflineFragment == null || fullscreenOfflineFragment?.onBackPressed() == 0) {
+                handleOfflineBackClick()
+            }
         }
+    }
+
+    private fun handleOfflineBackClick() {
+        // workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
+        // offline, and hide AppBarLayout when immediately on go back, we will see the flicker
+        // of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
+        if (bottomNavigationCurrentItem != HOME_BNV) {
+            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+        } else {
+            drawerItem = DrawerItem.HOMEPAGE
+        }
+        handleSuperBackPressed()
     }
 
     fun adjustTransferWidgetPositionInHomepage() {

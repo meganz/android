@@ -10,13 +10,14 @@ import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
  * @param showOfflineWarning UI state to show the offline warning
  * @param offlineNodes The offline nodes fetched from the database
  * @param selectedNodeHandles The selected nodes when the view is in the selecting mode
- * @param parentId Parent id of folder
- *
+ * @param parentId Parent id of Node
+ * @param title Title of screen
  */
 data class OfflineUIState(
     val isLoading: Boolean = false,
     val showOfflineWarning: Boolean = false,
     val offlineNodes: List<OfflineNodeUIItem> = emptyList(),
     val selectedNodeHandles: List<String> = emptyList(),
-    val parentId: Int = -1
+    val parentId: Int = -1,
+    val title: String = "",
 )

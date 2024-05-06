@@ -42,6 +42,8 @@ class OfflineComposeViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(OfflineUIState())
 
+    private val arrayDeque = ArrayDeque<Pair<Int, String>>()
+
     /**
      * Flow of [OfflineUIState] UI State
      */
@@ -97,16 +99,6 @@ class OfflineComposeViewModel @Inject constructor(
     }
 
     /**
-     * Offline folder clicked
-     */
-    fun onFolderClicked(parentId: Int) {
-        _uiState.update {
-            it.copy(parentId = parentId)
-        }
-        refreshList()
-    }
-
-    /**
      * Dismiss showing the Offline warning message
      */
     fun dismissOfflineWarning() {
@@ -131,6 +123,7 @@ class OfflineComposeViewModel @Inject constructor(
         }
 
         return OfflineFileInfoUiState(
+            id = offlineNodeInfo.id,
             title = offlineNodeInfo.name,
             isFolder = offlineNodeInfo.isFolder,
             addedTime = addedTime,
@@ -156,5 +149,45 @@ class OfflineComposeViewModel @Inject constructor(
         offlineNodeInfo: OfflineNodeInformation,
     ) = offlineNodeInfo.takeIf { it.isFolder }?.let {
         offlineFolderInformationUseCase(it.id)
+    }
+
+    /**
+     * Handle on clicked of item
+     */
+    fun onItemClicked(offlineNodeUIItem: OfflineNodeUIItem) {
+        if (offlineNodeUIItem.offlineNode.isFolder) {
+            arrayDeque.addLast(
+                Pair(
+                    offlineNodeUIItem.offlineNode.parentId,
+                    uiState.value.title
+                )
+            )
+            _uiState.update {
+                it.copy(
+                    title = offlineNodeUIItem.offlineNode.title,
+                    parentId = offlineNodeUIItem.offlineNode.id,
+                )
+            }
+            refreshList()
+        }
+    }
+
+    /**
+     * OnBackClicked
+     */
+    fun onBackClicked(): Int? {
+        return if (arrayDeque.isNotEmpty()) {
+            val (parentId, parentTitle) = arrayDeque.removeLast()
+            _uiState.update {
+                it.copy(
+                    parentId = parentId,
+                    title = parentTitle
+                )
+            }
+            refreshList()
+            null
+        } else {
+            -1
+        }
     }
 }

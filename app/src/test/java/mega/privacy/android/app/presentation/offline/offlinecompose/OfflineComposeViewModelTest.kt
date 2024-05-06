@@ -5,6 +5,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
@@ -102,8 +104,49 @@ class OfflineComposeViewModelTest {
         whenever(offlineFolderInformationUseCase(-1)).thenReturn(offlineFolderInfo)
         whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(list)
 
-        underTest.onFolderClicked(parentId)
+        underTest.onItemClicked(
+            offlineNodeUIItem = OfflineNodeUIItem(
+                offlineNode = OfflineFileInfoUiState(
+                    id = parentId,
+                    parentId = 0,
+                    title = "Sample",
+                    isFolder = true
+                ),
+                isSelected = false
+            )
+        )
         assertThat(underTest.uiState.value.offlineNodes).hasSize(2)
+    }
+
+    @Test
+    fun `test that when back clicked, it calls its parent id`() = runTest {
+        val parentId = 1
+        val offlineList1 = mock<OtherOfflineNodeInformation>()
+        whenever(offlineList1.isFolder).thenReturn(true)
+        whenever(offlineList1.name).thenReturn("folder")
+        whenever(offlineList1.lastModifiedTime).thenReturn(100000L)
+
+        val offlineList2 = mock<OtherOfflineNodeInformation>()
+        whenever(offlineList2.isFolder).thenReturn(false)
+        whenever(offlineList2.name).thenReturn("file")
+        whenever(offlineList2.lastModifiedTime).thenReturn(100000L)
+
+        val list = listOf(offlineList1, offlineList2)
+        whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(list)
+        underTest.onItemClicked(
+            offlineNodeUIItem = OfflineNodeUIItem(
+                offlineNode = OfflineFileInfoUiState(
+                    id = parentId,
+                    parentId = 0,
+                    title = "Sample",
+                    isFolder = true
+                ),
+                isSelected = false
+            )
+        )
+
+        underTest.onBackClicked()
+        verify(getOfflineNodesByParentIdUseCase).invoke(parentId)
     }
 
     private suspend fun stubCommon() {
