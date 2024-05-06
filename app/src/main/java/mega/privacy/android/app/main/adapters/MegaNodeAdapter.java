@@ -58,6 +58,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -190,7 +191,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public RelativeLayout thumbLayout;
         public ImageView imageViewVideoIcon;
         public TextView videoDuration;
-        public RelativeLayout videoInfoLayout, bottomContainer;
+        public RelativeLayout videoInfoLayout;
+        public ConstraintLayout bottomContainer;
         public ImageButton imageButtonThreeDots;
 
         public View folderLayout;
