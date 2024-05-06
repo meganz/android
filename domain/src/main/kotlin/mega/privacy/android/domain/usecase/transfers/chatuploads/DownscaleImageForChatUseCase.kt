@@ -1,11 +1,15 @@
 package mega.privacy.android.domain.usecase.transfers.chatuploads
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
+import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
 import java.io.File
 import javax.inject.Inject
 
 /**
- * Use case to downscale an image that will be attached to a chat before uploading.
+ * Use case to downscale an image that will be attached to a chat before uploading and return the state of the compression..
  */
 class DownscaleImageForChatUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
@@ -14,17 +18,25 @@ class DownscaleImageForChatUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @return the downscaled image or null if it's not scaled.
+     * @return the state of the compression.
      */
-    suspend operator fun invoke(file: File): File? {
-        return getCacheFileForChatUploadUseCase(file)
-            ?.also { destination ->
-                fileSystemRepository.downscaleImage(
-                    file = file,
-                    destination = destination,
-                    maxPixels = DOWNSCALE_IMAGES_PX
-                )
-            }?.takeIf { it.exists() }
+    suspend operator fun invoke(file: File): Flow<ChatUploadCompressionState> {
+        return getCacheFileForChatUploadUseCase(file)?.let { destination ->
+            fileSystemRepository.downscaleImage(
+                file = file,
+                destination = destination,
+                maxPixels = DOWNSCALE_IMAGES_PX
+            )
+            flowOf(
+                if (destination.exists()) {
+                    ChatUploadCompressionState.Compressed(destination)
+                } else {
+                    ChatUploadCompressionState.NotCompressed(ChatUploadNotCompressedReason.FailedToCompress)
+                }
+            )
+        } ?: flowOf(
+            ChatUploadCompressionState.NotCompressed(ChatUploadNotCompressedReason.NoCacheFile)
+        )
     }
 
     companion object {

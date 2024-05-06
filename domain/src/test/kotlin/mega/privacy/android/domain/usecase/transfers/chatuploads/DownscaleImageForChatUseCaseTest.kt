@@ -1,8 +1,11 @@
 package mega.privacy.android.domain.usecase.transfers.chatuploads
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
+import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
 import mega.privacy.android.domain.usecase.transfers.chatuploads.DownscaleImageForChatUseCase.Companion.DOWNSCALE_IMAGES_PX
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -41,33 +44,57 @@ class DownscaleImageForChatUseCaseTest {
         )
 
     @Test
-    fun `test that gifs are not scaled`() = runTest {
-        val file = File("img.gif")
-        assertThat(underTest(file)).isNull()
-        verifyNoInteractions(fileSystemRepository)
-    }
-
-    @Test
-    fun `test that webp are not scaled`() = runTest {
-        val file = File("img.webp")
-        assertThat(underTest(file)).isNull()
-        verifyNoInteractions(fileSystemRepository)
-    }
-
-    @Test
-    fun `test that scaled image from repository is returned when needs to be scaled`() =
+    fun `test that scaled image from repository is returned when it needs to be scaled`() =
         runTest {
             val file = File("img.jpg")
             val expected = stubDestination()
-            val actual = underTest(file)
-            assertThat(actual).isEqualTo(expected)
+            underTest(file).test {
+                assertThat(awaitItem())
+                    .isEqualTo(ChatUploadCompressionState.Compressed(expected))
+                awaitComplete()
+            }
             verify(fileSystemRepository).downscaleImage(file, expected, DOWNSCALE_IMAGES_PX)
         }
 
-    private suspend fun stubDestination(): File {
+    @Test
+    fun `test that FailedToCompress is returned when the file is not created`() =
+        runTest {
+            val file = File("img.jpg")
+            val expected = stubDestination(exists = false)
+            underTest(file).test {
+                assertThat(awaitItem())
+                    .isEqualTo(
+                        ChatUploadCompressionState.NotCompressed(
+                            ChatUploadNotCompressedReason.FailedToCompress
+                        )
+                    )
+                awaitComplete()
+            }
+            verify(fileSystemRepository).downscaleImage(file, expected, DOWNSCALE_IMAGES_PX)
+        }
+
+    @Test
+    fun `test that NoCacheFile is returned when the cache file is not created`() =
+        runTest {
+            val file = File("img.jpg")
+            val expected = stubDestination()
+            whenever(getCacheFileForChatUploadUseCase(any())) doReturn null
+            underTest(file).test {
+                assertThat(awaitItem())
+                    .isEqualTo(
+                        ChatUploadCompressionState.NotCompressed(
+                            ChatUploadNotCompressedReason.NoCacheFile
+                        )
+                    )
+                awaitComplete()
+            }
+            verifyNoInteractions(fileSystemRepository)
+        }
+
+    private suspend fun stubDestination(exists: Boolean = true): File {
         val destination = mock<File> {
             on { it.name } doReturn "destination"
-            on { it.exists() } doReturn true
+            on { it.exists() } doReturn exists
         }
         whenever(getCacheFileForChatUploadUseCase(any())) doReturn destination
         return destination

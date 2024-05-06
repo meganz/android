@@ -3,7 +3,9 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
@@ -12,6 +14,7 @@ import mega.privacy.android.domain.exception.chat.FoldersNotAllowedAsChatUploadE
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
 import java.io.File
@@ -66,7 +69,9 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
             return@flow
         }
         val filesAndNames = mapOf(
-            (runCatching { compressFileForChatUseCase(file) }.getOrNull() ?: file)
+            (compressFileForChatUseCase(file)
+                .mapNotNull { (it as? ChatUploadCompressionState.Compressed)?.file }
+                .firstOrNull() ?: file)
                     to name
         )
         coroutineContext.ensureActive()

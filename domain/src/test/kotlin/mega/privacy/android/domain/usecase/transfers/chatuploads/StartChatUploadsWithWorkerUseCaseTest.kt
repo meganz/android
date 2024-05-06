@@ -19,6 +19,8 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
+import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -80,6 +82,9 @@ class StartChatUploadsWithWorkerUseCaseTest {
 
     private suspend fun commonStub() {
         whenever(fileSystemRepository.isFilePath(any())) doReturn true
+        whenever(compressFileForChatUseCase(any())) doReturn flowOf(
+            ChatUploadCompressionState.NotCompressed(ChatUploadNotCompressedReason.CompressionNotNeeded)
+        )
     }
 
     @Test
@@ -196,7 +201,8 @@ class StartChatUploadsWithWorkerUseCaseTest {
         runTest {
             val file = mockFile()
             val compressed = mockFile()
-            whenever(compressFileForChatUseCase(file)).thenReturn(compressed)
+            whenever(compressFileForChatUseCase(file))
+                .thenReturn(flowOf(ChatUploadCompressionState.Compressed(compressed)))
             underTest(file, NodeId(11L), 1L).test {
                 verify(uploadFilesUseCase)
                     .invoke(eq(mapOf(compressed to null)), NodeId(any()), any(), any(), any())
