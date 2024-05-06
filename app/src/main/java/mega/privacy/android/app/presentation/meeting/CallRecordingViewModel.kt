@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -62,6 +63,10 @@ class CallRecordingViewModel @Inject constructor(
      * Sets chatId.
      */
     fun setChatId(chatId: Long) {
+        if (chatId == this.chatId) {
+            return
+        }
+
         this.chatId = chatId
         monitorCallSessionOnRecording(chatId)
         monitorCallInChat(chatId)
@@ -73,40 +78,46 @@ class CallRecordingViewModel @Inject constructor(
     private fun monitorCallSessionOnRecording(chatId: Long) {
         monitorCallSessionOnRecordingJob?.cancel()
         monitorCallSessionOnRecordingJob = viewModelScope.launch {
-            monitorCallSessionOnRecordingUseCase(chatId).collectLatest { callRecordingEvent ->
-                callRecordingEvent?.let {
-                    _state.update { state ->
-                        state.copy(callRecordingEvent = callRecordingEvent)
-                    }
-                    if (!it.isSessionOnRecording) {
-                        broadcastCallRecordingConsentEvent(null)
+            monitorCallSessionOnRecordingUseCase(chatId)
+                .catch { Timber.d(it) }
+                .collectLatest { callRecordingEvent ->
+                    callRecordingEvent?.let {
+                        _state.update { state ->
+                            state.copy(callRecordingEvent = callRecordingEvent)
+                        }
+                        if (!it.isSessionOnRecording) {
+                            broadcastCallRecordingConsentEvent(null)
+                        }
                     }
                 }
-            }
         }
     }
 
     private fun monitorCallInChat(chatId: Long) {
         monitorCallInChatJob?.cancel()
         monitorCallInChatJob = viewModelScope.launch {
-            monitorCallInChatUseCase(chatId).collectLatest { call ->
-                _state.update { state ->
-                    call?.let {
-                        val isParticipatingInCall = call.status?.isJoined == true
-                        val isRecording = call.sessionByClientId
-                            .filter { it.value.isRecording }.isNotEmpty()
+            monitorCallInChatUseCase(chatId)
+                .catch { Timber.d(it) }
+                .collectLatest { call ->
+                    _state.update { state ->
+                        call?.let {
+                            val isParticipatingInCall = call.status?.isJoined == true
+                            val isRecording = call.sessionByClientId
+                                .filter { it.value.isRecording }.isNotEmpty()
 
-                        if (!isRecording || !isParticipatingInCall) {
-                            broadcastCallRecordingConsentEvent(null)
-                        }
+                            if (!isRecording || !isParticipatingInCall) {
+                                broadcastCallRecordingConsentEvent(null)
+                            }
 
-                        state.copy(
-                            callRecordingEvent = state.callRecordingEvent.copy(isSessionOnRecording = isRecording),
-                            isParticipatingInCall = isParticipatingInCall,
-                        )
-                    } ?: CallRecordingUIState()
+                            state.copy(
+                                callRecordingEvent = state.callRecordingEvent.copy(
+                                    isSessionOnRecording = isRecording
+                                ),
+                                isParticipatingInCall = isParticipatingInCall,
+                            )
+                        } ?: CallRecordingUIState()
+                    }
                 }
-            }
         }
     }
 
