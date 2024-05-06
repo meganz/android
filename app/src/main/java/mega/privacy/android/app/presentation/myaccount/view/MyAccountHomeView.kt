@@ -478,9 +478,9 @@ private fun AccountInfoSection(
     val scope = rememberCoroutineScope()
     var lastSessionClick by remember { mutableIntStateOf(0) }
     val isExpiredOrGracePeriod =
-        uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive.not()
+        (uiState.isMasterBusinessAccount || uiState.isProFlexiAccount) && uiState.isBusinessProFlexiStatusActive.not()
     val isPaymentAlertVisible =
-        (uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive) || uiState.isBusinessAccount.not()
+        ((uiState.isMasterBusinessAccount || uiState.isProFlexiAccount) && uiState.isBusinessProFlexiStatusActive) || uiState.isBusinessAccount.not()
     val isSubscriptionRenewableOrExpired =
         uiState.hasRenewableSubscription || uiState.hasExpireAbleSubscription
 
@@ -499,7 +499,7 @@ private fun AccountInfoSection(
                 .wrapContentHeight()
                 .padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 8.dp),
             accountType = uiState.accountType,
-            showButton = (uiState.isBusinessAccount || uiState.accountType == AccountType.PRO_FLEXI).not(),
+            showButton = (uiState.isBusinessAccount || uiState.isProFlexiAccount).not(),
             onButtonClickListener = {
                 if (uiState.isBusinessAccount.not()) {
                     uiActions.onUpgradeAccount()
@@ -519,7 +519,7 @@ private fun AccountInfoSection(
             usedStoragePercentage = uiState.usedStoragePercentage,
             usedTransferPercentage = uiState.usedTransferPercentage,
             showTransfer = uiState.accountType != AccountType.FREE,
-            showProgressBar = (uiState.isBusinessAccount || uiState.accountType == AccountType.PRO_FLEXI).not(),
+            showProgressBar = (uiState.isBusinessAccount || uiState.isProFlexiAccount).not(),
             onUsageMeterClick = uiActions::onClickUsageMeter
         )
 
@@ -533,7 +533,7 @@ private fun AccountInfoSection(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight(),
-                    businessStatus = uiState.businessStatus,
+                    businessStatus = uiState.businessProFlexiStatus,
                 )
             }
             AnimatedVisibility(
@@ -979,10 +979,10 @@ internal fun MyAccountHomePreview() {
                 hasExpireAbleSubscription = true,
                 hasRenewableSubscription = true,
                 isMasterBusinessAccount = true,
-                isBusinessStatusActive = false,
+                isBusinessProFlexiStatusActive = false,
                 subscriptionRenewTime = 1000000,
                 proExpirationTime = 150000,
-                businessStatus = BusinessAccountStatus.Expired
+                businessProFlexiStatus = BusinessAccountStatus.Expired
             ),
             uiActions = object : MyAccountHomeViewActions {
                 override val isPhoneNumberDialogShown: Boolean

@@ -164,7 +164,12 @@ class MyAccountHomeViewTest {
 
     @Test
     fun `test that account type button should be invisible when account is PRO_FLEXI account`() {
-        initMyAccountWithDefaults(MyAccountHomeUIState(accountType = PRO_FLEXI))
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                accountType = PRO_FLEXI,
+                isBusinessAccount = true,
+            )
+        )
 
         composeTestRule.onNodeWithTag(UPGRADE_BUTTON).assertDoesNotExist()
     }
@@ -182,7 +187,19 @@ class MyAccountHomeViewTest {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
-                isBusinessStatusActive = false
+                isBusinessProFlexiStatusActive = false
+            )
+        )
+
+        composeTestRule.onNodeWithTag(EXPIRED_BUSINESS_BANNER).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that expired banner should be visible when account is pro flexi account but is currently expired or on grace period`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isMasterBusinessAccount = true,
+                isBusinessProFlexiStatusActive = false
             )
         )
 
@@ -194,8 +211,8 @@ class MyAccountHomeViewTest {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
-                isBusinessStatusActive = false,
-                businessStatus = BusinessAccountStatus.Expired
+                isBusinessProFlexiStatusActive = false,
+                businessProFlexiStatus = BusinessAccountStatus.Expired
             )
         )
 
@@ -209,8 +226,8 @@ class MyAccountHomeViewTest {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
-                isBusinessStatusActive = false,
-                businessStatus = BusinessAccountStatus.GracePeriod
+                isBusinessProFlexiStatusActive = false,
+                businessProFlexiStatus = BusinessAccountStatus.GracePeriod
             )
         )
 
@@ -224,8 +241,8 @@ class MyAccountHomeViewTest {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
-                isBusinessStatusActive = true,
-                businessStatus = BusinessAccountStatus.Active
+                isBusinessProFlexiStatusActive = true,
+                businessProFlexiStatus = BusinessAccountStatus.Active
             )
         )
 
@@ -237,7 +254,7 @@ class MyAccountHomeViewTest {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
-                isBusinessStatusActive = true,
+                isBusinessProFlexiStatusActive = true,
                 hasRenewableSubscription = true,
                 hasExpireAbleSubscription = true
             )
@@ -314,7 +331,12 @@ class MyAccountHomeViewTest {
 
     @Test
     fun `test that usage progress bar should be invisible and usage meter layout for Business or Pro Flexi is shown instead when account is PRO_FLEXI`() {
-        initMyAccountWithDefaults(MyAccountHomeUIState(accountType = PRO_FLEXI))
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                accountType = PRO_FLEXI,
+                isProFlexiAccount = true,
+            )
+        )
 
         composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_PROGRESS, useUnmergedTree = true)
             .assertDoesNotExist()
@@ -417,7 +439,7 @@ class MyAccountHomeViewTest {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
-                isBusinessStatusActive = false,
+                isBusinessProFlexiStatusActive = false,
                 hasRenewableSubscription = true,
                 subscriptionRenewTime = dueDateInSeconds
             )
@@ -434,7 +456,7 @@ class MyAccountHomeViewTest {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
-                isBusinessStatusActive = false,
+                isBusinessProFlexiStatusActive = false,
                 hasRenewableSubscription = true,
                 subscriptionRenewTime = dueDateInSeconds
             )

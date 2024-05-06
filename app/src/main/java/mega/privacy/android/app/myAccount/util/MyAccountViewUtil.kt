@@ -6,7 +6,6 @@ import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
-import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils
@@ -171,7 +170,7 @@ object MyAccountViewUtil {
      * @param expandedView  True if the binding is in the expanded view, false otherwise.
      * @param fragment      Value from `ActiveFragment` enum indicating what is the active fragment.
      */
-    fun MyAccountPaymentInfoContainerBinding.businessUpdate(
+    fun MyAccountPaymentInfoContainerBinding.businessOrProFlexiUpdate(
         context: Context,
         renewTime: Long,
         expirationTime: Long,
@@ -180,8 +179,9 @@ object MyAccountViewUtil {
         megaApi: MegaApiAndroid,
         expandedView: Boolean,
         fragment: ActiveFragment,
+        isProFlexi: Boolean,
     ) {
-        if (!megaApi.isMasterBusinessAccount) {
+        if (!megaApi.isMasterBusinessAccount && !isProFlexi) {
             return
         }
 
@@ -189,40 +189,16 @@ object MyAccountViewUtil {
 
         when {
             businessStatus == MegaApiJava.BUSINESS_STATUS_EXPIRED -> {
-                setBusinessAlert(true, expandedView, context)
+                setBusinessProFlexiAlert(true, expandedView, context)
             }
 
             businessStatus == MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD -> {
-                setBusinessAlert(false, expandedView, context)
+                setBusinessProFlexiAlert(false, expandedView, context)
             }
 
             hasRenewableSubscription || hasExpirableSubscription -> {
                 setRenewOrExpiryDate(renewTime, expirationTime, hasRenewableSubscription, fragment)
             }
-        }
-    }
-
-    /**
-     * Updates the views related to payments for only Pro Flexi accounts.
-     *
-     * @param viewModel [MyAccountViewModel] to check the data.
-     */
-    fun MyAccountPaymentInfoContainerBinding.setRenewalDateForProFlexi(
-        viewModel: MyAccountViewModel,
-    ) {
-        businessStatusText.isVisible = false
-
-        renewExpiryText.apply {
-            isVisible = true
-            val renewalDate = TimeUtils.formatDate(
-                viewModel.getRenewTime(),
-                TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                context
-            )
-            text = viewModel.context.getString(R.string.account_info_renews_on, renewalDate)
-                .formatColorTag(context, 'A', R.color.grey_087_white_054)
-                .formatColorTag(context, 'B', R.color.grey_087_white_054)
-                .toSpannedHtmlText()
         }
     }
 
@@ -276,7 +252,7 @@ object MyAccountViewUtil {
      * @param expired True if the account is expired, false otherwise.
      * @param expandedView  True if the binding is in the expanded view, false otherwise.
      */
-    private fun MyAccountPaymentInfoContainerBinding.setBusinessAlert(
+    private fun MyAccountPaymentInfoContainerBinding.setBusinessProFlexiAlert(
         expired: Boolean,
         expandedView: Boolean,
         context: Context,

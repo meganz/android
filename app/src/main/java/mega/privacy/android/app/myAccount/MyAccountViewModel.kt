@@ -54,7 +54,6 @@ import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Constants.FREE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
-import mega.privacy.android.app.utils.Constants.PRO_FLEXI
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_REFRESH
 import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
@@ -487,13 +486,6 @@ class MyAccountViewModel @Inject constructor(
      * @return
      */
     fun isFreeAccount(): Boolean = getAccountType() == FREE
-
-    /**
-     * Is pro flexi account
-     *
-     * @return
-     */
-    fun isProFlexiAccount(): Boolean = getAccountType() == PRO_FLEXI
 
     /**
      * Get used storage
@@ -1311,7 +1303,8 @@ class MyAccountViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isBusinessAccount = accountDetails.isBusinessAccount &&
-                                accountDetails.accountTypeIdentifier == AccountType.BUSINESS
+                                accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
+                        isProFlexiAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.PRO_FLEXI,
                     )
                 }
             }.onFailure {

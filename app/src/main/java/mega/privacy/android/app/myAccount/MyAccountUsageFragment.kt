@@ -18,8 +18,7 @@ import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.ActiveFragment
-import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
-import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.setRenewalDateForProFlexi
+import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessOrProFlexiUpdate
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
@@ -46,6 +45,9 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
     private val isBusinessAccount
         get() = viewModel.state.value.isBusinessAccount
+
+    private val isProFlexiAccount
+        get() = viewModel.state.value.isProFlexiAccount
 
     private lateinit var binding: FragmentMyAccountUsageBinding
     private lateinit var usageBinding: MyAccountUsageContainerBinding
@@ -138,7 +140,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 viewModel.getUsedStorage(),
                 viewModel.getUsedTransfer()
             )
-            paymentAlertBinding.businessUpdate(
+            paymentAlertBinding.businessOrProFlexiUpdate(
                 requireContext(),
                 viewModel.getRenewTime(),
                 viewModel.getExpirationTime(),
@@ -146,17 +148,29 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 viewModel.hasExpirableSubscription(),
                 megaApi,
                 true,
-                ActiveFragment.MY_ACCOUNT_USAGE
+                ActiveFragment.MY_ACCOUNT_USAGE,
+                false
             )
             paymentAlertBinding.root.isVisible = true
             binding.upgradeButton.isVisible = false
-        } else if (viewModel.isProFlexiAccount()) {
+        } else if (isProFlexiAccount) {
             usageBinding.updateBusinessOrProFlexi(
                 requireContext(),
                 viewModel.getUsedStorage(),
                 viewModel.getUsedTransfer()
             )
-            paymentAlertBinding.setRenewalDateForProFlexi(viewModel)
+            paymentAlertBinding.businessOrProFlexiUpdate(
+                requireContext(),
+                viewModel.getRenewTime(),
+                viewModel.getExpirationTime(),
+                viewModel.hasRenewableSubscription(),
+                viewModel.hasExpirableSubscription(),
+                megaApi,
+                true,
+                ActiveFragment.MY_ACCOUNT_USAGE,
+                true
+            )
+            paymentAlertBinding.root.isVisible = true
             binding.upgradeButton.isVisible = false
         } else {
             usageBinding.update(

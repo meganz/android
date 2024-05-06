@@ -188,6 +188,7 @@ class MyAccountHomeViewModel @Inject constructor(
                     it.copy(
                         accountType = accountDetails.accountTypeIdentifier,
                         isBusinessAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
+                        isProFlexiAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.PRO_FLEXI,
                         isMasterBusinessAccount = accountDetails.isMasterBusinessAccount,
                     )
                 }
@@ -198,8 +199,8 @@ class MyAccountHomeViewModel @Inject constructor(
 
                 _uiState.update {
                     it.copy(
-                        isBusinessStatusActive = isBusinessStatusActive,
-                        businessStatus = businessStatus
+                        isBusinessProFlexiStatusActive = isBusinessStatusActive,
+                        businessProFlexiStatus = businessStatus
                     )
                 }
             }.onFailure {

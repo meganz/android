@@ -19,8 +19,9 @@ import java.io.File
  * @property accountType
  * @property isBusinessAccount
  * @property isMasterBusinessAccount
- * @property isBusinessStatusActive
- * @property businessStatus
+ * @property isProFlexiAccount
+ * @property isBusinessProFlexiStatusActive  shows if account is active for Business or Pro Flexi
+ * @property businessProFlexiStatus          shows account status for Business or Pro Flexi
  * @property visibleContacts
  * @property accountDetail
  * @property avatarFileLastModified
@@ -50,8 +51,9 @@ data class MyAccountHomeUIState(
     val accountType: AccountType? = null,
     val isBusinessAccount: Boolean = false,
     val isMasterBusinessAccount: Boolean = false,
-    val isBusinessStatusActive: Boolean = false,
-    val businessStatus: BusinessAccountStatus? = null,
+    val isProFlexiAccount: Boolean = false,
+    val isBusinessProFlexiStatusActive: Boolean = false,
+    val businessProFlexiStatus: BusinessAccountStatus? = null,
     val visibleContacts: Int? = null,
     val accountDetail: AccountDetail? = null,
     val hasRenewableSubscription: Boolean = false,

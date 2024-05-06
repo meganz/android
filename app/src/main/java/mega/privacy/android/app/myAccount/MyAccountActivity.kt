@@ -86,6 +86,9 @@ class MyAccountActivity : PasscodeActivity(),
     private val isBusinessAccount
         get() = viewModel.state.value.isBusinessAccount
 
+    private val isProFlexiAccount
+        get() = viewModel.state.value.isProFlexiAccount
+
     private lateinit var navController: NavController
     private lateinit var binding: ActivityMyAccountBinding
 
@@ -313,11 +316,11 @@ class MyAccountActivity : PasscodeActivity(),
             R.id.my_account -> {
                 menu.toggleAllMenuItemsVisibility(true)
 
-                if (viewModel.thereIsNoSubscription() || viewModel.isProFlexiAccount()) {
+                if (viewModel.thereIsNoSubscription() || isProFlexiAccount) {
                     menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
                 }
 
-                if (isBusinessAccount || viewModel.isProFlexiAccount()) {
+                if (isBusinessAccount || isProFlexiAccount) {
                     menu.findItem(R.id.action_upgrade_account).isVisible = false
                 }
 
@@ -449,7 +452,7 @@ class MyAccountActivity : PasscodeActivity(),
                 showErrorAlert(state.errorMessage)
                 viewModel.resetErrorMessage()
             }
-            if (state.isBusinessAccount || viewModel.isProFlexiAccount()) {
+            if (state.isBusinessAccount || isProFlexiAccount) {
                 refreshMenuOptionsVisibility()
             }
             if (state.showInvalidChangeEmailLinkPrompt) {

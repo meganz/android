@@ -267,11 +267,36 @@ class MyAccountHomeViewModelTest {
                 val state = awaitItem()
                 assertThat(state.accountType).isEqualTo(expected.accountTypeIdentifier)
                 assertThat(state.isBusinessAccount).isEqualTo(expected.isBusinessAccount && expected.accountTypeIdentifier == AccountType.BUSINESS)
-                assertThat(state.isBusinessStatusActive).isTrue()
+                assertThat(state.isBusinessProFlexiStatusActive).isTrue()
             }
         }
 
-    @ParameterizedTest(name = "test that isBusinessStatusActive should return false when business account status {0}")
+    @Test
+    fun `test that account type should be Pro Flexi when refreshAccountInfo calls returns Pro Flexi type account`() =
+        runTest {
+            val expected = UserAccount(
+                userId = UserId(1),
+                email = "asd@mega.co.nz",
+                fullName = "test",
+                isBusinessAccount = true,
+                isMasterBusinessAccount = false,
+                accountTypeIdentifier = AccountType.PRO_FLEXI,
+                accountTypeString = "proflexi"
+            )
+            initViewModel(accountDetailsValue = expected)
+            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
+
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.accountType).isEqualTo(expected.accountTypeIdentifier)
+                assertThat(state.isProFlexiAccount).isEqualTo(expected.isBusinessAccount && expected.accountTypeIdentifier == AccountType.PRO_FLEXI)
+                assertThat(state.isBusinessProFlexiStatusActive).isTrue()
+            }
+        }
+
+    @ParameterizedTest(name = "test that isBusinessProFlexiStatusActive should return false when business account status {0}")
     @MethodSource("provideInactiveBusinessAccountType")
     fun `test inactive business account status`(expected: BusinessAccountStatus) =
         runTest {
@@ -282,7 +307,7 @@ class MyAccountHomeViewModelTest {
 
             underTest.uiState.test {
                 val state = awaitItem()
-                assertThat(state.isBusinessStatusActive).isFalse()
+                assertThat(state.isBusinessProFlexiStatusActive).isFalse()
             }
         }
 
