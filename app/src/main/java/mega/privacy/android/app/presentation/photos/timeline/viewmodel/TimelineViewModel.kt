@@ -122,6 +122,10 @@ class TimelineViewModel @Inject constructor(
 ) : ViewModel() {
 
     internal val _state = MutableStateFlow(TimelineViewState(loadPhotosDone = false))
+
+    /**
+     * The Timeline State
+     */
     val state = _state.asStateFlow()
 
     internal val selectedPhotosIds = mutableSetOf<Long>()
@@ -155,7 +159,7 @@ class TimelineViewModel @Inject constructor(
             .collect {
                 when (it) {
                     is CameraUploadsStatusInfo.CheckFilesForUpload -> {
-                        handleCameraUploadsCheckStatus(it)
+                        handleCameraUploadsCheckStatus()
                     }
 
                     is CameraUploadsStatusInfo.UploadProgress -> {
@@ -195,9 +199,9 @@ class TimelineViewModel @Inject constructor(
             )
         }.launchIn(viewModelScope)
 
-    private fun handleCameraUploadsCheckStatus(info: CameraUploadsStatusInfo.CheckFilesForUpload) {
+    private fun handleCameraUploadsCheckStatus() {
         setCameraUploadsSyncFab(isVisible = true)
-
+        setCameraUploadsPausedMenuIconVisibility(isVisible = false)
         setCameraUploadsCompleteMenu(isVisible = false)
         setCameraUploadsWarningMenu(isVisible = false)
     }
@@ -219,28 +223,44 @@ class TimelineViewModel @Inject constructor(
 
     private suspend fun handleCameraUploadsFinishedStatus(info: CameraUploadsStatusInfo.Finished) {
         updateCameraUploadProgressIfNeeded(progress = Progress(1f), pending = 0)
-        if (info.reason == CameraUploadsFinishedReason.UNKNOWN) return
+        val cameraUploadsFinishedReason = info.reason
 
-        hideCameraUploadsFab()
-        setCameraUploadsFinishedReason(reason = info.reason)
+        if (cameraUploadsFinishedReason == CameraUploadsFinishedReason.UNKNOWN) return
 
-        if (info.reason == CameraUploadsFinishedReason.COMPLETED) {
-            if (isCameraUploadsUploading) {
-                setCameraUploadsCompleteFab(isVisible = true)
-                setCameraUploadsCompletedMessage(show = true)
+        setCameraUploadsFinishedReason(reason = cameraUploadsFinishedReason)
 
-                isCameraUploadsUploading = false
-                delay(4.seconds)
+        when (cameraUploadsFinishedReason) {
+            CameraUploadsFinishedReason.COMPLETED -> {
+                if (isCameraUploadsUploading) {
+                    setCameraUploadsCompleteFab(isVisible = true)
+                    setCameraUploadsCompletedMessage(show = true)
+
+                    isCameraUploadsUploading = false
+                    delay(4.seconds)
+                }
+
+                setCameraUploadsCompleteMenu(isVisible = true)
+                setCameraUploadsCompleteFab(isVisible = false)
             }
 
-            setCameraUploadsCompleteMenu(isVisible = true)
-            setCameraUploadsCompleteFab(isVisible = false)
-        } else {
-            setCameraUploadsCompleteMenu(isVisible = false)
-            setCameraUploadsWarningFab(isVisible = true, progress = 0.5f)
+            CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET -> {
+                // For this Scenario, show the Paused Menu Icon in the Toolbar
+                setCameraUploadsPausedMenuIconVisibility(isVisible = true)
+                setCameraUploadsCompleteMenu(isVisible = false)
+                setCameraUploadsWarningMenu(isVisible = false)
+                hideCameraUploadsFab()
+            }
+
+            else -> {
+                setCameraUploadsCompleteMenu(isVisible = false)
+                setCameraUploadsWarningFab(isVisible = true, progress = 0.5f)
+            }
         }
     }
 
+    /**
+     * Syncs the Camera Uploads Status
+     */
     fun syncCameraUploadsStatus() {
         if (isCameraUploadsFirstSyncTriggered) return
         isCameraUploadsFirstSyncTriggered = true
@@ -250,6 +270,9 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Updates the Camera Uploads completed message to the UI State
+     */
     fun setCameraUploadsCompletedMessage(show: Boolean) {
         _state.update {
             it.copy(showCameraUploadsCompletedMessage = show)
@@ -313,13 +336,8 @@ class TimelineViewModel @Inject constructor(
     }
 
     /**
-     * Handle specific behavior when permissions are granted / denied
+     * Handles the behavior when the Camera Uploads permissions have changed
      */
-    fun handlePermissionsResult() {
-        if (hasMediaPermissionUseCase()) handleEnableCameraUploads()
-        else setTriggerMediaPermissionsDeniedLogicState(shouldTrigger = true)
-    }
-
     fun handleCameraUploadsPermissionsResult() {
         val hasPermissions = hasMediaPermissionUseCase()
 
@@ -488,6 +506,9 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Sorts the content by order
+     */
     fun sortByOrder() {
         viewModelScope.launch {
             handleAndUpdatePhotosUIState(
@@ -497,6 +518,9 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Enables the Camera Uploads functionality
+     */
     fun enableCU() {
         _state.update {
             it.copy(
@@ -518,20 +542,32 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Retrieves the selected Photo IDs
+     *
+     * @return a List of Photo IDs
+     */
     fun getSelectedIds(): List<Long> =
         selectedPhotosIds.toList()
 
+    /**
+     * Retrieves the selected Nodes
+     *
+     * @return a list of Nodes
+     */
     suspend fun getSelectedNodes(): List<MegaNode> =
         getNodeListByIds(selectedPhotosIds.toList())
 
-
+    /**
+     * Establishes the initial Camera Uploads preferences
+     */
     fun setInitialPreferences() {
         viewModelScope.launch(ioDispatcher) {
             setInitialCUPreferences()
         }
     }
 
-    fun isInAllView(): Boolean = _state.value.selectedTimeBarTab == TimeBarTab.All
+    private fun isInAllView(): Boolean = _state.value.selectedTimeBarTab == TimeBarTab.All
 
     internal fun resetCUButtonAndProgress() {
         viewModelScope.launch(ioDispatcher) {
@@ -555,6 +591,11 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Perform actions when long pressing a Photo
+     *
+     * @param photo The Photo being long pressed
+     */
     fun onLongPress(photo: Photo) {
         togglePhotoSelection(photo.id)
         _state.update {
@@ -573,6 +614,11 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Perform actions when clicking a Photo
+     *
+     * @param photo The Photo being clicked
+     */
     fun onClick(photo: Photo) {
         if (selectedPhotosIds.size == 0) {
             _state.update {
@@ -583,12 +629,20 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Invalidates the selected Photo in the UI State
+     */
     fun onNavigateToSelectedPhoto() {
         _state.update {
             it.copy(selectedPhoto = null)
         }
     }
 
+    /**
+     * Perform actions when clicking a DateCard
+     *
+     * @param dateCard The DateCard that was clicked
+     */
     fun onCardClick(dateCard: DateCard) {
         when (dateCard) {
             is DateCard.YearsCard -> {
@@ -620,6 +674,11 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Perform actions when clicking a TimeBarTab
+     *
+     * @param tab The TimeBarTab that was clicked
+     */
     fun onTimeBarTabSelected(tab: TimeBarTab) {
         when (tab) {
             TimeBarTab.Years -> {
@@ -640,7 +699,7 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    fun updateSelectedTimeBarState(
+    private fun updateSelectedTimeBarState(
         selectedTimeBarTab: TimeBarTab,
         startIndex: Int = 0,
         startOffset: Int = 0,
@@ -701,28 +760,54 @@ class TimelineViewModel @Inject constructor(
     }
 
     /**
-     * Timeline x CU Revamp Controller
+     * Updates the CU Complete Menu Icon visibility in the Top App Bar
+     *
+     * Figma File for reference:
+     * https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1300-16994&mode=design&t=apaI1dEqa2bUBPIP-0
+     *
+     * @param isVisible true if this Menu Icon should be shown
      */
-
-    // The flag controls CU complete icon visibility on top bar.
-    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1300-16994&mode=design&t=apaI1dEqa2bUBPIP-0
-    fun setCameraUploadsCompleteMenu(isVisible: Boolean) {
+    private fun setCameraUploadsCompleteMenu(isVisible: Boolean) {
         _state.update {
             it.copy(showCameraUploadsComplete = isVisible)
         }
     }
 
-    // The flag controls CU warning icon visibility on top bar.
-    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1300-16945&mode=design&t=apaI1dEqa2bUBPIP-0
+    /**
+     * Updates the CU Paused Menu Icon visibility in the Top App Bar
+     *
+     * Figma File for reference:
+     * https://www.figma.com/file/T5vL9rzzMtRqrVmZy51nLZ/%5BDSN-1501%5D-AND---Scheduled-camera-uploads-(While-charging)?type=design&node-id=1717-3148&mode=dev
+     *
+     * @param isVisible true if this Menu Icon should be shown
+     */
+    private fun setCameraUploadsPausedMenuIconVisibility(isVisible: Boolean) {
+        _state.update { it.copy(showCameraUploadsPaused = isVisible) }
+    }
+
+    /**
+     * Updates the CU Warning Menu Icon visibility in the Top App Bar
+     *
+     * Figma File for reference:
+     * https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1300-16945&mode=design&t=apaI1dEqa2bUBPIP-0
+     *
+     * @param isVisible true if this Menu Icon should be shown
+     */
     fun setCameraUploadsWarningMenu(isVisible: Boolean) {
         _state.update {
             it.copy(showCameraUploadsWarning = isVisible)
         }
     }
 
-    // The flag controls CU sync fab visibility.
-    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-27891&mode=design&t=vcAb54xEixEVIEvN-0
-    fun setCameraUploadsSyncFab(isVisible: Boolean) {
+    /**
+     * Updates the CU Syncing Fab Icon visibility
+     *
+     * Figma File for reference:
+     * https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-27891&mode=design&t=vcAb54xEixEVIEvN-0
+     *
+     * @param isVisible true if this Fab Icon should be shown
+     */
+    private fun setCameraUploadsSyncFab(isVisible: Boolean) {
         _state.update {
             it.copy(
                 cameraUploadsStatus = CameraUploadsStatus.Sync.takeIf {
@@ -732,9 +817,16 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    // The flag controls CU uploading fab visibility + progress value.
-    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-27947&mode=design&t=apaI1dEqa2bUBPIP-0
-    fun setCameraUploadsUploadingFab(isVisible: Boolean, progress: Float) {
+    /**
+     * Updates the CU Uploading Fab Icon visibility and its progress
+     *
+     * Figma File for reference:
+     * https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-27947&mode=design&t=apaI1dEqa2bUBPIP-0
+     *
+     * @param isVisible true if this Fab Icon should be shown
+     * @param progress the Camera Uploads Uploading progress
+     */
+    private fun setCameraUploadsUploadingFab(isVisible: Boolean, progress: Float) {
         _state.update {
             it.copy(
                 cameraUploadsStatus = CameraUploadsStatus.Uploading.takeIf {
@@ -745,9 +837,15 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    // The flag controls CU complete fab visibility.
-    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-28067&mode=design&t=apaI1dEqa2bUBPIP-0
-    fun setCameraUploadsCompleteFab(isVisible: Boolean) {
+    /**
+     * Updates the CU Complete Fab Icon visibility
+     *
+     * Figma File for reference:
+     * https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-28067&mode=design&t=apaI1dEqa2bUBPIP-0
+     *
+     * @param isVisible true if this Fab Icon should be shown
+     */
+    private fun setCameraUploadsCompleteFab(isVisible: Boolean) {
         _state.update {
             it.copy(
                 cameraUploadsStatus = CameraUploadsStatus.Complete.takeIf {
@@ -757,9 +855,16 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    // The flag controls CU warning fab visibility + progress value.
-    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=2089-12855&mode=design&t=vcAb54xEixEVIEvN-0
-    fun setCameraUploadsWarningFab(isVisible: Boolean, progress: Float) {
+    /**
+     * Updates the CU Warning Fab Icon visibility and its progress
+     *
+     * Figma File for reference:
+     * https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=2089-12855&mode=design&t=vcAb54xEixEVIEvN-0
+     *
+     * @param isVisible true if this Fab Icon should be shown
+     * @param progress the Camera Uploads Uploading progress
+     */
+    private fun setCameraUploadsWarningFab(isVisible: Boolean, progress: Float) {
         _state.update {
             it.copy(
                 cameraUploadsStatus = CameraUploadsStatus.Warning.takeIf {
@@ -770,33 +875,53 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    // Convenient way in case to hide any showing CU status fab.
-    fun hideCameraUploadsFab() {
+    /**
+     * Hides the Camera Uploads Fab Icon
+     */
+    private fun hideCameraUploadsFab() {
         _state.update {
             it.copy(cameraUploadsStatus = CameraUploadsStatus.None)
         }
     }
 
-    // The flag controls CU limited access banner visibility.
-    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-27609&mode=design&t=apaI1dEqa2bUBPIP-0
+    /**
+     * Updates the CU Limited Access Banner visibility
+     *
+     * Figma File for reference:
+     * https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-27609&mode=design&t=apaI1dEqa2bUBPIP-0
+     *
+     * @param isLimitedAccess true if Camera Uploads only has limited access
+     */
     fun setCameraUploadsLimitedAccess(isLimitedAccess: Boolean) {
         _state.update {
             it.copy(isCameraUploadsLimitedAccess = isLimitedAccess)
         }
     }
 
-    // Show snackbar to display the CU change permissions message.
-    // It will show upon FAB if they appear together.
-    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1791-39721&mode=design&t=vcAb54xEixEVIEvN-0
+    /**
+     * Updates the CU Change Permissions Message visibility, which will also be shown in the Fab
+     * when they appear together
+     *
+     * Figma File for reference:
+     * https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1791-39721&mode=design&t=vcAb54xEixEVIEvN-0
+     *
+     * @param show true if this message should be shown
+     */
     fun showCameraUploadsChangePermissionsMessage(show: Boolean) {
         _state.update {
             it.copy(showCameraUploadsChangePermissionsMessage = show)
         }
     }
 
-    // Show snackbar to display the CU message.
-    // It will show upon FAB if they appear together.
-    // https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-28657&mode=design&t=apaI1dEqa2bUBPIP-0
+    /**
+     * Updates the CU Change Message for the Snackbar, which will also be shown in the Fab when
+     * they appear together
+     *
+     * Figma File for reference:
+     * https://www.figma.com/file/1Giwkl6NvNXkFXrX51PiyQ/%5BDSN-1291%5D-Timeline-%2F-Camera-Uploads-Redesign?type=design&node-id=1702-28657&mode=design&t=apaI1dEqa2bUBPIP-0
+     *
+     * @param message the new Camera Uploads message
+     */
     fun setCameraUploadsMessage(message: String) {
         _state.update {
             it.copy(cameraUploadsMessage = message)
@@ -815,6 +940,11 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Control the visibility of the selected Nodes
+     *
+     * @param hide true if the selected Nodes should be hidden
+     */
     fun hideOrUnhideNodes(hide: Boolean) = viewModelScope.launch {
         for (node in getSelectedNodes()) {
             async {

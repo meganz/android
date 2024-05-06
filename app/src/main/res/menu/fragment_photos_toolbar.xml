@@ -1,4 +1,5 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
@@ -12,6 +13,14 @@
     <item
         android:id="@+id/action_cu_status_default"
         android:icon="@drawable/ic_cu_status"
+        android:orderInCategory="80"
+        android:visible="false"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+
+    <item
+        android:id="@+id/action_cu_status_paused"
+        android:icon="@drawable/ic_cu_status_paused"
         android:orderInCategory="80"
         android:visible="false"
         app:showAsAction="always" />

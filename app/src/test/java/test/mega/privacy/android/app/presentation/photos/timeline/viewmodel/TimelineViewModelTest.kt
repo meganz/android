@@ -72,9 +72,12 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
+/**
+ * Test class for [TimelineViewModel]
+ */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TimelineViewModelTest {
+internal class TimelineViewModelTest {
     private lateinit var underTest: TimelineViewModel
 
     private val isCameraUploadsEnabledUseCase =
@@ -385,6 +388,76 @@ class TimelineViewModelTest {
                 assertThat(state.progressBarShowing).isEqualTo(false)
             }
         }
+
+    @Test
+    fun `test that the paused camera uploads toolbar menu icon is shown when camera uploads finishes because the device is not charged`() =
+        runTest {
+            val cameraUploadsStatusInfo =
+                CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET)
+            cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().showCameraUploadsPaused).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that other toolbar menu icons are hidden when camera uploads finishes because the device is not charged`() =
+        runTest {
+            val cameraUploadsStatusInfo =
+                CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET)
+            cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.showCameraUploadsComplete).isFalse()
+                assertThat(state.showCameraUploadsWarning).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the fab icon is hidden when camera uploads finishes because the device is not charged`() =
+        runTest {
+            val cameraUploadsStatusInfo =
+                CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET)
+            cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().cameraUploadsStatus).isEqualTo(CameraUploadsStatus.None)
+            }
+        }
+
+    @ParameterizedTest(name = "and that specific reason is {0}")
+    @EnumSource(
+        value = CameraUploadsFinishedReason::class,
+        names = ["UNKNOWN", "COMPLETED", "DEVICE_CHARGING_REQUIREMENT_NOT_MET"],
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    fun `test that no toolbar menu icon is shown and a warning fab icon is shown when camera uploads finishes for any other reason`(
+        cameraUploadsFinishedReason: CameraUploadsFinishedReason,
+    ) = runTest {
+        val cameraUploadsStatusInfo = CameraUploadsStatusInfo.Finished(cameraUploadsFinishedReason)
+        cameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
+
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            // Verify that the Toolbar Menu Icons are hidden
+            assertThat(state.showCameraUploadsPaused).isFalse()
+            assertThat(state.showCameraUploadsComplete).isFalse()
+            assertThat(state.showCameraUploadsWarning).isFalse()
+            // Verify that the Warning Fab Icon is shown
+            assertThat(state.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.Warning)
+            assertThat(state.cameraUploadsProgress).isEqualTo(0.5f)
+        }
+    }
 
     @Test
     fun `test that when camera upload progress is received with pending 0, then progressBarShowing state is set to false`() =

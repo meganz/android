@@ -46,10 +46,19 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property shouldTriggerCameraUploads                 True if Camera Uploads can be triggered
  * @property shouldShowBusinessAccountPrompt            True if the Business Account prompt should be shown
  * @property shouldTriggerMediaPermissionsDeniedLogic   True if certain logic should be executed when Media Permissions are denied
- * @property cameraUploadsStatus                        CameraU
- * @property cameraUploadsProgress
- * @property cameraUploadsPending
- * @property cameraUploadsMessage
+ * @property showCameraUploadsComplete                  True if the Icon indicating that Camera Uploads has been completed should be shown
+ * @property showCameraUploadsPaused                    True if the Icon indicating that Camera Uploads is Paused should be shown
+ * @property showCameraUploadsWarning                   True if the Icon indicating a Camera Uploads warning should be shown
+ * @property cameraUploadsStatus                        Indicates the current Camera Uploads status
+ * @property cameraUploadsProgress                      Indicates the overall upload progress of Camera Uploads
+ * @property cameraUploadsTotalUploaded                 Indicates the overall content uploaded by Camera Uploads
+ * @property cameraUploadsFinishedReason                Indicates the reason why Camera Uploads finished
+ * @property cameraUploadsMessage                       The specific Camera Uploads message
+ * @property isCameraUploadsLimitedAccess               True if Camera Uploads only has limited access
+ * @property showCameraUploadsChangePermissionsMessage  True if the Change Permissions message in Camera Uploads should be shown
+ * @property showCameraUploadsCompletedMessage          True if the message that Camera Uploads has been completed should be shown
+ * @property accountType                                Indicates the User's Account Type
+ * @property isHiddenNodesOnboarded                     True if the Hidden Nodes have been onboarded
  */
 data class TimelineViewState(
     val photos: List<Photo> = emptyList(),
@@ -59,7 +68,7 @@ data class TimelineViewState(
     val yearsCardPhotos: List<DateCard> = emptyList(),
     val monthsCardPhotos: List<DateCard> = emptyList(),
     val daysCardPhotos: List<DateCard> = emptyList(),
-    val timeBarTabs: List<TimeBarTab> = TimeBarTab.values().asList(),
+    val timeBarTabs: List<TimeBarTab> = TimeBarTab.entries,
     val selectedTimeBarTab: TimeBarTab = TimeBarTab.All,
     val currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     val scrollStartIndex: Int = 0,
@@ -87,6 +96,7 @@ data class TimelineViewState(
     val shouldShowBusinessAccountPrompt: Boolean = false,
     val shouldTriggerMediaPermissionsDeniedLogic: Boolean = false,
     val showCameraUploadsComplete: Boolean = false,
+    val showCameraUploadsPaused: Boolean = false,
     val showCameraUploadsWarning: Boolean = false,
     val cameraUploadsStatus: CameraUploadsStatus = CameraUploadsStatus.None,
     val cameraUploadsProgress: Float = 0f,

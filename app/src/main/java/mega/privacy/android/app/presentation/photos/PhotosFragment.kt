@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos
 
+import mega.privacy.android.shared.resources.R as SharedR
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
@@ -97,6 +98,10 @@ import javax.inject.Inject
 
 /** A temporary bridge to support compatibility between view and compose architecture. */
 class PhotosViewComposeCoordinator {
+
+    /**
+     * The current LazyGridState
+     */
     var lazyGridState: LazyGridState? = null
 }
 
@@ -125,10 +130,16 @@ class PhotosFragment : Fragment() {
             timelineViewModel.handleCameraUploadsPermissionsResult()
         }
 
+    /**
+     * Retrieves the App Theme
+     */
     @Inject
     lateinit var getThemeMode: GetThemeMode
     private val viewComposeCoordinator = PhotosViewComposeCoordinator()
 
+    /**
+     * Retrieves the value of a specific Feature Flag
+     */
     @Inject
     lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
@@ -154,6 +165,9 @@ class PhotosFragment : Fragment() {
         }
     }
 
+    /**
+     * onCreate
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         managerActivity = activity as ManagerActivity
@@ -166,13 +180,16 @@ class PhotosFragment : Fragment() {
     }
 
     private fun initializeCameraUploads() {
-        if (arguments?.getBoolean(firstLoginKey) == true) {
+        if (arguments?.getBoolean(FIRST_LOGIN_KEY) == true) {
             timelineViewModel.setInitialPreferences()
-            arguments?.putBoolean(firstLoginKey, false)
+            arguments?.putBoolean(FIRST_LOGIN_KEY, false)
         }
         MegaApplication.getInstance().sendSignalPresenceActivity()
     }
 
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -204,6 +221,9 @@ class PhotosFragment : Fragment() {
         }
     }
 
+    /**
+     * onResume
+     */
     override fun onResume() {
         timelineViewModel.resetCUButtonAndProgress()
         albumsViewModel.revalidateInput()
@@ -227,10 +247,13 @@ class PhotosFragment : Fragment() {
         cameraUploadsPermissionsLauncher.launch(cameraUploadsPermissions)
     }
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        if (arguments?.getBoolean(firstLoginKey) == true) {
+        if (arguments?.getBoolean(FIRST_LOGIN_KEY) == true) {
             timelineViewModel.shouldEnableCUPage(true)
         }
         setUpFlow()
@@ -296,21 +319,31 @@ class PhotosFragment : Fragment() {
         }
     }
 
-    private fun handleCameraUploadsMenu(state: TimelineViewState) {
-        // CU warning menu
-        val showCameraUploadsWarning = state.showCameraUploadsWarning
-        this.menu?.findItem(R.id.action_cu_status_warning)?.isVisible =
-            showCameraUploadsWarning && photosViewModel.state.value.selectedTab != PhotosTab.Albums
+    /**
+     * Configures the Camera Uploads-related Menu Actions are shown
+     *
+     * @param timelineViewState The Timeline State
+     */
+    private fun handleCameraUploadsMenu(timelineViewState: TimelineViewState) {
+        this.menu?.apply {
+            // Conditions for showing the CU Warning Menu Icon
+            val isCuWarningStatusVisible =
+                timelineViewState.showCameraUploadsWarning && photosViewModel.state.value.selectedTab != PhotosTab.Albums
+            // Conditions for showing the CU Default Menu Icon
+            val isCuDefaultStatusVisible =
+                timelineViewState.enableCameraUploadButtonShowing && !isCuWarningStatusVisible
+            // Conditions for showing the CU Paused Menu Icon
+            val isCuPausedStatusVisible =
+                timelineViewState.showCameraUploadsPaused && !isCuDefaultStatusVisible
+            // Conditions for showing the CU Complete Menu Icon
+            val isCuCompleteStatusVisible =
+                timelineViewState.showCameraUploadsComplete && !isCuPausedStatusVisible
 
-        // CU default menu
-        val showCameraUploadsButton = state.enableCameraUploadButtonShowing
-        this.menu?.findItem(R.id.action_cu_status_default)?.isVisible =
-            showCameraUploadsButton && !showCameraUploadsWarning && photosViewModel.state.value.selectedTab != PhotosTab.Albums
-
-        // CU complete menu
-        val showCameraUploadsComplete = state.showCameraUploadsComplete
-        this.menu?.findItem(R.id.action_cu_status_complete)?.isVisible =
-            showCameraUploadsComplete && !showCameraUploadsButton && !showCameraUploadsWarning && photosViewModel.state.value.selectedTab != PhotosTab.Albums
+            findItem(R.id.action_cu_status_warning)?.isVisible = isCuWarningStatusVisible
+            findItem(R.id.action_cu_status_default)?.isVisible = isCuDefaultStatusVisible
+            findItem(R.id.action_cu_status_paused)?.isVisible = isCuPausedStatusVisible
+            findItem(R.id.action_cu_status_complete)?.isVisible = isCuCompleteStatusVisible
+        }
     }
 
     private fun handleFilterIcons(timelineViewState: TimelineViewState) {
@@ -415,6 +448,9 @@ class PhotosFragment : Fragment() {
         }
     }
 
+    /**
+     * onCreateOptionsMenu
+     */
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if (!managerActivity.isInPhotosPage) {
             return
@@ -426,7 +462,7 @@ class PhotosFragment : Fragment() {
         handleFilterIcons(timelineViewModel.state.value)
     }
 
-    internal fun handleMenuIcons(isShowing: Boolean) {
+    private fun handleMenuIcons(isShowing: Boolean) {
         handleCameraUploadsMenu(timelineViewModel.state.value)
 
         this.menu?.findItem(R.id.action_photos_filter_secondary)?.isVisible = isShowing
@@ -449,6 +485,9 @@ class PhotosFragment : Fragment() {
         startActivity(Intent(context, settingsCameraUploadsClass))
     }
 
+    /**
+     * onPrepareOptionsMenu
+     */
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         val zoomInValid = timelineViewModel.state.value.enableZoomIn
@@ -517,6 +556,9 @@ class PhotosFragment : Fragment() {
         }
     }
 
+    /**
+     * onOptionsItemSelected
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_zoom_in -> { // +
@@ -545,7 +587,7 @@ class PhotosFragment : Fragment() {
                     context = managerActivity,
                     checkedItem = timelineViewModel.getCurrentSort().ordinal,
                     onClickListener = { _, i ->
-                        timelineViewModel.setCurrentSort(Sort.values()[i])
+                        timelineViewModel.setCurrentSort(Sort.entries[i])
                         timelineViewModel.sortByOrder()
                     },
                     onDismissListener = {
@@ -557,6 +599,13 @@ class PhotosFragment : Fragment() {
 
             R.id.action_cu_status_default -> {
                 openCameraUploadsSettings()
+                true
+            }
+
+            R.id.action_cu_status_paused -> {
+                timelineViewModel.setCameraUploadsMessage(
+                    getString(SharedR.string.camera_uploads_phone_not_charging_message),
+                )
                 true
             }
 
@@ -667,7 +716,7 @@ class PhotosFragment : Fragment() {
     /**
      * Enables the Camera Uploads feature
      */
-    fun enableCameraUploads() {
+    private fun enableCameraUploads() {
         timelineViewModel.enableCU()
         managerActivity.refreshPhotosFragment()
     }
@@ -693,6 +742,9 @@ class PhotosFragment : Fragment() {
         timelineViewModel.state.value.enableCameraUploadPageShowing
                 && timelineViewModel.state.value.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE
 
+    /**
+     * onBackPressed
+     */
     fun onBackPressed(): Int {
         return if (isEnableCameraUploadsViewShown()) {
             skipInitialCUSetup()
@@ -707,13 +759,26 @@ class PhotosFragment : Fragment() {
         }
     }
 
+    /**
+     * Checks if the Photos screen displays the Timeline page
+     *
+     * @return true if the Timeline is currently shown
+     */
     fun isInTimeline(): Boolean = photosViewModel.state.value.selectedTab == PhotosTab.Timeline
 
+    /**
+     * Refreshes the current View
+     */
     fun refreshViewLayout() {
         handleMenuIcons(!timelineViewModel.state.value.enableCameraUploadPageShowing)
     }
 
-    fun openAlbum(album: UIAlbum) {
+    /**
+     * Opens a specific Album
+     *
+     * @param album The Album to be opened
+     */
+    private fun openAlbum(album: UIAlbum) {
         viewLifecycleOwner.lifecycleScope.launch {
             Handler(Looper.getMainLooper()).post {
                 val fragment = AlbumContentFragment.getInstance(album.id)
@@ -722,6 +787,9 @@ class PhotosFragment : Fragment() {
         }
     }
 
+    /**
+     * Navigates to the Album Get Link Screen
+     */
     fun openAlbumGetLinkScreen() {
         val albumId = albumsViewModel.state.value.selectedAlbumIds.elementAt(0)
         val intent = AlbumScreenWrapperActivity.createAlbumGetLinkScreen(
@@ -732,6 +800,9 @@ class PhotosFragment : Fragment() {
         activity?.overridePendingTransition(0, 0)
     }
 
+    /**
+     * Navigates to the Album Get Multiple Links Screen
+     */
     fun openAlbumGetMultipleLinksScreen() {
         val intent = AlbumScreenWrapperActivity.createAlbumGetMultipleLinksScreen(
             context = requireContext(),
@@ -761,6 +832,9 @@ class PhotosFragment : Fragment() {
      */
     fun doesAccountHavePhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
 
+    /**
+     * Handles the procedure of hiding a Node
+     */
     fun handleHideNodeClick() {
         val (isPaid, isHiddenNodesOnboarded) = with(timelineViewModel.state.value) {
             (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded
@@ -817,19 +891,29 @@ class PhotosFragment : Fragment() {
         Util.showSnackbar(requireActivity(), message)
     }
 
+    /**
+     * onPause
+     */
     override fun onPause() {
         albumsViewModel.updateAlbumDeletedMessage(message = "")
         super.onPause()
     }
 
     companion object {
+
+        /**
+         * Creates a new instance of [PhotosFragment]
+         *
+         * @param isFirstLogin true if the User logs in for the first time
+         * @return The new instance of [PhotosFragment]
+         */
         fun newInstance(isFirstLogin: Boolean): PhotosFragment {
             val fragment = PhotosFragment()
-            fragment.arguments = bundleOf(firstLoginKey to isFirstLogin)
+            fragment.arguments = bundleOf(FIRST_LOGIN_KEY to isFirstLogin)
 
             return fragment
         }
 
-        private const val firstLoginKey = "PHOTOS_FRAGMENT_FIRST_LOGIN_ARGUMENT"
+        private const val FIRST_LOGIN_KEY = "PHOTOS_FRAGMENT_FIRST_LOGIN_ARGUMENT"
     }
 }

@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.settings.camerauploads
 
+import mega.privacy.android.shared.resources.R as SharedR
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
@@ -25,8 +26,10 @@ import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
@@ -55,6 +58,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathVa
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
@@ -138,6 +142,8 @@ internal class SettingsCameraUploadsViewModelTest {
         mock<MonitorCameraUploadsFolderDestinationUseCase>()
     private val monitorCameraUploadsSettingsActionsUseCase =
         mock<MonitorCameraUploadsSettingsActionsUseCase>()
+    private val monitorCameraUploadsStatusInfoUseCase =
+        mock<MonitorCameraUploadsStatusInfoUseCase>()
     private val preparePrimaryFolderPathUseCase = mock<PreparePrimaryFolderPathUseCase>()
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
     private val setChargingRequiredForVideoCompressionUseCase =
@@ -163,6 +169,9 @@ internal class SettingsCameraUploadsViewModelTest {
 
     private val fakeMonitorCameraUploadsSettingsActionsFlow =
         MutableSharedFlow<CameraUploadsSettingsAction>()
+    private val fakeMonitorCameraUploadsStatusInfoFlow =
+        MutableSharedFlow<CameraUploadsStatusInfo>()
+
     private val applicationScope = TestScope(UnconfinedTestDispatcher())
 
     @BeforeEach
@@ -195,6 +204,7 @@ internal class SettingsCameraUploadsViewModelTest {
             listenToNewMediaUseCase,
             monitorCameraUploadsFolderDestinationUseCase,
             monitorCameraUploadsSettingsActionsUseCase,
+            monitorCameraUploadsStatusInfoUseCase,
             preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase,
@@ -267,6 +277,9 @@ internal class SettingsCameraUploadsViewModelTest {
         whenever(monitorCameraUploadsSettingsActionsUseCase()).thenReturn(
             fakeMonitorCameraUploadsSettingsActionsFlow
         )
+        whenever(monitorCameraUploadsStatusInfoUseCase()).thenReturn(
+            fakeMonitorCameraUploadsStatusInfoFlow
+        )
 
         underTest = SettingsCameraUploadsViewModel(
             applicationScope = applicationScope,
@@ -297,6 +310,7 @@ internal class SettingsCameraUploadsViewModelTest {
             listenToNewMediaUseCase = listenToNewMediaUseCase,
             monitorCameraUploadsFolderDestinationUseCase = monitorCameraUploadsFolderDestinationUseCase,
             monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
+            monitorCameraUploadsStatusInfoUseCase = monitorCameraUploadsStatusInfoUseCase,
             preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
@@ -703,6 +717,20 @@ internal class SettingsCameraUploadsViewModelTest {
                     assertThat(awaitItem().requireChargingWhenUploadingContent).isEqualTo(
                         requireChargingWhenUploadingContent
                     )
+                }
+            }
+
+        @Test
+        fun `test that an error snackbar is shown when camera uploads finishes because the device is not charged`() =
+            runTest {
+                val cameraUploadsStatusInfo =
+                    CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET)
+                initializeUnderTest()
+
+                fakeMonitorCameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(SharedR.string.camera_uploads_phone_not_charging_message))
                 }
             }
     }

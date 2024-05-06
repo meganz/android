@@ -24,8 +24,10 @@ import mega.privacy.android.app.presentation.settings.camerauploads.model.Upload
 import mega.privacy.android.app.presentation.settings.camerauploads.model.VideoQualityUiItem
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
@@ -53,6 +55,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathVa
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
@@ -73,6 +76,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.shared.resources.R as SharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -117,6 +121,7 @@ import javax.inject.Inject
  * / Media Uploads Folder Nodes
  * @property monitorCameraUploadsSettingsActionsUseCase Monitors any changes to Settings Camera
  * Uploads
+ * @property monitorCameraUploadsStatusInfoUseCase Monitors the Camera Uploads status
  * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
  * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
  * @property setChargingRequiredForVideoCompressionUseCase Sets whether or not the Device should be
@@ -173,6 +178,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
     private val monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
+    private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
     private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setChargingRequiredForVideoCompressionUseCase: SetChargingRequiredForVideoCompressionUseCase,
@@ -206,6 +212,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
         initializeSettings()
         monitorCameraUploadsFolderDestination()
         monitorCameraUploadsSettingsActions()
+        monitorCameraUploadsStatusInfo()
     }
 
     /**
@@ -306,6 +313,27 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                         CameraUploadsSettingsAction.DisableMediaUploads -> {
                             onMediaUploadsStateChanged(enabled = false)
                         }
+                    }
+                }
+        }
+    }
+
+    /**
+     * Observes any Camera Uploads status changes
+     */
+    private fun monitorCameraUploadsStatusInfo() {
+        viewModelScope.launch {
+            monitorCameraUploadsStatusInfoUseCase()
+                .catch { exception ->
+                    Timber.e(
+                        "An exception occurred when listening for Camera Uploads status changes",
+                        exception,
+                    )
+                }.collect { cameraUploadsStatusInfo ->
+                    if (cameraUploadsStatusInfo is CameraUploadsStatusInfo.Finished &&
+                        cameraUploadsStatusInfo.reason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+                    ) {
+                        showSnackbar(SharedR.string.camera_uploads_phone_not_charging_message)
                     }
                 }
         }
