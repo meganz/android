@@ -18,7 +18,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFavouriteBinding
 import mega.privacy.android.app.databinding.ItemFavouriteGridBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter
 import mega.privacy.android.app.presentation.favourites.model.Favourite
@@ -31,6 +30,9 @@ import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
 import mega.privacy.android.app.utils.Constants.ITEM_VIEW_TYPE
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 
 /**
  * The adapter regarding favourites
@@ -48,6 +50,7 @@ class FavouritesGridAdapter(
 ) : ListAdapter<FavouriteItem, FavouritesGridViewHolder>(FavouritesDiffCallback) {
 
     private var selectionMode = false
+    private var accountType: AccountType? = null
     override fun getItemViewType(position: Int): Int = getItem(position).type
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavouritesGridViewHolder {
@@ -81,7 +84,8 @@ class FavouritesGridAdapter(
             onItemClicked = onItemClicked,
             onThreeDotsClicked = onThreeDotsClicked,
             onLongClicked = onLongClicked,
-            selectionMode = selectionMode
+            selectionMode = selectionMode,
+            accountType = accountType,
         )
     }
 
@@ -100,6 +104,10 @@ class FavouritesGridAdapter(
      */
     fun updateSelectionMode(isSelectionMode: Boolean) {
         selectionMode = isSelectionMode
+    }
+
+    fun updateAccountType(accountType: AccountType?) {
+        this.accountType = accountType
     }
 
 }
@@ -126,6 +134,7 @@ class FavouritesGridViewHolder(
         onThreeDotsClicked: (info: Favourite) -> Unit,
         onLongClicked: (info: Favourite) -> Boolean,
         selectionMode: Boolean,
+        accountType: AccountType?,
     ) {
         with(binding) {
             when (this) {
@@ -196,6 +205,11 @@ class FavouritesGridViewHolder(
                             }
                         }
                         itemGirdFavourite.apply {
+                            handleSensitiveEffect(
+                                view = itemGirdFavourite,
+                                accountType = accountType,
+                                favouriteNode = info.typedNode
+                            )
                             setOnLongClickListener {
                                 onLongClicked(info)
                             }
@@ -218,6 +232,16 @@ class FavouritesGridViewHolder(
                 else -> {}
             }
         }
+    }
+
+    private fun handleSensitiveEffect(
+        view: View,
+        accountType: AccountType?,
+        favouriteNode: TypedNode,
+    ) {
+        val isSensitive =
+            accountType?.isPaid == true && (favouriteNode.isMarkedSensitive || favouriteNode.isSensitiveInherited)
+        view.setAlpha(if (isSensitive) 0.5f else 1f)
     }
 
     /**

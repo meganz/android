@@ -18,7 +18,6 @@ import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFavouriteBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter
 import mega.privacy.android.app.presentation.favourites.model.Favourite
@@ -27,7 +26,10 @@ import mega.privacy.android.app.presentation.favourites.model.FavouriteItem
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ITEM_VIEW_TYPE
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 
 /**
  * The adapter regarding favourites
@@ -45,6 +47,7 @@ class FavouritesAdapter(
 ) : ListAdapter<FavouriteItem, FavouritesViewHolder>(FavouritesDiffCallback) {
 
     private var selectionMode = false
+    private var accountType: AccountType? = null
     override fun getItemViewType(position: Int): Int = getItem(position).type
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavouritesViewHolder {
@@ -73,7 +76,8 @@ class FavouritesAdapter(
             onItemClicked = onItemClicked,
             onThreeDotsClicked = onThreeDotsClicked,
             onLongClicked = onLongClicked,
-            selectionMode = selectionMode
+            selectionMode = selectionMode,
+            accountType = accountType,
         )
     }
 
@@ -82,6 +86,10 @@ class FavouritesAdapter(
      */
     fun updateSelectionMode(isSelectionMode: Boolean) {
         selectionMode = isSelectionMode
+    }
+
+    fun updateAccountType(accountType: AccountType?) {
+        this.accountType = accountType
     }
 
 }
@@ -110,6 +118,7 @@ class FavouritesViewHolder(
         onThreeDotsClicked: (info: Favourite) -> Unit,
         onLongClicked: (info: Favourite) -> Boolean,
         selectionMode: Boolean,
+        accountType: AccountType?,
     ) {
         with(binding) {
             when (this) {
@@ -150,6 +159,12 @@ class FavouritesViewHolder(
                         itemImgLabel.isVisible = favourite.showLabel
                         fileListSavedOffline.isVisible = favourite.isAvailableOffline
                         itemImgFavourite.isVisible = favourite.typedNode.isFavourite
+                        handleSensitiveEffect(
+                            view = itemFavouriteLayout,
+                            accountType = accountType,
+                            favouriteNode = favourite.typedNode
+                        )
+
                         itemPublicLink.isVisible = favourite.typedNode.exportedData != null
                         itemTakenDown.isVisible = favourite.typedNode.isTakenDown
                         itemVersionsIcon.isVisible = favourite.typedNode.hasVersion
@@ -178,6 +193,16 @@ class FavouritesViewHolder(
                 else -> {}
             }
         }
+    }
+
+    private fun handleSensitiveEffect(
+        view: View,
+        accountType: AccountType?,
+        favouriteNode: TypedNode,
+    ) {
+        val isSensitive =
+            accountType?.isPaid == true && (favouriteNode.isMarkedSensitive || favouriteNode.isSensitiveInherited)
+        view.setAlpha(if (isSensitive) 0.5f else 1f)
     }
 
     override fun animate(listener: Animation.AnimationListener, isSelected: Boolean) {

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.favourites.FavouritesViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
@@ -32,7 +33,9 @@ import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.MapFavouriteSortOrderUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -109,11 +112,25 @@ class FavouritesViewModelTest {
             invoke()
         }.thenReturn(flowOf(AccountDetail()))
     }
+
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
         on {
             runBlocking { invoke() }
         }.thenReturn(false)
     }
+
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase> {
+        on {
+            runBlocking { invoke() }
+        }.thenReturn(flowOf(false))
+    }
+
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
+        on {
+            runBlocking { invoke(any()) }
+        }.thenReturn(false)
+    }
+
     @BeforeEach
     fun setUp() {
         Mockito.reset(
@@ -143,6 +160,9 @@ class FavouritesViewModelTest {
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            defaultDispatcher = UnconfinedTestDispatcher(),
         )
     }
 
@@ -218,13 +238,14 @@ class FavouritesViewModelTest {
     }
 
     @Test
-    fun `test that showSearch value is set to true if viewmodel is set to search mode`() = runTest {
-        underTest.favouritesState.test {
-            assertThat(awaitItem().showSearch).isFalse()
-            underTest.searchQuery("")
-            assertThat(awaitItem().showSearch).isTrue()
+    fun `test that showSearch value is set to true if viewmodel is set to search mode`() =
+        runTest {
+            underTest.favouritesState.test {
+                assertThat(awaitItem().showSearch).isFalse()
+                underTest.searchQuery("")
+                assertThat(awaitItem().showSearch).isTrue()
+            }
         }
-    }
 
     @Test
     fun `test that list is filtered according to query string`() = runTest {
