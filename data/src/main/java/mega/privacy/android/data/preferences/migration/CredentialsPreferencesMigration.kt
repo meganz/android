@@ -18,11 +18,11 @@ internal class CredentialsPreferencesMigration @Inject constructor(
         currentData.asMap().keys.isEmpty()
 
     override suspend fun migrate(currentData: Preferences): Preferences {
-        // it only run if shouldMigrate as true so ephemeral not null
-        val credentials = databaseHandler.credentials
-        checkNotNull(credentials)
-        return currentData.toMutablePreferences().apply {
-            migrate(this, credentials)
+        databaseHandler.credentials?.let {
+            return currentData.toMutablePreferences().apply {
+                migrate(this, it)
+            }
         }
+        return currentData
     }
 }
