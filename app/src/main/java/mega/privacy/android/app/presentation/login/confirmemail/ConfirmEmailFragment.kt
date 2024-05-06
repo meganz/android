@@ -7,10 +7,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -18,11 +26,16 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentConfirmEmailBinding
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Confirm email fragment.
@@ -33,6 +46,12 @@ import timber.log.Timber
  */
 @AndroidEntryPoint
 class ConfirmEmailFragment : Fragment() {
+
+    /**
+     * Current theme
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
 
     private val viewModel: ConfirmEmailViewModel by viewModels()
 
@@ -50,6 +69,40 @@ class ConfirmEmailFragment : Fragment() {
     ): View {
         Timber.d("onCreateView")
         _binding = FragmentConfirmEmailBinding.inflate(inflater, container, false)
+
+        binding.snackBarComposeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val snackBarHostState = remember { SnackbarHostState() }
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                    val successMessage =
+                        stringResource(id = R.string.confirm_email_misspelled_email_sent)
+                    LaunchedEffect(uiState.shouldShowSuccessMessage) {
+                        if (uiState.shouldShowSuccessMessage) {
+                            snackBarHostState.showSnackbar(
+                                message = successMessage
+                            )
+                            viewModel.onSuccessMessageDisplayed()
+                        }
+                    }
+
+                    LaunchedEffect(uiState.errorMessage) {
+                        uiState.errorMessage?.let {
+                            snackBarHostState.showSnackbar(
+                                message = it
+                            )
+                            viewModel.onErrorMessageDisplayed()
+                        }
+                    }
+
+                    SnackbarHost(hostState = snackBarHostState)
+                }
+            }
+        }
+
         return binding.root
     }
 
