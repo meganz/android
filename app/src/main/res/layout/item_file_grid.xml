@@ -130,7 +130,7 @@
             android:layout_below="@+id/file_grid_thumbnail_layout_for_file"
             android:background="@color/grey_012_white_012" />
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/grid_bottom_container"
             android:layout_width="match_parent"
             android:layout_height="47dp"
@@ -138,35 +138,43 @@
 
             <TextView
                 android:id="@+id/file_grid_filename_for_file"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_toStartOf="@+id/file_grid_taken_down_for_file"
                 android:ellipsize="middle"
                 android:singleLine="true"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/file_grid_taken_down_for_file"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/file_grid_taken_down_for_file"
                 style="@style/taken_down_icon"
+                android:layout_marginEnd="8dp"
                 android:layout_toStartOf="@+id/file_grid_three_dots_for_file"
-                android:layout_marginStart="6dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="6dp"
                 android:src="@drawable/ic_alert_triangle_medium_regular_outline"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/file_grid_three_dots_for_file"
+                app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/color_button_brand"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                tools:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/file_grid_three_dots_for_file"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/file_grid_radio_button"
                 android:background="@null"
                 android:src="@drawable/ic_dots_vertical_grey"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/file_grid_radio_button"
+                app:layout_constraintTop_toTopOf="parent"
                 app:tint="?android:attr/textColorSecondary"
                 tools:ignore="ContentDescription" />
 
@@ -176,7 +184,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:visibility="gone"/>
-        </RelativeLayout>
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </RelativeLayout>
 </RelativeLayout>
