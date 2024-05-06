@@ -33,6 +33,7 @@ import mega.privacy.android.data.mapper.contact.UserMapper
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.ContactWrapper
+import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactLink
@@ -1486,5 +1487,26 @@ class DefaultContactsRepositoryTest {
             )
             assertThat(actual).isEqualTo(userUpdate)
         }
+    }
+
+    @Test
+    fun `test that the correct contact is returned when the local contact is not null`() = runTest {
+        val contactId = 123L
+        val contact = Contact(userId = contactId, email = "email@test.com")
+        whenever(megaLocalRoomGateway.getContactByHandle(contactId)) doReturn contact
+
+        val actual = underTest.getContactFromCacheByHandle(contactId)
+
+        assertThat(actual).isEqualTo(contact)
+    }
+
+    @Test
+    fun `test that NULL is returned when the local contact is null`() = runTest {
+        val contactId = 123L
+        whenever(megaLocalRoomGateway.getContactByHandle(contactId)) doReturn null
+
+        val actual = underTest.getContactFromCacheByHandle(contactId)
+
+        assertThat(actual).isNull()
     }
 }

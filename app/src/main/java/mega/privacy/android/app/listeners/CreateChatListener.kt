@@ -39,7 +39,12 @@ class CreateChatListener(
     private var failureCount = 0
 
     private var chats = ArrayList<MegaChatRoom>()
-    private val usersNoChat = ArrayList<MegaUser>()
+
+    // If the given users with no chat room is MEGAUsers
+    private val megaUsersNoChat = ArrayList<MegaUser>()
+
+    // If the given users with no chat room is Users
+    private var usersNoChatSize = 0
 
     private var counter = 0
     private var error = 0
@@ -50,11 +55,15 @@ class CreateChatListener(
     constructor(
         action: Int,
         chats: List<MegaChatRoom>,
-        usersNoChat: List<MegaUser>,
+        usersNoChatSize: Int,
         context: Context,
         snackbarShower: SnackbarShower,
-    ) : this(context, action, usersNoChat.size + chats.size, snackbarShower, null, null) {
-        initFields(chats, usersNoChat)
+        onChatsCreated: (List<MegaChatRoom>) -> Unit,
+    ) : this(context, action, usersNoChatSize + chats.size, snackbarShower, onChatsCreated, null) {
+        this.chats.addAll(chats)
+        this.usersNoChatSize = usersNoChatSize
+
+        counter = usersNoChatSize
     }
 
     constructor(
@@ -72,25 +81,14 @@ class CreateChatListener(
         this.chatId = chatId
     }
 
-    constructor(
-        action: Int,
-        chats: List<MegaChatRoom>,
-        usersNoChat: List<MegaUser>,
-        context: Context,
-        snackbarShower: SnackbarShower,
-        onChatsCreated: (List<MegaChatRoom>) -> Unit,
-    ) : this(context, action, usersNoChat.size + chats.size, snackbarShower, onChatsCreated, null) {
-        initFields(chats, usersNoChat)
-    }
-
     private fun initFields(
         chats: List<MegaChatRoom>,
-        usersNoChat: List<MegaUser>,
+        megaUsersNoChat: List<MegaUser>,
     ) {
         this.chats.addAll(chats)
-        this.usersNoChat.addAll(usersNoChat)
+        this.megaUsersNoChat.addAll(megaUsersNoChat)
 
-        counter = usersNoChat.size
+        counter = megaUsersNoChat.size
     }
 
     override fun onRequestFinish(api: MegaChatApiJava, request: MegaChatRequest, e: MegaChatError) {
@@ -133,10 +131,11 @@ class CreateChatListener(
                 if (errorCreatingChat()) {
                     snackbarShower?.showSnackbar(context.getString(R.string.create_chat_error))
                 } else {
-                    MegaApplication.userWaitingForCall = usersNoChat[0].handle
+                    MegaApplication.userWaitingForCall = megaUsersNoChat[0].handle
                     MegaApplication.isWaitingForCall = true
                 }
             }
+
             SEND_MESSAGES -> {
                 val handles = messageHandles ?: return
 
@@ -162,8 +161,9 @@ class CreateChatListener(
                     forwardChatProcessor.forward(api.getChatRoom(chatId))
                 }
             }
+
             SEND_FILE_EXPLORER_CONTENT -> {
-                if (errorCreatingChat()) {
+                if (usersNoChatSize == error && chats.isEmpty()) {
                     // All send messages fail; Show error
                     snackbarShower?.showSnackbar(
                         context.getString(
@@ -176,6 +176,7 @@ class CreateChatListener(
                     onChatsCreated?.invoke(chats)
                 }
             }
+
             CONFIGURE_DND -> {
                 if (errorCreatingChat()) {
                     snackbarShower?.showSnackbar(context.getString(R.string.general_text_error))
@@ -192,7 +193,7 @@ class CreateChatListener(
      * @return True, if there has been an error. False, otherwise.
      */
     private fun errorCreatingChat(): Boolean {
-        return usersNoChat.size == error && chats.isEmpty()
+        return megaUsersNoChat.size == error && chats.isEmpty()
     }
 
     companion object {

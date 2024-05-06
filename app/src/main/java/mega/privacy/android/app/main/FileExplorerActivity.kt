@@ -99,6 +99,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
@@ -2343,7 +2344,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     private fun getChatAdded(listItems: ArrayList<ChatExplorerListItem>) {
         val chats = ArrayList<MegaChatRoom>()
-        val users = ArrayList<MegaUser>()
+        val users = ArrayList<User>()
         createAndShowProgressDialog(true, getString(R.string.preparing_chats))
 
         for (item in listItems) {
@@ -2351,17 +2352,17 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 megaChatApi.getChatRoom(item.chat.chatId)?.let {
                     chats.add(it)
                 }
-            } else if (item.contact != null && item.contact.megaUser != null) {
-                users.add(item.contact.megaUser ?: return)
+            } else if (item.contactItem?.user != null) {
+                users.add(item.contactItem.user)
             }
         }
         if (users.isNotEmpty()) {
             val listener = CreateChatListener(
-                CreateChatListener.SEND_FILE_EXPLORER_CONTENT,
-                chats,
-                users,
-                this,
-                this
+                action = CreateChatListener.SEND_FILE_EXPLORER_CONTENT,
+                chats = chats,
+                usersNoChatSize = users.size,
+                context = this,
+                snackbarShower = this
             ) { resultChats: List<MegaChatRoom> -> sendToChats(resultChats) }
 
             for (user in users) {

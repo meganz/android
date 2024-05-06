@@ -4,7 +4,6 @@ import static mega.privacy.android.app.main.FileExplorerActivity.CHAT_FRAGMENT;
 import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
 import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 import static mega.privacy.android.app.utils.ContactUtil.getContactDB;
-import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
@@ -45,9 +44,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.ListIterator;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -57,7 +57,9 @@ import mega.privacy.android.app.main.megachat.chatAdapters.MegaChipChatExplorerA
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.data.mapper.contact.UserMapper;
 import mega.privacy.android.domain.entity.Contact;
+import mega.privacy.android.domain.entity.contacts.User;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -68,6 +70,9 @@ import timber.log.Timber;
 
 @AndroidEntryPoint
 public class ChatExplorerFragment extends Fragment implements CheckScrollInterface {
+
+    @Inject
+    UserMapper userMapper;
 
     private static final int RECENTS_MAX_SIZE = 6;
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
@@ -87,7 +92,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     private ArrayList<ChatExplorerListItem> recents;
     private ArrayList<MegaChatListItem> chats;
     private ArrayList<MegaChatListItem> archievedChats;
-    private ArrayList<MegaContactAdapter> contacts;
     private ArrayList<ChatExplorerListItem> items;
     private ArrayList<ChatExplorerListItem> addedItems;
     private ArrayList<String> addedItemsSaved;
@@ -117,6 +121,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     private SimpleDividerItemDecoration simpleDividerItemDecoration;
 
     private ChatExplorerViewModel viewModel;
+    private ArrayList<ContactItemUiState> contacts;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -277,21 +282,17 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
     }
 
-    private MegaContactAdapter getContact(MegaChatListItem chat) {
+    private ContactItemUiState getContact(MegaChatListItem chat) {
         long handle = chat.getPeerHandle();
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
-        MegaUser user = megaApi.getContact(userHandleEncoded);
+        MegaUser megaUser = megaApi.getContact(userHandleEncoded);
 
 //        Maybe the contact is not my contact already
-        if (user == null) {
+        if (megaUser == null) {
             Timber.d("Chat ID %d with PeerHandle: %d is NULL", chat.getChatId(), handle);
             return null;
         }
         Contact contactDB = getContactDB(handle);
-        String fullName = getContactNameDB(contactDB);
-        if (fullName == null) {
-            fullName = user.getEmail();
-        }
         if (handle != -1) {
             int userStatus = megaChatApi.getUserOnlineStatus(handle);
             if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
@@ -299,7 +300,13 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 megaChatApi.requestLastGreen(handle, null);
             }
         }
-        return new MegaContactAdapter(contactDB, user, fullName);
+        User user = userMapper.invoke(megaUser);
+        return new ContactItemUiState(
+                contactDB,
+                user,
+                "",
+                false
+        );
     }
 
     @Override
@@ -347,11 +354,13 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 long contactHandle = contactsMEGA.get(i).getHandle();
                 Contact contactDB = getContactDB(contactHandle);
-                String fullName = getContactNameDB(contactDB);
-                if (fullName == null) {
-                    fullName = contactsMEGA.get(i).getEmail();
-                }
-                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
+                User user = userMapper.invoke(contactsMEGA.get(i));
+                ContactItemUiState megaContactAdapter = new ContactItemUiState(
+                        contactDB,
+                        user,
+                        "",
+                        false
+                );
                 contacts.add(megaContactAdapter);
             }
         }
@@ -489,11 +498,11 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
     }
 
-    private long getMegaContactHandle(MegaContactAdapter contact) {
+    private long getMegaContactHandle(ContactItemUiState contact) {
         long handle = -1;
         if (contact != null) {
-            if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
-                handle = contact.getMegaUser().getHandle();
+            if (contact.getUser() != null && contact.getUser().getHandle() != -1) {
+                handle = contact.getUser().getHandle();
             } else if (contact.getContact() != null && contact.getContact().getEmail() != null) {
                 handle = contact.getContact().getUserId();
             }
@@ -508,9 +517,9 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             while (itrReplace.hasNext()) {
                 ChatExplorerListItem itemToUpdate = itrReplace.next();
                 if (itemToUpdate != null) {
-                    if (itemToUpdate.getContact() != null) {
-                        if (getMegaContactHandle(itemToUpdate.getContact()) == userhandle) {
-                            itemToUpdate.getContact().setLastGreen(formattedDate);
+                    if (itemToUpdate.getContactItem() != null) {
+                        if (getMegaContactHandle(itemToUpdate.getContactItem()) == userhandle) {
+                            itemToUpdate.getContactItem().setLastGreen(formattedDate);
                             adapterList.updateItemContactStatus(itrReplace.nextIndex());
                             items = adapterList.getItems();
                             break;
@@ -529,9 +538,9 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             while (itrReplace.hasNext()) {
                 ChatExplorerListItem itemToUpdate = itrReplace.next();
                 if (itemToUpdate != null) {
-                    if (itemToUpdate.getContact() != null) {
-                        if (getMegaContactHandle(itemToUpdate.getContact()) == userhandle) {
-                            itemToUpdate.getContact().setLastGreen(formattedDate);
+                    if (itemToUpdate.getContactItem() != null) {
+                        if (getMegaContactHandle(itemToUpdate.getContactItem()) == userhandle) {
+                            itemToUpdate.getContactItem().setLastGreen(formattedDate);
                             items = adapterAdded.getItems();
                             break;
                         }
@@ -730,12 +739,12 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                     }
                 }
 
-                for (MegaContactAdapter contact : contacts) {
-                    if (contact.getMegaUser() != null) {
-                        MegaChatRoom chat = megaChatApi.getChatRoomByUser(contact.getMegaUser().getHandle());
+                for (ContactItemUiState contact : contacts) {
+                    if (contact.getUser() != null) {
+                        MegaChatRoom chat = megaChatApi.getChatRoomByUser(contact.getUser().getHandle());
                         if (chat == null) {
-                            if (contact.getMegaUser() != null) {
-                                long handle = contact.getMegaUser().getHandle();
+                            if (contact.getUser() != null) {
+                                long handle = contact.getUser().getHandle();
                                 if (handle != -1) {
                                     int userStatus = megaChatApi.getUserOnlineStatus(handle);
                                     if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
@@ -748,12 +757,19 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                                     }
                                 }
                             }
+
+                            String fullName;
+                            if (contact.getContact() != null) {
+                                fullName = contact.getContact().getFullName();
+                            } else {
+                                fullName = contact.getUser().getEmail();
+                            }
                             items.add(
                                     new ChatExplorerListItem(
                                             contact,
                                             null,
-                                            contact.getFullName(),
-                                            String.valueOf(contact.getMegaUser().getHandle())
+                                            fullName,
+                                            String.valueOf(contact.getUser().getHandle())
                                     )
                             );
                         }

@@ -5,6 +5,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
 import static mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_PRIMARY_COLOR;
 import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_ADD_CONTACTS;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
@@ -35,9 +36,9 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment;
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem;
+import mega.privacy.android.domain.entity.contacts.User;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 
@@ -120,8 +121,8 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             holder.textViewName.setText(item.getTitle());
         } else {
             String name;
-            if (item.getContact() != null) {
-                String fullName = item.getContact().getFullName();
+            if (item.getContactItem() != null && item.getContactItem().getContact() != null) {
+                String fullName = item.getContactItem().getContact().getFullName();
                 if (fullName != null) {
                     String[] s = fullName.split(" ");
                     if (s.length > 0) {
@@ -212,11 +213,18 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         if (item.getChat() != null && item.getChat().isGroup()) {
             holder.avatar.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), item.getTitle(), AVATAR_SIZE, true));
         } else {
-            MegaUser user = null;
-            if (item.getContact() != null && item.getContact().getMegaUser() != null) {
-                user = item.getContact().getMegaUser();
+            User user = null;
+            if (item.getContactItem() != null && item.getContactItem().getUser() != null) {
+                user = item.getContactItem().getUser();
             }
-            holder.avatar.setImageBitmap(getDefaultAvatar(getColorAvatar(user), item.getTitle(), AVATAR_SIZE, true));
+
+            int avatarColor;
+            if (user == null) {
+                avatarColor = getSpecificAvatarColor(AVATAR_PRIMARY_COLOR);
+            } else {
+                avatarColor = getColorAvatar(user.getHandle());
+            }
+            holder.avatar.setImageBitmap(getDefaultAvatar(avatarColor, item.getTitle(), AVATAR_SIZE, true));
 
             ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
             File avatar = null;
@@ -224,12 +232,12 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             long handle = -1;
             if (item.getChat() != null) {
                 holder.email = megaChatApi.getContactEmail(item.getChat().getPeerHandle());
-            } else if (item.getContact() != null && item.getContact().getMegaUser() != null) {
-                holder.email = item.getContact().getMegaUser().getEmail();
+            } else if (item.getContactItem() != null && item.getContactItem().getUser() != null) {
+                holder.email = item.getContactItem().getUser().getEmail();
             }
 
-            if (item.getContact() != null && item.getContact().getMegaUser() != null) {
-                handle = item.getContact().getMegaUser().getHandle();
+            if (item.getContactItem() != null && item.getContactItem().getUser() != null) {
+                handle = item.getContactItem().getUser().getHandle();
             }
             String userHandle = MegaApiAndroid.userHandleToBase64(handle);
 

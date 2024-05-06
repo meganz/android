@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.ContactData
@@ -457,4 +458,12 @@ interface ContactsRepository {
      * @return List of [ContactRequest]
      */
     suspend fun getOutgoingContactRequests(): List<ContactRequest>
+
+    /**
+     * Get contact from cache by its handle
+     *
+     * @param contactId The contact's ID
+     * @return The [Contact]
+     */
+    suspend fun getContactFromCacheByHandle(contactId: Long): Contact?
 }

@@ -940,4 +940,9 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.outgoingContactRequests().map(contactRequestMapper)
         }
+
+    override suspend fun getContactFromCacheByHandle(contactId: Long): Contact? =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getContactByHandle(contactId)
+        }
 }
