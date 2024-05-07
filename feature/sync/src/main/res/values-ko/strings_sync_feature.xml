@@ -117,7 +117,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">이동 또는 이름 변경을 할 수 없습니다</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">삭제 또는 이동이 스캔을 기다리는 중입니다</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">아직 삭제할 수 없음</string>
     <!-- Sync stalled issue reason is upload issue-->

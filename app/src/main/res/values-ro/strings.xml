@@ -5460,7 +5460,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Încărcarea întreruptă din cauza lipsei conexiunii la internet</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Încărcarea întreruptă. Baterie este sub %1$d&#160;%% și nu se încarcă.</string>
+    <string name="photos_camera_uploads_low_battery">Încărcarea a fost întreruptă deoarece bateria este sub %1$d&#160;%%.</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Încărcări camere au încetat să funcționeze. Încercați să reactivați încărcările camerei pentru a o rezolva. Dacă problema persistă, contactați asistență.</string>
     <!-- Camera uploads pending info in Photos screen. -->

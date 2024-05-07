@@ -275,7 +275,7 @@
     <!-- Option to don't use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_only_this_time_option">Только в этот раз</string>
     <!-- Option to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_always_here_option">Всегда сохранять здесь</string>
+    <string name="transfers_dialog_save_download_location_always_here_option">Всегда скачивать сюда</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
     <string name="transfers_dialog_save_download_location_always_ask_option">Всегда спрашивать расположение</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
@@ -283,7 +283,7 @@
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">ТБ</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">Найдите свой идеальный объём хранилища. От %1$s %2$s.</string>
+    <string name="dialog_onboarding_feature_storage_description">Найдите свой идеальный объём хранилища. От %1$s&#160;%2$s.</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">Недостаточно места для хранения</string>
     <!-- Body text of the insufficient storage error dialog -->
@@ -292,4 +292,12 @@
     <string name="sync_error_dialog_insufficient_storage_confirm_button">Подписки</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">Не сейчас</string>
+    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
+    <string name="account_confirm_email_misspelled_email_description">Если вы неправильно написали свой адрес электронной почты, исправьте его и нажмите [A]«Выслать повторно»[/A].</string>
+    <!-- Title of the insufficient storage error banner -->
+    <string name="sync_error_storage_over_quota_banner_title">Синхронизация приостановлена, в вашем плане MEGA закончилось место.</string>
+    <!-- Title of the insufficient storage error action -->
+    <string name="sync_error_storage_over_quota_banner_action">Улучшить</string>
+    <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
+    <string name="camera_uploads_phone_not_charging_message">Upload paused, phone is not charging</string>
 </resources>

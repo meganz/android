@@ -4996,7 +4996,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Tải lên bị tạm dừng do không có kết&#160;nối internet</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Tải lên bị tạm dừng. Pin bên dưới %1$d%% và không được sạc.</string>
+    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Đăng tải camêra đã dừng hoạt&#160;động. Hãy thử bật lại đăng tải camêra để giải&#160;quyết. Nếu vấn&#160;đề tiếp diễn, vui lòng liên&#160;hệ với bộ&#160;phận hỗ&#160;trợ.</string>
     <!-- Camera uploads pending info in Photos screen. -->

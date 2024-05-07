@@ -5692,7 +5692,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Загрузка приостановлена. Аккумулятор заряжен менее чем на %1$d&#160;%% и не заряжается.</string>
+    <string name="photos_camera_uploads_low_battery">Загрузка приостановлена, так как заряд батареи ниже %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Загрузки из камеры перестали работать. Попробуйте повторно включить загрузки из камеры. Если проблема повторяется, обратитесь в поддержку.</string>
     <!-- Camera uploads pending info in Photos screen. -->

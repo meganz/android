@@ -275,7 +275,7 @@
     <!-- Option to don't use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_only_this_time_option">Tylko tym razem</string>
     <!-- Option to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_always_here_option">Zawsze zapisuj tutaj</string>
+    <string name="transfers_dialog_save_download_location_always_here_option">Zawsze pobieraj tutaj</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
     <string name="transfers_dialog_save_download_location_always_ask_option">Zawsze pytaj o miejsce docelowe</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
@@ -283,13 +283,21 @@
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">Zaczynając od %1$s %2$s, znajdź idealne dopasowanie do swoich potrzeb pojemność.</string>
+    <string name="dialog_onboarding_feature_storage_description">Zaczynając od %1$s&#160;%2$s, znajdź idealne dopasowanie do swoich potrzeb pojemność.</string>
     <!-- Title of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_title">Insufficient storage space</string>
+    <string name="sync_error_dialog_insufficient_storage_title">Niewystarczająca dostępna pamięć</string>
     <!-- Body text of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_body">The size of this folder will take your MEGA account over its storage limit. In order to be able to sync it, you will need to either free up some space or upgrade your MEGA account.</string>
+    <string name="sync_error_dialog_insufficient_storage_body">Rozmiar tego katalogu spowoduje, że Twoje konto MEGA przekroczy limit pojemności. Aby móc go zsynchronizować, musisz zwolnić trochę miejsca lub uaktualnić swoje konto MEGA.</string>
     <!-- Confirm button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_confirm_button">Zobacz abonamenty</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">Nie teraz</string>
+    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
+    <string name="account_confirm_email_misspelled_email_description">Jeśli błędnie wpisałeś swój adres email, popraw go i kliknij [A]Wyślij ponownie[/A].</string>
+    <!-- Title of the insufficient storage error banner -->
+    <string name="sync_error_storage_over_quota_banner_title">Synchronizacja jest wstrzymana, w planie MEGA zabrakło pamięci.</string>
+    <!-- Title of the insufficient storage error action -->
+    <string name="sync_error_storage_over_quota_banner_action">Zmień</string>
+    <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
+    <string name="camera_uploads_phone_not_charging_message">Upload paused, phone is not charging</string>
 </resources>

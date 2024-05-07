@@ -9,7 +9,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="general_sync_invalid_local_type">ไม่สามารถซิงค์ไฟล์ทีละไฟล์ได้ คุณต้องตั้งค่าการซิงค์จากโฟลเดอร์แทน</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="general_sync_initial_scan_failed">การสแกนเริ่มต้นล้มเหลว คุณจะต้องเปิดใช้งานการซิงค์หรือสำรองข้อมูลจากแอปเดสก์ทอปของคุณใหม่</string>
+    <string name="general_sync_initial_scan_failed">การสแกนเริ่มต้นล้มเหลว คุณต้องเปิดใช้งานการซิงค์หรือสำรองข้อมูลจากแอปเดสก์ท็อปอีกครั้ง</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="general_sync_remote_node_not_found">ไม่สามารถหาโฟลเดอร์ใน MEGA ได้ เนื่องจากถูกย้ายหรือลบออก หรือคุณอาจไม่สามารถเข้าถึงได้</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -33,7 +33,7 @@
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="general_sync_unknown_temporary_error">มีปัญหาในการซิงค์หรือสำรองข้อมูลในโฟลเดอร์นี้ ลองใหม่อีกครั้งในภายหลัง หากยังประสบปัญหาอยู่ กรุณาติดต่อฝ่ายสนับสนุน</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
-    <string name="general_sync_too_many_action_packets">บัญชีของคุณถูกโหลดซ้ำ การเปลี่ยนแปลงที่หายไปจะไม่มีผลกับการสำรองข้อมูลหรือการซิงค์ของคุณ</string>
+    <string name="general_sync_too_many_action_packets">โหลดข้อมูลในบัญชีใหม่แล้ว แต่การอัปเดตสำรองข้อมูลหรือการซิงค์ที่พลาดไปยังไม่ได้ถูกนำไปใช้</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="general_sync_logged_out">การซิงค์หรือสำรองข้อมูลหยุดลง เนื่องจากคุณออกจากระบบแอปเดสก์ท็อปแล้ว เข้าสู่ระบบแอปเดสก์ท็อปอีกครั้งเพื่อดำเนินการซิงค์หรือสำรองข้อมูลต่อ</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
@@ -251,7 +251,7 @@
     <!-- Option to don't use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_only_this_time_option">เฉพาะครั้งนี้เท่านั้น</string>
     <!-- Option to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_always_here_option">บันทึกไว้ที่นี่เสมอ</string>
+    <string name="transfers_dialog_save_download_location_always_here_option">ดาวน์โหลดไว้ที่นี่เสมอ</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
     <string name="transfers_dialog_save_download_location_always_ask_option">ถามให้เลือกปลายทางทุกครั้ง</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
@@ -259,13 +259,21 @@
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">เริ่มต้นที่ %1$s %2$s เลือกขนาดพื้นที่เก็บข้อมูลที่เหมาะกับคุณ</string>
+    <string name="dialog_onboarding_feature_storage_description">Starting from %1$s&#160;%2$s, find the perfect fit for your storage needs.</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">พื้นที่จัดเก็บข้อมูลไม่เพียงพอ</string>
     <!-- Body text of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_body">โฟลเดอร์นี้มีขนาดใหญ่เกินกว่าพื้นที่เก็บข้อมูล MEGA ของคุณ หากต้องการซิงค์โฟลเดอร์นี้ คุณต้องเพิ่มพื้นที่ว่างในบัญชี MEGA ของคุณ หรืออัปเกรดเป็นแผนที่มีพื้นที่เก็บข้อมูลมากกว่า</string>
+    <string name="sync_error_dialog_insufficient_storage_body">โฟลเดอร์นี้มีขนาดใหญ่เกินกว่าพื้นที่เก็บข้อมูล MEGA ของคุณ หากต้องการซิงค์โฟลเดอร์นี้ คุณต้องเพิ่มพื้นที่ว่างในบัญชี MEGA ของคุณ หรืออัปเกรดเป็นแผนที่มีพื้นที่เก็บข้อมูลมากกว่าเดิม</string>
     <!-- Confirm button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_confirm_button">ดูแผนการ</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">ไม่ใช่ตอนนี้</string>
+    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
+    <string name="account_confirm_email_misspelled_email_description">หากคุณสะกดที่อยู่อีเมลผิด ให้แก้ไขแล้วแตะ[A]ส่งใหม่[/A]</string>
+    <!-- Title of the insufficient storage error banner -->
+    <string name="sync_error_storage_over_quota_banner_title">การซิงค์ถูกหยุดไว้ชั่วคราว เนื่องจากพื้นที่เก็บข้อมูลใน MEGA ของคุณเต็มแล้ว</string>
+    <!-- Title of the insufficient storage error action -->
+    <string name="sync_error_storage_over_quota_banner_action">อัปเกรด</string>
+    <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
+    <string name="camera_uploads_phone_not_charging_message">Upload paused, phone is not charging</string>
 </resources>

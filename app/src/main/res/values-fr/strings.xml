@@ -5460,7 +5460,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Les téléversements ont été mis en pause, car il n’y a pas de connexion à Internet</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Le téléversement est en pause. Le niveau de batterie est inférieur à %1$d&#160;%% et l’appareil n’est pas en charge.</string>
+    <string name="photos_camera_uploads_low_battery">Le téléversement est en pause, car le niveau de la batterie est inférieur à %1$d&#160;%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Les téléversements de l’appareil photo ne fonctionnent plus. Essayez de les réactiver afin de résoudre la situation. Si le problème persiste, contactez l’assistance.</string>
     <!-- Camera uploads pending info in Photos screen. -->

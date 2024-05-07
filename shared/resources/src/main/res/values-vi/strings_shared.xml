@@ -251,7 +251,7 @@
     <!-- Option to don't use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_only_this_time_option">Chỉ lần này</string>
     <!-- Option to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_always_here_option">Luôn lưu vào đây</string>
+    <string name="transfers_dialog_save_download_location_always_here_option">Luôn tải xuống vào đây</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
     <string name="transfers_dialog_save_download_location_always_ask_option">Luôn hỏi vị&#160;trí lưu</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
@@ -259,7 +259,7 @@
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">Bắt đầu từ %1$s %2$s, tìm gói phù&#160;hợp hoàn&#160;hảo cho nhu&#160;cầu lưu&#160;trữ của bạn.</string>
+    <string name="dialog_onboarding_feature_storage_description">Bắt&#160;đầu với %1$s&#160;%2$s, tìm gói phù&#160;hợp hoàn&#160;hảo cho nhu&#160;cầu lưu&#160;trữ của bạn.</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">Không&#160;gian lưu&#160;trữ không đủ</string>
     <!-- Body text of the insufficient storage error dialog -->
@@ -268,4 +268,12 @@
     <string name="sync_error_dialog_insufficient_storage_confirm_button">Xem các gói thuê bao</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">Không phải lúc này</string>
+    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
+    <string name="account_confirm_email_misspelled_email_description">Nếu địa chỉ email bị viết sai, sửa lại cho đúng và chạm vào [A]Gửi lại[/A].</string>
+    <!-- Title of the insufficient storage error banner -->
+    <string name="sync_error_storage_over_quota_banner_title">Đồng&#160;bộ hóa tạm dừng, gói MEGA của bạn đã hết dung&#160;lượng lưu&#160;trữ.</string>
+    <!-- Title of the insufficient storage error action -->
+    <string name="sync_error_storage_over_quota_banner_action">Nâng cấp</string>
+    <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
+    <string name="camera_uploads_phone_not_charging_message">Upload paused, phone is not charging</string>
 </resources>

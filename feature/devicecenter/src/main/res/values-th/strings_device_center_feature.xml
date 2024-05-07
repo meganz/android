@@ -111,7 +111,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
     <string name="device_center_list_view_item_sub_state_notification_system_unavailable">ไม่สามารถสื่อสารกับตำแหน่งที่ตั้งโฟลเดอร์ได้ กรุณาตรวจสอบว่าสามารถเข้าถึงได้และได้รับอนุญาตให้ใช้งานโฟลเดอร์ตามตำแหน่งที่ตั้งนี้หรือไม่</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
-    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">ไม่สามารถเพิ่มการตรวจดูระบบไฟล์ได้ ตรวจสอบให้แน่ใจว่ามีพื้นที่ว่างและหน่วยความจำเพียงพอแล้ว และคุณได้ให้สิทธิ์ในการเข้าถึงตำแหน่งที่ตั้งโฟลเดอร์แล้ว</string>
+    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">ไม่สามารถติดตามการเปลี่ยนแปลงไฟล์ในโฟลเดอร์นี้ได้ ตรวจสอบพื้นที่ว่างบนอุปกรณ์และหน่วยความจำ และตรวจสอบให้แน่ใจว่าคุณมีสิทธิ์เข้าถึงโฟลเดอร์นี้</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">ไม่สามารถอ่านตำแหน่งที่ตั้งการซิงค์ได้ กรุณาตรวจสอบว่าสามารถเข้าถึงได้และได้รับอนุญาตให้ใช้งานโฟลเดอร์ตามตำแหน่งที่ตั้งนี้หรือไม่</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->

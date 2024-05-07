@@ -834,7 +834,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Terlalu banyak coba masuk yang gagal, mohon tunggu selama satu jam.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Check your email inbox and follow the link to confirm your account.</string>
+    <string name="account_not_validated_login">Periksa kotak masuk email anda dan ikuti tautan untuk mengonfirmasi akun anda.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Tautan folder tidak tersedia</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -848,7 +848,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">Menunggu konfirmasi e-mail</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Check your email inbox and follow the link to confirm your account.</string>
+    <string name="confirm_email_explanation">Periksa kotak masuk email anda dan ikuti tautan untuk mengonfirmasi akun anda.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d barang</item>
@@ -4757,7 +4757,7 @@
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_message_download_success">Aplikasi telah diperbarui</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Relaunch the app</string>
+    <string name="general_app_update_action_restart">Luncurkan kembali aplikasi</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Izinkan akses ke file audio</string>
     <!-- Photos action menu zoom in -->
@@ -4997,7 +4997,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Unggahan dijeda. Baterai di bawah %1$d%% dan tidak mengisi daya.</string>
+    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Unggahan kamera berhenti berfungsi. Coba aktifkan kembali unggahan kamera untuk menyelesaikannya. Jika masalah berlanjut, hubungi dukungan.</string>
     <!-- Camera uploads pending info in Photos screen. -->
@@ -5139,7 +5139,7 @@
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">Laporkan masalah anda</string>
     <!-- Hidden nodes show items -->
-    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <string name="hidden_nodes_show_items">Tampilkan item tersembunyi</string>
     <!-- Hidden nodes show items description -->
     <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
     <!-- Button text for photo option in camera screen -->

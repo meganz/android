@@ -5228,7 +5228,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Upload onderbroken omdat er geen internetverbinding is</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Het uploaden is gepauzeerd. Batterij onder %1$d%% en laad niet op.</string>
+    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Camera-uploads werken niet meer. Probeer camera-uploads opnieuw in te schakelen om het probleem op te lossen. Als het probleem zich blijft voordoen, neem contact op met de klantenservice.</string>
     <!-- Camera uploads pending info in Photos screen. -->

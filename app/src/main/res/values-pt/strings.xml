@@ -5460,7 +5460,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">O upload foi pausado por falta de conexão à Internet</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">O upload foi pausado. Há menos de %1$d%% de bateria, e não está sendo carregada.</string>
+    <string name="photos_camera_uploads_low_battery">O upload foi pausado porque a bateria há menos de %1$d%% de bateria</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Os uploads da câmera pararam de funcionar - tente reativá-los. Se o problema persistir, entre em contato com o suporte.</string>
     <!-- Camera uploads pending info in Photos screen. -->
