@@ -480,7 +480,7 @@ private fun AccountInfoSection(
     val isExpiredOrGracePeriod =
         (uiState.isMasterBusinessAccount || uiState.isProFlexiAccount) && uiState.isBusinessProFlexiStatusActive.not()
     val isPaymentAlertVisible =
-        ((uiState.isMasterBusinessAccount || uiState.isProFlexiAccount) && uiState.isBusinessProFlexiStatusActive) || uiState.isBusinessAccount.not()
+        ((uiState.isMasterBusinessAccount || uiState.isProFlexiAccount) && uiState.isBusinessProFlexiStatusActive) || (uiState.isBusinessAccount.not() && uiState.isProFlexiAccount.not())
     val isSubscriptionRenewableOrExpired =
         uiState.hasRenewableSubscription || uiState.hasExpireAbleSubscription
 
