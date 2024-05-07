@@ -694,6 +694,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private val fileBackupManager: FileBackupManager = initFileBackupManager()
 
+    private val credentials by lazy {
+        runBlocking {
+            runCatching {
+                getAccountCredentialsUseCase()
+            }.getOrNull()
+        }
+    }
+
     /**
      * Feature Flag for OfflineCompose
      */
@@ -956,7 +964,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             selectDrawerItem(drawerItem)
             showOfflineMode()
-            dbH.credentials?.let {
+            credentials?.let {
                 val gSession = it.session
                 ChatUtil.initMegaChatApi(gSession, this)
             }
@@ -1346,7 +1354,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             refreshSession()
             return true
         }
-        if (dbH.credentials == null) {
+        if (credentials == null) {
             if (intent != null) {
                 if (intent.action != null) {
                     if (intent.action == Constants.ACTION_EXPORT_MASTER_KEY || intent.action == Constants.ACTION_OPEN_MEGA_LINK || intent.action == Constants.ACTION_OPEN_MEGA_FOLDER_LINK) {
@@ -2442,7 +2450,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             isSearching = false
             return
         }
-        if (dbH.credentials == null) {
+        if (credentials == null) {
             if (!openLink) {
                 return
             } else {

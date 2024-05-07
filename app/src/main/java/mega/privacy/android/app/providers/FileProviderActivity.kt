@@ -44,6 +44,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.BaseActivity.Companion.showSimpleSnackbar
 import mega.privacy.android.app.DownloadService
@@ -77,6 +78,8 @@ import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.usecase.account.SetUserCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -135,6 +138,12 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
 
     @Inject
     lateinit var dbH: DatabaseHandler
+
+    @Inject
+    lateinit var getAccountCredentialsUseCase: GetAccountCredentialsUseCase
+
+    @Inject
+    lateinit var setUserCredentialsUseCase: SetUserCredentialsUseCase
 
     private val viewModel by viewModels<FileProviderViewModel>()
 
@@ -275,7 +284,7 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
         megaApi.addTransferListener(this@FileProviderActivity)
         checkLogin()
 
-        val credentials = dbH.credentials
+        val credentials = runBlocking { runCatching { getAccountCredentialsUseCase() }.getOrNull() }
         if (credentials == null) {
             loginLayout?.visibility = View.VISIBLE
             loginCreateAccount?.visibility = View.INVISIBLE
@@ -1393,7 +1402,9 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
             } else {
                 val credentials =
                     UserCredentials(lastEmail, gSession, "", "", megaApi.myUserHandle)
-                dbH.saveCredentials(credentials)
+                lifecycleScope.launch {
+                    setUserCredentialsUseCase(credentials)
+                }
                 setContentView(R.layout.activity_file_provider)
                 tabShown = CLOUD_TAB
                 runCatching { loginMutex.unlock() }

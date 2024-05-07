@@ -10,12 +10,14 @@ import android.os.Bundle
 import android.os.StatFs
 import android.text.TextUtils
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.lifecycleScope
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
@@ -420,8 +422,14 @@ class NodeSaver(
                 return false
             }
 
-            if (dbHandler.credentials != null && dbHandler.askSetDownloadLocation && activity is BaseActivity) {
-                activity.showConfirmationSaveInSameLocation(parentPath)
+            if (dbHandler.askSetDownloadLocation && activity is BaseActivity) {
+                activity.lifecycleScope.launch {
+                    val credentials =
+                        runCatching { activity.getAccountCredentialsUseCase() }.getOrNull()
+                    if (credentials != null) {
+                        activity.showConfirmationSaveInSameLocation(parentPath)
+                    }
+                }
             }
 
             Completable

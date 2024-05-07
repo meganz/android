@@ -20,9 +20,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -286,14 +288,15 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Defines the click action of the transfers widget.
      * Launches an Intent to navigate to In progress tab in Transfers section.
      */
-    protected fun openTransfersSection() {
-        if (megaApi.isLoggedIn == 0 || dbH.credentials == null) {
+    private fun openTransfersSection() = lifecycleScope.launch {
+        val credentials = runCatching { getAccountCredentialsUseCase() }.getOrNull()
+        if (megaApi.isLoggedIn == 0 || credentials == null) {
             Timber.w("Not logged in, no action.")
-            return
+            return@launch
         }
 
         startActivity(
-            Intent(this, ManagerActivity::class.java)
+            Intent(this@TransfersManagementActivity, ManagerActivity::class.java)
                 .setAction(ACTION_SHOW_TRANSFERS)
                 .putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)

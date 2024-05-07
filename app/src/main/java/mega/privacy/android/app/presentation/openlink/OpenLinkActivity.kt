@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.OpenPasswordLinkActivity
 import mega.privacy.android.app.R
@@ -159,7 +160,8 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         url = decodeURL(url)
-        isLoggedIn = megaApi.isLoggedIn != 0 && dbH.credentials != null
+        val credentials = runBlocking { runCatching { getAccountCredentialsUseCase() }.getOrNull() }
+        isLoggedIn = megaApi.isLoggedIn != 0 && credentials != null
         needsRefreshSession = megaApi.rootNode == null
 
         collectFlows()

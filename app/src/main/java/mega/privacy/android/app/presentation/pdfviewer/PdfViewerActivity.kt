@@ -42,6 +42,7 @@ import com.shockwave.pdfium.PdfDocument.Bookmark
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -55,7 +56,6 @@ import mega.privacy.android.app.databinding.ActivityPdfviewerBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
@@ -208,6 +208,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             finish()
             return
         }
+        val credentials = runBlocking { runBlocking { getAccountCredentialsUseCase() } }
 
         binding = ActivityPdfviewerBinding.inflate(layoutInflater)
 
@@ -295,7 +296,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             megaApi.addGlobalListener(this)
             if (uri.toString().contains("http://")) {
                 when {
-                    dbH.credentials != null -> megaApi
+                    credentials != null -> megaApi
                     isFolderLink -> megaApiFolder
                     else -> null
                 }?.apply { initStreaming() }
@@ -329,7 +330,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     )
                 } else {
                     Timber.d("CurrentDocumentAuth is not null")
-                    val url: String? = if (dbH.credentials != null) {
+                    val url: String? = if (credentials != null) {
                         megaApi.httpServerGetLocalLink(node)
                     } else {
                         megaApiFolder.httpServerGetLocalLink(node)

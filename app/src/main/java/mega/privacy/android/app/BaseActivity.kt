@@ -37,6 +37,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
@@ -113,10 +114,11 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
-import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
+import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
@@ -195,6 +197,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     @Inject
     lateinit var fetchPsaUseCase: FetchPsaUseCase
+
+    @Inject
+    lateinit var getAccountCredentialsUseCase: GetAccountCredentialsUseCase
+
+    @Inject
+    lateinit var saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase
 
     /**
      * Monitor Chat Signal Presence Use Case
@@ -1032,8 +1040,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @param accountBlockedDetail [AccountBlockedDetail]
      */
     private fun checkWhyAmIBlocked(accountBlockedDetail: AccountBlockedDetail) {
-
-        val intent: Intent
         when (accountBlockedDetail.type) {
             AccountBlockedType.NOT_BLOCKED -> {}
             AccountBlockedType.TOS_COPYRIGHT -> megaChatApi.logout(
@@ -1071,25 +1077,18 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             AccountBlockedType.VERIFICATION_SMS -> {
                 if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed) return
                 MegaApplication.smsVerifyShowed(true)
-                val gSession = megaApi.dumpSession()
-                //For first login, keep the valid session,
-                //after added phone number, the account can use this session to fastLogin
-                if (gSession != null) {
-                    val myUser = megaApi.myUser
-                    var myUserHandle: String? = null
-                    var lastEmail: String? = null
-                    if (myUser != null) {
-                        lastEmail = myUser.email
-                        myUserHandle = myUser.handle.toString() + ""
+                lifecycleScope.launch {
+                    runCatching {
+                        saveAccountCredentialsUseCase()
+                    }.onFailure {
+                        Timber.e(it)
                     }
-                    val credentials = UserCredentials(lastEmail, gSession, "", "", myUserHandle)
-                    dbH.saveCredentials(credentials)
+                    Timber.d("Show SMS verification activity.")
+                    val intent = Intent(applicationContext, SMSVerificationActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    intent.putExtra(NAME_USER_LOCKED, true)
+                    startActivity(intent)
                 }
-                Timber.d("Show SMS verification activity.")
-                intent = Intent(applicationContext, SMSVerificationActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra(NAME_USER_LOCKED, true)
-                startActivity(intent)
             }
 
             AccountBlockedType.VERIFICATION_EMAIL -> {
@@ -1147,10 +1146,10 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     /**
      * Shows a warning indicating transfer over quota occurred.
      */
-    fun showGeneralTransferOverQuotaWarning() {
-        if (isActivityInBackground || transfersManagement.isOnTransfersSection || transferGeneralOverQuotaWarning != null) return
+    fun showGeneralTransferOverQuotaWarning() = lifecycleScope.launch {
+        if (isActivityInBackground || transfersManagement.isOnTransfersSection || transferGeneralOverQuotaWarning != null) return@launch
         val builder =
-            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            MaterialAlertDialogBuilder(this@BaseActivity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
         val binding = TransferOverquotaLayoutBinding.inflate(layoutInflater)
         builder.setView(binding.root)
             .setOnDismissListener {
@@ -1167,7 +1166,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             stringResource, TimeUtils.getHumanizedTime(megaApi.bandwidthOverquotaDelay)
         )
         binding.transferOverquotaButtonPayment.apply {
-            val isLoggedIn = megaApi.isLoggedIn != 0 && dbH.credentials != null
+            val credentials = runCatching { getAccountCredentialsUseCase() }.getOrNull()
+            val isLoggedIn = megaApi.isLoggedIn != 0 && credentials != null
             text = if (isLoggedIn) {
                 val isFreeAccount =
                     myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE
@@ -1286,8 +1286,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
         if (state == MegaChatApi.INIT_ERROR || state == MegaChatApi.INIT_NOT_DONE) {
             Timber.w("MegaChatApi state: %s", state)
-
-            state = megaChatApi.init(dbH.credentials?.session)
+            val credentials =
+                runBlocking { runCatching { getAccountCredentialsUseCase() }.getOrNull() }
+            state = megaChatApi.init(credentials?.session)
             Timber.d("result of init ---> %s", state)
 
             if (state == MegaChatApi.INIT_ERROR) {
