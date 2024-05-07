@@ -4425,18 +4425,12 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -5393,4 +5387,25 @@
     <string name="camera_flash_mode_auto">Flash mode auto</string>
     <!--  -->
     <string name="camera_send_to">Send to %1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">More</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">Raise hand</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">Lower hand</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">Put call on hold</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">Swap calls</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">Resume call</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">New feature: Raise hand</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">Your hand is raised</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="one">You and another raised your hands</item>
+        <item quantity="other">You and %1$d others raised your hands</item>
+    </plurals>
 </resources>

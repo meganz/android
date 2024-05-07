@@ -216,7 +216,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     NewManageChatHistoryActivity(
         "Enable new manage chat history activity",
         false
-    );
+    ),
+
+    /**
+     * Raise to speak in a call
+     */
+    RaiseToSpeak("Raise to speak in a call or a meeting", false);
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
