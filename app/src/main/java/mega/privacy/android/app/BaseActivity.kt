@@ -347,6 +347,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * Broadcast to show a warning when it tries to upload files to a chat conversation
      * and the transfers are paused.
      */
+    @Deprecated("Use StartTransferComponent Composable instead")
     private val resumeTransfersReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action != BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS

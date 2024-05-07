@@ -556,4 +556,14 @@ interface TransferRepository {
      * @return true if the user can choose download's destination. False means downloads will be saved to default destination. See [settingsRepository.setDefaultStorageDownloadLocation()]
      */
     suspend fun allowUserToSetDownloadDestination(): Boolean
+
+    /**
+     * Monitors ask resume transfers.
+     */
+    fun monitorAskedResumeTransfers(): StateFlow<Boolean>
+
+    /**
+     * Set ask resume transfers.
+     */
+    suspend fun setAskedResumeTransfers()
 }

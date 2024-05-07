@@ -37,7 +37,6 @@ internal fun BaseMegaAlertDialog(
     content = text?.composeLet {
         Text(
             text = text,
-            fontWeight = FontWeight.Medium,
             style = MaterialTheme.typography.subtitle1,
             color = MegaTheme.colors.text.secondary,
             modifier = Modifier.testTag(CONTENT_TAG),
@@ -108,7 +107,6 @@ internal fun BaseMegaAlertDialog(
     text = {
         Text(
             text = text,
-            fontWeight = FontWeight.Medium,
             style = MaterialTheme.typography.subtitle1,
             color = MegaTheme.colors.text.secondary,
             modifier = Modifier.testTag(CONTENT_TAG),

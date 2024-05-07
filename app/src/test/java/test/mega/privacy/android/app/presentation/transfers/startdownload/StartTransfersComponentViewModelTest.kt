@@ -34,13 +34,16 @@ import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSett
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorActiveTransferFinishedUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.ShouldAskForResumeTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -77,7 +80,7 @@ class StartTransfersComponentViewModelTest {
         mock<SetAskBeforeLargeDownloadsSettingUseCase>()
     private val getOrCreateStorageDownloadLocationUseCase =
         mock<GetOrCreateStorageDownloadLocationUseCase>()
-    private val monitorOngoingActiveTransfersUntilFinishedUseCase = mock<MonitorOngoingActiveTransfersUntilFinishedUseCase>()
+    private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
     private val getCurrentDownloadSpeedUseCase = mock<GetCurrentDownloadSpeedUseCase>()
     private val getFilePreviewDownloadPathUseCase = mock<GetFilePreviewDownloadPathUseCase>()
     private val shouldAskDownloadDestinationUseCase = mock<ShouldAskDownloadDestinationUseCase>()
@@ -88,7 +91,9 @@ class StartTransfersComponentViewModelTest {
     private val setStorageDownloadLocationUseCase = mock<SetStorageDownloadLocationUseCase>()
     private val monitorActiveTransferFinishedUseCase = mock<MonitorActiveTransferFinishedUseCase>()
     private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
-
+    private val shouldAskForResumeTransfersUseCase = mock<ShouldAskForResumeTransfersUseCase>()
+    private val setAskedResumeTransfersUseCase = mock<SetAskedResumeTransfersUseCase>()
+    private val pauseAllTransfersUseCase = mock<PauseAllTransfersUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -99,25 +104,28 @@ class StartTransfersComponentViewModelTest {
     fun setup() {
         initialStub()
         underTest = StartTransfersComponentViewModel(
-            getOfflinePathForNodeUseCase,
-            getOrCreateStorageDownloadLocationUseCase,
-            getFilePreviewDownloadPathUseCase,
-            startDownloadsWithWorkerUseCase,
-            clearActiveTransfersIfFinishedUseCase,
-            isConnectedToInternetUseCase,
-            totalFileSizeOfNodesUseCase,
-            fileSizeStringMapper,
-            isAskBeforeLargeDownloadsSettingUseCase,
-            setAskBeforeLargeDownloadsSettingUseCase,
-            monitorOngoingActiveTransfersUntilFinishedUseCase,
-            getCurrentDownloadSpeedUseCase,
-            shouldAskDownloadDestinationUseCase,
-            shouldPromptToSaveDestinationUseCase,
-            saveDoNotPromptToSaveDestinationUseCase,
-            setStorageDownloadAskAlwaysUseCase,
-            setStorageDownloadLocationUseCase,
-            monitorActiveTransferFinishedUseCase,
-            sendChatAttachmentsUseCase,
+            getOfflinePathForNodeUseCase = getOfflinePathForNodeUseCase,
+            getOrCreateStorageDownloadLocationUseCase = getOrCreateStorageDownloadLocationUseCase,
+            getFilePreviewDownloadPathUseCase = getFilePreviewDownloadPathUseCase,
+            startDownloadsWithWorkerUseCase = startDownloadsWithWorkerUseCase,
+            clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
+            totalFileSizeOfNodesUseCase = totalFileSizeOfNodesUseCase,
+            fileSizeStringMapper = fileSizeStringMapper,
+            isAskBeforeLargeDownloadsSettingUseCase = isAskBeforeLargeDownloadsSettingUseCase,
+            setAskBeforeLargeDownloadsSettingUseCase = setAskBeforeLargeDownloadsSettingUseCase,
+            monitorOngoingActiveTransfersUseCase = monitorOngoingActiveTransfersUseCase,
+            getCurrentDownloadSpeedUseCase = getCurrentDownloadSpeedUseCase,
+            shouldAskDownloadDestinationUseCase = shouldAskDownloadDestinationUseCase,
+            shouldPromptToSaveDestinationUseCase = shouldPromptToSaveDestinationUseCase,
+            saveDoNotPromptToSaveDestinationUseCase = saveDoNotPromptToSaveDestinationUseCase,
+            setStorageDownloadAskAlwaysUseCase = setStorageDownloadAskAlwaysUseCase,
+            setStorageDownloadLocationUseCase = setStorageDownloadLocationUseCase,
+            monitorActiveTransferFinishedUseCase = monitorActiveTransferFinishedUseCase,
+            sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
+            shouldAskForResumeTransfersUseCase = shouldAskForResumeTransfersUseCase,
+            setAskedResumeTransfersUseCase = setAskedResumeTransfersUseCase,
+            pauseAllTransfersUseCase = pauseAllTransfersUseCase,
         )
     }
 
@@ -135,13 +143,17 @@ class StartTransfersComponentViewModelTest {
             fileSizeStringMapper,
             isAskBeforeLargeDownloadsSettingUseCase,
             setAskBeforeLargeDownloadsSettingUseCase,
-            monitorOngoingActiveTransfersUntilFinishedUseCase,
+            monitorOngoingActiveTransfersUseCase,
             getCurrentDownloadSpeedUseCase,
             shouldAskDownloadDestinationUseCase,
             shouldPromptToSaveDestinationUseCase,
             saveDoNotPromptToSaveDestinationUseCase,
             setStorageDownloadAskAlwaysUseCase,
             setStorageDownloadLocationUseCase,
+            shouldAskForResumeTransfersUseCase,
+            setAskedResumeTransfersUseCase,
+            pauseAllTransfersUseCase,
+            sendChatAttachmentsUseCase
         )
         initialStub()
     }
@@ -149,7 +161,7 @@ class StartTransfersComponentViewModelTest {
     private val monitorActiveTransferFinishedFlow = MutableSharedFlow<Int>()
 
     private fun initialStub() {
-        whenever(monitorOngoingActiveTransfersUntilFinishedUseCase(any())).thenReturn(emptyFlow())
+        whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
         whenever(monitorActiveTransferFinishedUseCase(any())).thenReturn(
             monitorActiveTransferFinishedFlow
         )
@@ -394,6 +406,17 @@ class StartTransfersComponentViewModelTest {
 
                 assertThat(actual).isEqualTo(expected)
             }
+        }
+
+    @Test
+    fun `test that paused transfers event is emitted when shouldAskForResumeTransfersUseCase is true and start a chat upload`() =
+        runTest {
+            commonStub()
+            whenever(shouldAskForResumeTransfersUseCase()).thenReturn(true)
+            underTest.startTransfer(
+                TransferTriggerEvent.StartChatUpload.Files(CHAT_ID, listOf(chatUri))
+            )
+            assertCurrentEventIsEqualTo(StartTransferEvent.PausedTransfers)
         }
 
     private fun provideDownloadNodeParameters() = listOf(

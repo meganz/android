@@ -409,7 +409,7 @@ internal fun ChatView(
     }
     BackHandler(enabled = messageOptionsModalSheetState.isVisible) {
         coroutineScope.launch {
-            messageNotSentBottomSheetState.hide()
+            messageOptionsModalSheetState.hide()
         }
     }
     BackHandler(enabled = messageNotSentBottomSheetState.isVisible) {

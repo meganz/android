@@ -51,6 +51,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeTransfersDialog
 import mega.privacy.android.app.presentation.transfers.view.TransferInProgressDialog
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
@@ -142,6 +143,8 @@ internal fun StartTransferComponent(
         onPromptSaveDestinationConsumed = viewModel::consumePromptSaveDestination,
         onSaveDestination = viewModel::saveDestination,
         onDoNotPromptToSaveDestinationAgain = viewModel::doNotPromptToSaveDestinationAgain,
+        onResumeTransfers = viewModel::resumeTransfers,
+        onAskedResumeTransfers = viewModel::setAskedResumeTransfers,
         snackBarHostState = snackBarHostState,
     )
 }
@@ -191,10 +194,13 @@ private fun StartTransferComponent(
     onPromptSaveDestinationConsumed: () -> Unit,
     onSaveDestination: (String) -> Unit,
     onDoNotPromptToSaveDestinationAgain: () -> Unit,
+    onResumeTransfers: () -> Unit,
+    onAskedResumeTransfers: () -> Unit,
     snackBarHostState: SnackbarHostState,
 ) {
     val context = LocalContext.current
     var showOfflineAlertDialog by rememberSaveable { mutableStateOf(false) }
+    var showResumeTransfersAlertDialog by rememberSaveable { mutableStateOf(false) }
     val showQuotaExceededDialog = remember { mutableStateOf<StorageState?>(null) }
     var showConfirmLargeTransfer by remember {
         mutableStateOf<StartTransferEvent.ConfirmLargeDownload?>(null)
@@ -231,6 +237,10 @@ private fun StartTransferComponent(
 
                 StartTransferEvent.NotConnected -> {
                     showOfflineAlertDialog = true
+                }
+
+                StartTransferEvent.PausedTransfers -> {
+                    showResumeTransfersAlertDialog = true
                 }
 
                 is StartTransferEvent.ConfirmLargeDownload -> {
@@ -328,6 +338,15 @@ private fun StartTransferComponent(
                 showPromptSaveDestinationDialog = null
             }
         )
+    }
+    if (showResumeTransfersAlertDialog) {
+        ResumeTransfersDialog(onResume = {
+            onResumeTransfers()
+            showResumeTransfersAlertDialog = false
+        }, onDismiss = {
+            onAskedResumeTransfers()
+            showResumeTransfersAlertDialog = false
+        })
     }
 }
 

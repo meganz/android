@@ -34,6 +34,11 @@ sealed interface StartTransferEvent {
     data object NotConnected : StartTransferEvent
 
     /**
+     * Transfer cannot proceed because transfers' queue is paused.
+     */
+    data object PausedTransfers : StartTransferEvent
+
+    /**
      * User needs to confirm large download
      * @param sizeString: the size of the download
      * @param transferTriggerEvent: the event to start again the download if confirmed

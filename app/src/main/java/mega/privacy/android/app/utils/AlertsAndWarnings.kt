@@ -69,6 +69,7 @@ object AlertsAndWarnings {
      * @param context current Context.
      */
     @JvmStatic
+    @Deprecated("Use ResumeTransfersDialog Composable dialog instead")
     fun showResumeTransfersWarning(
         context: Context,
         onResumePausedTransfers: () -> Unit,

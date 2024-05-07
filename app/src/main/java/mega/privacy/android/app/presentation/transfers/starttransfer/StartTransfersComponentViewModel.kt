@@ -42,13 +42,16 @@ import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSett
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorActiveTransferFinishedUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.ShouldAskForResumeTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -68,7 +71,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val isAskBeforeLargeDownloadsSettingUseCase: IsAskBeforeLargeDownloadsSettingUseCase,
     private val setAskBeforeLargeDownloadsSettingUseCase: SetAskBeforeLargeDownloadsSettingUseCase,
-    private val monitorOngoingActiveTransfersUntilFinishedUseCase: MonitorOngoingActiveTransfersUntilFinishedUseCase,
+    private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     private val getCurrentDownloadSpeedUseCase: GetCurrentDownloadSpeedUseCase,
     private val shouldAskDownloadDestinationUseCase: ShouldAskDownloadDestinationUseCase,
     private val shouldPromptToSaveDestinationUseCase: ShouldPromptToSaveDestinationUseCase,
@@ -77,6 +80,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val setStorageDownloadLocationUseCase: SetStorageDownloadLocationUseCase,
     private val monitorActiveTransferFinishedUseCase: MonitorActiveTransferFinishedUseCase,
     private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
+    private val shouldAskForResumeTransfersUseCase: ShouldAskForResumeTransfersUseCase,
+    private val setAskedResumeTransfersUseCase: SetAskedResumeTransfersUseCase,
+    private val pauseAllTransfersUseCase: PauseAllTransfersUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var currentInProgressJob: Job? = null
@@ -115,6 +121,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 }
 
                 is TransferTriggerEvent.StartChatUpload -> {
+                    checkAndHandleTransfersPaused()
                     startChatUploads(
                         chatId = transferTriggerEvent.chatId,
                         uris = transferTriggerEvent.uris,
@@ -469,31 +476,29 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         //check download speed and size to show rating
         if (checkShowRating) {
             viewModelScope.launch {
-                monitorOngoingActiveTransfersUntilFinishedUseCase(TransferType.DOWNLOAD)
-                    .conflate()
-                    .takeWhile {
-                        checkShowRating
-                    }.catch {
-                        Timber.e(it)
-                    }.collect { (transferTotals, paused) ->
-                        if (checkShowRating && !paused && transferTotals.totalFileTransfers > 0) {
-                            val currentDownloadSpeed = getCurrentDownloadSpeedUseCase()
-                            RatingHandlerImpl().showRatingBaseOnSpeedAndSize(
-                                size = transferTotals.totalFileTransfers.toLong(),
-                                speed = currentDownloadSpeed.toLong(),
-                                listener = object : OnCompleteListener {
-                                    override fun onComplete() {
-                                        checkShowRating = false
-                                    }
-
-
-                                    override fun onConditionsUnmet() {
-                                        checkShowRating = false
-                                    }
+                monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD).conflate().takeWhile {
+                    checkShowRating
+                }.catch {
+                    Timber.e(it)
+                }.collect { (transferTotals, paused) ->
+                    if (checkShowRating && !paused && transferTotals.totalFileTransfers > 0) {
+                        val currentDownloadSpeed = getCurrentDownloadSpeedUseCase()
+                        RatingHandlerImpl().showRatingBaseOnSpeedAndSize(
+                            size = transferTotals.totalFileTransfers.toLong(),
+                            speed = currentDownloadSpeed.toLong(),
+                            listener = object : OnCompleteListener {
+                                override fun onComplete() {
+                                    checkShowRating = false
                                 }
-                            )
-                        }
+
+
+                                override fun onConditionsUnmet() {
+                                    checkShowRating = false
+                                }
+                            }
+                        )
                     }
+                }
             }
         }
     }
@@ -553,6 +558,31 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     override fun onPause(owner: LifecycleOwner) {
         super.onPause(owner)
         active = false
+    }
+
+    /**
+     * Set asked resume transfers.
+     */
+    fun setAskedResumeTransfers() {
+        viewModelScope.launch {
+            setAskedResumeTransfersUseCase()
+        }
+    }
+
+    /**
+     * Resume transfers.
+     */
+    fun resumeTransfers() {
+        viewModelScope.launch {
+            runCatching { pauseAllTransfersUseCase(false) }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    private fun checkAndHandleTransfersPaused() {
+        if (runCatching { shouldAskForResumeTransfersUseCase() }.getOrDefault(false)) {
+            _uiState.updateEventAndClearProgress(StartTransferEvent.PausedTransfers)
+        }
     }
 
     companion object {
