@@ -8,6 +8,7 @@ import kotlinx.coroutines.sync.withPermit
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.exception.extension.shouldEmitErrorForNodeMovement
+import mega.privacy.android.domain.repository.AccountRepository
 import javax.inject.Inject
 
 /**
@@ -15,6 +16,7 @@ import javax.inject.Inject
  */
 class CopyCollidedNodesUseCase @Inject constructor(
     private val copyCollidedNodeUseCase: CopyCollidedNodeUseCase,
+    private val accountRepository: AccountRepository,
 ) {
     /**
      * Invoke
@@ -49,6 +51,10 @@ class CopyCollidedNodesUseCase @Inject constructor(
         return MoveRequestResult.Copy(
             count = results.size,
             errorCount = results.size - successCount,
-        )
+        ).also {
+            if (successCount > 0) {
+                accountRepository.resetAccountDetailsTimeStamp()
+            }
+        }
     }
 }

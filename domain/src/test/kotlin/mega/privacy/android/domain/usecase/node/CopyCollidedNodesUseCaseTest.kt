@@ -8,13 +8,16 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.repository.AccountRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -23,17 +26,19 @@ internal class CopyCollidedNodesUseCaseTest {
     private lateinit var underTest: CopyCollidedNodesUseCase
 
     private val copyCollidedNodeUseCase: CopyCollidedNodeUseCase = mock()
+    private val accountRepository: AccountRepository = mock()
 
     @BeforeAll
     fun setUp() {
         underTest = CopyCollidedNodesUseCase(
-            copyCollidedNodeUseCase = copyCollidedNodeUseCase
+            copyCollidedNodeUseCase = copyCollidedNodeUseCase,
+            accountRepository = accountRepository
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(copyCollidedNodeUseCase)
+        reset(copyCollidedNodeUseCase, accountRepository)
     }
 
 
@@ -111,6 +116,7 @@ internal class CopyCollidedNodesUseCaseTest {
             assertThat(result.count).isEqualTo(2)
             assertThat(result.successCount).isEqualTo(1)
             assertThat(result.errorCount).isEqualTo(1)
+            verify(accountRepository).resetAccountDetailsTimeStamp()
         }
 
     @Test
@@ -137,6 +143,7 @@ internal class CopyCollidedNodesUseCaseTest {
             assertThat(result.count).isEqualTo(2)
             assertThat(result.successCount).isEqualTo(2)
             assertThat(result.errorCount).isEqualTo(0)
+            verify(accountRepository).resetAccountDetailsTimeStamp()
         }
 
     @Test
@@ -165,5 +172,6 @@ internal class CopyCollidedNodesUseCaseTest {
             assertThat(result.count).isEqualTo(2)
             assertThat(result.successCount).isEqualTo(0)
             assertThat(result.errorCount).isEqualTo(2)
+            verify(accountRepository, never()).resetAccountDetailsTimeStamp()
         }
 }
