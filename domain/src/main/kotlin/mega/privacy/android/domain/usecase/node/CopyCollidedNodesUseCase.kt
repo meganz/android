@@ -6,33 +6,37 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import mega.privacy.android.domain.entity.node.MoveRequestResult
-import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.exception.extension.shouldEmitErrorForNodeMovement
-import mega.privacy.android.domain.repository.AccountRepository
 import javax.inject.Inject
 
 /**
- * Restore nodes use case
- *
+ *  Use Case to copy list of collided nodes
  */
-class CopyNodesUseCase @Inject constructor(
-    private val copyNodeUseCase: CopyNodeUseCase,
-    private val accountRepository: AccountRepository,
+class CopyCollidedNodesUseCase @Inject constructor(
+    private val copyCollidedNodeUseCase: CopyCollidedNodeUseCase,
 ) {
     /**
      * Invoke
      *
-     * @param nodes key node to move, value target node
-     * @return
+     * @param nameCollisions The list of NodeNameCollision
+     * @param rename True if the node should be renamed, false otherwise
+     * @return MoveRequestResult
      */
-    suspend operator fun invoke(nodes: Map<Long, Long>): MoveRequestResult {
+    suspend operator fun invoke(
+        nameCollisions: List<NodeNameCollision>,
+        rename: Boolean,
+    ): MoveRequestResult {
         val results = coroutineScope {
             val semaphore = Semaphore(10)
-            nodes.map { (nodeHandle, destinationHandle) ->
+            nameCollisions.map { nameCollision ->
                 async {
                     semaphore.withPermit {
                         runCatching {
-                            copyNodeUseCase(NodeId(nodeHandle), NodeId(destinationHandle), null)
+                            copyCollidedNodeUseCase(
+                                nameCollision = nameCollision,
+                                rename = rename,
+                            )
                         }.recover {
                             if (it.shouldEmitErrorForNodeMovement()) throw it
                             return@async Result.failure(it)
@@ -42,9 +46,6 @@ class CopyNodesUseCase @Inject constructor(
             }
         }.awaitAll()
         val successCount = results.count { it.isSuccess }
-        if (successCount > 0) {
-            accountRepository.resetAccountDetailsTimeStamp()
-        }
         return MoveRequestResult.Copy(
             count = results.size,
             errorCount = results.size - successCount,
