@@ -283,5 +283,5 @@
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">Upgrade</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Upload paused. Phone is not charging</string>
+    <string name="camera_uploads_phone_not_charging_message">Upload paused, phone is not charging</string>
 </resources>

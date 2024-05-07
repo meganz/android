@@ -251,7 +251,7 @@
     <!-- Option to don't use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_only_this_time_option">只有这次</string>
     <!-- Option to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_always_here_option">总是保存在此</string>
+    <string name="transfers_dialog_save_download_location_always_here_option">总是下载到此处</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
     <string name="transfers_dialog_save_download_location_always_ask_option">总是询问下载位置</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
@@ -259,7 +259,7 @@
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">从%1$s%2$s起，找到最适合您存储需求的方案。</string>
+    <string name="dialog_onboarding_feature_storage_description">从%1$s&#160;%2$s起，找到最适合您存储需求的方案。</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">存储空间不足</string>
     <!-- Body text of the insufficient storage error dialog -->
@@ -268,4 +268,12 @@
     <string name="sync_error_dialog_insufficient_storage_confirm_button">查看方案</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">现在不用</string>
+    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
+    <string name="account_confirm_email_misspelled_email_description">如果您拼错了您的电子邮件地址，请更正并点按[A]重新发送[/A]。</string>
+    <!-- Title of the insufficient storage error banner -->
+    <string name="sync_error_storage_over_quota_banner_title">同步已暂停，您MEGA方案的存储空间已用完。</string>
+    <!-- Title of the insufficient storage error action -->
+    <string name="sync_error_storage_over_quota_banner_action">升级</string>
+    <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
+    <string name="camera_uploads_phone_not_charging_message">上传已暂停，手机未在充电</string>
 </resources>

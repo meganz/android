@@ -4996,7 +4996,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">インターネット接続がないためアップロードが一時停止されました</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">アップロードが一時停止されました。バッテリーが%1$d&#160;%%を下回っており、充電されていません。</string>
+    <string name="photos_camera_uploads_low_battery">バッテリーが%1$d%%を下回っているため、アップロードが一時停止されました</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">カメラアップロードが機能しなくなりました。これを解決するには、カメラアップロードを再度有効にしてみてください。問題が解決しない場合は、サポートにご連絡ください。</string>
     <!-- Camera uploads pending info in Photos screen. -->

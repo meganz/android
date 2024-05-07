@@ -4996,7 +4996,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">由于没有互联网连接，上传已暂停</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">上传已暂停。电量低于%1$d%%而且不在充电。</string>
+    <string name="photos_camera_uploads_low_battery">由于电池电量已低于%1$d%%，上传已暂停。</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">相机上传功能已停止运行。尝试重新启用相机上传功能来解决问题。如果问题仍然存在，请联系客服人员。</string>
     <!-- Camera uploads pending info in Photos screen. -->

@@ -2188,7 +2188,7 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">ชื่อไฟล์</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">แสดงดูครั้งล่าสุด</string>
+    <string name="option_enable_last_green_chat">แสดงการดูครั้งล่าสุด</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
     <string name="subtitle_option_enable_last_green_chat">อนุญาตให้ผู้ติดต่อของคุณเห็นเวลาใช้งาน MEGA ล่าสุดของคุณ</string>
     <!-- title of notification when device is out of storage during camera upload -->
@@ -4996,7 +4996,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">การอัปโหลดถูกหยุดชั่วคราวเนื่องจากการเชื่อมต่ออินเทอร์เน็ตขาดหายไป</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">การอัปโหลดถูกหยุดชั่วคราว เนื่องจากแบตเตอรี่เหลือน้อยกว่า %1$d%% และยังไม่ได้เสียบชาร์จ</string>
+    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">การอัปโหลดจากกล้องหยุดทำงาน ลองเปิดใช้งานการอัปโหลดรูปภาพจากกล้องอีกครั้งเพื่อแก้ไข หากปัญหายังมีอยู่ กรุณาติดต่อฝ่ายสนับสนุน</string>
     <!-- Camera uploads pending info in Photos screen. -->

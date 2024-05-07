@@ -213,7 +213,7 @@
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">동기화된 폴더 추가:</string>
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
-    <string name="general_size_giga_byte">%1$s&#160;GB</string>
+    <string name="general_size_giga_byte">%1$sGB</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">Free</string>
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
@@ -223,7 +223,7 @@
     <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
     <string name="dialog_onboarding_button_continue">계속</string>
     <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
+    <string name="dialog_onboarding_app_bar_title">MEGA 요금제 선택</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">포함된 항목</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -247,25 +247,33 @@
         <item quantity="other">링크 공유</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_title">Download to this location\?</string>
+    <string name="transfers_dialog_save_download_location_title">이 위치에 다운로드 할까요\?</string>
     <!-- Option to don't use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_only_this_time_option">Only this time</string>
+    <string name="transfers_dialog_save_download_location_only_this_time_option">이번 한번만</string>
     <!-- Option to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_always_here_option">Always save here</string>
+    <string name="transfers_dialog_save_download_location_always_here_option">항상 여기에 다운로드</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
-    <string name="transfers_dialog_save_download_location_always_ask_option">Always ask for destination</string>
+    <string name="transfers_dialog_save_download_location_always_ask_option">항상 대상 묻기</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_giga_byte_standalone">GB</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">Starting from %1$s %2$s, find the perfect fit for your storage needs.</string>
+    <string name="dialog_onboarding_feature_storage_description">%1$s%2$s부터 시작하여, 당신의 저장소 수요에 맞는 것을 찾으세요.</string>
     <!-- Title of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_title">Insufficient storage space</string>
+    <string name="sync_error_dialog_insufficient_storage_title">저장 공간 부족</string>
     <!-- Body text of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_body">The size of this folder will take your MEGA account over its storage limit. In order to be able to sync it, you will need to either free up some space or upgrade your MEGA account.</string>
+    <string name="sync_error_dialog_insufficient_storage_body">이 폴더의 크기는 당신의 MEGA 계정의 저장소 한도를 초과할 것입니다. 동기화를 가능하게 하려면 여유 공간을 확보하거나 MEGA 계정을 업그레이드 하세요.</string>
     <!-- Confirm button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_confirm_button">요금제 보기</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">나중에</string>
+    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
+    <string name="account_confirm_email_misspelled_email_description">만약 이메일 주소를 잘못 입력하였다면, 수정하고 [A]재발송[/A]을 탭하세요.</string>
+    <!-- Title of the insufficient storage error banner -->
+    <string name="sync_error_storage_over_quota_banner_title">당신의 MEGA 요금제의 저장소를 다 써서, 동기화가 일시정지 되었습니다.</string>
+    <!-- Title of the insufficient storage error action -->
+    <string name="sync_error_storage_over_quota_banner_action">업그레이드</string>
+    <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
+    <string name="camera_uploads_phone_not_charging_message">휴대전화가 충전 중이 아니어서, 업로드가 일시정지 되었습니다</string>
 </resources>
