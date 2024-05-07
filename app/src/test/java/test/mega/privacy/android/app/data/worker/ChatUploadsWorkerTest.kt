@@ -46,7 +46,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import org.junit.Before
 import org.junit.Test
@@ -77,7 +77,7 @@ class ChatUploadsWorkerTest {
     private val attachNodeWithPendingMessageUseCase = mock<AttachNodeWithPendingMessageUseCase>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val handleTransferEventUseCase = mock<HandleTransferEventUseCase>()
-    private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
+    private val monitorOngoingActiveTransfersUntilFinishedUseCase = mock<MonitorOngoingActiveTransfersUntilFinishedUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
     private val overQuotaNotificationBuilder = mock<OverQuotaNotificationBuilder>()
@@ -123,7 +123,7 @@ class ChatUploadsWorkerTest {
             ioDispatcher = ioDispatcher,
             monitorTransferEventsUseCase,
             handleTransferEventUseCase,
-            monitorOngoingActiveTransfersUseCase,
+            monitorOngoingActiveTransfersUntilFinishedUseCase,
             areTransfersPausedUseCase,
             getActiveTransferTotalsUseCase,
             overQuotaNotificationBuilder,
@@ -229,7 +229,7 @@ class ChatUploadsWorkerTest {
             on { hasCompleted() }.thenReturn(false)
             on { hasOngoingTransfers() }.thenReturn(true)
         }
-        whenever(monitorOngoingActiveTransfersUseCase(TransferType.CHAT_UPLOAD)) doReturn (flowOf(
+        whenever(monitorOngoingActiveTransfersUntilFinishedUseCase(TransferType.CHAT_UPLOAD)) doReturn (flowOf(
             MonitorOngoingActiveTransfersResult(
                 totals,
                 paused = false,

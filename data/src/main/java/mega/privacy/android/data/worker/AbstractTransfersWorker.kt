@@ -29,7 +29,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 
@@ -44,7 +44,7 @@ abstract class AbstractTransfersWorker(
     private val ioDispatcher: CoroutineDispatcher,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val handleTransferEventUseCase: HandleTransferEventUseCase,
-    private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
+    private val monitorOngoingActiveTransfersUntilFinishedUseCase: MonitorOngoingActiveTransfersUntilFinishedUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     private val overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -112,7 +112,7 @@ abstract class AbstractTransfersWorker(
         }
 
         onStart()
-        monitorOngoingActiveTransfersUseCase(type)
+        monitorOngoingActiveTransfersUntilFinishedUseCase(type)
             .catch { Timber.e("${this@AbstractTransfersWorker::class.java.simpleName}error: $it") }
             .onEach { (transferTotals, paused, _, _) ->
                 //set progress percent as worker progress

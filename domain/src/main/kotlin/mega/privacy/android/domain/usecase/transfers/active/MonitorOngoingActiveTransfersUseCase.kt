@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.sample
-import kotlinx.coroutines.flow.transformWhile
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
@@ -15,11 +14,10 @@ import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTrans
 import javax.inject.Inject
 
 /**
- * Use case to get a flow of ongoing active transfers and it's paused state. Mainly created to update the notification in the related Worker.
+ * Use case to get a flow of ongoing active transfers and it's paused state. Mainly created as base use case to update the notification in the related Workers.
  *
- * Once all ongoing active transfers of this type finish a last value is emitted and the flow ends, indicating that the notification can be dismissed and the worker can finish.
- * If there are no ongoing active transfers it will return a flow with just the current active transfer totals (all 0 in this case) and ends
- * Paused is true if if transfers are paused globally or all individual transfers are paused.
+ * If there are no ongoing active transfers it will return a flow with just the current active transfer totals (all 0 in this case)
+ * Paused is true if transfers are paused globally or all individual transfers are paused.
  * Active transfers monitoring is sampled to avoid too much updates.
  */
 class MonitorOngoingActiveTransfersUseCase @Inject constructor(
@@ -54,9 +52,6 @@ class MonitorOngoingActiveTransfersUseCase @Inject constructor(
                 transfersOverQuota,
                 storageOverQuota
             )
-        }.transformWhile {
-            emit(it)
-            it.activeTransferTotals.hasOngoingTransfers() && !it.transfersOverQuota && !it.storageOverQuota
         }
     }
 }

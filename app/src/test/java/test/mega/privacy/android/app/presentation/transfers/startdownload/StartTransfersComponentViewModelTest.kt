@@ -34,7 +34,7 @@ import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSett
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorActiveTransferFinishedUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
@@ -77,7 +77,7 @@ class StartTransfersComponentViewModelTest {
         mock<SetAskBeforeLargeDownloadsSettingUseCase>()
     private val getOrCreateStorageDownloadLocationUseCase =
         mock<GetOrCreateStorageDownloadLocationUseCase>()
-    private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
+    private val monitorOngoingActiveTransfersUntilFinishedUseCase = mock<MonitorOngoingActiveTransfersUntilFinishedUseCase>()
     private val getCurrentDownloadSpeedUseCase = mock<GetCurrentDownloadSpeedUseCase>()
     private val getFilePreviewDownloadPathUseCase = mock<GetFilePreviewDownloadPathUseCase>()
     private val shouldAskDownloadDestinationUseCase = mock<ShouldAskDownloadDestinationUseCase>()
@@ -109,7 +109,7 @@ class StartTransfersComponentViewModelTest {
             fileSizeStringMapper,
             isAskBeforeLargeDownloadsSettingUseCase,
             setAskBeforeLargeDownloadsSettingUseCase,
-            monitorOngoingActiveTransfersUseCase,
+            monitorOngoingActiveTransfersUntilFinishedUseCase,
             getCurrentDownloadSpeedUseCase,
             shouldAskDownloadDestinationUseCase,
             shouldPromptToSaveDestinationUseCase,
@@ -135,7 +135,7 @@ class StartTransfersComponentViewModelTest {
             fileSizeStringMapper,
             isAskBeforeLargeDownloadsSettingUseCase,
             setAskBeforeLargeDownloadsSettingUseCase,
-            monitorOngoingActiveTransfersUseCase,
+            monitorOngoingActiveTransfersUntilFinishedUseCase,
             getCurrentDownloadSpeedUseCase,
             shouldAskDownloadDestinationUseCase,
             shouldPromptToSaveDestinationUseCase,
@@ -149,7 +149,7 @@ class StartTransfersComponentViewModelTest {
     private val monitorActiveTransferFinishedFlow = MutableSharedFlow<Int>()
 
     private fun initialStub() {
-        whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
+        whenever(monitorOngoingActiveTransfersUntilFinishedUseCase(any())).thenReturn(emptyFlow())
         whenever(monitorActiveTransferFinishedUseCase(any())).thenReturn(
             monitorActiveTransferFinishedFlow
         )

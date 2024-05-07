@@ -21,7 +21,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 
@@ -36,7 +36,7 @@ class DownloadsWorker @AssistedInject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     handleTransferEventUseCase: HandleTransferEventUseCase,
-    monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
+    monitorOngoingActiveTransfersUntilFinishedUseCase: MonitorOngoingActiveTransfersUntilFinishedUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -56,7 +56,7 @@ class DownloadsWorker @AssistedInject constructor(
     ioDispatcher = ioDispatcher,
     monitorTransferEventsUseCase = monitorTransferEventsUseCase,
     handleTransferEventUseCase = handleTransferEventUseCase,
-    monitorOngoingActiveTransfersUseCase = monitorOngoingActiveTransfersUseCase,
+    monitorOngoingActiveTransfersUntilFinishedUseCase = monitorOngoingActiveTransfersUntilFinishedUseCase,
     areTransfersPausedUseCase = areTransfersPausedUseCase,
     getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder = overQuotaNotificationBuilder,

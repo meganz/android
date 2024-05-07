@@ -42,7 +42,7 @@ import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSett
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorActiveTransferFinishedUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
@@ -68,7 +68,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val isAskBeforeLargeDownloadsSettingUseCase: IsAskBeforeLargeDownloadsSettingUseCase,
     private val setAskBeforeLargeDownloadsSettingUseCase: SetAskBeforeLargeDownloadsSettingUseCase,
-    private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
+    private val monitorOngoingActiveTransfersUntilFinishedUseCase: MonitorOngoingActiveTransfersUntilFinishedUseCase,
     private val getCurrentDownloadSpeedUseCase: GetCurrentDownloadSpeedUseCase,
     private val shouldAskDownloadDestinationUseCase: ShouldAskDownloadDestinationUseCase,
     private val shouldPromptToSaveDestinationUseCase: ShouldPromptToSaveDestinationUseCase,
@@ -469,29 +469,31 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         //check download speed and size to show rating
         if (checkShowRating) {
             viewModelScope.launch {
-                monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD).conflate().takeWhile {
-                    checkShowRating
-                }.catch {
-                    Timber.e(it)
-                }.collect { (transferTotals, paused) ->
-                    if (checkShowRating && !paused && transferTotals.totalFileTransfers > 0) {
-                        val currentDownloadSpeed = getCurrentDownloadSpeedUseCase()
-                        RatingHandlerImpl().showRatingBaseOnSpeedAndSize(
-                            size = transferTotals.totalFileTransfers.toLong(),
-                            speed = currentDownloadSpeed.toLong(),
-                            listener = object : OnCompleteListener {
-                                override fun onComplete() {
-                                    checkShowRating = false
-                                }
+                monitorOngoingActiveTransfersUntilFinishedUseCase(TransferType.DOWNLOAD)
+                    .conflate()
+                    .takeWhile {
+                        checkShowRating
+                    }.catch {
+                        Timber.e(it)
+                    }.collect { (transferTotals, paused) ->
+                        if (checkShowRating && !paused && transferTotals.totalFileTransfers > 0) {
+                            val currentDownloadSpeed = getCurrentDownloadSpeedUseCase()
+                            RatingHandlerImpl().showRatingBaseOnSpeedAndSize(
+                                size = transferTotals.totalFileTransfers.toLong(),
+                                speed = currentDownloadSpeed.toLong(),
+                                listener = object : OnCompleteListener {
+                                    override fun onComplete() {
+                                        checkShowRating = false
+                                    }
 
 
-                                override fun onConditionsUnmet() {
-                                    checkShowRating = false
+                                    override fun onConditionsUnmet() {
+                                        checkShowRating = false
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
-                }
             }
         }
     }

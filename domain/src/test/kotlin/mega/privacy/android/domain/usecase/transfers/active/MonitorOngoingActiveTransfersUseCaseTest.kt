@@ -2,10 +2,8 @@ package mega.privacy.android.domain.usecase.transfers.active
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
@@ -23,7 +21,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MonitorOngoingActiveTransfersUseCaseTest {
     private lateinit var underTest: MonitorOngoingActiveTransfersUseCase
@@ -35,6 +32,17 @@ class MonitorOngoingActiveTransfersUseCaseTest {
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
     private val monitorStorageOverQuotaUseCase = mock<MonitorStorageOverQuotaUseCase>()
 
+
+    @BeforeAll
+    fun setUp() {
+        underTest = MonitorOngoingActiveTransfersUseCase(
+            monitorActiveTransferTotalsUseCase = monitorActiveTransferTotalsUseCase,
+            getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
+            monitorDownloadTransfersPausedUseCase = monitorDownloadTransfersPausedUseCase,
+            monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
+            monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase
+        )
+    }
 
     @BeforeEach
     fun resetMocks() {
@@ -51,17 +59,6 @@ class MonitorOngoingActiveTransfersUseCaseTest {
     private fun commonStub() {
         whenever(monitorTransferOverQuotaUseCase()) doReturn flowOf(false)
         whenever(monitorStorageOverQuotaUseCase()) doReturn flowOf(false)
-    }
-
-    @BeforeAll
-    fun setUp() {
-        underTest = MonitorOngoingActiveTransfersUseCase(
-            monitorActiveTransferTotalsUseCase = monitorActiveTransferTotalsUseCase,
-            getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
-            monitorDownloadTransfersPausedUseCase = monitorDownloadTransfersPausedUseCase,
-            monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
-            monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase
-        )
     }
 
     @ParameterizedTest
@@ -88,30 +85,6 @@ class MonitorOngoingActiveTransfersUseCaseTest {
                 )
             cancelAndIgnoreRemainingEvents()
         }
-    }
-
-    @ParameterizedTest
-    @EnumSource(TransferType::class)
-    fun `test that flow ends when there are no more ongoing active transfers`(
-        transferType: TransferType,
-    ) = runTest {
-        val first = mockActiveTransfersTotals(true)
-        val last = mockActiveTransfersTotals(false)
-        whenever(monitorActiveTransferTotalsUseCase(transferType))
-            .thenReturn(MutableStateFlow(last))
-        whenever(monitorDownloadTransfersPausedUseCase())
-            .thenReturn(flowOf(false))
-        whenever(getActiveTransferTotalsUseCase(transferType))
-            .thenReturn(first)
-        val lastReceived = underTest(transferType).last()
-        assertThat(lastReceived).isEqualTo(
-            MonitorOngoingActiveTransfersResult(
-                last,
-                paused = false,
-                transfersOverQuota = false,
-                storageOverQuota = false,
-            )
-        )
     }
 
     @ParameterizedTest
