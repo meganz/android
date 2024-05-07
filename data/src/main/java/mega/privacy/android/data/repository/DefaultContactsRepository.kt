@@ -28,7 +28,6 @@ import mega.privacy.android.data.extensions.replaceIfExists
 import mega.privacy.android.data.extensions.sortList
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.contact.ContactGateway
@@ -43,6 +42,7 @@ import mega.privacy.android.data.mapper.chat.UserLastGreenMapper
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
+import mega.privacy.android.data.mapper.contact.ContactRequestActionMapper
 import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.mapper.contact.UserMapper
 import mega.privacy.android.data.model.ChatUpdate
@@ -53,6 +53,7 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.contacts.ContactRequestAction
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.contacts.User
@@ -89,7 +90,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property contactDataMapper        [ContactDataMapper]
  * @property contactCredentialsMapper [ContactCredentialsMapper]
  * @property inviteContactRequestMapper [InviteContactRequestMapper]
- * @property localStorageGateway      [MegaLocalStorageGateway]
+ * @property contactRequestActionMapper [ContactRequestActionMapper]
  * @property contactGateway           [ContactGateway]
  */
 internal class DefaultContactsRepository @Inject constructor(
@@ -108,6 +109,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val inviteContactRequestMapper: InviteContactRequestMapper,
     private val credentialsPreferencesGateway: CredentialsPreferencesGateway,
     private val contactWrapper: ContactWrapper,
+    private val contactRequestActionMapper: ContactRequestActionMapper,
     private val databaseHandler: DatabaseHandler,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @ApplicationContext private val context: Context,
@@ -778,6 +780,69 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.getIncomingContactRequests()?.map(contactRequestMapper).orEmpty()
         }
+
+    override suspend fun manageReceivedContactRequest(
+        requestHandle: Long,
+        contactRequestAction: ContactRequestAction,
+    ) =
+        withContext(ioDispatcher) {
+            getContactRequestByHandleAndType(
+                requestHandle = requestHandle,
+                isOutgoing = false
+            )?.let { contactRequest ->
+                suspendCancellableCoroutine { continuation ->
+                    val listener = continuation.getRequestListener("manageReceivedContactRequest") {
+                        return@getRequestListener
+                    }
+                    megaApiGateway.replyReceivedContactRequest(
+                        contactRequest = contactRequest,
+                        action = contactRequestActionMapper(contactRequestAction),
+                        listener = listener,
+                    )
+                    continuation.invokeOnCancellation {
+                        megaApiGateway.removeRequestListener(listener)
+                    }
+                }
+            } ?: Timber.e("Not a received contact request")
+        }
+
+    override suspend fun manageSentContactRequest(
+        requestHandle: Long,
+        contactRequestAction: ContactRequestAction,
+    ) =
+        withContext(ioDispatcher) {
+            getContactRequestByHandleAndType(
+                requestHandle = requestHandle,
+                isOutgoing = true
+            )?.let { contactRequest ->
+                suspendCancellableCoroutine { continuation ->
+                    val listener = continuation.getRequestListener("manageSentContactRequest") {
+                        return@getRequestListener
+                    }
+                    megaApiGateway.sendInvitedContactRequest(
+                        email = contactRequest.targetEmail,
+                        message = contactRequest.sourceMessage,
+                        action = contactRequestActionMapper(contactRequestAction),
+                        listener = listener
+                    )
+                    continuation.invokeOnCancellation {
+                        megaApiGateway.removeRequestListener(listener)
+                    }
+                }
+            } ?: Timber.e("Not a sent contact request")
+        }
+
+    /**
+     * Get a contact request by handle and type
+     *
+     * @param requestHandle identifier for contact request
+     * @param isOutgoing: true if contact request is sent, false if contact request is received
+     */
+    private suspend fun getContactRequestByHandleAndType(
+        requestHandle: Long,
+        isOutgoing: Boolean,
+    ) = megaApiGateway.getContactRequestByHandle(requestHandle)
+        ?.takeIf { it.isOutgoing == isOutgoing }
 
     override suspend fun getContactLink(userHandle: Long) = withContext(ioDispatcher) {
         val result = suspendCancellableCoroutine { continuation ->

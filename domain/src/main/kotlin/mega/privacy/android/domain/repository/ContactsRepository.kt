@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.contacts.ContactRequestAction
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
@@ -363,6 +364,28 @@ interface ContactsRepository {
      * @return list of [ContactRequest]
      */
     suspend fun getIncomingContactRequests(): List<ContactRequest>
+
+    /**
+     * Manage a received contact request
+     *
+     * @param requestHandle         contact request identifier
+     * @param contactRequestAction  contact request action
+     */
+    suspend fun manageReceivedContactRequest(
+        requestHandle: Long,
+        contactRequestAction: ContactRequestAction,
+    )
+
+    /**
+     * Manage a sent contact request
+     *
+     * @param requestHandle         contact request identifier
+     * @param contactRequestAction  contact request action
+     */
+    suspend fun manageSentContactRequest(
+        requestHandle: Long,
+        contactRequestAction: ContactRequestAction,
+    )
 
     /**
      * Get contact link

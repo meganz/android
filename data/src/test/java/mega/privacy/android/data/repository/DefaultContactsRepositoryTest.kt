@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.chat.UserLastGreenMapper
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
+import mega.privacy.android.data.mapper.contact.ContactRequestActionMapper
 import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.mapper.contact.UserMapper
 import mega.privacy.android.data.model.ChatUpdate
@@ -90,6 +91,7 @@ class DefaultContactsRepositoryTest {
     private val contactDataMapper = mock<ContactDataMapper>()
     private val contactCredentialsMapper = mock<ContactCredentialsMapper>()
     private val inviteContactRequestMapper = mock<InviteContactRequestMapper>()
+    private val contactRequestActionMapper = mock<ContactRequestActionMapper>()
     private val chatConnectionStateMapper =
         ChatConnectionStateMapper(chatConnectionStatusMapper = ChatConnectionStatusMapper())
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
@@ -143,6 +145,7 @@ class DefaultContactsRepositoryTest {
             contactCredentialsMapper = contactCredentialsMapper,
             inviteContactRequestMapper = inviteContactRequestMapper,
             credentialsPreferencesGateway = credentialsPreferencesGateway,
+            contactRequestActionMapper = contactRequestActionMapper,
             contactWrapper = contactWrapper,
             databaseHandler = databaseHandler,
             chatConnectionStateMapper = chatConnectionStateMapper,
@@ -427,7 +430,11 @@ class DefaultContactsRepositoryTest {
                 lastName = null,
                 myHandle = null,
             )
-            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(flowOf(credentials))
+            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(
+                flowOf(
+                    credentials
+                )
+            )
             assertThat(underTest.getCurrentUserFirstName(forceRefresh = false)).isEqualTo(
                 expectedFirstName
             )
@@ -444,7 +451,11 @@ class DefaultContactsRepositoryTest {
                 lastName = null,
                 myHandle = null,
             )
-            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(flowOf(credentials))
+            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(
+                flowOf(
+                    credentials
+                )
+            )
 
             val request = mock<MegaRequest> {
                 on { text }.thenReturn(expectedFirstName)
@@ -468,7 +479,11 @@ class DefaultContactsRepositoryTest {
                 lastName = null,
                 myHandle = null,
             )
-            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(flowOf(credentials))
+            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(
+                flowOf(
+                    credentials
+                )
+            )
 
             val request = mock<MegaRequest> {
                 on { text }.thenReturn(expectedFirstName)
@@ -493,7 +508,11 @@ class DefaultContactsRepositoryTest {
                 lastName = expectedLastName,
                 myHandle = null,
             )
-            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(flowOf(credentials))
+            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(
+                flowOf(
+                    credentials
+                )
+            )
             assertThat(underTest.getCurrentUserLastName(forceRefresh = false)).isEqualTo(
                 expectedLastName
             )
@@ -510,7 +529,11 @@ class DefaultContactsRepositoryTest {
                 lastName = null,
                 myHandle = null,
             )
-            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(flowOf(credentials))
+            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(
+                flowOf(
+                    credentials
+                )
+            )
 
             val request = mock<MegaRequest> {
                 on { text }.thenReturn(expectedLastName)
@@ -534,7 +557,11 @@ class DefaultContactsRepositoryTest {
                 lastName = null,
                 myHandle = null,
             )
-            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(flowOf(credentials))
+            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(
+                flowOf(
+                    credentials
+                )
+            )
 
             val request = mock<MegaRequest> {
                 on { text }.thenReturn(expectedLastName)
