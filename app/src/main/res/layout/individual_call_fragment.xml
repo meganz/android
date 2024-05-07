@@ -27,9 +27,9 @@
 
     <ImageView
         android:id="@+id/on_hold_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_call_hold_big"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_meeting_pause"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/avatar"
         app:layout_constraintEnd_toEndOf="@id/avatar"

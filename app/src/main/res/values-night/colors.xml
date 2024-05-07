@@ -359,4 +359,6 @@
     <color name="color_icon_secondary">#A9ABAD</color>
     <color name="color_text_error">#FD6F90</color>
     <color name="color_support_error">#FD6F90</color>
+    <color name="color_primary_400">#FB6361</color>
+    <color name="color_icon_fill">#303233</color>
 </resources>

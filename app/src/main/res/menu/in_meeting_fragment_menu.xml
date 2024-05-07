@@ -13,16 +13,16 @@
     <item
         android:id="@+id/grid_view"
         android:enabled="true"
-        android:icon="@drawable/grid_view_icon"
+        android:icon="@drawable/ic_square_9"
         android:orderInCategory="110"
         android:title="@string/action_grid"
         android:visible="false"
-        app:iconTint="@color/white"
+        app:iconTint="@null"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/speaker_view"
         android:enabled="true"
-        android:icon="@drawable/main_view_icon"
+        android:icon="@drawable/ic_grid_split"
         android:orderInCategory="120"
         android:title="@string/main_view"
         android:visible="true"

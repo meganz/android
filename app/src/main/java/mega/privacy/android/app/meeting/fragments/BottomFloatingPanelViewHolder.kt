@@ -603,8 +603,8 @@ class BottomFloatingPanelViewHolder(
      */
     fun changeOnHoldIconDrawable(existsAnotherCallOnHold: Boolean) {
         floatingPanelView.fabHold.setOnIcon(
-            if (existsAnotherCallOnHold) R.drawable.ic_call_swap
-            else R.drawable.ic_transfers_pause
+            if (existsAnotherCallOnHold) mega.privacy.android.icon.pack.R.drawable.ic_arrows_swap
+            else mega.privacy.android.icon.pack.R.drawable.ic_meeting_pause
         )
     }
 
@@ -617,14 +617,14 @@ class BottomFloatingPanelViewHolder(
         Timber.d("Update speaker icon. Audio device is $device")
         when (device) {
             AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
-                floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                floatingPanelView.fabSpeaker.setOnIcon(mega.privacy.android.icon.pack.R.drawable.ic_volume_max)
                 floatingPanelView.fabSpeaker.enable = true
                 floatingPanelView.fabSpeaker.isOn = true
                 floatingPanelView.fabSpeakerLabel.text = context.getString(R.string.general_speaker)
             }
 
             AppRTCAudioManager.AudioDevice.EARPIECE -> {
-                floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_off)
+                floatingPanelView.fabSpeaker.setOnIcon(mega.privacy.android.icon.pack.R.drawable.ic_volume_off)
                 floatingPanelView.fabSpeaker.enable = true
                 floatingPanelView.fabSpeaker.isOn = false
                 floatingPanelView.fabSpeakerLabel.text = context.getString(R.string.general_speaker)
@@ -641,7 +641,7 @@ class BottomFloatingPanelViewHolder(
             }
 
             else -> {
-                floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                floatingPanelView.fabSpeaker.setOnIcon(mega.privacy.android.icon.pack.R.drawable.ic_volume_max)
                 floatingPanelView.fabSpeaker.enable = false
                 floatingPanelView.fabSpeaker.isOn = true
                 floatingPanelView.fabSpeakerLabel.text = context.getString(R.string.general_speaker)

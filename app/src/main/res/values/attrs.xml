@@ -145,6 +145,7 @@
         <attr name="on_background_tint" format="color" />
         <attr name="off_background_tint" format="color" />
         <attr name="disable_icon" format="reference" />
+        <attr name="apply_tint" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="LeftMeetingItem">

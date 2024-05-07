@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
@@ -18,6 +17,12 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
         set(value) {
             field = value
 
+            updateAppearance()
+        }
+
+    var applyTint: Boolean = true
+        set(value) {
+            field = value
             updateAppearance()
         }
 
@@ -57,6 +62,7 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
         val a = context.obtainStyledAttributes(attrs, R.styleable.OnOffFab, defStyleAttr, 0)
 
         isOn = a.getBoolean(R.styleable.OnOffFab_is_on, true)
+        applyTint = a.getBoolean(R.styleable.OnOffFab_apply_tint, true)
 
         onIcon = a.getDrawable(R.styleable.OnOffFab_on_icon)
         offIcon = a.getDrawable(R.styleable.OnOffFab_off_icon)
@@ -104,10 +110,25 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
 
     private fun updateAppearance() {
         setImageDrawable(if (!enable) disableIcon else if (isOn) onIcon else offIcon)
-        imageTintList = if (!enable){
-            ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054))
-        } else {
-            ColorStateList.valueOf(if (isOn) onIconTint else offIconTint)
+
+        imageTintList = when {
+            !enable -> ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    context,
+                    R.color.white_alpha_054
+                )
+            )
+
+            isOn -> ColorStateList.valueOf(onIconTint)
+            !applyTint -> ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    context,
+                    R.color.color_icon_fill
+                )
+            )
+
+            !isOn -> ColorStateList.valueOf(offIconTint)
+            else -> imageTintList
         }
 
         backgroundTintList =
