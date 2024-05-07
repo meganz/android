@@ -1387,6 +1387,10 @@ internal class DefaultAccountRepository @Inject constructor(
         credentialsPreferencesGateway.monitorCredentials()
             .flowOn(ioDispatcher)
 
+    override suspend fun clearCredentials() = withContext(ioDispatcher) {
+        credentialsPreferencesGateway.clear()
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"

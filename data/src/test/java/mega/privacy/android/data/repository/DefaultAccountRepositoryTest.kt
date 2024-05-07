@@ -1899,4 +1899,19 @@ class DefaultAccountRepositoryTest {
             awaitComplete()
         }
     }
+
+    @Test
+    fun `test that credentialsPreferencesGateway calls save when setCredentials called`() =
+        runTest {
+            val credentials = mock<UserCredentials>()
+            underTest.setCredentials(credentials)
+            verify(credentialsPreferencesGateway).save(credentials)
+        }
+
+    @Test
+    fun `test that credentialsPreferencesGateway calls clear when clearCredentials called`() =
+        runTest {
+            underTest.clearCredentials()
+            verify(credentialsPreferencesGateway).clear()
+        }
 }

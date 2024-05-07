@@ -669,4 +669,10 @@ interface AccountRepository {
      * @param credentials
      */
     suspend fun setCredentials(credentials: UserCredentials)
+
+    /**
+     * Clear credentials
+     *
+     */
+    suspend fun clearCredentials()
 }
