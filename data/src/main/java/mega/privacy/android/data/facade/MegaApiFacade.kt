@@ -562,6 +562,22 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getIncomingContactRequests(): ArrayList<MegaContactRequest> =
         megaApi.incomingContactRequests
 
+    override suspend fun getContactRequestByHandle(requestHandle: Long): MegaContactRequest? =
+        megaApi.getContactRequestByHandle(requestHandle)
+
+    override fun replyReceivedContactRequest(
+        contactRequest: MegaContactRequest,
+        action: Int,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.replyContactRequest(contactRequest, action, listener)
+
+    override fun sendInvitedContactRequest(
+        email: String,
+        message: String,
+        action: Int,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.inviteContact(email, message, action, listener)
+
     override suspend fun searchByType(
         cancelToken: MegaCancelToken,
         order: Int,
@@ -1216,7 +1232,7 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getChildren(
         filter: MegaSearchFilter,
         order: Int,
-        megaCancelToken: MegaCancelToken
+        megaCancelToken: MegaCancelToken,
     ): List<MegaNode> = megaApi.getChildren(filter, order, megaCancelToken, null)
 
     override fun openShareDialog(
@@ -1579,7 +1595,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun setNodeDescription(
         node: MegaNode,
         description: String?,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) {
         megaApi.setNodeDescription(node, description, listener)
     }

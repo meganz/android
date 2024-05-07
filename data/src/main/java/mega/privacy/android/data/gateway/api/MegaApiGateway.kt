@@ -777,6 +777,43 @@ interface MegaApiGateway {
     suspend fun getIncomingContactRequests(): ArrayList<MegaContactRequest>?
 
     /**
+     * Get contact request by request handle
+     *
+     * @param requestHandle identifier for contact request
+     *
+     * @return contact request if exists or null
+     */
+    suspend fun getContactRequestByHandle(requestHandle: Long): MegaContactRequest?
+
+    /**
+     * Reply action to a received contact request
+     *
+     * @param contactRequest
+     * @param action performed to reply
+     * @param listener
+     */
+    fun replyReceivedContactRequest(
+        contactRequest: MegaContactRequest,
+        action: Int,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Send action to an invited contact request
+     *
+     * @param email
+     * @param message
+     * @param action performed to send
+     * @param listener
+     */
+    fun sendInvitedContactRequest(
+        email: String,
+        message: String,
+        action: Int,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
      * Get the default color for the avatar
      *
      * @param megaUser
