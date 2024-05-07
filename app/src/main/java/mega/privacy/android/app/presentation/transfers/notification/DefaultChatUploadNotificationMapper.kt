@@ -12,8 +12,8 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
-import mega.privacy.android.data.mapper.transfer.VideoCompressionProgress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
 import javax.inject.Inject
 
 /**
@@ -25,7 +25,7 @@ class DefaultChatUploadNotificationMapper @Inject constructor(
 
     override fun invoke(
         activeTransferTotals: ActiveTransferTotals?,
-        videoCompressionProgress: VideoCompressionProgress?,
+        chatCompressionProgress: ChatCompressionProgress?,
         paused: Boolean,
     ): Notification {
         val intent = Intent(context, ManagerActivity::class.java)
@@ -40,11 +40,11 @@ class DefaultChatUploadNotificationMapper @Inject constructor(
         val content = context.getString(R.string.chat_upload_title_notification)
 
         val title = when {
-            videoCompressionProgress != null -> {
+            chatCompressionProgress != null -> {
                 context.getString(
                     R.string.title_compress_video,
-                    videoCompressionProgress.alreadyCompressed + 1,
-                    videoCompressionProgress.totalToCompress
+                    chatCompressionProgress.alreadyCompressed + 1,
+                    chatCompressionProgress.totalToCompress
                 )
             }
 
