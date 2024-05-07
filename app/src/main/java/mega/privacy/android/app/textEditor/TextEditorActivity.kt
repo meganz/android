@@ -530,12 +530,12 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     val shouldShowHideNode =
                         (isHiddenNodesEnabled
                                 && !isInSharedItems
-                                && parentNode?.isInShare == false) && !node.isMarkedSensitive
+                                && parentNode?.isInShare == false) && !node.isMarkedSensitive || viewModel.uiState.value.accountType?.isPaid == false
 
                     val shouldShowUnhideNode =
                         (isHiddenNodesEnabled
                                 && !isInSharedItems
-                                && parentNode?.isInShare == false) && node.isMarkedSensitive
+                                && parentNode?.isInShare == false) && node.isMarkedSensitive && viewModel.uiState.value.accountType?.isPaid == true
                     menu.findItem(R.id.action_hide).isVisible = shouldShowHideNode
                     menu.findItem(R.id.action_unhide).isVisible = shouldShowUnhideNode
                     menu.findItem(R.id.action_save).isVisible = false

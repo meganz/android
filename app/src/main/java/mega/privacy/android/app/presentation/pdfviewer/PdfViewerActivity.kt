@@ -1217,11 +1217,14 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     && !isInSharedItems
                     && parentNode?.isInShare == false
                     && node?.isMarkedSensitive == false
+                    || viewModel.uiState.value.accountType?.isPaid == false
+
         val shouldShowUnhideNode =
             isHiddenNodesEnabled
                     && !isInSharedItems
                     && parentNode?.isInShare == false
                     && node?.isMarkedSensitive == true
+                    && viewModel.uiState.value.accountType?.isPaid == true
 
         hideMenuItem.isVisible = shouldShowHideNode
         unhideMenuItem.isVisible = shouldShowUnhideNode

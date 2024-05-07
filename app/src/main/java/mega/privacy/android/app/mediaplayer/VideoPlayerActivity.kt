@@ -1229,12 +1229,14 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                                         && !isInSharedItems
                                         && !megaApi.getRootParentNode(node).isInShare
                                         && !node.isMarkedSensitive
+                                        || viewModel.state.value.accountType?.isPaid == false
 
                             val shouldShowUnhideNode =
                                 isHiddenNodesEnabled
                                         && !isInSharedItems
                                         && !megaApi.getRootParentNode(node).isInShare
                                         && node.isMarkedSensitive
+                                        && viewModel.state.value.accountType?.isPaid == true
 
                             menu.findItem(R.id.hide).isVisible = shouldShowHideNode
 
