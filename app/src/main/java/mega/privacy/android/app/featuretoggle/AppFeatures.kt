@@ -221,7 +221,15 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * Raise to speak in a call
      */
-    RaiseToSpeak("Raise to speak in a call or a meeting", false);
+    RaiseToSpeak("Raise to speak in a call or a meeting", false),
+
+    /**
+     * Enables UploadWorker for upload files, instead of UploadService. This is a work in progress feature.
+     */
+    UploadWorker(
+        "Enables UploadWorker for download files, instead of UploadService. This is a work in progress feature.",
+        false,
+    );
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
