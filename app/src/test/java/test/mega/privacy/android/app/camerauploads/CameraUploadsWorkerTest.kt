@@ -119,9 +119,9 @@ import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.junit.jupiter.api.AfterAll
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.kotlin.any
@@ -311,10 +311,9 @@ internal class CameraUploadsWorkerTest {
                 crashReporter = crashReporter,
             )
         )
-        setupDefaultCheckConditionMocks()
     }
 
-    @AfterAll
+    @After
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -386,12 +385,17 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that crashReporter is invoked when the worker starts doing work`() =
         runTest {
+            setupDefaultCheckConditionMocks()
+
             underTest.doWork()
+
             verify(crashReporter, times(2)).log(any())
         }
 
     @Test
     fun `test that the initial notification is displayed when the worker runs`() = runTest {
+        setupDefaultCheckConditionMocks()
+
         underTest.doWork()
 
         verify(underTest).setForegroundAsync(foregroundInfo)
@@ -399,6 +403,8 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that the worker calls handleLocalIpChangeUseCase`() = runTest {
+        setupDefaultCheckConditionMocks()
+
         underTest.doWork()
 
         verify(handleLocalIpChangeUseCase).invoke(false)
@@ -407,6 +413,8 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker cancel all error notifications after preconditions passed`() =
         runTest {
+            setupDefaultCheckConditionMocks()
+
             underTest.doWork()
 
             verify(underTest).setProgress(workDataOf(STATUS_INFO to START))
@@ -415,6 +423,8 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the check files to upload notification is displayed after preconditions passed`() =
         runTest {
+            setupDefaultCheckConditionMocks()
+
             underTest.doWork()
 
             verify(underTest).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
@@ -423,6 +433,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that all processing of the files before upload are done`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val list = listOf<CameraUploadsRecord>(mock())
             setupDefaultProcessingFilesConditionMocks(list)
 
@@ -448,6 +459,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the processing of the files to upload are not done if the list to upload is empty`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(getPendingCameraUploadsRecordsUseCase()).thenReturn(emptyList())
 
             underTest.doWork()
@@ -472,6 +484,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the initial backup state is sent with value ACTIVE if the transfers are not paused when uploads starts`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(monitorPausedTransfersUseCase()).thenReturn(flowOf(false))
             val list = listOf<CameraUploadsRecord>(mock())
             setupDefaultProcessingFilesConditionMocks(list)
@@ -485,6 +498,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the initial backup state is sent with value PAUSE_UPLOADS if the transfers are paused when uploads starts`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(monitorPausedTransfersUseCase()).thenReturn(flowOf(true))
             val list = listOf<CameraUploadsRecord>(mock())
             setupDefaultProcessingFilesConditionMocks(list)
@@ -497,6 +511,7 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that the backup heartbeat is sent regularly when uploads occurs`() = runTest {
+        setupDefaultCheckConditionMocks()
         whenever(monitorPausedTransfersUseCase()).thenReturn(flowOf(true))
         val list = listOf<CameraUploadsRecord>(mock())
         setupDefaultProcessingFilesConditionMocks(list)
@@ -508,6 +523,7 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that the uploads occurs after the processing of the files to upload`() = runTest {
+        setupDefaultCheckConditionMocks()
         val list = listOf<CameraUploadsRecord>(mock())
         setupDefaultProcessingFilesConditionMocks(list)
 
@@ -520,6 +536,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the state is updated and emitted properly when an event ToUpload, UploadInProgress TransferUpdate, and Uploaded are received`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
             }
@@ -611,6 +628,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker is broadcasting quota exceeded event when an event UploadInProgress TransferTemporaryError is received with error QuotaExceededMegaException`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
             }
@@ -651,6 +669,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker is broadcasting quota exceeded event when an event Uploaded is received with error QuotaExceededMegaException`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
             }
@@ -694,6 +713,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the state is updated and emitted properly when an event ToCopy and Copied is received`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
             }
@@ -758,6 +778,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the compression progress is emitted properly when an event Compressing Progress and Compressing Successful is received`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_VIDEO)
@@ -818,6 +839,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker returns failure and an error notification is displayed when an event Compressing InsufficientStorage is received`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_VIDEO)
@@ -863,6 +885,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that an error notification is displayed when an event Compressing Cancel is received`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_VIDEO)
@@ -901,6 +924,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker returns failure and an error notification is displayed when an event Error is received with error NotEnoughStorageException`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
             }
@@ -946,6 +970,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that video files are not filtered out if video quality is original`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val photoRecord = mock<CameraUploadsRecord> {
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_PHOTO)
             }
@@ -965,6 +990,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that video files are filtered out and error notification is shown if video quality is not original and video compression requirement are not met and device not charging`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val photoRecord = mock<CameraUploadsRecord> {
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_PHOTO)
                 on { filePath }.thenReturn("photoRecordPath")
@@ -999,6 +1025,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that video files are not filtered out if video quality is not original and video compression requirement are not met and device charging`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val photoRecord = mock<CameraUploadsRecord> {
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_PHOTO)
                 on { filePath }.thenReturn("photoRecordPath")
@@ -1031,6 +1058,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that if the list of files to upload is empty, then no upload is triggered`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val list = emptyList<CameraUploadsRecord>()
             setupDefaultProcessingFilesConditionMocks(list)
 
@@ -1048,6 +1076,7 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that the worker returns failure when camera uploads is not enabled`() = runTest {
+        setupDefaultCheckConditionMocks()
         whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
 
         val result = underTest.doWork()
@@ -1065,6 +1094,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker returns failure when required permissions are not granted`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(hasMediaPermissionUseCase()).thenReturn(false)
 
             val result = underTest.doWork()
@@ -1081,6 +1111,7 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that the worker returns failure when login is not successful`() = runTest {
+        setupDefaultCheckConditionMocks()
         whenever(backgroundFastLoginUseCase()).thenThrow(RuntimeException())
 
         val result = underTest.doWork()
@@ -1098,6 +1129,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker returns failure, reset primary local folder paths and show an error notification when local primary folder path is not valid`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(false)
 
             val result = underTest.doWork()
@@ -1123,6 +1155,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker disable media uploads, reset secondary local folder path and show an error notification when media uploads enabled and local secondary folder path is not valid`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(isSecondaryFolderEnabled()).thenReturn(true)
             whenever(isSecondaryFolderSetUseCase()).thenReturn(false)
 
@@ -1141,6 +1174,7 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that the worker returns failure when upload nodes are not retrieved`() = runTest {
+        setupDefaultCheckConditionMocks()
         whenever(establishCameraUploadsSyncHandlesUseCase()).thenThrow(RuntimeException())
 
         val result = underTest.doWork()
@@ -1158,6 +1192,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker returns failure when primary upload node is not retrieved and fails to be created`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(
                 checkOrCreateCameraUploadsNodeUseCase(
                     context.getString(R.string.section_photo_sync),
@@ -1180,6 +1215,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker returns failure when secondary upload node is not retrieved and fails to be created`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(isSecondaryFolderEnabled()).thenReturn(true)
             whenever(isSecondaryFolderSetUseCase()).thenReturn(true)
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
@@ -1205,6 +1241,7 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that the worker returns failure is backup not initialized`() = runTest {
+        setupDefaultCheckConditionMocks()
         whenever(initializeBackupsUseCase()).thenThrow(RuntimeException())
 
         val result = underTest.doWork()
@@ -1216,6 +1253,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker returns failure when it fails to create the temporary folder`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(createCameraUploadTemporaryRootDirectoryUseCase()).thenThrow(RuntimeException())
 
             val result = underTest.doWork()
@@ -1232,6 +1270,8 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that the check upload notification is displayed when the worker runs`() = runTest {
+        setupDefaultCheckConditionMocks()
+
         underTest.doWork()
 
         verify(underTest).setProgress(workDataOf(STATUS_INFO to CHECK_FILE_UPLOAD))
@@ -1239,6 +1279,8 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that worker monitor external events when started`() = runTest {
+        setupDefaultCheckConditionMocks()
+
         underTest.doWork()
 
         verify(monitorConnectivityUseCase).invoke()
@@ -1251,6 +1293,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that worker returns failure when connection changed and wifi requirement is not satisfied`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
             whenever(isWifiNotSatisfiedUseCase()).thenReturn(true)
 
@@ -1268,6 +1311,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that worker is rescheduled when connection changed and wifi requirement is not satisfied`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
             whenever(isWifiNotSatisfiedUseCase()).thenReturn(true)
 
@@ -1278,6 +1322,7 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that worker returns failure when connection is lost`() = runTest {
+        setupDefaultCheckConditionMocks()
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))
 
         val result = underTest.doWork()
@@ -1293,6 +1338,7 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that worker is rescheduled when when connection is lost`() = runTest {
+        setupDefaultCheckConditionMocks()
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))
 
         underTest.doWork()
@@ -1303,6 +1349,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker returns failure when the battery level is too low and is not charging`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(10, false)))
             whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(flowOf(false))
 
@@ -1320,6 +1367,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker is rescheduled when the battery level is too low and is not charging`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(10, false)))
             whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(flowOf(false))
 
@@ -1331,6 +1379,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker returns failure when the charging requirement is not satisfied`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, false)))
             whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(flowOf(true))
 
@@ -1348,6 +1397,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker is rescheduled when the charging requirement is not satisfied`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, false)))
             whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(flowOf(true))
 
@@ -1359,6 +1409,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that worker returns retry when parent node deleted`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val nodeUpdate = NodeUpdate(
                 mapOf(
                     mock<Node> {
@@ -1388,6 +1439,7 @@ internal class CameraUploadsWorkerTest {
 
     @Test
     fun `test that worker returns failure when quota is not enough`() = runTest {
+        setupDefaultCheckConditionMocks()
         whenever(isStorageOverQuotaUseCase.invoke()).thenReturn(true)
 
         val result = underTest.doWork()
@@ -1404,6 +1456,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that worker is rescheduled when quota is not enough`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(isStorageOverQuotaUseCase.invoke()).thenReturn(true)
 
             underTest.doWork()
@@ -1414,6 +1467,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that worker returns failure primary local folder path is not valid`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(isPrimaryFolderPathValidUseCase(primaryLocalPath)).thenReturn(false)
 
             val result = underTest.doWork()
@@ -1424,6 +1478,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that worker is disabled when primary folder path is not valid`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(isPrimaryFolderPathValidUseCase(primaryLocalPath)).thenReturn(false)
 
             underTest.doWork()
@@ -1434,6 +1489,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker is disabled when required permissions are not granted`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(hasMediaPermissionUseCase()).thenReturn(false)
 
             underTest.doWork()
@@ -1444,7 +1500,10 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the CU is scheduled when the worker complete with success`() =
         runTest {
+            setupDefaultCheckConditionMocks()
+
             val result = underTest.doWork()
+
             verify(scheduleCameraUploadUseCase).invoke()
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
@@ -1452,7 +1511,10 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the temporary folder is deleted when the worker complete with success`() =
         runTest {
+            setupDefaultCheckConditionMocks()
+
             val result = underTest.doWork()
+
             verify(deleteCameraUploadsTemporaryRootDirectoryUseCase).invoke()
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
@@ -1460,7 +1522,10 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that total upload count is reset on the back end when the worker complete with success`() =
         runTest {
+            setupDefaultCheckConditionMocks()
+
             val result = underTest.doWork()
+
             verify(resetTotalUploadsUseCase).invoke()
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
@@ -1468,6 +1533,7 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that all transfers are cancelled when the worker complete with failure`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             val fakeFlow = MutableStateFlow(true)
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
@@ -1507,23 +1573,28 @@ internal class CameraUploadsWorkerTest {
 
             underTest.doWork()
 
-
             verify(cancelTransferByTagUseCase).invoke(uploadTag)
         }
 
     @Test
     fun `test that no child jobs are running when the worker complete`() =
         runTest {
+            setupDefaultCheckConditionMocks()
+
             val result = underTest.doWork()
+
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
 
     @Test
     fun `test that the interrupted backup is sent when the worker complete with failure`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(isPrimaryFolderPathValidUseCase(primaryLocalPath)).thenReturn(false)
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
+
             val result = underTest.doWork()
+
             verify(updateCameraUploadsBackupStatesUseCase).invoke(BackupState.TEMPORARILY_DISABLED)
             verify(updateCameraUploadsBackupHeartbeatStatusUseCase)
                 .invoke(eq(HeartbeatStatus.INACTIVE), any())
@@ -1533,8 +1604,11 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the up-to-date backup state is sent when the worker complete with success`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
+
             val result = underTest.doWork()
+
             verify(updateCameraUploadsBackupHeartbeatStatusUseCase)
                 .invoke(eq(HeartbeatStatus.UP_TO_DATE), any())
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
@@ -1543,9 +1617,12 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the interrupted backup is not sent when the worker complete with failure and no internet connection`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(isPrimaryFolderPathValidUseCase(primaryLocalPath)).thenReturn(false)
             whenever(isConnectedToInternetUseCase()).thenReturn(false)
+
             val result = underTest.doWork()
+
             verify(updateCameraUploadsBackupStatesUseCase, never())
                 .invoke(BackupState.TEMPORARILY_DISABLED)
             verify(updateCameraUploadsBackupHeartbeatStatusUseCase, never())
@@ -1556,8 +1633,11 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the up-to-date backup state is not sent when the worker complete with success and no internet connection`() =
         runTest {
+            setupDefaultCheckConditionMocks()
             whenever(isConnectedToInternetUseCase()).thenReturn(false)
+
             val result = underTest.doWork()
+
             verify(updateCameraUploadsBackupHeartbeatStatusUseCase, never())
                 .invoke(eq(HeartbeatStatus.UP_TO_DATE), any())
             assertThat(result).isEqualTo(ListenableWorker.Result.success())

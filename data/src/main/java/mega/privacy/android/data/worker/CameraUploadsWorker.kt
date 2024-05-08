@@ -443,9 +443,13 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     private fun CoroutineScope.monitorBatteryLevelAndChargingStatusesJob() = launch {
-        monitorBatteryInfoUseCase().combine(monitorIsChargingRequiredToUploadContentUseCase()) { batteryInfo, chargingRequired ->
-            Pair(batteryInfo, chargingRequired)
-        }.collect { (batteryInfo, chargingRequired) ->
+        combine(
+            monitorBatteryInfoUseCase(),
+            monitorIsChargingRequiredToUploadContentUseCase(),
+            transform = { batteryInfo, chargingRequired ->
+                Pair(batteryInfo, chargingRequired)
+            },
+        ).collect { (batteryInfo, chargingRequired) ->
             val isCharging = batteryInfo.isCharging
             deviceAboveMinimumBatteryLevel = (batteryInfo.level > LOW_BATTERY_LEVEL || isCharging)
             isChargingConstraintSatisfied = if (chargingRequired) isCharging else true
