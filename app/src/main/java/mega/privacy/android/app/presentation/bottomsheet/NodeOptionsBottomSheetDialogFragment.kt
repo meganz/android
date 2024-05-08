@@ -64,7 +64,6 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.Aut
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
-import mega.privacy.android.app.presentation.search.SearchViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -94,10 +93,6 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.mobile.analytics.event.SearchResultGetLinkMenuItemEvent
-import mega.privacy.mobile.analytics.event.SearchResultOpenWithMenuItemEvent
-import mega.privacy.mobile.analytics.event.SearchResultSaveToDeviceMenuItemEvent
-import mega.privacy.mobile.analytics.event.SearchResultShareMenuItemEvent
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
@@ -117,7 +112,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private var isHiddenNodesEnabled: Boolean = false
 
     private val nodeOptionsViewModel: NodeOptionsViewModel by viewModels()
-    private val searchViewModel: SearchViewModel by activityViewModels()
     private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
 
     /**
@@ -287,18 +281,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionInfo.setOnClickListener { onClick { onInfoClicked(node) } }
                 optionLink.setOnClickListener {
                     onClick {
-                        if (drawerItem == DrawerItem.SEARCH) {
-                            Analytics.tracker.trackEvent(SearchResultGetLinkMenuItemEvent)
-                        }
                         onLinkClicked(node)
                     }
                 }
                 optionRemoveLink.setOnClickListener { onClick { onRemoveLinkClicked(node) } }
                 optionShare.setOnClickListener {
                     onClick {
-                        if (drawerItem == DrawerItem.SEARCH) {
-                            Analytics.tracker.trackEvent(SearchResultShareMenuItemEvent)
-                        }
                         shareNode(requireActivity(), node)
                     }
                 }
@@ -322,9 +310,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionSlideshow.setOnClickListener { onClick { onSlideShowClicked(node) } }
                 optionOpenWith.setOnClickListener {
                     onClick {
-                        if (drawerItem == DrawerItem.SEARCH) {
-                            Analytics.tracker.trackEvent(SearchResultOpenWithMenuItemEvent)
-                        }
                         onOpenWithClicked(node)
                     }
                 }
@@ -1241,9 +1226,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      * @param node The [MegaNode] to be downloaded
      */
     private fun onDownloadClicked(node: MegaNode) {
-        if (drawerItem == DrawerItem.SEARCH) {
-            Analytics.tracker.trackEvent(SearchResultSaveToDeviceMenuItemEvent)
-        }
         lifecycleScope.launch {
             if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
                 startDownloadViewModel.onDownloadClicked(NodeId(node.handle))
@@ -1442,7 +1424,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun onOpenFolderClicked(node: MegaNode) {
-        searchViewModel.setTextSubmitted(true)
         nodeController.openFolderFromSearch(node.handle)
         dismissAllowingStateLoss()
         setStateBottomSheetBehaviorHidden()
@@ -1596,7 +1577,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             DrawerItem.SHARED_ITEMS -> mode = SHARED_ITEMS_MODE
-            DrawerItem.SEARCH -> mode = SEARCH_MODE
             else -> Unit
         }
     }

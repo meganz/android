@@ -40,11 +40,6 @@ enum class DrawerItem {
     BACKUPS,
 
     /**
-     * Search
-     */
-    SEARCH,
-
-    /**
      * Transfers
      */
     TRANSFERS,

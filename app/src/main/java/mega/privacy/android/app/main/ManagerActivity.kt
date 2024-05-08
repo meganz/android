@@ -6,7 +6,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
-import android.app.SearchManager
 import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.DialogInterface
@@ -27,7 +26,6 @@ import android.view.Display
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -221,7 +219,6 @@ import mega.privacy.android.app.presentation.recentactions.recentactionbucket.Re
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
-import mega.privacy.android.app.presentation.search.SearchViewModel
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
@@ -336,7 +333,6 @@ import mega.privacy.mobile.analytics.event.CloudDriveSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
 import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
 import mega.privacy.mobile.analytics.event.OutgoingSharesTabEvent
-import mega.privacy.mobile.analytics.event.SearchResultOverflowMenuItemEvent
 import mega.privacy.mobile.analytics.event.SharedItemsScreenEvent
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -396,7 +392,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     internal val outgoingSharesViewModel: OutgoingSharesComposeViewModel by viewModels()
     internal val linksViewModel: LinksViewModel by viewModels()
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
-    internal val searchViewModel: SearchViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
     private val transferPageViewModel: TransferPageViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
@@ -672,7 +667,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         showSnackbar(
                             Constants.SNACKBAR_TYPE,
                             getString(R.string.call_error_too_many_participants),
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                            MEGACHAT_INVALID_HANDLE
                         )
                     }
                 }
@@ -1491,7 +1486,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             showSnackbar(
                                 Constants.SNACKBAR_TYPE,
                                 it,
-                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                                MEGACHAT_INVALID_HANDLE
                             )
                         }
                         if (locationFileInfo) {
@@ -1566,7 +1561,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         selectDrawerItem(drawerItem)
                         val chatId: Long = intent.getLongExtra(
                             Constants.CHAT_ID,
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                            MEGACHAT_INVALID_HANDLE
                         )
                         if (intent.getBooleanExtra(
                                 Constants.EXTRA_MOVE_TO_CHAT_SECTION,
@@ -2445,11 +2440,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     override fun onPostResume() {
         Timber.d("onPostResume")
         super.onPostResume()
-        if (isSearching) {
-            selectDrawerItem(DrawerItem.SEARCH)
-            isSearching = false
-            return
-        }
         if (credentials == null) {
             if (!openLink) {
                 return
@@ -2602,7 +2592,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Timber.d("ACTION_CHAT_NOTIFICATION_MESSAGE")
                     val chatId: Long = intent.getLongExtra(
                         Constants.CHAT_ID,
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                        MEGACHAT_INVALID_HANDLE
                     )
                     if (intent.getBooleanExtra(Constants.EXTRA_MOVE_TO_CHAT_SECTION, false)) {
                         moveToChatSection(chatId)
@@ -2655,7 +2645,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         showSnackbar(
                             Constants.SNACKBAR_TYPE,
                             it,
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                            MEGACHAT_INVALID_HANDLE
                         )
                     }
                     actionOpenFolder(handleIntent)
@@ -2665,7 +2655,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE -> {
                     val chatId: Long = intent.getLongExtra(
                         Constants.CHAT_ID,
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                        MEGACHAT_INVALID_HANDLE
                     )
                     showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId)
                 }
@@ -2693,15 +2683,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } catch (e: Exception) {
                     Timber.e(e, "Exception NotificationManager - remove contact notification")
                 }
-                setToolbarTitle()
-                hideAdsView()
-            }
-
-            DrawerItem.SEARCH -> {
-                if (searchExpand) {
-                    return
-                }
-                setBottomNavigationMenuItemChecked(NO_BNV)
                 setToolbarTitle()
                 hideAdsView()
             }
@@ -2769,16 +2750,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         dbH.removeSentPendingMessages()
         megaApi.removeRequestListener(this)
         composite.clear()
-        cancelSearch()
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
         nodeSaver.destroy()
         cookieDialogHandler.onDestroy()
         super.onDestroy()
-    }
-
-    private fun cancelSearch() {
-        searchViewModel.cancelSearch()
     }
 
     override fun exitCloudDrive() = performOnBack()
@@ -3074,31 +3050,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 viewModel.setIsFirstNavigationLevel(true)
             }
 
-            DrawerItem.SEARCH -> {
-                supportActionBar?.subtitle = null
-                if (searchViewModel.state.value.searchParentHandle == -1L) {
-                    viewModel.setIsFirstNavigationLevel(true)
-                    if (searchViewModel.state.value.searchQuery != null) {
-                        searchViewModel.setTextSubmitted(true)
-                        val state = searchViewModel.state.value
-                        if (state.searchQuery?.isNotEmpty() == true) {
-                            supportActionBar?.setTitle(getString(R.string.action_search) + ": " + searchViewModel.state.value.searchQuery)
-                        } else {
-                            supportActionBar?.setTitle(getString(R.string.action_search) + ": " + "")
-                        }
-                    } else {
-                        supportActionBar?.setTitle(getString(R.string.action_search) + ": " + "")
-                    }
-                } else {
-                    val parentNode =
-                        megaApi.getNodeByHandle(searchViewModel.state.value.searchParentHandle)
-                    if (parentNode != null) {
-                        supportActionBar?.title = parentNode.name
-                        viewModel.setIsFirstNavigationLevel(false)
-                    }
-                }
-            }
-
             DrawerItem.TRANSFERS -> {
                 supportActionBar?.subtitle = null
                 supportActionBar?.title = getString(R.string.section_transfers)
@@ -3224,7 +3175,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         supportActionBar?.title = title
         viewModel.setIsFirstNavigationLevel(firstNavigationLevel)
         viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON)
-        searchViewModel.setTextSubmitted(true)
         searchMenuItem?.isVisible = showSearch
     }
 
@@ -3233,7 +3183,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val totalNotifications = numUnreadUserAlerts + totalIncomingContactRequestCount
         if (totalNotifications == 0) {
             if (isFirstNavigationLevel) {
-                if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
+                if (drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
                     supportActionBar?.setHomeAsUpIndicator(
                         tintIcon(
                             this,
@@ -3256,7 +3206,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setPhotosNavigationToolbarIcon()
             }
             if (isFirstNavigationLevel) {
-                if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
+                if (drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
                     badgeDrawable?.progress = 1.0f
                 } else {
                     badgeDrawable?.progress = 0.0f
@@ -3333,7 +3283,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 checkCurrentStorageStatus()
             } else {
                 Timber.w("showOnlineMode - Root is NULL")
-                if (MegaApplication.openChatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+                if (MegaApplication.openChatId == MEGACHAT_INVALID_HANDLE) {
                     ConfirmConnectDialogFragment().show(
                         supportFragmentManager,
                         ConfirmConnectDialogFragment.TAG
@@ -3404,7 +3354,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 hideAdsView()
             }
 
-            DrawerItem.SEARCH, DrawerItem.TRANSFERS, DrawerItem.NOTIFICATIONS, DrawerItem.BACKUPS -> {
+            DrawerItem.TRANSFERS, DrawerItem.NOTIFICATIONS, DrawerItem.BACKUPS -> {
                 setBottomNavigationMenuItemChecked(NO_BNV)
                 hideAdsView()
             }
@@ -3957,12 +3907,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 hideAdsView()
             }
 
-            DrawerItem.SEARCH -> {
-                lifecycleScope.launch {
-                    navigateToSearchActivity()
-                }
-            }
-
             DrawerItem.TRANSFERS -> {
                 showHideBottomNavigationView(true)
                 supportActionBar?.subtitle = null
@@ -4032,15 +3976,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         )
 
         searchResultLauncher.launch(searchActivityIntent)
-
-        closeSearchSection()
     }
 
     private fun onSelectSharedItemsDrawerItem() {
         Analytics.tracker.trackEvent(SharedItemsScreenEvent)
         lifecycleScope.launch {
             if (isSharesTabComposeEnabled()) {
-
                 showFabButton()
                 showHideBottomNavigationView(false)
                 if (!comesFromNotifications) {
@@ -4419,48 +4360,30 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         startActivity(accountIntent)
     }
 
-    private fun closeSearchSection() {
-        searchViewModel.resetSearchQuery()
-        drawerItem = searchViewModel.state.value.searchDrawerItem
-        selectDrawerItem(drawerItem)
-        searchViewModel.resetSearchDrawerItem()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         Timber.d("onCreateOptionsMenu")
         // Force update the toolbar title to make the the tile length to be updated
         setToolbarTitle()
         // Inflate the menu items for use in the action bar
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.activity_manager, menu)
+        menuInflater.inflate(R.menu.activity_manager, menu)
         searchMenuItem = menu.findItem(R.id.action_search)
         searchView = searchMenuItem?.actionView as? SearchView
-        val searchAutoComplete =
-            searchView?.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text)
-        searchAutoComplete?.hint = getString(R.string.hint_action_search)
+        searchView?.queryHint = getString(R.string.hint_action_search)
         val v = searchView?.findViewById<View>(androidx.appcompat.R.id.search_plate)
         v?.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent))
-        if (searchView != null) {
-            searchView?.setIconifiedByDefault(true)
-        }
+        searchView?.setIconifiedByDefault(true)
         searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                 Timber.d("onMenuItemActionExpand")
                 searchExpand = true
                 if (drawerItem === DrawerItem.HOMEPAGE) {
                     if (homepageScreen === HomepageScreen.FULLSCREEN_OFFLINE) {
-                        setFullscreenOfflineFragmentSearchQuery(searchViewModel.state.value.searchQuery)
+                        setFullscreenOfflineFragmentSearchQuery(viewModel.state.value.searchQuery)
                     } else if (mHomepageSearchable != null) {
                         mHomepageSearchable?.searchReady()
                     } else {
                         openSearchOnHomepage()
                     }
-                } else if (drawerItem !== DrawerItem.CHAT) {
-                    viewModel.setIsFirstNavigationLevel(true)
-                    searchViewModel.setSearchParentHandle(-1L)
-                    searchViewModel.resetSearchDepth()
-                    setSearchDrawerItem()
-                    selectDrawerItem(drawerItem)
                 } else {
                     Util.resetActionBar(supportActionBar)
                 }
@@ -4484,20 +4407,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 )
                 if (drawerItem === DrawerItem.HOMEPAGE) {
                     if (homepageScreen === HomepageScreen.FULLSCREEN_OFFLINE) {
-                        if (!searchViewModel.state.value.textSubmitted) {
-                            setFullscreenOfflineFragmentSearchQuery(null)
-                            searchViewModel.setTextSubmitted(true)
-                        }
+                        setFullscreenOfflineFragmentSearchQuery(null)
                         supportInvalidateOptionsMenu()
                     } else if (mHomepageSearchable != null) {
                         mHomepageSearchable?.exitSearch()
-                        searchViewModel.resetSearchQuery()
                         supportInvalidateOptionsMenu()
                     }
-                } else {
-                    cancelSearch()
-                    searchViewModel.setTextSubmitted(true)
-                    closeSearchSection()
                 }
                 return true
             }
@@ -4510,11 +4425,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } else if (drawerItem === DrawerItem.HOMEPAGE) {
                     if (homepageScreen === HomepageScreen.FULLSCREEN_OFFLINE) {
                         searchExpand = false
-                        searchViewModel.setTextSubmitted(true)
                         Util.hideKeyboard(this@ManagerActivity, 0)
-                        if (fullscreenOfflineFragment != null) {
-                            fullscreenOfflineFragment?.onSearchQuerySubmitted()
-                        }
+                        fullscreenOfflineFragment?.onSearchQuerySubmitted()
                         setToolbarTitle()
                         supportInvalidateOptionsMenu()
                     } else {
@@ -4522,10 +4434,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 } else {
                     searchExpand = false
-                    searchViewModel.setSearchQuery("" + query)
+                    viewModel.updateSearchQuery(query)
                     setToolbarTitle()
                     Timber.d("Search query: %s", query)
-                    searchViewModel.setTextSubmitted(true)
                     supportInvalidateOptionsMenu()
                 }
                 return true
@@ -4535,35 +4446,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Timber.d("onQueryTextChange")
                 if (drawerItem === DrawerItem.HOMEPAGE) {
                     if (homepageScreen === HomepageScreen.FULLSCREEN_OFFLINE) {
-                        if (searchViewModel.state.value.textSubmitted) {
-                            searchViewModel.setTextSubmitted(false)
-                            return true
-                        }
-                        searchViewModel.setSearchQuery(newText)
-                        setFullscreenOfflineFragmentSearchQuery(searchViewModel.state.value.searchQuery)
-                    } else if (mHomepageSearchable != null) {
-                        searchViewModel.setSearchQuery(newText)
-                        searchViewModel.state.value.searchQuery?.let {
-                            mHomepageSearchable?.searchQuery(
-                                it
-                            )
-                        }
-                    }
-                } else {
-                    if (searchViewModel.state.value.textSubmitted) {
-                        searchViewModel.setTextSubmitted(false)
-                    } else {
-                        searchViewModel.setSearchQuery(newText)
-                        searchViewModel.performSearch(
-                            browserParentHandle = fileBrowserViewModel.state().fileBrowserHandle,
-                            rubbishBinParentHandle = rubbishBinViewModel.state().rubbishBinHandle,
-                            backupsParentHandle = backupsFragment?.getCurrentBackupsFolderHandle()
-                                ?: -1L,
-                            incomingParentHandle = getHandleFromIncomingSharesViewModel(),
-                            outgoingParentHandle = getHandleFromOutgoingSharesViewModel(),
-                            linksParentHandle = getHandleFromLinksViewModel(),
-                            isFirstNavigationLevel = viewModel.state().isFirstNavigationLevel,
-                        )
+                        viewModel.updateSearchQuery(newText)
+                        setFullscreenOfflineFragmentSearchQuery(viewModel.state.value.searchQuery)
                     }
                 }
                 return true
@@ -4617,7 +4501,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
 
-                DrawerItem.PHOTOS -> {}
                 DrawerItem.BACKUPS -> {
                     moreMenuItem.isVisible = false
                     if ((backupsFragment?.getNodeCount() ?: 0) > 0) {
@@ -4644,12 +4527,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
 
-                DrawerItem.SEARCH -> if (searchExpand) {
-                    openSearchView()
-                } else {
-                    moreMenuItem.isVisible = !isFirstNavigationLevel
-                }
-
                 DrawerItem.TRANSFERS -> if (transferPageViewModel.transferTab == TransfersTab.PENDING_TAB
                     && transfersViewModel.getActiveTransfers().isNotEmpty()
                 ) {
@@ -4664,7 +4541,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     openLinkMenuItem?.isVisible = true
                 }
 
-                DrawerItem.NOTIFICATIONS -> {}
                 else -> {}
             }
         }
@@ -4685,17 +4561,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun openSearchOnHomepage() {
         viewModel.setIsFirstNavigationLevel(true)
-        searchViewModel.setSearchParentHandle(-1L)
-        searchViewModel.resetSearchDepth()
-        setSearchDrawerItem()
-        selectDrawerItem(drawerItem)
         Util.resetActionBar(supportActionBar)
+        nodeSourceType = nodeSourceTypeMapper(drawerItem = drawerItem, sharesTab = tabItemShares)
+        lifecycleScope.launch {
+            navigateToSearchActivity()
+        }
     }
 
     private fun setFullscreenOfflineFragmentSearchQuery(searchQuery: String?) {
-        if (fullscreenOfflineFragment != null) {
-            fullscreenOfflineFragment?.setSearchQuery(searchQuery)
-        }
+        fullscreenOfflineFragment?.setSearchQuery(searchQuery)
     }
 
     fun updateFullscreenOfflineFragmentOptionMenu(openSearchView: Boolean) {
@@ -4732,7 +4606,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <F : Fragment?> getFragmentByType(fragmentClass: Class<F>): F? {
+    private fun <F : Fragment?> getFragmentByType(fragmentClass: Class<F>): F? {
         val navHostFragment: Fragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
                 ?: return null
@@ -4750,7 +4624,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         megaChatApi.retryPendingConnections(false, null)
         return when (item.itemId) {
             android.R.id.home -> {
-                if (isFirstNavigationLevel && drawerItem != DrawerItem.SEARCH) {
+                if (isFirstNavigationLevel) {
                     when (drawerItem) {
                         DrawerItem.SYNC, DrawerItem.RUBBISH_BIN, DrawerItem.TRANSFERS -> {
                             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
@@ -4951,7 +4825,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun hideItemsWhenSearchSelected() {
-        searchViewModel.setTextSubmitted(false)
         if (searchMenuItem != null) {
             doNotDisturbMenuItem?.isVisible = false
             archivedMenuItem?.isVisible = false
@@ -4969,7 +4842,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun checkBeforeOpeningQR(openScanQR: Boolean) {
-        if (CallUtil.isNecessaryDisableLocalCamera() != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+        if (CallUtil.isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
             CallUtil.showConfirmationOpenCamera(this, Constants.ACTION_OPEN_QR, openScanQR)
             return
         }
@@ -5404,7 +5277,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param message      Text message to show as the request result.
      */
     private fun showRestorationOrRemovalResult(message: String) {
-        showSnackbar(Constants.SNACKBAR_TYPE, message, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+        showSnackbar(Constants.SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE)
     }
 
     fun showRenameDialog(document: MegaNode?) {
@@ -5421,7 +5294,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             showSnackbar(
                 Constants.SNACKBAR_TYPE,
                 getString(R.string.general_text_error),
-                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                MEGACHAT_INVALID_HANDLE
             )
             return
         }
@@ -5447,7 +5320,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             showSnackbar(
                 Constants.SNACKBAR_TYPE,
                 getString(R.string.warning_node_not_exists_in_cloud),
-                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                MEGACHAT_INVALID_HANDLE
             )
             return
         }
@@ -5652,35 +5525,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                         tabItemShares === SharesTab.LINKS_TAB -> {
                             parentHandle = getHandleFromLinksViewModel()
-                        }
-                    }
-                }
-
-                DrawerItem.SEARCH -> {
-                    if (searchViewModel.state.value.searchParentHandle != -1L) {
-                        parentHandle = searchViewModel.state.value.searchParentHandle
-                    } else if (searchViewModel.state.value.searchDrawerItem != null) {
-                        when (searchViewModel.state.value.searchDrawerItem) {
-                            DrawerItem.CLOUD_DRIVE -> parentHandle =
-                                fileBrowserViewModel.getSafeBrowserParentHandle()
-
-                            DrawerItem.SHARED_ITEMS -> when (searchViewModel.state.value.searchSharesTab) {
-                                SharesTab.INCOMING_TAB -> parentHandle =
-                                    getHandleFromIncomingSharesViewModel()
-
-                                SharesTab.OUTGOING_TAB -> parentHandle =
-                                    getHandleFromOutgoingSharesViewModel()
-
-                                SharesTab.LINKS_TAB -> parentHandle =
-                                    getHandleFromLinksViewModel()
-
-                                else -> {}
-                            }
-
-                            DrawerItem.BACKUPS -> parentHandle =
-                                backupsFragment?.getCurrentBackupsFolderHandle() ?: -1L
-
-                            else -> {}
                         }
                     }
                 }
@@ -5934,7 +5778,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         // No update needed.
     }
 
-    fun cameraUploadsClicked() {
+    private fun cameraUploadsClicked() {
         Timber.d("cameraUploadsClicked")
         drawerItem = DrawerItem.PHOTOS
         setBottomNavigationMenuItemChecked(PHOTOS_BNV)
@@ -5972,9 +5816,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     ) {
         Timber.d("showNodeOptionsPanel")
         if (node == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
-        if (drawerItem == DrawerItem.SEARCH) {
-            Analytics.tracker.trackEvent(SearchResultOverflowMenuItemEvent)
-        }
         bottomSheetDialogFragment = NodeOptionsBottomSheetDialogFragment.newInstance(
             nodeId = NodeId(node.handle),
             shareData = shareData,
@@ -6098,7 +5939,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     /**
      * Refresh the Cloud Order
      */
-    fun refreshCloudOrder() {
+    private fun refreshCloudOrder() {
         refreshCloudDrive()
         refreshRubbishBin()
         backupsFragment?.refreshBackupsNodes()
@@ -6126,9 +5967,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         super.onNewIntent(intent)
         Timber.d("onNewIntent")
         if (Intent.ACTION_SEARCH == intent.action) {
-            intent.getStringExtra(SearchManager.QUERY)
-                ?.let { searchViewModel.setSearchQuery(it) }
-            searchViewModel.setSearchParentHandle(-1L)
             setToolbarTitle()
             isSearching = true
             if (searchMenuItem != null) {
@@ -6284,7 +6122,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,
                         result,
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                        MEGACHAT_INVALID_HANDLE
                     )
                 }
             }
@@ -6484,9 +6322,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 val chatId = intent.getLongExtra(
                     StartConversationActivity.EXTRA_NEW_CHAT_ID,
-                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                    MEGACHAT_INVALID_HANDLE
                 )
-                if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+                if (chatId != MEGACHAT_INVALID_HANDLE) {
                     navigator.openChat(
                         context = this,
                         chatId = chatId,
@@ -6872,7 +6710,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             showSnackbar(
                 Constants.SNACKBAR_TYPE,
                 getString(R.string.upload_can_not_open),
-                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                MEGACHAT_INVALID_HANDLE
             )
             return
         }
@@ -6901,7 +6739,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 withoutCollisions.size,
                                 withoutCollisions.size
                             ),
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                            MEGACHAT_INVALID_HANDLE
                         )
                         for (info in withoutCollisions) {
                             if (info.isContact) {
@@ -6924,7 +6762,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,
                         getString(R.string.error_temporary_unavaible),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                        MEGACHAT_INVALID_HANDLE
                     )
                 }
             )
@@ -7043,7 +6881,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             showSnackbar(
                 Constants.SNACKBAR_TYPE,
                 getString(R.string.general_text_error),
-                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                MEGACHAT_INVALID_HANDLE
             )
             return
         }
@@ -7065,7 +6903,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         showSnackbar(
                             Constants.SNACKBAR_TYPE,
                             getString(R.string.general_error),
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                            MEGACHAT_INVALID_HANDLE
                         )
                     } else if (throwable is MegaNodeException.ChildDoesNotExistsException) {
                         uploadFile(file, parentNode)
@@ -7453,7 +7291,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                     errorVersionRemove,
                                     errorVersionRemove
                                 ),
-                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                                MEGACHAT_INVALID_HANDLE
                             )
                         }
                         versionsToRemove = 0
@@ -7939,26 +7777,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    fun openSearchView() {
-        if (searchMenuItem != null) {
-            searchMenuItem?.expandActionView()
-            if (searchView != null) {
-                searchView?.setQuery(searchViewModel.state.value.searchQuery, false)
-            }
-        }
-    }
-
-    fun clearSearchViewFocus() {
-        if (searchView != null) {
-            searchView?.clearFocus()
-        }
-    }
-
-    fun requestSearchViewFocus() {
-        if (searchView == null || searchViewModel.state.value.textSubmitted) {
-            return
-        }
-        searchView?.isIconified = false
+    private fun openSearchView() {
+        searchMenuItem?.expandActionView()
+        searchView?.setQuery(viewModel.state.value.searchQuery, false)
     }
 
     /**
@@ -8006,12 +7827,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    fun openSearchFolder(node: MegaNode) {
-        openSearchFolder(node.handle)
-    }
-
     fun closeSearchView() {
-        searchViewModel.setTextSubmitted(true)
         if (searchMenuItem?.isActionViewExpanded == true) {
             searchMenuItem?.collapseActionView()
         }
@@ -8019,13 +7835,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun setTextSubmitted() {
         if (searchView != null) {
-            if (!searchViewModel.isSearchQueryValid()) return
-            searchView?.setQuery(searchViewModel.state.value.searchQuery, true)
+            searchView?.setQuery(viewModel.state.value.searchQuery, true)
         }
     }
 
     val isSearchOpen: Boolean
-        get() = searchViewModel.state.value.searchQuery != null && searchExpand
+        get() = searchExpand
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
@@ -8042,13 +7857,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun setSearchDrawerItem() {
-        if (drawerItem === DrawerItem.SEARCH) return
-        nodeSourceType = nodeSourceTypeMapper(drawerItem = drawerItem, sharesTab = tabItemShares)
-        drawerItem?.let { searchViewModel.setSearchDrawerItem(it) }
-        searchViewModel.setSearchSharedTab(tabItemShares)
-        drawerItem = DrawerItem.SEARCH
-    }
 
     /**
      * This method sets "Tap to return to call" banner when there is a call in progress
@@ -8061,9 +7869,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
         setCallBadge()
-        if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.TRANSFERS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.HOMEPAGE || !Util.isScreenInPortrait(
-                this
-            )
+        if (drawerItem === DrawerItem.TRANSFERS ||
+            drawerItem === DrawerItem.NOTIFICATIONS ||
+            drawerItem === DrawerItem.HOMEPAGE ||
+            !Util.isScreenInPortrait(this)
         ) {
             CallUtil.hideCallWidget(this, callInProgressChrono, callInProgressLayout)
             return
@@ -8106,7 +7915,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             showSnackbar(
                                 Constants.SNACKBAR_TYPE,
                                 getString(R.string.location_not_exist),
-                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                                MEGACHAT_INVALID_HANDLE
                             )
                             return
                         }
@@ -8504,7 +8313,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     /**
      * Restores the FileBrowser section after opening it from a notification in the Notifications section.
      */
-    fun restoreFileBrowserAfterComingFromNotification() {
+    private fun restoreFileBrowserAfterComingFromNotification() {
         comesFromNotifications = false
         comesFromNotificationHandle = -1
         selectDrawerItem(DrawerItem.NOTIFICATIONS)

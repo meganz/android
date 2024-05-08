@@ -1391,6 +1391,15 @@ class ManagerViewModelTest {
             }
         }
 
+    @Test
+    fun `test that manager state is updated when search query is updated`() = runTest {
+        val query = "query"
+        underTest.updateSearchQuery(query)
+        underTest.state.test {
+            assertThat(awaitItem().searchQuery).isEqualTo(query)
+        }
+    }
+
     private fun provideChatCallStatusParameters(): Stream<Arguments> = Stream.of(
         Arguments.of(ChatCallStatus.TerminatingUserParticipation),
         Arguments.of(ChatCallStatus.GenericNotification),

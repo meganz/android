@@ -1229,6 +1229,15 @@ class ManagerViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Update search query
+     *
+     * @param query Search query
+     */
+    fun updateSearchQuery(query: String) {
+        _state.update { it.copy(searchQuery = query) }
+    }
+
     internal companion object {
         internal const val isFirstLoginKey = "EXTRA_FIRST_LOGIN"
         private const val INVALID_HANDLE = -1L

@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property shouldUpgradeToProPlan                     State to show the upgrade to Pro plan dialog.
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * @property usersCallLimitReminders   [UsersCallLimitReminders]
+ * @property searchQuery  Search query
  * previous Bottom Navigation item before accessing Device Center
  */
 data class ManagerState(
@@ -59,5 +60,6 @@ data class ManagerState(
     val callEndedDueToFreePlanLimits: Boolean = false,
     val shouldUpgradeToProPlan: Boolean = false,
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
-    val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled
+    val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled,
+    val searchQuery: String = "",
 )

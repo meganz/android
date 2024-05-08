@@ -35,7 +35,7 @@ internal class FabButtonListener(val context: Context) : View.OnClickListener {
                             )
                         }
 
-                        DrawerItem.SEARCH, DrawerItem.SHARED_ITEMS -> {
+                        DrawerItem.SHARED_ITEMS -> {
                             Timber.d("Cloud Drive SECTION")
                             if (!Util.isOnline(context)) {
                                 context.showSnackbar(
