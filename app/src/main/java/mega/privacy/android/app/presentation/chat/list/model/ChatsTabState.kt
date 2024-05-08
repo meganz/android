@@ -11,7 +11,9 @@ import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
  * Chats tab state
  *
  * @property chats
+ * @property areChatsLoading
  * @property meetings
+ * @property areMeetingsLoading
  * @property selectedIds
  * @property currentChatStatus
  * @property currentUnreadStatus
@@ -27,7 +29,9 @@ import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
  */
 data class ChatsTabState constructor(
     val chats: List<ChatRoomItem> = emptyList(),
+    val areChatsLoading: Boolean = true,
     val meetings: List<ChatRoomItem> = emptyList(),
+    val areMeetingsLoading: Boolean = true,
     val selectedIds: List<Long> = emptyList(),
     val currentChatStatus: ChatStatus? = null,
     val currentUnreadStatus: Pair<Boolean, Boolean>? = null,

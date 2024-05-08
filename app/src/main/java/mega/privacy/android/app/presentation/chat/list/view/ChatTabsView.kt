@@ -171,9 +171,14 @@ fun ChatTabsView(
                 } else {
                     filteredChats ?: state.chats
                 }
+                val isLoading = if (isMeetingView)
+                    state.areMeetingsLoading
+                else
+                    state.areChatsLoading
 
                 ChatListView(
                     items = items,
+                    isLoading = isLoading,
                     selectedIds = state.selectedIds,
                     scrollToTop = scrollToTop,
                     onItemClick = onItemClick,

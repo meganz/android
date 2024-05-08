@@ -185,7 +185,10 @@ class ChatTabsViewModel @Inject constructor(
                 .catch { Timber.e(it) }
                 .collect { items ->
                     state.update {
-                        it.copy(chats = items)
+                        it.copy(
+                            areChatsLoading = false,
+                            chats = items
+                        )
                     }
                 }
         }
@@ -209,7 +212,10 @@ class ChatTabsViewModel @Inject constructor(
                     .catch { Timber.e(it) }
                     .collect { items ->
                         state.update {
-                            it.copy(meetings = items)
+                            it.copy(
+                                areMeetingsLoading = false,
+                                meetings = items
+                            )
                         }
                     }
             }

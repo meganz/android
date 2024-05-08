@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.chat.list.view
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -41,10 +42,26 @@ class ChatListViewTest {
                 selectedIds = emptyList(),
                 scrollToTop = false,
                 isMeetingView = false,
+                isLoading = false,
             )
         }
 
         composeTestRule.onNodeWithTag("chat_room_list:list").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that EmptyView is not displayed when page is loading`() {
+        composeTestRule.setContent {
+            ChatListView(
+                items = emptyList(),
+                selectedIds = emptyList(),
+                scrollToTop = false,
+                isMeetingView = false,
+                isLoading = true,
+            )
+        }
+
+        composeTestRule.onNodeWithTag("chat_room_list:empty").assertIsNotDisplayed()
     }
 
     @Test
@@ -55,6 +72,7 @@ class ChatListViewTest {
                 selectedIds = emptyList(),
                 scrollToTop = false,
                 isMeetingView = false,
+                isLoading = false
             )
         }
 
