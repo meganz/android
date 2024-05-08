@@ -3723,11 +3723,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (item == DrawerItem.OFFLINE) {
             bottomItemBeforeOpenFullscreenOffline = bottomNavigationCurrentItem
             openFullscreenOfflineFragment(pathNavigationOffline)
-            setTabsVisibility()
         } else {
             drawerItem = item
-            selectDrawerItem(item)
         }
+        selectDrawerItem(drawerItem)
     }
 
     /**
