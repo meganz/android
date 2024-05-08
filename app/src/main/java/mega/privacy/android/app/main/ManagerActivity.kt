@@ -3692,6 +3692,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * [INVALID_HANDLE] by default
      * The value is set to -1 by default if no other Backups Node Handle is passed
      * @param errorMessage The [StringRes] of the error message to display
+     * @param title Custom title
      */
     @SuppressLint("NewApi")
     @JvmOverloads
@@ -3701,6 +3702,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         cloudDriveNodeHandle: Long = INVALID_HANDLE,
         backupsHandle: Long = INVALID_HANDLE,
         @StringRes errorMessage: Int? = null,
+        title: String? = null,
     ) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         if (!this::drawerLayout.isInitialized) {
@@ -3814,9 +3816,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             DrawerItem.SYNC -> {
-                syncFragment =
-                    supportFragmentManager.findFragmentByTag(FragmentTag.SYNC.tag) as? SyncFragment
-                        ?: SyncFragment.newInstance()
+                syncFragment = SyncFragment.newInstance(title = title)
 
                 setBottomNavigationMenuItemChecked(NO_BNV)
                 supportInvalidateOptionsMenu()
@@ -4895,7 +4895,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
             handleCloudDriveBackNavigation(performBackNavigation = true)
         } else if (drawerItem == DrawerItem.SYNC) {
-            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+            if (viewModel.state.value.isAndroidSyncIntegrationIntoDeviceCenterEnabled) {
+                selectDrawerItem(item = DrawerItem.DEVICE_CENTER)
+            } else {
+                goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+            }
         } else if (drawerItem == DrawerItem.DEVICE_CENTER) {
             handleDeviceCenterBackNavigation()
         } else if (drawerItem == DrawerItem.RUBBISH_BIN) {

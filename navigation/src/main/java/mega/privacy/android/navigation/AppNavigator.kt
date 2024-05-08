@@ -79,4 +79,12 @@ interface AppNavigator {
      * This screen allows users to upgrade to a paid plan
      */
     fun openUpgradeAccount(context: Context)
+
+    /**
+     * Navigates to the Syncs page
+     *
+     * @param activity      The Activity
+     * @param deviceName    The device name
+     */
+    fun openSyncs(activity: Activity, deviceName: String? = null)
 }

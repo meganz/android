@@ -26,6 +26,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
+import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
 import timber.log.Timber
@@ -143,6 +144,11 @@ internal class DeviceCenterViewModel @Inject constructor(
             filteredUiItems = null
         )
     }
+
+    fun shouldNavigateToSyncs(deviceUINode: DeviceUINode) =
+        _state.value.enabledFlags.contains(SyncFeatures.AndroidSync) && _state.value.enabledFlags.contains(
+            SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter
+        ) && deviceUINode is OwnDeviceUINode
 
     /**
      * Handles specific Back Press behavior

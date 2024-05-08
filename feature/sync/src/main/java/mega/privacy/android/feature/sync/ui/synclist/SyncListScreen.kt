@@ -76,6 +76,7 @@ internal fun SyncListScreen(
     actions: List<MenuAction>,
     onActionPressed: (MenuAction) -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
+    title: String? = null,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -125,7 +126,7 @@ internal fun SyncListScreen(
         Scaffold(
             topBar = {
                 MegaAppBar(
-                    title = stringResource(R.string.sync_toolbar_title),
+                    title = title ?: stringResource(R.string.sync_toolbar_title),
                     appBarType = AppBarType.BACK_NAVIGATION,
                     elevation = 0.dp,
                     onNavigationPressed = {

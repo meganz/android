@@ -33,6 +33,7 @@ internal fun SyncListRoute(
     syncPermissionsManager: SyncPermissionsManager,
     addFolderClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
+    title: String? = null,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -100,7 +101,8 @@ internal fun SyncListRoute(
                 }
             }
         },
-        onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked
+        onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
+        title = title,
     )
 
     if (showSyncOptionsDialog) {

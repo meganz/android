@@ -31,11 +31,16 @@ import javax.inject.Inject
 class SyncFragment : Fragment() {
 
     companion object {
+        private const val TITLE_KEY = "titleKey"
+
         /**
          * Returns the instance of SyncFragment
          */
         @JvmStatic
-        fun newInstance(): SyncFragment = SyncFragment()
+        fun newInstance(title: String? = null): SyncFragment {
+            val args = Bundle().apply { putString(TITLE_KEY, title) }
+            return SyncFragment().apply { arguments = args }
+        }
     }
 
     /**
@@ -68,6 +73,7 @@ class SyncFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
+                val title = arguments?.getString(TITLE_KEY)
                 val animatedNavController = rememberNavController()
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
@@ -86,7 +92,8 @@ class SyncFragment : Fragment() {
                                 syncPermissionsManager = syncPermissionsManager,
                                 openUpgradeAccountPage = {
                                     megaNavigator.openUpgradeAccount(requireContext())
-                                }
+                                },
+                                title = title,
                             )
                         }
                     }

@@ -474,7 +474,14 @@ class ManagerViewModel @Inject constructor(
             if (androidSyncEnabled) {
                 monitorSyncsUseCase().catch { Timber.e(it) }.collect { syncFolders ->
                     val isServiceEnabled = syncFolders.isNotEmpty()
-                    _state.update { it.copy(androidSyncServiceEnabled = isServiceEnabled) }
+                    _state.update {
+                        it.copy(
+                            androidSyncServiceEnabled = isServiceEnabled,
+                            isAndroidSyncIntegrationIntoDeviceCenterEnabled = getFeatureFlagValueUseCase(
+                                SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter
+                            )
+                        )
+                    }
                 }
             }
         }

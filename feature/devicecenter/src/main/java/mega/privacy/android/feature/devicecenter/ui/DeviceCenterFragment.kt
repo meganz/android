@@ -103,13 +103,21 @@ class DeviceCenterFragment : Fragment() {
                     DeviceCenterScreen(
                         uiState = uiState,
                         snackbarHostState = snackbarHostState,
-                        onDeviceClicked = {
+                        onDeviceClicked = { device ->
                             Analytics.tracker.trackEvent(
                                 DeviceCenterItemClickedEvent(
                                     DeviceCenterItemClicked.ItemType.Device
                                 )
                             )
-                            viewModel.showDeviceFolders(it)
+                            if (viewModel.shouldNavigateToSyncs(device)) {
+                                megaNavigator.openSyncs(
+                                    activity = this@DeviceCenterFragment.activity
+                                        ?: return@DeviceCenterScreen,
+                                    deviceName = device.name,
+                                )
+                            } else {
+                                viewModel.showDeviceFolders(device)
+                            }
                         },
                         onDeviceMenuClicked = {
                             Analytics.tracker.trackEvent(

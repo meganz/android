@@ -35,4 +35,13 @@ internal interface AppNavigatorImpl : AppNavigator {
             )
         }
     }
+
+    override fun openSyncs(activity: Activity, deviceName: String?) {
+        if (activity is ManagerActivity) {
+            activity.selectDrawerItem(
+                item = DrawerItem.SYNC,
+                title = deviceName,
+            )
+        }
+    }
 }

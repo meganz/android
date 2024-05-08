@@ -159,7 +159,10 @@ internal class ManagerDrawerFragment : Fragment() {
             binding.backupsSection.isVisible = false
             setDrawerLayout(uiState.isRootNodeExist && uiState.isConnected)
             binding.navigationDrawerAddPhoneNumberContainer.isVisible = uiState.canVerifyPhoneNumber
-            binding.syncSection.isVisible = uiState.enabledFlags.contains(SyncFeatures.AndroidSync)
+            binding.syncSection.isVisible =
+                uiState.enabledFlags.contains(SyncFeatures.AndroidSync) && !uiState.enabledFlags.contains(
+                    SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter
+                )
             binding.deviceCenterSection.isVisible = true
             binding.notificationSectionPromoTag.isVisible = uiState.showPromoTag
         }

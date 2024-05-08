@@ -28,7 +28,8 @@ internal fun NavGraphBuilder.syncNavGraph(
     navController: NavController,
     fileTypeIconMapper: FileTypeIconMapper,
     syncPermissionsManager: SyncPermissionsManager,
-    openUpgradeAccountPage: () -> Unit
+    openUpgradeAccountPage: () -> Unit,
+    title: String? = null,
 ) {
     navigation(
         startDestination = if (showOnboardingScreen) {
@@ -81,7 +82,8 @@ internal fun NavGraphBuilder.syncNavGraph(
                     Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
                     navController.navigate(syncNewFolderRoute)
                 },
-                onOpenUpgradeAccountClicked = { openUpgradeAccountPage() }
+                onOpenUpgradeAccountClicked = { openUpgradeAccountPage() },
+                title = title,
             )
         }
     }
