@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +31,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -69,52 +71,64 @@ fun CoreVoiceClipMessageView(
     loadProgress: Float? = null,
     playProgress: Float? = null,
     isPlaying: Boolean = false,
+    showPausedTransfersWarning: Boolean = false,
     onPlayClicked: () -> Unit = {},
     onSeek: (Float) -> Unit = {},
 ) {
-    Box(
-        modifier = modifier
-            .size(width = 209.dp, height = 56.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(
-                color = when {
-                    !exists -> MegaTheme.colors.button.disabled
-                    isMe -> MegaTheme.colors.icon.accent
-                    else -> MegaTheme.colors.background.surface2
-                }
-            ),
-        contentAlignment = Alignment.BottomCenter,
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(start = 12.dp)
-                .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
+    Column {
+        Box(
+            modifier = modifier
+                .size(width = 209.dp, height = 56.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    color = when {
+                        !exists -> MegaTheme.colors.button.disabled
+                        isMe -> MegaTheme.colors.icon.accent
+                        else -> MegaTheme.colors.background.surface2
+                    }
+                ),
+            contentAlignment = Alignment.BottomCenter,
         ) {
-            PlayButton(
-                isMe = isMe,
-                exists = exists,
-                isPlaying = isPlaying,
-                onPlayClicked = {
-                    if (loadProgress != null)
-                        return@PlayButton
+            Row(
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                PlayButton(
+                    isMe = isMe,
+                    exists = exists,
+                    isPlaying = isPlaying,
+                    onPlayClicked = {
+                        if (loadProgress != null)
+                            return@PlayButton
 
-                    onPlayClicked()
-                },
-                interactionEnabled = interactionEnabled,
-            )
-            PlaySlider(
-                isMe = isMe,
-                progressByMediaPlayer = playProgress,
-                modifier = Modifier.padding(start = 8.dp),
-                exists = exists,
-                onValueChange = onSeek,
-                interactionEnabled = interactionEnabled,
-            )
-            TimestampText(isMe = isMe, timestamp = timestamp, exists = exists)
+                        onPlayClicked()
+                    },
+                    interactionEnabled = interactionEnabled,
+                )
+                PlaySlider(
+                    isMe = isMe,
+                    progressByMediaPlayer = playProgress,
+                    modifier = Modifier.padding(start = 8.dp),
+                    exists = exists,
+                    onValueChange = onSeek,
+                    interactionEnabled = interactionEnabled,
+                )
+                TimestampText(isMe = isMe, timestamp = timestamp, exists = exists)
+            }
+            LoadOverlay(loadProgress = loadProgress)
+            LoadProgress(loadProgress = loadProgress, exists = exists)
         }
-        LoadOverlay(loadProgress = loadProgress)
-        LoadProgress(loadProgress = loadProgress, exists = exists)
+
+        if (showPausedTransfersWarning) {
+            MegaText(
+                modifier = Modifier.padding(top = 2.dp),
+                text = stringResource(id = R.string.manual_resume_alert),
+                style = MaterialTheme.typography.body4,
+                textColor = TextColor.Primary
+            )
+        }
     }
 }
 
@@ -303,6 +317,7 @@ private fun Preview(
             isPlaying = parameter.isPlaying,
             exists = parameter.exists,
             interactionEnabled = true,
+            showPausedTransfersWarning = parameter.showPausedTransfersWarning,
         )
     }
 }
@@ -314,6 +329,7 @@ private class VoiceClipMessageViewPreviewParameter(
     val playProgress: Float? = null,
     val isPlaying: Boolean = true,
     val exists: Boolean = true,
+    val showPausedTransfersWarning: Boolean = false,
 )
 
 private class Provider : PreviewParameterProvider<VoiceClipMessageViewPreviewParameter> {
@@ -322,6 +338,10 @@ private class Provider : PreviewParameterProvider<VoiceClipMessageViewPreviewPar
             VoiceClipMessageViewPreviewParameter(isPlaying = false),
             VoiceClipMessageViewPreviewParameter(isMe = false, isPlaying = false),
             VoiceClipMessageViewPreviewParameter(loadProgress = .5f),
+            VoiceClipMessageViewPreviewParameter(
+                loadProgress = .5f,
+                showPausedTransfersWarning = true
+            ),
             VoiceClipMessageViewPreviewParameter(isMe = false, loadProgress = .5f),
             VoiceClipMessageViewPreviewParameter(playProgress = .2f),
             VoiceClipMessageViewPreviewParameter(isMe = false, playProgress = .2f),

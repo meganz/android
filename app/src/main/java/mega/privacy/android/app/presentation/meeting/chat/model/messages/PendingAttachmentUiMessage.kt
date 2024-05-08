@@ -37,6 +37,4 @@ data class PendingAttachmentUiMessage(
     override val timeSent = message.time
     override val userHandle = message.userHandle
     override val id = message.msgId
-
-
 }

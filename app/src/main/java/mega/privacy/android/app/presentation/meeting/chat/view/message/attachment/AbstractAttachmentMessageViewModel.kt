@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap
 abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
-    private val fileTypeIconMapper: FileTypeIconMapper
+    private val fileTypeIconMapper: FileTypeIconMapper,
 ) : ViewModel() {
 
 
@@ -71,4 +71,12 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
         fileTypeResId = fileTypeIconMapper(attachmentMessage.fileType.extension),
         isError = attachmentMessage.isSendError()
     )
+
+    internal fun updatePausedTransfers(areTransfersPaused: Boolean) {
+        _uiStateFlowMap.forEach { (_, uiStateFlow) ->
+            uiStateFlow.update {
+                it.copy(areTransfersPaused = areTransfersPaused)
+            }
+        }
+    }
 }

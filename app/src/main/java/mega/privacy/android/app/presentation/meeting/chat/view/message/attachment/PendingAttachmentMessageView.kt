@@ -27,6 +27,7 @@ fun PendingAttachmentMessageView(
         fileName = uiState.fileName,
         fileSize = uiState.fileSize,
         duration = uiState.duration,
+        showPausedTransfersWarning = uiState.areTransfersPaused,
         modifier = modifier,
     )
 }

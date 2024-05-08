@@ -123,7 +123,7 @@ abstract class AvatarMessage : UiChatMessage {
         onClick: () -> Unit,
         onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
-    ) = if (message.isNotSent()) {
+    ) = if (message.isNotSent() && interactionEnabled) {
         forNotSent(
             onNotSentClick = { onNotSentClick(message) }
         )
@@ -152,6 +152,4 @@ abstract class AvatarMessage : UiChatMessage {
     }
 
     override val isSelectable = true
-
-    override fun key() = super.key()
 }

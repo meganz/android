@@ -23,4 +23,5 @@
     <string name="video_button">Video</string>
     <string name="edited_message_text">(edited)</string>
     <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
+    <string name="manual_resume_alert">Transfers paused. Tap to resume.</string>
 </resources>

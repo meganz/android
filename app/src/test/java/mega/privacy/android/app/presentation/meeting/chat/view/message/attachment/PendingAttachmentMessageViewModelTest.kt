@@ -15,8 +15,9 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
-import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.MonitorPendingMessageTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -35,7 +36,10 @@ import java.io.File
 class PendingAttachmentMessageViewModelTest {
     lateinit var underTest: PendingAttachmentMessageViewModel
 
-    private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
+    private val monitorPendingMessageTransferEventsUseCase =
+        mock<MonitorPendingMessageTransferEventsUseCase>()
+    private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
+    private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val fileTypeIconMapper = FileTypeIconMapper()
@@ -43,7 +47,7 @@ class PendingAttachmentMessageViewModelTest {
     @BeforeEach
     internal fun resetMocks() {
         reset(
-            monitorTransferEventsUseCase,
+            areTransfersPausedUseCase,
             fileSizeStringMapper,
             durationInSecondsTextMapper,
         )
@@ -51,6 +55,8 @@ class PendingAttachmentMessageViewModelTest {
     }
 
     private fun commonStub() {
+        whenever(monitorPendingMessageTransferEventsUseCase()) doReturn emptyFlow()
+        whenever(monitorPausedTransfersUseCase()) doReturn emptyFlow()
         whenever(fileSizeStringMapper(any())).thenReturn("1 byte")
     }
 
@@ -59,7 +65,9 @@ class PendingAttachmentMessageViewModelTest {
         setup(emptyFlow())
         val path = "root/file.jpg"
         val attachmentMessage = stubMessage()
+
         whenever(attachmentMessage.file) doReturn File(path)
+
         val actual = underTest.createFirstUiState(attachmentMessage)
         assertThat(actual.previewUri).endsWith(path)
     }
@@ -71,7 +79,9 @@ class PendingAttachmentMessageViewModelTest {
     ) {
         setup(emptyFlow())
         val attachmentMessage = stubMessage()
+
         whenever(attachmentMessage.isSendError()) doReturn expected
+
         val actual = underTest.createFirstUiState(attachmentMessage)
         assertThat(actual.isError).isEqualTo(expected)
     }
@@ -79,19 +89,63 @@ class PendingAttachmentMessageViewModelTest {
     @Test
     fun `test that transfer events updates the pending message progress`() = runTest {
         val expected = Progress(0.33f)
-        val eventsFlow = MutableSharedFlow<TransferEvent>()
+        val eventsFlow = MutableSharedFlow<Pair<List<Long>, Transfer>>()
         setup(eventsFlow)
         val attachmentMessage = stubMessage()
         val transfer = mock<Transfer> {
             on { appData } doReturn listOf(TransferAppData.ChatUpload(pendingMsgId))
             on { progress } doReturn expected
         }
+
         underTest.updateAndGetUiStateFlow(attachmentMessage).test {
             assertThat(awaitItem().loadProgress).isNull()
-            eventsFlow.emit(TransferEvent.TransferUpdateEvent(transfer))
+            eventsFlow.emit(Pair(listOf(pendingMsgId), transfer))
             assertThat(awaitItem().loadProgress).isEqualTo(expected)
         }
     }
+
+    @Test
+    fun `test that transfer events updates the pending message transfers paused property`() =
+        runTest {
+            val eventsFlow = MutableSharedFlow<Pair<List<Long>, Transfer>>()
+            setup(eventsFlow)
+            val attachmentMessage = stubMessage()
+            val transfer = mock<Transfer> {
+                on { appData } doReturn listOf(TransferAppData.ChatUpload(pendingMsgId))
+            }
+
+            whenever(areTransfersPausedUseCase()) doReturn true
+
+            underTest.updateAndGetUiStateFlow(attachmentMessage).test {
+                assertThat(awaitItem().areTransfersPaused).isFalse()
+                eventsFlow.emit(Pair(listOf(pendingMsgId), transfer))
+                assertThat(awaitItem().areTransfersPaused).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that paused transfers updates the pending message transfers paused property`() =
+        runTest {
+            val eventsFlow = MutableSharedFlow<Pair<List<Long>, Transfer>>()
+            setup(eventsFlow)
+            val pausedFlow = MutableSharedFlow<Boolean>()
+            whenever(monitorPausedTransfersUseCase()) doReturn pausedFlow
+            val attachmentMessage = stubMessage()
+            val transfer = mock<Transfer> {
+                on { appData } doReturn listOf(TransferAppData.ChatUpload(pendingMsgId))
+            }
+
+            eventsFlow.emit(Pair(listOf(pendingMsgId), transfer))
+            underTest.updateAndGetUiStateFlow(attachmentMessage).test {
+                assertThat(awaitItem().areTransfersPaused).isFalse()
+                pausedFlow.emit(true)
+                underTest.updatePausedTransfers(true)
+                assertThat(awaitItem().areTransfersPaused).isTrue()
+                pausedFlow.emit(false)
+                underTest.updatePausedTransfers(false)
+                assertThat(awaitItem().areTransfersPaused).isFalse()
+            }
+        }
 
     @Test
     fun `test that error state is updated when a new attachment message with error is received`() =
@@ -104,13 +158,15 @@ class PendingAttachmentMessageViewModelTest {
             }
         }
 
-    internal fun setup(transferEvents: Flow<TransferEvent>) = runTest {
-        whenever(monitorTransferEventsUseCase()) doReturn transferEvents
+    internal fun setup(transferEvents: Flow<Pair<List<Long>, Transfer>>) = runTest {
+        whenever(monitorPendingMessageTransferEventsUseCase()) doReturn transferEvents
         underTest = PendingAttachmentMessageViewModel(
-            monitorTransferEventsUseCase,
-            fileSizeStringMapper,
-            durationInSecondsTextMapper,
-            fileTypeIconMapper
+            monitorPendingMessageTransferEventsUseCase = monitorPendingMessageTransferEventsUseCase,
+            monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
+            areTransfersPausedUseCase = areTransfersPausedUseCase,
+            fileSizeStringMapper = fileSizeStringMapper,
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
+            fileTypeIconMapper = fileTypeIconMapper
         )
     }
 
