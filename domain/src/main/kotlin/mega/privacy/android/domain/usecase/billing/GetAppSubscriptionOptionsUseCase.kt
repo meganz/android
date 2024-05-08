@@ -19,6 +19,9 @@ class GetAppSubscriptionOptionsUseCase @Inject constructor(
         getSubscriptionOptionsUseCase().filter { plan ->
             plan.accountType !== AccountType.BUSINESS &&
                     plan.accountType !== AccountType.PRO_FLEXI &&
+                    plan.accountType !== AccountType.STARTER &&
+                    plan.accountType !== AccountType.BASIC &&
+                    plan.accountType !== AccountType.ESSENTIAL &&
                     plan.accountType !== AccountType.UNKNOWN &&
                     plan.months == months
         }

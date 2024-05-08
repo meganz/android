@@ -325,7 +325,7 @@ internal class DefaultAccountRepository @Inject constructor(
                         if (error.errorCode == MegaError.API_OK) {
                             continuation.resumeWith(
                                 Result.success(
-                                    subscriptionOptionListMapper(request, currencyMapper)
+                                    subscriptionOptionListMapper(request)
                                 )
                             )
                         } else {

@@ -10,7 +10,6 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.mapper.AccountSessionDetailMapper
 import mega.privacy.android.data.mapper.AccountStorageDetailMapper
 import mega.privacy.android.data.mapper.AccountTransferDetailMapper
-import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
@@ -39,7 +38,6 @@ import mega.privacy.android.data.mapper.SortOrderMapperImpl
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
-import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserSetMapper
@@ -61,7 +59,6 @@ import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.toAccountSessionDetail
 import mega.privacy.android.data.mapper.toAccountStorageDetail
 import mega.privacy.android.data.mapper.toAccountTransferDetail
-import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toAchievementsOverview
 import mega.privacy.android.data.mapper.toChatFilesFolderUserAttribute
 import mega.privacy.android.data.mapper.toContactRequest
@@ -79,7 +76,6 @@ import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPaymentPlatformType
 import mega.privacy.android.data.mapper.toPricing
 import mega.privacy.android.data.mapper.toStorageState
-import mega.privacy.android.data.mapper.toSubscriptionOptionList
 import mega.privacy.android.data.mapper.toSubscriptionStatus
 import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserSet
@@ -127,11 +123,6 @@ internal abstract class MapperModule {
 
 
     companion object {
-        /**
-         * Provide account type mapper
-         */
-        @Provides
-        fun provideAccountTypeMapper(): AccountTypeMapper = ::toAccountType
 
         /**
          * Provide user update mapper
@@ -242,13 +233,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun providePaymentMethodTypeMapper(): PaymentMethodTypeMapper = ::toPaymentMethodType
-
-        /**
-         * Provide subscription plan list mapper
-         */
-        @Provides
-        fun provideSubscriptionOptionListMapper(): SubscriptionOptionListMapper =
-            ::toSubscriptionOptionList
 
         /**
          * Provide mega achievement mapper

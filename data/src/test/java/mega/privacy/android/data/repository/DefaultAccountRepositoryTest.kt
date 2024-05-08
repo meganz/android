@@ -38,9 +38,9 @@ import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsMapper
-import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.account.CurrencyPoint
@@ -147,7 +147,7 @@ class DefaultAccountRepositoryTest {
     private val appEventGateway: AppEventGateway = mock()
 
     private val subscriptionOption = SubscriptionOption(
-        accountType = toAccountType(1),
+        accountType = AccountType.PRO_I,
         months = 1,
         handle = 1560943707714440503,
         storage = 450,
@@ -306,8 +306,7 @@ class DefaultAccountRepositoryTest {
 
             whenever(
                 subscriptionOptionListMapper(
-                    request,
-                    currencyMapper,
+                    request
                 )
             ).thenReturn(
                 listOf(subscriptionOption)
@@ -340,8 +339,7 @@ class DefaultAccountRepositoryTest {
 
             whenever(
                 subscriptionOptionListMapper(
-                    request,
-                    currencyMapper,
+                    request
                 )
             ).thenReturn(
                 listOf(subscriptionOption)

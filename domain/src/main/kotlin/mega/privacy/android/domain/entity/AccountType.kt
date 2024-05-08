@@ -41,6 +41,21 @@ enum class AccountType {
     BUSINESS,
 
     /**
+     * STARTER
+     */
+    STARTER,
+
+    /**
+     * BASIC
+     */
+    BASIC,
+
+    /**
+     * ESSENTIAL
+     */
+    ESSENTIAL,
+
+    /**
      *
      */
     UNKNOWN;

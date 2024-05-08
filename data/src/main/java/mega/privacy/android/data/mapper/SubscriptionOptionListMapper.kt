@@ -3,28 +3,31 @@ package mega.privacy.android.data.mapper
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import nz.mega.sdk.MegaRequest
+import javax.inject.Inject
 
 /**
- * Map [MegaRequest], [CurrencyMapper] to [List<SubscriptionOption>]
+ * Subscription Option List Mapper
  */
-typealias SubscriptionOptionListMapper = (@JvmSuppressWildcards MegaRequest, @JvmSuppressWildcards CurrencyMapper) -> @JvmSuppressWildcards List<@JvmSuppressWildcards SubscriptionOption>
-
-internal fun toSubscriptionOptionList(
-    request: MegaRequest,
-    currencyMapper: CurrencyMapper,
-): List<SubscriptionOption> {
-    val currency = request.currency
-    val pricing = request.pricing
-
-    return (0 until request.pricing.numProducts).map {
+internal class SubscriptionOptionListMapper @Inject constructor(
+    private val currencyMapper: CurrencyMapper,
+    private val accountTypeMapper: AccountTypeMapper,
+) {
+    /**
+     * Invoke
+     * @param request [MegaRequest]
+     * @return [List<SubscriptionOption>]
+     */
+    operator fun invoke(
+        request: MegaRequest
+    ) = (0 until request.pricing.numProducts).map {
         SubscriptionOption(
-            toAccountType(pricing.getProLevel(it)),
-            pricing.getMonths(it),
-            pricing.getHandle(it),
-            pricing.getGBStorage(it),
-            pricing.getGBTransfer(it),
-            CurrencyPoint.SystemCurrencyPoint(pricing.getAmount(it).toLong()),
-            currencyMapper(currency.currencyName),
+            accountTypeMapper(request.pricing.getProLevel(it)),
+            request.pricing.getMonths(it),
+            request.pricing.getHandle(it),
+            request.pricing.getGBStorage(it),
+            request.pricing.getGBTransfer(it),
+            CurrencyPoint.SystemCurrencyPoint(request.pricing.getAmount(it).toLong()),
+            currencyMapper(request.currency.currencyName),
         )
     }
 }
