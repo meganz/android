@@ -131,6 +131,7 @@
     <mega.privacy.android.app.components.OnOffFab
         android:id="@+id/fab_hold"
         style="@style/BottomSheetIcon"
+        app:maxImageSize="16dp"
         app:disable_icon="@drawable/ic_meeting_pause"
         app:apply_tint="false"
         app:is_on="true"
