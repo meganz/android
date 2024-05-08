@@ -147,6 +147,8 @@ import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.mobile.analytics.event.ChatConversationUnmuteMenuToolbarEvent
 import nz.mega.sdk.MegaChatError
 import org.junit.jupiter.api.AfterEach
@@ -316,6 +318,8 @@ internal class ChatViewModelTest {
     private val leaveChatUseCase = mock<LeaveChatUseCase>()
     private val broadcastChatArchivedUseCase = mock<BroadcastChatArchivedUseCase>()
     private val broadcastUpgradeDialogClosedUseCase = mock<BroadcastUpgradeDialogClosedUseCase>()
+    private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
+    private val pauseAllTransfersUseCase = mock<PauseAllTransfersUseCase>()
 
     @BeforeEach
     fun resetMocks() {
@@ -382,7 +386,9 @@ internal class ChatViewModelTest {
             broadcastChatArchivedUseCase,
             setUsersCallLimitRemindersUseCase,
             getUsersCallLimitRemindersUseCase,
-            broadcastUpgradeDialogClosedUseCase
+            broadcastUpgradeDialogClosedUseCase,
+            areTransfersPausedUseCase,
+            pauseAllTransfersUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
@@ -494,7 +500,9 @@ internal class ChatViewModelTest {
             broadcastChatArchivedUseCase = broadcastChatArchivedUseCase,
             setUsersCallLimitRemindersUseCase = setUsersCallLimitRemindersUseCase,
             getUsersCallLimitRemindersUseCase = getUsersCallLimitRemindersUseCase,
-            broadcastUpgradeDialogClosedUseCase = broadcastUpgradeDialogClosedUseCase
+            broadcastUpgradeDialogClosedUseCase = broadcastUpgradeDialogClosedUseCase,
+            areTransfersPausedUseCase = areTransfersPausedUseCase,
+            pauseAllTransfersUseCase = pauseAllTransfersUseCase,
         )
     }
 
@@ -3101,6 +3109,23 @@ internal class ChatViewModelTest {
                         .isEqualTo(destination)
                 }
             }
+    }
+
+    @ParameterizedTest(name = " when use case returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that are transfers paused returns correctly`(
+        areTransfersPaused: Boolean
+    ) = runTest {
+        whenever(areTransfersPausedUseCase()).thenReturn(areTransfersPaused)
+
+        assertThat(underTest.areTransfersPaused()).isEqualTo(areTransfersPaused)
+    }
+
+    @Test
+    fun `test that resume transfers invokes correct use case`() = runTest {
+        underTest.resumeTransfers()
+
+        verify(pauseAllTransfersUseCase).invoke(false)
     }
 
 

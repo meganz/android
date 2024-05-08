@@ -136,6 +136,8 @@ import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.mobile.analytics.event.ChatConversationUnmuteMenuToolbarEvent
 import timber.log.Timber
 import java.io.File
@@ -252,6 +254,8 @@ class ChatViewModel @Inject constructor(
     private val setUsersCallLimitRemindersUseCase: SetUsersCallLimitRemindersUseCase,
     private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase,
     private val broadcastUpgradeDialogClosedUseCase: BroadcastUpgradeDialogClosedUseCase,
+    private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
+    private val pauseAllTransfersUseCase: PauseAllTransfersUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1680,6 +1684,21 @@ class ChatViewModel @Inject constructor(
             runCatching {
                 broadcastUpgradeDialogClosedUseCase()
             }
+        }
+    }
+
+    /**
+     * Checks if transfers are paused.
+     */
+    fun areTransfersPaused() = areTransfersPausedUseCase()
+
+    /**
+     * Pause transfers.
+     */
+    fun resumeTransfers() {
+        viewModelScope.launch {
+            runCatching { pauseAllTransfersUseCase(false) }
+                .onFailure { Timber.e(it) }
         }
     }
 

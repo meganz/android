@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.actions.ImportMes
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.InviteMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.OpenWithMessageAction
+import mega.privacy.android.app.presentation.meeting.chat.view.actions.ResumeTransfersMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.RetryMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.SaveToDeviceMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.SelectMessageAction
@@ -125,6 +126,11 @@ internal class MessageActionModule {
     @IntoSet
     fun provideRetryActionFactory(): (ChatViewModel) -> MessageAction =
         { RetryMessageAction() }
+
+    @Provides
+    @IntoSet
+    fun provideResumeTransfersMessageActionFactory(): (ChatViewModel) -> MessageAction =
+        { vm -> ResumeTransfersMessageAction(vm) }
 
     /**
      * MessageActionGroup.Delete

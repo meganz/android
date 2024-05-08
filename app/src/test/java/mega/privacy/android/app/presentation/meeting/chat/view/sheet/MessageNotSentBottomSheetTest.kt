@@ -10,9 +10,13 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageBottomSheetAction
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class MessageNotSentBottomSheetTest {
@@ -42,16 +46,37 @@ class MessageNotSentBottomSheetTest {
                     .size(10.dp)
                     .testTag(tag2)
             )
-        })
+        }).map {
+            MessageBottomSheetAction(
+                it,
+                MessageActionGroup.Share
+            )
+        }
         initComposeRule(actions)
         composeRule.onNodeWithTag(tag1).assertIsDisplayed()
         composeRule.onNodeWithTag(tag2).assertIsDisplayed()
     }
 
-    private fun initComposeRule(actions: List<@Composable () -> Unit> = emptyList<@Composable () -> Unit>()) {
+    @Test
+    fun `test that correct text in header is displayed when transfers are not paused`() {
+        initComposeRule(areTransfersPaused = false)
+        composeRule.onNodeWithText(R.string.title_message_not_sent_options).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that correct text in header is displayed when transfers are paused`() {
+        initComposeRule(areTransfersPaused = true)
+        composeRule.onNodeWithText(R.string.attachment_uploading_state_paused).assertIsDisplayed()
+    }
+
+    private fun initComposeRule(
+        actions: List<MessageBottomSheetAction> = emptyList(),
+        areTransfersPaused: Boolean = true,
+    ) {
         composeRule.setContent {
             MessageNotSentBottomSheet(
                 actions = actions,
+                areTransfersPaused = areTransfersPaused
             )
         }
     }

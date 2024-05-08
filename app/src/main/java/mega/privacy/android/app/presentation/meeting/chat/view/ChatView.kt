@@ -190,6 +190,7 @@ internal fun ChatView(
         onVoiceClipRecordEvent = viewModel::onVoiceClipRecordEvent,
         onConfirmFreePlanParticipantsLimitDialogEvent = viewModel::consumeShowFreePlanParticipantsLimitDialogEvent,
         onConsumeShouldUpgradeToProPlan = viewModel::onConsumeShouldUpgradeToProPlan,
+        areTransfersPaused = viewModel::areTransfersPaused,
     )
 }
 
@@ -285,6 +286,7 @@ internal fun ChatView(
     onVoiceClipRecordEvent: (VoiceClipRecordEvent) -> Unit = {},
     onConfirmFreePlanParticipantsLimitDialogEvent: () -> Unit = {},
     onConsumeShouldUpgradeToProPlan: () -> Unit = {},
+    areTransfersPaused: () -> Boolean = { false },
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -611,16 +613,20 @@ internal fun ChatView(
                             actions = actions.filter { action ->
                                 action.appliesTo(selectedMessages)
                             }.map { action ->
-                                action.bottomSheetMenuItem(
-                                    messages = selectedMessages,
-                                    hideBottomSheet = {
-                                        coroutineScope.launch {
-                                            messageNotSentBottomSheetState.hide()
-                                        }
-                                    },
-                                    setAction = { pendingAction = it }
+                                MessageBottomSheetAction(
+                                    action.bottomSheetMenuItem(
+                                        messages = selectedMessages,
+                                        hideBottomSheet = {
+                                            coroutineScope.launch {
+                                                messageNotSentBottomSheetState.hide()
+                                            }
+                                        },
+                                        setAction = { pendingAction = it }
+                                    ),
+                                    action.group
                                 )
                             },
+                            areTransfersPaused = areTransfersPaused(),
                         )
                     }
 

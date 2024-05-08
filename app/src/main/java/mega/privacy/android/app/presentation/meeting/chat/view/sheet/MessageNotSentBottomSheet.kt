@@ -7,6 +7,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageBottomSheetAction
+import mega.privacy.android.core.ui.controls.dividers.DividerType
+import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 
 /**
@@ -14,8 +17,9 @@ import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
  */
 @Composable
 fun MessageNotSentBottomSheet(
+    actions: List<MessageBottomSheetAction>,
+    areTransfersPaused: Boolean,
     modifier: Modifier = Modifier,
-    actions: List<@Composable () -> Unit>,
 ) {
     Column(
         modifier = modifier
@@ -24,9 +28,19 @@ fun MessageNotSentBottomSheet(
     ) {
         MenuActionHeader(
             modifier = Modifier.testTag(TEST_TAG_SEND_ERROR_HEADER),
-            text = stringResource(id = R.string.title_message_not_sent_options)
+            text = stringResource(
+                if (areTransfersPaused) R.string.attachment_uploading_state_paused
+                else R.string.title_message_not_sent_options
+            )
         )
-        actions.forEach { it() }
+        var group = if (actions.isNotEmpty()) actions.first().group else null
+        actions.forEach {
+            if (group != it.group) {
+                MegaDivider(dividerType = DividerType.BigStartPadding)
+                group = it.group
+            }
+            it.view()
+        }
     }
 
 }
