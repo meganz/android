@@ -34,11 +34,16 @@ class TimelineActionModeCallback(
                     fragment.timelineViewModel.state.value.selectedPhotoCount
                 )
             }
+
+            val isPaid =
+                fragment.timelineViewModel.state.value.accountType?.isPaid
+                    ?: false
+
             menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                isHiddenNodesEnabled && hasNonSensitiveNode
+                isHiddenNodesEnabled && (hasNonSensitiveNode || !isPaid)
 
             menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
-                isHiddenNodesEnabled && !hasNonSensitiveNode
+                isHiddenNodesEnabled && !hasNonSensitiveNode && isPaid
         }
         return true
     }
