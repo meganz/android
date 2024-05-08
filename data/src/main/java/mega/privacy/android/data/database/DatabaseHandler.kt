@@ -13,8 +13,6 @@ import mega.privacy.android.domain.entity.user.UserCredentials
 
 interface DatabaseHandler {
 
-    val myEmail: String?
-
     //get the credential of last login
     val credentials: UserCredentials?
 
@@ -118,12 +116,6 @@ interface DatabaseHandler {
      */
     var attributes: MegaAttributes?
 
-    fun saveCredentials(userCredentials: UserCredentials)
-    fun saveMyEmail(email: String?)
-    fun saveMyFirstName(firstName: String?)
-    fun saveMyLastName(lastName: String?)
-    fun shouldAskForDisplayOver(): Boolean
-    fun dontAskForDisplayOver()
     fun setNotificationSoundChat(sound: String?)
     fun setVibrationEnabledChat(enabled: String?)
     fun setWrittenTextItem(handle: String?, text: String?, editedMsgId: String?): Int
@@ -166,8 +158,6 @@ interface DatabaseHandler {
     fun setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp: Long)
     fun setLastPublicHandleTimeStamp()
     fun setInvalidateSdkCache(invalidateSdkCache: Boolean)
-    fun clearCredentials()
-
     @Deprecated("Call to ClearEphemeralCredentialsUseCase instead")
     fun clearEphemeral()
     fun clearPreferences()

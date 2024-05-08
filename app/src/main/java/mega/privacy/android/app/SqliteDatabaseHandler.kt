@@ -5,7 +5,6 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.provider.Settings
-import android.text.TextUtils
 import android.util.Base64
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
@@ -65,92 +64,6 @@ class SqliteDatabaseHandler @Inject constructor(
     private val writableDatabase: SupportSQLiteDatabase by lazy { sqLiteOpenHelper.writableDatabase }
     private val readableDatabase: SupportSQLiteDatabase by lazy { sqLiteOpenHelper.readableDatabase }
 
-    override fun saveCredentials(userCredentials: UserCredentials) {
-        val values = ContentValues().apply {
-            with(userCredentials) {
-                put(KEY_ID, 1)
-                email?.let { put(KEY_EMAIL, encrypt(it)) }
-                session?.let { put(KEY_SESSION, encrypt(it)) }
-                myHandle?.let { put(KEY_MY_HANDLE, encrypt(it)) }
-            }
-        }
-        writableDatabase.insert(TABLE_CREDENTIALS, SQLiteDatabase.CONFLICT_REPLACE, values)
-    }
-
-    override fun saveMyEmail(email: String?) {
-        Timber.d("saveEmail: %s", email)
-        val selectQuery = "SELECT * FROM $TABLE_CREDENTIALS"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_CREDENTIALS_TABLE =
-                        "UPDATE $TABLE_CREDENTIALS SET $KEY_EMAIL= '${encrypt(email)}' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_CREDENTIALS_TABLE)
-                } else {
-                    values.put(KEY_EMAIL, encrypt(email))
-                    writableDatabase.insert(TABLE_CREDENTIALS, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun saveMyFirstName(firstName: String?) {
-        val selectQuery = "SELECT * FROM $TABLE_CREDENTIALS"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_CREDENTIALS_TABLE =
-                        "UPDATE $TABLE_CREDENTIALS SET $KEY_FIRST_NAME= '${encrypt(firstName)}' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_CREDENTIALS_TABLE)
-                } else {
-                    values.put(KEY_FIRST_NAME, encrypt(firstName))
-                    writableDatabase.insert(TABLE_CREDENTIALS, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun saveMyLastName(lastName: String?) {
-        val selectQuery = "SELECT * FROM $TABLE_CREDENTIALS"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_CREDENTIALS_TABLE =
-                        "UPDATE $TABLE_CREDENTIALS SET $KEY_LAST_NAME= '${encrypt(lastName)}' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_CREDENTIALS_TABLE)
-                } else {
-                    values.put(KEY_LAST_NAME, encrypt(lastName))
-                    writableDatabase.insert(TABLE_CREDENTIALS, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override val myEmail: String?
-        get() {
-            val selectQuery = "SELECT $KEY_EMAIL FROM $TABLE_CREDENTIALS"
-            var email: String? = null
-            try {
-                readableDatabase.query(selectQuery).use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        email = decrypt(cursor.getString(0))
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return email
-        }
-
     //get the credential of last login
     override val credentials: UserCredentials?
         get() {
@@ -200,25 +113,6 @@ class SqliteDatabaseHandler @Inject constructor(
             }
             return ephemeralCredentials
         }
-
-    override fun shouldAskForDisplayOver(): Boolean {
-        var should = true
-        val text = getStringValue(TABLE_PREFERENCES, KEY_ASK_FOR_DISPLAY_OVER, "")
-        if (!TextUtils.isEmpty(text)) {
-            should = text.toBoolean()
-        }
-        return should
-    }
-
-    override fun dontAskForDisplayOver() {
-        writableDatabase.execSQL(
-            "UPDATE $TABLE_PREFERENCES SET $KEY_ASK_FOR_DISPLAY_OVER = '${
-                encrypt(
-                    "false"
-                )
-            }';"
-        )
-    }
 
     /**
      * Gets preferences.
@@ -2287,12 +2181,6 @@ class SqliteDatabaseHandler @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")
         }
-    }
-
-    override fun clearCredentials() {
-        Timber.w("Clear local credentials!")
-        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_CREDENTIALS")
-        legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
     override fun clearEphemeral() {

@@ -6,7 +6,6 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.settings.ChatSettings
-import mega.privacy.android.domain.entity.user.UserCredentials
 
 /**
  * Mega local storage gateway
@@ -184,18 +183,6 @@ interface MegaLocalStorageGateway {
     suspend fun getChatFilesFolderHandle(): Long?
 
     /**
-     * Save first name
-     * @param firstName first name
-     */
-    suspend fun saveMyFirstName(firstName: String)
-
-    /**
-     * Save last name
-     * @param lastName last name
-     */
-    suspend fun saveMyLastName(lastName: String)
-
-    /**
      * Set last public handle
      *
      * @param handle
@@ -225,18 +212,6 @@ interface MegaLocalStorageGateway {
      * @param chatSettings [ChatSettings]
      */
     suspend fun setChatSettings(chatSettings: ChatSettings)
-
-    /**
-     * Saves the user credentials of the current logged in account.
-     *
-     * @param userCredentials [UserCredentials]
-     */
-    suspend fun saveCredentials(userCredentials: UserCredentials)
-
-    /**
-     * Clear account credentials.
-     */
-    suspend fun clearCredentials()
 
     /**
      * Clear preferences

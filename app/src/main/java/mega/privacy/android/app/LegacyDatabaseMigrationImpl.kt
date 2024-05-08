@@ -41,16 +41,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                     "${SqliteDatabaseHandler.KEY_OFF_LAST_MODIFIED_TIME} INTEGER )"
         db.execSQL(CREATE_OFFLINE_TABLE)
 
-        val CREATE_CREDENTIALS_TABLE =
-            "CREATE TABLE IF NOT EXISTS ${SqliteDatabaseHandler.TABLE_CREDENTIALS}(" +
-                    "${SqliteDatabaseHandler.KEY_ID} INTEGER PRIMARY KEY," +
-                    "${SqliteDatabaseHandler.KEY_EMAIL} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_SESSION} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_FIRST_NAME} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_LAST_NAME} TEXT, " +
-                    "${SqliteDatabaseHandler.KEY_MY_HANDLE} TEXT)"
-        db.execSQL(CREATE_CREDENTIALS_TABLE)
-
         val CREATE_PREFERENCES_TABLE =
             "CREATE TABLE IF NOT EXISTS ${SqliteDatabaseHandler.TABLE_PREFERENCES} (" +
                     "${SqliteDatabaseHandler.KEY_ID} INTEGER PRIMARY KEY," +                    //0

@@ -6,7 +6,6 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.settings.ChatSettings
-import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_FAV_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LABEL_ASC
@@ -132,12 +131,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getChatFilesFolderHandle() = dbHandler.myChatFilesFolderHandle
 
-    override suspend fun saveMyFirstName(firstName: String) =
-        dbHandler.saveMyFirstName(firstName)
-
-    override suspend fun saveMyLastName(lastName: String) =
-        dbHandler.saveMyLastName(lastName)
-
     override suspend fun setLastPublicHandle(handle: Long) = dbHandler.setLastPublicHandle(handle)
 
     override suspend fun setLastPublicHandleTimeStamp() = dbHandler.setLastPublicHandleTimeStamp()
@@ -151,11 +144,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun setChatSettings(chatSettings: ChatSettings) {
         dbHandler.chatSettings = chatSettings
     }
-
-    override suspend fun saveCredentials(userCredentials: UserCredentials) =
-        dbHandler.saveCredentials(userCredentials)
-
-    override suspend fun clearCredentials() = dbHandler.clearCredentials()
 
     override suspend fun clearPreferences() = dbHandler.clearPreferences()
 
