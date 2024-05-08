@@ -23,9 +23,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
+import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.data.worker.AbstractTransfersWorker
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.ON_TRANSFER_UPDATE_REFRESH_MILLIS
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
@@ -80,7 +80,7 @@ class DownloadsWorkerTest {
         mock<MonitorOngoingActiveTransfersUntilFinishedUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
-    private val downloadNotificationMapper = mock<DownloadNotificationMapper>()
+    private val transfersNotificationMapper = mock<TransfersNotificationMapper>()
     private val areNotificationsEnabledUseCase = mock<AreNotificationsEnabledUseCase>()
     private val correctActiveTransfersUseCase = mock<CorrectActiveTransfersUseCase>()
     private val overQuotaNotificationBuilder = mock<OverQuotaNotificationBuilder>()
@@ -125,7 +125,7 @@ class DownloadsWorkerTest {
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             monitorOngoingActiveTransfersUntilFinishedUseCase = monitorOngoingActiveTransfersUntilFinishedUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
-            downloadNotificationMapper = downloadNotificationMapper,
+            transfersNotificationMapper = transfersNotificationMapper,
             overQuotaNotificationBuilder = overQuotaNotificationBuilder,
             areNotificationsEnabledUseCase = areNotificationsEnabledUseCase,
             notificationManager = mock(),
@@ -212,7 +212,7 @@ class DownloadsWorkerTest {
         val transferTotal: ActiveTransferTotals = mockActiveTransferTotals(true)
         commonStub(transferTotals = listOf(transferTotal))
         underTest.doWork()
-        verify(downloadNotificationMapper).invoke(transferTotal, false)
+        verify(transfersNotificationMapper).invoke(transferTotal, false)
     }
 
     @Test
@@ -226,9 +226,9 @@ class DownloadsWorkerTest {
             transferTotals = transferTotals,
         )
         underTest.doWork()
-        verify(downloadNotificationMapper, atLeastOnce()).invoke(initial, false)
+        verify(transfersNotificationMapper, atLeastOnce()).invoke(initial, false)
         transferTotals.forEach {
-            verify(downloadNotificationMapper).invoke(it, false)
+            verify(transfersNotificationMapper).invoke(it, false)
         }
     }
 
@@ -377,7 +377,7 @@ class DownloadsWorkerTest {
         whenever(areNotificationsEnabledUseCase()).thenReturn(true)
         whenever(workProgressUpdater.updateProgress(any(), any(), any()))
             .thenReturn(SettableFuture.create<Void?>().also { it.set(null) })
-        whenever(downloadNotificationMapper(any(), any())).thenReturn(mock())
+        whenever(transfersNotificationMapper(any(), any())).thenReturn(mock())
     }
 
     private fun mockActiveTransferTotals(

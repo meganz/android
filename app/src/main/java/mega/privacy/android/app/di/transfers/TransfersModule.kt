@@ -9,14 +9,14 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.presentation.transfers.notification.DefaultChatUploadNotificationMapper
-import mega.privacy.android.app.presentation.transfers.notification.DefaultDownloadNotificationMapper
 import mega.privacy.android.app.presentation.transfers.notification.DefaultOverQuotaNotificationBuilder
 import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersFinishedNotificationMapper
+import mega.privacy.android.app.presentation.transfers.notification.DefaultTransfersNotificationMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
-import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
+import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 
 /**
  * Module for transfers
@@ -26,12 +26,12 @@ import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMa
 abstract class TransfersModule {
 
     /**
-     * Binds [DownloadNotificationMapper] to its default implementation [DefaultDownloadNotificationMapper]
-     * @param mapper [DefaultDownloadNotificationMapper]
-     * @return default [DownloadNotificationMapper]
+     * Binds [TransfersNotificationMapper] to its default implementation [DefaultTransfersNotificationMapper]
+     * @param mapper [DefaultTransfersNotificationMapper]
+     * @return default [TransfersNotificationMapper]
      */
     @Binds
-    abstract fun bindDownloadNotificationMapper(mapper: DefaultDownloadNotificationMapper): DownloadNotificationMapper
+    abstract fun bindTransfersNotificationMapper(mapper: DefaultTransfersNotificationMapper): TransfersNotificationMapper
 
     /**
      * Binds [ChatUploadNotificationMapper] to its default implementation [DefaultChatUploadNotificationMapper]

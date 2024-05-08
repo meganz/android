@@ -8,9 +8,9 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
+import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -46,7 +46,7 @@ class DownloadsWorker @AssistedInject constructor(
     areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase,
     correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
-    private val downloadNotificationMapper: DownloadNotificationMapper,
+    private val transfersNotificationMapper: TransfersNotificationMapper,
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
     crashReporter: CrashReporter,
@@ -78,7 +78,7 @@ class DownloadsWorker @AssistedInject constructor(
     override fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
-    ) = downloadNotificationMapper(activeTransferTotals, paused)
+    ) = transfersNotificationMapper(activeTransferTotals, paused)
 
     override suspend fun createFinishNotification(activeTransferTotals: ActiveTransferTotals) =
         transfersFinishedNotificationMapper(activeTransferTotals)

@@ -4,12 +4,12 @@ import android.app.Notification
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 
 /**
- * Creates a notification for downloads from ActiveTransferTotals
+ * Creates a notification for transfers from ActiveTransferTotals
  */
-interface DownloadNotificationMapper {
+interface TransfersNotificationMapper {
 
     /**
-     * Creates a notification for downloads from ActiveTransferTotals
+     * Invoke.
      */
     operator fun invoke(
         activeTransferTotals: ActiveTransferTotals?,

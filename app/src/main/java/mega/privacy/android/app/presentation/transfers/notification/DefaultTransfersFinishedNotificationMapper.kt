@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.TransferType
 import javax.inject.Inject
 
 /**
@@ -31,27 +32,49 @@ class DefaultTransfersFinishedNotificationMapper @Inject constructor(
         val totalFinished = activeTransferTotals.totalFinishedFileTransfers
         val errorCount = activeTransferTotals.totalFinishedWithErrorsFileTransfers
         val alreadyDownloadedCount = activeTransferTotals.totalAlreadyDownloadedFiles
+        val isDownload = activeTransferTotals.transfersType == TransferType.DOWNLOAD
 
-        val notificationTitle = if (totalCompleted != totalFinished) {
-            resources.getQuantityString(
-                R.plurals.download_service_final_notification_with_details,
-                totalFinished,
-                totalCompleted,
-                totalFinished,
-            )
-        } else {
-            resources.getQuantityString(
-                R.plurals.download_service_final_notification,
-                totalCompleted,
-                totalCompleted
-            )
+        val notificationTitle = when {
+            isDownload && totalCompleted != totalFinished -> {
+                resources.getQuantityString(
+                    R.plurals.download_service_final_notification_with_details,
+                    totalFinished,
+                    totalCompleted,
+                    totalFinished,
+                )
+            }
 
+            isDownload -> {
+                resources.getQuantityString(
+                    R.plurals.download_service_final_notification,
+                    totalCompleted,
+                    totalCompleted
+                )
+            }
+
+            else -> {
+                val title = resources.getQuantityString(
+                    R.plurals.upload_service_final_notification,
+                    totalCompleted,
+                    totalCompleted
+                )
+                if (errorCount > 0) {
+                    val error = resources.getQuantityString(
+                        R.plurals.upload_service_failed,
+                        errorCount, errorCount
+                    )
+                    "$title · $error"
+                } else {
+                    title
+                }
+            }
         }
+
         val contentText = when {
             errorCount > 0 && alreadyDownloadedCount > 0 ->
                 "${alreadyDownloadedMsg(alreadyDownloadedCount)}, ${errorMsg(errorCount)}"
 
-            errorCount > 0 -> errorMsg(errorCount)
+            isDownload && errorCount > 0 -> errorMsg(errorCount)
             alreadyDownloadedCount > 0 -> alreadyDownloadedMsg(alreadyDownloadedCount)
             else -> okayMsg(activeTransferTotals.transferredBytes)
         }

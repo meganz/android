@@ -12,16 +12,17 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
+import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.TransferType
 import javax.inject.Inject
 
 /**
- * Default implementation of [DownloadNotificationMapper]
+ * Default implementation of [TransfersNotificationMapper]
  */
-class DefaultDownloadNotificationMapper @Inject constructor(
+class DefaultTransfersNotificationMapper @Inject constructor(
     @ApplicationContext private val context: Context,
-) : DownloadNotificationMapper {
+) : TransfersNotificationMapper {
 
     override fun invoke(
         activeTransferTotals: ActiveTransferTotals?,
@@ -43,19 +44,20 @@ class DefaultDownloadNotificationMapper @Inject constructor(
             } else {
                 val inProgress = activeTransferTotals.totalFinishedFileTransfers + 1
                 val totalTransfers = activeTransferTotals.totalFileTransfers
-                if (paused || activeTransferTotals.allPaused()) {
-                    context.getString(
-                        R.string.download_service_notification_paused,
-                        inProgress,
-                        totalTransfers
-                    )
-                } else {
-                    context.getString(
-                        R.string.download_service_notification,
-                        inProgress,
-                        totalTransfers
-                    )
+                val isDownload = activeTransferTotals.transfersType == TransferType.DOWNLOAD
+                val areTransfersPaused = paused || activeTransferTotals.allPaused()
+                val stringId = when {
+                    isDownload && areTransfersPaused ->
+                        R.string.download_service_notification_paused
+
+                    !isDownload && areTransfersPaused ->
+                        R.string.upload_service_notification_paused
+
+                    isDownload -> R.string.download_service_notification
+                    else -> R.string.upload_service_notification
                 }
+
+                context.getString(stringId, inProgress, totalTransfers)
             }
         val subText = activeTransferTotals?.let {
             Util.getProgressSize(
