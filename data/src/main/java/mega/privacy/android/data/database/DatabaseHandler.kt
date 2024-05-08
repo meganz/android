@@ -46,13 +46,6 @@ interface DatabaseHandler {
     var passcodeLockCode: String
 
     /**
-     * Sets the time required before ask for the passcode.
-     *
-     * @param requiredTime The time required before ask for the passcode.
-     */
-    var passcodeRequiredTime: Int
-
-    /**
      * Sets if the fingerprint lock setting is enabled or not.
      *
      * @param enabled True if the fingerprint is enabled, false otherwise.
@@ -78,13 +71,6 @@ interface DatabaseHandler {
      * @param lastPublicHandleType Last public handle type value.
      */
     var lastPublicHandleType: Int
-
-    /**
-     * Set the storage state value into the database.
-     *
-     * @param storageState Storage state value.
-     */
-    var storageState: StorageState
 
     /**
      * Set the handle of "My chat files" folder into the database.
@@ -113,21 +99,15 @@ interface DatabaseHandler {
     fun setNotificationSoundChat(sound: String?)
     fun setVibrationEnabledChat(enabled: String?)
     fun setWrittenTextItem(handle: String?, text: String?, editedMsgId: String?): Int
-    fun areNotificationsEnabled(handle: String?): String?
-
     fun setNonContactFirstName(name: String?, handle: String?): Int
     fun setNonContactLastName(lastName: String?, handle: String?): Int
     fun setNonContactEmail(email: String?, handle: String?): Int
-    fun setContactNickname(nickname: String?, handle: Long)
-
     fun exists(handle: Long): Boolean
     fun removeById(id: Int): Int
     fun setFirstTime(firstTime: Boolean)
-    fun setPreferredViewList(list: Boolean)
     fun setPreferredSortCloud(order: String?)
     fun setPreferredSortCameraUpload(order: String?)
     fun setPreferredSortOthers(order: String?)
-    fun setLastUploadFolder(folderPath: String)
     fun setLastCloudFolder(folderHandle: String)
     fun setAccountDetailsTimeStamp()
     fun resetAccountDetailsTimeStamp()
@@ -137,7 +117,6 @@ interface DatabaseHandler {
     fun setStorageDownloadLocation(storageDownloadLocation: String?)
     fun setAttrAskSizeDownload(askSizeDownload: String?)
     fun setAttrAskNoAppDownload(askNoAppDownload: String?)
-    fun setAttrAttempts(attempt: Int)
     fun setUseHttpsOnly(useHttpsOnly: Boolean)
     fun setShowCopyright(showCopyright: Boolean)
     fun setShowNotifOff(showNotifOff: Boolean)
@@ -187,7 +166,6 @@ interface DatabaseHandler {
     fun removePendingMessageByChatId(idChat: Long)
     fun removePendingMessageById(idMsg: Long)
     fun setAutoPlayEnabled(enabled: String)
-    fun setShowInviteBanner(show: String)
     fun findNonContactByHandle(handle: String): NonContactInfo?
     fun findContactByHandle(handleParam: Long): Contact?
     fun findContactByEmail(mail: String?): Contact?
