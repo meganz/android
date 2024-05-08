@@ -42,12 +42,6 @@ interface DatabaseHandler {
      */
     var chatVideoQuality: Int
 
-    /**
-     * Sets the flag to indicate if the local path selected as Media Uploads local folder belongs to an external SD card.
-     *
-     * @param mediaFolderExternalSdCard true if the local path selected belongs to an external SD card, false otherwise
-     */
-    var passcodeLockType: String?
     var isPasscodeLockEnabled: Boolean
     var passcodeLockCode: String
 
@@ -129,19 +123,12 @@ interface DatabaseHandler {
     fun exists(handle: Long): Boolean
     fun removeById(id: Int): Int
     fun setFirstTime(firstTime: Boolean)
-    fun setCamSyncWifi(wifi: Boolean)
     fun setPreferredViewList(list: Boolean)
-    fun setPreferredViewListCamera(list: Boolean)
     fun setPreferredSortCloud(order: String?)
     fun setPreferredSortCameraUpload(order: String?)
     fun setPreferredSortOthers(order: String?)
     fun setLastUploadFolder(folderPath: String)
     fun setLastCloudFolder(folderHandle: String)
-    fun setKeepFileNames(charging: Boolean)
-    fun setCamSyncEnabled(enabled: Boolean)
-    fun setSecondaryUploadEnabled(enabled: Boolean)
-    fun setCamSyncHandle(handle: Long)
-    fun setSecondaryFolderHandle(handle: Long)
     fun setAccountDetailsTimeStamp()
     fun resetAccountDetailsTimeStamp()
     fun setExtendedAccountDetailsTimestamp()
