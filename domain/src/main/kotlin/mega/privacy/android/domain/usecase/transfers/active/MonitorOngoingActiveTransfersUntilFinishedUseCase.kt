@@ -12,7 +12,6 @@ import javax.inject.Inject
  * Once all ongoing active transfers of this type finish a last value is emitted and the flow ends, indicating that the notification can be dismissed and the worker can finish.
  * If there are no ongoing active transfers it will return a flow with just the current active transfer totals (all 0 in this case) and ends
  * Paused is true if transfers are paused globally or all individual transfers are paused.
- * Active transfers monitoring is sampled to avoid too much updates.
  */
 class MonitorOngoingActiveTransfersUntilFinishedUseCase @Inject constructor(
     private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,

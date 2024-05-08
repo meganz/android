@@ -7,12 +7,21 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.transformWhile
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.ChatCompressionFinished
+import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
+import mega.privacy.android.domain.entity.transfer.ChatCompressionState
+import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pendingMessageIds
@@ -21,12 +30,13 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.pendingmessages.CompressAndUploadAllPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 
@@ -41,7 +51,6 @@ class ChatUploadsWorker @AssistedInject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     handleTransferEventUseCase: HandleTransferEventUseCase,
-    monitorOngoingActiveTransfersUntilFinishedUseCase: MonitorOngoingActiveTransfersUntilFinishedUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -53,6 +62,8 @@ class ChatUploadsWorker @AssistedInject constructor(
     private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     private val checkFinishedChatUploadsUseCase: CheckFinishedChatUploadsUseCase,
+    private val compressAndUploadAllPendingMessagesUseCase: CompressAndUploadAllPendingMessagesUseCase,
+    private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
 ) : AbstractTransfersWorker(
@@ -62,7 +73,6 @@ class ChatUploadsWorker @AssistedInject constructor(
     ioDispatcher = ioDispatcher,
     monitorTransferEventsUseCase = monitorTransferEventsUseCase,
     handleTransferEventUseCase = handleTransferEventUseCase,
-    monitorOngoingActiveTransfersUntilFinishedUseCase = monitorOngoingActiveTransfersUntilFinishedUseCase,
     areTransfersPausedUseCase = areTransfersPausedUseCase,
     getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder = overQuotaNotificationBuilder,
@@ -75,10 +85,34 @@ class ChatUploadsWorker @AssistedInject constructor(
 ) {
     override val updateNotificationId = NOTIFICATION_CHAT_UPLOAD
 
+    private val chatCompressionProgress =
+        MutableStateFlow<ChatCompressionState>(ChatCompressionProgress(0, 0, Progress(0f)))
+
     override fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
-    ) = chatUploadNotificationMapper(activeTransferTotals, null, paused)
+    ) = chatUploadNotificationMapper(
+        activeTransferTotals,
+        (chatCompressionProgress.value as? ChatCompressionProgress),
+        paused
+    )
+
+    override fun monitorOngoingActiveTransfers(): Flow<MonitorOngoingActiveTransfersResult> =
+        combine(
+            monitorOngoingActiveTransfersUseCase(type),
+            compressAndUploadAllPendingMessagesUseCase()
+        ) { monitorOngoingActiveTransfersResult, chatCompressionProgress ->
+            monitorOngoingActiveTransfersResult to chatCompressionProgress
+        }.transformWhile { (ongoingActiveTransfersResult, progress) ->
+            emit(ongoingActiveTransfersResult)
+            chatCompressionProgress.value = progress
+            //keep monitoring if and only if there are compressions or transfers in progress
+            return@transformWhile progress != ChatCompressionFinished || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota && !ongoingActiveTransfersResult.storageOverQuota)
+        }
+
+    override fun hasCompleted(activeTransferTotals: ActiveTransferTotals): Boolean {
+        return activeTransferTotals.hasCompleted() && chatCompressionProgress.value is ChatCompressionFinished
+    }
 
     override suspend fun onStart() {
         checkFinishedChatUploadsUseCase()

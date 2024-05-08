@@ -1,12 +1,12 @@
 package mega.privacy.android.domain.usecase.transfers.chatuploads
 
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import mega.privacy.android.domain.entity.chat.PendingMessageState
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -14,12 +14,11 @@ import mega.privacy.android.domain.exception.chat.FoldersNotAllowedAsChatUploadE
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
-import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
+import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
 import java.io.File
 import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 /**
  * Start uploading a list of files and folders to the chat uploads folder with the corresponding pending message id in their app data
@@ -32,10 +31,11 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val uploadFilesUseCase: UploadFilesUseCase,
     private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
     private val isChatUploadsWorkerStartedUseCase: IsChatUploadsWorkerStartedUseCase,
-    private val compressFileForChatUseCase: CompressFileForChatUseCase,
+    private val chatAttachmentNeedsCompressionUseCase: ChatAttachmentNeedsCompressionUseCase,
     private val chatMessageRepository: ChatMessageRepository,
     private val fileSystemRepository: FileSystemRepository,
     private val handleChatUploadTransferEventUseCase: HandleChatUploadTransferEventUseCase,
+    private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : AbstractStartTransfersWithWorkerUseCase(cancelCancelTokenUseCase) {
 
@@ -68,20 +68,27 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
             )
             return@flow
         }
-        val filesAndNames = mapOf(
-            (compressFileForChatUseCase(file)
-                .mapNotNull { (it as? ChatUploadCompressionState.Compressed)?.file }
-                .firstOrNull() ?: file)
-                    to name
-        )
-        coroutineContext.ensureActive()
+        val filesAndNames = mapOf(file to name)
         val appData = pendingMessageIds.map { TransferAppData.ChatUpload(it) }
         emitAll(startTransfersAndThenWorkerFlow(
             doTransfers = {
-                uploadFilesUseCase(
-                    filesAndNames, chatFilesFolderId, appData, false
-                ).onEach { event ->
-                    handleChatUploadTransferEventUseCase(event, *pendingMessageIds)
+                if (chatAttachmentNeedsCompressionUseCase(file)) {
+                    //if needs compression, skip the upload and update the state to COMPRESSING, it will be compressed and uploaded in the Worker
+                    pendingMessageIds.forEach { pendingMessageId ->
+                        updatePendingMessageUseCase(
+                            UpdatePendingMessageStateRequest(
+                                pendingMessageId,
+                                PendingMessageState.COMPRESSING
+                            )
+                        )
+                    }
+                    emptyFlow()
+                } else {
+                    uploadFilesUseCase(
+                        filesAndNames, chatFilesFolderId, appData, false
+                    ).onEach { event ->
+                        handleChatUploadTransferEventUseCase(event, *pendingMessageIds)
+                    }
                 }
             },
             startWorker = {

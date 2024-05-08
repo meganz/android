@@ -12,6 +12,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
 import javax.inject.Inject
@@ -38,21 +39,26 @@ class DefaultChatUploadNotificationMapper @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val content = context.getString(R.string.chat_upload_title_notification)
+        val progress: Progress?
 
         val title = when {
             chatCompressionProgress != null -> {
+                progress = chatCompressionProgress.progress
                 context.getString(
                     R.string.title_compress_video,
-                    chatCompressionProgress.alreadyCompressed + 1,
+                    (chatCompressionProgress.alreadyCompressed + 1)
+                        .coerceAtMost(chatCompressionProgress.totalToCompress),
                     chatCompressionProgress.totalToCompress
                 )
             }
 
             (activeTransferTotals == null || activeTransferTotals.totalBytes == 0L) -> {
+                progress = null
                 context.getString(R.string.download_preparing_files)
             }
 
             else -> {
+                progress = activeTransferTotals.transferProgress
                 val inProgress = activeTransferTotals.totalFinishedFileTransfers + 1
                 val totalTransfers = activeTransferTotals.totalFileTransfers
 
@@ -80,7 +86,7 @@ class DefaultChatUploadNotificationMapper @Inject constructor(
             setOnlyAlertOnce(true)
             setAutoCancel(false)
             setContentIntent(pendingIntent)
-            activeTransferTotals?.transferProgress?.let { setProgress(100, it.intValue, false) }
+            progress?.let { setProgress(100, it.intValue, false) }
         }
         return builder.build()
     }

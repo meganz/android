@@ -32,7 +32,7 @@ abstract class AbstractStartTransfersWithWorkerUseCase(
      * already downloaded, etc. but with a timeout to avoid showing it to far from the context.
      */
     internal fun startTransfersAndThenWorkerFlow(
-        doTransfers: () -> Flow<MultiTransferEvent>,
+        doTransfers: suspend () -> Flow<MultiTransferEvent>,
         startWorker: suspend () -> Unit,
     ) = channelFlow {
         var workerTriggered = false
@@ -58,6 +58,10 @@ abstract class AbstractStartTransfersWithWorkerUseCase(
                 }
 
                 return@transformWhile !workerStarted || singleTransferEvent?.allTransfersUpdated != true
+            }.onCompletion {
+                if (it == null && !workerTriggered) {
+                    startWorker()
+                }
             }.collect {
                 send(it)
             }

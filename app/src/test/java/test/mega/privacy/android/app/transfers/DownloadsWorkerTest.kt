@@ -27,6 +27,7 @@ import mega.privacy.android.data.mapper.transfer.DownloadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.worker.AbstractTransfersWorker
+import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.ON_TRANSFER_UPDATE_REFRESH_MILLIS
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.data.worker.ForegroundSetter
@@ -187,7 +188,8 @@ class DownloadsWorkerTest {
                 )
             underTest.doWork()
             inOrder.verify(correctActiveTransfersUseCase).invoke(TransferType.DOWNLOAD)
-            inOrder.verify(monitorOngoingActiveTransfersUntilFinishedUseCase).invoke(TransferType.DOWNLOAD)
+            inOrder.verify(monitorOngoingActiveTransfersUntilFinishedUseCase)
+                .invoke(TransferType.DOWNLOAD)
         }
 
 
@@ -277,7 +279,7 @@ class DownloadsWorkerTest {
         runTest {
             val initial: ActiveTransferTotals = mockActiveTransferTotals(true)
             whenever(initial.totalTransfers).thenReturn(1)
-            commonStub(initialTransferTotals = initial)
+            commonStub(initialTransferTotals = initial, transferTotals = emptyList())
             underTest.doWork()
             verify(transfersFinishedNotificationMapper).invoke(initial)
         }
@@ -345,16 +347,22 @@ class DownloadsWorkerTest {
     ) = runTest {
         val transfer: Transfer = mock()
         val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
-        whenever(getActiveTransferTotalsUseCase(TransferType.DOWNLOAD))
-            .thenReturn(initialTransferTotals)
         whenever(areTransfersPausedUseCase())
             .thenReturn(false)
         whenever(monitorTransferEventsUseCase())
             .thenReturn(flowOf(transferEvent))
         whenever(monitorOngoingActiveTransfersUntilFinishedUseCase(TransferType.DOWNLOAD))
             .thenReturn(flow {
-                delay(100)//to be sure that other events are received
+                emit(
+                    MonitorOngoingActiveTransfersResult(
+                        activeTransferTotals = initialTransferTotals,
+                        paused = false,
+                        transfersOverQuota = false,
+                        storageOverQuota = false
+                    )
+                )
                 transferTotals.forEach {
+                    delay(ON_TRANSFER_UPDATE_REFRESH_MILLIS) // events are sampled in the worker
                     emit(
                         MonitorOngoingActiveTransfersResult(
                             activeTransferTotals = it,
@@ -364,6 +372,7 @@ class DownloadsWorkerTest {
                         )
                     )
                 }
+                delay(ON_TRANSFER_UPDATE_REFRESH_MILLIS + 10) //to be sure the last event is received
             })
         whenever(areNotificationsEnabledUseCase()).thenReturn(true)
         whenever(workProgressUpdater.updateProgress(any(), any(), any()))

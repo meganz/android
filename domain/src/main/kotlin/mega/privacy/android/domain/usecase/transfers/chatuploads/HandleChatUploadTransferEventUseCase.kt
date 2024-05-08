@@ -32,7 +32,8 @@ class HandleChatUploadTransferEventUseCase @Inject constructor(
                 updatePendingMessageUseCase(
                     UpdatePendingMessageTransferTagRequest(
                         pendingMessageId,
-                        transferTag
+                        transferTag,
+                        PendingMessageState.UPLOADING
                     )
                 )
             }

@@ -12,15 +12,21 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.sample
+import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
@@ -29,7 +35,6 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 
@@ -40,11 +45,10 @@ import timber.log.Timber
 abstract class AbstractTransfersWorker(
     context: Context,
     workerParams: WorkerParameters,
-    private val type: TransferType,
+    protected val type: TransferType,
     private val ioDispatcher: CoroutineDispatcher,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val handleTransferEventUseCase: HandleTransferEventUseCase,
-    private val monitorOngoingActiveTransfersUntilFinishedUseCase: MonitorOngoingActiveTransfersUntilFinishedUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     private val overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -90,58 +94,75 @@ abstract class AbstractTransfersWorker(
      */
     open suspend fun onTransferEventReceived(event: TransferEvent) {}
 
+    /**
+     * @return a flow with updates of MonitorOngoingActiveTransfersResult to track the progress of the ongoing work. It will be sampled to avoid too much updates.
+     */
+    abstract fun monitorOngoingActiveTransfers(): Flow<MonitorOngoingActiveTransfersResult>
+
+    /**
+     * @return true if the work is completed, false otherwise
+     * Work usually is completed when all the transfers are completed but can be overridden
+     */
+    protected open fun hasCompleted(activeTransferTotals: ActiveTransferTotals) =
+        activeTransferTotals.hasCompleted()
+
+    @OptIn(FlowPreview::class)
     override suspend fun doWork() = withContext(ioDispatcher) {
         Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Started")
         crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Started")
         val monitorJob = monitorTransferEvents(this)
         correctActiveTransfersUseCase(type) //to be sure we haven't missed any event before monitoring them
-        val activeTransferTotals = getActiveTransferTotalsUseCase(type)
-        if (activeTransferTotals.hasCompleted()) {
-            Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} No transfers to monitor")
-            stopService(monitorJob)
-            if (activeTransferTotals.totalTransfers > 0) {
-                showFinishNotification(activeTransferTotals)
-            }
-            return@withContext Result.success()
-        }
-        // Signal to not kill the worker if the app is killed
-        val foregroundInfo = getForegroundInfo(activeTransferTotals, areTransfersPausedUseCase())
-        foregroundSetter?.setForeground(foregroundInfo) ?: run {
-            crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} start foreground")
-            setForeground(foregroundInfo)
-        }
-
         onStart()
-        monitorOngoingActiveTransfersUntilFinishedUseCase(type)
+        val lastMonitorOngoingActiveTransfersResult = monitorOngoingActiveTransfers()
             .catch { Timber.e("${this@AbstractTransfersWorker::class.java.simpleName}error: $it") }
+            .onFirst {
+                if (!hasCompleted(it.activeTransferTotals)) {
+                    // Signal to not kill the worker if the app is killed
+                    val foregroundInfo =
+                        getForegroundInfo(it.activeTransferTotals, areTransfersPausedUseCase())
+                    foregroundSetter?.setForeground(foregroundInfo) ?: run {
+                        crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} start foreground")
+                        setForeground(foregroundInfo)
+                    }
+                }
+            }
+            .sample(ON_TRANSFER_UPDATE_REFRESH_MILLIS)
             .onEach { (transferTotals, paused, _, _) ->
                 //set progress percent as worker progress
                 setProgress(workDataOf(PROGRESS to transferTotals.transferProgress.floatValue))
                 //update the notification
                 notify(createUpdateNotification(transferTotals, paused))
                 Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}${if (paused) "(paused) " else ""} Notification update (${transferTotals.transferProgress.intValue}):${transferTotals.hasOngoingTransfers()}")
-            }
-            .last().let { (lastActiveTransferTotals, _, transferOverQuota, storageOverQuota) ->
-                stopService(monitorJob)
-                if (lastActiveTransferTotals.hasCompleted()) {
-                    Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished Successful: $lastActiveTransferTotals")
-                    if (lastActiveTransferTotals.totalTransfers > 0) {
-                        showFinishNotification(lastActiveTransferTotals)
-                    }
-                    Result.success()
-                } else {
-                    if (storageOverQuota || transferOverQuota) {
-                        showOverQuotaNotification(storageOverQuota = storageOverQuota)
-                    } else {
-                        showFinishNotification(lastActiveTransferTotals)
-                    }
-                    Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}finished Failure: $lastActiveTransferTotals")
-                    Result.failure()//to retry in the future
+            }.lastOrNull()
+
+        stopService(monitorJob)
+        lastMonitorOngoingActiveTransfersResult?.let { (lastActiveTransferTotals, _, transferOverQuota, storageOverQuota) ->
+            if (hasCompleted(lastActiveTransferTotals)) {
+                Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished Successful: $lastActiveTransferTotals")
+                if (lastActiveTransferTotals.totalTransfers > 0) {
+                    showFinishNotification(lastActiveTransferTotals)
                 }
-            }.also {
-                crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
+                return@withContext Result.success()
+            } else {
+                if (storageOverQuota || transferOverQuota) {
+                    showOverQuotaNotification(storageOverQuota = storageOverQuota)
+                } else {
+                    showFinishNotification(lastActiveTransferTotals)
+                }
+                Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}finished Failure: $lastActiveTransferTotals")
+                return@withContext Result.failure() // To retry in the future
             }
+        }
+        return@withContext Result.success() // If there are no ongoing transfers it means no more work needed
+    }.also {
+        crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
     }
+
+    private fun <T> Flow<T>.onFirst(action: suspend (T) -> Unit): Flow<T> =
+        this.withIndex().transform { (index, value) ->
+            if (index == 0) action(value)
+            return@transform emit(value)
+        }
 
     override suspend fun getForegroundInfo() = getForegroundInfo(
         getActiveTransferTotalsUseCase(type),
@@ -175,7 +196,7 @@ abstract class AbstractTransfersWorker(
     }
 
     @SuppressLint("MissingPermission")
-    private suspend fun notify(notification: Notification) {
+    protected suspend fun notify(notification: Notification) {
         if (areNotificationsEnabledUseCase()) {
             notificationManager.notify(
                 updateNotificationId,
@@ -231,6 +252,7 @@ abstract class AbstractTransfersWorker(
          */
         const val PROGRESS = "Progress"
         private const val NOTIFICATION_STORAGE_OVERQUOTA = 14
+        const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 2000L
     }
 }
 

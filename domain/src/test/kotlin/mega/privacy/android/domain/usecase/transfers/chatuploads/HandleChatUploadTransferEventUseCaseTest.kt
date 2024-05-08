@@ -48,7 +48,11 @@ class HandleChatUploadTransferEventUseCaseTest {
         underTest(event, pendingMessageId)
 
         verify(updatePendingMessageUseCase).invoke(
-            UpdatePendingMessageTransferTagRequest(pendingMessageId, transferTag)
+            UpdatePendingMessageTransferTagRequest(
+                pendingMessageId,
+                transferTag,
+                PendingMessageState.UPLOADING
+            )
         )
     }
 

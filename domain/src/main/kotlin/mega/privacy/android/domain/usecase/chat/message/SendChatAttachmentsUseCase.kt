@@ -48,7 +48,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
                                 chatId = chatIds.first(),
                                 type = if (isVoiceClip) PendingMessage.TYPE_VOICE_CLIP else -1,
                                 uploadTimestamp = deviceCurrentTimeUseCase() / 1000,
-                                state = PendingMessageState.UPLOADING,
+                                state = PendingMessageState.PREPARING,
                                 tempIdKarere = -1,
                                 videoDownSampled = null,
                                 filePath = file.path,
