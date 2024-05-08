@@ -2,6 +2,7 @@ package mega.privacy.android.feature.devicecenter.ui.model
 
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
 /**
@@ -24,6 +25,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property filteredUiItems The list of [DeviceCenterUINode] objects that are filtered based on the search query
  * @property searchWidgetState The state of the search widget
  * @property infoSelectedItem The item selected to show its Info
+ * @property enabledFlags Enabled flags
  */
 data class DeviceCenterUiState(
     val devices: List<DeviceCenterUINode> = emptyList(),
@@ -39,6 +41,7 @@ data class DeviceCenterUiState(
     val filteredUiItems: List<DeviceCenterUINode>? = null,
     val searchWidgetState: SearchWidgetState = SearchWidgetState.COLLAPSED,
     val infoSelectedItem: DeviceCenterUINode? = null,
+    val enabledFlags: Set<Feature> = emptySet(),
 ) {
     val itemsToDisplay: List<DeviceCenterUINode> = selectedDevice?.folders ?: devices
 }

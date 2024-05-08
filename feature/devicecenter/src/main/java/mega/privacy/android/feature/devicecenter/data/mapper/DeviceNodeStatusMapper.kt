@@ -33,6 +33,7 @@ internal class DeviceNodeStatusMapper @Inject constructor() {
      * @param isCameraUploadsEnabled true if Camera Uploads is enabled on the User's Current Device,
      * and false if otherwise
      * @param isCurrentDevice true if the Device is the User's Current Device, and false if otherwise
+     * @param isSyncIntegrationFeatureFlagEnabled True if Sync integration into Device Center feature flag is enabled. False otherwise
      *
      * @return the appropriate [DeviceCenterNodeStatus] for the Device
      */
@@ -40,10 +41,19 @@ internal class DeviceNodeStatusMapper @Inject constructor() {
         folders: List<DeviceFolderNode>,
         isCameraUploadsEnabled: Boolean,
         isCurrentDevice: Boolean,
-    ) = if (isCurrentDevice && isCameraUploadsEnabled.not()) {
-        DeviceCenterNodeStatus.NoCameraUploads
+        isSyncIntegrationFeatureFlagEnabled: Boolean,
+    ) = if (isSyncIntegrationFeatureFlagEnabled) {
+        if (isCurrentDevice && folders.isEmpty()) {
+            DeviceCenterNodeStatus.NothingSetUp
+        } else {
+            folders.calculateDeviceStatus()
+        }
     } else {
-        folders.calculateDeviceStatus()
+        if (isCurrentDevice && isCameraUploadsEnabled.not()) {
+            DeviceCenterNodeStatus.NoCameraUploads
+        } else {
+            folders.calculateDeviceStatus()
+        }
     }
 
     /**

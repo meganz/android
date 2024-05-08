@@ -112,10 +112,21 @@ internal class DeviceCenterUINodeStatusMapperTest {
     }
 
     private fun provideParameters() = Stream.of(
+        Arguments.of(DeviceCenterNodeStatus.Unknown, DeviceCenterUINodeStatus.Unknown),
         Arguments.of(DeviceCenterNodeStatus.Stopped, DeviceCenterUINodeStatus.Stopped),
         Arguments.of(DeviceCenterNodeStatus.Disabled, DeviceCenterUINodeStatus.Disabled),
         Arguments.of(DeviceCenterNodeStatus.Offline, DeviceCenterUINodeStatus.Offline),
         Arguments.of(DeviceCenterNodeStatus.UpToDate, DeviceCenterUINodeStatus.UpToDate),
+        Arguments.of(
+            DeviceCenterNodeStatus.Stalled,
+            DeviceCenterUINodeStatus.Blocked(null),
+        ),
+        Arguments.of(DeviceCenterNodeStatus.Error(null), DeviceCenterUINodeStatus.Error(null)),
+        Arguments.of(DeviceCenterNodeStatus.Blocked(null), DeviceCenterUINodeStatus.Blocked(null)),
+        Arguments.of(
+            DeviceCenterNodeStatus.Overquota(null),
+            DeviceCenterUINodeStatus.Overquota(null)
+        ),
         Arguments.of(DeviceCenterNodeStatus.Paused, DeviceCenterUINodeStatus.Paused),
         Arguments.of(DeviceCenterNodeStatus.Initializing, DeviceCenterUINodeStatus.Initializing),
         Arguments.of(DeviceCenterNodeStatus.Scanning, DeviceCenterUINodeStatus.Scanning),
@@ -131,10 +142,7 @@ internal class DeviceCenterUINodeStatusMapperTest {
             DeviceCenterNodeStatus.NoCameraUploads,
             DeviceCenterUINodeStatus.CameraUploadsDisabled,
         ),
-        Arguments.of(
-            DeviceCenterNodeStatus.Stalled,
-            DeviceCenterUINodeStatus.Blocked(null),
-        ),
+        Arguments.of(DeviceCenterNodeStatus.NothingSetUp, DeviceCenterUINodeStatus.NothingSetUp),
     )
 
     @Test

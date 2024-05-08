@@ -35,6 +35,8 @@ import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.status.MegaStatusIndicator
 import mega.privacy.android.core.ui.controls.status.StatusColor
+import mega.privacy.android.core.ui.controls.status.getStatusIconColor
+import mega.privacy.android.core.ui.controls.status.getStatusTextColor
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -280,8 +282,8 @@ private fun SyncCardFooter(
                     modifier = Modifier.padding(end = 8.dp),
                     onClick = issuesInfoClicked,
                     icon = coreR.drawable.ic_info,
-                    iconColor = MaterialTheme.colors.error,
-                    textColor = MaterialTheme.colors.error,
+                    iconColor = StatusColor.Error.getStatusIconColor(),
+                    textColor = StatusColor.Error.getStatusTextColor(),
                     text = stringResource(id = R.string.sync_card_sync_issues_info)
                 )
             }

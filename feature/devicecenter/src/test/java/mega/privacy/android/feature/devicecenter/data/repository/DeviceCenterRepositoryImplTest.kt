@@ -67,6 +67,7 @@ internal class DeviceCenterRepositoryImplTest {
                     currentDeviceId = currentDeviceId,
                     deviceIdAndNameMap = deviceIdAndNameMap,
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
+                    isSyncIntegrationFeatureFlagEnabled = false,
                 )
             ).thenReturn(deviceNodes)
             assertThat(
@@ -75,6 +76,7 @@ internal class DeviceCenterRepositoryImplTest {
                     currentDeviceId = currentDeviceId,
                     deviceIdAndNameMap = deviceIdAndNameMap,
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
+                    isSyncIntegrationFeatureFlagEnabled = false,
                 )
             ).isEqualTo(deviceNodes)
         }

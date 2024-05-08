@@ -27,6 +27,7 @@ internal const val BOTTOM_SHEET_BODY_OWN_DEVICE =
  * @param onCameraUploadsClicked Lambda that is executed when the "Camera uploads" Tile is selected
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
+ * @param isSyncIntegrationFeatureFlagEnabled True if Sync integration into Device Center feature flag is enabled. False otherwise
  */
 @Composable
 internal fun OwnDeviceBottomSheetBody(
@@ -34,15 +35,18 @@ internal fun OwnDeviceBottomSheetBody(
     onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: () -> Unit,
     onInfoClicked: () -> Unit,
+    isSyncIntegrationFeatureFlagEnabled: Boolean = false,
 ) {
     Column(modifier = Modifier.testTag(BOTTOM_SHEET_BODY_OWN_DEVICE)) {
         if (isCameraUploadsEnabled) {
             InfoBottomSheetTile(onActionClicked = onInfoClicked)
         }
-        CameraUploadsBottomSheetTile(
-            isCameraUploadsEnabled = isCameraUploadsEnabled,
-            onActionClicked = onCameraUploadsClicked,
-        )
+        if (!isSyncIntegrationFeatureFlagEnabled) {
+            CameraUploadsBottomSheetTile(
+                isCameraUploadsEnabled = isCameraUploadsEnabled,
+                onActionClicked = onCameraUploadsClicked,
+            )
+        }
         RenameDeviceBottomSheetTile(onActionClicked = onRenameDeviceClicked)
     }
 }

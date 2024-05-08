@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,7 @@ import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.CardExpanded
 import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun SyncFoldersScreen(
@@ -84,51 +86,55 @@ internal fun SyncFoldersScreen(
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenSyncingPreview() {
-    SyncFoldersScreen(
-        listOf(
-            SyncUiItem(
-                id = 1,
-                folderPairName = "Folder pair name",
-                status = SyncStatus.SYNCING,
-                hasStalledIssues = false,
-                deviceStoragePath = "/path/to/local/folder",
-                megaStoragePath = "/path/to/mega/folder",
-                megaStorageNodeId = NodeId(1234L),
-                method = R.string.sync_two_way,
-                expanded = false,
-            )
-        ),
-        cardExpanded = {},
-        pauseRunClicked = {},
-        removeFolderClicked = {},
-        addFolderClicked = {},
-        issuesInfoClicked = {},
-        isLowBatteryLevel = false,
-    )
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        SyncFoldersScreen(
+            listOf(
+                SyncUiItem(
+                    id = 1,
+                    folderPairName = "Folder pair name",
+                    status = SyncStatus.SYNCING,
+                    hasStalledIssues = false,
+                    deviceStoragePath = "/path/to/local/folder",
+                    megaStoragePath = "/path/to/mega/folder",
+                    megaStorageNodeId = NodeId(1234L),
+                    method = R.string.sync_two_way,
+                    expanded = false,
+                )
+            ),
+            cardExpanded = {},
+            pauseRunClicked = {},
+            removeFolderClicked = {},
+            addFolderClicked = {},
+            issuesInfoClicked = {},
+            isLowBatteryLevel = false,
+        )
+    }
 }
 
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenSyncingWithStalledIssuesPreview() {
-    SyncFoldersScreen(
-        listOf(
-            SyncUiItem(
-                id = 1,
-                folderPairName = "Folder pair name",
-                status = SyncStatus.SYNCING,
-                hasStalledIssues = true,
-                deviceStoragePath = "/path/to/local/folder",
-                megaStoragePath = "/path/to/mega/folder",
-                megaStorageNodeId = NodeId(1234L),
-                method = R.string.sync_two_way,
-                expanded = false
-            )
-        ),
-        cardExpanded = {},
-        pauseRunClicked = {},
-        removeFolderClicked = {},
-        addFolderClicked = {},
-        issuesInfoClicked = {},
-        isLowBatteryLevel = false,
-    )
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        SyncFoldersScreen(
+            listOf(
+                SyncUiItem(
+                    id = 1,
+                    folderPairName = "Folder pair name",
+                    status = SyncStatus.SYNCING,
+                    hasStalledIssues = true,
+                    deviceStoragePath = "/path/to/local/folder",
+                    megaStoragePath = "/path/to/mega/folder",
+                    megaStorageNodeId = NodeId(1234L),
+                    method = R.string.sync_two_way,
+                    expanded = false
+                )
+            ),
+            cardExpanded = {},
+            pauseRunClicked = {},
+            removeFolderClicked = {},
+            addFolderClicked = {},
+            issuesInfoClicked = {},
+            isLowBatteryLevel = false,
+        )
+    }
 }

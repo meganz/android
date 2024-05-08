@@ -60,6 +60,8 @@ internal class DeviceCenterUINodeStatusMapper @Inject constructor(
 
         DeviceCenterNodeStatus.Stalled -> DeviceCenterUINodeStatus.Blocked(null)
 
+        DeviceCenterNodeStatus.NothingSetUp -> DeviceCenterUINodeStatus.NothingSetUp
+
         else -> DeviceCenterUINodeStatus.Unknown
     }
 }

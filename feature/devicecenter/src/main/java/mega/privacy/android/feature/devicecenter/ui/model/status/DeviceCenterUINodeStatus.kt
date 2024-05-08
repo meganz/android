@@ -3,6 +3,7 @@ package mega.privacy.android.feature.devicecenter.ui.model.status
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.feature.devicecenter.R as DeviceCenterR
+import mega.privacy.android.shared.resources.R as SharedR
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import mega.privacy.android.core.ui.controls.status.StatusColor
@@ -30,7 +31,7 @@ sealed class DeviceCenterUINodeStatus(
     data object Unknown : DeviceCenterUINodeStatus(
         name = R.string.device_center_list_view_item_status_unknown_status,
         localizedErrorMessage = null,
-        icon =iconPackR.drawable.ic_help_circle_medium_regular_outline,
+        icon = iconPackR.drawable.ic_help_circle_medium_regular_outline,
         color = null,
     )
 
@@ -94,6 +95,16 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = CoreR.drawable.ic_info,
         color = StatusColor.Warning,
+    )
+
+    /**
+     * Represents a Nothing Set Up Status
+     */
+    data object NothingSetUp : DeviceCenterUINodeStatus(
+        name = SharedR.string.device_center_list_view_item_status_nothing_setup,
+        localizedErrorMessage = null,
+        icon = CoreR.drawable.ic_info,
+        color = null,
     )
 
     /**

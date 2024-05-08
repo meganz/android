@@ -284,4 +284,6 @@
     <string name="sync_error_storage_over_quota_banner_action">Upgrade</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
     <string name="camera_uploads_phone_not_charging_message">Upload paused, phone is not charging</string>
+    <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
+    <string name="device_center_list_view_item_status_nothing_setup">Nothing is set up</string>
 </resources>

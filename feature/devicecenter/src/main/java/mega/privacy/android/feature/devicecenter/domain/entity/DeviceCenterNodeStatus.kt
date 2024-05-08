@@ -87,7 +87,12 @@ sealed class DeviceCenterNodeStatus(val priority: Int) {
 
     /**
      * The Device is found to have its Camera Uploads disabled. This is only applicable for the
-     * User's Current Device, and has the highest priority amongst all Device Statuses
+     * User's Current Device
      */
     data object NoCameraUploads : DeviceCenterNodeStatus(13)
+
+    /**
+     * The Device has nothing set up yet
+     */
+    data object NothingSetUp : DeviceCenterNodeStatus(14)
 }

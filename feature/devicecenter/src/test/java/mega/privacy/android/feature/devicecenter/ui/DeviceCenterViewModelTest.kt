@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
@@ -48,6 +49,10 @@ internal class DeviceCenterViewModelTest {
         onBlocking { invoke() } doReturn emptyFlow()
     }
 
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock {
+        onBlocking { invoke(any()) } doReturn false
+    }
+
     private val isCameraUploadsEnabled = true
     private val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
         id = "ABCD-EFGH",
@@ -77,12 +82,18 @@ internal class DeviceCenterViewModelTest {
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             deviceUINodeListMapper = deviceUINodeListMapper,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
     private suspend fun setupDefaultMocks() {
         whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
-        whenever(getDevicesUseCase(any())).thenReturn(listOf(mock<OwnDeviceNode>()))
+        whenever(
+            getDevicesUseCase(
+                isCameraUploadsEnabled = any(),
+                isSyncIntegrationFeatureFlagEnabled = any()
+            )
+        ).thenReturn(listOf(mock<OwnDeviceNode>()))
         whenever(deviceUINodeListMapper(any())).thenReturn(listOf(ownDeviceUINode))
     }
 
@@ -369,7 +380,12 @@ internal class DeviceCenterViewModelTest {
             thirdItem
         )
         whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(getDevicesUseCase(false)).thenReturn(deviceEntities)
+        whenever(
+            getDevicesUseCase(
+                isCameraUploadsEnabled = false,
+                isSyncIntegrationFeatureFlagEnabled = false
+            )
+        ).thenReturn(deviceEntities)
         whenever(deviceUINodeListMapper(deviceEntities)).thenReturn(itemsToDisplay)
 
         underTest.getBackupInfo()
@@ -402,7 +418,12 @@ internal class DeviceCenterViewModelTest {
                 thirdItem
             )
             whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-            whenever(getDevicesUseCase(false)).thenReturn(deviceEntities)
+            whenever(
+                getDevicesUseCase(
+                    isCameraUploadsEnabled = false,
+                    isSyncIntegrationFeatureFlagEnabled = false
+                )
+            ).thenReturn(deviceEntities)
             whenever(deviceUINodeListMapper(deviceEntities)).thenReturn(itemsToDisplay)
 
             underTest.getBackupInfo()

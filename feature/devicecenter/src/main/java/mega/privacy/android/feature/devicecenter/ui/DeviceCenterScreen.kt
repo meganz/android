@@ -65,6 +65,7 @@ import mega.privacy.android.feature.devicecenter.ui.renamedevice.RenameDeviceDia
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
@@ -167,7 +168,8 @@ internal fun DeviceCenterScreen(
                 onInfoClicked = onInfoOptionClicked,
                 onBottomSheetDismissed = {
                     coroutineScope.launch { modalSheetState.hide() }
-                }
+                },
+                isSyncIntegrationFeatureFlagEnabled = uiState.enabledFlags.contains(SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter)
             )
         },
         content = {
@@ -301,7 +303,9 @@ private fun DeviceCenterAppBar(
                         if (uiState.isCameraUploadsEnabled) {
                             list.add(DeviceMenuAction.Info)
                         }
-                        list.add(DeviceMenuAction.CameraUploads)
+                        if (!uiState.enabledFlags.contains(SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter)) {
+                            list.add(DeviceMenuAction.CameraUploads)
+                        }
                     }
 
                     else -> list.add(DeviceMenuAction.Info)
