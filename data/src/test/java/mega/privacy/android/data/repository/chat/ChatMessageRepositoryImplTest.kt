@@ -21,6 +21,7 @@ import mega.privacy.android.data.mapper.chat.messages.PendingMessageMapper
 import mega.privacy.android.data.mapper.chat.paging.TypedMessagePagingSourceMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
@@ -571,4 +572,47 @@ class ChatMessageRepositoryImplTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that clearPendingMessagesCompressionProgress clears the flow`() =
+        runTest {
+            underTest.clearPendingMessagesCompressionProgress() // to be sure we start with an empty flow
+
+            val pendingMessage = mock<PendingMessage> {
+                on { this.state } doReturn PendingMessageState.COMPRESSING.value
+                on { this.id } doReturn 15L
+            }
+
+            underTest.monitorPendingMessagesCompressionProgress().test {
+                assertThat(awaitItem()).isEmpty()
+                underTest.updatePendingMessagesCompressionProgress(
+                    Progress(0.5f),
+                    listOf(pendingMessage)
+                )
+                assertThat(awaitItem()).isNotEmpty()
+                underTest.clearPendingMessagesCompressionProgress()
+                assertThat(awaitItem()).isEmpty()
+            }
+        }
+
+    fun `test that updatePendingMessagesCompressionProgress emits a new flow value with the new updated progress`() =
+        runTest {
+            underTest.clearPendingMessagesCompressionProgress() // to be sure we start with an empty flow
+
+            val expected = Progress(0.5f)
+            val id = 15L
+            val pendingMessage = mock<PendingMessage> {
+                on { this.state } doReturn PendingMessageState.COMPRESSING.value
+                on { this.id } doReturn id
+            }
+
+
+            underTest.monitorPendingMessagesCompressionProgress().test {
+                assertThat(awaitItem()).isEmpty()
+                underTest.updatePendingMessagesCompressionProgress(expected, listOf(pendingMessage))
+                assertThat(awaitItem()[id]).isEqualTo(expected)
+            }
+
+            underTest.clearPendingMessagesCompressionProgress() // to don't affect next tests
+        }
 }

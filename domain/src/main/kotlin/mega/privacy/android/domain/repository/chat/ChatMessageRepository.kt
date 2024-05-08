@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository.chat
 
 import androidx.paging.PagingSource
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
@@ -554,4 +555,11 @@ interface ChatMessageRepository {
      * Clear all data from chat database
      */
     suspend fun clearAllData()
+
+    fun updatePendingMessagesCompressionProgress(progress: Progress, pendingMessages: List<PendingMessage>)
+
+    fun monitorPendingMessagesCompressionProgress(): Flow<Map<Long, Progress>>
+
+    fun clearPendingMessagesCompressionProgress()
+
 }
