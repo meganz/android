@@ -848,7 +848,7 @@ class DefaultAccountRepositoryTest {
                 userCredentialsMapper("test@mega.nz", "AFasdffW456sdfg", null, null, "1536456")
 
             underTest.saveAccountCredentials()
-            verify(localStorageGateway).saveCredentials(credentials)
+            verify(credentialsPreferencesGateway).save(credentials)
             verify(ephemeralCredentialsGateway).clear()
         }
 
@@ -967,7 +967,7 @@ class DefaultAccountRepositoryTest {
     fun `test that MegaLocalStorageGateway is invoked for clearing account preferences`() =
         runTest {
             underTest.clearAccountPreferences()
-            verify(localStorageGateway).clearCredentials()
+            verify(credentialsPreferencesGateway).clear()
             verify(localStorageGateway).clearPreferences()
             verify(localStorageGateway).setFirstTime(false)
             verify(megaLocalRoomGateway).clearOffline()

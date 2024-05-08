@@ -147,8 +147,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     val progressBar
         get() = binding.pdfViewerProgressBar
 
-    private var credentials: UserCredentials? = null
-    private var lastEmail: String? = null
     private var isUrl = false
     private var defaultScrollHandle: DefaultScrollHandle? = null
     private var uri: Uri? = null
@@ -1665,16 +1663,17 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish")
-        val gSession: String?
         if (request.type == MegaRequest.TYPE_LOGIN) {
             if (e.errorCode != MegaError.API_OK) {
                 Timber.w("Login failed with error code: ${e.errorCode}")
             } else {
                 //LOGIN OK
-                gSession = megaApi.dumpSession()
-                UserCredentials(lastEmail, gSession, "", "", "").apply {
-                    credentials = this
-                    dbH.saveCredentials(this)
+                lifecycleScope.launch {
+                    runCatching {
+                        saveAccountCredentialsUseCase()
+                    }.onFailure {
+                        Timber.e(it)
+                    }
                 }
                 Timber.d("Logged in with session")
                 Timber.d("Setting account auth token for folder links.")
@@ -1686,16 +1685,12 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             }
         } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
             if (e.errorCode == MegaError.API_OK) {
-                gSession = megaApi.dumpSession()
-                val myUser = megaApi.myUser
-                var myUserHandle = ""
-                if (myUser != null) {
-                    lastEmail = megaApi.myUser?.email
-                    myUserHandle = megaApi.myUser?.handle.toString() + ""
-                }
-                UserCredentials(lastEmail, gSession, "", "", myUserHandle).apply {
-                    credentials = this
-                    dbH.saveCredentials(this)
+                lifecycleScope.launch {
+                    runCatching {
+                        saveAccountCredentialsUseCase()
+                    }.onFailure {
+                        Timber.e(it)
+                    }
                 }
                 download()
             }

@@ -379,7 +379,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     fun cancelConfirmationAccount() {
         Timber.d("cancelConfirmationAccount")
         viewModel.clearEphemeral()
-        dbH.clearCredentials()
+        viewModel.clearUserCredentials()
         cancelledConfirmationProcess = true
         passwdTemp = null
         emailTemp = null

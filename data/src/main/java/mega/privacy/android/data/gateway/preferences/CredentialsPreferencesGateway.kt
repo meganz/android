@@ -30,6 +30,13 @@ internal interface CredentialsPreferencesGateway {
     suspend fun saveLastName(lastName: String)
 
     /**
+     * Save email
+     *
+     * @param email
+     */
+    suspend fun saveEmail(email: String)
+
+    /**
      * Clear
      *
      */

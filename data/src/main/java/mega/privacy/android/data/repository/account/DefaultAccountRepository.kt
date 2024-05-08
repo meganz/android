@@ -531,12 +531,12 @@ internal class DefaultAccountRepository @Inject constructor(
             if (forceRefresh) {
                 return@withContext megaApiGateway.accountEmail
                     .also {
-                        if (it.isNullOrBlank().not()) {
-                            dbHandler.saveMyEmail(it)
+                        if (!it.isNullOrBlank()) {
+                            credentialsPreferencesGateway.saveEmail(it)
                         }
                     }
             }
-            return@withContext dbHandler.myEmail
+            return@withContext getAccountCredentials()?.email
         }
     }
 
@@ -584,7 +584,6 @@ internal class DefaultAccountRepository @Inject constructor(
 
         val session = megaApiGateway.dumpSession
         val credentials = userCredentialsMapper(email, session, null, null, myUserHandle.toString())
-        localStorageGateway.saveCredentials(credentials)
         credentialsPreferencesGateway.save(credentials)
         ephemeralCredentialsGateway.clear()
 
@@ -664,7 +663,6 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun clearAccountPreferences() = withContext(ioDispatcher) {
         with(localStorageGateway) {
-            clearCredentials()
             clearPreferences()
             setFirstTime(false)
             clearContacts()
@@ -673,6 +671,7 @@ internal class DefaultAccountRepository @Inject constructor(
             clearAttributes()
             clearChatSettings()
         }
+        credentialsPreferencesGateway.clear()
         megaLocalRoomGateway.deleteAllBackups()
         megaLocalRoomGateway.deleteAllCompletedTransfers()
         megaLocalRoomGateway.clearOffline()

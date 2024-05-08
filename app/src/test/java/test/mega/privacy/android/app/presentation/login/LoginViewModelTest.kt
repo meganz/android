@@ -23,6 +23,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
@@ -108,6 +109,7 @@ internal class LoginViewModelTest {
     private val clearLastRegisteredEmailUseCase = mock<ClearLastRegisteredEmailUseCase>()
     private val installReferrerHandler = mock<InstallReferrerHandler>()
     private val transfersManagement = mock<TransfersManagement>()
+    private val clearUserCredentialsUseCase = mock<ClearUserCredentialsUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -148,6 +150,7 @@ internal class LoginViewModelTest {
             installReferrerHandler = installReferrerHandler,
             transfersManagement = transfersManagement,
             createSupportTicketEmailUseCase = mock(),
+            clearUserCredentialsUseCase = clearUserCredentialsUseCase
         )
     }
 
@@ -359,6 +362,13 @@ internal class LoginViewModelTest {
             assertThat(analyticsExtension.events).isEmpty()
             verifyNoInteractions(installReferrerHandler, clearLastRegisteredEmailUseCase)
         }
+
+    @Test
+    fun `test that clear user credentials invoke correctly`() = runTest {
+        underTest.clearUserCredentials()
+        advanceUntilIdle()
+        verify(clearUserCredentialsUseCase).invoke()
+    }
 
     companion object {
         private val scheduler = TestCoroutineScheduler()

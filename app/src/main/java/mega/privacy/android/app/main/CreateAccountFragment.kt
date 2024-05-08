@@ -401,7 +401,7 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
 
     private fun submitForm() {
         Timber.d("submit form!")
-        dbH.clearCredentials()
+        viewModel.clearUserCredentials()
 
         if (!validateForm()) {
             return

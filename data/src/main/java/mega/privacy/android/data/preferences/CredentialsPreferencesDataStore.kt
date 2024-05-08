@@ -40,6 +40,12 @@ internal class CredentialsPreferencesDataStore @Inject constructor(
         }
     }
 
+    override suspend fun saveEmail(email: String) {
+        dataStore.edit {
+            it[emailKey] = email
+        }
+    }
+
     override suspend fun clear() {
         dataStore.edit {
             it.clear()

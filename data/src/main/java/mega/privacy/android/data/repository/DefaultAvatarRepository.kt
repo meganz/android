@@ -128,7 +128,7 @@ internal class DefaultAvatarRepository @Inject constructor(
                     return@withContext loadAvatarFile(it)
                 }
             }
-            return@withContext cacheGateway.buildAvatarFile(databaseHandler.myEmail + FileConstant.JPG_EXTENSION)
+            return@withContext cacheGateway.buildAvatarFile(megaApiGateway.accountEmail.orEmpty() + FileConstant.JPG_EXTENSION)
         }
 
     override suspend fun getAvatarFile(userHandle: Long, skipCache: Boolean): File =

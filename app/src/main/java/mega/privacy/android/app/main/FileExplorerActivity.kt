@@ -197,9 +197,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     private var newChatMenuItem: MenuItem? = null
     private var searchMenuItem: MenuItem? = null
     private var fragmentHandle: Long = -1
-    private var gSession: String? = null
     private var credentials: UserCredentials? = null
-    private var lastEmail: String? = null
     private var moveFromHandles: LongArray? = null
     private var copyFromHandles: LongArray? = null
     private var importChatHandles: LongArray? = null
@@ -598,7 +596,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     fileLoginPrepareNodesText.isVisible = false
                 }
 
-                gSession = credentials?.session
+                val gSession = credentials?.session
                 lifecycleScope.launch {
                     loginMutex.lock()
                     ChatUtil.initMegaChatApi(gSession, this@FileExplorerActivity)
@@ -2112,10 +2110,13 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     fileLoginFetchNodesText.isVisible = true
                     fileLoginPrepareNodesText.isVisible = false
                 }
-
-                gSession = megaApi.dumpSession()
-                credentials = UserCredentials(lastEmail, gSession, "", "", "")
-                dbH.saveCredentials(credentials ?: return)
+                lifecycleScope.launch {
+                    runCatching {
+                        saveAccountCredentialsUseCase()
+                    }.onFailure {
+                        Timber.e(it)
+                    }
+                }
                 Timber.d("Logged in with session")
                 Timber.d("Setting account auth token for folder links.")
                 megaApiFolder.accountAuth = megaApi.accountAuth
@@ -2126,17 +2127,13 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             }
         } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
             if (error.errorCode == MegaError.API_OK) {
-                gSession = megaApi.dumpSession()
-                val myUser = megaApi.myUser
-                var myUserHandle = ""
-
-                if (myUser != null) {
-                    lastEmail = megaApi.myUser?.email
-                    myUserHandle = megaApi.myUser?.handle.toString() + ""
+                lifecycleScope.launch {
+                    runCatching {
+                        saveAccountCredentialsUseCase()
+                    }.onFailure {
+                        Timber.e(it)
+                    }
                 }
-
-                credentials = UserCredentials(lastEmail, gSession, "", "", myUserHandle)
-                dbH.saveCredentials(credentials ?: return)
                 binding.fileLoggingInLayout.isVisible = false
                 afterLoginAndFetch()
                 runCatching { loginMutex.unlock() }

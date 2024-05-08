@@ -241,7 +241,7 @@ internal class DefaultAvatarRepositoryTest {
     @Test
     fun `test that getMyAvatarFile from the cache when pass isForceRefresh as false`() = runTest {
         val email = "my_email"
-        whenever(databaseHandler.myEmail).thenReturn(email)
+        whenever(megaApiGateway.accountEmail).thenReturn(email)
         underTest.getMyAvatarFile(isForceRefresh = false)
         verify(megaApiGateway, times(0)).myUser
         val error = mock<MegaError> {

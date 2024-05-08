@@ -55,6 +55,7 @@ import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
@@ -134,6 +135,7 @@ class LoginViewModel @Inject constructor(
     private val createSupportTicketEmailUseCase: CreateSupportTicketEmailUseCase,
     @LoginMutex private val loginMutex: Mutex,
     private val transfersManagement: TransfersManagement,
+    private val clearUserCredentialsUseCase: ClearUserCredentialsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -901,6 +903,10 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Clear ephemeral
+     *
+     */
     fun clearEphemeral() {
         viewModelScope.launch {
             runCatching { clearEphemeralCredentialsUseCase() }
@@ -948,6 +954,16 @@ class LoginViewModel @Inject constructor(
             val ticket =
                 createSupportTicketEmailUseCase(title)
             sendEmail(ticket)
+        }
+    }
+
+    /**
+     * Clear user credentials
+     *
+     */
+    fun clearUserCredentials() {
+        viewModelScope.launch {
+            clearUserCredentialsUseCase()
         }
     }
 
