@@ -284,7 +284,11 @@ private suspend fun openUrlFile(
         val intent = Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(it)
         }
-        context.startActivity(intent)
+        safeLaunchActivity(
+            context = context,
+            intent = intent,
+            snackBarHostState = snackBarHostState
+        )
     } ?: run {
         snackBarHostState?.showSnackbar(message = context.getString(R.string.general_text_error))
     }
@@ -310,12 +314,11 @@ private suspend fun Intent.openShareIntent(
     if (resolveActivity(context.packageManager) == null) {
         action = Intent.ACTION_SEND
     }
-    runCatching {
-        context.startActivity(this)
-    }.onFailure { error ->
-        Timber.e(error)
-        snackBarHostState?.showSnackbar(context.getString(R.string.intent_not_available))
-    }
+    safeLaunchActivity(
+        context = context,
+        intent = this,
+        snackBarHostState = snackBarHostState
+    )
 }
 
 private suspend fun openZipFile(
