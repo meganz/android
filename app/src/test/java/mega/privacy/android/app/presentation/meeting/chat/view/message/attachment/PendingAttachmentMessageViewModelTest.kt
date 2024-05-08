@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMes
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.transfers.chatuploads.MonitorPendingMessageTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.MonitorPendingMessagesCompressionProgressUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -43,6 +45,8 @@ class PendingAttachmentMessageViewModelTest {
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val fileTypeIconMapper = FileTypeIconMapper()
+    private val monitorPendingMessagesCompressionProgressUseCase =
+        mock<MonitorPendingMessagesCompressionProgressUseCase>()
 
     @BeforeEach
     internal fun resetMocks() {
@@ -56,6 +60,7 @@ class PendingAttachmentMessageViewModelTest {
 
     private fun commonStub() {
         whenever(monitorPendingMessageTransferEventsUseCase()) doReturn emptyFlow()
+        whenever(monitorPendingMessagesCompressionProgressUseCase()) doReturn emptyFlow()
         whenever(monitorPausedTransfersUseCase()) doReturn emptyFlow()
         whenever(fileSizeStringMapper(any())).thenReturn("1 byte")
     }
@@ -150,6 +155,7 @@ class PendingAttachmentMessageViewModelTest {
     @Test
     fun `test that error state is updated when a new attachment message with error is received`() =
         runTest {
+            setup(emptyFlow())
             underTest.updateAndGetUiStateFlow(stubMessage()).test {
                 assertThat(awaitItem().isError).isFalse()
             }
@@ -157,6 +163,21 @@ class PendingAttachmentMessageViewModelTest {
                 assertThat(awaitItem().isError).isTrue()
             }
         }
+
+    @Test
+    fun `test that pending messages compression progress is updated`() = runTest {
+        val message = stubMessage()
+        val compressionProgressFlow = MutableStateFlow<Map<Long, Progress>>(emptyMap())
+        whenever(monitorPendingMessagesCompressionProgressUseCase()) doReturn compressionProgressFlow
+        val expected = Progress(0.5f)
+        setup(emptyFlow())
+
+        underTest.updateAndGetUiStateFlow(message).test {
+            assertThat(awaitItem().compressionProgress).isNull()
+            compressionProgressFlow.emit(mapOf(message.msgId to expected))
+            assertThat(awaitItem().compressionProgress).isEqualTo(expected)
+        }
+    }
 
     internal fun setup(transferEvents: Flow<Pair<List<Long>, Transfer>>) = runTest {
         whenever(monitorPendingMessageTransferEventsUseCase()) doReturn transferEvents
@@ -166,7 +187,8 @@ class PendingAttachmentMessageViewModelTest {
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             fileSizeStringMapper = fileSizeStringMapper,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
-            fileTypeIconMapper = fileTypeIconMapper
+            fileTypeIconMapper = fileTypeIconMapper,
+            monitorPendingMessagesCompressionProgressUseCase = monitorPendingMessagesCompressionProgressUseCase
         )
     }
 

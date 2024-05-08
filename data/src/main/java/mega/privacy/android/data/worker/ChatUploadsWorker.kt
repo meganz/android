@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
@@ -37,6 +38,7 @@ import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfe
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.ClearPendingMessagesCompressionProgressUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 
@@ -64,6 +66,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     private val checkFinishedChatUploadsUseCase: CheckFinishedChatUploadsUseCase,
     private val compressAndUploadAllPendingMessagesUseCase: CompressAndUploadAllPendingMessagesUseCase,
     private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
+    private val clearPendingMessagesCompressionProgressUseCase: ClearPendingMessagesCompressionProgressUseCase,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
 ) : AbstractTransfersWorker(
@@ -108,6 +111,8 @@ class ChatUploadsWorker @AssistedInject constructor(
             chatCompressionProgress.value = progress
             //keep monitoring if and only if there are compressions or transfers in progress
             return@transformWhile progress != ChatCompressionFinished || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota && !ongoingActiveTransfersResult.storageOverQuota)
+        }.onCompletion {
+            clearPendingMessagesCompressionProgressUseCase()
         }
 
     override fun hasCompleted(activeTransferTotals: ActiveTransferTotals): Boolean {

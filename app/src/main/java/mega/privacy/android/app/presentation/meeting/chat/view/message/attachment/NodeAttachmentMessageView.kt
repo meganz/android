@@ -19,7 +19,7 @@ fun NodeAttachmentMessageView(
         isMe = message.isMine,
         fileTypeResId = uiState.fileTypeResId,
         previewUri = uiState.previewUri?.toUri(),
-        loadProgress = uiState.loadProgress?.floatValue,
+        loadProgress = uiState.progress?.floatValue,
         fileName = uiState.fileName,
         fileSize = uiState.fileSize,
         duration = uiState.duration,

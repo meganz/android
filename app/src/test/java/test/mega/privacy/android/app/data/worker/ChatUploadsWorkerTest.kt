@@ -56,6 +56,7 @@ import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfe
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.ClearPendingMessagesCompressionProgressUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import org.junit.Before
 import org.junit.Test
@@ -103,6 +104,8 @@ class ChatUploadsWorkerTest {
     private val crashReporter = mock<CrashReporter>()
     private val compressAndUploadAllPendingMessagesUseCase =
         mock<CompressAndUploadAllPendingMessagesUseCase>()
+    private val clearPendingMessagesCompressionProgressUseCase =
+        mock<ClearPendingMessagesCompressionProgressUseCase>()
 
     @Before
     fun init() {
@@ -147,6 +150,7 @@ class ChatUploadsWorkerTest {
             checkFinishedChatUploadsUseCase,
             compressAndUploadAllPendingMessagesUseCase,
             monitorOngoingActiveTransfersUseCase,
+            clearPendingMessagesCompressionProgressUseCase,
             crashReporter,
             setForeground,
         )
@@ -274,6 +278,22 @@ class ChatUploadsWorkerTest {
             underTest.monitorOngoingActiveTransfers().test {
                 awaitItem()
                 expectNoEvents()
+            }
+        }
+
+    @Test
+    fun `test that pending messages compression progress is cleared when the work is finished`() =
+        runTest {
+            val monitorOngoingActiveTransfersUseFlow = monitorOngoingActiveTransfersFlow(false)
+            whenever(compressAndUploadAllPendingMessagesUseCase()) doReturn
+                    flowOf(ChatCompressionFinished)
+            whenever(monitorOngoingActiveTransfersUseCase(TransferType.CHAT_UPLOAD)) doReturn
+                    monitorOngoingActiveTransfersUseFlow
+
+            underTest.monitorOngoingActiveTransfers().test {
+                awaitItem() //first value
+                awaitComplete()
+                verify(clearPendingMessagesCompressionProgressUseCase).invoke()
             }
         }
 

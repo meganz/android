@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.chat.message.pendingmessages
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.Progress
@@ -12,6 +13,7 @@ import mega.privacy.android.domain.entity.transfer.ChatCompressionFinished
 import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
@@ -43,6 +45,7 @@ class CompressAndUploadAllPendingMessagesUseCaseTest {
     private val handleChatUploadTransferEventUseCase = mock<HandleChatUploadTransferEventUseCase>()
     private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
     private val monitorPendingMessagesByStateUseCase = mock<MonitorPendingMessagesByStateUseCase>()
+    private val chatMessageRepository = mock<ChatMessageRepository>()
 
     @BeforeAll
     fun setup() {
@@ -52,6 +55,7 @@ class CompressAndUploadAllPendingMessagesUseCaseTest {
             handleChatUploadTransferEventUseCase,
             getMyChatsFilesFolderIdUseCase,
             monitorPendingMessagesByStateUseCase,
+            chatMessageRepository,
         )
     }
 
@@ -63,6 +67,7 @@ class CompressAndUploadAllPendingMessagesUseCaseTest {
             handleChatUploadTransferEventUseCase,
             getMyChatsFilesFolderIdUseCase,
             monitorPendingMessagesByStateUseCase,
+            chatMessageRepository,
         )
         defaultStub()
     }
@@ -162,17 +167,51 @@ class CompressAndUploadAllPendingMessagesUseCaseTest {
         val pendingMessage = stubPendingMessage()
         whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)) doReturn
                 flowOf(listOf(pendingMessage))
-        whenever(compressFileForChatUseCase(any())) doReturn flowOf(
-            ChatUploadCompressionState.Compressing(Progress(0f)),
-            ChatUploadCompressionState.Compressing(Progress(0.5f)),
-            ChatUploadCompressionState.Compressed(mock())
-        )
+        val expectedProgress = listOf(Progress(0f), Progress(0.5f), Progress(0.9f))
+        whenever(compressFileForChatUseCase(any())) doReturn
+                expectedProgress.map {
+                    ChatUploadCompressionState.Compressing(it)
+                }
+                    .plus(ChatUploadCompressionState.Compressed(mock()))
+                    .asFlow()
 
         underTest().test {
-            assertThat(awaitItem()).isEqualTo(ChatCompressionProgress(0, 1, Progress(0f)))
-            assertThat(awaitItem()).isEqualTo(ChatCompressionProgress(0, 1, Progress(0.5f)))
+            expectedProgress.forEach {
+                assertThat(awaitItem()).isEqualTo(ChatCompressionProgress(0, 1, it))
+            }
+            // ChatUploadCompressionState.Compressed should be full progress
             assertThat(awaitItem()).isEqualTo(ChatCompressionProgress(1, 1, Progress(1f)))
             awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that compression progress is send to chat message repository`() = runTest {
+        val pendingMessages = listOf(stubPendingMessage())
+        whenever(monitorPendingMessagesByStateUseCase(PendingMessageState.COMPRESSING)) doReturn
+                flowOf(pendingMessages)
+        val expectedProgress = listOf(Progress(0f), Progress(0.5f), Progress(0.9f))
+        whenever(compressFileForChatUseCase(any())) doReturn
+                expectedProgress.map {
+                    ChatUploadCompressionState.Compressing(it)
+                }
+                    .plus(ChatUploadCompressionState.Compressed(mock()))
+                    .asFlow()
+
+
+        underTest().test {
+            cancelAndIgnoreRemainingEvents()
+            expectedProgress.forEach {
+                verify(chatMessageRepository).updatePendingMessagesCompressionProgress(
+                    it,
+                    pendingMessages,
+                )
+            }
+            // ChatUploadCompressionState.Compressed should be full progress
+            verify(chatMessageRepository).updatePendingMessagesCompressionProgress(
+                Progress(1f),
+                pendingMessages,
+            )
         }
     }
 

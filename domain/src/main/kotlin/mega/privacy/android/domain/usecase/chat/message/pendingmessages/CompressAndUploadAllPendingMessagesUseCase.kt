@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
 import mega.privacy.android.domain.entity.transfer.ChatCompressionState
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.CompressFileForChatUseCase
@@ -39,6 +40,7 @@ class CompressAndUploadAllPendingMessagesUseCase @Inject constructor(
     private val handleChatUploadTransferEventUseCase: HandleChatUploadTransferEventUseCase,
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
     private val monitorPendingMessagesByStateUseCase: MonitorPendingMessagesByStateUseCase,
+    private val chatMessageRepository: ChatMessageRepository,
 ) {
 
     /**
@@ -79,6 +81,10 @@ class CompressAndUploadAllPendingMessagesUseCase @Inject constructor(
                                                             Progress(1f)
                                                         }
                                                     }
+                                                chatMessageRepository.updatePendingMessagesCompressionProgress(
+                                                    newProgress,
+                                                    pendingMessages
+                                                )
                                                 pathsToSizeAndProgress[path]?.copy(
                                                     progress = newProgress
                                                 )?.let { progressUpdated ->

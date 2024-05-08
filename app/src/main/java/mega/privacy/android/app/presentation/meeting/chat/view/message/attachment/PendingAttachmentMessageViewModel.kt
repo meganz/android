@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMa
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.usecase.transfers.chatuploads.MonitorPendingMessageTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.MonitorPendingMessagesCompressionProgressUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import javax.inject.Inject
@@ -22,6 +23,7 @@ class PendingAttachmentMessageViewModel @Inject constructor(
     private val monitorPendingMessageTransferEventsUseCase: MonitorPendingMessageTransferEventsUseCase,
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
+    private val monitorPendingMessagesCompressionProgressUseCase: MonitorPendingMessagesCompressionProgressUseCase,
     fileSizeStringMapper: FileSizeStringMapper,
     durationInSecondsTextMapper: DurationInSecondsTextMapper,
     fileTypeIconMapper: FileTypeIconMapper,
@@ -32,6 +34,7 @@ class PendingAttachmentMessageViewModel @Inject constructor(
 ) {
     init {
         monitorUploads()
+        monitorCompression()
         monitorPausedTransfers()
     }
 
@@ -45,6 +48,21 @@ class PendingAttachmentMessageViewModel @Inject constructor(
                             it.copy(
                                 loadProgress = transfer.progress,
                                 areTransfersPaused = areTransfersPaused
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun monitorCompression() {
+        viewModelScope.launch {
+            monitorPendingMessagesCompressionProgressUseCase()
+                .collect { idProgressMap ->
+                    idProgressMap.forEach { (pendingMessageId, compressionProgress) ->
+                        getUiStateFlow(pendingMessageId)?.update {
+                            it.copy(
+                                compressionProgress = compressionProgress,
                             )
                         }
                     }
