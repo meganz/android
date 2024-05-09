@@ -17,6 +17,7 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.offline.OfflineFragmentArgs
 import mega.privacy.android.app.presentation.offline.view.OfflineFeatureScreen
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
@@ -63,6 +64,7 @@ class OfflineFragmentCompose : Fragment(), Scrollable {
                     OfflineFeatureScreen(
                         uiState = uiState,
                         fileTypeIconMapper = fileTypeIconMapper,
+                        rootFolderOnly = args.rootFolderOnly,
                         onOfflineItemClicked = viewModel::onItemClicked
                     )
                     (requireActivity() as? ManagerActivity)?.setToolbarTitleFromFullscreenOfflineFragment(

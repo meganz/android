@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.mode
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileTotalSizeUseCase
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageV
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -46,6 +48,7 @@ class OfflineComposeViewModelTest {
     private val getOfflineFileUseCase: GetOfflineFileUseCase = mock()
     private val getOfflineFileTotalSizeUseCase: GetOfflineFileTotalSizeUseCase = mock()
     private val getThumbnailUseCase: GetThumbnailUseCase = mock()
+    private val monitorViewType: MonitorViewType = mock()
     private lateinit var underTest: OfflineComposeViewModel
 
     @BeforeEach
@@ -66,7 +69,8 @@ class OfflineComposeViewModelTest {
             offlineFolderInformationUseCase = offlineFolderInformationUseCase,
             getOfflineFileUseCase = getOfflineFileUseCase,
             getOfflineFileTotalSizeUseCase = getOfflineFileTotalSizeUseCase,
-            getThumbnailUseCase = getThumbnailUseCase
+            getThumbnailUseCase = getThumbnailUseCase,
+            monitorViewType = monitorViewType
         )
     }
 
@@ -155,6 +159,7 @@ class OfflineComposeViewModelTest {
         whenever(setOfflineWarningMessageVisibilityUseCase(false)).thenReturn(Unit)
         whenever(monitorOfflineWarningMessageVisibilityUseCase()).thenReturn(emptyFlow())
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
+        whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(offlineFolderInformationUseCase(-1)).thenReturn(
             OfflineFolderInfo(
                 numFolders = 0,
@@ -176,7 +181,8 @@ class OfflineComposeViewModelTest {
             offlineFolderInformationUseCase,
             getOfflineFileUseCase,
             getOfflineFileTotalSizeUseCase,
-            getThumbnailUseCase
+            getThumbnailUseCase,
+            monitorViewType
         )
     }
 }

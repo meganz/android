@@ -5,12 +5,15 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
-import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUIState
+import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUiState
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
+import mega.privacy.android.core.ui.utils.pop
+import mega.privacy.android.core.ui.utils.push
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
@@ -21,6 +24,7 @@ import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageV
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,20 +42,21 @@ class OfflineComposeViewModel @Inject constructor(
     private val getOfflineFileUseCase: GetOfflineFileUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getOfflineFileTotalSizeUseCase: GetOfflineFileTotalSizeUseCase,
+    private val monitorViewType: MonitorViewType,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(OfflineUIState())
-
-    private val arrayDeque = ArrayDeque<Pair<Int, String>>()
+    private val _uiState = MutableStateFlow(OfflineUiState())
+    private val parentStack = ArrayDeque<Pair<Int, String>>()
 
     /**
-     * Flow of [OfflineUIState] UI State
+     * Flow of [OfflineUiState] UI State
      */
     val uiState = _uiState.asStateFlow()
 
     init {
         monitorOfflineWarningMessage()
         monitorOfflineNodeUpdates()
+        monitorViewTypeUpdate()
         viewModelScope.launch {
             monitorTransfersFinishedUseCase().conflate().collect {
                 refreshList()
@@ -59,17 +64,41 @@ class OfflineComposeViewModel @Inject constructor(
         }
     }
 
+    private fun monitorViewTypeUpdate() {
+        viewModelScope.launch {
+            monitorViewType()
+                .catch {
+                    Timber.e(it)
+                }
+                .collect { viewType ->
+                    _uiState.update {
+                        it.copy(
+                            currentViewType = viewType
+                        )
+                    }
+                }
+        }
+    }
+
     private fun monitorOfflineWarningMessage() {
         viewModelScope.launch {
-            monitorOfflineWarningMessageVisibilityUseCase().collect {
-                _uiState.update { state -> state.copy(showOfflineWarning = it) }
-            }
+            monitorOfflineWarningMessageVisibilityUseCase()
+                .catch {
+                    Timber.e(it)
+                }
+                .collect {
+                    _uiState.update { state -> state.copy(showOfflineWarning = it) }
+                }
         }
     }
 
     private fun monitorOfflineNodeUpdates() {
         viewModelScope.launch {
-            monitorOfflineNodeUpdatesUseCase().conflate()
+            monitorOfflineNodeUpdatesUseCase()
+                .catch {
+                    Timber.e(it)
+                }
+                .conflate()
                 .collect {
                     refreshList()
                 }
@@ -156,7 +185,7 @@ class OfflineComposeViewModel @Inject constructor(
      */
     fun onItemClicked(offlineNodeUIItem: OfflineNodeUIItem) {
         if (offlineNodeUIItem.offlineNode.isFolder) {
-            arrayDeque.addLast(
+            parentStack.push(
                 Pair(
                     offlineNodeUIItem.offlineNode.parentId,
                     uiState.value.title
@@ -176,8 +205,7 @@ class OfflineComposeViewModel @Inject constructor(
      * OnBackClicked
      */
     fun onBackClicked(): Int? {
-        return if (arrayDeque.isNotEmpty()) {
-            val (parentId, parentTitle) = arrayDeque.removeLast()
+        parentStack.pop()?.let { (parentId, parentTitle) ->
             _uiState.update {
                 it.copy(
                     parentId = parentId,
@@ -185,9 +213,9 @@ class OfflineComposeViewModel @Inject constructor(
                 )
             }
             refreshList()
-            null
-        } else {
-            -1
+            return null
+        } ?: run {
+            return -1
         }
     }
 }
