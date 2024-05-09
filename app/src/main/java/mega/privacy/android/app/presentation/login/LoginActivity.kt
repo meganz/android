@@ -28,6 +28,7 @@ import mega.privacy.android.app.main.TourFragment
 import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.reportissue.ReportIssueViaEmailFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
@@ -74,6 +75,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
             when (visibleFragment) {
                 Constants.CREATE_ACCOUNT_FRAGMENT -> showFragment(Constants.TOUR_FRAGMENT)
+                Constants.REPORT_ISSUE_VIA_EMAIL_FRAGMENT -> showFragment(Constants.LOGIN_FRAGMENT)
                 Constants.TOUR_FRAGMENT, Constants.CONFIRM_EMAIL_FRAGMENT -> finish()
             }
         }
@@ -254,6 +256,16 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
                 Util.setDrawUnderStatusBar(this, false)
             }
+
+
+            Constants.REPORT_ISSUE_VIA_EMAIL_FRAGMENT -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container_login, ReportIssueViaEmailFragment())
+                    .commitNowAllowingStateLoss()
+
+                Util.setDrawUnderStatusBar(this, false)
+            }
+
         }
         if ((application as MegaApplication).isEsid) {
             showAlertLoggedOut()

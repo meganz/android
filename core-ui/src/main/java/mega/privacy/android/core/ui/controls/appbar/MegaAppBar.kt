@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -420,6 +421,7 @@ internal fun MegaAppBarTitle(title: String, modifier: Modifier = Modifier, maxLi
         overflow = TextOverflow.Ellipsis,
         color = LocalMegaAppBarColors.current.titleColor,
         style = MaterialTheme.typography.subtitle1,
+        fontWeight = FontWeight.Medium,
         modifier = modifier.testTag(MEGA_APP_BAR_TITLE_TEST_TAG)
     )
 

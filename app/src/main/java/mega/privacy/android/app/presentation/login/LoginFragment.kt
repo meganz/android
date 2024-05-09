@@ -157,11 +157,16 @@ class LoginFragment : Fragment() {
                 onReportIssue = {
                     viewModel.onReportIssue(
                         getString(R.string.setting_feedback_body),
-                        ::sendSupportEmail
+                        ::sendSupportEmail,
+                        ::openReportIssueFragment
                     )
                 },
             )
         }
+    }
+
+    private fun openReportIssueFragment() {
+        (requireActivity() as LoginActivity).showFragment(LoginFragmentType.ReportIssue)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

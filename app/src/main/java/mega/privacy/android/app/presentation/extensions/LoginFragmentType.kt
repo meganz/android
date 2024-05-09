@@ -11,4 +11,5 @@ internal fun LoginFragmentType.toConstant() = when (this) {
     LoginFragmentType.CreateAccount -> Constants.CREATE_ACCOUNT_FRAGMENT
     LoginFragmentType.ConfirmEmail -> Constants.CONFIRM_EMAIL_FRAGMENT
     LoginFragmentType.Tour -> Constants.TOUR_FRAGMENT
+    LoginFragmentType.ReportIssue -> Constants.REPORT_ISSUE_VIA_EMAIL_FRAGMENT
 }

@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables report issue via email in login screen
+     */
+    ReportIssueViaEmail(
+        "Enable report issue via email in login screen",
+        true,
+    ),
+
+    /**
      * Enables new audio queue
      */
     NewAudioQueue(

@@ -949,11 +949,19 @@ class LoginViewModel @Inject constructor(
     /**
      * On report issue
      */
-    fun onReportIssue(title: String, sendEmail: (SupportEmailTicket) -> Unit) {
+    fun onReportIssue(
+        title: String,
+        sendEmail: (SupportEmailTicket) -> Unit,
+        openReportIssueFragment: () -> Unit,
+    ) {
         viewModelScope.launch {
-            val ticket =
-                createSupportTicketEmailUseCase(title)
-            sendEmail(ticket)
+            if (getFeatureFlagValueUseCase(AppFeatures.ReportIssueViaEmail)) {
+                openReportIssueFragment()
+            } else {
+                val ticket =
+                    createSupportTicketEmailUseCase(title)
+                sendEmail(ticket)
+            }
         }
     }
 

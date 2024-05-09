@@ -23,4 +23,9 @@ enum class LoginFragmentType {
      * Tour screen.
      */
     Tour,
+
+    /**
+     * Report issue via email screen.
+     */
+    ReportIssue
 }

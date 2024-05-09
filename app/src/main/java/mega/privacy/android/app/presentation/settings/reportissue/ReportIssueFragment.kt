@@ -143,23 +143,29 @@ class ReportIssueFragment : Fragment() {
         )
     }
 
-    @Composable
-    private fun ReportIssueBackHandler(
-        isEnabled: Boolean,
-        onDiscard: () -> Unit,
-    ) {
-        var showDiscardDialog by remember { mutableStateOf(false) }
+}
 
-        BackHandler(isEnabled) {
-            showDiscardDialog = true
-        }
+/**
+ * Report issue back handler
+ *
+ * @param isEnabled
+ * @param onDiscard
+ */
+@Composable
+fun ReportIssueBackHandler(
+    isEnabled: Boolean,
+    onDiscard: () -> Unit,
+) {
+    var showDiscardDialog by remember { mutableStateOf(false) }
 
-        if (showDiscardDialog) {
-            DiscardReportDialog(
-                onDiscardCancelled = { showDiscardDialog = false },
-                onDiscard = onDiscard
-            )
-        }
+    BackHandler(isEnabled) {
+        showDiscardDialog = true
     }
 
+    if (showDiscardDialog) {
+        DiscardReportDialog(
+            onDiscardCancelled = { showDiscardDialog = false },
+            onDiscard = onDiscard
+        )
+    }
 }
