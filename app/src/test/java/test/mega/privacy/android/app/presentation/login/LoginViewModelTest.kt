@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -110,6 +111,7 @@ internal class LoginViewModelTest {
     private val installReferrerHandler = mock<InstallReferrerHandler>()
     private val transfersManagement = mock<TransfersManagement>()
     private val clearUserCredentialsUseCase = mock<ClearUserCredentialsUseCase>()
+    private val startUploadsWorkerUseCase = mock<StartUploadsWorkerUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -150,7 +152,8 @@ internal class LoginViewModelTest {
             installReferrerHandler = installReferrerHandler,
             transfersManagement = transfersManagement,
             createSupportTicketEmailUseCase = mock(),
-            clearUserCredentialsUseCase = clearUserCredentialsUseCase
+            clearUserCredentialsUseCase = clearUserCredentialsUseCase,
+            startUploadsWorkerUseCase = startUploadsWorkerUseCase,
         )
     }
 

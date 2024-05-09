@@ -346,16 +346,22 @@ class TransfersManagement @Inject constructor(
                     if (megaApi.numPendingUploads > 0) {
                         val uploadServiceIntent = Intent(context, UploadService::class.java)
                             .setAction(Constants.ACTION_RESTART_SERVICE)
+                        val isUploadsWorker = getFeatureFlagValueUseCase(AppFeatures.UploadWorker)
+
                         if (!getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {
                             val chatUploadServiceIntent =
                                 Intent(context, ChatUploadService::class.java)
                                     .setAction(Constants.ACTION_RESTART_SERVICE)
 
-                            tryToStartForegroundService(
-                                uploadServiceIntent,
-                                chatUploadServiceIntent
-                            )
-                        } else {
+                            if (isUploadsWorker) {
+                                tryToStartForegroundService(chatUploadServiceIntent)
+                            } else {
+                                tryToStartForegroundService(
+                                    uploadServiceIntent,
+                                    chatUploadServiceIntent
+                                )
+                            }
+                        } else if (!isUploadsWorker) {
                             tryToStartForegroundService(uploadServiceIntent)
                         }
                     }

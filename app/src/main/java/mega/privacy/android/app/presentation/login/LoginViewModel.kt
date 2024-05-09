@@ -87,6 +87,7 @@ import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.mobile.analytics.event.AccountRegistrationEvent
 import timber.log.Timber
@@ -136,6 +137,7 @@ class LoginViewModel @Inject constructor(
     @LoginMutex private val loginMutex: Mutex,
     private val transfersManagement: TransfersManagement,
     private val clearUserCredentialsUseCase: ClearUserCredentialsUseCase,
+    private val startUploadsWorkerUseCase: StartUploadsWorkerUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -752,6 +754,9 @@ class LoginViewModel @Inject constructor(
                     startDownloadWorkerUseCase()
                     if (getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {
                         startChatUploadsWorkerUseCase()
+                    }
+                    if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                        startUploadsWorkerUseCase()
                     }
                     //Login check resumed pending transfers
                     transfersManagement.checkResumedPendingTransfers()
