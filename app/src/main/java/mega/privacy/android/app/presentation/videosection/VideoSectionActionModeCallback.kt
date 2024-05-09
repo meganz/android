@@ -88,7 +88,6 @@ internal class VideoSectionActionModeCallback(
                     nodes = videoSectionViewModel.getSelectedMegaNode(),
                     highPriority = false,
                     isFolderLink = false,
-                    fromMediaViewer = false,
                     fromChat = false,
                 )
 

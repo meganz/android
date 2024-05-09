@@ -100,7 +100,6 @@ class RecentActionBucketActionModeCallback constructor(
                     selectedMegaNodes,
                     false,
                     false,
-                    false,
                     false
                 )
                 viewModel.clearSelection()

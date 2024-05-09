@@ -41,13 +41,6 @@ class StartDownloadViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     /**
-     * DownloadsWorker is still under feature flag, so this method should be used to check the usage of this view model
-     * This should be removed once the feature flag is removed
-     */
-    @Deprecated (message = "This will be removed soon, as the Download worker is the current way of downloading nodes")
-    suspend fun shouldDownloadWithDownloadWorker() = true
-
-    /**
      * Triggers the event related to download a node with [nodeId]
      * @param nodeId
      */
@@ -223,27 +216,5 @@ class StartDownloadViewModel @Inject constructor(
      */
     fun consumeDownloadEvent() {
         _state.update { consumed() }
-    }
-
-    /**
-     * Triggers the event related to download a list of chat nodes if the corresponding feature flag is true, if not it will execute [toDoIfFalse]
-     * This is a temporal solution while ChatActivity is still in java (because it's hard to execute suspended functions) and we need to keep giving support with the old DownloadService if feature flag i false
-     */
-    @Deprecated(
-        "Please don't use this method, it will be removed once ChatActivity is refactored",
-        ReplaceWith("onDownloadClicked")
-    )
-    fun downloadChatNodesOnlyIfFeatureFlagIsTrue(
-        chatId: Long,
-        messageIds: List<Long?>,
-        toDoIfFalse: () -> Unit,
-    ) {
-        viewModelScope.launch {
-            if (shouldDownloadWithDownloadWorker()) {
-                onDownloadClicked(chatId, messageIds.filterNotNull())
-            } else {
-                toDoIfFalse()
-            }
-        }
     }
 }

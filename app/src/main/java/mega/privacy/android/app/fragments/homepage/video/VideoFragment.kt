@@ -612,7 +612,6 @@ class VideoFragment : Fragment(), HomepageSearchable {
                     nodes = listOf(node),
                     highPriority = true,
                     isFolderLink = false,
-                    fromMediaViewer = false,
                     fromChat = false
                 )
             }

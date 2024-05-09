@@ -6,10 +6,8 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -29,7 +27,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaNode
-import timber.log.Timber
 
 /**
  * Media player Activity
@@ -176,84 +173,26 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
     }
 
     internal fun saveChatNode() {
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                val (chatId, message) = getChatMessage()
-                startDownloadViewModel.onDownloadClicked(chatId, message?.msgId ?: INVALID_HANDLE)
-            } else {
-                getChatMessageNode()?.let { node ->
-                    nodeSaver.saveNode(
-                        node = node,
-                        highPriority = true,
-                        fromMediaViewer = true,
-                        needSerialize = true
-                    )
-                }
-            }
-        }
+        val (chatId, message) = getChatMessage()
+        startDownloadViewModel.onDownloadClicked(chatId, message?.msgId ?: INVALID_HANDLE)
     }
 
     internal fun saveFileLinkNode(serializedNode: String) {
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                startDownloadViewModel.onDownloadClicked(serializedNode)
-            } else {
-                MegaNode.unserialize(serializedNode)
-                    ?.let { currentDocument ->
-                        Timber.d("currentDocument NOT NULL")
-                        nodeSaver.saveNode(
-                            currentDocument,
-                            isFolderLink = false,
-                            fromMediaViewer = true,
-                            needSerialize = true
-                        )
-                    } ?: Timber.w("currentDocument is NULL")
-            }
-        }
+        startDownloadViewModel.onDownloadClicked(serializedNode)
     }
 
     internal fun saveNodeFromFolderLink(nodeId: NodeId) {
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                startDownloadViewModel.onFolderLinkChildNodeDownloadClicked(nodeId)
-            } else {
-                nodeSaver.saveHandle(
-                    handle = nodeId.longValue,
-                    isFolderLink = true,
-                    fromMediaViewer = true
-                )
-            }
-        }
+        startDownloadViewModel.onFolderLinkChildNodeDownloadClicked(nodeId)
     }
 
     internal fun saveFromAlbumSharing(nodeId: NodeId) {
         viewModel.getNodeForAlbumSharing(nodeId.longValue)?.let { node ->
-            lifecycleScope.launch {
-                if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                    startDownloadViewModel.onDownloadClicked(node.serialize())
-                } else {
-                    nodeSaver.saveNode(
-                        node = node,
-                        fromMediaViewer = true,
-                        needSerialize = true
-                    )
-                }
-            }
+            startDownloadViewModel.onDownloadClicked(node.serialize())
         }
     }
 
     internal fun saveNode(nodeId: NodeId) {
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                startDownloadViewModel.onDownloadClicked(nodeId)
-            } else {
-                nodeSaver.saveHandle(
-                    handle = nodeId.longValue,
-                    isFolderLink = false,
-                    fromMediaViewer = true
-                )
-            }
-        }
+        startDownloadViewModel.onDownloadClicked(nodeId)
     }
 
     /**

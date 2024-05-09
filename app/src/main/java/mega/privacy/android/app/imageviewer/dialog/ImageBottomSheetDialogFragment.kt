@@ -303,14 +303,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             switchOffline.isChecked = nodeItem?.isAvailableOffline == true
             val offlineAction = {
                 lifecycleScope.launch {
-                    if (node != null && nodeItem?.isAvailableOffline == false && startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
+                    if (node != null && nodeItem?.isAvailableOffline == false) {
                         if (node.isForeign) {
                             startDownloadViewModel.onSaveOfflineClicked(node.serialize())
                         } else {
                             startDownloadViewModel.onSaveOfflineClicked(NodeId(node.handle))
                         }
                     } else if (nodeItem != null) {
-                        viewModel.switchNodeOfflineAvailability(nodeItem, requireActivity())
+                        viewModel.switchNodeOfflineAvailabilityToFalse(nodeItem, requireActivity())
                     }
                     dismissAllowingStateLoss()
                 }
@@ -351,7 +351,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionShare.isVisible = imageItem.shouldShowShareOption()
             optionShare.setOnClickListener {
                 val file =
-                    imageItem.imageResult?.fullSizeUri?.toUri()?.toFile()?.takeIf { it.exists() }
+                    imageItem.imageResult?.fullSizeUri?.toUri()?.toFile()
+                        ?.takeIf { it.exists() }
                 when {
                     imageItem is ImageItem.OfflineNode -> {
                         trackOnShareClicked()
@@ -510,7 +511,12 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         when (type) {
             AlertDialogType.TYPE_REMOVE_LINK -> {
                 alertDialog = MaterialAlertDialogBuilder(requireContext())
-                    .setMessage(resources.getQuantityString(R.plurals.remove_links_warning_text, 1))
+                    .setMessage(
+                        resources.getQuantityString(
+                            R.plurals.remove_links_warning_text,
+                            1
+                        )
+                    )
                     .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
                         viewModel.removeLink(nodeHandle)
                         dismissAllowingStateLoss()

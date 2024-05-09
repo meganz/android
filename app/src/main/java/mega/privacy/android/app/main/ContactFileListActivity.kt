@@ -525,23 +525,10 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     }
 
     fun downloadFile(nodes: List<MegaNode>) {
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                startDownloadViewModel.onDownloadClicked(
-                    nodes.map { NodeId(it.handle) },
-                    true
-                )
-            } else {
-                checkNotificationsPermission(this@ContactFileListActivity)
-                nodeSaver.saveNodes(
-                    nodes = nodes,
-                    highPriority = true,
-                    isFolderLink = false,
-                    fromMediaViewer = false,
-                    needSerialize = false
-                )
-            }
-        }
+            startDownloadViewModel.onDownloadClicked(
+                nodeIds = nodes.map { NodeId(it.handle) },
+                isHighPriority = true
+            )
     }
 
     private fun moveToTrash(handleList: ArrayList<Long>) {

@@ -6,17 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.switchmaterial.SwitchMaterial
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.controllers.ChatController
@@ -35,7 +32,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationAvailableOfflineActionMenuItemEvent
@@ -306,15 +302,8 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 node?.let { node ->
                     cannotOpenFileDialog = this.showCannotOpenFileDialog(
                         requireActivity(),
-                        node
-                    ) { megaNode: MegaNode? ->
-                        lifecycleScope.launch {
-                            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                                startDownloadViewModel.onDownloadClicked(chatId, messageId)
-                            } else {
-                                (requireActivity() as ChatActivity).saveNodeByTap(megaNode)
-                            }
-                        }
+                    ) {
+                        startDownloadViewModel.onDownloadClicked(chatId, messageId)
                     }
                 }
             }
@@ -383,14 +372,8 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
             cannotOpenFileDialog = this.openWith(
                 requireActivity(),
                 node
-            ) { node: MegaNode? ->
-                lifecycleScope.launch {
-                    if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                        startDownloadViewModel.onDownloadClicked(chatId, messageId)
-                    } else {
-                        (requireActivity() as ChatActivity).saveNodeByTap(node)
-                    }
-                }
+            ) {
+                startDownloadViewModel.onDownloadClicked(chatId, messageId)
             }
             return
         } else if (id == R.id.forward) {
@@ -486,16 +469,7 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 Timber.w("The selected node is NULL")
                 return
             }
-            lifecycleScope.launch {
-                if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                    startDownloadViewModel.onDownloadClicked(chatId, messageId)
-                } else {
-                    val nodeList = message.message?.megaNodeList
-                    if (nodeList != null && nodeList.size() > 0) {
-                        (requireActivity() as ChatActivity).downloadNodeList(nodeList)
-                    }
-                }
-            }
+            startDownloadViewModel.onDownloadClicked(chatId, messageId)
         } else if (id == R.id.option_import) {
             Analytics.tracker.trackEvent(ChatConversationAddToCloudDriveActionMenuItemEvent)
             if (node == null) {
@@ -515,20 +489,7 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                     activity, resources.getString(R.string.file_removed_offline)
                 )
             } else {
-                lifecycleScope.launch {
-                    if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                        startDownloadViewModel
-                            .onSaveOfflineClicked(chatId, messageId)
-                    } else {
-                        checkNotificationsPermission(requireActivity())
-                        val messages = ArrayList<AndroidMegaChatMessage>()
-                        messages.add(message)
-                        chatC.saveForOfflineWithAndroidMessages(
-                            messages,
-                            megaChatApi.getChatRoom(chatId), requireActivity() as ChatActivity
-                        )
-                    }
-                }
+                startDownloadViewModel.onSaveOfflineClicked(chatId, messageId)
             }
         } else if (id == R.id.delete) {
             Analytics.tracker.trackEvent(ChatConversationRemoveActionMenuItemEvent)

@@ -34,7 +34,6 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -752,11 +751,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     ) == true
                 ) {
                     contentView.post {
-                        cannotOpenFileDialog = this.showCannotOpenFileDialog(
-                            requireActivity(),
-                            node,
-                            (requireActivity() as ManagerActivity)::saveNodeByTap
-                        )
+                        cannotOpenFileDialog = this.showCannotOpenFileDialog(requireActivity()) {
+                            (requireActivity() as ManagerActivity).saveNodeByTap(node)
+                        }
                     }
                 }
             }
@@ -1226,19 +1223,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      * @param node The [MegaNode] to be downloaded
      */
     private fun onDownloadClicked(node: MegaNode) {
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                startDownloadViewModel.onDownloadClicked(NodeId(node.handle))
-            } else {
-                (activity as? ManagerActivity)?.saveNodesToDevice(
-                    nodes = listOf(node),
-                    highPriority = false,
-                    isFolderLink = false,
-                    fromMediaViewer = false,
-                    fromChat = false,
-                )
-            }
-        }
+        startDownloadViewModel.onDownloadClicked(NodeId(node.handle))
         setStateBottomSheetBehaviorHidden()
     }
 
@@ -1306,16 +1291,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             refreshView()
             Util.showSnackbar(activity, resources.getString(R.string.file_removed_offline))
         } else {
-            lifecycleScope.launch {
-                if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                    startDownloadViewModel.onSaveOfflineClicked(NodeId(node.handle))
-                } else {
-                    saveForOffline(
-                        node = node,
-                        nodeDeviceCenterInformation = nodeDeviceCenterInformation,
-                    )
-                }
-            }
+            startDownloadViewModel.onSaveOfflineClicked(NodeId(node.handle))
         }
         setStateBottomSheetBehaviorHidden()
     }
@@ -1433,9 +1409,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (nodeOptionsViewModel.isFilePreviewOnline(node = node)) {
             openWith(
                 context = requireActivity(),
-                node = node,
-                (requireActivity() as ManagerActivity)::saveNodeByOpenWith
-            )
+                node = node
+            ) {
+                (requireActivity() as ManagerActivity).saveNodeByOpenWith(node)
+            }
         } else {
             onNodeTapped(
                 requireActivity(),

@@ -91,7 +91,7 @@ class FavouriteActionModeCallback(
 
             when (itemId) {
                 R.id.cab_menu_download -> {
-                    mainActivity.saveNodesToDevice(selectedNodes, false, false, false, false)
+                    mainActivity.saveNodesToDevice(selectedNodes, false, false, false)
                 }
 
                 R.id.cab_menu_copy -> {

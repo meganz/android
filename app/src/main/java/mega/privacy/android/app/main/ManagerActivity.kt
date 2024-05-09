@@ -3628,7 +3628,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
 
                 R.id.fullscreen_offline,
-                R.id.offlineFragmentCompose -> {
+                R.id.offlineFragmentCompose,
+                -> {
                     homepageScreen = HomepageScreen.FULLSCREEN_OFFLINE
                     hideAdsView()
                 }
@@ -5624,39 +5625,25 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param nodes           nodes to save
      * @param highPriority    whether this download is high priority or not
      * @param isFolderLink    whether this download is a folder link
-     * @param fromMediaViewer whether this download is from media viewer
      * @param fromChat        whether this download is from chat
      */
     fun saveNodesToDevice(
         nodes: List<MegaNode?>?, highPriority: Boolean, isFolderLink: Boolean,
-        fromMediaViewer: Boolean, fromChat: Boolean,
+        fromChat: Boolean,
     ) {
         if (nodes == null) return
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                when {
-                    isFolderLink || fromChat -> {
-                        startDownloadViewModel.onMultipleSerializedNodesDownloadClicked(
-                            nodes.mapNotNull { it?.serialize() },
-                            highPriority,
-                        )
-                    }
-
-                    else -> {
-                        startDownloadViewModel.onDownloadClicked(
-                            nodes.mapNotNull { megaNode -> megaNode?.handle?.let { NodeId(it) } },
-                            highPriority,
-                        )
-                    }
-                }
-            } else {
-                PermissionUtils.checkNotificationsPermission(this@ManagerActivity)
-                nodeSaver.saveNodes(
-                    nodes.filterNotNull(),
+        when {
+            isFolderLink || fromChat -> {
+                startDownloadViewModel.onMultipleSerializedNodesDownloadClicked(
+                    nodes.mapNotNull { it?.serialize() },
                     highPriority,
-                    isFolderLink,
-                    fromMediaViewer,
-                    fromChat
+                )
+            }
+
+            else -> {
+                startDownloadViewModel.onDownloadClicked(
+                    nodes.mapNotNull { megaNode -> megaNode?.handle?.let { NodeId(it) } },
+                    highPriority,
                 )
             }
         }
@@ -5669,21 +5656,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param node Node to be downloaded.
      */
     fun saveNodeByTap(node: MegaNode) {
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                startDownloadViewModel.onDownloadForPreviewClicked(NodeId(node.handle))
-            } else {
-                PermissionUtils.checkNotificationsPermission(this@ManagerActivity)
-                nodeSaver.saveNodes(
-                    nodes = listOf(element = node),
-                    highPriority = true,
-                    isFolderLink = false,
-                    fromMediaViewer = false,
-                    needSerialize = false,
-                    downloadForPreview = true
-                )
-            }
-        }
+        startDownloadViewModel.onDownloadForPreviewClicked(NodeId(node.handle))
     }
 
     /**
@@ -5693,22 +5666,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param node Node to be downloaded.
      */
     fun saveNodeByOpenWith(node: MegaNode) {
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                startDownloadViewModel.onDownloadForPreviewClicked(NodeId(node.handle))
-            } else {
-                PermissionUtils.checkNotificationsPermission(this@ManagerActivity)
-                nodeSaver.saveNodes(
-                    nodes = listOf(node),
-                    highPriority = true,
-                    isFolderLink = false,
-                    fromMediaViewer = false,
-                    needSerialize = false,
-                    downloadForPreview = true,
-                    downloadByOpenWith = true
-                )
-            }
-        }
+        startDownloadViewModel.onDownloadForPreviewClicked(NodeId(node.handle))
     }
 
     /**
@@ -5724,23 +5682,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         handles: List<Long?>?, highPriority: Boolean,
     ) {
         if (handles == null) return
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                startDownloadViewModel.onDownloadClicked(
-                    handles.mapNotNull { it?.let { NodeId(it) } },
-                    highPriority
-                )
-            } else {
-                PermissionUtils.checkNotificationsPermission(this@ManagerActivity)
-                nodeSaver.saveHandles(
-                    handles.filterNotNull(),
-                    highPriority,
-                    false,
-                    false,
-                    false
-                )
-            }
-        }
+        startDownloadViewModel.onDownloadClicked(
+            handles.mapNotNull { it?.let { NodeId(it) } },
+            highPriority
+        )
     }
 
     /**

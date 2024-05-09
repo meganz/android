@@ -97,7 +97,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
@@ -1445,23 +1444,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Method responsible for downloading file
      */
     fun downloadFile(nodes: List<MegaNode>) {
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                startDownloadViewModel.onDownloadClicked(
-                    nodes.map { NodeId(it.handle) },
-                    true
-                )
-            } else {
-                checkNotificationsPermission(this@ContactInfoActivity)
-                nodeSaver.saveNodes(
-                    nodes,
-                    highPriority = true,
-                    isFolderLink = false,
-                    fromMediaViewer = false,
-                    needSerialize = false
-                )
-            }
-        }
+        startDownloadViewModel.onDownloadClicked(
+            nodeIds = nodes.map { NodeId(it.handle) },
+            isHighPriority = true
+        )
     }
 
     /**

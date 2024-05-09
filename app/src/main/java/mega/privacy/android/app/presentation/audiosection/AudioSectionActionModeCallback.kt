@@ -88,7 +88,6 @@ internal class AudioSectionActionModeCallback(
                     nodes = audioSectionViewModel.getSelectedMegaNode(),
                     highPriority = false,
                     isFolderLink = false,
-                    fromMediaViewer = false,
                     fromChat = false,
                 )
 

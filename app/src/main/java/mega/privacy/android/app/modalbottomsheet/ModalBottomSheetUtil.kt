@@ -51,7 +51,7 @@ object ModalBottomSheetUtil {
     fun BottomSheetDialogFragment?.openWith(
         context: Context,
         node: MegaNode?,
-        nodeDownloader: ((node: MegaNode) -> Unit)? = null,
+        nodeDownloader: (() -> Unit)? = null,
     ): AlertDialog? {
         if (node == null) {
             Timber.w("Node is null")
@@ -93,7 +93,7 @@ object ModalBottomSheetUtil {
             mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             app.startActivity(mediaIntent)
         } else if (this != null && nodeDownloader != null && localPath == null) {
-            return this.showCannotOpenFileDialog(context, node, nodeDownloader)
+            return this.showCannotOpenFileDialog(context, nodeDownloader)
         } else {
             Util.showSnackbar(
                 context,
@@ -109,15 +109,13 @@ object ModalBottomSheetUtil {
      * Shows a warning dialog informing a file cannot be opened because the type is not supported.
      *
      * @param context           Required context.
-     * @param node              MegaNode to open.
      * @param nodeDownloader    Download action to perform if the user confirms it.
      * @return The AlertDialog.
      */
     @JvmStatic
     fun BottomSheetDialogFragment.showCannotOpenFileDialog(
         context: Context,
-        node: MegaNode,
-        nodeDownloader: (node: MegaNode) -> Unit,
+        nodeDownloader: () -> Unit,
     ): AlertDialog =
         MaterialAlertDialogBuilder(context)
             .setTitle(getString(R.string.dialog_cannot_open_file_title))
@@ -125,7 +123,7 @@ object ModalBottomSheetUtil {
             .setPositiveButton(
                 getString(R.string.context_download)
             ) { _, _ ->
-                nodeDownloader(node)
+                nodeDownloader()
                 this.dismissAllowingStateLoss()
             }
             .setNegativeButton(getString(R.string.general_cancel), null)

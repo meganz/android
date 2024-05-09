@@ -5063,20 +5063,7 @@ public class ChatActivity extends PasscodeActivity
                     Long megaNodeHandle = messagesSelected.get(i).getMessage().getMsgId();
                     messageIds.add(megaNodeHandle);
                 }
-                startDownloadViewModel.downloadChatNodesOnlyIfFeatureFlagIsTrue(
-                        idChat,
-                        messageIds,
-                        () -> {
-                            Timber.d("chat_cab_menu_download ");
-                            ArrayList<MegaNodeList> list = new ArrayList<>();
-                            for (int i = 0; i < messagesSelected.size(); i++) {
-                                MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
-                                list.add(megaNodeList);
-                            }
-                            PermissionUtils.checkNotificationsPermission(chatActivity);
-                            nodeSaver.saveNodeLists(list, false, false, false, true);
-                            return Unit.INSTANCE;
-                        });
+                startDownloadViewModel.onDownloadClicked(idChat, messageIds);
             } else if (itemId == R.id.chat_cab_menu_import) {
                 Analytics.INSTANCE.getTracker().trackEvent(ChatConversationAddToCloudDriveActionMenuEvent.INSTANCE);
                 finishMultiselectionMode();
@@ -5782,13 +5769,9 @@ public class ChatActivity extends PasscodeActivity
             manageTextFileIntent(this, msgId, idChat);
         } else {
             onNodeTapped(this, node, (megaNode) -> {
-                startDownloadViewModel.downloadChatNodesOnlyIfFeatureFlagIsTrue(
+                startDownloadViewModel.onDownloadClicked(
                         idChat,
-                        List.of(msgId),
-                        () -> {
-                            saveNodeByTap(megaNode);
-                            return Unit.INSTANCE;
-                        }
+                        List.of(msgId)
                 );
                 return null;
             }, this, this, false);

@@ -83,7 +83,6 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -723,45 +722,19 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     }
 
     private fun download() {
-        lifecycleScope.launch {
-            if (startDownloadViewModel.shouldDownloadWithDownloadWorker()) {
-                if (fromChat) {
-                    startDownloadViewModel.onDownloadClicked(chatId, msgId)
-                } else if (type == Constants.FILE_LINK_ADAPTER) {
-                    node?.serialize()?.let {
-                        startDownloadViewModel.onDownloadClicked(it)
-                    }
-                } else if (isFolderLink) {
-                    node?.handle?.let {
-                        startDownloadViewModel.onFolderLinkChildNodeDownloadClicked(NodeId(it))
-                    }
-                } else {
-                    node?.handle?.let {
-                        startDownloadViewModel.onDownloadClicked(NodeId(it))
-                    }
-                }
-            } else {
-                legacyDownload()
+        if (fromChat) {
+            startDownloadViewModel.onDownloadClicked(chatId, msgId)
+        } else if (type == Constants.FILE_LINK_ADAPTER) {
+            node?.serialize()?.let {
+                startDownloadViewModel.onDownloadClicked(it)
             }
-        }
-    }
-
-    private fun legacyDownload() {
-        checkNotificationsPermission(this)
-        if (type == Constants.OFFLINE_ADAPTER) {
-            val node = dbH.findByHandle(handle)
-            if (node != null) {
-                nodeSaver.saveOfflineNode(node, true)
+        } else if (isFolderLink) {
+            node?.handle?.let {
+                startDownloadViewModel.onFolderLinkChildNodeDownloadClicked(NodeId(it))
             }
         } else {
-            node?.let {
-                nodeSaver.saveNode(
-                    it,
-                    fromChat,
-                    isFolderLink,
-                    true,
-                    type == Constants.FILE_LINK_ADAPTER || fromChat
-                )
+            node?.handle?.let {
+                startDownloadViewModel.onDownloadClicked(NodeId(it))
             }
         }
     }

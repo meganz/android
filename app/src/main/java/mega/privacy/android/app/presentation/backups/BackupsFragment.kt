@@ -247,7 +247,6 @@ class BackupsFragment : RotatableFragment() {
                         nodes = selectedNodes,
                         highPriority = false,
                         isFolderLink = false,
-                        fromMediaViewer = false,
                         fromChat = false,
                     )
                     clearSelections()
@@ -650,7 +649,6 @@ class BackupsFragment : RotatableFragment() {
                         nodes = listOf(node),
                         highPriority = true,
                         isFolderLink = false,
-                        fromMediaViewer = false,
                         fromChat = false,
                     )
                 }
@@ -711,7 +709,6 @@ class BackupsFragment : RotatableFragment() {
                     nodes = listOf(node),
                     highPriority = true,
                     isFolderLink = false,
-                    fromMediaViewer = false,
                     fromChat = false,
                 )
             }

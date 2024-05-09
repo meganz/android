@@ -226,7 +226,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 Timber.w("The selected node is NULL");
                 return;
             }
-            ((NodeAttachmentHistoryActivity) requireActivity()).downloadMessageNode(nodeList, messageId);
+            ((NodeAttachmentHistoryActivity) requireActivity()).downloadMessageNode(messageId);
         } else if (id == R.id.option_import) {
             if (node == null) {
                 Timber.w("The selected node is NULL");

@@ -427,7 +427,6 @@ class LinksComposeFragment : Fragment() {
                         nodes = it.selectedMegaNode,
                         highPriority = false,
                         isFolderLink = false,
-                        fromMediaViewer = false,
                         fromChat = false,
                     )
                     disableSelectMode()

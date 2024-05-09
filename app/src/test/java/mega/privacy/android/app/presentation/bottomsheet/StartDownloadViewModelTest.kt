@@ -24,7 +24,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -136,18 +135,6 @@ class StartDownloadViewModelTest {
         underTest.onDownloadClicked(chatId, listOf(messageId1, messageId2))
         assertStartDownloadNode(chatFile1, chatFile2)
     }
-
-    @Test
-    fun `test that downloadChatNodesOnlyIfFeatureFlagIsTrue executes the lambda if and only if feature is false`() =
-        runTest {
-            val toDoIfFeatureFlagIsFalse = mock<() -> Unit>()
-            underTest.downloadChatNodesOnlyIfFeatureFlagIsTrue(
-                1L,
-                listOf(11L),
-                toDoIfFeatureFlagIsFalse
-            )
-            verifyNoInteractions(toDoIfFeatureFlagIsFalse)
-        }
 
     @Test
     fun `test that onSaveOfflineClicked for chat file launches the correct event`() = runTest {

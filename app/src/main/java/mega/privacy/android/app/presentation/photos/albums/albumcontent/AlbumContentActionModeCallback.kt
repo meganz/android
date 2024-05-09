@@ -142,7 +142,6 @@ class AlbumContentActionModeCallback(
                 selectedNodes,
                 highPriority = false,
                 isFolderLink = false,
-                fromMediaViewer = false,
                 fromChat = false,
             )
         }

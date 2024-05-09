@@ -586,13 +586,13 @@ class ImageViewerViewModel @Inject constructor(
             .subscribeAndComplete()
     }
 
-    fun switchNodeOfflineAvailability(
+    fun switchNodeOfflineAvailabilityToFalse(
         nodeItem: MegaNodeItem,
         activity: Activity,
     ) {
         getNodeUseCase.setNodeAvailableOffline(
             node = nodeItem.node,
-            setOffline = !nodeItem.isAvailableOffline,
+            setOffline = false,
             isFromIncomingShares = nodeItem.isFromIncoming,
             isFromBackups = nodeItem.isFromBackups,
             activity = activity

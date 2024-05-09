@@ -87,7 +87,6 @@ internal class DocumentSectionActionModeCallback(
                     nodes = documentSectionViewModel.getSelectedMegaNode(),
                     highPriority = false,
                     isFolderLink = false,
-                    fromMediaViewer = false,
                     fromChat = false,
                 )
 

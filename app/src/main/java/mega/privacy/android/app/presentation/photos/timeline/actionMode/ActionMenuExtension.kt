@@ -13,11 +13,12 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 fun PhotosFragment.actionSaveToDevice() {
     lifecycleScope.launch {
         val selectedNodes = timelineViewModel.getSelectedNodes()
-        managerActivity.saveNodesToDevice(selectedNodes,
+        managerActivity.saveNodesToDevice(
+            selectedNodes,
             false,
             false,
-            false,
-            false)
+            false
+        )
     }
 }
 

@@ -42,7 +42,6 @@ class ActionModeCallback constructor(
                         selectedNodes,
                         false,
                         false,
-                        false,
                         false
                     )
                 }
