@@ -725,6 +725,15 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun setAskedResumeTransfers() {
         monitorAskedResumeTransfers.emit(true)
     }
+
+    override suspend fun startUploadsWorker() = withContext(ioDispatcher) {
+        workerManagerGateway.enqueueUploadsWorkerRequest()
+    }
+
+    override fun isUploadsWorkerEnqueuedFlow() =
+        workerManagerGateway.monitorUploadsStatusInfo().map { workInfos ->
+            workInfos.any { it.state == WorkInfo.State.ENQUEUED }
+        }
 }
 
 private fun MegaTransfer.isCUUpload() =

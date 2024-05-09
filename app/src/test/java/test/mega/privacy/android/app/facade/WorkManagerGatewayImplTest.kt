@@ -405,4 +405,38 @@ class WorkManagerGatewayImplTest {
                 assertThat(info[0].state).isEqualTo(WorkInfo.State.ENQUEUED)
             }
         }
+
+    @Test
+    fun `test that uploads worker is enqueued only once when calling enqueueUploadsWorkerRequest`() =
+        runTest {
+            val tag = "MEGA_UPLOAD_TAG"
+            whenever(workerClassGateway.uploadsWorkerClass)
+                .thenReturn(fakeWorker)
+
+            underTest.enqueueUploadsWorkerRequest()
+            // second call to make sure that worker is enqueued only once
+            underTest.enqueueUploadsWorkerRequest()
+
+            val workInfo = workManager.getWorkInfosByTagFlow(tag)
+            workInfo.test {
+                val info = awaitItem()
+                assertThat(info.size).isEqualTo(1)
+                assertThat(info[0].state).isEqualTo(WorkInfo.State.RUNNING)
+            }
+        }
+
+    @Test
+    fun `test that uploads worker status info is monitored with monitorUploadsStatusInfo`() =
+        runTest {
+            whenever(workerClassGateway.uploadsWorkerClass)
+                .thenReturn(fakeWorker)
+
+            underTest.enqueueUploadsWorkerRequest()
+
+            underTest.monitorUploadsStatusInfo().test {
+                val info = awaitItem()
+                assertThat(info.size).isEqualTo(1)
+                assertThat(info[0].state).isEqualTo(WorkInfo.State.RUNNING)
+            }
+        }
 }

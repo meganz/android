@@ -23,6 +23,7 @@ import mega.privacy.android.data.worker.ChatUploadsWorker
 import mega.privacy.android.data.worker.DeleteOldestCompletedTransfersWorker
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.data.worker.NewMediaWorker
+import mega.privacy.android.data.worker.UploadsWorker
 import mega.privacy.android.domain.monitoring.CrashReporter
 import timber.log.Timber
 import javax.inject.Inject
@@ -302,6 +303,24 @@ class WorkManagerGatewayImpl @Inject constructor(
 
     override fun monitorChatUploadsStatusInfo() =
         workManager.getWorkInfosByTagFlow(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
+
+    override suspend fun enqueueUploadsWorkerRequest() {
+        workManager.debugWorkInfo(crashReporter)
+
+        val request =
+            OneTimeWorkRequest.Builder(workerClassGateway.uploadsWorkerClass)
+                .addTag(UploadsWorker.SINGLE_UPLOAD_TAG)
+                .build()
+        workManager
+            .enqueueUniqueWork(
+                UploadsWorker.SINGLE_UPLOAD_TAG,
+                ExistingWorkPolicy.KEEP,
+                request
+            )
+    }
+
+    override fun monitorUploadsStatusInfo() =
+        workManager.getWorkInfosByTagFlow(UploadsWorker.SINGLE_UPLOAD_TAG)
 }
 
 /**

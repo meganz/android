@@ -37,4 +37,8 @@ interface WorkerClassGateway {
      */
     val newMediaWorkerClass: Class<out CoroutineWorker>
 
+    /**
+     * Provide the uploads worker class
+     */
+    val uploadsWorkerClass: Class<out CoroutineWorker>
 }

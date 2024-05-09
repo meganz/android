@@ -9,6 +9,7 @@ import mega.privacy.android.data.worker.DeleteOldestCompletedTransfersWorker
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
+import mega.privacy.android.data.worker.UploadsWorker
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -59,6 +60,10 @@ class WorkerClassGatewayImplTest {
         Arguments.of(
             underTest.newMediaWorkerClass,
             NewMediaWorker::class.java
+        ),
+        Arguments.of(
+            underTest.uploadsWorkerClass,
+            UploadsWorker::class.java
         ),
     )
 }

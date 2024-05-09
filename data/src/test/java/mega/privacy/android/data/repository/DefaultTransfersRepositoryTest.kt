@@ -1246,6 +1246,33 @@ class DefaultTransfersRepositoryTest {
                 }
 
             }
+
+        @Test
+        fun `test that workerManagerGateway enqueueUploadsWorkerRequest is called when startUploadsWorker is called`() =
+            runTest {
+                underTest.startUploadsWorker()
+                verify(workerManagerGateway).enqueueUploadsWorkerRequest()
+            }
+
+        @ParameterizedTest
+        @EnumSource(WorkInfo.State::class)
+        fun `test that isUploadsWorkerEnqueuedFlow returns workerManagerGateway values`(state: WorkInfo.State) =
+            runTest {
+                val workInfo = mock<WorkInfo> {
+                    on { this.state }.thenReturn(state)
+                }
+                whenever(workerManagerGateway.monitorUploadsStatusInfo())
+                    .thenReturn(flowOf(listOf(workInfo)))
+                underTest.isUploadsWorkerEnqueuedFlow().test {
+                    if (state == WorkInfo.State.ENQUEUED) {
+                        assertThat(awaitItem()).isTrue()
+                    } else {
+                        assertThat(awaitItem()).isFalse()
+                    }
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+            }
     }
 
     @Nested

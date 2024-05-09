@@ -7,6 +7,7 @@ import mega.privacy.android.data.worker.DeleteOldestCompletedTransfersWorker
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
+import mega.privacy.android.data.worker.UploadsWorker
 import javax.inject.Inject
 
 /**
@@ -26,4 +27,6 @@ class WorkerClassGatewayImpl @Inject constructor() : WorkerClassGateway {
         DeleteOldestCompletedTransfersWorker::class.java
 
     override val newMediaWorkerClass = NewMediaWorker::class.java
+
+    override val uploadsWorkerClass = UploadsWorker::class.java
 }

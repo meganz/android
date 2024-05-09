@@ -67,4 +67,14 @@ interface WorkManagerGateway {
      * Get DownloadsWorker Info
      */
     fun monitorChatUploadsStatusInfo(): Flow<List<WorkInfo>>
+
+    /**
+     * Enqueue unique work request to start uploads worker to monitor the upload transfers as a foreground service
+     */
+    suspend fun enqueueUploadsWorkerRequest()
+
+    /**
+     * Get UploadsWorker Info
+     */
+    fun monitorUploadsStatusInfo(): Flow<List<WorkInfo>>
 }
