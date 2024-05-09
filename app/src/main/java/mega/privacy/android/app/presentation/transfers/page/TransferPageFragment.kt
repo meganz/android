@@ -27,7 +27,6 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentTransferPageBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter
@@ -40,7 +39,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.create
 import mega.privacy.android.app.usecase.DownloadNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.TransfersStatus
@@ -414,38 +412,7 @@ internal class TransferPageFragment : Fragment() {
         when (transfer.type) {
             MegaTransfer.TYPE_DOWNLOAD -> {
                 lifecycleScope.launch {
-                    if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                        transfersViewModel.retryTransfer(transfer)
-                    } else {
-                        val node = megaApi.getNodeByHandle(transfer.handle) ?: return@launch
-                        when (transfer.isOffline) {
-                            true -> {
-                                val offlineFile = File(transfer.originalPath)
-                                OfflineUtils.saveOffline(
-                                    offlineFile.parentFile,
-                                    node,
-                                    requireActivity()
-                                )
-                            }
-
-                            false -> {
-                                downloadNodeUseCase.download(requireActivity(), node, transfer.path)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(
-                                        { Timber.d("Transfer retried: ${node.handle}") },
-                                        { throwable: Throwable? ->
-                                            Timber.e(throwable, "Retry transfer failed.")
-                                        }
-                                    )
-                                    .addTo(composite)
-                            }
-
-                            null -> {
-                                Timber.d("Unable to retrieve transfer isOffline value")
-                            }
-                        }
-                    }
+                    transfersViewModel.retryTransfer(transfer)
                 }
             }
 

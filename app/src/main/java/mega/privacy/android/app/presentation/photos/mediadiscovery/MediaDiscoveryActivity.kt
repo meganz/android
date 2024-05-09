@@ -100,7 +100,6 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                     onPhotoClicked = this::onClick,
                     onPhotoLongPressed = this::onLongPress,
                     onImportClicked = this::importNode,
-                    legacyOnSaveToDeviceClicked = this::saveToDevice,
                 )
             }
         }
@@ -351,29 +350,6 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         val intent = Intent(this, FileExplorerActivity::class.java)
         intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
         selectImportFolderLauncher.launch(intent)
-    }
-
-    /**
-     * Handle download option
-     */
-    @Deprecated("This will be removed once [AppFeatures.DownloadWorker] is stable")
-    private fun saveToDevice() {
-        lifecycleScope.launch {
-            val nodes = mediaDiscoveryViewModel.getNodes()
-            downloadNodes(nodes)
-            mediaDiscoveryViewModel.clearSelectedPhotos()
-        }
-    }
-
-    private fun downloadNodes(nodes: List<MegaNode>) {
-        PermissionUtils.checkNotificationsPermission(this)
-        nodeSaver.saveNodes(
-            nodes,
-            highPriority = false,
-            isFolderLink = true,
-            fromMediaViewer = false,
-            needSerialize = false
-        )
     }
 
     @SuppressLint("CheckResult")

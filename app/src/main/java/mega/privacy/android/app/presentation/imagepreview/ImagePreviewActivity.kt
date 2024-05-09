@@ -61,7 +61,6 @@ import mega.privacy.mobile.analytics.event.PhotoPreviewSaveToDeviceMenuToolbarEv
 import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -245,9 +244,7 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun saveNodeToDevice(imageNode: ImageNode) {
         Analytics.tracker.trackEvent(PhotoPreviewSaveToDeviceMenuToolbarEvent)
-        viewModel.executeTransfer(transferMessage = getString(R.string.resume_paused_transfers_text)) {
-            saveNode(MegaNode.unserialize(imageNode.serializedData))
-        }
+        viewModel.executeTransfer(transferMessage = getString(R.string.resume_paused_transfers_text))
     }
 
     private fun importNode(imageNode: ImageNode) {
@@ -256,7 +253,6 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun setAvailableOffline(checked: Boolean, imageNode: ImageNode) {
         viewModel.setNodeAvailableOffline(
-            activity = WeakReference(this@ImagePreviewActivity),
             setOffline = checked,
             imageNode = imageNode
         )
@@ -357,11 +353,6 @@ class ImagePreviewActivity : BaseActivity() {
                 imageNode = imageNode,
             )
         }
-    }
-
-    private fun saveNode(node: MegaNode) {
-        PermissionUtils.checkNotificationsPermission(this)
-        viewModel.saveToDevice(nodeSaver = nodeSaver, node = node, isForeign = isForeign)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

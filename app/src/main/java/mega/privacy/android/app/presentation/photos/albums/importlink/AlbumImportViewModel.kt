@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_LINK
 import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
@@ -51,7 +50,6 @@ import mega.privacy.android.domain.usecase.photos.GetPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.IsAlbumLinkValidUseCase
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -522,20 +520,17 @@ internal class AlbumImportViewModel @Inject constructor(
         legacyPublicAlbumPhotoNodeProvider.stopPreview()
     }
 
-    fun startDownload(legacyDownload: ((megaNodes: List<MegaNode>) -> Unit)) {
+    fun startDownload() {
         viewModelScope.launch {
             val photos = with(state.value) { selectedPhotos.ifEmpty { photos } }
             val megaNodes = mapPhotosToNodes(photos)
-            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                // Please note that using [MegaNode] should be avoided, [Photo] should implement [TypedNode] so that it can be sent directly to [TransferTriggerEvent]
-                val nodes = megaNodes.mapNotNull {
-                    getPublicNodeFromSerializedDataUseCase(it.serialize())
-                }
-                updateDownloadEvent(TransferTriggerEvent.StartDownloadNode(nodes))
-                clearSelection()
-            } else {
-                legacyDownload(megaNodes)
+
+            // Please note that using [MegaNode] should be avoided, [Photo] should implement [TypedNode] so that it can be sent directly to [TransferTriggerEvent]
+            val nodes = megaNodes.mapNotNull {
+                getPublicNodeFromSerializedDataUseCase(it.serialize())
             }
+            updateDownloadEvent(TransferTriggerEvent.StartDownloadNode(nodes))
+            clearSelection()
         }
     }
 

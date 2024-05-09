@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.imagepreview
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
@@ -71,7 +70,6 @@ import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUs
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 @HiltViewModel
@@ -429,19 +427,15 @@ class ImagePreviewViewModel @Inject constructor(
     /**
      * Check if transfers are paused.
      */
-    fun executeTransfer(transferMessage: String, legacyTransferAction: () -> Unit) {
+    fun executeTransfer(transferMessage: String) {
         viewModelScope.launch {
             if (areTransfersPausedUseCase()) {
                 setTransferMessage(transferMessage)
             } else {
-                if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                    triggerDownloadEvent(
-                        imageNode = _state.value.currentImageNode,
-                    ) {
-                        TransferTriggerEvent.StartDownloadNode(listOf(it))
-                    }
-                } else {
-                    legacyTransferAction()
+                triggerDownloadEvent(
+                    imageNode = _state.value.currentImageNode,
+                ) {
+                    TransferTriggerEvent.StartDownloadNode(listOf(it))
                 }
             }
         }
@@ -458,24 +452,15 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     fun setNodeAvailableOffline(
-        activity: WeakReference<Activity>,
         setOffline: Boolean,
         imageNode: ImageNode,
     ) {
         viewModelScope.launch {
             if (setOffline) {
-                if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                    triggerDownloadEvent(
-                        imageNode,
-                    ) {
-                        TransferTriggerEvent.StartDownloadForOffline(it)
-                    }
-                } else {
-                    setNodeAvailableOffline(
-                        nodeId = imageNode.id,
-                        availableOffline = true,
-                        activity = activity
-                    )
+                triggerDownloadEvent(
+                    imageNode,
+                ) {
+                    TransferTriggerEvent.StartDownloadForOffline(it)
                 }
             } else {
                 removeOfflineNodeUseCase(imageNode.id)

@@ -248,20 +248,7 @@ internal fun AlbumImportScreen(
                         }
                     },
                     onSaveToDevice = {
-                        albumImportViewModel.startDownload(
-                            legacyDownload = { nodes ->
-                                if (state.isNetworkConnected) {
-                                    onSaveToDevice(nodes)
-                                    albumImportViewModel.clearSelection()
-                                } else {
-                                    coroutineScope.launch {
-                                        scaffoldState.snackbarHostState.showSnackbar(
-                                            message = context.resources.getString(R.string.error_server_connection_problem),
-                                        )
-                                    }
-                                }
-                            },
-                        )
+                        albumImportViewModel.startDownload()
                     }
                 )
             }

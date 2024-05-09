@@ -9,9 +9,9 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -30,7 +30,6 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -396,7 +395,6 @@ class FileLinkViewModelTest {
             val fileNode = mockFileNode()
             val publicNode = mock<PublicLinkFile>()
             whenever(getPublicNodeUseCase(any())).thenReturn(fileNode)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
             whenever(mapNodeToPublicLinkUseCase(any(), anyOrNull())).thenReturn(publicNode)
             underTest.state.test {
                 underTest.getPublicNode(url)

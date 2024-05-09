@@ -69,7 +69,6 @@ fun MediaDiscoveryScreen(
     onPhotoClicked: (Photo) -> Unit,
     onPhotoLongPressed: (Photo) -> Unit,
     onImportClicked: () -> Unit,
-    legacyOnSaveToDeviceClicked: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val lazyGridState = rememberLazyGridState()
@@ -123,9 +122,7 @@ fun MediaDiscoveryScreen(
                     showMoreMenu = false
                 },
                 onSaveToDeviceClicked = {
-                    viewModel.onSaveToDeviceClicked {
-                        legacyOnSaveToDeviceClicked()
-                    }
+                    viewModel.onSaveToDeviceClicked()
                     showMoreMenu = false
                 },
                 onSortByClicked = {

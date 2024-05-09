@@ -747,11 +747,9 @@ class LoginViewModel @Inject constructor(
                         )
                     }
 
-                    if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                        /*In case the app crash or restarts, we need to restart the worker
-                        in order to monitor current transfers and update the related notification.*/
-                        startDownloadWorkerUseCase()
-                    }
+                    /*In case the app crash or restarts, we need to restart the worker
+                    in order to monitor current transfers and update the related notification.*/
+                    startDownloadWorkerUseCase()
                     if (getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {
                         startChatUploadsWorkerUseCase()
                     }

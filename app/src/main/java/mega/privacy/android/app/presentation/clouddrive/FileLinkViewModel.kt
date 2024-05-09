@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
@@ -24,6 +23,7 @@ import mega.privacy.android.app.presentation.mapper.UrlDownloadException
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -44,8 +44,6 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -65,7 +63,7 @@ class FileLinkViewModel @Inject constructor(
     private val getFileUrlByPublicLinkUseCase: GetFileUrlByPublicLinkUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
-    private val fileTypeIconMapper: FileTypeIconMapper
+    private val fileTypeIconMapper: FileTypeIconMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -273,24 +271,18 @@ class FileLinkViewModel @Inject constructor(
      */
     fun handleSaveFile() {
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                val linkNodes = listOfNotNull(
-                    (_state.value.fileNode as? UnTypedNode)?.let {
-                        runCatching {
-                            mapNodeToPublicLinkUseCase(it, null) as? TypedNode
-                        }.onFailure {
-                            Timber.e(it)
-                        }.getOrNull()
-                    })
-                _state.update {
-                    it.copy(
-                        downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
-                    )
-                }
-            } else {
-                MegaNode.unserialize(state.value.serializedData)?.let { publicNode ->
-                    _state.update { it.copy(downloadFile = triggered(publicNode)) }
-                } ?: Timber.e("PublicNode is NULL")
+            val linkNodes = listOfNotNull(
+                (_state.value.fileNode as? UnTypedNode)?.let {
+                    runCatching {
+                        mapNodeToPublicLinkUseCase(it, null) as? TypedNode
+                    }.onFailure {
+                        Timber.e(it)
+                    }.getOrNull()
+                })
+            _state.update {
+                it.copy(
+                    downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
+                )
             }
         }
     }

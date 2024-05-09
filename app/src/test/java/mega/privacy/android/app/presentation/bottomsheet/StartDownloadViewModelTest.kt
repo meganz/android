@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -24,11 +23,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
@@ -70,15 +66,6 @@ class StartDownloadViewModelTest {
             getPublicNodeFromSerializedDataUseCase,
             getPublicChildNodeFromIdUseCase,
         )
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that shouldDownloadWithDownloadWorker returns feature flag value`(
-        expected: Boolean,
-    ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(expected)
-        assertThat(underTest.shouldDownloadWithDownloadWorker()).isEqualTo(expected)
     }
 
     @Test
@@ -154,24 +141,17 @@ class StartDownloadViewModelTest {
         assertStartDownloadNode(chatFile1, chatFile2)
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that downloadChatNodesOnlyIfFeatureFlagIsTrue executes the lambda if and only if feature is false`(
-        featureFlagValue: Boolean,
-    ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(featureFlagValue)
-        val toDoIfFeatureFlagIsFalse = mock<() -> Unit>()
-        underTest.downloadChatNodesOnlyIfFeatureFlagIsTrue(
-            1L,
-            listOf(11L),
-            toDoIfFeatureFlagIsFalse
-        )
-        if (featureFlagValue) {
+    @Test
+    fun `test that downloadChatNodesOnlyIfFeatureFlagIsTrue executes the lambda if and only if feature is false`() =
+        runTest {
+            val toDoIfFeatureFlagIsFalse = mock<() -> Unit>()
+            underTest.downloadChatNodesOnlyIfFeatureFlagIsTrue(
+                1L,
+                listOf(11L),
+                toDoIfFeatureFlagIsFalse
+            )
             verifyNoInteractions(toDoIfFeatureFlagIsFalse)
-        } else {
-            verify(toDoIfFeatureFlagIsFalse).invoke()
         }
-    }
 
     @Test
     fun `test that onSaveOfflineClicked for chat file launches the correct event`() = runTest {

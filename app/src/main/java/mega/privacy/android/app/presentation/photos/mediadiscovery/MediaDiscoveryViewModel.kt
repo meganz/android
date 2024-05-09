@@ -705,25 +705,20 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     /**
      * On save to device clicked, will start downloading selected nodes (or all if none selected)
-     * @param legacySaveToDevice: to launch legacy implementation if [AppFeatures.DownloadWorker] is false
      */
-    fun onSaveToDeviceClicked(legacySaveToDevice: () -> Unit) {
+    fun onSaveToDeviceClicked() {
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                val nodes = getNodes().mapNotNull {
-                    if (fromFolderLink == true) {
-                        getPublicChildNodeFromIdUseCase(NodeId(it.handle))
-                    } else {
-                        getNodeByIdUseCase(NodeId(it.handle))
-                    }
+            val nodes = getNodes().mapNotNull {
+                if (fromFolderLink == true) {
+                    getPublicChildNodeFromIdUseCase(NodeId(it.handle))
+                } else {
+                    getNodeByIdUseCase(NodeId(it.handle))
                 }
-                _state.update {
-                    it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(nodes)))
-                }
-                clearSelectedPhotos()
-            } else {
-                legacySaveToDevice()
             }
+            _state.update {
+                it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(nodes)))
+            }
+            clearSelectedPhotos()
         }
     }
 

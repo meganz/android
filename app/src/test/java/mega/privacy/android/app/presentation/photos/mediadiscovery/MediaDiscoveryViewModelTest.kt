@@ -208,9 +208,8 @@ class MediaDiscoveryViewModelTest {
     fun `test that start download node event is launched with correct value when on save to device is invoked with download worker feature flag is enabled`() =
         runTest {
             val node = stubSelectedNode()
-            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
 
-            underTest.onSaveToDeviceClicked(mock())
+            underTest.onSaveToDeviceClicked()
             assertThat(underTest.state.value.downloadEvent)
                 .isInstanceOf(StateEventWithContentTriggered::class.java)
             val downloadEvent =
@@ -235,15 +234,6 @@ class MediaDiscoveryViewModelTest {
     }
 
     @Test
-    fun `test that legacy lambda is launched when on save to device is invoked with download worker feature flag is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
-            val legacySaveToDevice = mock<() -> Unit>()
-            underTest.onSaveToDeviceClicked(legacySaveToDevice)
-            verify(legacySaveToDevice)()
-        }
-
-    @Test
     fun `test that download event initial value is consumed `() =
         runTest {
             assertThat(underTest.state.value.downloadEvent)
@@ -254,9 +244,8 @@ class MediaDiscoveryViewModelTest {
     fun `test that download event is consumed when on consume download event is invoked`() =
         runTest {
             stubSelectedNode()
-            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
 
-            underTest.onSaveToDeviceClicked(mock())
+            underTest.onSaveToDeviceClicked()
 
             assertThat(underTest.state.value.downloadEvent)
                 .isInstanceOf(StateEventWithContentTriggered::class.java)

@@ -20,7 +20,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
@@ -343,17 +342,6 @@ class TransfersManagement @Inject constructor(
         Handler(Looper.getMainLooper()).postDelayed({
             try {
                 applicationScope.launch {
-                    if (!getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                        @Suppress("DEPRECATION")
-                        if (megaApi.numPendingDownloads > 0) {
-                            val downloadServiceIntent =
-                                Intent(context, DownloadService::class.java)
-                                    .setAction(Constants.ACTION_RESTART_SERVICE)
-                            tryToStartForegroundService(downloadServiceIntent)
-                        }
-                    }
-
-
                     @Suppress("DEPRECATION")
                     if (megaApi.numPendingUploads > 0) {
                         val uploadServiceIntent = Intent(context, UploadService::class.java)

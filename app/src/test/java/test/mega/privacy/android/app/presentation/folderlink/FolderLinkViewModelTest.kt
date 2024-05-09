@@ -11,7 +11,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -23,7 +22,6 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -56,7 +54,6 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -575,27 +572,7 @@ class FolderLinkViewModelTest {
     }
 
     @Test
-    fun `test that downloadNodes is triggered when updateNodesToDownload is invoked`() = runTest {
-        val nodeHandle = 1234L
-        val nodeId = NodeId(nodeHandle)
-        val megaNodes: List<MegaNode> = mock()
-        val node: TypedFileNode = mock {
-            on { this.id }.thenReturn(nodeId)
-        }
-        val nodes = listOf(node)
-        val ids = listOf(nodeHandle)
-
-        whenever(getPublicNodeListByIds(ids)).thenReturn(megaNodes)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
-        underTest.updateNodesToDownload(nodes)
-        underTest.state.test {
-            val res = awaitItem()
-            assertThat(res.downloadNodes).isInstanceOf(triggered(megaNodes).javaClass)
-        }
-    }
-
-    @Test
-    fun `test that downloadEvent is triggered when updateNodesToDownload is invoked and feature flag is true`() =
+    fun `test that downloadEvent is triggered when updateNodesToDownload is invoked`() =
         runTest {
             val node1 = mock<TypedFileNode>()
             val node2 = mock<TypedFolderNode>()
@@ -604,7 +581,6 @@ class FolderLinkViewModelTest {
             val link2 = mock<PublicLinkFolder>()
             whenever(mapNodeToPublicLinkUseCase(node1, null)).thenReturn(link1)
             whenever(mapNodeToPublicLinkUseCase(node2, null)).thenReturn(link2)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
             underTest.updateNodesToDownload(nodes)
             underTest.state.test {
                 val res = awaitItem()

@@ -18,7 +18,6 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.updateItemAt
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -667,48 +666,28 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun handleSaveToDevice(nodeUIItem: NodeUIItem<TypedNode>?) {
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                val nodes = if (isMultipleNodeSelected()) {
-                    getSelectedNodes().map { it.node }.also {
-                        clearAllSelection()
-                    }
-                } else {
-                    val node = nodeUIItem?.node
-                        ?: state.value.parentNode
-                        ?: state.value.rootNode
-                    listOfNotNull(node)
-                }.mapNotNull {
-                    runCatching {
-                        mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
-                    }.onFailure {
-                        Timber.e(it)
-                    }.getOrNull()
-                }
-                _state.update {
-                    it.copy(
-                        downloadEvent = triggered(
-                            TransferTriggerEvent.StartDownloadNode(nodes)
-                        )
-                    )
+            val nodes = if (isMultipleNodeSelected()) {
+                getSelectedNodes().map { it.node }.also {
+                    clearAllSelection()
                 }
             } else {
-                if (isMultipleNodeSelected()) {
-                    val selectedNodeIds = getSelectedNodes().map { it.id.longValue }
-                    val selectedNodes = getPublicNodeListByIds(selectedNodeIds)
-                    _state.update { it.copy(downloadNodes = triggered(selectedNodes)) }
-                    clearAllSelection()
-                } else {
-                    val downloadNodeId =
-                        nodeUIItem?.id?.longValue
-                            ?: state.value.parentNode?.id?.longValue
-                            ?: state.value.rootNode?.id?.longValue
-
-                    downloadNodeId?.let {
-                        getPublicNodeListByIds(listOf(downloadNodeId)).let { downloadNode ->
-                            _state.update { it.copy(downloadNodes = triggered(downloadNode)) }
-                        }
-                    } ?: Timber.w("rootNode null!!")
-                }
+                val node = nodeUIItem?.node
+                    ?: state.value.parentNode
+                    ?: state.value.rootNode
+                listOfNotNull(node)
+            }.mapNotNull {
+                runCatching {
+                    mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
+                }.onFailure {
+                    Timber.e(it)
+                }.getOrNull()
+            }
+            _state.update {
+                it.copy(
+                    downloadEvent = triggered(
+                        TransferTriggerEvent.StartDownloadNode(nodes)
+                    )
+                )
             }
         }
     }
@@ -828,22 +807,17 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun updateNodesToDownload(nodes: List<TypedNode>) {
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                val linkNodes = nodes.mapNotNull {
-                    runCatching {
-                        mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
-                    }.onFailure {
-                        Timber.e(it)
-                    }.getOrNull()
-                }
-                _state.update {
-                    it.copy(
-                        downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
-                    )
-                }
-            } else {
-                val megaNodes = getPublicNodeListByIds(nodes.map { it.id.longValue })
-                _state.update { it.copy(downloadNodes = triggered(megaNodes)) }
+            val linkNodes = nodes.mapNotNull {
+                runCatching {
+                    mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
+                }.onFailure {
+                    Timber.e(it)
+                }.getOrNull()
+            }
+            _state.update {
+                it.copy(
+                    downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
+                )
             }
         }
     }

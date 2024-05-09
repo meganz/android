@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.extensions.updateItemAt
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -717,7 +716,7 @@ class FileBrowserViewModel @Inject constructor(
                 item = item,
                 selectedNodeHandle = state.value.selectedNodeHandles
             )
-            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker) && optionsItemInfo.optionClickedType == OptionItems.DOWNLOAD_CLICKED) {
+            if (optionsItemInfo.optionClickedType == OptionItems.DOWNLOAD_CLICKED) {
                 _state.update {
                     it.copy(
                         downloadEvent = triggered(

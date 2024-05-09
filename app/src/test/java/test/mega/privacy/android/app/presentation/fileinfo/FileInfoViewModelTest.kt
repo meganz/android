@@ -31,11 +31,11 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.FolderTreeInfo
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
@@ -82,7 +82,6 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import org.junit.jupiter.api.BeforeEach
@@ -815,21 +814,6 @@ internal class FileInfoViewModelTest {
     }
 
     @Test
-    fun `test availableOfflineChanged changes ui state accordingly`() = runTest {
-        mockMonitorStorageStateEvent(StorageState.Green)
-        val expected = true
-        whenever(isAvailableOffline.invoke(any())).thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
-        underTest.setNode(node.handle, true)
-        underTest.availableOfflineChanged(expected, activity)
-        underTest.uiState.mapNotNull { it.isAvailableOffline }.test {
-            Truth.assertThat(awaitItem()).isEqualTo(expected)
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(setNodeAvailableOffline, times(1)).invoke(nodeId, expected, activity)
-    }
-
-    @Test
     fun `test availableOfflineChanged does not start download if storage state is pay wall`() =
         runTest {
             mockMonitorStorageStateEvent(StorageState.PayWall)
@@ -982,18 +966,8 @@ internal class FileInfoViewModelTest {
         }
 
     @Test
-    fun `test that legacy download event is launched when download worker feature flag is disabled`() =
+    fun `test that start download node event is launched when start download node is triggered`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
-            underTest.startDownloadNode()
-            Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
-                .isEqualTo(FileInfoOneOffViewEvent.StartLegacyDownload)
-        }
-
-    @Test
-    fun `test that start download node event is launched when download worker feature flag is enabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
             underTest.setNode(node.handle, true)
             underTest.startDownloadNode()
             Truth.assertThat((underTest.uiState.value.downloadEvent as? StateEventWithContentTriggered)?.content)
@@ -1001,20 +975,8 @@ internal class FileInfoViewModelTest {
         }
 
     @Test
-    fun `test that legacy set node available offline use case is launched when availableOfflineChanged is set to true and download worker feature flag is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
-            mockMonitorStorageStateEvent(StorageState.Green)
-            whenever(isAvailableOffline(any())).thenReturn(false)
-            underTest.setNode(node.handle, true)
-            underTest.availableOfflineChanged(true, activity)
-            verify(setNodeAvailableOffline, times(1)).invoke(nodeId, true, activity)
-        }
-
-    @Test
     fun `test that start download node for offline event is launched when download worker feature flag is enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
             mockMonitorStorageStateEvent(StorageState.Green)
             whenever(isAvailableOffline(any())).thenReturn(false)
             underTest.setNode(node.handle, true)

@@ -9,10 +9,8 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_LINK
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
@@ -45,8 +43,6 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -409,38 +405,15 @@ class AlbumImportViewModelTest {
     }
 
     @Test
-    fun `test that start download invokes legacy code when DownloadWorker feature flag is false`() =
-        runTest {
-            stubSelectedMegaNode()
-            whenever(mockGetFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
-            val legacyDownload = mock<(megaNodes: List<MegaNode>) -> Unit>()
-            underTest.startDownload(legacyDownload)
-            advanceUntilIdle()
-            verify(legacyDownload).invoke(any())
-        }
-
-    @Test
-    fun `test that start download does not invoke legacy code when DownloadWorker feature flag is true`() =
-        runTest {
-            stubSelectedMegaNode()
-            whenever(mockGetFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
-            val legacyDownload = mock<(megaNodes: List<MegaNode>) -> Unit>()
-            underTest.startDownload(legacyDownload)
-            advanceUntilIdle()
-            verifyNoInteractions(legacyDownload)
-        }
-
-    @Test
-    fun `test that start download triggers the correct download event when DownloadWorker feature flag is true`() =
+    fun `test that start download triggers the correct download event when start download is triggered`() =
         runTest {
             val megaNode = stubSelectedMegaNode()
             val node = mock<PublicLinkFile>()
-            whenever(mockGetFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
             whenever(mockGetPublicNodeFromSerializedDataUseCase(megaNode.serialize()))
                 .thenReturn(node)
             underTest.stateFlow.test {
                 awaitItem() //initial
-                underTest.startDownload(mock())
+                underTest.startDownload()
                 val actual = awaitItem().downloadEvent
                 assertThat(actual).isInstanceOf(StateEventWithContentTriggered::class.java)
                 val content = (actual as StateEventWithContentTriggered).content
@@ -456,7 +429,7 @@ class AlbumImportViewModelTest {
         runTest {
             stubSelectedTypedNode()
             underTest.stateFlow.test {
-                underTest.startDownload(mock())
+                underTest.startDownload()
                 assertThat(awaitItem().selectedPhotos).isNotEmpty()
                 underTest.clearSelection()
                 val actual =
@@ -471,7 +444,7 @@ class AlbumImportViewModelTest {
             stubSelectedTypedNode()
             underTest.stateFlow.test {
                 awaitItem() //initial
-                underTest.startDownload(mock())
+                underTest.startDownload()
                 assertThat(awaitItem().downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
                 awaitItem() //clear selection
                 underTest.consumeDownloadEvent()
@@ -482,7 +455,6 @@ class AlbumImportViewModelTest {
     private suspend fun stubSelectedTypedNode(): TypedNode {
         val megaNode = stubSelectedMegaNode()
         val node = mock<PublicLinkFile>()
-        whenever(mockGetFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
         whenever(mockGetPublicNodeFromSerializedDataUseCase(megaNode.serialize()))
             .thenReturn(node)
         return node

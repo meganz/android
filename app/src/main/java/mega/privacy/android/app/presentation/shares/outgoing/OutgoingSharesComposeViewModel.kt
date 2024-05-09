@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.updateItemAt
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
@@ -584,7 +583,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
                 item = item,
                 selectedNodeHandle = state.value.selectedNodeHandles
             )
-            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker) && optionsItemInfo.optionClickedType == OptionItems.DOWNLOAD_CLICKED) {
+            if (optionsItemInfo.optionClickedType == OptionItems.DOWNLOAD_CLICKED) {
                 _state.update {
                     it.copy(
                         downloadEvent = triggered(

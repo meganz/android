@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -47,8 +46,8 @@ class StartDownloadViewModel @Inject constructor(
      * DownloadsWorker is still under feature flag, so this method should be used to check the usage of this view model
      * This should be removed once the feature flag is removed
      */
-    suspend fun shouldDownloadWithDownloadWorker() =
-        getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)
+    @Deprecated (message = "This will be removed soon, as the Download worker is the current way of downloading nodes")
+    suspend fun shouldDownloadWithDownloadWorker() = true
 
     /**
      * Triggers the event related to download a node with [nodeId]

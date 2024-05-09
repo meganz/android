@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
@@ -382,7 +381,6 @@ internal class LinksViewModelTest {
         val optionsItemInfo =
             OptionsItemInfo(OptionItems.DOWNLOAD_CLICKED, emptyList(), emptyList())
         whenever(handleOptionClickMapper(eq(menuItem), any())).thenReturn(optionsItemInfo)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
         underTest.onOptionItemClicked(menuItem)
     }
 

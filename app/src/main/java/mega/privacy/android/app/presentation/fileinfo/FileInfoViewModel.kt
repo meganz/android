@@ -18,7 +18,6 @@ import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
@@ -32,6 +31,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.StorageState
@@ -82,7 +82,6 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -133,7 +132,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
-    private val fileTypeIconMapper: FileTypeIconMapper
+    private val fileTypeIconMapper: FileTypeIconMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -325,7 +324,7 @@ class FileInfoViewModel @Inject constructor(
                 updateState { it.copy(oneOffViewEvent = triggered(FileInfoOneOffViewEvent.OverDiskQuota)) }
                 return@launch
             }
-            if (availableOffline && getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+            if (availableOffline) {
                 updateState {
                     it.copy(
                         downloadEvent = triggered(StartDownloadForOffline(typedNode)),
@@ -339,15 +338,13 @@ class FileInfoViewModel @Inject constructor(
                 viewModelScope.launch {
                     setNodeAvailableOffline(
                         typedNode.id,
-                        availableOffline,
+                        false,
                         activity
                     )
                     updateState {
                         it.copy(
-                            oneOffViewEvent = if (!availableOffline) triggered(
-                                FileInfoOneOffViewEvent.Message.RemovedOffline
-                            ) else consumed(),
-                            isAvailableOffline = availableOffline,
+                            oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.RemovedOffline),
+                            isAvailableOffline = false,
                             isAvailableOfflineEnabled = !typedNode.isTakenDown && !it.isNodeInRubbish,
                         )
                     }
@@ -980,13 +977,9 @@ class FileInfoViewModel @Inject constructor(
      */
     fun startDownloadNode() {
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                _uiState.updateDownloadEvent(
-                    TransferTriggerEvent.StartDownloadNode(listOf(typedNode))
-                )
-            } else {
-                _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.StartLegacyDownload)
-            }
+            _uiState.updateDownloadEvent(
+                TransferTriggerEvent.StartDownloadNode(listOf(typedNode))
+            )
         }
     }
 }

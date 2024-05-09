@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
@@ -473,7 +472,6 @@ class IncomingSharesComposeViewModelTest {
         val optionsItemInfo =
             OptionsItemInfo(OptionItems.DOWNLOAD_CLICKED, emptyList(), emptyList())
         whenever(handleOptionClickMapper(eq(menuItem), any())).thenReturn(optionsItemInfo)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
         underTest.onOptionItemClicked(menuItem)
     }
 
