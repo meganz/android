@@ -6,8 +6,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.mobile.analytics.event.ChatConversationResumeTransfersMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,6 +32,10 @@ class ResumeTransfersMessageActionTest {
     private lateinit var underTest: ResumeTransfersMessageAction
 
     private val chatViewModel = mock<ChatViewModel>()
+
+    private val contactMessage = mock<ContactAttachmentMessage> {
+        on { isContact } doReturn true
+    }
 
     @Before
     fun setUp() {
@@ -94,5 +100,15 @@ class ResumeTransfersMessageActionTest {
         }
 
         verify(chatViewModel).resumeTransfers()
+    }
+
+    @Test
+    fun `test that analytics event is sent when action is clicked`() {
+        val onHandled: () -> Unit = mock()
+        composeTestRule.setContent {
+            underTest.OnTrigger(messages = setOf(contactMessage), onHandled = onHandled)
+        }
+        verify(onHandled).invoke()
+        assertThat(analyticsRule.events).contains(ChatConversationResumeTransfersMenuItemEvent)
     }
 }
