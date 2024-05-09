@@ -24,7 +24,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -88,7 +87,6 @@ class ImagePreviewViewModel @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val addFavouritesUseCase: AddFavouritesUseCase,
     private val removeFavouritesUseCase: RemoveFavouritesUseCase,
-    private val setNodeAvailableOffline: SetNodeAvailableOffline,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,

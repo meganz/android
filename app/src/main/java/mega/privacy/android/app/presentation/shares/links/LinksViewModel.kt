@@ -31,7 +31,6 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorFolderNodeDeleteUpdatesUseCase
@@ -51,7 +50,6 @@ class LinksViewModel @Inject constructor(
     private val getLinksSortOrder: GetLinksSortOrder,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val handleOptionClickMapper: HandleOptionClickMapper,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
 ) : ViewModel() {
 

@@ -40,14 +40,11 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.theme.MegaAppTheme
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -60,9 +57,6 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel by viewModels()
     private val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()

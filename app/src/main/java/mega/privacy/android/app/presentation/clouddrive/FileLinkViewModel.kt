@@ -35,7 +35,6 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -61,7 +60,6 @@ class FileLinkViewModel @Inject constructor(
     private val httpServerStart: MegaApiHttpServerStartUseCase,
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
     private val getFileUrlByPublicLinkUseCase: GetFileUrlByPublicLinkUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
 ) : ViewModel() {

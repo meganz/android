@@ -26,7 +26,6 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
@@ -79,8 +78,6 @@ class AlbumImportViewModelTest {
 
     private val mockMonitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
 
-    private val mockGetFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
-
     private val mockGetPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase =
         mock()
 
@@ -104,7 +101,6 @@ class AlbumImportViewModelTest {
             isAlbumLinkValidUseCase = mockIsAlbumLinkValidUseCase,
             monitorConnectivityUseCase = mockMonitorConnectivityUseCase,
             defaultDispatcher = StandardTestDispatcher(),
-            getFeatureFlagValueUseCase = mockGetFeatureFlagValueUseCase,
             getPublicNodeFromSerializedDataUseCase = mockGetPublicNodeFromSerializedDataUseCase,
         )
     }

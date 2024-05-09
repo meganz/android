@@ -95,7 +95,6 @@ import mega.privacy.mobile.analytics.event.AlbumsStorageOverQuotaUpgradeAccountB
 import mega.privacy.mobile.analytics.event.ImportAlbumContentLoadedEvent
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
-import nz.mega.sdk.MegaNode
 
 private typealias ImageDownloader = (
     isPreview: Boolean,
@@ -108,7 +107,6 @@ internal fun AlbumImportScreen(
     albumImportViewModel: AlbumImportViewModel = viewModel(),
     onShareLink: (String) -> Unit,
     onPreviewPhoto: (Photo) -> Unit,
-    onSaveToDevice: (List<MegaNode>) -> Unit,
     onNavigateFileExplorer: () -> Unit,
     onUpgradeAccount: () -> Unit,
     onBack: (isBackToHome: Boolean) -> Unit,

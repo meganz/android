@@ -14,7 +14,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
@@ -35,7 +34,6 @@ class StartDownloadViewModelTest {
 
     private lateinit var underTest: StartDownloadViewModel
 
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getChatFileUseCase = mock<GetChatFileUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPublicNodeFromSerializedDataUseCase =
@@ -50,7 +48,6 @@ class StartDownloadViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            getFeatureFlagValueUseCase,
             getChatFileUseCase,
             getNodeByIdUseCase,
             getPublicNodeFromSerializedDataUseCase,
@@ -60,7 +57,6 @@ class StartDownloadViewModelTest {
 
     private fun initViewModel() {
         underTest = StartDownloadViewModel(
-            getFeatureFlagValueUseCase,
             getChatFileUseCase,
             getNodeByIdUseCase,
             getPublicNodeFromSerializedDataUseCase,

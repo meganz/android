@@ -18,7 +18,6 @@ import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.fileinfo.FileInfoViewModel
@@ -65,7 +64,6 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
@@ -145,7 +143,6 @@ internal class FileInfoViewModelTest {
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
     private val monitorOfflineFileAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
     private val fileTypeIconMapper = FileTypeIconMapper()
 
@@ -201,7 +198,6 @@ internal class FileInfoViewModelTest {
             isCameraUploadsEnabledUseCase,
             isSecondaryFolderEnabled,
             monitorOfflineFileAvailabilityUseCase,
-            getFeatureFlagValueUseCase,
             getContactVerificationWarningUseCase,
             typedFileNode,
             previewFile,
@@ -247,7 +243,6 @@ internal class FileInfoViewModelTest {
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
             fileTypeIconMapper = fileTypeIconMapper
         )

@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -60,7 +59,6 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
@@ -98,7 +96,6 @@ class FolderLinkViewModel @Inject constructor(
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
     private val addNodeType: AddNodeType,
-    private val getPublicNodeListByIds: GetPublicNodeListByIds,
     private val getNodeUseCase: GetNodeUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val areAchievementsEnabledUseCase: AreAchievementsEnabledUseCase,
@@ -114,7 +111,6 @@ class FolderLinkViewModel @Inject constructor(
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
     private val getFileUriUseCase: GetFileUriUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
 ) : ViewModel() {
 

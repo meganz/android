@@ -8,7 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewVideoLauncher
@@ -77,7 +76,6 @@ class ImagePreviewViewModelTest {
     private val moveNodeUseCase: MoveNodeUseCase = mock()
     private val addFavouritesUseCase: AddFavouritesUseCase = mock()
     private val removeFavouritesUseCase: RemoveFavouritesUseCase = mock()
-    private val setNodeAvailableOffline: SetNodeAvailableOffline = mock()
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase = mock()
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase = mock()
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase = mock()
@@ -118,7 +116,6 @@ class ImagePreviewViewModelTest {
         moveNodeUseCase,
         addFavouritesUseCase,
         removeFavouritesUseCase,
-        setNodeAvailableOffline,
         removeOfflineNodeUseCase,
         monitorOfflineNodeUpdatesUseCase,
         isAvailableOfflineUseCase,
@@ -155,7 +152,6 @@ class ImagePreviewViewModelTest {
             moveNodeUseCase = moveNodeUseCase,
             addFavouritesUseCase = addFavouritesUseCase,
             removeFavouritesUseCase = removeFavouritesUseCase,
-            setNodeAvailableOffline = setNodeAvailableOffline,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,

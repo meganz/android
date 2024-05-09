@@ -21,7 +21,6 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisio
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -56,7 +55,6 @@ class FileLinkViewModelTest {
     private val httpServerStart = mock<MegaApiHttpServerStartUseCase>()
     private val httpServerIsRunning = mock<MegaApiHttpServerIsRunningUseCase>()
     private val getFileUrlByPublicLinkUseCase = mock<GetFileUrlByPublicLinkUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase>()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
 
@@ -79,7 +77,6 @@ class FileLinkViewModelTest {
             httpServerStart,
             httpServerIsRunning,
             getFileUrlByPublicLinkUseCase,
-            getFeatureFlagValueUseCase,
             mapNodeToPublicLinkUseCase
         )
         initViewModel()
@@ -96,7 +93,6 @@ class FileLinkViewModelTest {
             httpServerStart = httpServerStart,
             httpServerIsRunning = httpServerIsRunning,
             getFileUrlByPublicLinkUseCase = getFileUrlByPublicLinkUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             mapNodeToPublicLinkUseCase = mapNodeToPublicLinkUseCase,
             fileTypeIconMapper = fileTypeIconMapper
         )

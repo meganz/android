@@ -75,7 +75,6 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.CopyChatNodeUseCase
@@ -113,7 +112,6 @@ import javax.inject.Inject
  * @property copyNodeUseCase            UseCase required to copy nodes.
  * @property downloadBackgroundFile     Use case for downloading the file in background if required.
  * @property ioDispatcher
- * @property getFeatureFlagValueUseCase
  * @property getNodeByIdUseCase
  * @property getChatFileUseCase
  * @property getPublicChildNodeFromIdUseCase
@@ -130,7 +128,6 @@ class TextEditorViewModel @Inject constructor(
     private val copyNodeUseCase: CopyNodeUseCase,
     private val downloadBackgroundFile: DownloadBackgroundFile,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
     private val copyChatNodeUseCase: CopyChatNodeUseCase,

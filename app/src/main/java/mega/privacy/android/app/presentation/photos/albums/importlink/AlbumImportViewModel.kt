@@ -40,7 +40,6 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
@@ -71,7 +70,6 @@ internal class AlbumImportViewModel @Inject constructor(
     private val importPublicAlbumUseCase: ImportPublicAlbumUseCase,
     private val isAlbumLinkValidUseCase: IsAlbumLinkValidUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {

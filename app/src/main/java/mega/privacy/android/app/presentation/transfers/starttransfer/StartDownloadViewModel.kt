@@ -14,7 +14,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
@@ -28,7 +27,6 @@ import javax.inject.Inject
 @HiltViewModel
 @Deprecated(message = "This view model should be used only as a temporal solution for existing legacy screens and view models, new view models should have the [TypedNode] and handle the [TransferTriggerEvent] event in its ui state")
 class StartDownloadViewModel @Inject constructor(
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,

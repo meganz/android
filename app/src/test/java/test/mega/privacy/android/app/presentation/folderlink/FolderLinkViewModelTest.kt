@@ -10,7 +10,6 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -38,7 +37,6 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
@@ -84,7 +82,6 @@ class FolderLinkViewModelTest {
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
     private val addNodeType: AddNodeType = mock()
-    private val getPublicNodeListByIds: GetPublicNodeListByIds = mock()
     private val getNodeUseCase: GetNodeUseCase = mock()
     private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
     private val areAchievementsEnabledUseCase: AreAchievementsEnabledUseCase = mock()
@@ -102,7 +99,6 @@ class FolderLinkViewModelTest {
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase = mock()
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase = mock()
     private val getFileUriUseCase: GetFileUriUseCase = mock()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase>()
 
     @BeforeEach
@@ -127,7 +123,6 @@ class FolderLinkViewModelTest {
             getFolderParentNodeUseCase,
             getFolderLinkChildrenNodesUseCase,
             addNodeType,
-            getPublicNodeListByIds,
             getNodeUseCase,
             getStringFromStringResMapper,
             areAchievementsEnabledUseCase,
@@ -162,7 +157,6 @@ class FolderLinkViewModelTest {
             getFolderParentNodeUseCase,
             getFolderLinkChildrenNodesUseCase,
             addNodeType,
-            getPublicNodeListByIds,
             getNodeUseCase,
             getStringFromStringResMapper,
             areAchievementsEnabledUseCase,
@@ -178,7 +172,6 @@ class FolderLinkViewModelTest {
             httpServerIsRunning,
             getLocalFolderLinkFromMegaApiUseCase,
             getFileUriUseCase,
-            getFeatureFlagValueUseCase,
             mapNodeToPublicLinkUseCase,
         )
     }

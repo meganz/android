@@ -65,7 +65,6 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
@@ -130,7 +129,6 @@ class FileInfoViewModel @Inject constructor(
     private val nodeActionMapper: NodeActionMapper,
     private val clipboardGateway: ClipboardGateway,
     private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
 ) : ViewModel() {

@@ -42,7 +42,6 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -91,7 +90,6 @@ class FileBrowserViewModelTest {
     private val transfersManagement = mock<TransfersManagement>()
     private val containsMediaItemUseCase = mock<ContainsMediaItemUseCase>()
     private val fileDurationMapper = mock<FileDurationMapper>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
@@ -133,7 +131,6 @@ class FileBrowserViewModelTest {
             containsMediaItemUseCase = containsMediaItemUseCase,
             fileDurationMapper = fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
@@ -537,7 +534,6 @@ class FileBrowserViewModelTest {
         whenever(fileDurationMapper(any())).thenReturn(1.seconds)
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
     }
 
     @AfterEach
@@ -555,7 +551,6 @@ class FileBrowserViewModelTest {
             transfersManagement,
             containsMediaItemUseCase,
             fileDurationMapper,
-            getFeatureFlagValueUseCase,
             monitorOfflineNodeUpdatesUseCase,
             monitorConnectivityUseCase,
         )

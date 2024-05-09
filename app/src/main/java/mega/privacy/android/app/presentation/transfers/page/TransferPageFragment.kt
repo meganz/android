@@ -36,7 +36,6 @@ import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
-import mega.privacy.android.app.usecase.DownloadNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -59,9 +58,6 @@ internal class TransferPageFragment : Fragment() {
 
     @Inject
     lateinit var areTransfersPausedUseCase: AreTransfersPausedUseCase
-
-    @Inject
-    lateinit var downloadNodeUseCase: DownloadNodeUseCase
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase

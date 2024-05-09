@@ -42,7 +42,6 @@ import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -83,7 +82,6 @@ class IncomingSharesComposeViewModelTest {
     private val setViewType = mock<SetViewType>()
     private val monitorRefreshSessionUseCase = mock<MonitorRefreshSessionUseCase>()
     private val fileDurationMapper = mock<FileDurationMapper>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
@@ -117,7 +115,6 @@ class IncomingSharesComposeViewModelTest {
             monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
             fileDurationMapper = fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             monitorContactUpdatesUseCase = monitorContactUpdatesUseCase,
@@ -527,7 +524,6 @@ class IncomingSharesComposeViewModelTest {
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorContactUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         whenever(getContactVerificationWarningUseCase()).thenReturn(true)
         whenever(areCredentialsVerifiedUseCase(any())).thenReturn(true)
         whenever(getIncomingShareParentUserEmailUseCase(NodeId(any()))).thenReturn("")
@@ -548,7 +544,6 @@ class IncomingSharesComposeViewModelTest {
             setViewType,
             monitorRefreshSessionUseCase,
             fileDurationMapper,
-            getFeatureFlagValueUseCase,
             monitorOfflineNodeUpdatesUseCase,
             monitorConnectivityUseCase,
             durationInSecondsTextMapper,

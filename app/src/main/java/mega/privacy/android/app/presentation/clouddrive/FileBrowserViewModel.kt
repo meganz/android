@@ -48,7 +48,6 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -101,7 +100,6 @@ class FileBrowserViewModel @Inject constructor(
     private val fileDurationMapper: FileDurationMapper,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
