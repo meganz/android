@@ -138,6 +138,13 @@
                 android:text="@string/general_view_contacts"
                 app:drawableStartCompat="@drawable/ic_info_medium_regular_outline" />
 
+            <TextView
+                android:id="@+id/option_info"
+                style="@style/BottomSheetOption"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:text="@string/general_info"
+                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline" />
             <LinearLayout
                 android:id="@+id/invite_separator"
                 android:layout_width="match_parent"
