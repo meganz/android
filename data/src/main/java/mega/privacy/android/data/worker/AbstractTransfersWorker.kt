@@ -68,7 +68,7 @@ abstract class AbstractTransfersWorker(
     /**
      * Final notification Id, null if there's no final notification
      */
-    open val finalNotificationId: Int? = 0
+    open val finalNotificationId: Int? = null
 
     /**
      * Create the update Notification to show worker progress

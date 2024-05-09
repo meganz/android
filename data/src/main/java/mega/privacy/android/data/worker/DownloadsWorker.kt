@@ -69,8 +69,8 @@ class DownloadsWorker @AssistedInject constructor(
     foregroundSetter = foregroundSetter,
 ) {
 
-    override val finalNotificationId = DOWNLOAD_NOTIFICATION_ID
-    override val updateNotificationId = NOTIFICATION_DOWNLOAD_FINAL
+    override val finalNotificationId = DOWNLOAD_FINAL_NOTIFICATION_ID
+    override val updateNotificationId = DOWNLOAD_UPDATE_NOTIFICATION_ID
 
     override fun monitorOngoingActiveTransfers(): Flow<MonitorOngoingActiveTransfersResult> =
         monitorOngoingActiveTransfersUntilFinishedUseCase(type)
@@ -98,8 +98,8 @@ class DownloadsWorker @AssistedInject constructor(
          * Tag for enqueue the worker to work manager
          */
         const val SINGLE_DOWNLOAD_TAG = "MEGA_DOWNLOAD_TAG"
-        private const val DOWNLOAD_NOTIFICATION_ID = 2
-        private const val NOTIFICATION_DOWNLOAD_FINAL = 4
+        private const val DOWNLOAD_FINAL_NOTIFICATION_ID = 2
+        private const val DOWNLOAD_UPDATE_NOTIFICATION_ID = 4
     }
 }
 
