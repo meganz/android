@@ -42,4 +42,10 @@ gradlePlugin {
             implementationClass = "JvmTestConventionPlugin"
         }
     }
+    plugins {
+        register("jvmLibrary") {
+            id = "mega.jvm.library"
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
+    }
 }

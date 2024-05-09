@@ -1,12 +1,11 @@
-import groovy.lang.Closure
 import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
-    id("kotlin")
+    alias(convention.plugins.mega.jvm.library)
+    alias(convention.plugins.mega.jvm.test)
     id("com.android.lint")
     id("kotlin-kapt")
     kotlin("plugin.serialization") version "1.9.21"
-    alias(convention.plugins.mega.jvm.test)
 }
 
 lint {
@@ -16,30 +15,6 @@ lint {
 
 apply(plugin = "jacoco")
 apply(from = "${project.rootDir}/tools/jacoco.gradle")
-
-/**
- * Service to set jvmToolchain
- */
-val service = project.extensions.getByType<JavaToolchainService>()
-
-/**
- * Custom Launcher to set jvmToolchain
- */
-val customLauncher = service.launcherFor {
-    val jdk: String by rootProject.extra
-    languageVersion.set(JavaLanguageVersion.of(jdk.toInt()))
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        val jdk: String by rootProject.extra
-        jvmTarget = jdk
-        val shouldSuppressWarnings: Boolean by rootProject.extra
-        suppressWarnings = shouldSuppressWarnings
-        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-    }
-    kotlinJavaToolchain.toolchain.use(customLauncher)
-}
 
 dependencies {
     lintChecks(project(":lint"))

@@ -1,5 +1,5 @@
 plugins {
-    id("kotlin")
+    alias(convention.plugins.mega.jvm.library)
     id("com.android.lint")
 }
 
@@ -21,28 +21,4 @@ dependencies {
     testImplementation(testlib.junit)
     testImplementation(tools.lint)
     testImplementation(tools.lint.tests)
-}
-
-/**
- * Service to set jvmToolchain
- */
-val service = project.extensions.getByType<JavaToolchainService>()
-
-/**
- * Custom Launcher to set jvmToolchain
- */
-val customLauncher = service.launcherFor {
-    val jdk: String by rootProject.extra
-    languageVersion.set(JavaLanguageVersion.of(jdk.toInt()))
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        val jdk: String by rootProject.extra
-        jvmTarget = jdk
-        val shouldSuppressWarnings: Boolean by rootProject.extra
-        suppressWarnings = shouldSuppressWarnings
-        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-    }
-    kotlinJavaToolchain.toolchain.use(customLauncher)
 }
