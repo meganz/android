@@ -3,6 +3,8 @@ import mega.privacy.android.gradle.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.provideDelegate
 
 /**
  * Convention plugin for Android library modules
@@ -22,6 +24,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             }
 
             extensions.configure<LibraryExtension> {
+                val targetSdkVersion: Int by rootProject.extra
+                defaultConfig.targetSdk = targetSdkVersion
                 configureKotlinAndroid(this)
             }
         }

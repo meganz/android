@@ -5,11 +5,6 @@ plugins {
 
 android {
     namespace = "mega.privacy.android.navigation"
-
-    kotlin {
-        val jdk: String by rootProject.extra
-        jvmToolchain(jdk.toInt())
-    }
 }
 
 dependencies {
