@@ -4384,6 +4384,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     } else {
                         openSearchOnHomepage()
                     }
+                } else if (drawerItem !== DrawerItem.CHAT) {
+                    openSearchOnHomepage()
                 } else {
                     Util.resetActionBar(supportActionBar)
                 }
@@ -4445,9 +4447,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             override fun onQueryTextChange(newText: String): Boolean {
                 Timber.d("onQueryTextChange")
                 if (drawerItem === DrawerItem.HOMEPAGE) {
+                    viewModel.updateSearchQuery(newText)
                     if (homepageScreen === HomepageScreen.FULLSCREEN_OFFLINE) {
-                        viewModel.updateSearchQuery(newText)
                         setFullscreenOfflineFragmentSearchQuery(viewModel.state.value.searchQuery)
+                    } else {
+                        mHomepageSearchable?.searchQuery(newText)
                     }
                 }
                 return true
