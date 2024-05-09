@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.notifications
 
-import android.app.Notification
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -19,13 +19,11 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.AreCredentialsNullUseCase
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
-import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 
@@ -44,7 +42,7 @@ internal object TransferOverQuotaNotification {
         @MegaApi
         fun megaApi(): MegaApiAndroid
         fun isUserLoggedIn(): IsUserLoggedIn
-        fun areCredentialsNullUseCase(): AreCredentialsNullUseCase
+        fun hasCredentialsUseCase(): HasCredentialsUseCase
         fun clearEphemeralCredentialsUseCase(): ClearEphemeralCredentialsUseCase
     }
 
@@ -56,7 +54,7 @@ internal object TransferOverQuotaNotification {
         entryPoint.applicationScope().launch {
             val isLoggedIn =
                 entryPoint.isUserLoggedIn().invoke()
-                        && entryPoint.areCredentialsNullUseCase().invoke()
+                        && entryPoint.hasCredentialsUseCase().invoke()
             var isFreeAccount = false
             val intent = Intent(applicationContext, DownloadNotificationIntentService::class.java)
             if (isLoggedIn) {

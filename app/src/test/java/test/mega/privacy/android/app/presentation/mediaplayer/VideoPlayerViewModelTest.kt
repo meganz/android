@@ -27,7 +27,6 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -94,7 +93,7 @@ internal class VideoPlayerViewModelTest {
             megaApiHttpServerIsRunningUseCase = mock(),
             megaApiHttpServerStartUseCase = mock(),
             megaApiHttpServerStop = mock(),
-            areCredentialsNullUseCase = mock(),
+            hasCredentialsUseCase = mock(),
             getLocalFilePathUseCase = mock(),
             getLocalFolderLinkFromMegaApiFolderUseCase = mock(),
             getLocalFolderLinkFromMegaApiUseCase = mock(),

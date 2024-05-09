@@ -89,7 +89,6 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.AreCredentialsNullUseCase
 import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
@@ -102,6 +101,7 @@ import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
@@ -152,7 +152,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerStop: MegaApiHttpServerStopUseCase,
-    private val areCredentialsNullUseCase: AreCredentialsNullUseCase,
+    private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getLocalFilePathUseCase: GetLocalFilePathUseCase,
     private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
@@ -1339,7 +1339,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     }
 
     private suspend fun isMegaApiFolder(type: Int) =
-        type == FOLDER_LINK_ADAPTER && areCredentialsNullUseCase()
+        type == FOLDER_LINK_ADAPTER && !hasCredentialsUseCase()
 
     override fun swapItems(current: Int, target: Int) {
         val indicesOfItems = playlistItemsFlow.value.first.indices
