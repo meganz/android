@@ -340,6 +340,16 @@ enum class ChatRequestType {
     RejectCall,
 
     /**
+     * Raise hand to speak request
+     */
+    RaiseHandToSpeak,
+
+    /**
+     * Set limit call request
+     */
+    SetLimitCall,
+
+    /**
      * Invalid request
      */
     InvalidRequest,

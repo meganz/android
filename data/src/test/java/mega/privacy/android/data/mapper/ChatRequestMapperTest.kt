@@ -105,6 +105,18 @@ class ChatRequestMapperTest {
     }
 
     @Test
+    fun `test that mapping raise hand request contain a true flag`() {
+        val request = mock<MegaChatRequest> {
+            on { type }.thenReturn(MegaChatRequest.TYPE_RAISE_HAND_TO_SPEAK)
+            on { flag }.thenReturn(true)
+        }
+
+        val actual = underTest(request)
+        assertThat(actual.type).isEqualTo(ChatRequestType.RaiseHandToSpeak)
+        assertThat(actual.flag).isEqualTo(true)
+    }
+
+    @Test
     fun `test that mapping disable audio request contain a valid param type`() {
         val request = mock<MegaChatRequest> {
             on { type }.thenReturn(MegaChatRequest.TYPE_DISABLE_AUDIO_VIDEO_CALL)

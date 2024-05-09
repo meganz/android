@@ -174,6 +174,20 @@ class ChatRequestMapperTest {
     }
 
     @Test
+    fun `test mapping chat call received contains a valid raise hands list`() {
+        val raisedHandsListTest = mock<MegaHandleList>()
+        whenever(raisedHandsListTest.size()).thenReturn(3)
+        whenever(raisedHandsListTest[0]).thenReturn(expectedPeerId1)
+        whenever(raisedHandsListTest[1]).thenReturn(expectedPeerId2)
+
+        val chatCall = getMockChatCall(raisedHandsList = raisedHandsListTest)
+        val actual = underTest(chatCall)
+        Truth.assertThat(actual.raisedHandsList).isNotNull()
+        Truth.assertThat(actual.raisedHandsList?.get(0)).isEqualTo(expectedPeerId1)
+        Truth.assertThat(actual.raisedHandsList?.get(1)).isEqualTo(expectedPeerId2)
+    }
+
+    @Test
     fun `test mapping chat call received contains a valid sessions client Id list`() {
         val sessionsClientIdListTest = mock<MegaHandleList>()
         whenever(sessionsClientIdListTest.size()).thenReturn(3)
@@ -303,6 +317,7 @@ class ChatRequestMapperTest {
         handle: Long = expectedPeerId1,
         flag: Boolean = false,
         moderators: MegaHandleList = mock(),
+        raisedHandsList: MegaHandleList = mock(),
         numParticipants: Int = 2,
         isIgnored: Boolean = false,
         isIncoming: Boolean = false,
@@ -353,6 +368,7 @@ class ChatRequestMapperTest {
             on { this.handle }.thenReturn(handle)
             on { this.flag }.thenReturn(flag)
             on { this.moderators }.thenReturn(moderators)
+            on { this.raiseHandsList }.thenReturn(raisedHandsList)
             on { this.numParticipants }.thenReturn(numParticipants)
             on { this.isIgnored }.thenReturn(isIgnored)
             on { this.isIncoming }.thenReturn(isIncoming)

@@ -109,6 +109,9 @@ class ChatRequestMapper @Inject constructor() {
         MegaChatRequest.TYPE_FETCH_SCHEDULED_MEETING_OCCURRENCES -> ChatRequestType.FetchScheduledMeetingOccurrences
         MegaChatRequest.TYPE_DELETE_SCHEDULED_MEETING -> ChatRequestType.DeleteScheduledMeeting
         MegaChatRequest.TYPE_CREATE_SCHEDULED_MEETING -> ChatRequestType.CreateScheduledMeeting
+        MegaChatRequest.TYPE_RAISE_HAND_TO_SPEAK -> ChatRequestType.RaiseHandToSpeak
+        MegaChatRequest.TYPE_SET_LIMIT_CALL -> ChatRequestType.SetLimitCall
+
         else -> ChatRequestType.InvalidRequest
     }
 

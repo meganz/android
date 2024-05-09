@@ -62,6 +62,8 @@ import kotlin.time.Duration
  * @property handle                         Handle used to notify multiple events. For example in onChatCallUpdate to indicate that speak permission for a call participant has changed
  * @property flag                           A boolean used to notify multiple events. For example in onChatCallUpdate, true to indicate that speak permission for a call participant has been granted, false otherwise
  * @property callWillEndTs                  Time stamp at which the call will be ended due to restrictions
+ * @property raisedHandsList                 List of users with their hands raised.
+ * @property usersRaiseHands                List of users handles with raised or lowered hand
  */
 data class ChatCall(
     val chatId: Long,
@@ -72,6 +74,7 @@ data class ChatCall(
     val changes: List<ChatCallChanges>? = null,
     val isAudioDetected: Boolean = false,
     val usersSpeakPermission: Map<Long, Boolean> = emptyMap(),
+    val usersRaiseHands: Map<Long, Boolean> = emptyMap(),
     val duration: Duration? = null,
     val initialTimestamp: Long? = null,
     val finalTimestamp: Long? = null,
@@ -94,6 +97,7 @@ data class ChatCall(
     val handle: Long? = null,
     val flag: Boolean = false,
     val moderators: List<Long>? = emptyList(),
+    val raisedHandsList: List<Long>? = emptyList(),
     val numParticipants: Int? = null,
     val isIgnored: Boolean = false,
     val isIncoming: Boolean = false,
@@ -111,7 +115,6 @@ data class ChatCall(
     val speakRequestsList: List<Long>? = emptyList(),
     val callWillEndTs: Long? = null,
 ) {
-
     /**
      * Get call start timestamp based on current duration
      *

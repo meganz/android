@@ -121,6 +121,11 @@ enum class ChatCallChanges {
     CallLimitsUpdated,
 
     /**
+     *  Notify that call raise hand have been updated
+     */
+    CallRaiseHand,
+
+    /**
      * Unknown
      */
     Unknown

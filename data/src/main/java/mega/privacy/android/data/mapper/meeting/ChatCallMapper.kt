@@ -32,6 +32,7 @@ internal class ChatCallMapper @Inject constructor(
         changes = chatCallChangesMapper(megaChatCall.changes),
         isAudioDetected = megaChatCall.isAudioDetected,
         usersSpeakPermission = megaChatCall.toUserSpeakPermission(),
+        usersRaiseHands = megaChatCall.toUserRaiseHands(),
         duration = megaChatCall.duration.seconds,
         initialTimestamp = megaChatCall.initialTimeStamp,
         finalTimestamp = megaChatCall.finalTimeStamp,
@@ -54,6 +55,7 @@ internal class ChatCallMapper @Inject constructor(
         handle = megaChatCall.handle,
         flag = megaChatCall.flag,
         moderators = handleListMapper(megaChatCall.moderators),
+        raisedHandsList = handleListMapper(megaChatCall.raiseHandsList),
         numParticipants = megaChatCall.numParticipants,
         isIgnored = megaChatCall.isIgnored,
         isIncoming = megaChatCall.isIncoming,
@@ -85,22 +87,32 @@ internal class ChatCallMapper @Inject constructor(
     }
 
     private fun MegaChatCall.toUserSpeakPermission(): Map<Long, Boolean> {
-        val userSpeakPermissionMap: MutableMap<Long, Boolean> = mutableMapOf()
-        val listOfClientId = handleListMapper(sessionsClientid)
-        for (i in listOfClientId.indices) {
-            val clientId = listOfClientId[i]
-            userSpeakPermissionMap[clientId] = hasUserSpeakPermission(clientId)
+        return buildMap {
+            val listOfClientId = handleListMapper(sessionsClientid)
+            for (i in listOfClientId.indices) {
+                val clientId = listOfClientId[i]
+                put(clientId, hasUserSpeakPermission(clientId))
+            }
         }
-        return userSpeakPermissionMap
+    }
+
+    private fun MegaChatCall.toUserRaiseHands(): Map<Long, Boolean> {
+        return buildMap {
+            val listOfClientId = handleListMapper(sessionsClientid)
+            for (i in listOfClientId.indices) {
+                val clientId = listOfClientId[i]
+                put(clientId, hasUserHandRaised(clientId))
+            }
+        }
     }
 
     private fun MegaChatCall.toUserPendingSpeakRequest(): Map<Long, Boolean> {
-        val userPendingSpeakRequestMap: MutableMap<Long, Boolean> = mutableMapOf()
-        val listOfClientId = handleListMapper(sessionsClientid)
-        for (i in listOfClientId.indices) {
-            val clientId = listOfClientId[i]
-            userPendingSpeakRequestMap[clientId] = hasUserPendingSpeakRequest(clientId)
+        return buildMap {
+            val listOfClientId = handleListMapper(sessionsClientid)
+            for (i in listOfClientId.indices) {
+                val clientId = listOfClientId[i]
+                put(clientId, hasUserPendingSpeakRequest(clientId))
+            }
         }
-        return userPendingSpeakRequestMap
     }
 }
