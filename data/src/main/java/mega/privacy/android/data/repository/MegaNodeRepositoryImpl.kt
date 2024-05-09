@@ -19,12 +19,17 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.search.DateFilterOption
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
@@ -72,6 +77,8 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     private val streamingGateway: StreamingGateway,
     private val getLinksSortOrder: GetLinksSortOrder,
     private val cancelTokenProvider: CancelTokenProvider,
+    private val megaSearchFilterMapper: MegaSearchFilterMapper,
+    private val getCloudSortOrder: GetCloudSortOrder,
 ) : MegaNodeRepository {
 
     override suspend fun moveNode(
@@ -312,5 +319,79 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
                 )
             }
         }
+    }
+
+    override suspend fun search(
+        nodeId: NodeId?,
+        query: String,
+        order: SortOrder,
+        searchTarget: SearchTarget,
+        searchCategory: SearchCategory,
+        modificationDate: DateFilterOption?,
+        creationDate: DateFilterOption?,
+    ): List<MegaNode> = withContext(ioDispatcher) {
+        val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = megaSearchFilterMapper(
+            searchQuery = query,
+            parentHandle = nodeId ?: NodeId(-1L),
+            searchTarget = searchTarget,
+            searchCategory = searchCategory,
+            modificationDate = modificationDate,
+            creationDate = creationDate
+        )
+        megaApiGateway.searchWithFilter(
+            filter = filter,
+            order = sortOrderIntMapper(order),
+            megaCancelToken = megaCancelToken,
+        )
+    }
+
+    override suspend fun getChildren(
+        nodeId: NodeId?,
+        query: String,
+        order: SortOrder,
+        searchTarget: SearchTarget,
+        searchCategory: SearchCategory,
+        modificationDate: DateFilterOption?,
+        creationDate: DateFilterOption?,
+    ): List<MegaNode> = withContext(ioDispatcher) {
+        val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = megaSearchFilterMapper(
+            searchQuery = query,
+            parentHandle = nodeId ?: NodeId(-1),
+            searchTarget = searchTarget,
+            searchCategory = searchCategory,
+            modificationDate = modificationDate,
+            creationDate = creationDate
+        )
+        megaApiGateway.getChildren(
+            filter = filter,
+            order = sortOrderIntMapper(order),
+            megaCancelToken = megaCancelToken,
+        )
+    }
+
+    override suspend fun getInShares() = withContext(ioDispatcher) {
+        megaApiGateway.getInShares(sortOrderIntMapper(getCloudSortOrder()))
+    }
+
+    override suspend fun getOutShares() = withContext(ioDispatcher) {
+        val searchNodes = ArrayList<MegaNode>()
+        val outShares =
+            megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(getCloudSortOrder()))
+        val addedHandles = mutableSetOf<Long>()
+        for (outShare in outShares) {
+            if (!addedHandles.contains(outShare.nodeHandle)) {
+                megaApiGateway.getMegaNodeByHandle(outShare.nodeHandle)?.let {
+                    addedHandles.add(it.handle)
+                    searchNodes.add(it)
+                }
+            }
+        }
+        searchNodes
+    }
+
+    override suspend fun getPublicLinks() = withContext(ioDispatcher) {
+        megaApiGateway.getPublicLinks(sortOrderIntMapper(getLinksSortOrder()))
     }
 }

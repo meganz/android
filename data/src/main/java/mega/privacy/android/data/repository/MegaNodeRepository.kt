@@ -3,6 +3,10 @@ package mega.privacy.android.data.repository
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.search.DateFilterOption
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -233,6 +237,59 @@ interface MegaNodeRepository {
         order: SortOrder,
         searchType: Int = MegaApiAndroid.FILE_TYPE_DEFAULT,
     ): List<MegaNode>
+
+    /**
+     * Search node and return list of [UnTypedNode]
+     * @param nodeId [NodeId] place where needed to be searched
+     * @param searchCategory Search Category for search
+     * @param query string to be search
+     * @param order oder in which result should be there
+     * @param modificationDate modified date filter if set [DateFilterOption]
+     * @param creationDate added date filter if set [DateFilterOption]
+     */
+    suspend fun search(
+        nodeId: NodeId?,
+        query: String,
+        order: SortOrder,
+        searchTarget: SearchTarget = SearchTarget.ROOT_NODES,
+        searchCategory: SearchCategory = SearchCategory.ALL,
+        modificationDate: DateFilterOption? = null,
+        creationDate: DateFilterOption? = null,
+    ): List<MegaNode>
+
+    /**
+     * Get children of a node and return list of [UnTypedNode]
+     * @param nodeId [NodeId] place where needed to be searched
+     * @param query string to be search
+     * @param searchCategory Search Category for search
+     * @param order oder in which result should be there
+     * @param modificationDate modified date filter if set [DateFilterOption]
+     * @param creationDate added date filter if set [DateFilterOption]
+     */
+    suspend fun getChildren(
+        nodeId: NodeId?,
+        query: String,
+        order: SortOrder,
+        searchTarget: SearchTarget = SearchTarget.ROOT_NODES,
+        searchCategory: SearchCategory = SearchCategory.ALL,
+        modificationDate: DateFilterOption? = null,
+        creationDate: DateFilterOption? = null,
+    ): List<MegaNode>
+
+    /**
+     * get incoming shares node list
+     */
+    suspend fun getInShares(): List<MegaNode>
+
+    /**
+     * get outgoing shares node list
+     */
+    suspend fun getOutShares(): List<MegaNode>
+
+    /**
+     * get links node list
+     */
+    suspend fun getPublicLinks(): List<MegaNode>
 
     /**
      * Creates a new share key for the node if there is no share key already created.

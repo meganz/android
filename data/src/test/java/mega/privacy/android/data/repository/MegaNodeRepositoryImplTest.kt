@@ -1,17 +1,23 @@
 package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -22,6 +28,13 @@ class MegaNodeRepositoryImplTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val testDispatcher = UnconfinedTestDispatcher()
+    private val getCloudSortOrder: GetCloudSortOrder = mock()
+    private val getLinksSortOrder: GetLinksSortOrder = mock()
+    private val sortOrderIntMapper: SortOrderIntMapper = mock()
+    private val nodeId = NodeId(123456L)
+    private val megaNode: MegaNode = mock {
+        on { handle } doReturn 123456L
+    }
 
 
     @Before
@@ -36,14 +49,16 @@ class MegaNodeRepositoryImplTest {
             megaLocalStorageGateway = mock(),
             shareDataMapper = mock(),
             megaExceptionMapper = mock(),
-            sortOrderIntMapper = mock(),
+            sortOrderIntMapper = sortOrderIntMapper,
             nodeMapper = mock(),
             fileTypeInfoMapper = mock(),
             fileGateway = mock(),
             chatFilesFolderUserAttributeMapper = mock(),
             streamingGateway = mock(),
-            getLinksSortOrder = mock(),
-            cancelTokenProvider = mock()
+            getLinksSortOrder = getLinksSortOrder,
+            cancelTokenProvider = mock(),
+            getCloudSortOrder = getCloudSortOrder,
+            megaSearchFilterMapper = mock(),
         )
     }
 
@@ -60,7 +75,7 @@ class MegaNodeRepositoryImplTest {
             whenever(megaApiGateway.getOutShares(node)).thenReturn(expected)
 
             val result = underTest.getOutShares(nodeId)
-            Truth.assertThat(result).isEqualTo(result)
+            assertThat(result).isEqualTo(result)
         }
 
     @Test
@@ -70,6 +85,26 @@ class MegaNodeRepositoryImplTest {
         whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
 
         val result = underTest.getOutShares(nodeId)
-        Truth.assertThat(result).isNull()
+        assertThat(result).isNull()
     }
+
+    @Test
+    fun `test that getInShares returns list of mega nodes`() = runTest {
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        whenever(megaApiGateway.getInShares(sortOrderIntMapper(SortOrder.ORDER_NONE))).thenReturn(
+            listOf(megaNode)
+        )
+        val actual = underTest.getInShares()
+        assertThat(actual.first().handle).isEqualTo(nodeId.longValue)
+    }
+
+    @Test
+    fun `test that getPublicLinks returns list of mega nodes`() = runTest {
+        whenever(getLinksSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        whenever(megaApiGateway.getPublicLinks(sortOrderIntMapper(getLinksSortOrder())))
+            .thenReturn(listOf(megaNode))
+        val actual = underTest.getPublicLinks()
+        assertThat(actual.first().handle).isEqualTo(nodeId.longValue)
+    }
+
 }
