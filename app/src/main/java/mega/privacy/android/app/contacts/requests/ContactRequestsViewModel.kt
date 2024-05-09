@@ -3,19 +3,21 @@ package mega.privacy.android.app.contacts.requests
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs.INCOMING
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs.OUTGOING
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
-import mega.privacy.android.app.contacts.usecase.ReplyContactRequestUseCase
+import mega.privacy.android.app.contacts.usecase.ManageContactRequestUseCase
 import mega.privacy.android.app.utils.notifyObserver
+import mega.privacy.android.domain.entity.contacts.ContactRequestAction
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -23,12 +25,12 @@ import javax.inject.Inject
  * ViewModel that handles all related logic to Contact Groups for the current user.
  *
  * @param getContactRequestsUseCase     Use case to retrieve contact requests for current user
- * @param replyContactRequestUseCase    Use case to reply to existing contact requests
+ * @param manageContactRequestUseCase    Use case to reply to existing contact requests
  */
 @HiltViewModel
 class ContactRequestsViewModel @Inject constructor(
     private val getContactRequestsUseCase: GetContactRequestsUseCase,
-    private val replyContactRequestUseCase: ReplyContactRequestUseCase
+    private val manageContactRequestUseCase: ManageContactRequestUseCase,
 ) : BaseRxViewModel() {
 
     private val contactRequests: MutableLiveData<List<ContactRequestItem>> = MutableLiveData()
@@ -66,24 +68,20 @@ class ContactRequestsViewModel @Inject constructor(
     fun getContactRequest(requestHandle: Long): LiveData<ContactRequestItem?> =
         getFilteredContactRequests().map { it.find { item -> item.handle == requestHandle } }
 
-    fun acceptRequest(requestHandle: Long) {
-        replyContactRequestUseCase.acceptReceivedRequest(requestHandle).subscribeAndUpdate()
-    }
-
-    fun ignoreRequest(requestHandle: Long) {
-        replyContactRequestUseCase.ignoreReceivedRequest(requestHandle).subscribeAndUpdate()
-    }
-
-    fun declineRequest(requestHandle: Long) {
-        replyContactRequestUseCase.denyReceivedRequest(requestHandle).subscribeAndUpdate()
-    }
-
-    fun reinviteRequest(requestHandle: Long) {
-        replyContactRequestUseCase.remindSentRequest(requestHandle).subscribeAndUpdate()
-    }
-
-    fun removeRequest(requestHandle: Long) {
-        replyContactRequestUseCase.deleteSentRequest(requestHandle).subscribeAndUpdate()
+    /**
+     * Handle contact request with a specific action
+     *
+     * @param requestHandle         contact request identifier
+     * @param contactRequestAction  contact request action
+     */
+    fun handleContactRequest(requestHandle: Long, contactRequestAction: ContactRequestAction) {
+        viewModelScope.launch {
+            runCatching {
+                manageContactRequestUseCase(requestHandle, contactRequestAction)
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     fun setQuery(query: String?) {
@@ -118,17 +116,9 @@ class ContactRequestsViewModel @Inject constructor(
                         }
                     }
                 },
-                onError = Timber::e)
-            .addTo(composite)
-        return result
-    }
-
-    private fun Completable.subscribeAndUpdate() {
-        subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
                 onError = Timber::e
             )
             .addTo(composite)
+        return result
     }
 }

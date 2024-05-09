@@ -12,6 +12,7 @@ import mega.privacy.android.app.contacts.requests.ContactRequestsViewModel
 import mega.privacy.android.app.databinding.BottomSheetContactRequestBinding
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.setImageRequestFromUri
+import mega.privacy.android.domain.entity.contacts.ContactRequestAction
 import nz.mega.sdk.MegaApiJava
 
 /**
@@ -34,8 +35,10 @@ class ContactRequestBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
 
     private val viewModel by viewModels<ContactRequestsViewModel>({ requireParentFragment() })
     private val requestHandle by lazy {
-        arguments?.getLong(REQUEST_HANDLE,
-            MegaApiJava.INVALID_HANDLE) ?: MegaApiJava.INVALID_HANDLE
+        arguments?.getLong(
+            REQUEST_HANDLE,
+            MegaApiJava.INVALID_HANDLE
+        ) ?: MegaApiJava.INVALID_HANDLE
     }
 
     private lateinit var binding: BottomSheetContactRequestBinding
@@ -43,7 +46,7 @@ class ContactRequestBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = BottomSheetContactRequestBinding.inflate(inflater, container, false)
         contentView = binding.root
@@ -64,23 +67,38 @@ class ContactRequestBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
             binding.groupSent.isVisible = item.isOutgoing
 
             binding.btnAccept.setOnClickListener {
-                viewModel.acceptRequest(requestHandle)
+                viewModel.handleContactRequest(
+                    requestHandle = requestHandle,
+                    contactRequestAction = ContactRequestAction.Accept
+                )
                 dismiss()
             }
             binding.btnIgnore.setOnClickListener {
-                viewModel.ignoreRequest(requestHandle)
+                viewModel.handleContactRequest(
+                    requestHandle = requestHandle,
+                    contactRequestAction = ContactRequestAction.Ignore
+                )
                 dismiss()
             }
             binding.btnDecline.setOnClickListener {
-                viewModel.declineRequest(requestHandle)
+                viewModel.handleContactRequest(
+                    requestHandle = requestHandle,
+                    contactRequestAction = ContactRequestAction.Deny
+                )
                 dismiss()
             }
             binding.btnReinvite.setOnClickListener {
-                viewModel.reinviteRequest(requestHandle)
+                viewModel.handleContactRequest(
+                    requestHandle = requestHandle,
+                    contactRequestAction = ContactRequestAction.Remind
+                )
                 dismiss()
             }
             binding.btnRemove.setOnClickListener {
-                viewModel.removeRequest(requestHandle)
+                viewModel.handleContactRequest(
+                    requestHandle = requestHandle,
+                    contactRequestAction = ContactRequestAction.Delete
+                )
                 dismiss()
             }
         }
