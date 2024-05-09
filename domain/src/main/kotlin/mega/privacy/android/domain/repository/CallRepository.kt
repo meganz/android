@@ -393,6 +393,24 @@ interface CallRepository {
     ): ChatRequest
 
     /**
+     * Raise hand to speak in a call
+     *
+     * @param chatId Chat id
+     */
+    suspend fun raiseHandToSpeak(
+        chatId: Long,
+    ): ChatRequest
+
+    /**
+     * Lowe hand to stop speak in a call
+     *
+     * @param chatId Chat id
+     */
+    suspend fun lowerHandToStopSpeak(
+        chatId: Long,
+    ): ChatRequest
+
+    /**
      * Request high resolution video from a client
      *
      * @param chatId Chat id

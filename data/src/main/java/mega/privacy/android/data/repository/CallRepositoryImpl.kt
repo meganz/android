@@ -614,6 +614,48 @@ internal class CallRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun raiseHandToSpeak(chatId: Long): ChatRequest =
+        withContext(dispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getChatRequestListener(
+                    methodName = "raiseHandToSpeak",
+                    chatRequestMapper::invoke
+                )
+
+                megaChatApiGateway.raiseHandToSpeak(
+                    chatId,
+                    listener
+                )
+
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(
+                        listener
+                    )
+                }
+            }
+        }
+
+    override suspend fun lowerHandToStopSpeak(chatId: Long): ChatRequest =
+        withContext(dispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getChatRequestListener(
+                    methodName = "lowerHandToStopSpeak",
+                    chatRequestMapper::invoke
+                )
+
+                megaChatApiGateway.lowerHandToStopSpeak(
+                    chatId,
+                    listener
+                )
+
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(
+                        listener
+                    )
+                }
+            }
+        }
+
     override suspend fun requestHiResVideo(chatId: Long, clientId: Long): ChatRequest =
         withContext(dispatcher) {
             suspendCancellableCoroutine { continuation ->
