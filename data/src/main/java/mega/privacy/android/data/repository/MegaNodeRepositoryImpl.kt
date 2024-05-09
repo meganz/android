@@ -31,7 +31,6 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
@@ -223,103 +222,12 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchInShares(
-        query: String,
-        order: SortOrder,
-    ): List<MegaNode> {
-        return withContext(ioDispatcher) {
-            return@withContext if (query.isEmpty()) {
-                megaApiGateway.getInShares(sortOrderIntMapper(order))
-            } else {
-                megaApiGateway.searchOnInShares(
-                    query,
-                    cancelTokenProvider.getOrCreateCancelToken(),
-                    sortOrderIntMapper(order)
-                )
-            }
-        }
-    }
-
-    override suspend fun searchOutShares(
-        query: String,
-        order: SortOrder,
-    ): List<MegaNode> {
-        return withContext(ioDispatcher) {
-            return@withContext if (query.isEmpty()) {
-                val searchNodes = ArrayList<MegaNode>()
-                val outShares = megaApiGateway.getOutgoingSharesNode(null)
-                val addedHandles: MutableList<Long> = ArrayList()
-                for (outShare in outShares) {
-                    val node = megaApiGateway.getMegaNodeByHandle(outShare.nodeHandle)
-                    if (node != null && !addedHandles.contains(node.handle)) {
-                        addedHandles.add(node.handle)
-                        searchNodes.add(node)
-                    }
-                }
-                searchNodes
-            } else {
-                megaApiGateway.searchOnOutShares(
-                    query = query,
-                    megaCancelToken = cancelTokenProvider.getOrCreateCancelToken(),
-                    order = sortOrderIntMapper(order)
-                )
-            }
-        }
-    }
-
     override suspend fun getOutShares(nodeId: NodeId): List<MegaShare>? =
         withContext(ioDispatcher) {
             megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { node ->
                 megaApiGateway.getOutShares(node)
             }
         }
-
-    override suspend fun searchLinkShares(
-        query: String,
-        order: SortOrder,
-        isFirstLevelNavigation: Boolean,
-    ): List<MegaNode> {
-        return withContext(ioDispatcher) {
-            return@withContext if (query.isEmpty()) {
-                megaApiGateway.getPublicLinks(
-                    if (isFirstLevelNavigation) sortOrderIntMapper(
-                        getLinksSortOrder()
-                    ) else sortOrderIntMapper(order)
-                )
-            } else {
-                megaApiGateway.searchOnLinkShares(
-                    query,
-                    cancelTokenProvider.getOrCreateCancelToken(),
-                    sortOrderIntMapper(order)
-                )
-            }
-        }
-    }
-
-    override suspend fun search(
-        parentNode: MegaNode,
-        query: String,
-        order: SortOrder,
-        searchType: Int,
-    ): List<MegaNode> {
-        val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
-        return withContext(ioDispatcher) {
-            return@withContext if (searchType == MegaApiAndroid.FILE_TYPE_DEFAULT) {
-                megaApiGateway.search(
-                    parentNode, query, megaCancelToken, sortOrderIntMapper(order)
-                )
-            } else {
-                megaApiGateway.searchByType(
-                    parentNode = parentNode,
-                    searchString = query,
-                    cancelToken = megaCancelToken,
-                    recursive = true,
-                    order = sortOrderIntMapper(order),
-                    type = searchType
-                )
-            }
-        }
-    }
 
     override suspend fun search(
         nodeId: NodeId?,

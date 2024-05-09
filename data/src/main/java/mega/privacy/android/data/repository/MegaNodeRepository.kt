@@ -8,7 +8,6 @@ import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.exception.MegaException
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
@@ -189,54 +188,11 @@ interface MegaNodeRepository {
     suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException
 
     /**
-     * Provides searched nodes InShares from query
-     * @param query String to be searched
-     */
-    suspend fun searchInShares(
-        query: String,
-        order: SortOrder,
-    ): List<MegaNode>
-
-    /**
-     * Provides searched nodes from OutShares from query
-     * @param query String to be searched
-     */
-    suspend fun searchOutShares(
-        query: String,
-        order: SortOrder,
-    ): List<MegaNode>
-
-
-    /**
      * Get a list with the active and pending outbound sharings for a MegaNode
      * @param nodeId the [NodeId] of the node to get the outbound sharings
      * @return a list of [MegaShare] of the outbound sharings of the node
      */
     suspend fun getOutShares(nodeId: NodeId): List<MegaShare>?
-
-    /**
-     * Provides searched nodes from Link from query
-     * @param query String to be searched
-     */
-    suspend fun searchLinkShares(
-        query: String,
-        order: SortOrder,
-        isFirstLevelNavigation: Boolean,
-    ): List<MegaNode>
-
-    /**
-     * Search node in parent Node
-     * @param parentNode [MegaNode]
-     * @param query Query string
-     * @param order [SortOrder]
-     * @param searchType filter type
-     */
-    suspend fun search(
-        parentNode: MegaNode,
-        query: String,
-        order: SortOrder,
-        searchType: Int = MegaApiAndroid.FILE_TYPE_DEFAULT,
-    ): List<MegaNode>
 
     /**
      * Search node and return list of [UnTypedNode]

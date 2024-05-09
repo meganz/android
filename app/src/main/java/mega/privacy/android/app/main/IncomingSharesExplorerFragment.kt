@@ -23,8 +23,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentFileexplorerlistBinding
-import mega.privacy.android.app.domain.usecase.search.GetSearchFromMegaNodeParentUseCase
-import mega.privacy.android.app.domain.usecase.search.GetSearchInSharesNodesUseCase
+import mega.privacy.android.app.domain.usecase.search.LegacySearchUseCase
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.COPY
@@ -40,6 +39,8 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.getPreferences
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -57,17 +58,12 @@ import javax.inject.Inject
 class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface,
     SearchCallback.View {
 
-    /**
-     * [GetSearchFromMegaNodeParentUseCase]
-     */
-    @Inject
-    lateinit var getSearchFromMegaNodeParentUseCase: GetSearchFromMegaNodeParentUseCase
 
     /**
-     * [GetSearchInSharesNodesUseCase]
+     * [LegacySearchUseCase]
      */
     @Inject
-    lateinit var getSearchInSharesNodesUseCase: GetSearchInSharesNodesUseCase
+    lateinit var legacySearchUseCase: LegacySearchUseCase
 
     /**
      * [CancelCancelTokenUseCase]
@@ -800,15 +796,11 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
         initNewSearch()
         lifecycleScope.launch {
             runCatching {
-                if (parentHandle == INVALID_HANDLE)
-                    getSearchInSharesNodesUseCase(searchString)
-                else
-                    getSearchFromMegaNodeParentUseCase(
-                        searchString,
-                        INVALID_HANDLE,
-                        parent = megaApi.getNodeByHandle(parentHandle),
-                        null
-                    )
+                legacySearchUseCase(
+                    nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                    query = searchString,
+                    parentHandle = NodeId(parentHandle)
+                )
             }.onSuccess { searchedNodes ->
                 finishSearch(searchedNodes)
             }.onFailure { throwable ->

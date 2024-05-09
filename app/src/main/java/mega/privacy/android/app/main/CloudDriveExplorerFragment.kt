@@ -29,7 +29,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentFileexplorerlistBinding
-import mega.privacy.android.app.domain.usecase.search.GetSearchFromMegaNodeParentUseCase
+import mega.privacy.android.app.domain.usecase.search.LegacySearchUseCase
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.CLOUD_FRAGMENT
@@ -46,6 +46,8 @@ import mega.privacy.android.app.utils.Util.getPreferences
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -64,10 +66,10 @@ import javax.inject.Inject
 class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, SearchCallback.View {
 
     /**
-     * [GetSearchFromMegaNodeParentUseCase]
+     * [LegacySearchUseCase]
      */
     @Inject
-    lateinit var getSearchFromMegaNodeParentUseCase: GetSearchFromMegaNodeParentUseCase
+    lateinit var legacySearchUseCase: LegacySearchUseCase
 
     /**
      * [CancelCancelTokenUseCase]
@@ -830,11 +832,10 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         lifecycleScope.launch {
             initNewSearch()
             runCatching {
-                getSearchFromMegaNodeParentUseCase(
+                legacySearchUseCase(
                     query = searchString,
-                    parentHandleSearch = INVALID_HANDLE,
-                    parent = megaApi.getNodeByHandle(parentHandle),
-                    searchFilter = null
+                    parentHandle = NodeId(parentHandle),
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE
                 )
             }.onSuccess {
                 finishSearch(it)
