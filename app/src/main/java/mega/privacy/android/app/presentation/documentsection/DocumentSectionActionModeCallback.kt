@@ -47,9 +47,7 @@ internal class DocumentSectionActionModeCallback(
                 totalNodes = documentSectionViewModel.uiState.value.allDocuments.size
             )
             CloudStorageOptionControlUtil.applyControl(menu, control)
-        }
 
-        managerActivity.lifecycleScope.launch {
             val isHiddenNodesEnabled =
                 managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
             val hasNonSensitiveNode =

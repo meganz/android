@@ -48,9 +48,7 @@ internal class AudioSectionActionModeCallback(
                 totalNodes = audioSectionViewModel.state.value.allAudios.size
             )
             CloudStorageOptionControlUtil.applyControl(menu, control)
-        }
 
-        managerActivity.lifecycleScope.launch {
             val isHiddenNodesEnabled =
                 managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
             val hasNonSensitiveNode =

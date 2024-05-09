@@ -48,9 +48,7 @@ internal class VideoSectionActionModeCallback(
                 totalNodes = videoSectionViewModel.state.value.allVideos.size
             )
             CloudStorageOptionControlUtil.applyControl(menu, control)
-        }
 
-        managerActivity.lifecycleScope.launch {
             val isHiddenNodesEnabled =
                 managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
             val hasNonSensitiveNode =
