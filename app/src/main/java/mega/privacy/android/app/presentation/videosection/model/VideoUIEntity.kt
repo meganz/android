@@ -22,6 +22,8 @@ import kotlin.time.Duration
  * @property label the video's label
  * @property elementID the element id if the video is belong to a playlist
  * @property isSelected the video if is selected
+ * @property isMarkedSensitive the video if is marked as sensitive
+ * @property isSensitiveInherited the video if is sensitive inherited
  */
 data class VideoUIEntity(
     val id: NodeId,
@@ -37,5 +39,7 @@ data class VideoUIEntity(
     val isSharedItems: Boolean = false,
     val label: Int = 0,
     val elementID: Long? = null,
-    val isSelected: Boolean = false
+    val isSelected: Boolean = false,
+    val isMarkedSensitive: Boolean = false,
+    val isSensitiveInherited: Boolean = false,
 )

@@ -49,6 +49,8 @@ internal fun VideoSectionComposeView(
         tabState.tabs.size
     }
 
+    val accountType = uiState.accountDetail?.levelDetail?.accountType
+
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             videoSectionViewModel.onTabSelected(selectTab = tabState.tabs[page])
@@ -63,6 +65,7 @@ internal fun VideoSectionComposeView(
         allVideoView = {
             AllVideosView(
                 items = uiState.allVideos,
+                accountType = accountType,
                 progressBarShowing = uiState.progressBarShowing,
                 searchMode = uiState.searchMode,
                 scrollToTop = uiState.scrollToTop,

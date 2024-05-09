@@ -30,6 +30,8 @@ class VideoUIEntityMapper @Inject constructor(
         isSharedItems = typedVideoNode.exportedData != null,
         nodeAvailableOffline = typedVideoNode.isAvailableOffline,
         label = typedVideoNode.label,
-        elementID = typedVideoNode.elementID
+        elementID = typedVideoNode.elementID,
+        isMarkedSensitive = typedVideoNode.isMarkedSensitive,
+        isSensitiveInherited = typedVideoNode.isSensitiveInherited,
     )
 }

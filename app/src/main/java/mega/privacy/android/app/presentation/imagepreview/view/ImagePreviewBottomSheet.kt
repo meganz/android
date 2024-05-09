@@ -412,7 +412,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isHiddenNodesEnabled && isHideMenuVisible && accountType != null && (!accountType.isPaid || isHiddenNodesOnboarded != null)) {
+                if (isHiddenNodesEnabled && accountType != null && (!accountType.isPaid || isHideMenuVisible && isHiddenNodesOnboarded != null)) {
                     MenuActionListTile(
                         icon = painterResource(id = Rpack.drawable.ic_eye_off_medium_regular_outline),
                         text = stringResource(id = R.string.general_hide_node),

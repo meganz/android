@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
@@ -32,12 +33,14 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
@@ -103,6 +106,13 @@ class VideoSectionViewModelTest {
         }.thenReturn(false)
     }
 
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase> {
+        on {
+            runBlocking { invoke() }
+        }.thenReturn(flowOf(false))
+    }
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+
     private val expectedVideo = mock<VideoUIEntity> {
         on { name }.thenReturn("video name")
         on { elementID }.thenReturn(1L)
@@ -122,6 +132,7 @@ class VideoSectionViewModelTest {
             fakeMonitorVideoPlaylistSetsUpdateFlow
         )
         wheneverBlocking { getVideoPlaylistsUseCase() }.thenReturn(listOf())
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         initUnderTest()
     }
 
@@ -151,6 +162,9 @@ class VideoSectionViewModelTest {
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            defaultDispatcher = UnconfinedTestDispatcher(),
         )
     }
 
@@ -370,7 +384,7 @@ class VideoSectionViewModelTest {
 
         underTest.onTabSelected(VideoSectionTab.Playlists)
 
-        underTest.state.drop(2).test {
+        underTest.state.drop(1).test {
             val actual = awaitItem()
             assertThat(actual.videoPlaylists.size).isEqualTo(2)
             assertThat(actual.isPlaylistProgressBarShown).isFalse()
@@ -390,7 +404,7 @@ class VideoSectionViewModelTest {
 
             underTest.onTabSelected(VideoSectionTab.Playlists)
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 assertThat(awaitItem().videoPlaylists).isNotEmpty()
 
                 underTest.onVideoPlaylistItemClicked(videoPlaylistUIEntity, 0)
@@ -407,7 +421,7 @@ class VideoSectionViewModelTest {
 
             underTest.onTabSelected(VideoSectionTab.Playlists)
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 assertThat(awaitItem().videoPlaylists.size).isEqualTo(2)
 
                 underTest.onVideoPlaylistItemClicked(videoPlaylistUIEntity, 0)
@@ -427,7 +441,7 @@ class VideoSectionViewModelTest {
 
             underTest.onTabSelected(VideoSectionTab.Playlists)
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 assertThat(awaitItem().videoPlaylists.size).isEqualTo(2)
 
                 underTest.selectAllVideoPlaylists()
@@ -606,7 +620,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
             underTest.addVideosToPlaylist(testPlaylistID, testVideoIDs)
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 val actual = awaitItem()
                 assertThat(actual.numberOfAddedVideos).isEqualTo(testVideoIDs.size)
                 val updated = awaitItem()
@@ -647,7 +661,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
             underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
             underTest.removeVideosFromPlaylist(testPlaylistID, testVideoElementIDs)
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 val actual = awaitItem()
                 assertThat(actual.numberOfRemovedItems).isEqualTo(testVideoElementIDs.size)
                 val updated = awaitItem()

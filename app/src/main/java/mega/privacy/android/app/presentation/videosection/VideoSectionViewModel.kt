@@ -5,20 +5,24 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -34,18 +38,21 @@ import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
@@ -89,6 +96,9 @@ class VideoSectionViewModel @Inject constructor(
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -98,6 +108,8 @@ class VideoSectionViewModel @Inject constructor(
     val state: StateFlow<VideoSectionState> = _state.asStateFlow()
 
     private val _tabState = MutableStateFlow(VideoSectionTabState())
+
+    private var showHiddenItems: Boolean? = null
 
     /**
      * The state regarding the tabs
@@ -126,8 +138,29 @@ class VideoSectionViewModel @Inject constructor(
                     }
                 }
         }
-        monitorAccountDetail()
-        monitorIsHiddenNodesOnboarded()
+
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                handleHiddenNodesUIFlow()
+                monitorIsHiddenNodesOnboarded()
+            }
+        }
+    }
+
+    private fun handleHiddenNodesUIFlow() {
+        combine(
+            monitorAccountDetailUseCase(),
+            monitorShowHiddenItemsUseCase(),
+        ) { accountDetail, showHiddenItems ->
+            this@VideoSectionViewModel.showHiddenItems = showHiddenItems
+            _state.update {
+                it.copy(
+                    accountDetail = accountDetail,
+                    isPendingRefresh = true
+                )
+            }
+        }.catch { Timber.e(it) }
+            .launchIn(viewModelScope)
     }
 
     private fun refreshNodesIfAnyUpdates() {
@@ -177,11 +210,15 @@ class VideoSectionViewModel @Inject constructor(
     private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
     internal fun refreshNodes() = viewModelScope.launch {
-        val videoList = getVideoUIEntityList()
-            .updateOriginalData()
+        val videoList = filterNonSensitiveItems(
+            items = getVideoUIEntityList(),
+            showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
+            isPaid = _state.value.accountDetail?.levelDetail?.accountType?.isPaid,
+        ).updateOriginalData()
             .filterVideosBySearchQuery()
             .filterVideosByDuration()
             .filterVideosByLocation()
+
         val sortOrder = getCloudSortOrder()
         _state.update {
             it.copy(
@@ -922,6 +959,21 @@ class VideoSectionViewModel @Inject constructor(
     fun setHiddenNodesOnboarded() {
         _state.update {
             it.copy(isHiddenNodesOnboarded = true)
+        }
+    }
+
+    private suspend fun filterNonSensitiveItems(
+        items: List<VideoUIEntity>,
+        showHiddenItems: Boolean?,
+        isPaid: Boolean?,
+    ) = withContext(defaultDispatcher) {
+        showHiddenItems ?: return@withContext items
+        isPaid ?: return@withContext items
+
+        return@withContext if (showHiddenItems || !isPaid) {
+            items
+        } else {
+            items.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
         }
     }
 
