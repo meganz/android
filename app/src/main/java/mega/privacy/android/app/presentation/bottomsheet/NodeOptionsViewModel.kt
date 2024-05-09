@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformat
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -58,6 +59,7 @@ class NodeOptionsViewModel @Inject constructor(
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
+    private val getRootNodeUseCase: GetRootNodeUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -227,6 +229,7 @@ class NodeOptionsViewModel @Inject constructor(
         getPrimarySyncHandleUseCase(),
         getSecondarySyncHandleUseCase(),
         getMyChatsFilesFolderIdUseCase().longValue,
+        getRootNodeUseCase()?.id?.longValue ?: 0,
     )
 
     /**

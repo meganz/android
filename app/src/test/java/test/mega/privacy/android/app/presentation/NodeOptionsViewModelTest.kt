@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -84,6 +85,7 @@ class NodeOptionsViewModelTest {
             runBlocking { invoke() }
         }.thenReturn(NodeId(0))
     }
+    private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
 
     private val nodeIdFlow = MutableStateFlow(-1L)
 
@@ -128,6 +130,7 @@ class NodeOptionsViewModelTest {
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
+            getRootNodeUseCase = getRootNodeUseCase,
             savedStateHandle = savedStateHandle,
         )
     }

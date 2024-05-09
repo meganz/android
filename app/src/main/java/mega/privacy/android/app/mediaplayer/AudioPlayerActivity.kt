@@ -993,8 +993,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                         isHiddenNodesEnabled
                                                 && !isInSharedItems
                                                 && !megaApi.getRootParentNode(node).isInShare
-                                                && !node.isMarkedSensitive
-                                                || viewModel.state.value.accountType?.isPaid == false
+                                                && (!node.isMarkedSensitive || viewModel.state.value.accountType?.isPaid == false)
 
                                     val shouldShowUnhideNode =
                                         isHiddenNodesEnabled
