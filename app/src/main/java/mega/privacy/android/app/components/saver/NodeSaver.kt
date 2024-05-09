@@ -103,20 +103,6 @@ class NodeSaver(
     }
 
     /**
-     * Save an offline node into device.
-     *
-     * @param node the offline node to save
-     * @param fromMediaViewer whether this download is from media viewer
-     */
-    @JvmOverloads
-    fun saveOfflineNode(
-        node: MegaOffline,
-        fromMediaViewer: Boolean = false,
-    ) {
-        saveOfflineNodes(listOf(node), fromMediaViewer)
-    }
-
-    /**
      * Save offline nodes into device.
      *
      * @param nodes the offline nodes to save
@@ -133,72 +119,6 @@ class NodeSaver(
                 totalSize += getTotalSize(getOfflineFile(app, node))
             }
             OfflineSaving(totalSize, nodes, fromMediaViewer)
-        }
-    }
-
-    /**
-     * Save a MegaNode into device.
-     *
-     * @param handle the handle of node to save
-     * @param highPriority whether this download is high priority or not
-     * @param isFolderLink whether this download is a folder link
-     * @param fromMediaViewer whether this download is from media viewer
-     * @param needSerialize whether this download need serialize
-     */
-    @JvmOverloads
-    fun saveHandle(
-        handle: Long,
-        highPriority: Boolean = false,
-        isFolderLink: Boolean = false,
-        fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-    ) {
-        saveHandles(
-            handles = listOf(handle),
-            highPriority = highPriority,
-            isFolderLink = isFolderLink,
-            fromMediaViewer = fromMediaViewer,
-            needSerialize = needSerialize,
-        )
-    }
-
-    /**
-     * Save a list of MegaNode into device.
-     * No matter if the list contains only files, or files and folders.
-     *
-     * @param handles the handle list of nodes to save
-     * @param highPriority whether this download is high priority or not
-     * @param isFolderLink whether this download is a folder link
-     * @param fromMediaViewer whether this download is from media viewer
-     * @param needSerialize whether this download need serialize
-     */
-    @JvmOverloads
-    fun saveHandles(
-        handles: List<Long>,
-        highPriority: Boolean = false,
-        isFolderLink: Boolean = false,
-        fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-    ) {
-        save(app) {
-            val nodes = ArrayList<MegaNode>()
-            val api = if (isFolderLink) megaApiFolder else megaApi
-
-            for (handle in handles) {
-                val node = api.getNodeByHandle(handle)
-                if (node != null) {
-                    nodes.add(node)
-                }
-            }
-
-            MegaNodeSaving(
-                totalSize = nodesTotalSize(nodes),
-                highPriority = highPriority,
-                isFolderLink = isFolderLink,
-                nodes = nodes,
-                fromMediaViewer = fromMediaViewer,
-                needSerialize = needSerialize
-            )
         }
     }
 
@@ -226,39 +146,6 @@ class NodeSaver(
             fromMediaViewer = fromMediaViewer,
             needSerialize = needSerialize,
         )
-    }
-
-    /**
-     * Save a list of MegaNodeList into device.
-     *
-     * @param nodeLists MegaNodeLists to save
-     * @param highPriority whether this download is high priority or not
-     * @param isFolderLink whether this download is a folder link
-     * @param fromMediaViewer whether this download is from media viewer
-     * @param needSerialize whether this download need serialize
-     */
-    @JvmOverloads
-    fun saveNodeLists(
-        nodeLists: List<MegaNodeList>,
-        highPriority: Boolean = false,
-        isFolderLink: Boolean = false,
-        fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-    ) {
-        save(app) {
-            val nodes = ArrayList<MegaNode>()
-            for (nodeList in nodeLists) {
-                val array = nodeListToArray(nodeList)
-                if (array != null) {
-                    nodes.addAll(array)
-                }
-            }
-
-            MegaNodeSaving(
-                nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
-                needSerialize
-            )
-        }
     }
 
     /**
@@ -294,35 +181,6 @@ class NodeSaver(
                 downloadByOpenWith = downloadByOpenWith
             )
         }
-    }
-
-    /**
-     * Save a MegaNode into device.
-     *
-     * @param node node to save
-     * @param parentPath parent path
-     */
-    fun saveNode(node: MegaNode, parentPath: String) {
-        Completable
-            .fromCallable(Callable {
-                this.saving = MegaNodeSaving(
-                    node.size,
-                    highPriority = false,
-                    isFolderLink = false,
-                    nodes = listOf(node),
-                    fromMediaViewer = false,
-                    needSerialize = false
-                )
-
-                if (lackPermission()) {
-                    return@Callable
-                }
-
-                checkSizeBeforeDownload(getCorrectDownloadPath(parentPath), app)
-            })
-            .subscribeOn(Schedulers.io())
-            .subscribeBy(onError = { logErr("NodeSaver saveNode") })
-            .addTo(compositeDisposable)
     }
 
     /**

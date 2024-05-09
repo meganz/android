@@ -514,15 +514,6 @@ class FileInfoActivity : BaseActivity() {
             }
 
             is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
-            FileInfoOneOffViewEvent.StartLegacyDownload -> {
-                nodeSaver.saveNode(
-                    viewModel.node,
-                    highPriority = false,
-                    isFolderLink = false,
-                    fromMediaViewer = false,
-                    needSerialize = false
-                )
-            }
         }
     }
 

@@ -5410,11 +5410,6 @@ public class ChatActivity extends PasscodeActivity
         return false;
     }
 
-    public void downloadNodeList(MegaNodeList nodeList) {
-        PermissionUtils.checkNotificationsPermission(this);
-        nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true);
-    }
-
     public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messagesToDelete, final MegaChatRoom chat) {
         Timber.d("showConfirmationDeleteMessages");
 
@@ -6804,18 +6799,6 @@ public class ChatActivity extends PasscodeActivity
     public void sendToDownload(MegaNodeList nodelist) {
         Timber.d("sendToDownload");
         nodeSaver.downloadVoiceClip(nodelist);
-    }
-
-    /**
-     * Upon a node is tapped, if it cannot be previewed in-app,
-     * then download it first, this download will be marked as "download by tap".
-     * Since it's down
-     *
-     * @param node Node to be downloaded.
-     */
-    public void saveNodeByTap(MegaNode node) {
-        PermissionUtils.checkNotificationsPermission(this);
-        nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, true, true);
     }
 
     @Override

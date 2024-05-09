@@ -9,26 +9,20 @@ import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 /**
- * Default implementation of [SetNodeAvailableOffline]
+ * Default implementation of [RemoveAvailableOfflineUseCase]
  */
-class DefaultSetNodeAvailableOffline @Inject constructor(
+class DefaultRemoveAvailableOfflineUseCase @Inject constructor(
     private val megaNodeRepository: MegaNodeRepository,
     private val getNodeUseCase: GetNodeUseCase,
-) : SetNodeAvailableOffline {
+) : RemoveAvailableOfflineUseCase {
     override suspend fun invoke(
         nodeId: NodeId,
-        availableOffline: Boolean,
         activity: WeakReference<Activity>,
     ) {
         megaNodeRepository.getNodeByHandle(nodeId.longValue)?.let { megaNode ->
-            val fromIncomingShare = megaNodeRepository.getUserFromInShare(megaNode, true) != null
-            val fromBackups = megaNodeRepository.isNodeInBackups(megaNode)
             activity.get()?.let { activity ->
-                getNodeUseCase.setNodeAvailableOffline(
+                getNodeUseCase.removeNodeAvailableOffline(
                     node = megaNode,
-                    setOffline = availableOffline,
-                    isFromIncomingShares = fromIncomingShare,
-                    isFromBackups = fromBackups,
                     activity = activity
                 ).await()
             }

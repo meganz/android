@@ -16,7 +16,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
-import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
+import mega.privacy.android.app.domain.usecase.offline.RemoveAvailableOfflineUseCase
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
@@ -117,7 +117,7 @@ class FileInfoViewModel @Inject constructor(
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase,
     private val getNodeLocationInfo: GetNodeLocationInfo,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
-    private val setNodeAvailableOffline: SetNodeAvailableOffline,
+    private val removeAvailableOfflineUseCase: RemoveAvailableOfflineUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val setOutgoingPermissions: SetOutgoingPermissions,
     private val stopSharingNode: StopSharingNode,
@@ -334,9 +334,8 @@ class FileInfoViewModel @Inject constructor(
                     it.copy(isAvailableOfflineEnabled = false) // to avoid multiple changes while changing
                 }
                 viewModelScope.launch {
-                    setNodeAvailableOffline(
+                    removeAvailableOfflineUseCase(
                         typedNode.id,
-                        false,
                         activity
                     )
                     updateState {

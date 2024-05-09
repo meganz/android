@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.usecase.offline.DefaultSetNodeAvailableOffline
-import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
+import mega.privacy.android.app.domain.usecase.offline.DefaultRemoveAvailableOfflineUseCase
+import mega.privacy.android.app.domain.usecase.offline.RemoveAvailableOfflineUseCase
 
 /**
  * binds use-cases related to offline
@@ -18,5 +18,5 @@ abstract class OfflineModule {
      * binds default implementation
      */
     @Binds
-    abstract fun bindSetNodeAvailableOffline(impl: DefaultSetNodeAvailableOffline): SetNodeAvailableOffline
+    abstract fun bindSetNodeAvailableOffline(impl: DefaultRemoveAvailableOfflineUseCase): RemoveAvailableOfflineUseCase
 }

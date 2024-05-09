@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
-import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
+import mega.privacy.android.app.domain.usecase.offline.RemoveAvailableOfflineUseCase
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -129,7 +129,7 @@ internal class FileInfoViewModelTest {
     private val getOutShares: GetOutShares = mock()
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase = mock()
     private val isAvailableOffline: IsAvailableOfflineUseCase = mock()
-    private val setNodeAvailableOffline: SetNodeAvailableOffline = mock()
+    private val removeAvailableOfflineUseCase: RemoveAvailableOfflineUseCase = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val setOutgoingPermissions: SetOutgoingPermissions = mock()
     private val stopSharingNode: StopSharingNode = mock()
@@ -185,7 +185,7 @@ internal class FileInfoViewModelTest {
             getOutShares,
             getNodeOutSharesUseCase,
             isAvailableOffline,
-            setNodeAvailableOffline,
+            removeAvailableOfflineUseCase,
             getNodeAccessPermission,
             setOutgoingPermissions,
             stopSharingNode,
@@ -230,7 +230,7 @@ internal class FileInfoViewModelTest {
             getOutShares = getOutShares,
             getNodeOutSharesUseCase = getNodeOutSharesUseCase,
             isAvailableOfflineUseCase = isAvailableOffline,
-            setNodeAvailableOffline = setNodeAvailableOffline,
+            removeAvailableOfflineUseCase = removeAvailableOfflineUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             setOutgoingPermissions = setOutgoingPermissions,
             stopSharingNode = stopSharingNode,
@@ -815,7 +815,7 @@ internal class FileInfoViewModelTest {
             whenever(isAvailableOffline.invoke(typedFileNode)).thenReturn(false)
             underTest.setNode(node.handle, true)
             underTest.availableOfflineChanged(true, activity)
-            verifyNoInteractions(setNodeAvailableOffline)
+            verifyNoInteractions(removeAvailableOfflineUseCase)
         }
 
     @Test

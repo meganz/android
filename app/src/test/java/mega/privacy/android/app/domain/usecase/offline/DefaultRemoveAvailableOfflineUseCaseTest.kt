@@ -17,9 +17,9 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.lang.ref.WeakReference
 
-class DefaultSetNodeAvailableOfflineTest {
+class DefaultRemoveAvailableOfflineUseCaseTest {
 
-    private lateinit var underTest: SetNodeAvailableOffline
+    private lateinit var underTest: RemoveAvailableOfflineUseCase
 
     private val megaNodeRepository = mock<MegaNodeRepository>()
     private val getNodeUseCase = mock<GetNodeUseCase>()
@@ -32,16 +32,13 @@ class DefaultSetNodeAvailableOfflineTest {
 
     @Before
     fun setup() {
-        underTest = DefaultSetNodeAvailableOffline(
+        underTest = DefaultRemoveAvailableOfflineUseCase(
             megaNodeRepository = megaNodeRepository,
             getNodeUseCase = getNodeUseCase,
         )
         whenever(
-            getNodeUseCase.setNodeAvailableOffline(
+            getNodeUseCase.removeNodeAvailableOffline(
                 node = any(),
-                setOffline = any(),
-                isFromIncomingShares = any(),
-                isFromBackups = any(),
                 activity = any(),
             )
         ).thenReturn(
@@ -52,7 +49,7 @@ class DefaultSetNodeAvailableOfflineTest {
     @Test
     fun `test when node is not found getNodeUseCase has no interaction`() = runTest {
         whenever(megaNodeRepository.getNodeByHandle(id.longValue)).thenReturn(null)
-        underTest(id, true, WeakReference(activity))
+        underTest(id, WeakReference(activity))
         verifyNoInteractions(getNodeUseCase)
     }
 
@@ -78,12 +75,9 @@ class DefaultSetNodeAvailableOfflineTest {
         whenever(megaNodeRepository.getUserFromInShare(node, true)).thenReturn(
             if (isFromIncomingShares) mock() else null
         )
-        underTest(id, true, WeakReference(activity))
-        verify(getNodeUseCase, times(1)).setNodeAvailableOffline(
+        underTest(id, WeakReference(activity))
+        verify(getNodeUseCase, times(1)).removeNodeAvailableOffline(
             node = node,
-            setOffline = true,
-            isFromIncomingShares = isFromIncomingShares,
-            isFromBackups = false,
             activity = activity
         )
     }
@@ -92,12 +86,9 @@ class DefaultSetNodeAvailableOfflineTest {
         whenever(megaNodeRepository.getNodeByHandle(id.longValue)).thenReturn(node)
         whenever(megaNodeRepository.isNodeInBackups(node)).thenReturn(isFromBackups)
         whenever(megaNodeRepository.getUserFromInShare(node, true)).thenReturn(null)
-        underTest(id, true, WeakReference(activity))
-        verify(getNodeUseCase, times(1)).setNodeAvailableOffline(
+        underTest(id, WeakReference(activity))
+        verify(getNodeUseCase, times(1)).removeNodeAvailableOffline(
             node = node,
-            setOffline = true,
-            isFromIncomingShares = false,
-            isFromBackups = isFromBackups,
             activity = activity
         )
     }

@@ -10,16 +10,15 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.toMegaException
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -30,7 +29,6 @@ import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -326,47 +324,17 @@ class GetNodeUseCase @Inject constructor(
      * Set node as available offline
      *
      * @param node                  Node to set available offline
-     * @param setOffline            Flag to set/unset available offline
      * @param activity              Activity context needed to create file
-     * @param isFromIncomingShares  Flag indicating if node is from incoming shares.
-     * @param isFromBackups         Flag indicating if node is from Backups.
      * @return                      Completable
      */
-    fun setNodeAvailableOffline(
+    fun removeNodeAvailableOffline(
         node: MegaNode?,
-        setOffline: Boolean,
-        isFromIncomingShares: Boolean = false,
-        isFromBackups: Boolean = false,
         activity: Activity,
     ): Completable =
         Completable.fromCallable {
             requireNotNull(node)
-            val isAvailableOffline =
-                isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
-            when {
-                setOffline && !isAvailableOffline -> {
-                    val from = when {
-                        isFromIncomingShares -> Constants.FROM_INCOMING_SHARES
-                        isFromBackups -> Constants.FROM_BACKUPS
-                        else -> Constants.FROM_OTHERS
-                    }
-
-                    val offlineParent =
-                        OfflineUtils.getOfflineParentFile(activity, from, node, megaApi)
-                    if (FileUtil.isFileAvailable(offlineParent)) {
-                        val offlineFile = File(offlineParent, node.name)
-                        if (FileUtil.isFileAvailable(offlineFile)) {
-                            val offlineNode = databaseHandler.findByHandle(node.handle)
-                            OfflineUtils.removeOffline(offlineNode, databaseHandler, activity)
-                        }
-                    }
-
-                    OfflineUtils.saveOffline(offlineParent, node, activity)
-                }
-
-                !setOffline && isAvailableOffline -> {
-                    removeOfflineNode(node.handle, activity).blockingAwait()
-                }
+            if (isNodeAvailableOffline(node.handle).blockingGetOrNull() == true) {
+                removeOfflineNode(node.handle, activity).blockingAwait()
             }
         }
 

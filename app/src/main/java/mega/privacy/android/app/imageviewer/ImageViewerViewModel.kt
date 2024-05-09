@@ -590,11 +590,8 @@ class ImageViewerViewModel @Inject constructor(
         nodeItem: MegaNodeItem,
         activity: Activity,
     ) {
-        getNodeUseCase.setNodeAvailableOffline(
+        getNodeUseCase.removeNodeAvailableOffline(
             node = nodeItem.node,
-            setOffline = false,
-            isFromIncomingShares = nodeItem.isFromIncoming,
-            isFromBackups = nodeItem.isFromBackups,
             activity = activity
         ).subscribeAndComplete {
             loadSingleNode(nodeItem.handle)

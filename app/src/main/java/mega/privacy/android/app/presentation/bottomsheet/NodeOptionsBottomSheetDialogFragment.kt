@@ -68,7 +68,6 @@ import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle
@@ -95,7 +94,6 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -1471,61 +1469,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             else -> {}
         }
-    }
-
-    /**
-     * Saves the selected [MegaNode] Offline, causing it to appear in the "Offline" section
-     *
-     * @param node A potentially nullable [MegaNode]
-     * @param nodeDeviceCenterInformation Contains specific information of a Device Center Node to
-     * be displayed
-     */
-    private fun saveForOffline(
-        node: MegaNode?,
-        nodeDeviceCenterInformation: NodeDeviceCenterInformation?,
-    ) {
-        val originatingFeature = when (drawerItem) {
-            DrawerItem.BACKUPS -> Constants.FROM_BACKUPS
-            DrawerItem.DEVICE_CENTER -> {
-                if (nodeDeviceCenterInformation?.isBackupsFolder == true) {
-                    Constants.FROM_BACKUPS
-                } else {
-                    Constants.FROM_OTHERS
-                }
-            }
-
-            DrawerItem.SHARED_ITEMS -> {
-                if ((requireActivity() as? ManagerActivity)?.tabItemShares === SharesTab.INCOMING_TAB) {
-                    Constants.FROM_INCOMING_SHARES
-                } else {
-                    Constants.FROM_OTHERS
-                }
-            }
-
-            else -> Constants.FROM_OTHERS
-        }
-        val offlineParent =
-            OfflineUtils.getOfflineParentFile(requireActivity(), originatingFeature, node, megaApi)
-        if (FileUtil.isFileAvailable(offlineParent)) {
-            val offlineFile = node?.name?.let { File(offlineParent, it) }
-            if (FileUtil.isFileAvailable(offlineFile)) {
-                if (FileUtil.isFileDownloadedLatest(offlineFile, node)
-                    && offlineFile?.length() == node?.size
-                ) {
-                    // if the file matches to the latest on the cloud, do nothing
-                    return
-                } else {
-                    // if the file does not match the latest on the cloud, delete the old file offline database record
-                    node?.let {
-                        nodeOptionsViewModel.removeOfflineNode(it.handle)
-                        refreshView()
-                    }
-                }
-            }
-        }
-
-        // Save the new file to offline
-        OfflineUtils.saveOffline(offlineParent, node, requireActivity())
     }
 
     /**
