@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import android.content.Intent
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,9 +13,11 @@ import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
+import mega.privacy.android.data.mapper.environment.DevicePowerConnectionStateMapper
 import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
 import mega.privacy.android.domain.entity.environment.ThermalState
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import org.junit.jupiter.api.BeforeAll
@@ -29,7 +32,7 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class EnvironmentRepositoryImplTest {
+internal class EnvironmentRepositoryImplTest {
     private lateinit var underTest: EnvironmentRepository
 
     private val deviceGateway = mock<DeviceGateway>()
@@ -41,7 +44,7 @@ class EnvironmentRepositoryImplTest {
     private val appInfoPreferencesGateway = mock<AppInfoPreferencesGateway>()
     private val applicationIpAddressWrapper = mock<ApplicationIpAddressWrapper>()
     private val thermalStateMapper = mock<ThermalStateMapper>()
-
+    private val devicePowerConnectionStateMapper = mock<DevicePowerConnectionStateMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -54,6 +57,7 @@ class EnvironmentRepositoryImplTest {
             appInfoPreferencesGateway = appInfoPreferencesGateway,
             applicationIpAddressWrapper = applicationIpAddressWrapper,
             thermalStateMapper = thermalStateMapper,
+            devicePowerConnectionStateMapper = devicePowerConnectionStateMapper,
         )
     }
 
@@ -67,6 +71,7 @@ class EnvironmentRepositoryImplTest {
             appInfoPreferencesGateway,
             applicationIpAddressWrapper,
             thermalStateMapper,
+            devicePowerConnectionStateMapper,
         )
         whenever(deviceGateway.getCurrentDeviceLanguage()).thenReturn("en")
     }
@@ -145,6 +150,21 @@ class EnvironmentRepositoryImplTest {
         )
         underTest.monitorBatteryInfo().test {
             assertThat(awaitItem().level).isEqualTo(batteryLevel)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the correct device power connection state is returned`() = runTest {
+        val expectedState = DevicePowerConnectionState.Connected
+        val powerType = Intent.ACTION_POWER_CONNECTED
+        whenever(devicePowerConnectionStateMapper(powerType)).thenReturn(expectedState)
+        whenever(deviceGateway.monitorDevicePowerConnectionState).thenReturn(
+            flowOf(powerType)
+        )
+
+        underTest.monitorDevicePowerConnectionState().test {
+            assertThat(awaitItem()).isEqualTo(expectedState)
             cancelAndIgnoreRemainingEvents()
         }
     }

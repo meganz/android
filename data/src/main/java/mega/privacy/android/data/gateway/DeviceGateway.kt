@@ -107,6 +107,11 @@ interface DeviceGateway {
     val monitorBatteryInfo: Flow<BatteryInfo>
 
     /**
+     * Monitors the Device Power Connection state
+     */
+    val monitorDevicePowerConnectionState: Flow<String?>
+
+    /**
      * Monitor thermal state
      */
     val monitorThermalState: Flow<Int>

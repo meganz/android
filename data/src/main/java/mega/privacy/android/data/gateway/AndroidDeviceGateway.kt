@@ -145,6 +145,16 @@ internal class AndroidDeviceGateway @Inject constructor(
         }.catch {
             Timber.e(it, "MonitorBatteryInfo Exception")
         }.toSharedFlow(appScope)
+
+    override val monitorDevicePowerConnectionState =
+        context.registerReceiverAsFlow(
+            flags = ContextCompat.RECEIVER_NOT_EXPORTED,
+            Intent.ACTION_POWER_CONNECTED, Intent.ACTION_POWER_DISCONNECTED,
+        ).map {
+            it.action
+        }.catch {
+            Timber.e("An Exception occurred when monitoring the device power connection", it)
+        }.toSharedFlow(appScope)
 }
 
 private fun <T> Flow<T>.toSharedFlow(

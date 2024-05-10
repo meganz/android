@@ -11,6 +11,7 @@ import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
+import mega.privacy.android.data.mapper.environment.DevicePowerConnectionStateMapper
 import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.domain.entity.AppInfo
@@ -33,6 +34,7 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     private val appInfoPreferencesGateway: AppInfoPreferencesGateway,
     private val applicationIpAddressWrapper: ApplicationIpAddressWrapper,
     private val thermalStateMapper: ThermalStateMapper,
+    private val devicePowerConnectionStateMapper: DevicePowerConnectionStateMapper,
 ) : EnvironmentRepository {
 
     override suspend fun getDeviceInfo() =
@@ -101,7 +103,9 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     override fun monitorBatteryInfo() =
         deviceGateway.monitorBatteryInfo
 
+    override fun monitorDevicePowerConnectionState() =
+        deviceGateway.monitorDevicePowerConnectionState.map { devicePowerConnectionStateMapper(it) }
+
     override fun availableProcessors() =
         deviceGateway.getAvailableProcessors()
-
 }

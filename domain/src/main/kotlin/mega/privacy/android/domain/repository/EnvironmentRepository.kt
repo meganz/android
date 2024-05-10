@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.AppInfo
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.DeviceInfo
+import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
 import mega.privacy.android.domain.entity.environment.ThermalState
 
 /**
@@ -100,6 +101,13 @@ interface EnvironmentRepository {
      * Monitor battery info
      */
     fun monitorBatteryInfo(): Flow<BatteryInfo>
+
+    /**
+     * Monitors the Device Power Connection State
+     *
+     * @return a Flow that observes and returns the Device Power Connection State
+     */
+    fun monitorDevicePowerConnectionState(): Flow<DevicePowerConnectionState>
 
     /**
      * Get the number of available processors
