@@ -16,6 +16,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
@@ -25,6 +26,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_C
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
+import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getCurrentOrientation
@@ -53,6 +55,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private lateinit var avatarImageView: RoundedImageView
     private lateinit var onHoldImageView: ImageView
     private var microOffImageView: ImageView? = null
+    private var raisedHandIcon: ImageView? = null
 
     private lateinit var inMeetingFragment: InMeetingFragment
 
@@ -209,6 +212,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             avatarImageView = binding.avatar
             onHoldImageView = binding.onHoldIcon
             microOffImageView = binding.microOffIcon
+            raisedHandIcon = binding.raisedHand
         }
 
         if (binding is IndividualCallFragmentBinding) {
@@ -225,6 +229,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        collectFlows()
         inMeetingViewModel.getAvatarBitmap(peerId)?.let {
             avatarImageView.setImageBitmap(it)
         }
@@ -251,6 +256,14 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
 
         checkUI()
+    }
+
+    private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
+            raisedHandIcon?.isVisible =
+                state.isRaiseToSpeakFeatureFlagEnabled && state.isMyHandRaisedToSpeak
+
+        }
     }
 
     /**
