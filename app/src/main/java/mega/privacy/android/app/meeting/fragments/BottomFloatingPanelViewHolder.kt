@@ -226,8 +226,7 @@ class BottomFloatingPanelViewHolder(
      */
     private fun initButtonsState() {
         disableEnableButtons(
-            inMeetingViewModel.isCallEstablished(),
-            inMeetingViewModel.isCallOnHold()
+            inMeetingViewModel.isCallEstablished()
         )
         floatingPanelView.fabMic.isOn = savedMicState
         floatingPanelView.fabCam.isOn = savedCamState
@@ -306,16 +305,14 @@ class BottomFloatingPanelViewHolder(
      * Method that disables or enables buttons depending on whether the call is connected or not
      *
      * @param isCallEstablished True, if the call is connected. False, otherwise
-     * @param isHold True, if the call is on hold. False, otherwise
      */
-    fun disableEnableButtons(isCallEstablished: Boolean, isHold: Boolean) {
-        val shouldBeEnable = !(!isCallEstablished || isHold)
+    fun disableEnableButtons(isCallEstablished: Boolean) {
         floatingPanelView.apply {
-            fabMic.enable = shouldBeEnable
-            fabCam.enable = shouldBeEnable
+            fabMic.enable = isCallEstablished
+            fabCam.enable = isCallEstablished
             fabHold.enable = isCallEstablished
-            fabHold.isOn = !isHold
-            fabSpeaker.enable = shouldBeEnable
+            fabHold.isOn = true
+            fabSpeaker.enable = isCallEstablished
         }
     }
 
@@ -342,19 +339,15 @@ class BottomFloatingPanelViewHolder(
                 updateBottomFloatingPanelIfNeeded()
             }
 
+            fabHold.setOnClickListener {
+                inMeetingViewModel.onClickMoreCallOptions()
+            }
+
             fabSpeaker.setOnClickListener {
                 listener.onChangeSpeakerState()
             }
 
             fabSpeaker.setOnChangeCallback {
-                updateBottomFloatingPanelIfNeeded()
-            }
-
-            fabHold.setOnOffCallback {
-                listener.onChangeHoldState(binding.bottomFloatingPanel.fabHold.isOn)
-            }
-
-            fabHold.setOnChangeCallback {
                 updateBottomFloatingPanelIfNeeded()
             }
 
@@ -569,43 +562,6 @@ class BottomFloatingPanelViewHolder(
     fun updateCamIcon(camOn: Boolean) {
         savedCamState = camOn
         floatingPanelView.fabCam.isOn = camOn
-    }
-
-    /**
-     * Enabling or disabling the on hold button
-     *
-     * @param isEnabled True, if enabled. False, if disabled
-     * @param isHold True, if it is an on hold button. False, if it is switch call button
-     */
-    fun enableHoldIcon(isEnabled: Boolean, isHold: Boolean) {
-        disableEnableButtons(isEnabled, isHold)
-    }
-
-    /**
-     * Method to control when to switch the button from on hold to switch call
-     *
-     * @param isAnotherCallOnHold True, if another call is in progress. False, if not
-     */
-    fun changeOnHoldIcon(isAnotherCallOnHold: Boolean) {
-        if (isAnotherCallOnHold) {
-            changeOnHoldIconDrawable(true)
-            floatingPanelView.fabHold.isOn = true
-        } else {
-            floatingPanelView.fabHold.isOn = false
-            changeOnHoldIconDrawable(false)
-        }
-    }
-
-    /**
-     * Method of changing the on hold button icon appropriately
-     *
-     * @param existsAnotherCallOnHold True, if another call is in progress. False, if not.
-     */
-    fun changeOnHoldIconDrawable(existsAnotherCallOnHold: Boolean) {
-        floatingPanelView.fabHold.setOnIcon(
-            if (existsAnotherCallOnHold) mega.privacy.android.icon.pack.R.drawable.ic_arrows_swap
-            else mega.privacy.android.icon.pack.R.drawable.ic_meeting_pause
-        )
     }
 
     /**

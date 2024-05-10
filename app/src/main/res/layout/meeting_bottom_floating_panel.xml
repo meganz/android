@@ -131,16 +131,15 @@
     <mega.privacy.android.app.components.OnOffFab
         android:id="@+id/fab_hold"
         style="@style/BottomSheetIcon"
-        app:maxImageSize="16dp"
-        app:disable_icon="@drawable/ic_meeting_pause"
+        app:disable_icon="@drawable/more_call_options_icon"
         app:apply_tint="false"
         app:is_on="true"
         app:layout_constraintEnd_toStartOf="@id/fab_end"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@id/fab_speaker"
         app:layout_constraintTop_toTopOf="@id/fab_mic"
-        app:off_icon="@drawable/ic_meeting_pause_off"
-        app:on_icon="@drawable/ic_meeting_pause"
+        app:off_icon="@drawable/more_call_options_icon"
+        app:on_icon="@drawable/more_call_options_icon"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -148,12 +147,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
-        android:text="@string/meeting_hold"
+        android:text="@string/meetings_more_call_option_button"
         android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
         app:layout_constraintEnd_toEndOf="@id/fab_hold"
         app:layout_constraintStart_toStartOf="@id/fab_hold"
         app:layout_constraintTop_toBottomOf="@id/fab_hold" />
-
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_end"

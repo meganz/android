@@ -34,6 +34,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
@@ -56,7 +57,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
-import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
@@ -99,6 +99,7 @@ import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.meeting.view.sheet.LeaveMeetingBottomSheetView
+import mega.privacy.android.app.presentation.meeting.view.sheet.MoreCallOptionsBottomSheetView
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
@@ -274,16 +275,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private val noOutgoingCallObserver = Observer<Long> {
-        if (inMeetingViewModel.isSameCall(it)) {
-            val call = inMeetingViewModel.getCall()
-            call?.let { chatCall ->
-                Timber.d("The call is no longer an outgoing call")
-                enableOnHoldFab(chatCall.isOnHold)
-            }
-        }
-    }
-
     private val visibilityChangeObserver = Observer<Long> {
         Timber.d("Change in the visibility of a participant")
         inMeetingViewModel.updateParticipantsVisibility(it)
@@ -322,8 +313,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             when (it.status) {
                 MegaChatCall.CALL_STATUS_INITIAL -> {
                     bottomFloatingPanelViewHolder?.disableEnableButtons(
-                        false,
-                        inMeetingViewModel.isCallOnHold()
+                        false
                     )
                 }
 
@@ -336,19 +326,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                 MegaChatCall.CALL_STATUS_CONNECTING -> {
                     bottomFloatingPanelViewHolder?.disableEnableButtons(
-                        false,
-                        inMeetingViewModel.isCallOnHold()
+                        false
                     )
 
                     checkMenuItemsVisibility()
                 }
 
                 MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
-                    bottomFloatingPanelViewHolder?.disableEnableButtons(
-                        true,
-                        inMeetingViewModel.isCallOnHold()
-                    )
-
+                    bottomFloatingPanelViewHolder?.disableEnableButtons(true)
                     checkMenuItemsVisibility()
                     checkChildFragments()
                     controlVideoLocalOneToOneCall(it.hasLocalVideo())
@@ -723,6 +708,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+        binding.moreOptionsListComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setViewTreeViewModelStoreOwner(requireActivity())
+            setContent {
+                MegaAppTheme(isDark = true) {
+                    MoreCallOptionsBottomSheetView()
+                }
+            }
+        }
+
         initLiveEventBus()
         takeActionByArgs()
 
@@ -866,9 +862,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         LiveEventBus.get(EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE, Boolean::class.java)
             .observe(this, enableOrDisableLocalVideoObserver)
 
-        LiveEventBus.get(EVENT_NOT_OUTGOING_CALL, Long::class.java)
-            .observe(this, noOutgoingCallObserver)
-
         LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long::class.java)
             .observe(this, nameChangeObserver)
 
@@ -1006,7 +999,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
 
-            floatingBottomSheet.isVisible = !state.showEndMeetingAsOnlyHostBottomPanel
+            floatingBottomSheet.isVisible =
+                !state.showEndMeetingAsOnlyHostBottomPanel && !state.showCallOptionsBottomSheet
 
             if (state.chatTitle.isNotEmpty()) {
                 toolbarTitle?.apply {
@@ -1085,7 +1079,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     if (bannerAnotherCallLayout.isVisible) {
                         Timber.d("No other calls in progress or on hold")
                         bannerAnotherCallLayout.isVisible = false
-                        bottomFloatingPanelViewHolder?.changeOnHoldIconDrawable(false)
                     }
                 }
 
@@ -1097,8 +1090,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         }
                         bannerAnotherCallSubtitle?.text =
                             getString(R.string.call_in_progress_layout)
-
-                        bottomFloatingPanelViewHolder?.changeOnHoldIconDrawable(false)
                     }
                 }
 
@@ -1111,8 +1102,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                         bannerAnotherCallSubtitle?.text =
                             getString(R.string.call_on_hold)
-
-                        bottomFloatingPanelViewHolder?.changeOnHoldIconDrawable(true)
                     }
                 }
             }
@@ -1510,11 +1499,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             if (it.hasLocalVideo()) {
                 sharedModel.camInitiallyOn()
             }
-            enableOnHoldFab(it.isOnHold)
             updatePanel()
             return
         }
-        enableOnHoldFab(false)
     }
 
     /**
@@ -2360,23 +2347,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Check if a call is outgoing, on hold button must be disabled
-     */
-    private fun enableOnHoldFab(callIsOnHold: Boolean) {
-        bottomFloatingPanelViewHolder?.enableHoldIcon(
-            !inMeetingViewModel.isRequestSent(),
-            callIsOnHold
-        )
-    }
-
-    /**
      * Method that controls whether the call has been put on or taken off hold, and updates the UI.
      */
     private fun isCallOnHold(isHold: Boolean) {
         Timber.d("Changes in the on hold status of the call")
         bottomFloatingPanelViewHolder?.disableEnableButtons(
-            inMeetingViewModel.isCallEstablished(),
-            isHold
+            inMeetingViewModel.isCallEstablished()
         )
 
         showMuteBanner()
@@ -2644,44 +2620,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Change Hold State
-     *
-     * @param isHold True, if should be on hold. False, otherwise.
-     */
-    override fun onChangeHoldState(isHold: Boolean) {
-        val anotherCall = inMeetingViewModel.getAnotherCall()
-        when {
-            anotherCall == null -> {
-                Timber.d("No other calls in progress")
-                inMeetingViewModel.setCallOnHold(isHold)
-            }
-
-            anotherCall.isOnHold -> {
-                Timber.d("Change of status on hold and switch of call")
-                inMeetingViewModel.setCallOnHold(true)
-                inMeetingViewModel.setAnotherCallOnHold(anotherCall.chatid, false)
-                sharedModel.clickSwitchCall()
-            }
-
-            inMeetingViewModel.isCallOnHold() -> {
-                Timber.d("Change of status on hold")
-                inMeetingViewModel.setCallOnHold(false)
-                inMeetingViewModel.setAnotherCallOnHold(anotherCall.chatid, true)
-            }
-
-            else -> {
-                Timber.d("The current call is not on hold, change the status")
-                inMeetingViewModel.setCallOnHold(isHold)
-            }
-        }
-    }
-
-    /**
      * Change Speaker state
      */
     override fun onChangeSpeakerState() {
         Timber.d("Change in speaker state")
         sharedModel.clickSpeaker()
+    }
+
+    /**
+     * More options clicked
+     */
+    override fun onMoreOptions() {
+        Timber.d("More options clicked")
+        inMeetingViewModel.onClickMoreCallOptions()
     }
 
     /**

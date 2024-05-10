@@ -88,7 +88,7 @@ internal class ChatCallMapper @Inject constructor(
 
     private fun MegaChatCall.toUserSpeakPermission(): Map<Long, Boolean> {
         return buildMap {
-            val listOfClientId = handleListMapper(sessionsClientid)
+            val listOfClientId = handleListMapper(speakersList)
             for (i in listOfClientId.indices) {
                 val clientId = listOfClientId[i]
                 put(clientId, hasUserSpeakPermission(clientId))
@@ -98,7 +98,7 @@ internal class ChatCallMapper @Inject constructor(
 
     private fun MegaChatCall.toUserRaiseHands(): Map<Long, Boolean> {
         return buildMap {
-            val listOfClientId = handleListMapper(sessionsClientid)
+            val listOfClientId = handleListMapper(raiseHandsList)
             for (i in listOfClientId.indices) {
                 val clientId = listOfClientId[i]
                 put(clientId, hasUserHandRaised(clientId))
@@ -108,7 +108,7 @@ internal class ChatCallMapper @Inject constructor(
 
     private fun MegaChatCall.toUserPendingSpeakRequest(): Map<Long, Boolean> {
         return buildMap {
-            val listOfClientId = handleListMapper(sessionsClientid)
+            val listOfClientId = handleListMapper(speakRequestsList)
             for (i in listOfClientId.indices) {
                 val clientId = listOfClientId[i]
                 put(clientId, hasUserPendingSpeakRequest(clientId))

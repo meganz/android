@@ -10,8 +10,10 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.meeting.CallOnHoldType
 import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.android.icon.pack.R
 
 /**
  * Data class defining the state of [MeetingActivityViewModel]
@@ -207,6 +209,5 @@ data class MeetingState(
          * Max participants in bottom panel
          */
         const val MAX_PARTICIPANTS_IN_BOTTOM_PANEL = 4
-
     }
 }
