@@ -2172,6 +2172,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 myAccountInfo.isBusinessAlertShown = true
             }
 
+            checkProFlexiStatus() -> {
+                myAccountInfo.isBusinessAlertShown = true
+            }
+
             firstTimeAfterInstallation || askPermissions || newCreationAccount -> {
                 if (!initialPermissionsAlreadyAsked && !onAskingPermissionsFragment) {
                     drawerItem = DrawerItem.ASK_PERMISSIONS
@@ -2221,6 +2225,22 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun showBusinessGraceAlert() {
         if (supportFragmentManager.findFragmentByTag(BusinessGraceDialogFragment.TAG) != null) return
         BusinessGraceDialogFragment().show(supportFragmentManager, BusinessGraceDialogFragment.TAG)
+    }
+
+    private fun checkProFlexiStatus(): Boolean {
+        if (!isProFlexiAccount) return false
+        if (myAccountInfo.isBusinessAlertShown) {
+            return false
+        }
+        if (viewModel.state().isFirstLogin && myAccountInfo.wasNotBusinessAlertShownYet()) {
+            val status: Int = megaApi.businessStatus
+            if (status == MegaApiJava.BUSINESS_STATUS_EXPIRED) {
+                myAccountInfo.isBusinessAlertShown = true
+                startActivity(Intent(this, BusinessExpiredAlertActivity::class.java))
+                return true
+            }
+        }
+        return false
     }
 
     private fun openContactLink(handle: Long) {
@@ -8289,6 +8309,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private val isBusinessAccount: Boolean
         get() = megaApi.isBusinessAccount && myAccountInfo.accountType == Constants.BUSINESS
+    private val isProFlexiAccount: Boolean
+        get() = megaApi.isBusinessAccount && myAccountInfo.accountType == Constants.PRO_FLEXI
 
     /**
      * Function to add unverified incoming count on tabs
