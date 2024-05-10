@@ -45,8 +45,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
 
     private val uploadFilesUseCase = mock<UploadFilesUseCase>()
     private val cancelCancelTokenUseCase = mock<CancelCancelTokenUseCase>()
-    private val startChatUploadsWorkerUseCase = mock<StartChatUploadsWorkerUseCase>()
-    private val isChatUploadsWorkerStartedUseCase = mock<IsChatUploadsWorkerStartedUseCase>()
+    private val startChatUploadsWorkerAndWaitUntilIsStartedUseCase = mock<StartChatUploadsWorkerAndWaitUntilIsStartedUseCase>()
     private val chatMessageRepository = mock<ChatMessageRepository>()
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val handleChatUploadTransferEventUseCase = mock<HandleChatUploadTransferEventUseCase>()
@@ -58,8 +57,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     fun setup() {
         underTest = StartChatUploadsWithWorkerUseCase(
             uploadFilesUseCase,
-            startChatUploadsWorkerUseCase,
-            isChatUploadsWorkerStartedUseCase,
+            startChatUploadsWorkerAndWaitUntilIsStartedUseCase,
             chatAttachmentNeedsCompressionUseCase,
             chatMessageRepository,
             fileSystemRepository,
@@ -73,8 +71,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     fun resetMocks() = runTest {
         reset(
             uploadFilesUseCase,
-            startChatUploadsWorkerUseCase,
-            isChatUploadsWorkerStartedUseCase,
+            startChatUploadsWorkerAndWaitUntilIsStartedUseCase,
             chatAttachmentNeedsCompressionUseCase,
             chatMessageRepository,
             fileSystemRepository,
@@ -171,7 +168,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             }
         )
         underTest(mockFile(), NodeId(11L), 1L).collect()
-        verify(startChatUploadsWorkerUseCase).invoke()
+        verify(startChatUploadsWorkerAndWaitUntilIsStartedUseCase).invoke()
     }
 
     @Test
@@ -185,7 +182,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
                 awaitCancellation()
             }
         )
-        whenever(isChatUploadsWorkerStartedUseCase()).then(
+        whenever(startChatUploadsWorkerAndWaitUntilIsStartedUseCase()).then(
             AdditionalAnswers.answersWithDelay(
                 10
             ) {
@@ -196,7 +193,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             awaitComplete()
             assertThat(workerStarted).isTrue()
         }
-        verify(isChatUploadsWorkerStartedUseCase).invoke()
+        verify(startChatUploadsWorkerAndWaitUntilIsStartedUseCase).invoke()
     }
 
     @Test

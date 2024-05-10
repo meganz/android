@@ -5,17 +5,18 @@ import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
 
 /**
- * Use case to wait until the worker is started or already finished (success or failure), this use case is usually invoked after [StartChatUploadsWorkerUseCase] to wait for its start
+ * Use case to start chat uploads worker and wait until is started or already finished (success or failure).
  */
-class IsChatUploadsWorkerStartedUseCase @Inject constructor(
+class StartChatUploadsWorkerAndWaitUntilIsStartedUseCase @Inject constructor(
+    private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
     private val transferRepository: TransferRepository,
 ) {
 
     /**
-     * Invoke function
-     * @return It will wait until the worker is not enqueued (it's started or finished)
+     * Invoke.
      */
     suspend operator fun invoke() {
+        startChatUploadsWorkerUseCase()
         transferRepository.isChatUploadsWorkerEnqueuedFlow().first { !it }
     }
 }

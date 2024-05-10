@@ -29,8 +29,7 @@ import javax.inject.Inject
  */
 class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val uploadFilesUseCase: UploadFilesUseCase,
-    private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
-    private val isChatUploadsWorkerStartedUseCase: IsChatUploadsWorkerStartedUseCase,
+    private val startChatUploadsWorkerAndWaitUntilIsStartedUseCase: StartChatUploadsWorkerAndWaitUntilIsStartedUseCase,
     private val chatAttachmentNeedsCompressionUseCase: ChatAttachmentNeedsCompressionUseCase,
     private val chatMessageRepository: ChatMessageRepository,
     private val fileSystemRepository: FileSystemRepository,
@@ -92,9 +91,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                 }
             },
             startWorker = {
-                startChatUploadsWorkerUseCase()
-                //ensure worker has started and is listening to global events so we can finish uploadFilesUseCase
-                isChatUploadsWorkerStartedUseCase()
+                startChatUploadsWorkerAndWaitUntilIsStartedUseCase()
             }
         ))
     }

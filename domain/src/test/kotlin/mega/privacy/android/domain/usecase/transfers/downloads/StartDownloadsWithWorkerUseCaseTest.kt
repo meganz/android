@@ -50,8 +50,7 @@ class StartDownloadsWithWorkerUseCaseTest {
     private val downloadNodesUseCase: DownloadNodesUseCase = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
-    private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase = mock()
-    private val isDownloadsWorkerStartedUseCase: IsDownloadsWorkerStartedUseCase =
+    private val startDownloadsWorkerAndWaitUntilIsStartedUseCase: StartDownloadsWorkerAndWaitUntilIsStartedUseCase =
         mock()
     private val transferRepository = mock<TransferRepository>()
     private val getExternalPathByContentUriUseCase = mock<GetExternalPathByContentUriUseCase>()
@@ -64,8 +63,7 @@ class StartDownloadsWithWorkerUseCaseTest {
                 doesPathHaveSufficientSpaceForNodesUseCase = doesPathHaveSufficientSpaceForNodesUseCase,
                 downloadNodesUseCase = downloadNodesUseCase,
                 fileSystemRepository = fileSystemRepository,
-                startDownloadWorkerUseCase = startDownloadWorkerUseCase,
-                isDownloadsWorkerStartedUseCase = isDownloadsWorkerStartedUseCase,
+                startDownloadsWorkerAndWaitUntilIsStartedUseCase = startDownloadsWorkerAndWaitUntilIsStartedUseCase,
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
                 transferRepository = transferRepository,
                 getExternalPathByContentUriUseCase = getExternalPathByContentUriUseCase,
@@ -80,8 +78,7 @@ class StartDownloadsWithWorkerUseCaseTest {
             downloadNodesUseCase,
             cancelCancelTokenUseCase,
             fileSystemRepository,
-            startDownloadWorkerUseCase,
-            isDownloadsWorkerStartedUseCase,
+            startDownloadsWorkerAndWaitUntilIsStartedUseCase,
             transferRepository,
             getExternalPathByContentUriUseCase,
         )
@@ -193,7 +190,7 @@ class StartDownloadsWithWorkerUseCaseTest {
             }
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).collect()
-        verify(startDownloadWorkerUseCase).invoke()
+        verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase).invoke()
     }
 
     @Test
@@ -207,7 +204,7 @@ class StartDownloadsWithWorkerUseCaseTest {
                 awaitCancellation()
             }
         )
-        whenever(isDownloadsWorkerStartedUseCase()).then(
+        whenever(startDownloadsWorkerAndWaitUntilIsStartedUseCase()).then(
             AdditionalAnswers.answersWithDelay(
                 10
             ) {
@@ -218,7 +215,7 @@ class StartDownloadsWithWorkerUseCaseTest {
             awaitComplete()
             assertThat(workerStarted).isTrue()
         }
-        verify(isDownloadsWorkerStartedUseCase).invoke()
+        verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase).invoke()
     }
 
     @Test

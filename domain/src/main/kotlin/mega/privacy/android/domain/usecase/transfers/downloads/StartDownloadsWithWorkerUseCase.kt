@@ -31,8 +31,7 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
     private val downloadNodesUseCase: DownloadNodesUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val transferRepository: TransferRepository,
-    private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
-    private val isDownloadsWorkerStartedUseCase: IsDownloadsWorkerStartedUseCase,
+    private val startDownloadsWorkerAndWaitUntilIsStartedUseCase: StartDownloadsWorkerAndWaitUntilIsStartedUseCase,
     private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
     private val isExternalStorageContentUriUseCase: IsExternalStorageContentUriUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
@@ -105,9 +104,7 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
                             )
                         },
                         startWorker = {
-                            startDownloadWorkerUseCase()
-                            //ensure worker has started and is listening to global events so we can finish downloadNodesUseCase
-                            isDownloadsWorkerStartedUseCase()
+                            startDownloadsWorkerAndWaitUntilIsStartedUseCase()
                         },
                     )
                 )
