@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.AccountType
  * @param isLoading true if loading
  * @param isConnected true if connected to internet
  * @param accountType
+ * @param showHiddenItems
  */
 data class RecentActionsUiState(
     val groupedRecentActionItems: Map<String, List<RecentActionBucketUiEntity>> = emptyMap(),
@@ -17,4 +18,5 @@ data class RecentActionsUiState(
     val isLoading: Boolean = true,
     val isConnected: Boolean = false,
     val accountType: AccountType? = null,
+    val showHiddenItems: Boolean = false,
 )

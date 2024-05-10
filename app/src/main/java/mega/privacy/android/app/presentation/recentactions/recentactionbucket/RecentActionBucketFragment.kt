@@ -198,6 +198,7 @@ class RecentActionBucketFragment : Fragment() {
                     this,
                     nodes,
                     viewModel.bucket.value?.isMedia ?: false,
+                    viewModel.isInShare,
                     RecentActionBucketDiffCallback()
                 )
             listView.adapter = adapter
@@ -226,6 +227,7 @@ class RecentActionBucketFragment : Fragment() {
             listView.clipToPadding = false
             listView.setHasFixedSize(true)
         } else {
+            adapter?.setIsIncomingShare(viewModel.isInShare)
             adapter?.setNodes(nodes)
         }
     }

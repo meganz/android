@@ -39,6 +39,7 @@ fun RecentActionsView(
             RecentActionsListView(
                 groupedRecentActions = uiState.groupedRecentActionItems,
                 accountType = uiState.accountType,
+                showHiddenItems = uiState.showHiddenItems,
                 onItemClick = onItemClick,
                 onMenuClick = onMenuClick,
                 onScrollStateChanged = onScrollStateChanged,

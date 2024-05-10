@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,6 +38,7 @@ class RecentActionsComposeViewModel @Inject constructor(
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
 
     /** private mutable UI state */
@@ -91,6 +93,15 @@ class RecentActionsComposeViewModel @Inject constructor(
                         }
                     }
             }
+        }
+
+        viewModelScope.launch {
+            monitorShowHiddenItemsUseCase()
+                .collectLatest {
+                    _uiState.update { state ->
+                        state.copy(showHiddenItems = it)
+                    }
+                }
         }
     }
 

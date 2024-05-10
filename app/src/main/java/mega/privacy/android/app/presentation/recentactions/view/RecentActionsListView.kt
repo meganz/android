@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.recentactions.view.previewdataprovi
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.shared.theme.MegaAppTheme
 
@@ -40,6 +41,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 fun RecentActionsListView(
     groupedRecentActions: Map<String, List<RecentActionBucketUiEntity>>,
     accountType: AccountType? = null,
+    showHiddenItems: Boolean = false,
     onMenuClick: (TypedFileNode) -> Unit = {},
     onItemClick: (RecentActionBucket) -> Unit = {},
     onScrollStateChanged: (isScrolling: Boolean) -> Unit = {},
@@ -72,7 +74,7 @@ fun RecentActionsListView(
 
             items(list) { item ->
                 val isSensitive = item.bucket.nodes.firstOrNull()?.let { node ->
-                    node.isMarkedSensitive || node.isSensitiveInherited
+                    (node.isMarkedSensitive || node.isSensitiveInherited) && item.bucket.parentFolderSharesType != RecentActionsSharesType.INCOMING_SHARES
                 }?.takeIf { item.showMenuButton } ?: false
 
                 RecentActionListViewItem(
@@ -86,7 +88,7 @@ fun RecentActionsListView(
                     updatedByText = item.updatedByText,
                     isFavourite = item.isFavourite,
                     labelColor = item.labelColor,
-                    isSensitive = accountType?.isPaid == true && isSensitive,
+                    isSensitive = accountType?.isPaid == true && isSensitive && showHiddenItems,
                     onItemClick = { onItemClick(item.bucket) },
                     onMenuClick = { onMenuClick(item.bucket.nodes.first()) }
                 )

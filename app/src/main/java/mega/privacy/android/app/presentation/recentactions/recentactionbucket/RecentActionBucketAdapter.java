@@ -73,12 +73,14 @@ public class RecentActionBucketAdapter
 
     List<NodeItem> nodes;
     boolean isMedia;
+    boolean isIncomingShare;
 
-    public RecentActionBucketAdapter(Context context, Object fragment, List<NodeItem> nodes, boolean isMedia, RecentActionBucketDiffCallback diffCallback) {
+    public RecentActionBucketAdapter(Context context, Object fragment, List<NodeItem> nodes, boolean isMedia, boolean isIncomingShare, RecentActionBucketDiffCallback diffCallback) {
         super(diffCallback);
         this.context = context;
         this.fragment = fragment;
         this.isMedia = isMedia;
+        this.isIncomingShare = isIncomingShare;
         setNodes(nodes);
 
         megaApi = MegaApplication.getInstance().getMegaApi();
@@ -222,7 +224,7 @@ public class RecentActionBucketAdapter
 
         if (isMedia) {
             holder.mediaView.setVisibility(View.VISIBLE);
-            holder.mediaView.setAlpha(node.isSensitive() ? 0.5f : 1f);
+            holder.mediaView.setAlpha(node.isSensitive() && !isIncomingShare ? 0.5f : 1f);
             holder.listView.setVisibility(View.GONE);
             holder.imgLabel.setVisibility(View.GONE);
             holder.imgFavourite.setVisibility(View.GONE);
@@ -250,7 +252,7 @@ public class RecentActionBucketAdapter
 
             if (node.getThumbnail() != null) {
                 ImageRequestBuilder builder = ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(node.getThumbnail()));
-                if (node.isSensitive()) {
+                if (node.isSensitive() && !isIncomingShare) {
                     builder.setPostprocessor(new BlurPostProcessor(20, context));
                 }
                 ImageRequest request = builder.build();
@@ -286,7 +288,7 @@ public class RecentActionBucketAdapter
         } else {
             holder.mediaView.setVisibility(View.GONE);
             holder.listView.setVisibility(View.VISIBLE);
-            holder.listView.setAlpha(node.isSensitive() ? 0.5f : 1f);
+            holder.listView.setAlpha(node.isSensitive() && !isIncomingShare ? 0.5f : 1f);
             holder.nameText.setText(megaNode.getName());
             holder.infoText.setText(getSizeString(megaNode.getSize(), context) + " · " + formatTime(megaNode.getCreationTime()));
 
@@ -352,6 +354,10 @@ public class RecentActionBucketAdapter
     public void setNodes(List<NodeItem> nodes) {
         this.nodes = nodes;
         notifyDataSetChanged();
+    }
+
+    public void setIsIncomingShare(boolean isIncomingShare) {
+        this.isIncomingShare = isIncomingShare;
     }
 
     @Override
