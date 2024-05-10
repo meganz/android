@@ -22,7 +22,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
@@ -211,10 +210,7 @@ internal fun AllVideosView(
                                 modifier = Modifier
                                     .alpha(0.5f.takeIf {
                                         accountType?.isPaid == true && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
-                                    } ?: 1f)
-                                    .blur(16.dp.takeIf {
-                                        accountType?.isPaid == true && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
-                                    } ?: 0.dp),
+                                    } ?: 1f),
                             )
                         }
                     }

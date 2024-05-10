@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
@@ -70,10 +69,7 @@ internal fun DocumentListView(
                     .testTag("$DOCUMENT_SECTION_ITEM_VIEW_TEST_TAG$it")
                     .alpha(0.5f.takeIf {
                         accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
-                    } ?: 1f)
-                    .blur(16.dp.takeIf {
-                        accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
-                    } ?: 0.dp),
+                    } ?: 1f),
                 isSelected = documentItem.isSelected,
                 icon = documentItem.icon,
                 showVersion = documentItem.hasVersions,

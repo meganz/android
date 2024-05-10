@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.core.ui.controls.lists.NodeGridViewItem
@@ -78,10 +77,7 @@ internal fun AudioGridView(
                 modifier = Modifier
                     .alpha(0.5f.takeIf {
                         accountType?.isPaid == true && (audioItem.isMarkedSensitive || audioItem.isSensitiveInherited)
-                    } ?: 1f)
-                    .blur(16.dp.takeIf {
-                        accountType?.isPaid == true && (audioItem.isMarkedSensitive || audioItem.isSensitiveInherited)
-                    } ?: 0.dp),
+                    } ?: 1f),
             )
         }
     }

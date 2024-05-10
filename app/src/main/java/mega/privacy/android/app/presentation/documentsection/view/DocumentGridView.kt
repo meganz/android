@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
@@ -66,10 +65,7 @@ internal fun DocumentGridView(
                     .testTag("$DOCUMENT_SECTION_GRID_ITEM_VIEW_TEST_TAG$it")
                     .alpha(0.5f.takeIf {
                         accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
-                    } ?: 1f)
-                    .blur(16.dp.takeIf {
-                        accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
-                    } ?: 0.dp),
+                    } ?: 1f),
                 isSelected = documentItem.isSelected,
                 name = documentItem.name,
                 iconRes = documentItem.icon,

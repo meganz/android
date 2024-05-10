@@ -9,7 +9,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.intl.Locale
@@ -94,10 +93,7 @@ internal fun AudioListView(
                 modifier = Modifier
                     .alpha(0.5f.takeIf {
                         accountType?.isPaid == true && (audioItem.isMarkedSensitive || audioItem.isSensitiveInherited)
-                    } ?: 1f)
-                    .blur(16.dp.takeIf {
-                        accountType?.isPaid == true && (audioItem.isMarkedSensitive || audioItem.isSensitiveInherited)
-                    } ?: 0.dp),
+                    } ?: 1f),
             )
             Divider(
                 modifier = Modifier
