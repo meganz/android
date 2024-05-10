@@ -47,11 +47,9 @@ import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.theme.MegaAppTheme
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -108,12 +106,6 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                 event = uiState.openFile,
                 onConsumed = viewModel::resetOpenFile,
                 action = ::onOpenFile
-            )
-
-            EventEffect(
-                event = uiState.downloadFile,
-                onConsumed = viewModel::resetDownloadFile,
-                action = ::downloadFile
             )
 
             val snackBarHostState = remember { SnackbarHostState() }
@@ -231,20 +223,6 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
             startActivity(Intent(this@FileLinkComposeActivity, ManagerActivity::class.java))
         }
         finish()
-    }
-
-    /**
-     * Download the file
-     */
-    private fun downloadFile(node: MegaNode) {
-        checkNotificationsPermission(this)
-        nodeSaver.saveNode(
-            node = node,
-            highPriority = false,
-            isFolderLink = false,
-            fromMediaViewer = false,
-            needSerialize = true
-        )
     }
 
     /**

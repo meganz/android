@@ -427,7 +427,6 @@ class FileLinkViewModel @Inject constructor(
      */
     fun resetDownloadFile() = _state.update {
         it.copy(
-            downloadFile = consumed(),
             downloadEvent = consumed(),
         )
     }

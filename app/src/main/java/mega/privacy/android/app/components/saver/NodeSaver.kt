@@ -120,32 +120,6 @@ class NodeSaver(
     }
 
     /**
-     * Save a MegaNode into device.
-     *
-     * @param node node to save
-     * @param highPriority whether this download is high priority or not
-     * @param isFolderLink whether this download is a folder link
-     * @param fromMediaViewer whether this download is from media viewer
-     * @param needSerialize whether this download need serialize
-     */
-    @JvmOverloads
-    fun saveNode(
-        node: MegaNode,
-        highPriority: Boolean = false,
-        isFolderLink: Boolean = false,
-        fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-    ) {
-        saveNodes(
-            nodes = listOf(node),
-            highPriority = highPriority,
-            isFolderLink = isFolderLink,
-            fromMediaViewer = fromMediaViewer,
-            needSerialize = needSerialize,
-        )
-    }
-
-    /**
      * Save a list of MegaNode into device.
      *
      * @param nodes nodes to save

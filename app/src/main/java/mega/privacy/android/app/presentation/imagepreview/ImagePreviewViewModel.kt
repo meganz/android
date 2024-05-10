@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
@@ -774,19 +773,6 @@ class ImagePreviewViewModel @Inject constructor(
                 Timber.e(it)
                 setCopyMoveException(it)
             }
-        }
-    }
-
-    fun saveToDevice(nodeSaver: NodeSaver, node: MegaNode, isForeign: Boolean) {
-        viewModelScope.launch {
-            resetTotalDownloadsUseCase()
-            nodeSaver.saveNode(
-                node,
-                highPriority = false,
-                isFolderLink = isForeign,
-                fromMediaViewer = false,
-                needSerialize = true,
-            )
         }
     }
 

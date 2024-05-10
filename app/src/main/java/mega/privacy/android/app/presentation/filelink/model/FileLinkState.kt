@@ -9,7 +9,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.PublicNodeException
-import nz.mega.sdk.MegaNode
 
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity]
@@ -53,7 +52,6 @@ data class FileLinkState(
     val fetchPublicNodeError: PublicNodeException? = null,
     val jobInProgressState: FileLinkJobInProgressState? = FileLinkJobInProgressState.InitialLoading,
     val openFile: StateEventWithContent<Intent> = consumed(),
-    val downloadFile: StateEventWithContent<MegaNode> = consumed(),
     val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
     val errorMessage: StateEventWithContent<Int> = consumed(),
     val overQuotaError: StateEventWithContent<StorageState> = consumed(),

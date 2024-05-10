@@ -115,7 +115,6 @@ class FileLinkViewModelTest {
             assertThat(initial.collision).isNull()
             assertThat(initial.copySuccess).isFalse()
             assertThat(initial.openFile).isInstanceOf(consumed().javaClass)
-            assertThat(initial.downloadFile).isInstanceOf(consumed().javaClass)
         }
     }
 
@@ -313,16 +312,6 @@ class FileLinkViewModelTest {
             assertThat(newValue.collision).isNull()
         }
     }
-
-    @Test
-    fun `test that downloadFile should be reset to consumed when resetDownloadFile is invoked`() =
-        runTest {
-            underTest.state.test {
-                underTest.resetDownloadFile()
-                val newValue = expectMostRecentItem()
-                assertThat(newValue.downloadFile).isInstanceOf(consumed().javaClass)
-            }
-        }
 
     @Test
     fun `test that overQuotaError should be reset to consumed when resetDownloadFile is invoked`() =
