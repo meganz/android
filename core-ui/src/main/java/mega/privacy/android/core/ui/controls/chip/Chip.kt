@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -72,7 +74,6 @@ fun Chip(
 
     Surface(
         modifier = modifier
-            .height(40.dp)
             .clip(shape)
             .selectable(
                 selected = selected,
@@ -137,6 +138,26 @@ private fun ChipWithIconPreview(
                 text = "Type"
             )
             Icon(
+                modifier = Modifier.size(18.dp),
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_chevron_down),
+                contentDescription = "See more",
+            )
+        }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ChipWithIconPreview2(
+    @PreviewParameter(BooleanProvider::class) selected: Boolean,
+) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        Chip(selected = selected, contentDescription = "") {
+            Text(
+                text = "Type"
+            )
+            Icon(
+                modifier = Modifier.height(18.dp).width(18.dp),
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_chevron_down),
                 contentDescription = "See more",
             )
