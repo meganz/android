@@ -329,6 +329,12 @@ class ImagePreviewViewModel @Inject constructor(
         return menu?.isUnhideMenuVisible(imageNode) ?: false
     }
 
+    // When ImageNode from ShareItems, then we always hide the hidden menus (Hide/Unhide) in Bottom Sheet
+    fun forceHideHiddenMenus(): Boolean {
+        return imagePreviewMenuSource == ImagePreviewMenuSource.SHARED_ITEMS
+                || imagePreviewMenuSource == ImagePreviewMenuSource.LINKS
+    }
+
     suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {
         return menu?.isMoveMenuVisible(imageNode) ?: false
     }

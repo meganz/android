@@ -301,9 +301,9 @@ class MediaDiscoveryViewModel @Inject constructor(
             FilterMediaType.VIDEOS -> sourcePhotos.filterIsInstance<Photo.Video>()
         }
         return when (_state.value.currentSort) {
-            Sort.NEWEST -> filteredPhotos.sortedByDescending { it.modificationTime }
-            Sort.OLDEST -> filteredPhotos.sortedBy { it.modificationTime }
-            else -> filteredPhotos.sortedByDescending { it.modificationTime }
+            Sort.NEWEST -> filteredPhotos.sortedWith(compareByDescending<Photo> { it.modificationTime }.thenByDescending { it.id })
+            Sort.OLDEST -> filteredPhotos.sortedWith(compareBy<Photo> { it.modificationTime }.thenByDescending { it.id })
+            else -> filteredPhotos.sortedWith(compareByDescending<Photo> { it.modificationTime }.thenByDescending { it.id })
         }
     }
 

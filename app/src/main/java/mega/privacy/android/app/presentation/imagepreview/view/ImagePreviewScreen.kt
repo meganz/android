@@ -356,6 +356,7 @@ internal fun ImagePreviewScreen(
                     showRenameMenu = viewModel::isRenameMenuVisible,
                     showHideMenu = viewModel::isHideMenuVisible,
                     showUnhideMenu = viewModel::isUnhideMenuVisible,
+                    forceHideHiddenMenus = viewModel::forceHideHiddenMenus,
                     showMoveMenu = viewModel::isMoveMenuVisible,
                     showCopyMenu = viewModel::isCopyMenuVisible,
                     showRestoreMenu = viewModel::isRestoreMenuVisible,

@@ -76,6 +76,7 @@ internal fun ImagePreviewBottomSheet(
     showRenameMenu: suspend (ImageNode) -> Boolean,
     showHideMenu: suspend (ImageNode) -> Boolean,
     showUnhideMenu: suspend (ImageNode) -> Boolean,
+    forceHideHiddenMenus: () -> Boolean,
     showMoveMenu: suspend (ImageNode) -> Boolean,
     showCopyMenu: suspend (ImageNode) -> Boolean,
     showRestoreMenu: suspend (ImageNode) -> Boolean,
@@ -412,7 +413,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isHiddenNodesEnabled && isHideMenuVisible && accountType != null && (!accountType.isPaid || isHiddenNodesOnboarded != null)) {
+                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType != null && (!accountType.isPaid || (isHideMenuVisible && isHiddenNodesOnboarded != null))) {
                     MenuActionListTile(
                         icon = painterResource(id = Rpack.drawable.ic_eye_off_medium_regular_outline),
                         text = stringResource(id = R.string.general_hide_node),
@@ -442,7 +443,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isHiddenNodesEnabled && accountType?.isPaid == true && isUnhideMenuVisible) {
+                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType?.isPaid == true && isUnhideMenuVisible) {
                     MenuActionListTile(
                         icon = painterResource(id = Rpack.drawable.ic_eye_medium_regular_outline),
                         text = stringResource(id = R.string.general_unhide_node),
