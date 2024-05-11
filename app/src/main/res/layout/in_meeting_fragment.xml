@@ -55,6 +55,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/snackbar_compose_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="125dp"/>
+
     <include
         android:id="@+id/bottom_floating_panel"
         layout="@layout/meeting_bottom_floating_panel" />

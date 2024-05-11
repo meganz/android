@@ -48,6 +48,8 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
@@ -181,6 +183,8 @@ class InMeetingViewModel @Inject constructor(
     private val lowerHandToStopSpeakUseCase: LowerHandToStopSpeakUseCase,
     private val holdChatCallUseCase: HoldChatCallUseCase,
     private val monitorParticipatingInAnotherCallUseCase: MonitorParticipatingInAnotherCallUseCase,
+    private val getStringFromStringResMapper: GetStringFromStringResMapper,
+    private val getPluralStringFromStringResMapper: GetPluralStringFromStringResMapper,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
@@ -216,16 +220,15 @@ class InMeetingViewModel @Inject constructor(
      */
     fun onItemClick(participant: Participant) {
         onSnackbarMessageConsumed()
-
         _pinItemEvent.value = Event(participant)
         getSession(participant.clientId)?.let {
             if (it.hasScreenShare() && _state.value.callUIStatus == CallUIStatusType.SpeakerView) {
                 if (!participant.isScreenShared) {
-                    _state.update { state ->
-                        state.copy(
-                            snackbarMessage = triggered(R.string.meetings_meeting_screen_main_view_participant_is_sharing_screen_warning),
+                    triggerSnackbarInSpeakerViewMessage(
+                        getStringFromStringResMapper(
+                            R.string.meetings_meeting_screen_main_view_participant_is_sharing_screen_warning
                         )
-                    }
+                    )
                 }
 
                 Timber.d("Participant clicked: $participant")
@@ -512,6 +515,29 @@ class InMeetingViewModel @Inject constructor(
 
                             contains(ChatCallChanges.CallRaiseHand) -> {
                                 Timber.d("CallRaiseHand change. Flag: ${call.flag}")
+                                if (state.value.showRaisedHandSnackbar) {
+                                    _state.update { state ->
+                                        state.copy(
+                                            showRaisedHandSnackbar = false
+                                        )
+                                    }
+                                    if (state.value.isMyHandRaisedToSpeak) {
+                                        triggerSnackbarMessage(
+                                            when (state.value.numUsersWithHandRaised) {
+                                                1 -> getStringFromStringResMapper(
+                                                    R.string.meeting_your_hand_is_raised_message
+                                                )
+
+                                                else -> getPluralStringFromStringResMapper(
+                                                    stringId = R.plurals.meeting_you_and_others_raised_your_hands_message,
+                                                    quantity = state.value.getNumOfOtherParticipantsWithHandRaised(),
+                                                    state.value.getNumOfOtherParticipantsWithHandRaised()
+                                                )
+                                            }
+
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -3178,15 +3204,43 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Raised hand to speak clicked
+     * Raised/Lower hand button clicked
      */
-    fun onClickRaiseHandToSpeak() {
+    fun onClickRaiseHand() {
+        when (state.value.isMyHandRaisedToSpeak) {
+            true -> lowerHandToStopSpeak()
+            false -> raiseHandToSpeak()
+        }
+    }
+
+    /**
+     * Raised hand to speak
+     */
+    private fun raiseHandToSpeak() {
         viewModelScope.launch {
             runCatching {
-                when (state.value.isMyHandRaisedToSpeak) {
-                    true -> lowerHandToStopSpeakUseCase(_state.value.currentChatId)
-                    false -> raiseHandToSpeakUseCase(_state.value.currentChatId)
+                _state.update { state ->
+                    state.copy(
+                        showRaisedHandSnackbar = true
+                    )
                 }
+                raiseHandToSpeakUseCase(_state.value.currentChatId)
+            }.onSuccess {
+                moreCallOptionsBottomPanelDismiss()
+
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    /**
+     * Lower hand to stop speak
+     */
+    fun lowerHandToStopSpeak() {
+        viewModelScope.launch {
+            runCatching {
+                lowerHandToStopSpeakUseCase(_state.value.currentChatId)
             }.onSuccess {
                 moreCallOptionsBottomPanelDismiss()
             }.onFailure { exception ->
@@ -3208,8 +3262,40 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Sets snackbarMessage in state as consumed.
+     * Trigger event to show Snackbar message
+     *
+     * @param message     Content for snack bar
      */
-    fun onSnackbarMessageConsumed() =
-        _state.update { state -> state.copy(snackbarMessage = consumed()) }
+    private fun triggerSnackbarMessage(message: String) {
+        onSnackbarMessageConsumed()
+        _state.update { it.copy(snackbarMessage = triggered(message)) }
+    }
+
+    /**
+     * Reset and notify that snackbarMessage is consumed
+     */
+    fun onSnackbarMessageConsumed() {
+        _state.update {
+            it.copy(snackbarMessage = consumed())
+        }
+    }
+
+    /**
+     * Trigger event to show snackbarInSpeakerViewMessage
+     *
+     * @param message     Content for snack bar
+     */
+    private fun triggerSnackbarInSpeakerViewMessage(message: String) {
+        onSnackbarInSpeakerViewMessageConsumed()
+        _state.update { it.copy(snackbarInSpeakerViewMessage = triggered(message)) }
+    }
+
+    /**
+     * Reset and notify that snackbarInSpeakerViewMessage is consumed
+     */
+    fun onSnackbarInSpeakerViewMessageConsumed() {
+        _state.update {
+            it.copy(snackbarInSpeakerViewMessage = consumed())
+        }
+    }
 }

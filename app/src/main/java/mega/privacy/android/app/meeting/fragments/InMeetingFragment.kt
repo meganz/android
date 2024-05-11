@@ -98,6 +98,7 @@ import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
+import mega.privacy.android.app.presentation.meeting.view.SnackbarInMeetingView
 import mega.privacy.android.app.presentation.meeting.view.sheet.LeaveMeetingBottomSheetView
 import mega.privacy.android.app.presentation.meeting.view.sheet.MoreCallOptionsBottomSheetView
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -664,8 +665,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         initFloatingWindowContainerDragListener(view)
         initFloatingPanel()
 
-        binding.hostLeaveCallDialogComposeView.apply {
+        binding.snackbarComposeView.apply {
+            isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setViewTreeViewModelStoreOwner(requireActivity())
+            setContent {
+                MegaAppTheme(isDark = true) {
+                    SnackbarInMeetingView()
+                }
+            }
+
+        }
+
+        binding.hostLeaveCallDialogComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setViewTreeViewModelStoreOwner(requireActivity())
             setContent {
                 val sharedState by sharedModel.state.collectAsStateWithLifecycle()
                 val state by inMeetingViewModel.state.collectAsStateWithLifecycle()

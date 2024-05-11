@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property isOneToOneCall                         True, if it's one to one call. False, if it's a group call or a meeting.
  * @property showMeetingInfoFragment                True to show meeting info fragment or False otherwise
  * @property snackbarMessage                        Message to show in Snackbar.
+ * @property snackbarInSpeakerViewMessage           Message to show in Snackbar in speaker view.
  * @property addScreensSharedParticipantsList       List of [Participant] to add the screen shared in the carousel
  * @property removeScreensSharedParticipantsList    List of [Participant] to remove the screen shared in the carousel
  * @property isMeeting                              True if it's meetings. False, if not.
@@ -47,6 +48,7 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property anotherCall                            Another call in progress or on hold.
  * @property showCallOptionsBottomSheet             True, if should be shown the call options bottom panel. False, otherwise
  * @property myUserHandle                           My user handle
+ * @property showRaisedHandSnackbar                 Show raised hand snackbar
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -68,7 +70,8 @@ data class InMeetingUiState(
     val updateNumParticipants: Int = 1,
     val isOneToOneCall: Boolean = true,
     val showMeetingInfoFragment: Boolean = false,
-    val snackbarMessage: StateEventWithContent<Int> = consumed(),
+    val snackbarMessage: StateEventWithContent<String> = consumed(),
+    val snackbarInSpeakerViewMessage: StateEventWithContent<String> = consumed(),
     val addScreensSharedParticipantsList: List<Participant>? = null,
     val removeScreensSharedParticipantsList: List<Participant>? = null,
     val isMeeting: Boolean = false,
@@ -83,6 +86,7 @@ data class InMeetingUiState(
     val anotherCall: ChatCall? = null,
     val showCallOptionsBottomSheet: Boolean = false,
     val myUserHandle: Long? = null,
+    val showRaisedHandSnackbar: Boolean = false,
 ) {
     /**
      * Is call on hold
@@ -95,6 +99,18 @@ data class InMeetingUiState(
      */
     val isMyHandRaisedToSpeak
         get():Boolean = myUserHandle?.let { call?.usersRaiseHands?.get(it) } ?: false
+
+    /**
+     * Get number of users with hand raised
+     */
+    val numUsersWithHandRaised
+        get():Int = call?.raisedHandsList?.size ?: 0
+
+    /**
+     * Number of other participants with raised hand
+     */
+    fun getNumOfOtherParticipantsWithHandRaised() =
+        if (isMyHandRaisedToSpeak) numUsersWithHandRaised - 1 else numUsersWithHandRaised
 
     /**
      * Get the button to be displayed depending on the type of call on hold you have

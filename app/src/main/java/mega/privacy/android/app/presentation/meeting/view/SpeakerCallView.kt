@@ -24,7 +24,7 @@ fun SpeakerCallView(
     state: InMeetingUiState,
     onSnackbarMessageConsumed: () -> Unit,
 ) {
-    if (!state.snackbarMessage.equals(consumed)) {
+    if (!state.snackbarInSpeakerViewMessage.equals(consumed)) {
         val snackbarHostState = remember { SnackbarHostState() }
         val context = LocalContext.current
 
@@ -34,11 +34,11 @@ fun SpeakerCallView(
         )
 
         EventEffect(
-            event = state.snackbarMessage,
+            event = state.snackbarInSpeakerViewMessage,
             onConsumed = onSnackbarMessageConsumed
         ) {
             snackbarHostState.showSnackbar(
-                message = context.resources.getString(it),
+                message = it,
                 duration = SnackbarDuration.Short
             )
         }

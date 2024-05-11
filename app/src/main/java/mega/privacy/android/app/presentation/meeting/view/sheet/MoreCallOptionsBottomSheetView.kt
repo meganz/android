@@ -76,7 +76,7 @@ internal fun MoreCallOptionsBottomSheetView(
                     coroutineScope = coroutineScope,
                     uiState = uiState,
                     onPutCallOnHold = { viewModel.onClickOnHold() },
-                    onRaiseHand = { viewModel.onClickRaiseHandToSpeak() },
+                    onRaiseHand = { viewModel.onClickRaiseHand() },
                 )
             }
         ) {
@@ -107,7 +107,7 @@ private fun BottomSheetContent(
 
             Column(modifier = Modifier.verticalScroll(rememberScrollState()))
             {
-                if (isRaiseToSpeakFeatureFlagEnabled) {
+                if (isRaiseToSpeakFeatureFlagEnabled && !isOneToOneCall) {
                     BottomSheetMenuItemView(
                         modifier = Modifier.testTag(CALL_OPTIONS_BOTTOM_SHEET_RAISE_HAND_BUTTON),
                         res = R.drawable.raise_hand_icon,

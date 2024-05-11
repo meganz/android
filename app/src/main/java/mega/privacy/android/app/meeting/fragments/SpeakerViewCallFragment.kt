@@ -140,7 +140,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                     SpeakerCallView(
                         state = state,
                         onSnackbarMessageConsumed = {
-                            inMeetingViewModel.onSnackbarMessageConsumed()
+                            inMeetingViewModel.onSnackbarInSpeakerViewMessageConsumed()
                         },
                     )
 
