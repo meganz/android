@@ -34,6 +34,7 @@ ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
  * Default release notes content files
  */
 RELEASE_NOTES = "default_release_notes.json"
+MAJOR_RELEASE_NOTES = "major_release_notes.json"
 RELEASE_NOTES_CONTENT = ""
 
 /**
@@ -166,6 +167,21 @@ pipeline {
 
                     // load the common library script
                     common = load('jenkinsfile/common.groovy')
+                }
+            }
+        }
+        stage('Clone transifex') {
+            when {
+                expression { isMajorRelease(common) }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Clone transifex'
+                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
+                        sh """
+                            git clone https://code.developers.mega.co.nz/mobile/android/transifex.git
+                        """
+                    }
                 }
             }
         }
@@ -381,8 +397,18 @@ pipeline {
                     BUILD_STEP = 'Deploy to Google Play Alpha'
                 }
                 script {
-                    // Get the formatted release notes
-                    RELEASE_NOTES_CONTENT = common.releaseNotes(RELEASE_NOTES)
+                    withCredentials([
+                            string(credentialsId: 'ANDROID_TRANSIFIX_AUTHORIZATION_TOKEN', variable: 'TRANSIFEX_TOKEN'),
+                            gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')
+                    ]) {
+                        if (isMajorRelease(common)) {
+                            sh './gradlew readReleaseNotes'
+                            RELEASE_NOTES_CONTENT = common.releaseNotes(MAJOR_RELEASE_NOTES)
+                            println("Major release notes: ${RELEASE_NOTES_CONTENT}")
+                        } else {
+                            RELEASE_NOTES_CONTENT = common.releaseNotes(RELEASE_NOTES)
+                        }
+                    }
 
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
@@ -503,6 +529,12 @@ private String skipMessage(String lineBreak) {
  */
 private boolean isOnReleaseBranch() {
     return env.gitlabSourceBranch != null && env.gitlabSourceBranch.startsWith("release/")
+}
+
+private boolean isMajorRelease(Object common) {
+    def versionName = common.readAppVersion()[0]
+    def minor = versionName.split("\\.")[1]
+    return minor == "0"
 }
 
 /**
