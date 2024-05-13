@@ -6098,39 +6098,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == Activity.RESULT_OK -> {
-                if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    requestPermission(
-                        this,
-                        Constants.REQUEST_WRITE_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    )
-                }
-                if (viewModel.getStorageState() === StorageState.PayWall) {
-                    showOverDiskQuotaPaywallWarning()
-                    return
-                }
-                val treeUri = intent?.data
-                Timber.d("Create the document : %s", treeUri)
-                val handleToDownload = intent?.getLongExtra("handleToDownload", -1) ?: -1
-                Timber.d("The recovered handle is: %s", handleToDownload)
-                //Now, call to the DownloadService
-                if (handleToDownload != 0L && handleToDownload != -1L) {
-                    PermissionUtils.checkNotificationsPermission(this)
-                    val service = Intent(this, DownloadService::class.java)
-                    service.putExtra(DownloadService.EXTRA_HASH, handleToDownload)
-                    service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString())
-                    val tempFolder =
-                        CacheFolderManager.getCacheFolder(CacheFolderManager.TEMPORARY_FOLDER)
-                    if (!FileUtil.isFileAvailable(tempFolder)) {
-                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1)
-                        return
-                    }
-                    service.putExtra(DownloadService.EXTRA_PATH, tempFolder?.absolutePath)
-                    startService(service)
-                }
-            }
-
             requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == Activity.RESULT_OK -> {
                 Timber.d("requestCode == REQUEST_CODE_SELECT_FILE")
                 if (intent == null) {
