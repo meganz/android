@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -46,6 +47,9 @@ import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.mobile.analytics.event.SearchDateAddedFilterClickedEvent
+import mega.privacy.mobile.analytics.event.SearchFileTypeOptionClickedEvent
+import mega.privacy.mobile.analytics.event.SearchLastModifiedOptionClickedEvent
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -484,6 +488,7 @@ class SearchActivityViewModel @Inject constructor(
                         )
                     }
                 )
+                Analytics.tracker.trackEvent(SearchFileTypeOptionClickedEvent(typeOption?.name.orEmpty()))
             }
 
             DATE_MODIFIED -> {
@@ -498,6 +503,7 @@ class SearchActivityViewModel @Inject constructor(
                         )
                     }
                 )
+                Analytics.tracker.trackEvent(SearchLastModifiedOptionClickedEvent(dateModifiedOption?.name.orEmpty()))
             }
 
             DATE_ADDED -> {
@@ -512,6 +518,7 @@ class SearchActivityViewModel @Inject constructor(
                         )
                     }
                 )
+                Analytics.tracker.trackEvent(SearchDateAddedFilterClickedEvent(dateAddedOption?.name.orEmpty()))
             }
         }
     }
