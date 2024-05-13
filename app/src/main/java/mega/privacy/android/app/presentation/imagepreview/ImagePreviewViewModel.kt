@@ -430,7 +430,7 @@ class ImagePreviewViewModel @Inject constructor(
     /**
      * Check if transfers are paused.
      */
-    fun executeTransfer(transferMessage: String) {
+    fun executeTransfer(transferMessage: String, downloadForPreview: Boolean = false) {
         viewModelScope.launch {
             if (areTransfersPausedUseCase()) {
                 setTransferMessage(transferMessage)
@@ -438,7 +438,11 @@ class ImagePreviewViewModel @Inject constructor(
                 triggerDownloadEvent(
                     imageNode = _state.value.currentImageNode,
                 ) {
-                    TransferTriggerEvent.StartDownloadNode(listOf(it))
+                    if (downloadForPreview) {
+                        TransferTriggerEvent.StartDownloadForPreview(it)
+                    } else {
+                        TransferTriggerEvent.StartDownloadNode(listOf(it))
+                    }
                 }
             }
         }

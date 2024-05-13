@@ -862,7 +862,7 @@ class FolderLinkViewModel @Inject constructor(
      * Reset and notify that downloadNodes event is consumed
      */
     fun resetDownloadNode() = _state.update {
-        it.copy(downloadNodes = consumed(), downloadEvent = consumed())
+        it.copy(downloadEvent = consumed())
     }
 
     /**

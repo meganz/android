@@ -41,6 +41,8 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNo
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.presentation.versions.VersionsFileViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants
@@ -50,7 +52,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -80,6 +81,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, M
     private lateinit var binding: ActivityVersionsFileBinding
 
     private val viewModel by viewModels<VersionsFileViewModel>()
+    private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
 
     var aB: ActionBar? = null
     var selectedNode: MegaNode? = null
@@ -193,6 +195,17 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, M
 
         // Initialize the ViewModel
         viewModel.init(nodeHandle = nodeHandle)
+        addStartDownloadTransferView()
+    }
+
+    private fun addStartDownloadTransferView() {
+        binding.root.addView(
+            createStartTransferView(
+                this,
+                startDownloadViewModel.state,
+                startDownloadViewModel::consumeDownloadEvent
+            )
+        )
     }
 
 
@@ -352,10 +365,9 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, M
             }
     }
 
-    fun downloadNodes(nodes: List<MegaNode>?) {
-        checkNotificationsPermission(this)
-        nodes?.let {
-            nodeSaver.saveNodes(it, false, false, false, false)
+    private fun downloadNodes(nodes: List<MegaNode>?) {
+        nodes?.map { NodeId(it.handle) }?.let {
+            startDownloadViewModel.onDownloadClicked(it)
         }
     }
 

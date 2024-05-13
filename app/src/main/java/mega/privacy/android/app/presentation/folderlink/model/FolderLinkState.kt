@@ -12,7 +12,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import nz.mega.sdk.MegaNode
 
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel]
@@ -37,7 +36,6 @@ import nz.mega.sdk.MegaNode
  * @property selectedNodeCount          Count of nodes selected
  * @property finishActivity             Whether to finish the activity
  * @property openFile                   State to handle file opening
- * @property downloadNodes              State to download nodes
  * @property downloadEvent              Event to download nodes with DownloadsWorker
  * @property importNode                 Node to import
  * @property selectImportLocation       State to open location selection
@@ -70,7 +68,6 @@ data class FolderLinkState(
     val selectedNodeCount: Int = 0,
     val finishActivity: Boolean = false,
     val openFile: StateEventWithContent<Intent> = consumed(),
-    val downloadNodes: StateEventWithContent<List<MegaNode>> = consumed(),
     val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
     val importNode: NodeUIItem<TypedNode>? = null,
     val selectImportLocation: StateEvent = consumed,

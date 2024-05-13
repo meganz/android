@@ -50,7 +50,6 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -235,7 +234,7 @@ class ImagePreviewActivity : BaseActivity() {
         onNodeTapped(
             this,
             MegaNode.unserialize(imageNode.serializedData),
-            this::saveNodeByOpenWith,
+            { this.saveNodeByOpenWith() },
             this,
             this,
             true
@@ -391,18 +390,11 @@ class ImagePreviewActivity : BaseActivity() {
      * Upon a node is open with, if it cannot be previewed in-app,
      * then download it first, this download will be marked as "download by open with".
      *
-     * @param node Node to be downloaded.
      */
-    private fun saveNodeByOpenWith(node: MegaNode) {
-        PermissionUtils.checkNotificationsPermission(this)
-        nodeSaver.saveNodes(
-            nodes = listOf(node),
-            highPriority = true,
-            isFolderLink = false,
-            fromMediaViewer = false,
-            needSerialize = false,
+    private fun saveNodeByOpenWith() {
+        viewModel.executeTransfer(
+            transferMessage = getString(R.string.resume_paused_transfers_text),
             downloadForPreview = true,
-            downloadByOpenWith = true
         )
     }
 

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.folderlink
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
@@ -64,15 +63,13 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
-import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -235,8 +232,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 onImportClicked = viewModel::handleImportClick,
                 onOpenFile = ::onOpenFile,
                 onResetOpenFile = viewModel::resetOpenFile,
-                onDownloadNode = ::downloadNodes,
-                onResetDownloadNode = viewModel::resetDownloadNode,
                 onSelectImportLocation = ::onSelectImportLocation,
                 onResetSelectImportLocation = viewModel::resetSelectImportLocation,
                 onResetSnackbarMessage = viewModel::resetSnackbarMessage,
@@ -557,21 +552,8 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
      *
      * @param nodes List of nodes to download
      */
-    fun downloadNodes(nodes: List<MegaNode>) {
-        val hasStoragePermission =
-            PermissionUtils.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        if (!hasStoragePermission) {
-            storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            return
-        }
-        PermissionUtils.checkNotificationsPermission(this)
-        nodeSaver.saveNodes(
-            nodes,
-            highPriority = false,
-            isFolderLink = true,
-            fromMediaViewer = false,
-            needSerialize = false
-        )
+    fun downloadNodes(nodes: List<TypedNode>) {
+        viewModel.updateNodesToDownload(nodes)
     }
 
     private fun navigateToAchievements() {

@@ -70,15 +70,14 @@ import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTT
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SNACKBAR_TAG
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
-import nz.mega.sdk.MegaNode
 
 internal object Constants {
     /**
@@ -136,8 +135,6 @@ internal fun FolderLinkView(
     onImportClicked: (NodeUIItem<TypedNode>?) -> Unit,
     onOpenFile: (Intent) -> Unit,
     onResetOpenFile: () -> Unit,
-    onDownloadNode: (List<MegaNode>) -> Unit,
-    onResetDownloadNode: () -> Unit,
     onSelectImportLocation: () -> Unit,
     onResetSelectImportLocation: () -> Unit,
     onResetSnackbarMessage: () -> Unit,
@@ -184,12 +181,6 @@ internal fun FolderLinkView(
         event = state.openFile,
         onConsumed = onResetOpenFile,
         action = onOpenFile
-    )
-
-    EventEffect(
-        event = state.downloadNodes,
-        onConsumed = onResetDownloadNode,
-        action = onDownloadNode
     )
 
     EventEffect(
