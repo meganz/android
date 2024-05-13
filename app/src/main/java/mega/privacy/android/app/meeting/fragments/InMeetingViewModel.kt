@@ -51,6 +51,8 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
+import mega.privacy.android.app.presentation.meeting.model.ParticipantsChange
+import mega.privacy.android.app.presentation.meeting.model.ParticipantsChangeType
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetNetworkChangesUseCase
@@ -63,6 +65,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NAME_CHANGE
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
+import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
@@ -688,9 +691,15 @@ class InMeetingViewModel @Inject constructor(
         _getParticipantsChanges.value = Pair(type, action)
     }
 
-    fun onConsumeParticipantChanges(){
+    /**
+     * on consume participant changes
+     */
+    fun onConsumeParticipantChanges() {
         _getParticipantsChanges.update {
             it.copy(second = null)
+        }
+        _state.update {
+            it.copy(participantsChanges = null)
         }
     }
 
@@ -3297,6 +3306,63 @@ class InMeetingViewModel @Inject constructor(
     fun onSnackbarInSpeakerViewMessageConsumed() {
         _state.update {
             it.copy(snackbarInSpeakerViewMessage = consumed())
+        }
+    }
+
+    /**
+     * Trigger event to show OnlyMeEndCallTimer
+     */
+    fun showOnlyMeEndCallTimer(time: Long) {
+        _state.update {
+            it.copy(showOnlyMeEndCallTime = time)
+        }
+    }
+
+    /**
+     * Hide OnlyMeEndCallTimer
+     */
+    fun hideOnlyMeEndCallTimer() {
+        _state.update {
+            it.copy(showOnlyMeEndCallTime = null)
+        }
+    }
+
+    /**
+     * Trigger event to show participants changes message
+     */
+    fun showParticipantChangesMessage(message: String, type: Int) {
+        when (type) {
+            TYPE_JOIN -> {
+                _state.update {
+                    it.copy(
+                        participantsChanges = ParticipantsChange(
+                            message,
+                            ParticipantsChangeType.Join
+                        )
+                    )
+                }
+            }
+
+            TYPE_LEFT -> {
+                _state.update {
+                    it.copy(
+                        participantsChanges = ParticipantsChange(
+                            message,
+                            ParticipantsChangeType.Left
+                        )
+                    )
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Hide participant changes message
+     */
+    fun hideParticipantChangesMessage() {
+        _state.update {
+            it.copy(participantsChanges = null)
         }
     }
 }

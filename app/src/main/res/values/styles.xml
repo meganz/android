@@ -690,6 +690,17 @@
         <item name="android:paddingBottom">9dp</item>
     </style>
 
+    <style name="ComposeBanner">
+        <item name="android:minHeight">36dp</item>
+        <item name="android:elevation">1dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">16dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">9dp</item>
+        <item name="android:paddingBottom">9dp</item>
+    </style>
+
     <style name="ScheduledMeetingBanner">
         <item name="android:minHeight">48dp</item>
         <item name="android:textStyle">normal</item>

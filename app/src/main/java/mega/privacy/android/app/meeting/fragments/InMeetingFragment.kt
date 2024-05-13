@@ -42,8 +42,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -120,10 +118,8 @@ import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_ALONE_ON_THE_CALL
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
@@ -187,9 +183,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private lateinit var bannerMuteLayout: View
     private var bannerMuteText: EmojiTextView? = null
     private var bannerMuteIcon: ImageView? = null
-
-    private var participantsChangesBanner: EmojiTextView? = null
-    private var callBanner: TextView? = null
     private var bannerInfo: TextView? = null
 
     private lateinit var floatingWindowContainer: View
@@ -773,7 +766,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         AutoJoinPublicChatListener(requireContext(), this)
                     )
                 }
-
             }
 
             MEETING_ACTION_GUEST -> inMeetingViewModel.joinMeetingAsGuest(
@@ -949,8 +941,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bannerAnotherCallLayout = meetingActivity.binding.bannerAnotherCall
         bannerAnotherCallTitle = meetingActivity.binding.bannerAnotherCallTitle
         bannerAnotherCallSubtitle = meetingActivity.binding.bannerAnotherCallSubtitle
-        participantsChangesBanner = meetingActivity.binding.participantsChangesBanner
-        callBanner = meetingActivity.binding.callBanner
 
         bannerInfo = meetingActivity.binding.bannerInfo
         bannerMuteLayout = meetingActivity.binding.bannerMute
@@ -980,6 +970,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
         meetingActivity.binding.toolbar.setOnClickListener {
             inMeetingViewModel.onToolbarTap(true)
+        }
+        meetingActivity.binding.callBannerCompose.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MegaAppTheme(isDark = false) {
+                    MeetingBanner(inMeetingViewModel)
+                }
+            }
         }
     }
 
@@ -1146,7 +1145,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
                 endMeetingAsModeratorDialog = null
             }
-            showWarningTimer()
             if (state.showMeetingEndWarningDialog) {
                 collapsePanel()
             }
@@ -1219,31 +1217,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 sharedModel.updateParticipantsSection(ParticipantsSection.WaitingRoomSection)
                 if (bottomFloatingPanelViewHolder?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
                     bottomFloatingPanelViewHolder?.expand()
-                }
-            }
-        }
-
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.showMeetingEndWarningDialog }
-            .distinctUntilChanged()) { showMeetingEndWarningDialog ->
-            if (showMeetingEndWarningDialog) {
-                callBanner?.visibility = View.GONE
-            }
-        }
-    }
-
-    private fun showWarningTimer() {
-        inMeetingViewModel.state.value.let { state ->
-            if (state.minutesToEndMeeting != null && !state.showMeetingEndWarningDialog) {
-                callBanner?.apply {
-                    isVisible = true
-                    text = getString(
-                        R.string.meetings_in_call_warning_timer_message,
-                        TimeUtils.getMinutesAndSecondsFromMilliseconds(
-                            TimeUnit.MINUTES.toMillis(
-                                state.minutesToEndMeeting.toLong()
-                            )
-                        )
-                    )
                 }
             }
         }
@@ -1392,33 +1365,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         viewLifecycleOwner.collectFlow(inMeetingViewModel.getParticipantsChanges) { (type, getTitle) ->
             if (getTitle != null) {
-                participantsChangesBanner?.apply {
-                    clearAnimation()
-                    hideCallWillEndInBanner()
-
-                    text = getTitle(requireContext())
-                    isVisible = true
-                    alpha =
-                        if (bottomFloatingPanelViewHolder?.getState() == BottomSheetBehavior.STATE_EXPANDED) 0f
-                        else 1f
-
-                    animate()
-                        .alpha(0f)
-                        .setDuration(INFO_ANIMATION)
-                        .withEndAction {
-                            isVisible = false
-                            if (type == TYPE_LEFT) {
-                                inMeetingViewModel.checkShowOnlyMeBanner()
-                            }
-                            inMeetingViewModel.onConsumeParticipantChanges()
-                            showWarningTimer()
-                        }
-                }
+                inMeetingViewModel.showParticipantChangesMessage(getTitle(requireContext()), type)
             } else {
-                participantsChangesBanner?.apply {
-                    clearAnimation()
-                    isVisible = false
-                }
+                inMeetingViewModel.hideParticipantChangesMessage()
             }
         }
 
@@ -1429,16 +1378,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             } else {
                 hideCallBannerAndOnlyMeDialog()
             }
-            if (shouldBeShown.not()) {
-                showWarningTimer()
-            }
         }
 
         viewLifecycleOwner.collectFlow(inMeetingViewModel.showWaitingForOthersBanner) { shouldBeShown ->
             checkMenuItemsVisibility()
-            if (shouldBeShown) {
-                showWaitingForOthersBanner()
-            } else {
+            if (shouldBeShown.not()) {
                 hideCallWillEndInBanner()
             }
         }
@@ -2282,7 +2226,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
 
-            callBanner?.apply {
+            meetingActivity.binding.callBannerCompose.apply {
                 if (isVisible) {
                     alpha = 1 - it
                 }
@@ -2754,8 +2698,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         const val MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC = 6
 
         const val MILLISECONDS_IN_ONE_SECOND: Long = 1000
-
-        const val INFO_ANIMATION = MILLISECONDS_IN_ONE_SECOND
     }
 
     /**
@@ -2794,7 +2736,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         MegaApplication.getInstance().startProximitySensor()
         checkChildFragments()
         inMeetingViewModel.checkParticipantsList()
-        showWarningTimer()
     }
 
     override fun onPause() {
@@ -2942,39 +2883,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Show Call will end banner
-     *
-     * @param milliseconds Time remaining until the end of the call
-     */
-    private fun showCallWillEndInBanner(milliseconds: Long) {
-        callBanner?.apply {
-            collapsePanel()
-
-            isVisible = true
-            text = getString(
-                R.string.calls_call_screen_count_down_timer_to_end_call,
-                TimeUtils.getMinutesAndSecondsFromMilliseconds(milliseconds)
-            )
-
-            countDownTimerToEndCall?.cancel()
-            countDownTimerToEndCall = object :
-                CountDownTimer(milliseconds, MILLISECONDS_IN_ONE_SECOND) {
-                override fun onTick(millisUntilFinished: Long) {
-                    text = getString(
-                        R.string.calls_call_screen_count_down_timer_to_end_call,
-                        TimeUtils.getMinutesAndSecondsFromMilliseconds(millisUntilFinished)
-                    )
-                }
-
-                override fun onFinish() {
-                    countDownTimerToEndCall = null
-                    this@apply.isVisible = false
-                }
-            }.start()
-        }
-    }
-
-    /**
      * Dialogue displayed when you are left alone in the group call or meeting and you can stay on the call or end it
      */
     private fun showOnlyMeInTheCallDialog() {
@@ -2998,29 +2906,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Show Waiting for others banner
-     */
-    private fun showWaitingForOthersBanner() {
-        callBanner?.apply {
-            if (!isVisible) {
-                collapsePanel()
-                isVisible = true
-            }
-
-            text = getString(
-                R.string.calls_call_screen_waiting_for_participants
-            )
-        }
-    }
-
-    /**
      * Method to show call will end banner and only me dialog
      */
     private fun showCallWillEndBannerAndOnlyMeDialog() {
         inMeetingViewModel.startCounterTimerAfterBanner()
         val currentTime =
             MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog
-        showCallWillEndInBanner(
+        inMeetingViewModel.showOnlyMeEndCallTimer(
             if (currentTime > 0) currentTime else TimeUnit.SECONDS.toMillis(
                 SECONDS_TO_WAIT_ALONE_ON_THE_CALL
             )
@@ -3040,13 +2932,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Hide call banner and counter down timer
      */
     private fun hideCallWillEndInBanner() {
-        callBanner?.apply {
-            if (isVisible) {
-                isVisible = false
-                countDownTimerToEndCall?.cancel()
-                countDownTimerToEndCall = null
-            }
-        }
+        inMeetingViewModel.hideOnlyMeEndCallTimer()
     }
 
     /**

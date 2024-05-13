@@ -49,6 +49,8 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property showCallOptionsBottomSheet             True, if should be shown the call options bottom panel. False, otherwise
  * @property myUserHandle                           My user handle
  * @property showRaisedHandSnackbar                 Show raised hand snackbar
+ * @property showOnlyMeEndCallTime                  Show only me end call remaining time
+ * @property participantsChanges                     Message to show when a participant changes
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -87,6 +89,8 @@ data class InMeetingUiState(
     val showCallOptionsBottomSheet: Boolean = false,
     val myUserHandle: Long? = null,
     val showRaisedHandSnackbar: Boolean = false,
+    val showOnlyMeEndCallTime: Long? = null,
+    val participantsChanges: ParticipantsChange? = null,
 ) {
     /**
      * Is call on hold
@@ -121,4 +125,33 @@ data class InMeetingUiState(
             !isCallOnHold -> CallOnHoldType.PutCallOnHold
             else -> CallOnHoldType.ResumeCall
         }
+}
+
+/**
+ * Data class to represent a change in the participants list
+ */
+data class ParticipantsChange(
+    /**
+     * Text to show
+     */
+    val text: String,
+    /**
+     * Type of change
+     */
+    val type: ParticipantsChangeType,
+)
+
+/**
+ * Enum class to represent the type of change in the participants list
+ */
+enum class ParticipantsChangeType {
+    /**
+     * A participant joined the call
+     */
+    Join,
+
+    /**
+     * A participant left the call
+     */
+    Left
 }
