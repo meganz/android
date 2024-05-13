@@ -1263,4 +1263,39 @@ class ChatRepositoryImplTest {
 
             assertThat(actual).isEqualTo(emptyList<ChatListItem>())
         }
+
+    @Test
+    fun `test that the correct list of chat items is returned when the list of archived chat items is not NULL`() =
+        runTest {
+            val chatItem = mock<MegaChatListItem> {
+                on { chatId } doReturn 123L
+                on { title } doReturn "title"
+                on { lastMessage } doReturn "lastMessage"
+            }
+            whenever(
+                megaChatApiGateway.getChatListItems(
+                    mask = MegaChatApi.CHAT_FILTER_BY_ARCHIVED_OR_NON_ARCHIVED,
+                    filter = MegaChatApi.CHAT_GET_ARCHIVED
+                )
+            ) doReturn listOf(chatItem)
+
+            val actual = underTest.getArchivedChatListItems()
+
+            assertThat(actual).isEqualTo(listOf(chatListItemMapper(chatItem)))
+        }
+
+    @Test
+    fun `test that an empty list is returned when the list of archived chat items is NULL`() =
+        runTest {
+            whenever(
+                megaChatApiGateway.getChatListItems(
+                    mask = MegaChatApi.CHAT_FILTER_BY_ARCHIVED_OR_NON_ARCHIVED,
+                    filter = MegaChatApi.CHAT_GET_ARCHIVED
+                )
+            ) doReturn null
+
+            val actual = underTest.getArchivedChatListItems()
+
+            assertThat(actual).isEqualTo(emptyList<ChatListItem>())
+        }
 }

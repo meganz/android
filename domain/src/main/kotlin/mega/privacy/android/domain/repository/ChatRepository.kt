@@ -1051,4 +1051,11 @@ interface ChatRepository {
      * @return List of active chat items
      */
     suspend fun getActiveChatListItems(): List<ChatListItem>
+
+    /**
+     * Get the archived chat list items.
+     *
+     * @return List of archived chat items
+     */
+    suspend fun getArchivedChatListItems(): List<ChatListItem>
 }

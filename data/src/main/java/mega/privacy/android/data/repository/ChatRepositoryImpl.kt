@@ -1393,4 +1393,12 @@ internal class ChatRepositoryImpl @Inject constructor(
             filter = MegaChatApi.CHAT_GET_ACTIVE + MegaChatApi.CHAT_GET_NON_ARCHIVED
         )?.map(chatListItemMapper::invoke) ?: emptyList()
     }
+
+    override suspend fun getArchivedChatListItems(): List<ChatListItem> =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatListItems(
+                MegaChatApi.CHAT_FILTER_BY_ARCHIVED_OR_NON_ARCHIVED,
+                MegaChatApi.CHAT_GET_ARCHIVED
+            )?.map(chatListItemMapper::invoke) ?: emptyList()
+        }
 }
