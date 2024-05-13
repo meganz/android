@@ -281,12 +281,14 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         MegaChatAdapter.ViewHolderMessageChat holder;
         int position;
         long userHandle;
+        long messageId;
         MegaNodeList nodeList;
 
-        public ChatVoiceClipAsyncTask(MegaChatAdapter.ViewHolderMessageChat holder, int position, long userHandle) {
+        public ChatVoiceClipAsyncTask(MegaChatAdapter.ViewHolderMessageChat holder, int position, long userHandle, long messageId) {
             this.holder = holder;
             this.userHandle = userHandle;
             this.position = position;
+            this.messageId = messageId;
         }
 
         @Override
@@ -312,7 +314,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Override
         protected Integer doInBackground(MegaNodeList... params) {
             nodeList = params[0];
-            ((ChatActivity) context).sendToDownload(nodeList);
+            ((ChatActivity) context).sendToDownload(nodeList, messageId);
             return 1;
         }
     }
@@ -5190,7 +5192,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         holder.contentOwnMessageVoiceClipSeekBar.setEnabled(false);
                         holder.contentOwnMessageVoiceClipSeekBar.setProgress(0);
                         holder.contentOwnMessageVoiceClipDuration.setText("--:--");
-                        downloadVoiceClip(holder, positionInAdapter, message.getUserHandle(), message.getMegaNodeList());
+                        downloadVoiceClip(holder, positionInAdapter, message);
                     } else {
                         Timber.d("myMessage: id %dis downloaded", message.getMsgId());
                         if (isDownloaded && currentMessagePlaying.isPlayingWhenTheScreenRotated()) {
@@ -5353,7 +5355,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     holder.contentContactMessageVoiceClipSeekBar.setEnabled(false);
                     holder.contentContactMessageVoiceClipSeekBar.setProgress(0);
                     holder.contentContactMessageVoiceClipDuration.setText("--:--");
-                    downloadVoiceClip(holder, positionInAdapter, message.getUserHandle(), message.getMegaNodeList());
+                    downloadVoiceClip(holder, positionInAdapter, message);
 
                 } else {
                     Timber.d("ContMessage -> is downloaded");
@@ -7874,10 +7876,10 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /*
      * Download a voice note using an asynctask
      */
-    private void downloadVoiceClip(final ViewHolderMessageChat holder, int position, long userHandle, final MegaNodeList nodeList) {
+    private void downloadVoiceClip(final ViewHolderMessageChat holder, int position, final MegaChatMessage megaChatMessage) {
         Timber.d("downloadVoiceClip() ");
         try {
-            new MegaChatAdapter.ChatVoiceClipAsyncTask(holder, position, userHandle).execute(nodeList);
+            new MegaChatAdapter.ChatVoiceClipAsyncTask(holder, position, megaChatMessage.getUserHandle(), megaChatMessage.getMsgId()).execute(megaChatMessage.getMegaNodeList());
         } catch (Exception ex) {
             Timber.e(ex, "Too many AsyncTasks");
         }
@@ -7968,7 +7970,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                 File vcFile = CacheFolderManager.buildVoiceClipFile(nodeList.get(0).getName());
                 if (!isFileAvailable(vcFile) || vcFile.length() != nodeList.get(0).getSize())
-                    downloadVoiceClip(holder, positionInAdapter, currentMessage.getMessage().getUserHandle(), nodeList);
+                    downloadVoiceClip(holder, positionInAdapter, currentMessage.getMessage());
 
                 playVoiceClip(m, vcFile.getAbsolutePath());
                 break;

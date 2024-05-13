@@ -8,15 +8,22 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
+import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -31,6 +38,8 @@ class StartDownloadViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
+    private val getCacheFileUseCase: GetCacheFileUseCase,
+    private val downloadNodesUseCase: DownloadNodesUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<StateEventWithContent<TransferTriggerEvent>>(consumed())
@@ -208,6 +217,30 @@ class StartDownloadViewModel @Inject constructor(
     fun onSaveOfflineClicked(node: TypedNode) {
         _state.update {
             triggered(TransferTriggerEvent.StartDownloadForOffline(node))
+        }
+    }
+
+    /**
+     * Download a voice clip
+     */
+    @Deprecated(message = "This method will be removed once ChatActivity has been removed")
+    fun downloadVoiceClip(name: String, chatId: Long, messageId: Long) {
+        viewModelScope.launch {
+            val node = getChatFileUseCase(chatId, messageId) ?: run {
+                Timber.e("voice clip node not found")
+                return@launch
+            }
+            val voiceClipFile: File =
+                getCacheFileUseCase(CacheFolderManager.VOICE_CLIP_FOLDER, name) ?: run {
+                    Timber.e("voice clip cache path is invalid ($name - $chatId - $messageId)")
+                    return@launch
+                }
+            downloadNodesUseCase(
+                nodes = listOf(node),
+                destinationPath = "${voiceClipFile.parent}${File.separator}",
+                appData = TransferAppData.VoiceClip,
+                isHighPriority = true,
+            ).lastOrNull()
         }
     }
 

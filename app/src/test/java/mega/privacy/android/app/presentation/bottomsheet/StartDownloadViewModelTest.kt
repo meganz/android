@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -13,18 +14,26 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
+import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -37,7 +46,9 @@ class StartDownloadViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPublicNodeFromSerializedDataUseCase =
         mock<GetPublicNodeFromSerializedDataUseCase>()
-    val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
+    private val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
+    private val getCacheFileUseCase = mock<GetCacheFileUseCase>()
+    private val downloadNodesUseCase = mock<DownloadNodesUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -51,6 +62,8 @@ class StartDownloadViewModelTest {
             getNodeByIdUseCase,
             getPublicNodeFromSerializedDataUseCase,
             getPublicChildNodeFromIdUseCase,
+            getCacheFileUseCase,
+            downloadNodesUseCase,
         )
     }
 
@@ -60,6 +73,8 @@ class StartDownloadViewModelTest {
             getNodeByIdUseCase,
             getPublicNodeFromSerializedDataUseCase,
             getPublicChildNodeFromIdUseCase,
+            getCacheFileUseCase,
+            downloadNodesUseCase,
         )
     }
 
@@ -155,6 +170,30 @@ class StartDownloadViewModelTest {
             underTest.onSaveOfflineClicked(serializedData)
             assertStartDownloadForOffline(node)
         }
+
+    @Test
+    fun `test that downloadVoiceClip downloads the node to the cache folder`() = runTest {
+        val chatId = 34L
+        val messageId = 65L
+        val chatFile = mock<ChatDefaultFile>()
+        val cachePath = "cache/"
+        val cacheFile = File("$cachePath/file.mp3")
+        val downloadFlow = mock<Flow<MultiTransferEvent>>()
+        whenever(getChatFileUseCase(chatId, messageId)) doReturn chatFile
+        whenever(getCacheFileUseCase(any(), any())) doReturn cacheFile
+        whenever(
+            downloadNodesUseCase(
+                nodes = listOf(chatFile),
+                destinationPath = cachePath,
+                appData = TransferAppData.VoiceClip,
+                isHighPriority = true,
+            )
+        ) doReturn downloadFlow
+
+        underTest.downloadVoiceClip("messageName", chatId, messageId)
+
+        verify(downloadFlow).collect(any())
+    }
 
     private suspend fun assertStartDownloadNode(vararg node: TypedNode) {
         underTest.state.test {

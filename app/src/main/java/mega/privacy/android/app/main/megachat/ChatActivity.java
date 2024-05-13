@@ -194,6 +194,7 @@ import static mega.privacy.android.app.utils.permission.PermissionUtils.requestC
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
 import static mega.privacy.android.data.facade.FileFacadeKt.INTENT_EXTRA_NODE_HANDLE;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.nodeListToArray;
 import static nz.mega.sdk.MegaChatApi.INIT_ANONYMOUS;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -6796,9 +6797,12 @@ public class ChatActivity extends PasscodeActivity
         checkMegaLink(msg);
     }
 
-    public void sendToDownload(MegaNodeList nodelist) {
+    public void sendToDownload(MegaNodeList nodelist, Long msgId) {
         Timber.d("sendToDownload");
-        nodeSaver.downloadVoiceClip(nodelist);
+        ArrayList<MegaNode> nodes = nodeListToArray(nodelist);
+        MegaNode node = nodes.get(0);
+        if (node == null) return;
+        startDownloadViewModel.downloadVoiceClip(node.getName(), idChat, msgId);
     }
 
     @Override

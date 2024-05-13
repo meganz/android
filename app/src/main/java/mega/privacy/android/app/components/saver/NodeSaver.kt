@@ -36,7 +36,6 @@ import mega.privacy.android.app.main.FileStorageActivity.PICK_FOLDER_TYPE
 import mega.privacy.android.app.main.FileStorageActivity.PickFolderType
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE
 import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
@@ -54,9 +53,7 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.storeDownloadLocationIfNeeded
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.StorageState
-import nz.mega.sdk.MegaApiJava.nodeListToArray
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
 import java.util.concurrent.Callable
 
@@ -181,47 +178,6 @@ class NodeSaver(
                 downloadByOpenWith = downloadByOpenWith
             )
         }
-    }
-
-    /**
-     * Download voice clip.
-     *
-     * @param nodeList voice clip to download
-     */
-    fun downloadVoiceClip(nodeList: MegaNodeList) {
-        Completable
-            .fromCallable(Callable {
-                val nodes = nodeListToArray(nodeList)
-                if (nodes == null || nodes.isEmpty()) {
-                    return@Callable
-                }
-
-                val parentPath =
-                    buildVoiceClipFile(nodes[0].name)?.parentFile?.path ?: return@Callable
-
-                val totalSize = nodesTotalSize(nodes)
-
-                if (notEnoughSpace(parentPath, totalSize)) {
-                    return@Callable
-                }
-
-                val voiceClipSaving = MegaNodeSaving(
-                    totalSize,
-                    highPriority = true,
-                    isFolderLink = false,
-                    nodes = nodes,
-                    fromMediaViewer = false,
-                    needSerialize = true,
-                    isVoiceClip = true
-                )
-
-                voiceClipSaving.doDownload(
-                    megaApi, megaApiFolder, parentPath, false, null, null
-                )
-            })
-            .subscribeOn(Schedulers.io())
-            .subscribeBy(onError = { logErr("NodeSaver downloadVoiceClip") })
-            .addTo(compositeDisposable)
     }
 
     /**
