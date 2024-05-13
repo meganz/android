@@ -19,6 +19,7 @@ import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +32,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -69,19 +69,52 @@ fun LabelTextField(
     errorText: String? = null,
     isEmail: Boolean = false,
     isAutoFocus: Boolean = false,
-) = LabelTextField(
-    onTextChange = {
-        onTextChange(it.text)
-    },
-    label = label,
-    imeAction = imeAction,
-    keyboardActions = keyboardActions,
-    modifier = modifier,
-    value = TextFieldValue(text = text, selection = TextRange(text.length)),
-    errorText = errorText,
-    isEmail = isEmail,
-    isAutoFocus = isAutoFocus
-)
+) {
+    // Holds the latest internal TextFieldValue state. We need to keep it to have the correct value
+    // of the composition.
+    var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = text)) }
+    // Holds the latest TextFieldValue that BasicTextField was recomposed with. We couldn't simply
+    // pass `TextFieldValue(text = value)` to the LabelTextField because we need to preserve the
+    // composition.
+    val textFieldValue = textFieldValueState.copy(text = text)
+
+    // Update the TextFieldValue state when either the selection range or the composition range changes
+    SideEffect {
+        if (
+            textFieldValue.selection != textFieldValueState.selection ||
+            textFieldValue.composition != textFieldValueState.composition
+        ) {
+            textFieldValueState = textFieldValue
+        }
+    }
+
+    // Last String value that either text field was recomposed with or updated in the onValueChange
+    // callback. We keep track of it to prevent calling onValueChange(String) for same String when
+    // LabelTextField's onValueChange is called multiple times without recomposition in between.
+    // E.g. when we change the theme from dark to light or vice versa.
+    var lastTextValue by remember(text) { mutableStateOf(text) }
+
+    LabelTextField(
+        onTextChange = { newTextFieldValueState ->
+            textFieldValueState = newTextFieldValueState
+
+            val stringChangedSinceLastInvocation = lastTextValue != newTextFieldValueState.text
+            lastTextValue = newTextFieldValueState.text
+
+            if (stringChangedSinceLastInvocation) {
+                onTextChange(newTextFieldValueState.text)
+            }
+        },
+        label = label,
+        imeAction = imeAction,
+        keyboardActions = keyboardActions,
+        modifier = modifier,
+        value = textFieldValue,
+        errorText = errorText,
+        isEmail = isEmail,
+        isAutoFocus = isAutoFocus
+    )
+}
 
 /**
  * Text field with label.
