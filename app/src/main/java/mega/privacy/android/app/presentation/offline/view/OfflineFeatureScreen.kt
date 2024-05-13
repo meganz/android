@@ -47,7 +47,8 @@ fun OfflineFeatureScreen(
     fileTypeIconMapper: FileTypeIconMapper,
     rootFolderOnly: Boolean = true,
     spanCount: Int = 2,
-    onOfflineItemClicked: (OfflineNodeUIItem) -> Unit
+    onOfflineItemClicked: (OfflineNodeUIItem) -> Unit,
+    onItemLongClicked: (OfflineNodeUIItem) -> Unit
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -77,7 +78,11 @@ fun OfflineFeatureScreen(
                             thumbnailData = it.offlineNode.thumbnail,
                             onItemClicked = {
                                 onOfflineItemClicked(it)
-                            }
+                            },
+                            onLongClick = {
+                                onItemLongClicked(it)
+                            },
+                            isSelected = it.isSelected
                         )
                         MegaDivider(dividerType = DividerType.BigStartPadding)
                     }
@@ -105,11 +110,14 @@ fun OfflineFeatureScreen(
                                 fileTypeIconMapper(getFileExtension(it.offlineNode.title))
                             },
                             thumbnailData = it.offlineNode.thumbnail,
-                            isSelected = false,
+                            isSelected = it.isSelected,
                             isTakenDown = false,
                             inVisible = it.isInvisible,
                             onClick = {
                                 onOfflineItemClicked(it)
+                            },
+                            onLongClick = {
+                                onItemLongClicked(it)
                             },
                             onMenuClick = {}
                         )
@@ -233,6 +241,7 @@ private fun OfflineFeatureScreenPreview() {
             )
         ),
         fileTypeIconMapper = FileTypeIconMapper(),
-        onOfflineItemClicked = {}
+        onOfflineItemClicked = {},
+        onItemLongClicked = {}
     )
 }

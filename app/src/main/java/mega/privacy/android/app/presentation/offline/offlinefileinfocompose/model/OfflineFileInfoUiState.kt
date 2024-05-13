@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 /**
  * UI state for the OfflineFileInfoComposeViewModel
  * @property id Id of the node
+ * @property handle handle of node
  * @property title title of the screen, node's name
  * @property totalSize Size of the node, for folder it will be the total size of its content
  * @property folderInfo number of files in a folder
@@ -18,6 +19,7 @@ import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
  */
 data class OfflineFileInfoUiState(
     val id: Int = 0,
+    val handle: Long = 0,
     val parentId: Int = -1,
     val title: String = "",
     val totalSize: Long = 0L,

@@ -91,11 +91,13 @@ class OfflineComposeViewModelTest {
         val offlineList1 = mock<OtherOfflineNodeInformation>()
         whenever(offlineList1.isFolder).thenReturn(true)
         whenever(offlineList1.name).thenReturn("folder")
+        whenever(offlineList1.handle).thenReturn("1234")
         whenever(offlineList1.lastModifiedTime).thenReturn(100000L)
 
         val offlineList2 = mock<OtherOfflineNodeInformation>()
         whenever(offlineList2.isFolder).thenReturn(false)
         whenever(offlineList2.name).thenReturn("file")
+        whenever(offlineList2.handle).thenReturn("2345")
         whenever(offlineList2.lastModifiedTime).thenReturn(100000L)
 
         val list = listOf(offlineList1, offlineList2)
@@ -128,11 +130,13 @@ class OfflineComposeViewModelTest {
         val offlineList1 = mock<OtherOfflineNodeInformation>()
         whenever(offlineList1.isFolder).thenReturn(true)
         whenever(offlineList1.name).thenReturn("folder")
+        whenever(offlineList1.handle).thenReturn("1234")
         whenever(offlineList1.lastModifiedTime).thenReturn(100000L)
 
         val offlineList2 = mock<OtherOfflineNodeInformation>()
         whenever(offlineList2.isFolder).thenReturn(false)
         whenever(offlineList2.name).thenReturn("file")
+        whenever(offlineList2.handle).thenReturn("2345")
         whenever(offlineList2.lastModifiedTime).thenReturn(100000L)
 
         val list = listOf(offlineList1, offlineList2)
@@ -151,6 +155,111 @@ class OfflineComposeViewModelTest {
 
         underTest.onBackClicked()
         verify(getOfflineNodesByParentIdUseCase).invoke(parentId)
+    }
+
+    @Test
+    fun `test that when select all is clicked total selected node size is equal to total offline list size`() =
+        runTest {
+            val parentId = 1
+            val offlineList1 = mock<OtherOfflineNodeInformation>()
+            whenever(offlineList1.isFolder).thenReturn(true)
+            whenever(offlineList1.name).thenReturn("folder")
+            whenever(offlineList1.handle).thenReturn("1234")
+            whenever(offlineList1.lastModifiedTime).thenReturn(100000L)
+
+            val offlineList2 = mock<OtherOfflineNodeInformation>()
+            whenever(offlineList2.isFolder).thenReturn(false)
+            whenever(offlineList2.name).thenReturn("file")
+            whenever(offlineList2.handle).thenReturn("2345")
+            whenever(offlineList2.lastModifiedTime).thenReturn(100000L)
+
+            val list = listOf(offlineList1, offlineList2)
+            whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(list)
+            underTest.onItemClicked(
+                offlineNodeUIItem = OfflineNodeUIItem(
+                    offlineNode = OfflineFileInfoUiState(
+                        id = parentId,
+                        parentId = 0,
+                        title = "Sample",
+                        isFolder = true
+                    ),
+                    isSelected = false
+                )
+            )
+            underTest.selectAll()
+            assertThat(underTest.uiState.value.offlineNodes.size).isEqualTo(underTest.uiState.value.selectedNodeHandles.size)
+        }
+
+    @Test
+    fun `test that when clear all is clicked total selected node size is empty`() =
+        runTest {
+            val parentId = 1
+            val offlineList1 = mock<OtherOfflineNodeInformation>()
+            whenever(offlineList1.isFolder).thenReturn(true)
+            whenever(offlineList1.name).thenReturn("folder")
+            whenever(offlineList1.handle).thenReturn("1234")
+            whenever(offlineList1.lastModifiedTime).thenReturn(100000L)
+
+            val offlineList2 = mock<OtherOfflineNodeInformation>()
+            whenever(offlineList2.isFolder).thenReturn(false)
+            whenever(offlineList2.name).thenReturn("file")
+            whenever(offlineList2.handle).thenReturn("2345")
+            whenever(offlineList2.lastModifiedTime).thenReturn(100000L)
+
+            val list = listOf(offlineList1, offlineList2)
+            whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(list)
+            underTest.onItemClicked(
+                offlineNodeUIItem = OfflineNodeUIItem(
+                    offlineNode = OfflineFileInfoUiState(
+                        id = parentId,
+                        parentId = 0,
+                        title = "Sample",
+                        isFolder = true
+                    ),
+                    isSelected = false
+                )
+            )
+            underTest.clearSelection()
+            assertThat(underTest.uiState.value.selectedNodeHandles.size).isEqualTo(0)
+        }
+
+    @Test
+    fun `test that when long clicked on offline item updates selected list`() = runTest {
+        val parentId = 1
+        val offlineList1 = mock<OtherOfflineNodeInformation>()
+        whenever(offlineList1.isFolder).thenReturn(true)
+        whenever(offlineList1.name).thenReturn("folder")
+        whenever(offlineList1.handle).thenReturn("1234")
+        whenever(offlineList1.lastModifiedTime).thenReturn(100000L)
+
+        val offlineList2 = mock<OtherOfflineNodeInformation>()
+        whenever(offlineList2.isFolder).thenReturn(false)
+        whenever(offlineList2.name).thenReturn("file")
+        whenever(offlineList2.handle).thenReturn("2345")
+        whenever(offlineList2.lastModifiedTime).thenReturn(100000L)
+
+        val list = listOf(offlineList1, offlineList2)
+        whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(list)
+        underTest.onItemClicked(
+            offlineNodeUIItem = OfflineNodeUIItem(
+                offlineNode = OfflineFileInfoUiState(
+                    id = parentId,
+                    parentId = 0,
+                    title = "Sample",
+                    isFolder = true
+                ),
+                isSelected = false
+            )
+        )
+        underTest.onLongItemClicked(
+            offlineNodeUIItem = OfflineNodeUIItem(
+                offlineNode = OfflineFileInfoUiState(
+                    id = 1,
+                    handle = 1234,
+                ),
+            )
+        )
+        assertThat(underTest.uiState.value.selectedNodeHandles.size).isEqualTo(1)
     }
 
     private suspend fun stubCommon() {

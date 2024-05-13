@@ -4238,9 +4238,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         when (drawerItem) {
             DrawerItem.HOMEPAGE -> {
-                if (enableOfflineCompose) {
-                    fullscreenOfflineFragmentCompose?.checkScroll()
-                } else {
+                if (enableOfflineCompose.not()) {
                     fullscreenOfflineFragment?.checkScroll()
                 }
             }

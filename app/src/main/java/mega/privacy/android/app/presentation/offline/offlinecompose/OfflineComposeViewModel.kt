@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUiState
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
@@ -153,6 +154,7 @@ class OfflineComposeViewModel @Inject constructor(
 
         return OfflineFileInfoUiState(
             id = offlineNodeInfo.id,
+            handle = offlineNodeInfo.handle.toLong(),
             title = offlineNodeInfo.name,
             isFolder = offlineNodeInfo.isFolder,
             addedTime = addedTime,
@@ -184,20 +186,24 @@ class OfflineComposeViewModel @Inject constructor(
      * Handle on clicked of item
      */
     fun onItemClicked(offlineNodeUIItem: OfflineNodeUIItem) {
-        if (offlineNodeUIItem.offlineNode.isFolder) {
-            parentStack.push(
-                Pair(
-                    offlineNodeUIItem.offlineNode.parentId,
-                    uiState.value.title
+        if (uiState.value.selectedNodeHandles.isEmpty()) {
+            if (offlineNodeUIItem.offlineNode.isFolder) {
+                parentStack.push(
+                    Pair(
+                        offlineNodeUIItem.offlineNode.parentId,
+                        uiState.value.title
+                    )
                 )
-            )
-            _uiState.update {
-                it.copy(
-                    title = offlineNodeUIItem.offlineNode.title,
-                    parentId = offlineNodeUIItem.offlineNode.id,
-                )
+                _uiState.update {
+                    it.copy(
+                        title = offlineNodeUIItem.offlineNode.title,
+                        parentId = offlineNodeUIItem.offlineNode.id,
+                    )
+                }
+                refreshList()
             }
-            refreshList()
+        } else {
+            onLongItemClicked(offlineNodeUIItem)
         }
     }
 
@@ -216,6 +222,66 @@ class OfflineComposeViewModel @Inject constructor(
             return null
         } ?: run {
             return -1
+        }
+    }
+
+    /**
+     * On Long item clicked
+     * @param offlineNodeUIItem [OfflineNodeUIItem]
+     */
+    fun onLongItemClicked(offlineNodeUIItem: OfflineNodeUIItem) {
+        val index =
+            _uiState.value.offlineNodes.indexOfFirst { it.offlineNode.handle == offlineNodeUIItem.offlineNode.handle }
+        updateNodeInSelectionState(offlineNodeUIItem = offlineNodeUIItem, index = index)
+    }
+
+    private fun updateNodeInSelectionState(offlineNodeUIItem: OfflineNodeUIItem, index: Int) {
+        offlineNodeUIItem.isSelected = !offlineNodeUIItem.isSelected
+        val newNodesList =
+            _uiState.value.offlineNodes.updateItemAt(index = index, item = offlineNodeUIItem)
+        val selectedHandleList = newNodesList.filter {
+            it.isSelected
+        }.map {
+            it.offlineNode.handle
+        }
+        _uiState.update {
+            it.copy(
+                offlineNodes = newNodesList,
+                selectedNodeHandles = selectedHandleList,
+            )
+        }
+    }
+
+    /**
+     * Clear Selected nodes
+     */
+    fun clearSelection() {
+        val clearList = _uiState.value.offlineNodes.map {
+            it.copy(isSelected = false)
+        }
+        _uiState.update {
+            it.copy(
+                offlineNodes = clearList,
+                selectedNodeHandles = emptyList()
+            )
+        }
+    }
+
+    /**
+     * Select All nodes
+     */
+    fun selectAll() {
+        viewModelScope.launch {
+            val selectedList = _uiState.value.offlineNodes.map {
+                it.copy(isSelected = true)
+            }
+            val selectedListHandles = selectedList.map { it.offlineNode.handle }
+            _uiState.update {
+                it.copy(
+                    offlineNodes = selectedList,
+                    selectedNodeHandles = selectedListHandles
+                )
+            }
         }
     }
 }

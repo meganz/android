@@ -16,7 +16,7 @@ data class OfflineUiState(
     val isLoading: Boolean = false,
     val showOfflineWarning: Boolean = false,
     val offlineNodes: List<OfflineNodeUIItem> = emptyList(),
-    val selectedNodeHandles: List<String> = emptyList(),
+    val selectedNodeHandles: List<Long> = emptyList(),
     val parentId: Int = -1,
     val title: String = "",
     val currentViewType: ViewType = ViewType.LIST,
