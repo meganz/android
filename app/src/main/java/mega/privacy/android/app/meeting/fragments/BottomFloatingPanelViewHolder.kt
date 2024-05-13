@@ -340,6 +340,7 @@ class BottomFloatingPanelViewHolder(
             }
 
             fabHold.setOnClickListener {
+                collapse()
                 inMeetingViewModel.onClickMoreCallOptions()
             }
 

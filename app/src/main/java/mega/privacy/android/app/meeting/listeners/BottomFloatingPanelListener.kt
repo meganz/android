@@ -9,7 +9,6 @@ interface BottomFloatingPanelListener {
     fun onChangeMicState(micOn: Boolean)
     fun onChangeCamState(camOn: Boolean)
     fun onChangeSpeakerState()
-    fun onMoreOptions()
     fun onEndMeeting()
 
     /**

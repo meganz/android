@@ -2643,14 +2643,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * More options clicked
-     */
-    override fun onMoreOptions() {
-        Timber.d("More options clicked")
-        inMeetingViewModel.onClickMoreCallOptions()
-    }
-
-    /**
      * Method that updates UI when speaker changes
      *
      * @param device The current device selected

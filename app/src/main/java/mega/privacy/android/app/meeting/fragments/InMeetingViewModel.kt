@@ -3146,6 +3146,7 @@ class InMeetingViewModel @Inject constructor(
      * More call options clicked
      */
     fun onClickMoreCallOptions() {
+        onSnackbarMessageConsumed()
         _state.update { it.copy(showCallOptionsBottomSheet = true) }
     }
 
