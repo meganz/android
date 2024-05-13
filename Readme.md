@@ -195,28 +195,30 @@ fun shouldUsePrebuiltSdk(): Boolean = false
        
 ### 12. Disable library dependencies
 1. in root `build.gradle.kts`, comment out below codes.
+   ```kotlin
+   id("mega.android.release")
+   ```
+2. in `settings.gradle.kts`, comment out below code
     ```kotlin
-        maven {
-            url =
-                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/megagradle")
+     maven {
+         url =
+             uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/megagradle")
+     }
+    ```
+   and
+    ```kotlin
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "mega.android.release") {
+                useModule("mega.privacy:megagradle:${requested.version}")
+            }
         }
-    ```
-   and
-    ```kotlin
-        classpath(tools.mega.gradle)
-    ```
-   and
-    ```kotlin
-        tasks.register<mega.privacy.megagradle.PreReleaseTask>("preRelease")
-        tasks.register<mega.privacy.megagradle.ReleaseTask>("release")
-        tasks.register<mega.privacy.megagradle.PostReleaseTask>("postRelease")
-        tasks.register<mega.privacy.megagradle.CreateJiraVersionTask>("createJiraVersion")
+    }
     ```
 
 ### 13. Run the project
 
 Open the project with Android Studio, let it build the project and hit _*Run*_.
-
 
 
 ##### If the build script fails to detect cmake when building ffmpeg extension on a mac

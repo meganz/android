@@ -4,17 +4,15 @@ import mega.privacy.android.build.shouldUsePrebuiltSdk
 plugins {
     alias(plugin.plugins.ksp) apply false
     id("org.jetbrains.kotlin.android") version "1.9.22" apply false
+    id("mega.android.release") version "0.18.20240510034738"
 }
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
         google()
         maven { url = uri("https://plugins.gradle.org/m2/") }
         jcenter()
-        maven {
-            url =
-                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/megagradle")
-        }
     }
     dependencies {
         classpath(plugin.build.tools)
@@ -31,7 +29,6 @@ buildscript {
         classpath(plugin.junit5)
         classpath(plugin.kotlin.gradle)
         classpath("androidx.benchmark:benchmark-baseline-profile-gradle-plugin:1.2.3")
-        classpath(tools.mega.gradle)
     }
 }
 
@@ -100,8 +97,4 @@ if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     apply(from = "${project.rootDir}/tools/prebuilt-sdk.gradle")
 }
 
-tasks.register<mega.privacy.megagradle.PreReleaseTask>("preRelease")
-tasks.register<mega.privacy.megagradle.ReleaseTask>("release")
-tasks.register<mega.privacy.megagradle.PostReleaseTask>("postRelease")
-tasks.register<mega.privacy.megagradle.CreateJiraVersionTask>("createJiraVersion")
 

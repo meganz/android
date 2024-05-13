@@ -4,6 +4,17 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven {
+            url =
+                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/megagradle")
+        }
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "mega.android.release") {
+                useModule("mega.privacy:megagradle:${requested.version}")
+            }
+        }
     }
 }
 
