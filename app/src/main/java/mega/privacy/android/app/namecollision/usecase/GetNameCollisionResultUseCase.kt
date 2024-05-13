@@ -185,14 +185,15 @@ class GetNameCollisionResultUseCase @Inject constructor(
     fun get(collisions: List<NameCollision>): Flowable<MutableList<NameCollisionResult>> =
         Flowable.create({ emitter ->
             val collisionsResult = mutableListOf<NameCollisionResult>()
-
             for ((i, collision) in collisions.withIndex()) {
                 get(collision).blockingSubscribeBy(
                     onNext = { nameCollisionResult ->
-                        collisionsResult.add(
-                            i,
-                            nameCollisionResult
-                        )
+                        // Replace with latest value if exists, add otherwise
+                        if (i >= collisionsResult.size) {
+                            collisionsResult.add(nameCollisionResult)
+                        } else {
+                            collisionsResult[i] = nameCollisionResult
+                        }
                     },
                     onError = { error -> Timber.w(error, "NameCollisionResult error") },
                     onComplete = { emitter.onNext(collisionsResult) }
@@ -356,6 +357,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
                 val firstIndex = lastIndexOf('(')
                 name.substring(0, firstIndex + 1).plus("$newNumber)")
             }
+
             else -> name.plus(" (1)")
         }
 
