@@ -25,18 +25,18 @@ class GetDevicesUseCase @Inject constructor(
      * Invocation function
      *
      * @param isCameraUploadsEnabled true if Camera Uploads is enabled, and false if otherwise
-     * @param isSyncIntegrationFeatureFlagEnabled True if Sync integration into Device Center feature flag is enabled. False otherwise
+     * @param isSyncAndIntegrationFeatureFlagEnabled True if Sync and Integration into Device Center feature flags are enabled. False otherwise
      *
      * @return The User's Backup Devices
      */
     suspend operator fun invoke(
         isCameraUploadsEnabled: Boolean,
-        isSyncIntegrationFeatureFlagEnabled: Boolean,
+        isSyncAndIntegrationFeatureFlagEnabled: Boolean,
     ): List<DeviceNode> = deviceCenterRepository.getDevices(
         currentDeviceId = getDeviceIdUseCase().orEmpty(),
         backupInfoList = getBackupInfoUseCase(),
         deviceIdAndNameMap = getDeviceIdAndNameMapUseCase(),
         isCameraUploadsEnabled = isCameraUploadsEnabled,
-        isSyncIntegrationFeatureFlagEnabled = isSyncIntegrationFeatureFlagEnabled,
+        isSyncAndIntegrationFeatureFlagEnabled = isSyncAndIntegrationFeatureFlagEnabled,
     )
 }

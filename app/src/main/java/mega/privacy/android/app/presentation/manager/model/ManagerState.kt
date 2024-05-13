@@ -25,17 +25,17 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property nodeNameCollisionResult
  * @property moveRequestResult
  * @property message
- * @property chatLinkContent                                    Result of check link request
- * @property androidSyncServiceEnabled                          Indicates if need to enable android sync service
- * @property userRootBackupsFolderHandle                        The User's Root Backups Folder Handle
- * @property callInProgressChatId                               Chat ID of the current call in progress.
- * @property deviceCenterPreviousBottomNavigationItem           A potentially nullable Integer that holds the previous Bottom Navigation item before accessing Device Center
- * @property callEndedDueToFreePlanLimits                       State event to show the force free plan limit participants dialog.
- * @property shouldUpgradeToProPlan                             State to show the upgrade to Pro plan dialog.
- * @property isCallUnlimitedProPlanFeatureFlagEnabled           True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
- * @property usersCallLimitReminders                            [UsersCallLimitReminders]
- * @property searchQuery                                        Search query
- * @property isAndroidSyncIntegrationIntoDeviceCenterEnabled    True if Android Sync Integration into Device Center feature flag is enabled. False otherwise.
+ * @property chatLinkContent                            Result of check link request
+ * @property androidSyncServiceEnabled                  Indicates if need to enable android sync service
+ * @property userRootBackupsFolderHandle                The User's Root Backups Folder Handle
+ * @property callInProgressChatId                       Chat ID of the current call in progress.
+ * @property deviceCenterPreviousBottomNavigationItem   A potentially nullable Integer that holds the previous Bottom Navigation item before accessing Device Center
+ * @property callEndedDueToFreePlanLimits               State event to show the force free plan limit participants dialog.
+ * @property shouldUpgradeToProPlan                     State to show the upgrade to Pro plan dialog.
+ * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
+ * @property usersCallLimitReminders                    [UsersCallLimitReminders]
+ * @property searchQuery                                Search query
+ * @property isSyncAndIntegrationFeatureFlagsEnabled    True if Android Sync and Integration into Device Center feature flags are enabled. False otherwise.
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -62,5 +62,5 @@ data class ManagerState(
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
     val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled,
     val searchQuery: String = "",
-    val isAndroidSyncIntegrationIntoDeviceCenterEnabled: Boolean = false,
+    val isSyncAndIntegrationFeatureFlagsEnabled: Boolean = false,
 )

@@ -23,27 +23,33 @@ internal class DeviceFolderUINodeListMapper @Inject constructor(
      * Invocation function
      *
      * @param folders a list of [DeviceFolderNode] objects
+     * @param isSyncAndIntegrationFeatureFlagEnabled True if Sync and Integration into Device Center feature flags are enabled. False otherwise
+     *
      * @return a list of [DeviceFolderUINode] objects
      */
-    operator fun invoke(folders: List<DeviceFolderNode>): List<DeviceFolderUINode> =
-        folders.map { folder ->
-            if (folder.type == BackupInfoType.BACKUP_UPLOAD) {
-                BackupDeviceFolderUINode(
-                    id = folder.id,
-                    name = folder.name,
-                    icon = deviceFolderUINodeIconMapper(folder.type),
-                    status = deviceCenterUINodeStatusMapper(folder.status),
-                    rootHandle = folder.rootHandle,
-                )
-            } else {
-                NonBackupDeviceFolderUINode(
-                    id = folder.id,
-                    name = folder.name,
-                    icon = deviceFolderUINodeIconMapper(folder.type),
-                    status = deviceCenterUINodeStatusMapper(folder.status),
-                    rootHandle = folder.rootHandle,
-                    localFolderPath = folder.localFolderPath
-                )
+    operator fun invoke(
+        folders: List<DeviceFolderNode>,
+        isSyncAndIntegrationFeatureFlagEnabled: Boolean,
+    ): List<DeviceFolderUINode> =
+        folders.filter { !isSyncAndIntegrationFeatureFlagEnabled || (it.type != BackupInfoType.CAMERA_UPLOADS && it.type != BackupInfoType.MEDIA_UPLOADS) }
+            .map { folder ->
+                if (folder.type == BackupInfoType.BACKUP_UPLOAD) {
+                    BackupDeviceFolderUINode(
+                        id = folder.id,
+                        name = folder.name,
+                        icon = deviceFolderUINodeIconMapper(folder.type),
+                        status = deviceCenterUINodeStatusMapper(folder.status),
+                        rootHandle = folder.rootHandle,
+                    )
+                } else {
+                    NonBackupDeviceFolderUINode(
+                        id = folder.id,
+                        name = folder.name,
+                        icon = deviceFolderUINodeIconMapper(folder.type),
+                        status = deviceCenterUINodeStatusMapper(folder.status),
+                        rootHandle = folder.rootHandle,
+                        localFolderPath = folder.localFolderPath
+                    )
+                }
             }
-        }
 }

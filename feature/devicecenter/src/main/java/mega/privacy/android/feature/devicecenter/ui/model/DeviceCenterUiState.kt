@@ -4,6 +4,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
 
 /**
  * Data class representing the state of the Device Center Screen
@@ -26,6 +27,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property searchWidgetState The state of the search widget
  * @property infoSelectedItem The item selected to show its Info
  * @property enabledFlags Enabled flags
+ * @property isSyncAndIntegrationFeatureFlagsEnabled True if Android Sync and Integration into Device Center feature flags are enabled. False otherwise.
  */
 data class DeviceCenterUiState(
     val devices: List<DeviceCenterUINode> = emptyList(),
@@ -44,4 +46,8 @@ data class DeviceCenterUiState(
     val enabledFlags: Set<Feature> = emptySet(),
 ) {
     val itemsToDisplay: List<DeviceCenterUINode> = selectedDevice?.folders ?: devices
+    val isSyncAndIntegrationFeatureFlagsEnabled =
+        enabledFlags.contains(SyncFeatures.AndroidSync) && enabledFlags.contains(
+            SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter
+        )
 }

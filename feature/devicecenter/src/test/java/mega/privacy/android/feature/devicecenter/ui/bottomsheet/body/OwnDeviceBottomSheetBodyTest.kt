@@ -25,6 +25,7 @@ internal class OwnDeviceBottomSheetBodyTest {
         composeTestRule.setContent {
             OwnDeviceBottomSheetBody(
                 isCameraUploadsEnabled = true,
+                hasSyncedFolders = true,
                 onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
@@ -41,6 +42,7 @@ internal class OwnDeviceBottomSheetBodyTest {
         composeTestRule.setContent {
             OwnDeviceBottomSheetBody(
                 isCameraUploadsEnabled = false,
+                hasSyncedFolders = true,
                 onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},

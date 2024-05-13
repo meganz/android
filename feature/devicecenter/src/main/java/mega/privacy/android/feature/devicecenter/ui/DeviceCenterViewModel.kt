@@ -94,13 +94,17 @@ internal class DeviceCenterViewModel @Inject constructor(
     fun getBackupInfo() = viewModelScope.launch {
         runCatching {
             val isCameraUploadsEnabled = isCameraUploadsEnabledUseCase()
-            val isSyncIntegrationFeatureFlagEnabled =
-                runBlocking { getEnabledFeatures().contains(SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter) }
-            val devices = deviceUINodeListMapper(
-                getDevicesUseCase(
-                    isCameraUploadsEnabled = isCameraUploadsEnabled,
-                    isSyncIntegrationFeatureFlagEnabled = isSyncIntegrationFeatureFlagEnabled,
+            val isSyncAndIntegrationFeatureFlagsEnabled = runBlocking {
+                getEnabledFeatures().contains(SyncFeatures.AndroidSync) && getEnabledFeatures().contains(
+                    SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter
                 )
+            }
+            val devices = deviceUINodeListMapper(
+                deviceNodes = getDevicesUseCase(
+                    isCameraUploadsEnabled = isCameraUploadsEnabled,
+                    isSyncAndIntegrationFeatureFlagEnabled = isSyncAndIntegrationFeatureFlagsEnabled,
+                ),
+                isSyncAndIntegrationFeatureFlagEnabled = isSyncAndIntegrationFeatureFlagsEnabled,
             )
             val selectedDevice = getSelectedDevice(devices)
             _state.update {

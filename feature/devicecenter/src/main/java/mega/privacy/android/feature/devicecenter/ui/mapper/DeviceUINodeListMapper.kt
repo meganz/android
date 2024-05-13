@@ -23,16 +23,24 @@ internal class DeviceUINodeListMapper @Inject constructor(
      * Invocation function
      *
      * @param deviceNodes a list of [DeviceNode] objects
+     * @param isSyncAndIntegrationFeatureFlagEnabled True if Sync and Integration into Device Center feature flags are enabled. False otherwise
+     *
      * @return a list of Device UI Node objects
      */
-    operator fun invoke(deviceNodes: List<DeviceNode>) = deviceNodes.map { deviceNode ->
+    operator fun invoke(
+        deviceNodes: List<DeviceNode>,
+        isSyncAndIntegrationFeatureFlagEnabled: Boolean,
+    ) = deviceNodes.map { deviceNode ->
         if (deviceNode is OwnDeviceNode) {
             OwnDeviceUINode(
                 id = deviceNode.id,
                 name = deviceNode.name,
                 icon = deviceUINodeIconMapper(deviceNode.folders),
                 status = deviceCenterUINodeStatusMapper(deviceNode.status),
-                folders = deviceFolderUINodeListMapper(deviceNode.folders),
+                folders = deviceFolderUINodeListMapper(
+                    deviceNode.folders,
+                    isSyncAndIntegrationFeatureFlagEnabled
+                ),
             )
         } else {
             OtherDeviceUINode(
@@ -40,7 +48,10 @@ internal class DeviceUINodeListMapper @Inject constructor(
                 name = deviceNode.name,
                 icon = deviceUINodeIconMapper(deviceNode.folders),
                 status = deviceCenterUINodeStatusMapper(deviceNode.status),
-                folders = deviceFolderUINodeListMapper(deviceNode.folders),
+                folders = deviceFolderUINodeListMapper(
+                    deviceNode.folders,
+                    isSyncAndIntegrationFeatureFlagEnabled
+                ),
             )
         }
     }

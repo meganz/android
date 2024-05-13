@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -91,10 +92,15 @@ internal class DeviceCenterViewModelTest {
         whenever(
             getDevicesUseCase(
                 isCameraUploadsEnabled = any(),
-                isSyncIntegrationFeatureFlagEnabled = any()
+                isSyncAndIntegrationFeatureFlagEnabled = any()
             )
         ).thenReturn(listOf(mock<OwnDeviceNode>()))
-        whenever(deviceUINodeListMapper(any())).thenReturn(listOf(ownDeviceUINode))
+        whenever(
+            deviceUINodeListMapper(
+                deviceNodes = any(),
+                isSyncAndIntegrationFeatureFlagEnabled = anyBoolean(),
+            )
+        ).thenReturn(listOf(ownDeviceUINode))
     }
 
     @Test
@@ -170,7 +176,12 @@ internal class DeviceCenterViewModelTest {
                     status = DeviceCenterUINodeStatus.Initializing,
                     folders = listOf(updatedOwnDeviceFolderUINode)
                 )
-                whenever(deviceUINodeListMapper(any())).thenReturn(listOf(updatedOwnDeviceUINode))
+                whenever(
+                    deviceUINodeListMapper(
+                        deviceNodes = any(),
+                        isSyncAndIntegrationFeatureFlagEnabled = anyBoolean(),
+                    )
+                ).thenReturn(listOf(updatedOwnDeviceUINode))
 
                 underTest.getBackupInfo()
                 val thirdState = awaitItem()
@@ -200,7 +211,12 @@ internal class DeviceCenterViewModelTest {
                     id = "9012-3456",
                     status = DeviceCenterUINodeStatus.Initializing,
                 )
-                whenever(deviceUINodeListMapper(any())).thenReturn(listOf(updatedOwnDeviceUINode))
+                whenever(
+                    deviceUINodeListMapper(
+                        deviceNodes = any(),
+                        isSyncAndIntegrationFeatureFlagEnabled = anyBoolean(),
+                    )
+                ).thenReturn(listOf(updatedOwnDeviceUINode))
 
                 underTest.getBackupInfo()
                 val thirdState = awaitItem()
@@ -224,7 +240,12 @@ internal class DeviceCenterViewModelTest {
                 val updatedOwnDeviceUINode = ownDeviceUINode.copy(
                     status = DeviceCenterUINodeStatus.Initializing,
                 )
-                whenever(deviceUINodeListMapper(any())).thenReturn(listOf(updatedOwnDeviceUINode))
+                whenever(
+                    deviceUINodeListMapper(
+                        deviceNodes = any(),
+                        isSyncAndIntegrationFeatureFlagEnabled = anyBoolean(),
+                    )
+                ).thenReturn(listOf(updatedOwnDeviceUINode))
 
                 underTest.getBackupInfo()
                 val secondState = awaitItem()
@@ -383,10 +404,15 @@ internal class DeviceCenterViewModelTest {
         whenever(
             getDevicesUseCase(
                 isCameraUploadsEnabled = false,
-                isSyncIntegrationFeatureFlagEnabled = false
+                isSyncAndIntegrationFeatureFlagEnabled = false
             )
         ).thenReturn(deviceEntities)
-        whenever(deviceUINodeListMapper(deviceEntities)).thenReturn(itemsToDisplay)
+        whenever(
+            deviceUINodeListMapper(
+                deviceNodes = deviceEntities,
+                isSyncAndIntegrationFeatureFlagEnabled = false,
+            )
+        ).thenReturn(itemsToDisplay)
 
         underTest.getBackupInfo()
         underTest.onSearchQueryChanged(query)
@@ -421,10 +447,15 @@ internal class DeviceCenterViewModelTest {
             whenever(
                 getDevicesUseCase(
                     isCameraUploadsEnabled = false,
-                    isSyncIntegrationFeatureFlagEnabled = false
+                    isSyncAndIntegrationFeatureFlagEnabled = false
                 )
             ).thenReturn(deviceEntities)
-            whenever(deviceUINodeListMapper(deviceEntities)).thenReturn(itemsToDisplay)
+            whenever(
+                deviceUINodeListMapper(
+                    deviceNodes = deviceEntities,
+                    isSyncAndIntegrationFeatureFlagEnabled = false,
+                )
+            ).thenReturn(itemsToDisplay)
 
             underTest.getBackupInfo()
             underTest.onSearchQueryChanged(query)

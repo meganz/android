@@ -27,14 +27,14 @@ internal class DeviceCenterRepositoryImpl @Inject constructor(
         currentDeviceId: String,
         deviceIdAndNameMap: Map<String, String>,
         isCameraUploadsEnabled: Boolean,
-        isSyncIntegrationFeatureFlagEnabled: Boolean,
+        isSyncAndIntegrationFeatureFlagEnabled: Boolean,
     ) = withContext(ioDispatcher) {
         deviceNodeMapper(
             backupInfoList = backupInfoList,
             currentDeviceId = currentDeviceId,
             deviceIdAndNameMap = deviceIdAndNameMap,
             isCameraUploadsEnabled = isCameraUploadsEnabled,
-            isSyncIntegrationFeatureFlagEnabled = isSyncIntegrationFeatureFlagEnabled,
+            isSyncAndIntegrationFeatureFlagEnabled = isSyncAndIntegrationFeatureFlagEnabled,
         )
     }
 }

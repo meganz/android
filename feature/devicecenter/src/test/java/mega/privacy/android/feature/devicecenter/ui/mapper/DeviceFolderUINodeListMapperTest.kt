@@ -68,7 +68,12 @@ internal class DeviceFolderUINodeListMapperTest {
         whenever(deviceCenterUINodeStatusMapper(folderStatus)).thenReturn(expectedUINodeStatus)
         whenever(deviceFolderUINodeIconMapper(folderType)).thenReturn(expectedFolderUINodeIcon)
 
-        assertThat(underTest(folderList)).isEqualTo(
+        assertThat(
+            underTest(
+                folders = folderList,
+                isSyncAndIntegrationFeatureFlagEnabled = false,
+            )
+        ).isEqualTo(
             listOf(
                 BackupDeviceFolderUINode(
                     id = folderId,
@@ -112,7 +117,12 @@ internal class DeviceFolderUINodeListMapperTest {
         whenever(deviceCenterUINodeStatusMapper(folderStatus)).thenReturn(expectedUINodeStatus)
         whenever(deviceFolderUINodeIconMapper(folderType)).thenReturn(expectedFolderUINodeIcon)
 
-        assertThat(underTest(folderList)).isEqualTo(
+        assertThat(
+            underTest(
+                folders = folderList,
+                isSyncAndIntegrationFeatureFlagEnabled = false,
+            )
+        ).isEqualTo(
             listOf(
                 NonBackupDeviceFolderUINode(
                     id = folderId,

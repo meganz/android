@@ -24,24 +24,26 @@ internal const val BOTTOM_SHEET_BODY_OWN_DEVICE =
  * device" category
  *
  * @param isCameraUploadsEnabled true if Camera Uploads is Enabled, and false if otherwise
+ * @param hasSyncedFolders True if the device has synced folders. False otherwise
  * @param onCameraUploadsClicked Lambda that is executed when the "Camera uploads" Tile is selected
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
- * @param isSyncIntegrationFeatureFlagEnabled True if Sync integration into Device Center feature flag is enabled. False otherwise
+ * @param isSyncAndIntegrationFeatureFlagEnabled True if Sync and Integration into Device Center feature flags are enabled. False otherwise
  */
 @Composable
 internal fun OwnDeviceBottomSheetBody(
     isCameraUploadsEnabled: Boolean,
+    hasSyncedFolders: Boolean,
     onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: () -> Unit,
     onInfoClicked: () -> Unit,
-    isSyncIntegrationFeatureFlagEnabled: Boolean = false,
+    isSyncAndIntegrationFeatureFlagEnabled: Boolean = false,
 ) {
     Column(modifier = Modifier.testTag(BOTTOM_SHEET_BODY_OWN_DEVICE)) {
-        if (isCameraUploadsEnabled) {
+        if ((isSyncAndIntegrationFeatureFlagEnabled && hasSyncedFolders) || isCameraUploadsEnabled) {
             InfoBottomSheetTile(onActionClicked = onInfoClicked)
         }
-        if (!isSyncIntegrationFeatureFlagEnabled) {
+        if (!isSyncAndIntegrationFeatureFlagEnabled) {
             CameraUploadsBottomSheetTile(
                 isCameraUploadsEnabled = isCameraUploadsEnabled,
                 onActionClicked = onCameraUploadsClicked,
@@ -65,6 +67,7 @@ private fun PreviewOwnDeviceBottomSheet(
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         OwnDeviceBottomSheetBody(
             isCameraUploadsEnabled = isCameraUploadsEnabled,
+            hasSyncedFolders = true,
             onCameraUploadsClicked = {},
             onRenameDeviceClicked = {},
             onInfoClicked = {},
