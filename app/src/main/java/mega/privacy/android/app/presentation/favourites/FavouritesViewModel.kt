@@ -81,6 +81,7 @@ class FavouritesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val query = MutableStateFlow<String?>(null)
+    private var isConnected: Boolean = true
     private lateinit var order: MutableStateFlow<FavouriteSortOrder>
     private val selected = MutableStateFlow<Set<NodeId>>(emptySet())
     private val _state =
@@ -125,18 +126,23 @@ class FavouritesViewModel @Inject constructor(
                 isHiddenNodesOnboardedFlow,
                 favouritesFlow,
                 monitorShowHiddenItemsUseCase(),
-            ) { accountDetail, isHiddenNodesOnboarded, favouritesState, showHiddenItems ->
+                query,
+            ) { accountDetail, isHiddenNodesOnboarded, favouritesState, showHiddenItems, search ->
                 if (favouritesState is FavouriteLoadState.Success) {
                     val filteredItems = filterNonSensitiveItems(
                         items = favouritesState.favourites,
                         showHiddenItems = showHiddenItems,
                         isPaid = accountDetail.levelDetail?.accountType?.isPaid,
                     )
-                    favouritesState.copy(
-                        favourites = filteredItems,
-                        accountDetail = accountDetail,
-                        isHiddenNodesOnboarded = isHiddenNodesOnboarded
-                    )
+                    if (filteredItems.any { it is FavouriteListItem }) {
+                        favouritesState.copy(
+                            favourites = filteredItems,
+                            accountDetail = accountDetail,
+                            isHiddenNodesOnboarded = isHiddenNodesOnboarded
+                        )
+                    } else {
+                        FavouriteLoadState.Empty(search != null, isConnected)
+                    }
                 } else {
                     favouritesState
                 }
@@ -172,6 +178,7 @@ class FavouritesViewModel @Inject constructor(
         selectedNodes: Set<NodeId>,
         isConnected: Boolean,
     ): FavouriteLoadState {
+        this@FavouritesViewModel.isConnected = isConnected
         return if (nodes.isEmpty()) FavouriteLoadState.Empty(search != null, isConnected)
         else FavouriteLoadState.Success(
             favourites = createFavouriteItemsList(order, nodes, search, selectedNodes),
