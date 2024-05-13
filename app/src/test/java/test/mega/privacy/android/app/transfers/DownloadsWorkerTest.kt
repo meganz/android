@@ -134,7 +134,8 @@ class DownloadsWorkerTest {
             transfersFinishedNotificationMapper = transfersFinishedNotificationMapper,
             scanMediaFileUseCase = scanMediaFileUseCase,
             crashReporter = crashReporter,
-            foregroundSetter = setForeground
+            foregroundSetter = setForeground,
+            notificationSamplePeriod = 0L,
         )
     }
 
@@ -210,7 +211,7 @@ class DownloadsWorkerTest {
     @Test
     fun `test that notification is created when worker starts`() = runTest {
         val transferTotal: ActiveTransferTotals = mockActiveTransferTotals(true)
-        commonStub(transferTotals = listOf(transferTotal))
+        commonStub(initialTransferTotals = transferTotal)
         underTest.doWork()
         verify(transfersNotificationMapper).invoke(transferTotal, false)
     }
@@ -319,7 +320,7 @@ class DownloadsWorkerTest {
         val transferTotal = mockActiveTransferTotals(true)
         val expectedProgress = Progress(1f)
         whenever(transferTotal.transferProgress).thenReturn(expectedProgress)
-        commonStub(transferTotals = listOf(transferTotal))
+        commonStub(initialTransferTotals = transferTotal)
         underTest.doWork()
         val expectedData =
             workDataOf(AbstractTransfersWorker.PROGRESS to expectedProgress.floatValue)

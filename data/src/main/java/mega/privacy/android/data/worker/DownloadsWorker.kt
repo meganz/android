@@ -51,6 +51,7 @@ class DownloadsWorker @AssistedInject constructor(
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
+    notificationSamplePeriod: Long? = null,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -67,6 +68,7 @@ class DownloadsWorker @AssistedInject constructor(
     clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
     crashReporter = crashReporter,
     foregroundSetter = foregroundSetter,
+    notificationSamplePeriod = notificationSamplePeriod,
 ) {
 
     override val finalNotificationId = DOWNLOAD_FINAL_NOTIFICATION_ID

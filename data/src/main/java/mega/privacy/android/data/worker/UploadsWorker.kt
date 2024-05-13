@@ -47,6 +47,7 @@ class UploadsWorker @AssistedInject constructor(
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
+    notificationSamplePeriod: Long? = null,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -63,6 +64,7 @@ class UploadsWorker @AssistedInject constructor(
     clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
     crashReporter = crashReporter,
     foregroundSetter = foregroundSetter,
+    notificationSamplePeriod = notificationSamplePeriod,
 ) {
     override val finalNotificationId = NOTIFICATION_UPLOAD_FINAL
     override val updateNotificationId = UPLOAD_NOTIFICATION_ID

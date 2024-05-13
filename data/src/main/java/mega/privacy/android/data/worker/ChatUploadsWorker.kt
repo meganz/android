@@ -69,6 +69,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     private val clearPendingMessagesCompressionProgressUseCase: ClearPendingMessagesCompressionProgressUseCase,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
+    notificationSamplePeriod: Long? = null,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -85,6 +86,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
     crashReporter = crashReporter,
     foregroundSetter = foregroundSetter,
+    notificationSamplePeriod = notificationSamplePeriod,
 ) {
     override val updateNotificationId = NOTIFICATION_CHAT_UPLOAD
 

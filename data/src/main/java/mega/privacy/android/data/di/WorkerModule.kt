@@ -17,4 +17,10 @@ object WorkerModule {
      */
     @Provides
     fun provideForegroundSetter(): ForegroundSetter? = null
+
+    /**
+     * Provides NotificationSamplePeriod to its default null value
+     */
+    @Provides
+    fun provideNotificationSamplePeriod(): Long? = null
 }

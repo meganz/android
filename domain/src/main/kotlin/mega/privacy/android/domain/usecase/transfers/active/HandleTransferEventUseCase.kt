@@ -48,6 +48,8 @@ class HandleTransferEventUseCase @Inject internal constructor(
             if (event is TransferEvent.TransferStartEvent || event is TransferEvent.TransferFinishEvent) {
                 getTransferDestinationUriUseCase(event.transfer)
             } else null
+        handleAvailableOfflineEventUseCase(event)
+        handleSDCardEventUseCase(event, transferDestination)
         when (event) {
             is TransferEvent.TransferStartEvent, is TransferEvent.TransferPaused -> {
                 transferRepository.insertOrUpdateActiveTransfer(event.transfer)
@@ -62,6 +64,9 @@ class HandleTransferEventUseCase @Inject internal constructor(
             }
 
             is TransferEvent.TransferFinishEvent -> {
+                if (event.error is BusinessAccountExpiredMegaException) {
+                    broadcastBusinessAccountExpiredUseCase()
+                }
                 transferRepository.insertOrUpdateActiveTransfer(event.transfer)
                 transferRepository.updateTransferredBytes(event.transfer)
                 if (!event.transfer.isFolderTransfer) {
@@ -70,10 +75,6 @@ class HandleTransferEventUseCase @Inject internal constructor(
                         event.error,
                         transferDestination?.toString()
                     )
-                }
-
-                if (event.error is BusinessAccountExpiredMegaException) {
-                    broadcastBusinessAccountExpiredUseCase()
                 }
             }
 
@@ -87,7 +88,5 @@ class HandleTransferEventUseCase @Inject internal constructor(
                 }
             }
         }
-        handleAvailableOfflineEventUseCase(event)
-        handleSDCardEventUseCase(event, transferDestination)
     }
 }

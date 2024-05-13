@@ -14,12 +14,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.lastOrNull
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
@@ -37,10 +36,14 @@ import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTot
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
+import java.time.Instant
+import java.time.Instant.MIN
+import java.time.Instant.now
 
 /**
  * Abstract CoroutineWorker to share common implementation of transfers workers
  * @param foregroundSetter to inject the set foreground method, used for testing
+ * @param type Transfer type that this worker will manage
  */
 abstract class AbstractTransfersWorker(
     context: Context,
@@ -58,6 +61,7 @@ abstract class AbstractTransfersWorker(
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val crashReporter: CrashReporter,
     private val foregroundSetter: ForegroundSetter?,
+    private val notificationSamplePeriod: Long?,
 ) : CoroutineWorker(context, workerParams) {
 
     /**
@@ -126,12 +130,13 @@ abstract class AbstractTransfersWorker(
                     }
                 }
             }
-            .sample(ON_TRANSFER_UPDATE_REFRESH_MILLIS)
-            .onEach { (transferTotals, paused, _, _) ->
+            .onEachSampled(
+                notificationSamplePeriod ?: ON_TRANSFER_UPDATE_REFRESH_MILLIS
+            ) { (transferTotals, paused, _, _) ->
                 //set progress percent as worker progress
                 setProgress(workDataOf(PROGRESS to transferTotals.transferProgress.floatValue))
                 //update the notification
-                notify(createUpdateNotification(transferTotals, paused))
+                updateProgressNotification(createUpdateNotification(transferTotals, paused))
                 Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}${if (paused) "(paused) " else ""} Notification update (${transferTotals.transferProgress.intValue}):${transferTotals.hasOngoingTransfers()}")
             }.lastOrNull()
 
@@ -164,6 +169,26 @@ abstract class AbstractTransfersWorker(
             return@transform emit(value)
         }
 
+    /**
+     * Similar to onEach but it will run the action only if periodMillis time has passed since last time action was run
+     * As opposite of the behaviour of Flow.sample, if an action is omitted because it won't be run later, it only runs when a new value is emitted
+     * Action will always be run with first emitted value, action can be skipped with last emitted value.
+     */
+    private fun <T> Flow<T>.onEachSampled(
+        periodMillis: Long,
+        action: suspend (T) -> Unit,
+    ): Flow<T> {
+        var initial: Instant = MIN
+        return this.transform {
+            val now = now()
+            if (periodMillis == 0L || now.isAfter(initial.plusMillis(periodMillis))) {
+                initial = now
+                action(it)
+            }
+            return@transform emit(it)
+        }
+    }
+
     override suspend fun getForegroundInfo() = getForegroundInfo(
         getActiveTransferTotalsUseCase(type),
         areTransfersPausedUseCase()
@@ -172,9 +197,8 @@ abstract class AbstractTransfersWorker(
     private fun getForegroundInfo(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
-    ): ForegroundInfo {
-        return createForegroundInfo(createUpdateNotification(activeTransferTotals, paused))
-    }
+    ): ForegroundInfo =
+        createForegroundInfo(createUpdateNotification(activeTransferTotals, paused))
 
     /**
      * Monitors transfer events and update the related active transfers
@@ -185,7 +209,12 @@ abstract class AbstractTransfersWorker(
                 .filter { it.transfer.transferType == type }
                 .collect { transferEvent ->
                     onTransferEventReceived(transferEvent)
-                    handleTransferEventUseCase(transferEvent)
+                    withContext(NonCancellable) {
+                        //handling events can update Active transfers and ends the monitorOngoingActiveTransfers flow that triggers the cancelling of this job, so we need to launch it in a non cancellable context
+                        launch {
+                            handleTransferEventUseCase(transferEvent)
+                        }
+                    }
                 }
         }
 
@@ -195,8 +224,11 @@ abstract class AbstractTransfersWorker(
         monitorJob.cancel()
     }
 
+    /**
+     * Updates the notification that shows the transfer progress
+     */
     @SuppressLint("MissingPermission")
-    protected suspend fun notify(notification: Notification) {
+    protected suspend fun updateProgressNotification(notification: Notification) {
         if (areNotificationsEnabledUseCase()) {
             notificationManager.notify(
                 updateNotificationId,
@@ -252,6 +284,10 @@ abstract class AbstractTransfersWorker(
          */
         const val PROGRESS = "Progress"
         private const val NOTIFICATION_STORAGE_OVERQUOTA = 14
+
+        /**
+         * Milliseconds to sample the transfer progress updates
+         */
         const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 2000L
     }
 }
