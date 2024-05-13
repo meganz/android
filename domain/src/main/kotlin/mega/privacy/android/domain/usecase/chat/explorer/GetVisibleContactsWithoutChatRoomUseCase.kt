@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactFromCacheByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import javax.inject.Inject
@@ -25,6 +26,7 @@ class GetVisibleContactsWithoutChatRoomUseCase @Inject constructor(
     private val getChatRoomByUserUseCase: GetChatRoomByUserUseCase,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
+    private val getContactFromCacheByHandleUseCase: GetContactFromCacheByHandleUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) {
 
@@ -46,8 +48,7 @@ class GetVisibleContactsWithoutChatRoomUseCase @Inject constructor(
                                     requestUserLastGreenUseCase(user.handle)
                                 }
                             }
-                            val cachedContact =
-                                contactsRepository.getContactFromCacheByHandle(user.handle)
+                            val cachedContact = getContactFromCacheByHandleUseCase(user.handle)
                             add(
                                 UserContact(
                                     contact = cachedContact?.copy(

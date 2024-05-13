@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactFromCacheByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import org.junit.jupiter.api.AfterEach
@@ -40,6 +41,7 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
     private val getChatRoomByUserUseCase: GetChatRoomByUserUseCase = mock()
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase = mock()
+    private val getContactFromCacheByHandleUseCase: GetContactFromCacheByHandleUseCase = mock()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val defaultDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
@@ -51,6 +53,7 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
             getChatRoomByUserUseCase = getChatRoomByUserUseCase,
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
+            getContactFromCacheByHandleUseCase = getContactFromCacheByHandleUseCase,
             defaultDispatcher = defaultDispatcher
         )
     }
@@ -187,7 +190,7 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
             userId = userHandle,
             email = contactEmail
         )
-        whenever(contactsRepository.getContactFromCacheByHandle(userHandle)) doReturn contact
+        whenever(getContactFromCacheByHandleUseCase(userHandle)) doReturn contact
 
         val actual = underTest()
 
@@ -217,7 +220,7 @@ class GetVisibleContactsWithoutChatRoomUseCaseTest {
                 userId = userHandle,
                 email = null
             )
-            whenever(contactsRepository.getContactFromCacheByHandle(userHandle)) doReturn contact
+            whenever(getContactFromCacheByHandleUseCase(userHandle)) doReturn contact
 
             val actual = underTest()
 
