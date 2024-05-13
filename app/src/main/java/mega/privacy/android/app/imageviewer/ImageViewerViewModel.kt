@@ -24,11 +24,9 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState
@@ -441,9 +439,7 @@ class ImageViewerViewModel @Inject constructor(
 
     private fun resetTotalDownloadsIfNeeded() {
         viewModelScope.launch {
-            val currentTransfers = getNumPendingDownloadsNonBackgroundUseCase()
-            val isServiceRunning = TransfersManagement.isServiceRunning(DownloadService::class.java)
-            if (currentTransfers == 0 && !isServiceRunning) {
+            if (getNumPendingDownloadsNonBackgroundUseCase() == 0) {
                 resetTotalDownloadsUseCase()
             }
         }

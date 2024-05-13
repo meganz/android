@@ -53,7 +53,6 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.storeDownloadLocationIfNeeded
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.StorageState
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.concurrent.Callable
 
@@ -346,16 +345,6 @@ class NodeSaver(
         }
 
         activityLauncher.launchActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER)
-    }
-
-    private fun nodesTotalSize(nodes: List<MegaNode>): Long {
-        var totalSize = 0L
-
-        for (node in nodes) {
-            totalSize += if (node.isFolder) nodesTotalSize(megaApi.getChildren(node)) else node.size
-        }
-
-        return totalSize
     }
 
     private fun notEnoughSpace(parentPath: String, totalSize: Long): Boolean {
