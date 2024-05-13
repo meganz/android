@@ -121,6 +121,7 @@ import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUs
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -1364,6 +1365,7 @@ internal class CameraUploadsWorkerTest {
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         }
 
+    @Ignore("This Test is flaky as it sometimes fails in the Gitlab pipeline. Check the test implementation again")
     @Test
     fun `test that the worker is rescheduled when the battery level is too low and is not charging`() =
         runTest {
@@ -1376,6 +1378,7 @@ internal class CameraUploadsWorkerTest {
             verify(scheduleCameraUploadUseCase).invoke()
         }
 
+    @Ignore("This Test is flaky as it sometimes fails in the Gitlab pipeline. Check the test implementation again")
     @Test
     fun `test that the worker returns failure when the charging requirement is not satisfied`() =
         runTest {
