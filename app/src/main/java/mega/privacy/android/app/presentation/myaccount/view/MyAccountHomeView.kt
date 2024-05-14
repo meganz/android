@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.myaccount.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
@@ -78,7 +79,6 @@ import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.meeting.view.dialog.ChangeSFUIdDialog
 import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewActions
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
-import mega.privacy.android.app.presentation.myaccount.model.mapper.toAccountAttributes
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACCOUNT_TYPE_SECTION
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACCOUNT_TYPE_TOP_PADDING
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACHIEVEMENTS
@@ -658,6 +658,25 @@ private fun AccountInfoSection(
     }
 }
 
+/**
+ * Get the account description based on the account type
+ * @param accountType Account type
+ */
+private fun getAccountDescriptionResId(accountType: AccountType?): Int =
+    when (accountType) {
+        AccountType.FREE -> R.string.free_account
+        AccountType.PRO_LITE -> R.string.prolite_account
+        AccountType.PRO_I -> R.string.pro1_account
+        AccountType.PRO_II -> R.string.pro2_account
+        AccountType.PRO_III -> R.string.pro3_account
+        AccountType.PRO_FLEXI -> R.string.pro_flexi_account
+        AccountType.BUSINESS -> R.string.business_label
+        AccountType.STARTER -> sharedR.string.general_low_tier_plan_starter_label
+        AccountType.BASIC -> sharedR.string.general_low_tier_plan_basic_label
+        AccountType.ESSENTIAL -> sharedR.string.general_low_tier_plan_essential_label
+        else -> R.string.recovering_info
+    }
+
 @Composable
 internal fun AccountTypeSection(
     accountType: AccountType?,
@@ -665,8 +684,9 @@ internal fun AccountTypeSection(
     onButtonClickListener: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val attributes = accountType.toAccountAttributes()
 
+    val accountDescription =
+        remember(accountType) { getAccountDescriptionResId(accountType = accountType) }
     ConstraintLayout(
         modifier = modifier
             .testTag(ACCOUNT_TYPE_SECTION)
@@ -684,7 +704,7 @@ internal fun AccountTypeSection(
                     start.linkTo(parent.start, 16.dp)
                 },
             painter = painterResource(id = R.drawable.ic_account_type),
-            contentDescription = stringResource(id = attributes.description),
+            contentDescription = stringResource(id = accountDescription),
         )
 
         constrain(planChain) {
@@ -709,7 +729,7 @@ internal fun AccountTypeSection(
                     bottom.linkTo(parent.bottom)
                     start.linkTo(iconIv.end, 16.dp)
                 },
-            text = stringResource(id = attributes.description),
+            text = stringResource(id = accountDescription),
             style = MaterialTheme.typography.body2medium,
             color = MaterialTheme.colors.textColorPrimary,
         )

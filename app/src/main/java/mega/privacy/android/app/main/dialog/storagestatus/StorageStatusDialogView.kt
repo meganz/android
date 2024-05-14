@@ -33,12 +33,12 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.h6
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 internal const val TITLE_TAG = "storage_status_dialog:text_title"
 internal const val IMAGE_STATUS_TAG = "storage_status_dialog:image_status"
@@ -278,7 +278,10 @@ private fun getDetail(state: StorageStatusDialogState): DialogViewDetail {
                 stringResource(id = R.string.button_custom_almost_full_warning)
         }
 
-        AccountType.PRO_LITE, AccountType.PRO_I, AccountType.PRO_II -> {
+        AccountType.PRO_LITE, AccountType.PRO_I,
+        AccountType.PRO_II, AccountType.BASIC,
+        AccountType.STARTER, AccountType.ESSENTIAL,
+        -> {
             when (state.storageState) {
                 StorageState.Orange -> {
                     contentText = String.format(
@@ -365,8 +368,31 @@ private class StorageStatusDialogPreviewProvider :
                 isAchievementsEnabled = true,
                 overQuotaAlert = false,
                 preWarning = false
+            ), StorageStatusDialogState(
+                storageState = StorageState.Red,
+                accountType = AccountType.ESSENTIAL,
+                product = null,
+                isAchievementsEnabled = false,
+                overQuotaAlert = true,
+                preWarning = false
             ),
-            StorageStatusDialogState().copy(
+            StorageStatusDialogState(
+                storageState = StorageState.Red,
+                accountType = AccountType.BASIC,
+                product = null,
+                isAchievementsEnabled = false,
+                overQuotaAlert = true,
+                preWarning = false
+            ),
+            StorageStatusDialogState(
+                storageState = StorageState.Red,
+                accountType = AccountType.STARTER,
+                product = null,
+                isAchievementsEnabled = false,
+                overQuotaAlert = true,
+                preWarning = false
+            ),
+            StorageStatusDialogState(
                 storageState = StorageState.Red,
                 accountType = AccountType.FREE,
                 product = null,
@@ -374,7 +400,7 @@ private class StorageStatusDialogPreviewProvider :
                 overQuotaAlert = true,
                 preWarning = false
             ),
-            StorageStatusDialogState().copy(
+            StorageStatusDialogState(
                 storageState = StorageState.Orange,
                 accountType = AccountType.FREE,
                 product = null,

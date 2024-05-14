@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.myaccount.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -69,5 +70,5 @@ data class MyAccountHomeUIState(
     val proExpirationTime: Long = 0,
     val isConnectedToNetwork: Boolean = true,
     val navigateToAchievements: StateEvent = consumed,
-    val userMessage: StateEventWithContent<Int> = consumed()
+    val userMessage: StateEventWithContent<Int> = consumed(),
 )

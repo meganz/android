@@ -231,7 +231,18 @@ fun UpgradeAccountView(
                         derivedStateOf { state.currentSubscriptionPlan == it.accountType }
                     }
                     val isRecommended = remember {
-                        derivedStateOf { (((state.currentSubscriptionPlan == AccountType.FREE || state.currentSubscriptionPlan == AccountType.PRO_LITE) && it.accountType == AccountType.PRO_I) || (state.currentSubscriptionPlan == AccountType.PRO_I && it.accountType == AccountType.PRO_II) || (state.currentSubscriptionPlan == AccountType.PRO_II && it.accountType == AccountType.PRO_III)) }
+                        derivedStateOf {
+                            (((state.currentSubscriptionPlan == AccountType.STARTER ||
+                                    state.currentSubscriptionPlan == AccountType.BASIC ||
+                                    state.currentSubscriptionPlan == AccountType.ESSENTIAL ||
+                                    state.currentSubscriptionPlan == AccountType.FREE ||
+                                    state.currentSubscriptionPlan == AccountType.PRO_LITE) &&
+                                    it.accountType == AccountType.PRO_I) ||
+                                    (state.currentSubscriptionPlan == AccountType.PRO_I &&
+                                            it.accountType == AccountType.PRO_II) ||
+                                    (state.currentSubscriptionPlan == AccountType.PRO_II &&
+                                            it.accountType == AccountType.PRO_III))
+                        }
                     }
                     val showCurrentPlanLabel =
                         isCurrentPlan && ((userSubscription == UserSubscription.NOT_SUBSCRIBED) || (isMonthly && userSubscription == UserSubscription.MONTHLY_SUBSCRIBED) || (!isMonthly && userSubscription == UserSubscription.YEARLY_SUBSCRIBED))

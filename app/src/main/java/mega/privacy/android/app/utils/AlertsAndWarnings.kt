@@ -188,39 +188,6 @@ object AlertsAndWarnings {
     }
 
     @JvmStatic
-    fun askForCustomizedPlan(context: Context, myEmail: String?, accountType: Int) {
-        Timber.d("askForCustomizedPlan")
-        val body = StringBuilder()
-        body.append(context.getString(R.string.subject_mail_upgrade_plan))
-            .append("\n\n\n\n\n\n\n")
-            .append(
-                """${context.getString(R.string.settings_about_app_version)} v${
-                    context.getString(
-                        R.string.app_version
-                    )
-                }"""
-            )
-            .append(context.getString(R.string.user_account_feedback).toString() + "  " + myEmail)
-
-        when (accountType) {
-            0 -> body.append(" (" + context.getString(R.string.my_account_free) + ")")
-            1 -> body.append(" (" + context.getString(R.string.my_account_pro1) + ")")
-            2 -> body.append(" (" + context.getString(R.string.my_account_pro2) + ")")
-            3 -> body.append(" (" + context.getString(R.string.my_account_pro3) + ")")
-            4 -> body.append(" (" + context.getString(R.string.my_account_prolite_feedback_email) + ")")
-            else -> body.append(" (" + context.getString(R.string.my_account_free) + ")")
-        }
-
-        val emailAndroid = Constants.MAIL_SUPPORT
-        val subject = context.getString(R.string.title_mail_upgrade_plan)
-        val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$emailAndroid"))
-            .putExtra(Intent.EXTRA_SUBJECT, subject)
-            .putExtra(Intent.EXTRA_TEXT, body.toString())
-
-        context.startActivity(Intent.createChooser(emailIntent, " "))
-    }
-
-    @JvmStatic
     fun askForCustomizedPlan(context: Context, myEmail: String?, accountType: AccountType) {
         Timber.d("askForCustomizedPlan")
         val body = StringBuilder()
