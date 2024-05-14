@@ -394,7 +394,8 @@ class HomepageFragment : Fragment() {
         var enableRecentActionsCompose: Boolean
         runBlocking {
             enableOfflineCompose = getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
-            enableRecentActionsCompose = getFeatureFlagValueUseCase(AppFeatures.RecentActionsCompose)
+            enableRecentActionsCompose =
+                getFeatureFlagValueUseCase(AppFeatures.RecentActionsCompose)
         }
         viewPager = viewDataBinding.homepageBottomSheet.viewPager
         val adapter =
@@ -514,11 +515,8 @@ class HomepageFragment : Fragment() {
         findNavController().run {
             if (currentDestination?.id == R.id.homepageFragment) {
                 val destination =
-                    if (getFeatureFlagValueUseCase(AppFeatures.NewDocumentSection)) {
-                        HomepageFragmentDirections.actionHomepageFragmentToDocumentSectionFragment()
-                    } else {
-                        HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
-                    }
+                    HomepageFragmentDirections.actionHomepageFragmentToDocumentSectionFragment()
+
                 currentDestination?.getAction(destination.actionId)?.let {
                     navigate(destination.actionId)
                 }

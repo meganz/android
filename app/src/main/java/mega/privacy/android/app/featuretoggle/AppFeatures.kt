@@ -48,14 +48,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables new document section flag
-     */
-    NewDocumentSection(
-        "Enable new document section flag",
-        true,
-    ),
-
-    /**
      * Enables the Hidden Nodes feature
      */
     HiddenNodes(

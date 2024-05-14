@@ -19,9 +19,6 @@
             android:id="@+id/action_homepage_to_offline_file_info"
             app:destination="@id/offline_file_info_compose" />
         <action
-            android:id="@+id/action_homepageFragment_to_documentsFragment"
-            app:destination="@id/documentsFragment" />
-        <action
             android:id="@+id/action_homepageFragment_to_documentSectionFragment"
             app:destination="@id/documentSectionFragment" />
         <action
@@ -84,17 +81,6 @@
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
-    </fragment>
-    <fragment
-        android:id="@+id/documentsFragment"
-        android:name="mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment"
-        android:label="DocumentsFragment">
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline"
-            app:destination="@id/fullscreen_offline" />
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
-            app:destination="@id/offlineFragmentCompose" />
     </fragment>
     <fragment
         android:id="@+id/documentSectionFragment"

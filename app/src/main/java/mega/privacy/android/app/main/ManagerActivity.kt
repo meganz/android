@@ -3622,11 +3622,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     hideAdsView()
                 }
 
-                R.id.documentsFragment -> {
-                    homepageScreen = HomepageScreen.DOCUMENTS
-                    hideAdsView()
-                }
-
                 R.id.documentSectionFragment -> {
                     homepageScreen = HomepageScreen.DOCUMENTS
                     hideAdsView()
