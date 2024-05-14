@@ -81,6 +81,7 @@ import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
+import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -188,6 +189,7 @@ class InMeetingViewModel @Inject constructor(
     private val monitorParticipatingInAnotherCallUseCase: MonitorParticipatingInAnotherCallUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val getPluralStringFromStringResMapper: GetPluralStringFromStringResMapper,
+    private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
@@ -326,7 +328,6 @@ class InMeetingViewModel @Inject constructor(
         }
 
     init {
-        getMyUserHandle()
         startMonitorChatRoomUpdates()
         startMonitorChatCallUpdates()
 
@@ -496,6 +497,11 @@ class InMeetingViewModel @Inject constructor(
                             contains(ChatCallChanges.Status) -> {
                                 Timber.d("Call status changed ${call.status}")
                                 call.status?.let { status ->
+                                    if (status == ChatCallStatus.InProgress) {
+                                        Timber.d("Call in progress, get my user information")
+                                        getMyUserHandle()
+                                        isEphemeralAccount()
+                                    }
                                     checkSubtitleToolbar()
                                     _state.update { state ->
                                         state.copy(
@@ -511,7 +517,7 @@ class InMeetingViewModel @Inject constructor(
 
                             contains(ChatCallChanges.CallRaiseHand) -> {
                                 Timber.d("CallRaiseHand change. Flag: ${call.flag}")
-                                if (state.value.showRaisedHandSnackbar) {
+                                if (state.value.showRaisedHandSnackbar && call.flag) {
                                     _state.update { state ->
                                         state.copy(
                                             showRaisedHandSnackbar = false
@@ -800,7 +806,7 @@ class InMeetingViewModel @Inject constructor(
         MegaApplication.getChatManagement().stopCounterToFinishCall()
         _showOnlyMeBanner.value = false
         _showWaitingForOthersBanner.value = false
-        hangCall()
+        checkBeforeHangCurrentCall()
 
         viewModelScope.launch {
             kotlin.runCatching {
@@ -2994,6 +3000,7 @@ class InMeetingViewModel @Inject constructor(
         runCatching {
             endCallUseCase(chatId)
         }.onSuccess {
+            lowerHandToStopSpeak()
             broadcastCallEndedUseCase(chatId)
         }.onFailure {
             Timber.e(it.stackTraceToString())
@@ -3022,9 +3029,11 @@ class InMeetingViewModel @Inject constructor(
      */
     private fun hangCall(callId: Long) = viewModelScope.launch {
         Timber.d("Hang up call. Call id $callId")
+
         runCatching {
             hangChatCallUseCase(callId)
         }.onSuccess {
+            lowerHandToStopSpeak()
             broadcastCallEndedUseCase(state.value.currentChatId)
         }.onFailure {
             Timber.e(it.stackTraceToString())
@@ -3034,9 +3043,19 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Hang up the current call
      */
-    fun hangCall() {
-        callLiveData.value?.let { call ->
-            hangCall(call.callId)
+    private fun hangCurrentCall() {
+        state.value.call?.apply {
+            hangCall(callId)
+        }
+    }
+
+    /**
+     * Check if is my hand raised before hang the call
+     */
+    fun checkBeforeHangCurrentCall() {
+        when (state.value.isMyHandRaisedToSpeak) {
+            true -> lowerHandToStopSpeak(shouldHangCall = true)
+            false -> hangCurrentCall()
         }
     }
 
@@ -3045,23 +3064,23 @@ class InMeetingViewModel @Inject constructor(
      */
     fun checkClickEndButton() {
         if (isOneToOneCall()) {
-            hangCall()
+            checkBeforeHangCurrentCall()
             return
         }
 
         if (amIAGuest()) {
-            _callLiveData.value?.let {
+            _state.value.call?.apply {
                 LiveEventBus.get(
                     EventConstants.EVENT_REMOVE_CALL_NOTIFICATION,
                     Long::class.java
-                ).post(it.callId)
-                hangCall(it.callId)
+                ).post(callId)
+                checkBeforeHangCurrentCall()
             }
             return
         }
 
         if (numParticipants() == 0) {
-            hangCall()
+            checkBeforeHangCurrentCall()
             return
         }
 
@@ -3075,7 +3094,7 @@ class InMeetingViewModel @Inject constructor(
                     )
                 }
 
-                else -> hangCall()
+                else -> checkBeforeHangCurrentCall()
             }
         }
     }
@@ -3241,12 +3260,15 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Lower hand to stop speak
      */
-    fun lowerHandToStopSpeak() {
+    fun lowerHandToStopSpeak(shouldHangCall: Boolean = false) {
         viewModelScope.launch {
             runCatching {
                 lowerHandToStopSpeakUseCase(_state.value.currentChatId)
             }.onSuccess {
                 moreCallOptionsBottomPanelDismiss()
+                if (shouldHangCall) {
+                    hangCurrentCall()
+                }
             }.onFailure { exception ->
                 Timber.e(exception)
             }
@@ -3261,6 +3283,18 @@ class InMeetingViewModel @Inject constructor(
             runCatching {
                 val myUserHandle = getMyUserHandleUseCase()
                 _state.update { state -> state.copy(myUserHandle = myUserHandle) }
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Is ephemeral account plus plus
+     */
+    private fun isEphemeralAccount() {
+        viewModelScope.launch {
+            runCatching {
+                val isEphemeralAccount = isEphemeralPlusPlusUseCase()
+                _state.update { state -> state.copy(isEphemeralAccount = isEphemeralAccount) }
             }.onFailure { Timber.e(it) }
         }
     }

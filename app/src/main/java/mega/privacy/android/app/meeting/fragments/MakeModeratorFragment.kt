@@ -313,7 +313,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
         disableLocalCamera()
         Timber.d("Leave meeting")
-        inMeetingViewModel.hangCall()
+        inMeetingViewModel.checkBeforeHangCurrentCall()
     }
 
     /**

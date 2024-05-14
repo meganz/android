@@ -48,6 +48,7 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property anotherCall                            Another call in progress or on hold.
  * @property showCallOptionsBottomSheet             True, if should be shown the call options bottom panel. False, otherwise
  * @property myUserHandle                           My user handle
+ * @property isEphemeralAccount                     True, if it's ephemeral account. False, if not.
  * @property showRaisedHandSnackbar                 Show raised hand snackbar
  * @property showOnlyMeEndCallTime                  Show only me end call remaining time
  * @property participantsChanges                     Message to show when a participant changes
@@ -89,6 +90,7 @@ data class InMeetingUiState(
     val showCallOptionsBottomSheet: Boolean = false,
     val myUserHandle: Long? = null,
     val showRaisedHandSnackbar: Boolean = false,
+    val isEphemeralAccount: Boolean = false,
     val showOnlyMeEndCallTime: Long? = null,
     val participantsChanges: ParticipantsChange? = null,
 ) {
@@ -102,7 +104,11 @@ data class InMeetingUiState(
      * Monitor if is my hand raised to speak
      */
     val isMyHandRaisedToSpeak
-        get():Boolean = myUserHandle?.let { call?.usersRaiseHands?.get(it) } ?: false
+        get():Boolean = myUserHandle?.let {
+            call?.usersRaiseHands?.get(
+                it
+            )
+        } ?: false
 
     /**
      * Get number of users with hand raised

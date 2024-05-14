@@ -684,7 +684,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         onAssignAndLeaveClick = {
                             showAssignModeratorFragment()
                         },
-                        onLeaveAnywayClick = inMeetingViewModel::hangCall,
+                        onLeaveAnywayClick = inMeetingViewModel::checkBeforeHangCurrentCall,
                         onEndForAllClick = inMeetingViewModel::endCallForAll,
                         onDismiss = inMeetingViewModel::hideBottomPanels
                     )
@@ -1130,7 +1130,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             inMeetingViewModel.hideBottomPanels()
                         }
                         setLeaveMeetingCallBack {
-                            inMeetingViewModel.hangCall()
+                            inMeetingViewModel.checkBeforeHangCurrentCall()
                         }
                         setEndForAllCallBack {
                             inMeetingViewModel.endCallForAll()
