@@ -14,6 +14,6 @@ import mega.privacy.android.domain.entity.contacts.User
 data class ContactItemUiState(
     val contact: Contact? = null,
     val user: User? = null,
-    var lastGreen: String = "",
-    var isSelected: Boolean = false,
+    val lastGreen: String = "",
+    val isSelected: Boolean = false,
 )

@@ -1,12 +1,12 @@
 package mega.privacy.android.app.main.megachat.chat.explorer
 
-import nz.mega.sdk.MegaChatListItem
+import mega.privacy.android.domain.entity.chat.ChatListItem
 
 /**
  * Chat explorer list item
  *
  * @property contactItem [ContactItemUiState]
- * @property chat [MegaChatListItem]
+ * @property chat [ChatListItem]
  * @property title The title of the item
  * @property id The ID of the item
  * @property isRecent True if the item is a recent contact, false otherwise
@@ -14,9 +14,9 @@ import nz.mega.sdk.MegaChatListItem
  */
 data class ChatExplorerListItem @JvmOverloads constructor(
     val contactItem: ContactItemUiState? = null,
-    val chat: MegaChatListItem? = null,
+    val chat: ChatListItem? = null,
     val title: String? = null,
     val id: String? = null,
-    var isRecent: Boolean = false,
+    val isRecent: Boolean = false,
     val isHeader: Boolean = false,
 )

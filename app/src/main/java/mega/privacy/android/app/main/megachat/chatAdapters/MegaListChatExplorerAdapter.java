@@ -45,9 +45,9 @@ import mega.privacy.android.app.main.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment;
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem;
 import mega.privacy.android.app.main.megachat.chat.explorer.ContactItemUiState;
+import mega.privacy.android.domain.entity.chat.ChatListItem;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 import timber.log.Timber;
 
@@ -153,7 +153,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     public void onBindViewHolder(MegaListChatExplorerAdapter.ViewHolderChatExplorerList holder, int position) {
 
         ChatExplorerListItem item = getItem(position);
-        MegaChatListItem chat = item.getChat();
+        ChatListItem chat = item.getChat();
 
         if (item.isHeader()) {
             holder.itemContainer.setVisibility(View.GONE);

@@ -19,14 +19,21 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.domain.entity.Contact;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaUser;
 
 public class ContactUtil {
 
+    /**
+     * To retrieve the contact from cache
+     *
+     * @param contactHandle The contact's ID
+     * @return contact
+     * @deprecated Use GetContactFromCacheByHandleUseCase instead.
+     */
     public static Contact getContactDB(long contactHandle) {
         return MegaApplication.getInstance().getDbH().findContactByHandle(contactHandle);
     }

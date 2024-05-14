@@ -48,11 +48,11 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
+import mega.privacy.android.domain.entity.chat.ChatListItem;
 import mega.privacy.android.domain.entity.contacts.User;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
@@ -372,7 +372,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         if (messagesIds != null) {
             intent.putExtra(ID_MESSAGES, messagesIds);
         }
-        ArrayList<MegaChatListItem> chats = new ArrayList<>();
+        ArrayList<ChatListItem> chats = new ArrayList<>();
         ArrayList<User> users = new ArrayList<>();
 
         for (ChatExplorerListItem item : listItems) {
