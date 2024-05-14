@@ -402,6 +402,19 @@ class IncomingSharesComposeFragment : Fragment() {
     }
 
     /**
+     * Handle back press
+     */
+    fun onBackPressed() {
+        with(requireActivity() as ManagerActivity) {
+            if (comesFromNotifications && comesFromNotificationHandle == incomingSharesViewModel.getCurrentNodeHandle()) {
+                restoreSharesAfterComingFromNotifications()
+                return
+            }
+        }
+        viewModel.performBackNavigation()
+    }
+
+    /**
      * Get empty state for Incoming Shares
      * @param isPageEmpty true when there's no incoming shares
      */

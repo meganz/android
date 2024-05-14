@@ -4672,7 +4672,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         rubbishBinComposeFragment?.onBackPressed()
                     } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
                         if (tabItemShares == SharesTab.INCOMING_TAB && isIncomingAdded) {
-                            incomingSharesViewModel.performBackNavigation()
+                            incomingSharesComposeFragment?.onBackPressed()
                         } else if (tabItemShares == SharesTab.OUTGOING_TAB && isOutgoingAdded) {
                             outgoingSharesViewModel.performBackNavigation()
                         } else if (tabItemShares == SharesTab.LINKS_TAB && isLinksAdded) {
@@ -7399,7 +7399,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (incomingSharesViewModel.getCurrentNodeHandle() == INVALID_HANDLE)
             true
         else {
-            incomingSharesViewModel.performBackNavigation()
+            incomingSharesComposeFragment?.onBackPressed()
             false
         }
 
