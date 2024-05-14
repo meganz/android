@@ -4,7 +4,6 @@ import android.content.Intent
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
@@ -416,12 +415,6 @@ class NodeAttachmentMessageViewModelTest {
         whenever(copyRequestMessageMapper(copyResult)).thenReturn(stringResult)
 
         assertThat(underTest.getCopyNodesResult(result)).isEqualTo(stringResult)
-    }
-
-    @Test
-    fun `test useImagePreview invokes and returns correctly`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.ImagePreview)).thenReturn(true)
-        assertThat(underTest.useImagePreview()).isTrue()
     }
 
     private fun getFileAndVideoTypes(): List<FileTypeInfo> {

@@ -40,7 +40,6 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.databinding.FragmentRecentActionBucketBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -430,33 +429,20 @@ class RecentActionBucketFragment : Fragment() {
         node: MegaNode,
     ) = viewLifecycleOwner.lifecycleScope.launch {
         val handles = getNodesHandles(true)
-        val intent = if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
-            val menuOptionSource = if (megaApi.getRootParentNode(node).isInShare) {
-                ImagePreviewMenuSource.SHARED_ITEMS
-            } else {
-                ImagePreviewMenuSource.DEFAULT
-            }
-            ImagePreviewActivity.createIntent(
-                context = requireContext(),
-                imageSource = ImagePreviewFetcherSource.DEFAULT,
-                menuOptionsSource = menuOptionSource,
-                anchorImageNodeId = NodeId(node.handle),
-                params = mapOf(DefaultImageNodeFetcher.NODE_IDS to handles),
-            )
+        val nodeIds = if (handles.isNotEmpty()) handles else longArrayOf(node.handle)
+        val menuOptionSource = if (megaApi.getRootParentNode(node).isInShare) {
+            ImagePreviewMenuSource.SHARED_ITEMS
         } else {
-            if (handles.isNotEmpty()) {
-                ImageViewerActivity.getIntentForChildren(
-                    requireContext(),
-                    handles,
-                    node.handle
-                )
-            } else {
-                ImageViewerActivity.getIntentForSingleNode(
-                    requireContext(),
-                    node.handle
-                )
-            }
+            ImagePreviewMenuSource.DEFAULT
         }
+        val intent = ImagePreviewActivity.createIntent(
+            context = requireContext(),
+            imageSource = ImagePreviewFetcherSource.DEFAULT,
+            menuOptionsSource = menuOptionSource,
+            anchorImageNodeId = NodeId(node.handle),
+            params = mapOf(DefaultImageNodeFetcher.NODE_IDS to nodeIds),
+            showScreenLabel = false,
+        )
         putThumbnailLocation(
             intent,
             listView,

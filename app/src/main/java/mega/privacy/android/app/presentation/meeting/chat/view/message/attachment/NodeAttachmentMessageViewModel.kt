@@ -6,7 +6,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
@@ -109,8 +108,6 @@ class NodeAttachmentMessageViewModel @Inject constructor(
                 }
             }
         }
-
-    suspend fun useImagePreview() = getFeatureFlagValueUseCase(AppFeatures.ImagePreview)
 
     /**
      * Handle file node

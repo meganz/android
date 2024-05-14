@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentFavouriteFolderBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.favourites.adapter.FavouritesAdapter
@@ -53,6 +52,7 @@ class FavouriteFolderFragment : Fragment() {
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
+
     /**
      * MegaUtilWrapper variable
      */
@@ -80,8 +80,10 @@ class FavouriteFolderFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentFavouriteFolderBinding.inflate(inflater, container, false)
-        binding.emptyHintText.text = formatEmptyScreenText(context,
-            getString(R.string.file_browser_empty_folder_new))
+        binding.emptyHintText.text = formatEmptyScreenText(
+            context,
+            getString(R.string.file_browser_empty_folder_new)
+        )
         setupAdapter()
         return binding.root
     }
@@ -89,8 +91,10 @@ class FavouriteFolderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupFlow()
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
-            onBackPressedCallback)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            onBackPressedCallback
+        )
     }
 
     /**
@@ -147,15 +151,18 @@ class FavouriteFolderFragment : Fragment() {
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         }
+
                         is FavouritesEventState.OpenBottomSheetFragment -> {
                             (activity as ManagerActivity).showNodeOptionsPanel(
                                 eventState.favourite.node,
                                 NodeOptionsBottomSheetDialogFragment.FAVOURITES_MODE
                             )
                         }
+
                         is FavouritesEventState.OpenFile -> {
                             openNode(eventState.favouriteFile)
                         }
+
                         else -> {}
                     }
                 }
@@ -178,7 +185,7 @@ class FavouriteFolderFragment : Fragment() {
         MimeTypeList.typeForName(favourite.typedNode.name).apply {
             when {
                 isImage || (isVideoMimeType || isAudio) || isPdf -> viewLifecycleOwner.lifecycleScope.launch {
-                    if (isImage && getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                    if (isImage) {
                         val handle = favourite.node.handle
                         launchIntent(
                             ImagePreviewActivity.createIntent(
@@ -186,7 +193,12 @@ class FavouriteFolderFragment : Fragment() {
                                 imageSource = ImagePreviewFetcherSource.DEFAULT,
                                 menuOptionsSource = ImagePreviewMenuSource.FAVOURITE,
                                 anchorImageNodeId = NodeId(handle),
-                                params = mapOf(DefaultImageNodeFetcher.NODE_IDS to longArrayOf(handle)),
+                                params = mapOf(
+                                    DefaultImageNodeFetcher.NODE_IDS to longArrayOf(
+                                        handle
+                                    )
+                                ),
+                                showScreenLabel = false,
                             )
                         )
                     } else {
@@ -201,9 +213,11 @@ class FavouriteFolderFragment : Fragment() {
                         )
                     }
                 }
+
                 isURL -> {
                     megaUtilWrapper.manageURLNode(requireContext(), favourite.node)
                 }
+
                 isOpenableTextFile(favourite.typedNode.size) -> {
                     MegaNodeUtil.manageTextFileIntent(
                         requireContext(),
@@ -211,6 +225,7 @@ class FavouriteFolderFragment : Fragment() {
                         Constants.FAVOURITES_ADAPTER
                     )
                 }
+
                 else -> {
                     MegaNodeUtil.onNodeTapped(
                         context = requireActivity(),

@@ -33,7 +33,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
 import mega.privacy.android.app.databinding.FragmentFavouritesBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -366,7 +365,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         MimeTypeList.typeForName(favourite.typedNode.name).apply {
             when {
                 isImage || (isVideoMimeType || isAudio) || isPdf -> viewLifecycleOwner.lifecycleScope.launch {
-                    if (isImage && getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+                    if (isImage) {
                         val handle = favourite.node.handle
                         launchIntent(
                             ImagePreviewActivity.createIntent(
@@ -375,6 +374,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                                 menuOptionsSource = ImagePreviewMenuSource.FAVOURITE,
                                 anchorImageNodeId = NodeId(handle),
                                 params = mapOf(FavouriteImageNodeFetcher.NODE_ID to handle),
+                                showScreenLabel = false,
                             )
                         )
                     } else {

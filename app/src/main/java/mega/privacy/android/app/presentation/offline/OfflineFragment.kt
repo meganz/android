@@ -48,12 +48,10 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment
@@ -781,25 +779,15 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
             }
 
             mime.isImage -> viewLifecycleOwner.lifecycleScope.launch {
-                val intent = if (!getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
-                    val handles = (adapter ?: return@launch).getOfflineNodes().map {
-                        it.handle.toLong()
-                    }.toLongArray()
-                    ImageViewerActivity.getIntentForOfflineChildren(
-                        requireContext(),
-                        handles,
-                        node.node.handle.toLongOrNull()
-                    )
-                } else {
-                    val handle = node.node.handle.toLongOrNull() ?: return@launch
-                    ImagePreviewActivity.createIntent(
-                        context = requireContext(),
-                        imageSource = ImagePreviewFetcherSource.OFFLINE,
-                        menuOptionsSource = ImagePreviewMenuSource.OFFLINE,
-                        anchorImageNodeId = NodeId(handle),
-                        params = mapOf(OfflineImageNodeFetcher.PATH to node.node.path),
-                    )
-                }
+                val handle = node.node.handle.toLongOrNull() ?: return@launch
+                val intent = ImagePreviewActivity.createIntent(
+                    context = requireContext(),
+                    imageSource = ImagePreviewFetcherSource.OFFLINE,
+                    menuOptionsSource = ImagePreviewMenuSource.OFFLINE,
+                    anchorImageNodeId = NodeId(handle),
+                    params = mapOf(OfflineImageNodeFetcher.PATH to node.node.path),
+                    showScreenLabel = false,
+                )
 
                 putThumbnailLocation(
                     launchIntent = intent,
