@@ -447,6 +447,7 @@ class InMeetingViewModel @Inject constructor(
                         if (status != ChatCallStatus.Initial && _state.value.previousState == ChatCallStatus.Initial) {
                             _state.update { it.copy(previousState = status) }
                         }
+                        handleFreeCallEndWarning()
                     }
                 }
             }.onFailure { exception ->
@@ -500,14 +501,6 @@ class InMeetingViewModel @Inject constructor(
                                         state.copy(
                                             previousState = status,
                                         )
-                                    }
-                                    when (status) {
-                                        ChatCallStatus.InProgress -> {
-                                            Timber.d("Call in progress")
-                                            handleFreeCallEndWarning()
-                                        }
-
-                                        else -> {}
                                     }
                                 }
                             }
@@ -593,6 +586,7 @@ class InMeetingViewModel @Inject constructor(
     }
 
     private fun startMeetingEndWarningTimer(minutes: Int) {
+        meetingLeftTimerJob?.cancel()
         meetingLeftTimerJob = viewModelScope.launch {
             (minutes downTo 0).forEach { minute ->
                 Timber.d("Meeting will end in $minute minutes")
