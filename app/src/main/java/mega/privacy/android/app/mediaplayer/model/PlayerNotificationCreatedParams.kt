@@ -21,6 +21,7 @@ import java.io.File
  * @property useNextActionInCompactView useNextActionInCompactView
  * @property usePreviousActionInCompactView usePreviousActionInCompactView
  * @property onNotificationPostedCallback callback for onNotificationPosted
+ * @property onNotificationCancelledCallback callback for onNotificationCancelled
  */
 data class PlayerNotificationCreatedParams(
     val notificationId: Int,
@@ -39,4 +40,5 @@ data class PlayerNotificationCreatedParams(
         notification: Notification,
         ongoing: Boolean,
     ) -> Unit,
+    val onNotificationCancelledCallback: () -> Unit,
 )

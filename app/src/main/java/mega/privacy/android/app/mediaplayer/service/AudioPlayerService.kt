@@ -220,12 +220,16 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
                 override fun onPlaybackStateChangedCallback(state: Int) {
                     when {
-                        state == MEDIA_PLAYER_STATE_ENDED && !isPaused() ->
-                            setPaused(true)
+                        state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> setPaused(true)
 
-                        state == MEDIA_PLAYER_STATE_READY && isPaused()
-                                && mediaPlayerGateway.getPlayWhenReady() ->
-                            setPaused(false)
+                        state == MEDIA_PLAYER_STATE_READY && mediaPlayerGateway.getPlayWhenReady() -> {
+                            if (!isNotificationCreated) {
+                                createPlayerControlNotification()
+                            }
+                            if (isPaused()) {
+                                setPaused(false)
+                            }
+                        }
                     }
                 }
 
@@ -292,6 +296,10 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                         // Make notification cancellable.
                         stopForeground(STOP_FOREGROUND_DETACH)
                     }
+                },
+                onNotificationCancelledCallback = {
+                    isNotificationCreated = false
+                    mediaPlayerGateway.playerStop()
                 }
             )
         )

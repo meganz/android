@@ -197,6 +197,7 @@ class MediaPlayerFacade @Inject constructor(
                         if (dismissedByUser) {
                             playerNotificationManager?.setPlayer(null)
                             notificationDismissed = true
+                            onNotificationCancelledCallback()
                         }
                     }
                 })

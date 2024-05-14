@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.gateway
 
+import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.source.ShuffleOrder
@@ -24,6 +25,7 @@ interface MediaPlayerGateway {
      * @param nameChangeCallback the callback when name is changed
      * @param mediaPlayerCallback MediaPlayerCallback
      */
+    @OptIn(androidx.media3.common.util.UnstableApi::class)
     fun createPlayer(
         shuffleEnabled: Boolean? = null,
         shuffleOrder: ShuffleOrder? = null,
@@ -58,6 +60,7 @@ interface MediaPlayerGateway {
      *
      * @param newShuffleOrder new shuffle order
      */
+    @OptIn(androidx.media3.common.util.UnstableApi::class)
     fun setShuffleOrder(newShuffleOrder: ShuffleOrder)
 
     /**
