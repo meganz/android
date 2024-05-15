@@ -23,7 +23,7 @@ class OngoingCallBannerTest {
             OngoingCallBannerContent(
                 uiState = OngoingCallUiState(
                     currentCall = ChatCall(chatId = 1L, callId = 1L),
-                    isShow = true,
+                    isShown = true,
                     themeMode = ThemeMode.System
                 ),
                 onShow = {}

@@ -7,11 +7,11 @@ import mega.privacy.android.domain.entity.chat.ChatCall
  * Call in progress UI state
  *
  * @property currentCall Current call
- * @property isShow Is show
+ * @property isShown Is show
  * @property themeMode Theme mode
  */
 data class OngoingCallUiState(
     val currentCall: ChatCall? = null,
-    val isShow: Boolean = true,
+    val isShown: Boolean = true,
     val themeMode: ThemeMode = ThemeMode.System
 )

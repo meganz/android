@@ -12,6 +12,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.net.Uri
@@ -69,7 +70,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
@@ -106,7 +106,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BusinessExpiredAlertActivity
-import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
@@ -116,9 +115,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.isPortrait
@@ -154,6 +150,8 @@ import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
 import mega.privacy.android.app.main.mapper.ManagerRedirectIntentMapper
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask
+import mega.privacy.android.app.main.view.OngoingCallBanner
+import mega.privacy.android.app.main.view.OngoingCallViewModel
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
@@ -342,7 +340,6 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatRequest
@@ -393,6 +390,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     internal val outgoingSharesViewModel: OutgoingSharesComposeViewModel by viewModels()
     internal val linksViewModel: LinksViewModel by viewModels()
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
+    private val callInProgressViewModel: OngoingCallViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
     private val transferPageViewModel: TransferPageViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
@@ -565,11 +563,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
     private lateinit var viewPagerShares: ViewPager2
 
-    //Tabs in Transfers
-    private lateinit var callInProgressLayout: RelativeLayout
-    private lateinit var callInProgressChrono: Chronometer
-    private lateinit var callInProgressText: TextView
-
     @JvmField
     var firstTimeAfterInstallation = true
     var searchView: SearchView? = null
@@ -658,30 +651,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private var showDialogStorageStatusJob: Job? = null
 
-    private val callStatusObserver: Observer<MegaChatCall> =
-        Observer { call: MegaChatCall ->
-            when (call.status) {
-                MegaChatCall.CALL_STATUS_CONNECTING, MegaChatCall.CALL_STATUS_IN_PROGRESS, MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED, MegaChatCall.CALL_STATUS_USER_NO_PRESENT -> {
-                    updateVisibleCallElements(call.chatid)
-                    if (call.status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION &&
-                        call.termCode == MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS
-                    ) {
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.call_error_too_many_participants),
-                            MEGACHAT_INVALID_HANDLE
-                        )
-                    }
-                }
-            }
-        }
-    private val callOnHoldObserver: Observer<MegaChatCall> =
-        Observer { call: MegaChatCall -> updateVisibleCallElements(call.chatid) }
-    private val sessionOnHoldObserver =
-        Observer { sessionAndCall: android.util.Pair<*, *> ->
-            val call: MegaChatCall = megaChatApi.getChatCallByCallId(sessionAndCall.first as Long)
-            updateVisibleCallElements(call.chatid)
-        }
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -703,19 +672,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Feature Flag for OfflineCompose
      */
     private var enableOfflineCompose: Boolean = false
-
-    /**
-     * Method for updating the visible elements related to a call.
-     *
-     * @param chatIdReceived The chat ID of a call.
-     */
-    private fun updateVisibleCallElements(chatIdReceived: Long) {
-        if (Util.isScreenInPortrait(this@ManagerActivity)) {
-            setCallWidget()
-        } else {
-            invalidateOptionsMenu()
-        }
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -930,7 +886,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.d("Bundle is NULL")
             pathNavigationOffline = Constants.OFFLINE_ROOT
         }
-        registerEventBusObservers()
         CacheFolderManager.createCacheFolders()
         checkChatChanges()
         Timber.d("retryChatPendingConnections()")
@@ -1081,9 +1036,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         cameraUploadViewTypes = findViewById(R.id.cu_view_type)
         tabLayoutShares = findViewById(R.id.sliding_tabs_shares)
         viewPagerShares = findViewById(R.id.shares_tabs_pager)
-        callInProgressLayout = findViewById(R.id.call_in_progress_layout)
-        callInProgressChrono = findViewById(R.id.call_in_progress_chrono)
-        callInProgressText = findViewById(R.id.call_in_progress_text)
         navHostView = findViewById(R.id.nav_host_fragment)
     }
 
@@ -1108,7 +1060,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 8f
             ) else Color.WHITE
         )
-        callInProgressLayout.visibility = View.GONE
 
         waitingRoomComposeView.apply {
             isVisible = true
@@ -1201,6 +1152,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 }
                             })
                     }
+                }
+            }
+        }
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            findViewById<ComposeView>(R.id.call_in_progress_layout).setContent {
+                OngoingCallBanner(viewModel = callInProgressViewModel) { isShow ->
+                    changeAppBarElevation(isShow, ELEVATION_CALL_IN_PROGRESS)
                 }
             }
         }
@@ -1299,7 +1257,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 override fun onTabReselected(tab: TabLayout.Tab) {}
             }
         )
-        callInProgressLayout.setOnClickListener(this)
         (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment)?.let {
             setupNavDestListener(it)
         }
@@ -1818,17 +1775,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
 
         return false
-    }
-
-    private fun registerEventBusObservers() {
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observe(this, callStatusObserver)
-        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
-            .observe(this, callOnHoldObserver)
-        LiveEventBus.get(
-            EVENT_SESSION_ON_HOLD_CHANGE,
-            android.util.Pair::class.java
-        ).observe(this, sessionOnHoldObserver)
     }
 
     private fun restoreFromSavedInstanceState(savedInstanceState: Bundle) {
@@ -3729,6 +3675,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         }
         drawerItem = item ?: DrawerItem.CLOUD_DRIVE
+        callInProgressViewModel.setShow(
+            drawerItem != DrawerItem.TRANSFERS && drawerItem != DrawerItem.NOTIFICATIONS && drawerItem != DrawerItem.HOMEPAGE
+        )
 
         // Homepage may hide the Appbar before
         appBarLayout.visibility = View.VISIBLE
@@ -3739,7 +3688,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else {
             transfersViewModel.clearSelectedTab()
         }
-        setCallWidget()
         if (item !== DrawerItem.CHAT) {
             //remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
             removeFragment(chatsFragment)
@@ -4407,18 +4355,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Util.resetActionBar(supportActionBar)
                 }
                 CallUtil.hideCallMenuItem(chronometerMenuItem, returnCallMenuItem)
-                CallUtil.hideCallWidget(
-                    this@ManagerActivity,
-                    callInProgressChrono,
-                    callInProgressLayout
-                )
                 return true
             }
 
             override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
                 Timber.d("onMenuItemActionCollapse()")
                 searchExpand = false
-                setCallWidget()
                 CallUtil.setCallMenuItem(
                     returnCallMenuItem,
                     layoutCallMenuItem,
@@ -6013,10 +5955,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Timber.d("Click on Upgrade in pro panel!")
                 navigateToUpgradeAccount()
             }
-
-            R.id.call_in_progress_layout -> {
-                returnCall()
-            }
         }
     }
 
@@ -7580,9 +7518,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             mElevationCause = mElevationCause xor cause
         }
 
-        // In landscape mode, if no call in progress layout ("Tap to return call"), then don't show elevation
-        if (mElevationCause == ELEVATION_CALL_IN_PROGRESS && callInProgressLayout.visibility != View.VISIBLE) return
-
         // If any Tablayout is visible, set the background of the toolbar to transparent (or its elevation
         // overlay won't be correctly set via AppBarLayout) and then set the elevation of AppBarLayout,
         // in this way, both Toolbar and TabLayout would have expected elevation overlay.
@@ -7793,33 +7728,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-
-    /**
-     * This method sets "Tap to return to call" banner when there is a call in progress
-     * and it is in Cloud Drive section, Recent section, Incoming section, Outgoing section or in the chats list.
-     */
-    private fun setCallWidget() {
-        if (CallUtil.participatingInACall()) {
-            CallUtil.getCallInProgress()?.chatid?.let { chatId ->
-                callRecordingViewModel.setChatId(chatId)
-            }
-        }
-        setCallBadge()
-        if (drawerItem === DrawerItem.TRANSFERS ||
-            drawerItem === DrawerItem.NOTIFICATIONS ||
-            drawerItem === DrawerItem.HOMEPAGE ||
-            !Util.isScreenInPortrait(this)
-        ) {
-            CallUtil.hideCallWidget(this, callInProgressChrono, callInProgressLayout)
-            return
-        }
-        CallUtil.showCallLayout(
-            this,
-            callInProgressLayout,
-            callInProgressChrono,
-            callInProgressText
-        )
-    }
 
     fun homepageToSearch() {
         hideItemsWhenSearchSelected()

@@ -40,7 +40,7 @@ class OngoingCallViewModelTest {
         underTest.setShow(true)
         underTest.state.test {
             val state = awaitItem()
-            Truth.assertThat(state.isShow).isTrue()
+            Truth.assertThat(state.isShown).isTrue()
         }
     }
 

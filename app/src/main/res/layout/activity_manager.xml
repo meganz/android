@@ -60,12 +60,10 @@
 
                 </com.google.android.material.appbar.AppBarLayout>
 
-                <include
-                    layout="@layout/item_call_in_progress_layout"
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/call_in_progress_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="16dp"
-                    android:visibility="gone" />
+                    android:layout_height="wrap_content" />
 
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/shares_tabs_pager"

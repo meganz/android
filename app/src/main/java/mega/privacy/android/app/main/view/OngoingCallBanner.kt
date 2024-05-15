@@ -29,11 +29,11 @@ internal fun OngoingCallBannerContent(
     uiState: OngoingCallUiState,
     onShow: (Boolean) -> Unit,
 ) {
-    LaunchedEffect(uiState.isShow) {
-        onShow(uiState.isShow)
+    LaunchedEffect(uiState.isShown) {
+        onShow(uiState.isShown)
     }
     val context = LocalContext.current
-    uiState.currentCall?.takeIf { uiState.isShow }?.let { call ->
+    uiState.currentCall?.takeIf { uiState.isShown }?.let { call ->
         MegaAppTheme(isDark = uiState.themeMode.isDarkMode()) {
             ReturnToCallBanner(
                 text = stringResource(id = R.string.call_in_progress_layout),
@@ -49,7 +49,7 @@ internal fun OngoingCallBannerContent(
 private fun OngoingCallBannerPreview() {
     OngoingCallBannerContent(
         uiState = OngoingCallUiState(
-            isShow = true,
+            isShown = true,
             currentCall = ChatCall(chatId = 1L, callId = 1L)
         ),
         onShow = {}
