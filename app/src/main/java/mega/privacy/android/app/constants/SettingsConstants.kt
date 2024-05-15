@@ -29,34 +29,6 @@ object SettingsConstants {
     const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED = "settings_audio_background_play_enabled"
     const val KEY_FEATURES_CALLS = "settings_features_calls"
 
-    /* CU settings */
-    const val KEY_CAMERA_UPLOAD_ON_OFF = "settings_camera_upload_on_off"
-    const val KEY_CAMERA_UPLOAD_HOW_TO = "settings_camera_upload_how_to_upload"
-    const val KEY_CAMERA_UPLOAD_WHAT_TO = "settings_camera_upload_what_to_upload"
-    const val KEY_CAMERA_UPLOAD_INCLUDE_GPS = "settings_camera_upload_include_gps"
-    const val KEY_CAMERA_UPLOAD_VIDEO_QUALITY = "settings_video_upload_quality"
-    const val KEY_CAMERA_UPLOAD_CHARGING = "settings_camera_upload_charging"
-    const val KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE = "video_compression_queue_size"
-    const val KEY_KEEP_FILE_NAMES = "settings_keep_file_names"
-    const val KEY_CAMERA_UPLOAD_CAMERA_FOLDER = "settings_local_camera_upload_folder"
-    const val KEY_CAMERA_UPLOAD_MEGA_FOLDER = "settings_mega_camera_folder"
-    const val KEY_SECONDARY_MEDIA_FOLDER_ON = "settings_secondary_media_folder_on"
-    const val KEY_LOCAL_SECONDARY_MEDIA_FOLDER = "settings_local_secondary_media_folder"
-    const val KEY_MEGA_SECONDARY_MEDIA_FOLDER = "settings_mega_secondary_media_folder"
-    const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
-    const val COMPRESSION_QUEUE_SIZE_MIN = 100
-    const val COMPRESSION_QUEUE_SIZE_MAX = 1000
-    const val REQUEST_PRIMARY_FOLDER = 2000
-    const val REQUEST_PRIMARY_UPLOAD_NODE = 3000
-    const val REQUEST_SECONDARY_FOLDER = 4000
-    const val REQUEST_SECONDARY_UPLOAD_NODE = 5000
-    const val SELECTED_MEGA_FOLDER = "SELECT_MEGA_FOLDER"
-    const val CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001
-    const val CAMERA_UPLOAD_WIFI = 1002
-    const val CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS = 1001
-    const val CAMERA_UPLOAD_FILE_UPLOAD_VIDEOS = 1002
-    const val CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS = 1003
-
     /* Chat settings */
     const val KEY_CHAT_NOTIFICATIONS_CHAT = "settings_chat_notification_chat"
     const val KEY_CHAT_STATUS = "settings_chat_list_status"

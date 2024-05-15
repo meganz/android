@@ -1885,7 +1885,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     Timber.e("The new Cloud Drive Folder is invalid")
                 }
                 val intent = Intent()
-                intent.putExtra("SELECT_MEGA_FOLDER", parentNode?.handle)
+                intent.putExtra(EXTRA_MEGA_SELECTED_FOLDER, parentNode?.handle)
                 setResult(RESULT_OK, intent)
                 finishAndRemoveTask()
             }
@@ -2771,6 +2771,11 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
          * Intent extra for selected folder.
          */
         const val EXTRA_SELECTED_FOLDER = "selected_folder"
+
+        /**
+         * Intent extra for the selected MEGA Folder
+         */
+        const val EXTRA_MEGA_SELECTED_FOLDER = "EXTRA_MEGA_SELECTED_FOLDER"
 
         /**
          * Intent action for processed info.

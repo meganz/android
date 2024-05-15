@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
@@ -534,7 +533,7 @@ class TimelineViewModel @Inject constructor(
             enableCameraUploadsInPhotosUseCase(
                 shouldSyncVideos = _state.value.cuUploadsVideos,
                 shouldUseWiFiOnly = _state.value.cuUseCellularConnection.not(),
-                videoCompressionSizeLimit = SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE,
+                videoCompressionSizeLimit = VIDEO_COMPRESSION_SIZE_LIMIT,
                 videoUploadQuality = VideoQuality.ORIGINAL,
             )
             Timber.d("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
@@ -972,6 +971,10 @@ class TimelineViewModel @Inject constructor(
         _state.update {
             it.copy(isHiddenNodesOnboarded = true)
         }
+    }
+
+    companion object {
+        private const val VIDEO_COMPRESSION_SIZE_LIMIT = 200
     }
 }
 

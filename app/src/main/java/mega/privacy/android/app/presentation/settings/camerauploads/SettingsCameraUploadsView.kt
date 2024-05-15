@@ -33,7 +33,7 @@ import androidx.lifecycle.LifecycleOwner
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER
+import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.business.BusinessAccountPromptHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FileUploadDialog
@@ -159,13 +159,17 @@ internal fun SettingsCameraUploadsView(
     val cameraUploadsFolderNodeLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) {
-        val primaryFolderNodeId = NodeId(it.data?.getLongExtra(SELECTED_MEGA_FOLDER, -1L) ?: -1L)
+        val primaryFolderNodeId = NodeId(
+            it.data?.getLongExtra(FileExplorerActivity.EXTRA_MEGA_SELECTED_FOLDER, -1L) ?: -1L
+        )
         onPrimaryFolderNodeSelected.invoke(primaryFolderNodeId)
     }
     val mediaUploadsFolderNodeLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) {
-        val secondaryFolderNodeId = NodeId(it.data?.getLongExtra(SELECTED_MEGA_FOLDER, -1L) ?: -1L)
+        val secondaryFolderNodeId = NodeId(
+            it.data?.getLongExtra(FileExplorerActivity.EXTRA_MEGA_SELECTED_FOLDER, -1L) ?: -1L
+        )
         onSecondaryFolderNodeSelected.invoke(secondaryFolderNodeId)
     }
 

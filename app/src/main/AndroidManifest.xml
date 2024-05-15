@@ -417,10 +417,6 @@
         <activity android:name=".presentation.verification.SMSVerificationActivity" />
         <activity android:name=".presentation.verification.SMSVerificationTextActivity" />
         <activity
-            android:name=".activities.settingsActivities.LegacyCameraUploadsPreferencesActivity"
-            android:label="@string/section_photo_sync"
-            android:launchMode="singleTop" />
-        <activity
             android:name=".presentation.settings.camerauploads.SettingsCameraUploadsComposeActivity"
             android:label="@string/section_photo_sync"
             android:launchMode="singleTop" />
