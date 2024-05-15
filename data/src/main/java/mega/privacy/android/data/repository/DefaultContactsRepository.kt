@@ -821,7 +821,7 @@ internal class DefaultContactsRepository @Inject constructor(
                     }
                     megaApiGateway.sendInvitedContactRequest(
                         email = contactRequest.targetEmail,
-                        message = contactRequest.sourceMessage,
+                        message = contactRequest.sourceMessage.orEmpty(),
                         action = contactRequestActionMapper(contactRequestAction),
                         listener = listener
                     )
