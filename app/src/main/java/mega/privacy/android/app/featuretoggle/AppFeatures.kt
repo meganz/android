@@ -206,7 +206,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     NewManageChatHistoryActivity(
         "Enable new manage chat history activity",
-        false
+        true
     ),
 
     /**
