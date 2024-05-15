@@ -475,16 +475,16 @@ pipeline {
                         sh "./gradlew domain:jacocoTestReport"
 
                         // data coverage
-                        sh "./gradlew data:testGmsDebugUnitTestCoverage"
+                        sh "./gradlew data:testDebugUnitTestCoverage"
 
                         // run coverage for app module
                         sh "./gradlew app:createUnitTestCoverageReport"
 
                         APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
                         DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
-                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
+                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testDebugUnitTest")
                         DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
-                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
+                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.csv")}"
                         APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
                         def appSummaryCoverageArray = APP_COVERAGE.split('=')[1].split('/')
                         def domainSummaryCoverageArray = DOMAIN_COVERAGE.split('=')[1].split('/')
