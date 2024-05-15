@@ -3,6 +3,7 @@ plugins {
     alias(convention.plugins.mega.android.test)
     id("kotlin-android")
     id("kotlin-kapt")
+    alias(convention.plugins.mega.android.library.jacoco)
 }
 
 android {

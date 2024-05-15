@@ -48,4 +48,10 @@ gradlePlugin {
             implementationClass = "JvmLibraryConventionPlugin"
         }
     }
+    plugins {
+        register("androidLibraryJacoco") {
+            id = "mega.android.library.jacoco"
+            implementationClass = "AndroidLibraryJacocoConventionPlugin"
+        }
+    }
 }

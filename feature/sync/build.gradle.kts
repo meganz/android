@@ -5,6 +5,7 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.test)
+    alias(convention.plugins.mega.android.library.jacoco)
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")

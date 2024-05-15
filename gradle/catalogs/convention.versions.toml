@@ -6,4 +6,5 @@ mega-android-test = { id = "mega.android.test", version = "unspecified" }
 mega-android-app = { id = "mega.android.app", version = "unspecified" }
 mega-jvm-test = { id = "mega.jvm.test", version = "unspecified" }
 mega-jvm-library = { id = "mega.jvm.library", version = "unspecified" }
+mega-android-library-jacoco = { id = "mega.android.library.jacoco", version = "unspecified" }
 

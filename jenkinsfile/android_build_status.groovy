@@ -323,11 +323,11 @@ pipeline {
 
                                         // data coverage
                                         try {
-                                            sh "./gradlew data:testGmsDebugUnitTestCoverage"
+                                            sh "./gradlew data:testDebugUnitTestCoverage"
                                         } finally {
-                                            DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testGmsDebugUnitTest", "data_unit_test_result.zip")
+                                            DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testDebugUnitTest", "data_unit_test_result.zip")
                                         }
-                                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
+                                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.csv")}"
                                         println("DATA_COVERAGE = ${DATA_COVERAGE}")
 
                                         // run coverage for app module
@@ -362,7 +362,7 @@ pipeline {
                                         // We have to collect the report here, before they are cleaned in the last stage.
                                         APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
                                         DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
-                                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
+                                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testDebugUnitTest")
 
                                         // Compare Coverage
                                         String developCoverageLocation = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/coverage_summary.txt"
@@ -589,6 +589,11 @@ String buildTestCasesColumn(def currentModuleTestCases,
                             def currentModuleTestResultsLink,
                             def latestDevelopModuleTestCases
 ) {
+    println("Entering buildTestCasesColumn")
+    println("currentModuleTestCases = $currentModuleTestCases")
+    println("currentModuleTestResultsLink = $currentModuleTestResultsLink")
+    println("latestDevelopModuleTestCases = $latestDevelopModuleTestCases")
+
     // Build the "Current Branch" Column first
     String currentBranchColumn = "**Current Branch:**".concat("<br><br>")
 

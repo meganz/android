@@ -1,6 +1,7 @@
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.test)
+    alias(convention.plugins.mega.android.library.jacoco)
     id("kotlin-android")
     id("kotlin-kapt")
 }
