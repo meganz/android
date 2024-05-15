@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.model.SortByHeaderState
+import mega.privacy.android.app.fragments.homepage.model.SortOrderState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -105,23 +106,22 @@ class SortByHeaderViewModel @Inject constructor(
      */
     private fun getStateViewType() = _state.value.viewType
 
-    /** Triple<SortOrder, SortOrder, SortOrder>:
-    - First: Cloud order
-    - Second: Others order (Incoming root)
-    - Third: Offline order */
-    var order = Triple(
-        _cloudSortOrder.value,
-        _othersSortOrder.value,
-        _offlineSortOrder.value
+    /**
+     * SortOrderState
+     */
+    var order = SortOrderState(
+        cloudSortOrder = _cloudSortOrder.value,
+        othersSortOrder = _othersSortOrder.value,
+        offlineSortOrder = _offlineSortOrder.value
     )
         private set
 
-    private val _orderChangeState = MutableSharedFlow<Triple<SortOrder, SortOrder, SortOrder>>()
+    private val _orderChangeState = MutableSharedFlow<SortOrderState>()
 
     /**
      * Order changed state
      */
-    val orderChangeState: SharedFlow<Triple<SortOrder, SortOrder, SortOrder>> = _orderChangeState
+    val orderChangeState: SharedFlow<SortOrderState> = _orderChangeState
 
     private val _oldOrder = MutableStateFlow<SortOrder?>(null)
 
@@ -140,7 +140,11 @@ class SortByHeaderViewModel @Inject constructor(
             _cloudSortOrder.value = getCloudSortOrder()
             _othersSortOrder.value = getOthersSortOrder()
             _offlineSortOrder.value = getOfflineSortOrder()
-            order = Triple(_cloudSortOrder.value, _othersSortOrder.value, _offlineSortOrder.value)
+            order = SortOrderState(
+                cloudSortOrder = _cloudSortOrder.value,
+                othersSortOrder = _othersSortOrder.value,
+                offlineSortOrder = _offlineSortOrder.value
+            )
             setOldOrder()
             if (isUpdatedOrderChangeState) {
                 _orderChangeState.emit(order)
@@ -233,7 +237,7 @@ class SortByHeaderViewModel @Inject constructor(
         }
     }
 
-    internal fun updateWhenOrderChanged(newOrder: Triple<SortOrder, SortOrder, SortOrder>) =
+    internal fun updateWhenOrderChanged(newOrder: SortOrderState) =
         viewModelScope.launch {
             order = newOrder
             _orderChangeState.emit(newOrder)

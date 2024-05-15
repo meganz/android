@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.homepage.model.SortOrderState
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.ORDER_CAMERA
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
@@ -238,7 +239,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 -> {
                     sortByHeaderViewModel.setOrderCloud(order).join()
                     sortByHeaderViewModel.updateWhenOrderChanged(
-                        Triple(
+                        SortOrderState(
                             order,
                             sortByHeaderViewModel.othersSortOrder.value,
                             sortByHeaderViewModel.offlineSortOrder.value,
@@ -253,7 +254,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 ORDER_OTHERS -> {
                     sortByHeaderViewModel.setOrderOthers(order).join()
                     sortByHeaderViewModel.updateWhenOrderChanged(
-                        Triple(
+                        SortOrderState(
                             sortByHeaderViewModel.cloudSortOrder.value,
                             order,
                             sortByHeaderViewModel.offlineSortOrder.value,
@@ -264,7 +265,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 ORDER_OFFLINE -> {
                     sortByHeaderViewModel.setOrderOffline(order).join()
                     sortByHeaderViewModel.updateWhenOrderChanged(
-                        Triple(
+                        SortOrderState(
                             sortByHeaderViewModel.cloudSortOrder.value,
                             sortByHeaderViewModel.othersSortOrder.value,
                             order

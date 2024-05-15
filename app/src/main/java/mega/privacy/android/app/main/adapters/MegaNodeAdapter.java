@@ -217,17 +217,17 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         private void bind() {
             binding.setSortByHeaderViewModel(sortByViewModel);
 
-            SortOrder orderType = sortByViewModel.getOrder().getFirst();
+            SortOrder orderType = sortByViewModel.getOrder().getCloudSortOrder();
 
             // Root of incoming shares tab, display sort options OTHERS
             if (type == INCOMING_SHARES_ADAPTER
                     && ((ManagerActivity) context).getDeepBrowserTreeIncoming() == 0) {
-                orderType = sortByViewModel.getOrder().getSecond();
+                orderType = sortByViewModel.getOrder().getOthersSortOrder();
             }
             // Root of outgoing shares tab, display sort options OTHERS
             else if (type == OUTGOING_SHARES_ADAPTER
                     && ((ManagerActivity) context).getDeepBrowserTreeOutgoing() == 0) {
-                orderType = sortByViewModel.getOrder().getSecond();
+                orderType = sortByViewModel.getOrder().getOthersSortOrder();
             }
 
             binding.setOrderNameStringId(SortByHeaderViewModel.getOrderNameMap().get(orderType));

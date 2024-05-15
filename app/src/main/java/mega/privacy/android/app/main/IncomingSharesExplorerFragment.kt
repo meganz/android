@@ -349,9 +349,9 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             (activity as? FileExplorerActivity)?.refreshIncomingExplorerOrderNodes(
                 sortOrderIntMapper(
                     if (parentHandle == INVALID_HANDLE) {
-                        order.second
+                        order.othersSortOrder
                     } else {
-                        order.first
+                        order.cloudSortOrder
                     }
                 )
             )

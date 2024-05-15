@@ -151,7 +151,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
                             INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                             INVALID_HANDLE
                         ),
-                        order = sortByHeaderViewModel.order.third,
+                        order = sortByHeaderViewModel.order.offlineSortOrder,
                         isList = sortByHeaderViewModel.isListView(),
                     )
                 }
@@ -303,7 +303,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
         collectFlow(sortByHeaderViewModel.orderChangeState) { order ->
             folderContentAdapter.notifyItemChanged(0)
-            viewModel.setOrder(order.third)
+            viewModel.setOrder(order.offlineSortOrder)
         }
 
         LiveEventBus.get(EVENT_SCANNING_TRANSFERS_CANCELLED, Boolean::class.java)

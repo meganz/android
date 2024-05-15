@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.homepage
 import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemNodeGridBinding
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
@@ -21,7 +22,7 @@ class NodeViewHolder(private val binding: ViewDataBinding) :
         actionModeViewModel: ActionModeViewModel,
         itemOperationViewModel: ItemOperationViewModel,
         sortByHeaderViewModel: SortByHeaderViewModel,
-        item: NodeItem
+        item: NodeItem,
     ) {
         binding.apply {
             when (this) {
@@ -33,6 +34,7 @@ class NodeViewHolder(private val binding: ViewDataBinding) :
 
                     thumbnail.isVisible = true
                 }
+
                 is ItemNodeListBinding -> {
                     this.itemOperationViewModel = itemOperationViewModel
                     this.actionModeViewModel = actionModeViewModel
@@ -41,9 +43,11 @@ class NodeViewHolder(private val binding: ViewDataBinding) :
 
                     thumbnail.isVisible = true
                 }
+
                 is SortByHeaderBinding -> {
                     this.orderNameStringId =
-                        SortByHeaderViewModel.orderNameMap[sortByHeaderViewModel.order.first]!!
+                        SortByHeaderViewModel.orderNameMap[sortByHeaderViewModel.order.cloudSortOrder]
+                            ?: R.string.sortby_name
                     this.sortByHeaderViewModel = sortByHeaderViewModel
                 }
             }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.adapters
 
+import mega.privacy.android.core.R as CoreUiR
 import android.content.Context
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.graphics.Color
@@ -23,7 +24,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeThumbnail
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
@@ -838,9 +838,9 @@ class MegaExplorerAdapter(
         internal fun bind() {
             binding.sortByHeaderViewModel = sortByViewModel
             SortByHeaderViewModel.orderNameMap[if (fragment is IncomingSharesExplorerFragment && parentHandle == INVALID_HANDLE) {
-                sortByViewModel.order.second
+                sortByViewModel.order.othersSortOrder
             } else {
-                sortByViewModel.order.first
+                sortByViewModel.order.cloudSortOrder
             }]?.let {
                 binding.orderNameStringId = it
             }

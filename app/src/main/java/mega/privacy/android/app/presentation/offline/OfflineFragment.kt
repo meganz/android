@@ -620,7 +620,7 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
         })
 
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
-            viewModel.setOrder(it.third)
+            viewModel.setOrder(it.offlineSortOrder)
             adapter?.notifyItemChanged(0)
         }
 

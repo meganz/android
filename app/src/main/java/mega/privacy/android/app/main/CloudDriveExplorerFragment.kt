@@ -416,7 +416,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
 
             viewLifecycleOwner.collectFlow(orderChangeState) { order ->
                 (this@CloudDriveExplorerFragment.activity as? FileExplorerActivity)?.refreshCloudExplorerOrderNodes(
-                    sortOrderIntMapper(order.first)
+                    sortOrderIntMapper(order.cloudSortOrder)
                 )
             }
         }

@@ -276,7 +276,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         })
 
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
-            viewModel.onOrderChange(sortOrder = it.first)
+            viewModel.onOrderChange(sortOrder = it.cloudSortOrder)
         }
     }
 
