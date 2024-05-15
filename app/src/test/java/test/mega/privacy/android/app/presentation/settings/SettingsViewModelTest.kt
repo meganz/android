@@ -14,7 +14,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
 import mega.privacy.android.app.presentation.settings.SettingsViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -52,7 +51,6 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -522,22 +520,6 @@ class SettingsViewModelTest {
             Arguments.of(true, null, null),
             Arguments.of(false, null, COOKIES_URI)
         )
-    }
-
-    @ParameterizedTest(name = "is settings camera uploads compose enabled: {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that the settings camera uploads compose feature flag state is retrieved`(
-        isSettingsCameraUploadsComposeEnabled: Boolean,
-    ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsCompose)).thenReturn(
-            isSettingsCameraUploadsComposeEnabled
-        )
-        initViewModel()
-        advanceUntilIdle()
-        underTest.uiState.map { it.enableSettingsCameraUploadsCompose }.distinctUntilChanged()
-            .test {
-                assertThat(awaitItem()).isEqualTo(isSettingsCameraUploadsComposeEnabled)
-            }
     }
 
     companion object {

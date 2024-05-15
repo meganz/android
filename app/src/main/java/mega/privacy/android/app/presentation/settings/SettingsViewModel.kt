@@ -211,7 +211,6 @@ class SettingsViewModel @Inject constructor(
             }
         }
         getCookiePolicyLink()
-        checkSettingsCameraUploadsComposeState()
     }
 
     /**
@@ -226,23 +225,6 @@ class SettingsViewModel @Inject constructor(
             state.update { it.copy(cookiePolicyLink = url) }
         }.onFailure {
             Timber.e("Failed to fetch session transfer URL for Cookie Policy page: ${it.message}")
-        }
-    }
-
-    /**
-     * Checks the state of [AppFeatures.SettingsCameraUploadsCompose] and decide if the Compose
-     * version of Settings Camera Uploads should be shown or not
-     */
-    private fun checkSettingsCameraUploadsComposeState() {
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsCompose)
-            }.onSuccess { isFeatureFlagEnabled ->
-                Timber.d("Successfully retrieved the Settings Camera Uploads Compose Feature Flag")
-                state.update { it.copy(enableSettingsCameraUploadsCompose = isFeatureFlagEnabled) }
-            }.onFailure {
-                Timber.e("Unable to Retrieve the Settings Camera Uploads Compose Feature Flag\n${it.message}")
-            }
         }
     }
 

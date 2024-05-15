@@ -56,15 +56,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables the Settings Camera Uploads page in Jetpack Compose
-     */
-    SettingsCameraUploadsCompose(
-        "Enables the Settings Camera Uploads in Jetpack Compose. This requires an app " +
-                "restart for the changes to take effect.",
-        true,
-    ),
-
-    /**
      * Shows the "Upload only while charging" Option in the refactored Settings Camera Uploads screen
      */
     SettingsCameraUploadsUploadWhileCharging(

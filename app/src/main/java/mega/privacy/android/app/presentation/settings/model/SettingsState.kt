@@ -24,7 +24,6 @@ import mega.privacy.android.domain.entity.account.AccountDetail
  * @property passcodeLock
  * @property subFolderMediaDiscoveryChecked
  * @property cookiePolicyLink
- * @property enableSettingsCameraUploadsCompose true if the Compose version of Settings Camera
  * Uploads should be shown
  * @property isHiddenNodesEnabled
  * @property showHiddenItems
@@ -50,7 +49,6 @@ data class SettingsState(
     val passcodeLock: Boolean,
     val subFolderMediaDiscoveryChecked: Boolean,
     val cookiePolicyLink: String?,
-    val enableSettingsCameraUploadsCompose: Boolean = false,
     val isHiddenNodesEnabled: Boolean?,
     val showHiddenItems: Boolean,
     val accountDetail: AccountDetail?,

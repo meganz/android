@@ -7,7 +7,6 @@ import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.ManageChatHistoryActivity
-import mega.privacy.android.app.activities.settingsActivities.LegacyCameraUploadsPreferencesActivity
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
@@ -34,13 +33,12 @@ internal class MegaNavigatorImpl @Inject constructor(
     AppNavigatorImpl {
     override fun openSettingsCameraUploads(activity: Activity) {
         applicationScope.launch {
-            val settingsCameraUploadsClass =
-                if (getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsCompose)) {
-                    SettingsCameraUploadsComposeActivity::class.java
-                } else {
-                    LegacyCameraUploadsPreferencesActivity::class.java
-                }
-            activity.startActivity(Intent(activity, settingsCameraUploadsClass))
+            activity.startActivity(
+                Intent(
+                    activity,
+                    SettingsCameraUploadsComposeActivity::class.java,
+                )
+            )
         }
     }
 

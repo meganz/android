@@ -38,7 +38,6 @@ import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesAct
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
-import mega.privacy.android.app.activities.settingsActivities.LegacyCameraUploadsPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.LegacyPasscodePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
 import mega.privacy.android.app.constants.SettingsConstants.KEY_2FA
@@ -292,13 +291,7 @@ class SettingsFragment :
         val key = preference.key
         when (key) {
             KEY_FEATURES_CAMERA_UPLOAD -> {
-                val settingsCameraUploadsClass =
-                    if (viewModel.uiState.value.enableSettingsCameraUploadsCompose) {
-                        SettingsCameraUploadsComposeActivity::class.java
-                    } else {
-                        LegacyCameraUploadsPreferencesActivity::class.java
-                    }
-                startActivity(Intent(context, settingsCameraUploadsClass))
+                startActivity(Intent(context, SettingsCameraUploadsComposeActivity::class.java))
             }
 
             KEY_FEATURES_CHAT ->

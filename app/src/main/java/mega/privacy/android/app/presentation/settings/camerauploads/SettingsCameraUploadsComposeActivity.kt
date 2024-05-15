@@ -16,11 +16,8 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 import javax.inject.Inject
 
 /**
- * An Activity that shows the Settings Camera Uploads screen in Jetpack Compose
- *
- * This Activity is used when the [mega.privacy.android.app.featuretoggle.AppFeatures.SettingsCameraUploadsCompose]
- * Feature Flag is enabled. Otherwise, the legacy
- * [mega.privacy.android.app.activities.settingsActivities.LegacyCameraUploadsPreferencesActivity] is used
+ * An Activity that shows the Settings Camera Uploads screen in Jetpack Compose. This replaces the
+ * deprecated [mega.privacy.android.app.activities.settingsActivities.LegacyCameraUploadsPreferencesActivity]
  */
 @AndroidEntryPoint
 class SettingsCameraUploadsComposeActivity : ComponentActivity() {

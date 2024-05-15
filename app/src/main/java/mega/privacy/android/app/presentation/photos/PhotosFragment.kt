@@ -43,7 +43,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.settingsActivities.LegacyCameraUploadsPreferencesActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
@@ -475,14 +474,7 @@ class PhotosFragment : Fragment() {
 
     private fun openCameraUploadsSettings() {
         val context = context ?: return
-
-        val settingsCameraUploadsClass =
-            if (photosViewModel.state.value.enableSettingsCameraUploadsCompose) {
-                SettingsCameraUploadsComposeActivity::class.java
-            } else {
-                LegacyCameraUploadsPreferencesActivity::class.java
-            }
-        startActivity(Intent(context, settingsCameraUploadsClass))
+        startActivity(Intent(context, SettingsCameraUploadsComposeActivity::class.java))
     }
 
     /**
