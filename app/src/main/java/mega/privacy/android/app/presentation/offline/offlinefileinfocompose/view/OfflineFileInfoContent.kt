@@ -13,6 +13,7 @@ import mega.privacy.android.app.presentation.fileinfo.view.CreationModificationT
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoContentDivider
 import mega.privacy.android.app.presentation.fileinfo.view.FolderContentView
 import mega.privacy.android.app.presentation.fileinfo.view.NodeSizeView
+import mega.privacy.android.app.presentation.fileinfo.view.paddingStartDefault
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
 import mega.privacy.android.app.utils.Util
 
@@ -26,7 +27,7 @@ internal fun OfflineFileInfoContent(
 ) {
 
     Column {
-        val paddingHorizontal = Modifier.padding(start = 72.dp, end = 16.dp)
+        val paddingHorizontal = Modifier.padding(start = paddingStartDefault.dp, end = 16.dp)
 
         AvailableOfflineView(
             enabled = true,

@@ -29,6 +29,7 @@ import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState.Companion.MAX_NUMBER_OF_CONTACTS_IN_LIST
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHARES_HEADER
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHOW_MORE
+import mega.privacy.android.app.presentation.fileinfo.view.paddingStartDefault
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -85,7 +86,7 @@ private fun Header(
         modifier = modifier
             .clickable(onClick = onHeaderClick)
             .height(56.dp)
-            .padding(start = 72.dp)
+            .padding(start = paddingStartDefault.dp)
             .fillMaxWidth()
             .testTag(TEST_TAG_SHARES_HEADER),
     ) {
@@ -131,7 +132,7 @@ private fun ColumnScope.ContactsList(
         )
         if (i < contacts.size - 1) {
             Divider(
-                modifier = Modifier.padding(start = 72.dp),
+                modifier = Modifier.padding(start = paddingStartDefault.dp),
                 color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                 thickness = 1.dp
             )

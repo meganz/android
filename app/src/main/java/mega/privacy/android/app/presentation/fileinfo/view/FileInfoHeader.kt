@@ -16,11 +16,11 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.layouts.CollapsibleHeaderWithTitle
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun FileInfoHeader(
@@ -39,9 +39,10 @@ internal fun FileInfoHeader(
                 .testTag(TEST_TAG_ICON)
                 .constrainAs(icon) {
                     start.linkTo(parent.start, 16.dp)
-                    top.linkTo(parent.top, 56.dp)
-                    width = Dimension.value(24.dp)
-                    height = Dimension.value(24.dp)
+                    end.linkTo(parent.end, 16.dp)
+                    top.linkTo(titleConstrainedLayoutReference.bottom, 32.dp)
+                    width = Dimension.value(96.dp)
+                    height = Dimension.value(96.dp)
                 },
             painter = painterResource(id = iconResource),
             contentDescription = "Icon"
@@ -58,7 +59,7 @@ internal fun FileInfoHeader(
                 modifier = Modifier
                     .testTag(TEST_TAG_ACCESS)
                     .constrainAs(permission) {
-                        start.linkTo(parent.start, paddingStartDefault.dp)
+                        start.linkTo(parent.start, 72.dp)
                         top.linkTo(titleConstrainedLayoutReference.bottom, 5.dp)
                     }
 

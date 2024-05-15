@@ -352,9 +352,9 @@ internal val LocalCollapsibleHeaderTitleTransition =
 internal const val APP_BAR_HEIGHT = 56f
 private const val HEADER_MIN_HEIGHT = APP_BAR_HEIGHT
 private const val HEADER_MAX_HEIGHT = HEADER_MIN_HEIGHT + 96f
-private const val HEADER_START_GONE_HEIGHT = HEADER_MIN_HEIGHT + 76f
-private const val HEADER_GONE_HEIGHT = HEADER_MIN_HEIGHT + 18f
-private const val SPACER_HEIGHT = HEADER_MAX_HEIGHT - APP_BAR_HEIGHT
+private const val HEADER_START_GONE_HEIGHT = HEADER_MIN_HEIGHT + 96f
+private const val HEADER_GONE_HEIGHT = HEADER_MIN_HEIGHT + 56f
+private const val SPACER_HEIGHT = HEADER_MAX_HEIGHT - APP_BAR_HEIGHT + 56f
 
 private fun topBarOpacityTransitionDelta(headerHeight: Float) =
     1 - ((headerHeight - HEADER_MIN_HEIGHT)

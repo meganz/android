@@ -58,7 +58,7 @@ internal fun FileInfoContent(
         modifier = modifier
     ) {
         val paddingEnd = Modifier.padding(end = 16.dp)
-        val paddingHorizontal = Modifier.padding(start = 72.dp, end = 16.dp)
+        val paddingHorizontal = Modifier.padding(start = paddingStartDefault.dp, end = 16.dp)
         with(viewState) {
             //take down alert
             var showTakeDownWarning by remember(isTakenDown) { mutableStateOf(isTakenDown) }
@@ -81,12 +81,12 @@ internal fun FileInfoContent(
                         text = stringResource(id = R.string.contact_approve_credentials_toolbar_title),
                         style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.secondary),
                         modifier = Modifier
-                            .padding(bottom = 16.dp, start = 72.dp, end = 16.dp)
+                            .padding(bottom = 16.dp, start = paddingStartDefault.dp, end = 16.dp)
                             .clickable(onClick = { onVerifyContactClick(contactItem.email) })
                             .testTag(TEST_TAG_LOCATION)
                     )
                 }
-                FileInfoContentDivider(16.dp)
+                FileInfoContentDivider()
             }
 
             //available offline
