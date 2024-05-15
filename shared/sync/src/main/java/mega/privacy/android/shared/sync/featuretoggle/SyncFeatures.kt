@@ -21,7 +21,7 @@ enum class SyncFeatures(
      */
     AndroidSyncIntegrationIntoDeviceCenter(
         description = "Enable the Android Sync integration into Device Center",
-        defaultValue = false,
+        defaultValue = true,
     ),
 
     /**

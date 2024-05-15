@@ -297,11 +297,6 @@ class ManagerViewModel @Inject constructor(
 
     private val _stalledIssuesCount = MutableStateFlow(0)
 
-    /**
-     * Sync stalled issues count
-     */
-    val stalledIssuesCount = _stalledIssuesCount.asStateFlow()
-
     private val _numUnreadUserAlerts = MutableStateFlow(
         Pair(
             UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE,

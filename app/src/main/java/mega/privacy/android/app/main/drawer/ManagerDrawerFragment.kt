@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.drawer
 
-import mega.privacy.android.feature.sync.R as syncR
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -47,8 +46,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
-import mega.privacy.mobile.analytics.event.AndroidSyncNavigationItemEvent
 import mega.privacy.mobile.analytics.event.DeviceCenterEntrypointButtonEvent
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
@@ -159,10 +156,6 @@ internal class ManagerDrawerFragment : Fragment() {
             binding.backupsSection.isVisible = false
             setDrawerLayout(uiState.isRootNodeExist && uiState.isConnected)
             binding.navigationDrawerAddPhoneNumberContainer.isVisible = uiState.canVerifyPhoneNumber
-            binding.syncSection.isVisible =
-                uiState.enabledFlags.contains(SyncFeatures.AndroidSync) && !uiState.enabledFlags.contains(
-                    SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter
-                )
             binding.deviceCenterSection.isVisible = true
             binding.notificationSectionPromoTag.isVisible = uiState.showPromoTag
         }
@@ -173,9 +166,6 @@ internal class ManagerDrawerFragment : Fragment() {
         }
         viewLifecycleOwner.collectFlow(managerViewModel.incomingContactRequests) { pendingRequest ->
             setContactTitleSection(pendingRequest.size)
-        }
-        viewLifecycleOwner.collectFlow(managerViewModel.stalledIssuesCount) { stalledIssuesCount ->
-            setSyncStatus(stalledIssuesCount)
         }
     }
 
@@ -209,10 +199,6 @@ internal class ManagerDrawerFragment : Fragment() {
             drawerManager.drawerItemClicked(DrawerItem.DEVICE_CENTER)
         }
         binding.transfersSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.TRANSFERS) }
-        binding.syncSection.setOnClickListener {
-            Analytics.tracker.trackEvent(AndroidSyncNavigationItemEvent)
-            drawerManager.drawerItemClicked(DrawerItem.SYNC)
-        }
         binding.rubbishBinSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.RUBBISH_BIN) }
         binding.offlineSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.OFFLINE) }
     }
@@ -339,7 +325,6 @@ internal class ManagerDrawerFragment : Fragment() {
         binding.myAccountSection.isEnabled = isEnable
         binding.contactsSection.isEnabled = isEnable
         binding.rubbishBinSection.isEnabled = isEnable
-        binding.syncSection.isEnabled = isEnable
         binding.upgradeNavigationView.isEnabled = isEnable
         binding.notificationsSection.isEnabled = isEnable
         val alpha = if (isEnable) 1f else 0.38f
@@ -348,7 +333,6 @@ internal class ManagerDrawerFragment : Fragment() {
             binding.contactsSectionText.alpha = this
             binding.notificationSectionText.alpha = this
             binding.rubbishBinSectionText.alpha = this
-            binding.syncSectionText.alpha = this
         }
     }
 
@@ -361,20 +345,6 @@ internal class ManagerDrawerFragment : Fragment() {
                     requireContext(),
                     ColorUtils.getColorHexString(requireContext(), R.color.color_button_brand)
                 )
-        }
-    }
-
-    private fun setSyncStatus(count: Int) {
-        binding.syncSectionText.text = if (count == 0) {
-            getString(syncR.string.sync)
-        } else {
-            getString(
-                syncR.string.section_sync_with_notification,
-                count
-            ).spanABTextFontColour(
-                requireContext(),
-                ColorUtils.getColorHexString(requireContext(), R.color.color_button_brand)
-            )
         }
     }
 }
