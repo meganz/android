@@ -48,7 +48,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -411,6 +410,7 @@ class FileBrowserComposeFragment : Fragment() {
     @OptIn(FlowPreview::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sortByHeaderViewModel.refreshData(isUpdatedOrderChangeState = true)
         viewLifecycleOwner.collectFlow(fileBrowserViewModel.state.map { it.isPendingRefresh }
             .sample(500L)) { isPendingRefresh ->
             if (isPendingRefresh) {
@@ -426,9 +426,9 @@ class FileBrowserComposeFragment : Fragment() {
             fileBrowserActionListener?.updateCloudDriveToolbarTitle(invalidateOptionsMenu = true)
         }
 
-        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
             fileBrowserViewModel.onCloudDriveSortOrderChanged()
-        })
+        }
     }
 
     /**

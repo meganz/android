@@ -9,20 +9,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
 import mega.privacy.android.app.utils.Constants.ORDER_CAMERA
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.ORDER_FAVOURITES
@@ -65,7 +62,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     /**
      * SortByHeaderViewModel
      */
-    val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
+    val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     /**
      * SortOrderIntMapper
@@ -93,6 +90,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      */
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        sortByHeaderViewModel.refreshData()
         val sortByName = getString(R.string.sortby_name)
         val sortByAsc = getString(R.string.sortby_name_ascending).lowercase(Locale.ROOT)
         val sortByDesc = getString(R.string.sortby_name_descending).lowercase(Locale.ROOT)
@@ -239,17 +237,13 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 ORDER_VIDEO_PLAYLIST,
                 -> {
                     sortByHeaderViewModel.setOrderCloud(order).join()
-                    LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
-                        .post(
-                            Triple(
-                                order,
-                                sortByHeaderViewModel.othersSortOrder.value,
-                                sortByHeaderViewModel.offlineSortOrder.value,
-                            )
+                    sortByHeaderViewModel.updateWhenOrderChanged(
+                        Triple(
+                            order,
+                            sortByHeaderViewModel.othersSortOrder.value,
+                            sortByHeaderViewModel.offlineSortOrder.value,
                         )
-                    if (requireActivity() is FileExplorerActivity) {
-                        updateFileExplorerOrder(sortOrderIntMapper(order))
-                    }
+                    )
                 }
 
                 ORDER_CAMERA -> {
@@ -258,29 +252,24 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                 ORDER_OTHERS -> {
                     sortByHeaderViewModel.setOrderOthers(order).join()
-                    LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
-                        .post(
-                            Triple(
-                                sortByHeaderViewModel.cloudSortOrder.value,
-                                order,
-                                sortByHeaderViewModel.offlineSortOrder.value,
-                            )
+                    sortByHeaderViewModel.updateWhenOrderChanged(
+                        Triple(
+                            sortByHeaderViewModel.cloudSortOrder.value,
+                            order,
+                            sortByHeaderViewModel.offlineSortOrder.value,
                         )
-                    if (requireActivity() is FileExplorerActivity) {
-                        updateFileExplorerOrder(sortOrderIntMapper(order))
-                    }
+                    )
                 }
 
                 ORDER_OFFLINE -> {
                     sortByHeaderViewModel.setOrderOffline(order).join()
-                    LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
-                        .post(
-                            Triple(
-                                sortByHeaderViewModel.cloudSortOrder.value,
-                                sortByHeaderViewModel.othersSortOrder.value,
-                                order
-                            )
+                    sortByHeaderViewModel.updateWhenOrderChanged(
+                        Triple(
+                            sortByHeaderViewModel.cloudSortOrder.value,
+                            sortByHeaderViewModel.othersSortOrder.value,
+                            order
                         )
+                    )
                 }
             }
 
@@ -288,7 +277,11 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
     }
 
-    private fun updateFileExplorerOrder(order: Int) {
-        (requireActivity() as FileExplorerActivity).refreshOrderNodes(order)
+    /**
+     * onDestroy()
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        sortByHeaderViewModel.resetOlderOrder()
     }
 }

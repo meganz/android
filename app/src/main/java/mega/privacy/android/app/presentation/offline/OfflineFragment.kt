@@ -24,6 +24,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -129,7 +130,7 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
-    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
+    private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
 
     private var recyclerView: RecyclerView? = null
     private var listDivider: PositionDividerItemDecoration? = null
@@ -618,10 +619,10 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
             }
         })
 
-        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
             viewModel.setOrder(it.third)
             adapter?.notifyItemChanged(0)
-        })
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {

@@ -45,6 +45,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -374,7 +375,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             }
         }
 
-        sortByHeaderViewModel.orderChangeEvent.observe(this) {
+        collectFlow(sortByHeaderViewModel.orderChangeState) {
             viewModel.onSortOrderChanged()
         }
     }

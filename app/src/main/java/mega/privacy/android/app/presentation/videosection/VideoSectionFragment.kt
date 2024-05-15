@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
@@ -349,9 +348,9 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
      * onViewCreated
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        sortByHeaderViewModel.orderChangeEvent.observe(
-            viewLifecycleOwner, EventObserver { videoSectionViewModel.refreshWhenOrderChanged() }
-        )
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
+            videoSectionViewModel.refreshWhenOrderChanged()
+        }
 
         viewLifecycleOwner.collectFlow(
             videoSectionViewModel.state.map { it.isPendingRefresh }.distinctUntilChanged()

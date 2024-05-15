@@ -33,7 +33,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
@@ -152,9 +151,9 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
      * onViewCreated
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        sortByHeaderViewModel.orderChangeEvent.observe(
-            viewLifecycleOwner, EventObserver { audioSectionViewModel.refreshWhenOrderChanged() }
-        )
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
+            audioSectionViewModel.refreshWhenOrderChanged()
+        }
 
         viewLifecycleOwner.collectFlow(
             audioSectionViewModel.state.map { it.isPendingRefresh }.distinctUntilChanged()

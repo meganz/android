@@ -1,5 +1,6 @@
 package mega.privacy.android.app.uploadFolder
 
+import mega.privacy.android.core.R as CoreUiR
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
@@ -24,10 +25,8 @@ import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
@@ -39,6 +38,7 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.uploadFolder.list.adapter.FolderContentAdapter
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.utils.Constants.EXTRA_ACTION_RESULT
@@ -301,10 +301,10 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
             newInstance(ORDER_OFFLINE).apply { show(supportFragmentManager, this.tag) }
         })
 
-        sortByHeaderViewModel.orderChangeEvent.observe(this, EventObserver { order ->
+        collectFlow(sortByHeaderViewModel.orderChangeState) { order ->
             folderContentAdapter.notifyItemChanged(0)
             viewModel.setOrder(order.third)
-        })
+        }
 
         LiveEventBus.get(EVENT_SCANNING_TRANSFERS_CANCELLED, Boolean::class.java)
             .observe(this) { cancelled ->

@@ -10,16 +10,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VideoSelectedScreen
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.theme.MegaAppTheme
 import javax.inject.Inject
@@ -97,9 +97,9 @@ class VideoSelectedActivity : PasscodeActivity() {
             }
         }
 
-        sortByHeaderViewModel.orderChangeEvent.observe(
-            this, EventObserver { viewModel.refreshWhenOrderChanged() }
-        )
+        collectFlow(sortByHeaderViewModel.orderChangeState) {
+            viewModel.refreshWhenOrderChanged()
+        }
     }
 
     private fun showNewSortByPanel() {

@@ -125,6 +125,7 @@ import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
@@ -397,6 +398,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by viewModels()
     private val offlineComposeViewModel: OfflineComposeViewModel by viewModels()
+    private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
     private val searchResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -905,6 +907,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     override fun onStart() {
         Timber.d("onStart")
         mStopped = false
+        sortByHeaderViewModel.refreshData(isUpdatedOrderChangeState = true)
         super.onStart()
     }
 

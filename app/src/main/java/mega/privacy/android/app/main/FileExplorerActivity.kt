@@ -2508,13 +2508,21 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         }
 
     /**
-     * Refresh the order of nodes.
+     * Refresh the order of nodes for cloud explorer.
      *
      * @param order Order to apply.
      */
-    fun refreshOrderNodes(order: Int) {
+    fun refreshCloudExplorerOrderNodes(order: Int) {
         cDriveExplorer = cloudExplorerFragment
         cDriveExplorer?.orderNodes(order)
+    }
+
+    /**
+     * Refresh the order of nodes for incoming explorer.
+     *
+     * @param order Order to apply.
+     */
+    fun refreshIncomingExplorerOrderNodes(order: Int) {
         iSharesExplorer = incomingExplorerFragment
         iSharesExplorer?.updateNodesByOrder(order)
     }

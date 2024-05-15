@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +25,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentFileexplorerlistBinding
@@ -45,6 +45,7 @@ import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util.getPreferences
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -94,7 +95,10 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
-    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
+    @Inject
+    lateinit var sortOrderIntMapper: SortOrderIntMapper
+
+    private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
     private val fileExplorerViewModel by activityViewModels<FileExplorerViewModel>()
     private lateinit var binding: FragmentFileexplorerlistBinding
 
@@ -407,6 +411,14 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
                 rotatableFragmentViewType = state.viewType
                 switchListGridView(state.viewType)
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+            refreshData(isUpdatedOrderChangeState = true)
+
+            viewLifecycleOwner.collectFlow(orderChangeState) { order ->
+                (this@CloudDriveExplorerFragment.activity as? FileExplorerActivity)?.refreshCloudExplorerOrderNodes(
+                    sortOrderIntMapper(order.first)
+                )
+            }
         }
         super.onViewCreated(view, savedInstanceState)
     }

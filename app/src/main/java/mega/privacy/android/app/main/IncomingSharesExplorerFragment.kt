@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,6 +37,7 @@ import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.getPreferences
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -78,7 +78,10 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
 
-    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
+    @Inject
+    lateinit var sortOrderIntMapper: SortOrderIntMapper
+
+    private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
     private val fileExplorerViewModel by activityViewModels<FileExplorerViewModel>()
 
     private var _binding: FragmentFileexplorerlistBinding? = null
@@ -340,6 +343,20 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        sortByHeaderViewModel.refreshData(isUpdatedOrderChangeState = true)
+
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) { order ->
+            (activity as? FileExplorerActivity)?.refreshIncomingExplorerOrderNodes(
+                sortOrderIntMapper(
+                    if (parentHandle == INVALID_HANDLE) {
+                        order.second
+                    } else {
+                        order.first
+                    }
+                )
+            )
+        }
+
         emptyRootText = TextUtil.formatEmptyScreenText(
             requireContext(),
             getString(R.string.context_empty_incoming)

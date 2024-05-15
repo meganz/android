@@ -38,7 +38,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -120,7 +119,7 @@ class OutgoingSharesComposeFragment : Fragment() {
 
     private val viewModel: OutgoingSharesComposeViewModel by activityViewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
-    private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
+    private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     /**
      * Flag to restore elevation when checkScroll() is called
@@ -402,9 +401,9 @@ class OutgoingSharesComposeFragment : Fragment() {
             }
         }
 
-        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
             viewModel.onSortOrderChanged()
-        })
+        }
     }
 
     /**

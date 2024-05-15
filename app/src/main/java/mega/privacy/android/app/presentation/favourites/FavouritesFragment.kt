@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
 import mega.privacy.android.app.databinding.FragmentFavouritesBinding
@@ -77,7 +79,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FavouritesFragment : Fragment(), HomepageSearchable {
     private val viewModel by viewModels<FavouritesViewModel>()
-    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
+    private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
     private lateinit var binding: FragmentFavouritesBinding
     private lateinit var listAdapter: FavouritesAdapter
     private lateinit var gridAdapter: FavouritesGridAdapter
@@ -273,10 +275,9 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             }
         })
 
-        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
             viewModel.onOrderChange(sortOrder = it.first)
-        })
-
+        }
     }
 
     /**

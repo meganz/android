@@ -211,7 +211,7 @@ class BackupsViewModel @Inject constructor(
      * This method will handle the sort order change event
      */
     fun onSortOrderChanged() {
-        markHandledPendingRefresh()
+        refreshBackupsNodes()
     }
 
     /**

@@ -218,7 +218,7 @@ class LinksViewModel @Inject constructor(
      * This will map list of [PublicLinkNode] to [NodeUIItem]
      */
     private fun getNodeUiItems(nodeList: List<PublicLinkNode>): List<NodeUIItem<PublicLinkNode>> {
-        return nodeList.mapIndexed { index, node ->
+        return nodeList.mapIndexed { _, node ->
             val isSelected = state.value.selectedNodeHandles.contains(node.id.longValue)
             NodeUIItem(
                 node = node,
@@ -261,8 +261,8 @@ class LinksViewModel @Inject constructor(
      * Handles Back Navigation events
      */
     fun performBackNavigation() {
-        _state.value.parentNode?.let {
-            closeFolder(it)
+        _state.value.parentNode?.let { parentNode ->
+            closeFolder(parentNode)
             _state.update { it.copy(updateToolbarTitleEvent = triggered) }
         } ?: run {
             _state.update { it.copy(exitLinksPageEvent = triggered) }

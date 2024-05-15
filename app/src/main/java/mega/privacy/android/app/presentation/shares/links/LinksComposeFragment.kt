@@ -37,7 +37,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -85,7 +84,7 @@ class LinksComposeFragment : Fragment() {
 
     private val viewModel: LinksViewModel by activityViewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
-    private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
+    private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     /**
      * Mapper to get options for Action Bar
@@ -325,9 +324,10 @@ class LinksComposeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+        sortByHeaderViewModel.refreshData(isUpdatedOrderChangeState = true)
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
             viewModel.refreshLinkNodes(false)
-        })
+        }
 
         viewLifecycleOwner.collectFlow(viewModel.state
             .map { it.nodesList.isEmpty() }

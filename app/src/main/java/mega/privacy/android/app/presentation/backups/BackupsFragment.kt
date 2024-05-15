@@ -440,9 +440,10 @@ class BackupsFragment : RotatableFragment() {
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
             EventObserver { showSortByPanel() }
         )
-        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
             viewModel.onSortOrderChanged()
-        })
+        }
     }
 
     /**

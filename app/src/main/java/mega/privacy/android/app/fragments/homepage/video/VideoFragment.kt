@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -81,7 +82,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
     private val viewModel by viewModels<VideoViewModel>()
     private val actionModeViewModel by viewModels<ActionModeViewModel>()
     private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
-    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
+    private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
 
     private lateinit var binding: FragmentVideoBinding
     private lateinit var listView: NewGridRecyclerView
@@ -506,9 +507,9 @@ class VideoFragment : Fragment(), HomepageSearchable {
             callManager { it.showNewSortByPanel(ORDER_CLOUD) }
         })
 
-        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
             viewModel.onOrderChange()
-        })
+        }
 
         lifecycleScope.launch {
             itemOperationViewModel.openDisputeNodeEvent.collect {

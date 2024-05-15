@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.sample
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -47,13 +46,13 @@ import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeVi
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -247,6 +246,7 @@ class RubbishBinComposeFragment : Fragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sortByHeaderViewModel.refreshData(isUpdatedOrderChangeState = true)
         setupObserver()
     }
 
@@ -386,9 +386,10 @@ class RubbishBinComposeFragment : Fragment() {
             .distinctUntilChanged()) {
             requireActivity().invalidateOptionsMenu()
         }
-        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.orderChangeState) {
             viewModel.onSortOrderChanged()
-        })
+        }
     }
 
     /**

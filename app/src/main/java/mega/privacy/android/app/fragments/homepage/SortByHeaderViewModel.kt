@@ -2,19 +2,18 @@ package mega.privacy.android.app.fragments.homepage
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.model.SortByHeaderState
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
@@ -117,28 +116,25 @@ class SortByHeaderViewModel @Inject constructor(
     )
         private set
 
-
-    private val _orderChangeEvent =
-        MutableLiveData<Event<Triple<SortOrder, SortOrder, SortOrder>>>()
+    private val _orderChangeState = MutableSharedFlow<Triple<SortOrder, SortOrder, SortOrder>>()
 
     /**
-     * Order Change Event
+     * Order changed state
      */
-    val orderChangeEvent: LiveData<Event<Triple<SortOrder, SortOrder, SortOrder>>> =
-        _orderChangeEvent
-
-    private val orderChangeObserver = Observer<Triple<SortOrder, SortOrder, SortOrder>> {
-        order = it
-        _orderChangeEvent.value = Event(it)
-    }
+    val orderChangeState: SharedFlow<Triple<SortOrder, SortOrder, SortOrder>> = _orderChangeState
 
     private val _oldOrder = MutableStateFlow<SortOrder?>(null)
 
     init {
-        // Use "sticky" to observe the value set in ManagerActivity onCreate()
-        LiveEventBus.get<Triple<SortOrder, SortOrder, SortOrder>>(EVENT_ORDER_CHANGE)
-            .observeStickyForever(orderChangeObserver)
+        refreshData()
+        viewModelScope.launch {
+            monitorViewType().collect { viewType ->
+                _state.update { it.copy(viewType = viewType) }
+            }
+        }
+    }
 
+    internal fun refreshData(isUpdatedOrderChangeState: Boolean = false) {
         viewModelScope.launch {
             _cameraSortOrder.value = getCameraSortOrder()
             _cloudSortOrder.value = getCloudSortOrder()
@@ -146,9 +142,8 @@ class SortByHeaderViewModel @Inject constructor(
             _offlineSortOrder.value = getOfflineSortOrder()
             order = Triple(_cloudSortOrder.value, _othersSortOrder.value, _offlineSortOrder.value)
             setOldOrder()
-
-            monitorViewType().collect { viewType ->
-                _state.update { it.copy(viewType = viewType) }
+            if (isUpdatedOrderChangeState) {
+                _orderChangeState.emit(order)
             }
         }
     }
@@ -165,6 +160,10 @@ class SortByHeaderViewModel @Inject constructor(
      */
     fun setOrderType(orderType: Int) {
         this.orderType = orderType
+    }
+
+    internal fun resetOlderOrder() {
+        _oldOrder.value = null
     }
 
     /**
@@ -234,13 +233,11 @@ class SortByHeaderViewModel @Inject constructor(
         }
     }
 
-    /**
-     * onCleared()
-     */
-    override fun onCleared() {
-        LiveEventBus.get<Triple<SortOrder, SortOrder, SortOrder>>(EVENT_ORDER_CHANGE)
-            .removeObserver(orderChangeObserver)
-    }
+    internal fun updateWhenOrderChanged(newOrder: Triple<SortOrder, SortOrder, SortOrder>) =
+        viewModelScope.launch {
+            order = newOrder
+            _orderChangeState.emit(newOrder)
+        }
 
     companion object {
         /**
@@ -253,6 +250,8 @@ class SortByHeaderViewModel @Inject constructor(
             SortOrder.ORDER_DEFAULT_DESC to R.string.sortby_name,
             SortOrder.ORDER_MODIFICATION_ASC to R.string.sortby_date,
             SortOrder.ORDER_MODIFICATION_DESC to R.string.sortby_date,
+            SortOrder.ORDER_LINK_CREATION_ASC to R.string.sortby_date,
+            SortOrder.ORDER_LINK_CREATION_DESC to R.string.sortby_date,
             SortOrder.ORDER_SIZE_ASC to R.string.sortby_size,
             SortOrder.ORDER_SIZE_DESC to R.string.sortby_size,
             SortOrder.ORDER_FAV_ASC to R.string.file_properties_favourite,
