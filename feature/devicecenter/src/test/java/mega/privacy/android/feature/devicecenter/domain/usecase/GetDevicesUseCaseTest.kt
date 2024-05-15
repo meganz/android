@@ -71,14 +71,14 @@ internal class GetDevicesUseCaseTest {
                     currentDeviceId = currentDeviceId,
                     deviceIdAndNameMap = deviceIdAndNameMap,
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
-                    isSyncAndIntegrationFeatureFlagEnabled = false,
+                    isSyncFeatureFlagEnabled = false,
                 )
             ).thenReturn(deviceNodes)
 
             assertThat(
                 underTest(
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
-                    isSyncAndIntegrationFeatureFlagEnabled = false,
+                    isSyncFeatureFlagEnabled = false,
                 )
             ).isEqualTo(
                 deviceNodes

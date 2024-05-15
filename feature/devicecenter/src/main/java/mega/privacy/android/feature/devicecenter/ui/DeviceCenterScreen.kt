@@ -168,7 +168,7 @@ internal fun DeviceCenterScreen(
                 onBottomSheetDismissed = {
                     coroutineScope.launch { modalSheetState.hide() }
                 },
-                isSyncAndIntegrationFeatureFlagEnabled = uiState.isSyncAndIntegrationFeatureFlagsEnabled,
+                isSyncFeatureFlagEnabled = uiState.isSyncFeatureFlagEnabled,
             )
         },
         content = {
@@ -302,7 +302,7 @@ private fun DeviceCenterAppBar(
                         if (uiState.isCameraUploadsEnabled) {
                             list.add(DeviceMenuAction.Info)
                         }
-                        if (!uiState.isSyncAndIntegrationFeatureFlagsEnabled) {
+                        if (!uiState.isSyncFeatureFlagEnabled) {
                             list.add(DeviceMenuAction.CameraUploads)
                         }
                     }

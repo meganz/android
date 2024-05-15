@@ -24,7 +24,7 @@ internal class DeviceNodeMapper @Inject constructor(
      * @param deviceIdAndNameMap A String map of the User's backed up Device IDs and Device Names.
      * Each Key-Value entry corresponds to the User's Device ID and Device Name
      * @param isCameraUploadsEnabled true if Camera Uploads is enabled, and false if otherwise
-     * @param isSyncAndIntegrationFeatureFlagEnabled True if Sync and Integration into Device Center feature flags are enabled. False otherwise
+     * @param isSyncFeatureFlagEnabled True if Sync feature flag is enabled. False otherwise
      *
      * @return A list of [DeviceNode] objects
      */
@@ -33,7 +33,7 @@ internal class DeviceNodeMapper @Inject constructor(
         currentDeviceId: String,
         deviceIdAndNameMap: Map<String, String>,
         isCameraUploadsEnabled: Boolean,
-        isSyncAndIntegrationFeatureFlagEnabled: Boolean,
+        isSyncFeatureFlagEnabled: Boolean,
     ): List<DeviceNode> {
         val deviceNodeList = mutableListOf<DeviceNode>()
 
@@ -48,7 +48,7 @@ internal class DeviceNodeMapper @Inject constructor(
                     folders = currentDeviceFolders,
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
                     isCurrentDevice = true,
-                    isSyncAndIntegrationFeatureFlagEnabled = isSyncAndIntegrationFeatureFlagEnabled,
+                    isSyncFeatureFlagEnabled = isSyncFeatureFlagEnabled,
                 ),
                 folders = currentDeviceFolders,
             )
@@ -68,7 +68,7 @@ internal class DeviceNodeMapper @Inject constructor(
                                 folders = otherDeviceFolders,
                                 isCameraUploadsEnabled = isCameraUploadsEnabled,
                                 isCurrentDevice = false,
-                                isSyncAndIntegrationFeatureFlagEnabled = isSyncAndIntegrationFeatureFlagEnabled,
+                                isSyncFeatureFlagEnabled = isSyncFeatureFlagEnabled,
                             ),
                             folders = otherDeviceFolders,
                         )

@@ -4858,7 +4858,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
             handleCloudDriveBackNavigation(performBackNavigation = true)
         } else if (drawerItem == DrawerItem.SYNC) {
-            if (viewModel.state.value.isSyncAndIntegrationFeatureFlagsEnabled) {
+            if (viewModel.state.value.isSyncFeatureFlagEnabled) {
                 selectDrawerItem(item = DrawerItem.DEVICE_CENTER)
             } else {
                 goBackToBottomNavigationItem(bottomNavigationCurrentItem)

@@ -35,7 +35,7 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * @property usersCallLimitReminders                    [UsersCallLimitReminders]
  * @property searchQuery                                Search query
- * @property isSyncAndIntegrationFeatureFlagsEnabled    True if Android Sync and Integration into Device Center feature flags are enabled. False otherwise.
+ * @property isSyncFeatureFlagEnabled                   True if Android Sync feature flag is enabled. False otherwise.
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -62,5 +62,5 @@ data class ManagerState(
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
     val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled,
     val searchQuery: String = "",
-    val isSyncAndIntegrationFeatureFlagsEnabled: Boolean = false,
+    val isSyncFeatureFlagEnabled: Boolean = false,
 )

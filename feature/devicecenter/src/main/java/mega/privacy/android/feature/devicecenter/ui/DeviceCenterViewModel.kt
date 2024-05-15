@@ -94,17 +94,15 @@ internal class DeviceCenterViewModel @Inject constructor(
     fun getBackupInfo() = viewModelScope.launch {
         runCatching {
             val isCameraUploadsEnabled = isCameraUploadsEnabledUseCase()
-            val isSyncAndIntegrationFeatureFlagsEnabled = runBlocking {
-                getEnabledFeatures().contains(SyncFeatures.AndroidSync) && getEnabledFeatures().contains(
-                    SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter
-                )
+            val isSyncFeatureFlagEnabled = runBlocking {
+                getEnabledFeatures().contains(SyncFeatures.AndroidSync)
             }
             val devices = deviceUINodeListMapper(
                 deviceNodes = getDevicesUseCase(
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
-                    isSyncAndIntegrationFeatureFlagEnabled = isSyncAndIntegrationFeatureFlagsEnabled,
+                    isSyncFeatureFlagEnabled = isSyncFeatureFlagEnabled,
                 ),
-                isSyncAndIntegrationFeatureFlagEnabled = isSyncAndIntegrationFeatureFlagsEnabled,
+                isSyncFeatureFlagEnabled = isSyncFeatureFlagEnabled,
             )
             val selectedDevice = getSelectedDevice(devices)
             _state.update {
@@ -150,9 +148,7 @@ internal class DeviceCenterViewModel @Inject constructor(
     }
 
     fun shouldNavigateToSyncs(deviceUINode: DeviceUINode) =
-        _state.value.enabledFlags.contains(SyncFeatures.AndroidSync) && _state.value.enabledFlags.contains(
-            SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter
-        ) && deviceUINode is OwnDeviceUINode
+        _state.value.enabledFlags.contains(SyncFeatures.AndroidSync) && deviceUINode is OwnDeviceUINode
 
     /**
      * Handles specific Back Press behavior
@@ -282,9 +278,6 @@ internal class DeviceCenterViewModel @Inject constructor(
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
             SyncFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },
-            SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter.takeIf {
-                getFeatureFlagValueUseCase(it)
-            },
         )
     }
 

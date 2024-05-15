@@ -60,7 +60,7 @@ internal class DeviceNodeMapperTest {
                 folders = currentDeviceFolderNodes,
                 isCameraUploadsEnabled = false,
                 isCurrentDevice = true,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).thenReturn(currentDeviceStatus)
 
@@ -70,7 +70,7 @@ internal class DeviceNodeMapperTest {
                 currentDeviceId = currentDeviceId,
                 deviceIdAndNameMap = deviceIdAndNameMap,
                 isCameraUploadsEnabled = false,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).isEqualTo(
             listOf(
@@ -112,7 +112,7 @@ internal class DeviceNodeMapperTest {
                 folders = currentDeviceFolderNodes,
                 isCameraUploadsEnabled = isCameraUploadsEnabled,
                 isCurrentDevice = true,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).thenReturn(currentDeviceStatus)
 
@@ -128,7 +128,7 @@ internal class DeviceNodeMapperTest {
                 folders = otherDeviceFolderNodes,
                 isCameraUploadsEnabled = isCameraUploadsEnabled,
                 isCurrentDevice = false,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).thenReturn(otherDeviceStatus)
 
@@ -152,7 +152,7 @@ internal class DeviceNodeMapperTest {
                 currentDeviceId = currentDeviceId,
                 deviceIdAndNameMap = deviceIdAndNameMap,
                 isCameraUploadsEnabled = isCameraUploadsEnabled,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).isEqualTo(deviceNodes)
     }
@@ -184,7 +184,7 @@ internal class DeviceNodeMapperTest {
                 folders = currentDeviceFolderNodes,
                 isCameraUploadsEnabled = isCameraUploadsEnabled,
                 isCurrentDevice = true,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).thenReturn(currentDeviceStatus)
 
@@ -196,7 +196,7 @@ internal class DeviceNodeMapperTest {
                 folders = emptyList(),
                 isCameraUploadsEnabled = isCameraUploadsEnabled,
                 isCurrentDevice = false,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).thenReturn(otherDeviceStatus)
 
@@ -214,7 +214,7 @@ internal class DeviceNodeMapperTest {
                 currentDeviceId = currentDeviceId,
                 deviceIdAndNameMap = deviceIdAndNameMap,
                 isCameraUploadsEnabled = isCameraUploadsEnabled,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).isEqualTo(deviceNodes)
     }

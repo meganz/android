@@ -34,7 +34,7 @@ internal class DeviceNodeStatusMapper @Inject constructor() {
      * @param isCameraUploadsEnabled true if Camera Uploads is enabled on the User's Current Device,
      * and false if otherwise
      * @param isCurrentDevice true if the Device is the User's Current Device, and false if otherwise
-     * @param isSyncAndIntegrationFeatureFlagEnabled True if Sync and Integration into Device Center feature flags are enabled. False otherwise
+     * @param isSyncFeatureFlagEnabled True if Sync feature flag is enabled. False otherwise
      *
      * @return the appropriate [DeviceCenterNodeStatus] for the Device
      */
@@ -42,18 +42,18 @@ internal class DeviceNodeStatusMapper @Inject constructor() {
         folders: List<DeviceFolderNode>,
         isCameraUploadsEnabled: Boolean,
         isCurrentDevice: Boolean,
-        isSyncAndIntegrationFeatureFlagEnabled: Boolean,
-    ) = if (isSyncAndIntegrationFeatureFlagEnabled) {
+        isSyncFeatureFlagEnabled: Boolean,
+    ) = if (isSyncFeatureFlagEnabled) {
         if (isCurrentDevice && folders.isEmpty()) {
             DeviceCenterNodeStatus.NothingSetUp
         } else {
-            folders.calculateDeviceStatus(isSyncAndIntegrationFeatureFlagEnabled = true)
+            folders.calculateDeviceStatus(isSyncFeatureFlagEnabled = true)
         }
     } else {
         if (isCurrentDevice && isCameraUploadsEnabled.not()) {
             DeviceCenterNodeStatus.NoCameraUploads
         } else {
-            folders.calculateDeviceStatus(isSyncAndIntegrationFeatureFlagEnabled = false)
+            folders.calculateDeviceStatus(isSyncFeatureFlagEnabled = false)
         }
     }
 
@@ -66,12 +66,12 @@ internal class DeviceNodeStatusMapper @Inject constructor() {
      * 1. When the Device is a Current Device and Camera Uploads is enabled, or
      * 2. When the Device is an Other Device
      *
-     * @param isSyncAndIntegrationFeatureFlagEnabled True if Sync and Integration into Device Center feature flags are enabled. False otherwise
+     * @param isSyncFeatureFlagEnabled True if Sync feature flag is enabled. False otherwise
      *
      * @return The appropriate [DeviceCenterNodeStatus]
      */
-    private fun List<DeviceFolderNode>.calculateDeviceStatus(isSyncAndIntegrationFeatureFlagEnabled: Boolean): DeviceCenterNodeStatus =
-        when (this.filter { !isSyncAndIntegrationFeatureFlagEnabled || (it.type != BackupInfoType.CAMERA_UPLOADS && it.type != BackupInfoType.MEDIA_UPLOADS) }
+    private fun List<DeviceFolderNode>.calculateDeviceStatus(isSyncFeatureFlagEnabled: Boolean): DeviceCenterNodeStatus =
+        when (this.filter { !isSyncFeatureFlagEnabled || (it.type != BackupInfoType.CAMERA_UPLOADS && it.type != BackupInfoType.MEDIA_UPLOADS) }
             .maxOfOrNull { folder -> folder.status.priority }) {
             // Syncing Devices do not need to display the syncing progress in the UI
             12 -> DeviceCenterNodeStatus.Syncing(progress = 0)

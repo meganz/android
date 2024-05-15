@@ -475,9 +475,9 @@ class ManagerViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             androidSyncServiceEnabled = isServiceEnabled,
-                            isSyncAndIntegrationFeatureFlagsEnabled = getFeatureFlagValueUseCase(
+                            isSyncFeatureFlagEnabled = getFeatureFlagValueUseCase(
                                 SyncFeatures.AndroidSync
-                            ) && getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter)
+                            )
                         )
                     }
                 }

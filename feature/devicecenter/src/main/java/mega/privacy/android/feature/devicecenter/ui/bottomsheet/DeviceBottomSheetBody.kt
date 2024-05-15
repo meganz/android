@@ -46,7 +46,7 @@ internal const val BOTTOM_SHEET_HEADER =
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
  * @param onBottomSheetDismissed Lambda that is executed when the bottom sheet is dismissed
- * @param isSyncAndIntegrationFeatureFlagEnabled True if Sync and Integration into Device Center feature flags are enabled. False otherwise
+ * @param isSyncFeatureFlagEnabled True if Sync feature flag is enabled. False otherwise
  */
 @Composable
 internal fun DeviceBottomSheetBody(
@@ -56,7 +56,7 @@ internal fun DeviceBottomSheetBody(
     onRenameDeviceClicked: (DeviceUINode) -> Unit,
     onInfoClicked: (DeviceUINode) -> Unit,
     onBottomSheetDismissed: () -> Unit,
-    isSyncAndIntegrationFeatureFlagEnabled: Boolean = false,
+    isSyncFeatureFlagEnabled: Boolean = false,
 ) {
     Column(Modifier.testTag(BOTTOM_SHEET_CONTAINER)) {
         MenuActionNodeHeaderWithBody(
@@ -88,7 +88,7 @@ internal fun DeviceBottomSheetBody(
                         onBottomSheetDismissed()
                         onInfoClicked(device)
                     },
-                    isSyncAndIntegrationFeatureFlagEnabled = isSyncAndIntegrationFeatureFlagEnabled,
+                    isSyncFeatureFlagEnabled = isSyncFeatureFlagEnabled,
                 )
             }
 

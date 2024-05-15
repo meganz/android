@@ -32,7 +32,7 @@ internal class DeviceNodeStatusMapperTest {
                 folders = listOf(mock(), mock()),
                 isCameraUploadsEnabled = false,
                 isCurrentDevice = true,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).isEqualTo(DeviceCenterNodeStatus.NoCameraUploads)
     }
@@ -44,7 +44,7 @@ internal class DeviceNodeStatusMapperTest {
                 folders = emptyList(),
                 isCameraUploadsEnabled = false,
                 isCurrentDevice = true,
-                isSyncAndIntegrationFeatureFlagEnabled = true,
+                isSyncFeatureFlagEnabled = true,
             )
         ).isEqualTo(DeviceCenterNodeStatus.NothingSetUp)
     }
@@ -60,7 +60,7 @@ internal class DeviceNodeStatusMapperTest {
                 folders = folders,
                 isCameraUploadsEnabled = true,
                 isCurrentDevice = true,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).isEqualTo(expectedDeviceStatus)
     }
@@ -76,7 +76,7 @@ internal class DeviceNodeStatusMapperTest {
                 folders = folders,
                 isCameraUploadsEnabled = false,
                 isCurrentDevice = false,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).isEqualTo(expectedDeviceStatus)
     }

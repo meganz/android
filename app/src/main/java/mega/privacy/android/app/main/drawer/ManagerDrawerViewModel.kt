@@ -180,9 +180,6 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
             SyncFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },
-            SyncFeatures.AndroidSyncIntegrationIntoDeviceCenter.takeIf {
-                getFeatureFlagValueUseCase(it)
-            },
         )
     }
 

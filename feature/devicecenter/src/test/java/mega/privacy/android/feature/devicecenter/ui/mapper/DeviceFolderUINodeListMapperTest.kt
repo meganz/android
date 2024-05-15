@@ -71,7 +71,7 @@ internal class DeviceFolderUINodeListMapperTest {
         assertThat(
             underTest(
                 folders = folderList,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).isEqualTo(
             listOf(
@@ -120,7 +120,7 @@ internal class DeviceFolderUINodeListMapperTest {
         assertThat(
             underTest(
                 folders = folderList,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).isEqualTo(
             listOf(

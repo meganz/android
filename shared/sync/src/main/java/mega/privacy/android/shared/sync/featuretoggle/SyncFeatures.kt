@@ -17,14 +17,6 @@ enum class SyncFeatures(
 ) : Feature {
 
     /**
-     * Android Sync integration into Device Center toggle
-     */
-    AndroidSyncIntegrationIntoDeviceCenter(
-        description = "Enable the Android Sync integration into Device Center",
-        defaultValue = true,
-    ),
-
-    /**
      * Android Sync toggle
      */
     AndroidSync(

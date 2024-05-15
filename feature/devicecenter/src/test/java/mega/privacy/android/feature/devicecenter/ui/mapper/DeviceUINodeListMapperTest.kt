@@ -132,7 +132,7 @@ internal class DeviceUINodeListMapperTest {
         whenever(
             deviceFolderUINodeListMapper(
                 folders = deviceFolders,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).thenReturn(expectedFolderUINodeList)
         whenever(deviceUINodeIconMapper(deviceFolders)).thenReturn(expectedDeviceUINodeIcon)
@@ -140,7 +140,7 @@ internal class DeviceUINodeListMapperTest {
         assertThat(
             underTest(
                 deviceNodes = deviceList,
-                isSyncAndIntegrationFeatureFlagEnabled = false,
+                isSyncFeatureFlagEnabled = false,
             )
         ).isEqualTo(expectedDeviceUINodeList)
     }
