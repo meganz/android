@@ -5623,4 +5623,26 @@
     <string name="camera_flash_mode_auto">Flash automático</string>
     <!--  -->
     <string name="camera_send_to">Enviar a %1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">Mais</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">Levantar a mão</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">Baixar a mão</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">Colocar a chamada em espera</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">Alternar chamadas</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">Voltar para a chamada</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">Novo recurso: Levantar a mão</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">Você levantou a mão</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="one">Você e mais %1$d pessoa levantaram a mão</item>
+        <item quantity="many">Você e mais %1$d de pessoas levantaram a mão</item>
+        <item quantity="other">Você e mais %1$d pessoas levantaram a mão</item>
+    </plurals>
 </resources>

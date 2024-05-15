@@ -746,7 +746,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">Verifikasi alamat email</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Check your email inbox to proceed.</string>
+    <string name="email_verification_text">Periksa kotak masuk email anda untuk melanjutkan.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Sebuah kesalahan terjadi, harap coba kembali.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -790,7 +790,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">Ini adalah alamat e-mail anda yang sudah ada.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">This is the last step to change your email address. Enter your password below.</string>
+    <string name="change_mail_text_last_step">Ini adalah langkah terakhir untuk mengubah alamat email anda. Masukkan kata sandi anda di bawah ini.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Ganti e-mail</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -806,7 +806,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Mendapatkan info&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">Your new email address needs to be validated. Check the inbox of the new email address to proceed.</string>
+    <string name="email_verification_text_change_mail">Alamat email baru anda perlu divalidasi. Periksa kotak masuk alamat email baru untuk melanjutkan.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">Hapus gambar profile anda?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -2011,8 +2011,7 @@
     <string name="contact_info_button_more">Selebihnya</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
-        <item quantity="one">Choose file</item>
-        <item quantity="other">Choose files</item>
+        <item quantity="other">Pilih file</item>
     </plurals>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Pilih folder</string>
@@ -2271,7 +2270,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Aktifkan panggilan</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Allow access to your address book</string>
+    <string name="allow_acces_contact_title">Izinkan akses ke buku alamat anda</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Temukan kontak dari buku alamat anda dengan mudah di MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3295,7 +3294,7 @@
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Anda sudah memiliki langganan. Jika anda membeli satu lagi, anda akan dikenakan biaya dua kali. Untuk menghindarinya, batalkan langganan anda saat ini dengan membuka MEGA di browser web desktop atau seluler. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">Go to Settings to allow MEGA permission to access your nearby devices using Bluetooth.</string>
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Buka Pengaturan untuk memberikan izin MEGA untuk mengakses perangkat terdekat anda menggunakan Bluetooth.</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">Kami tidak dapat melanjutkan penagihan. Jika anda menggunakan aplikasi ganda, harap pertimbangkan untuk masuk ke MEGA tanpa itu. Jika tidak, coba perbarui melalui browser web anda.</string>
     <!-- Title for subscription dialog that shows before delete account -->
@@ -3467,7 +3466,7 @@
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">Sebuah folder bernama [B]%1$s[/B] sudah ada di tujuan ini.</string>
     <!-- Banner text to indicate poor network quality -->
-    <string name="calls_call_screen_poor_network_quality">Koneksi buruk</string>
+    <string name="calls_call_screen_poor_network_quality">Koneksi lemah</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Tidak dapat menyambung kembali</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3647,7 +3646,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Di sinilah file dan folder yang dicadangkan disimpan. Item yang dicadangkan “hanya-baca” untuk melindunginya agar tidak dimodifikasi secara tidak sengaja di drive cloud anda.Anda dapat mencadangkan item dari komputer anda ke MEGA menggunakan aplikasi desktop kami.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck your email inbox for more information on how to file a counter-notice.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Akun MEGA anda telah ditangguhkan karena dugaan berulang pelanggaran hak cipta. Ini berarti anda tidak dapat mengakses akun atau data anda di dalamnya.\nPeriksa kotak masuk email anda untuk informasi lebih lanjut tentang cara mengajukan pemberitahuan balasan.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Akun anda dihentikan karena pelanggaran Ketentuan Layanan MEGA.\nAnda tidak akan bisa mendapatkan kembali akses ke data yang disimpan atau diberi wewenang untuk mendaftarkan akun MEGA baru.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -3773,7 +3772,7 @@
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">Hapus dari album?</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">To enable camera uploads, allow MEGA access to your photos and other media on your device.</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">Untuk mengaktifkan unggahan kamera, izinkan akses MEGA ke foto dan media lain di perangkat anda.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">Izinkan Akses</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
@@ -4873,15 +4872,15 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Dapatkan lebih banyak dengan paket Pro</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month.</string>
+    <string name="dialog_onboarding_get_pro_description">Tingkatkan ke paket Pro dan dapatkan lebih banyak penyimpanan dan akses ke fitur Pro. Rencana mulai dari serendah %1$s sebulan.</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
+    <string name="dialog_onboarding_some_features_title">Paket MEGA&#160;Pro meliputi:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
+    <string name="dialog_onboarding_feature_title_storage">Fleksibilitas penyimpanan terbaik</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
+    <string name="dialog_onboarding_feature_description_storage">Mulai dari %1$s, temukan yang cocok untuk kebutuhan penyimpanan anda.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
+    <string name="dialog_onboarding_button_view_pro_plan">Tingkatkan ke Pro hari ini</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s sedang mempresentasikan</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -4973,7 +4972,7 @@
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">Langganan diperpanjang secara otomatis untuk periode berlangganan berturut-turut dengan durasi yang sama dan dengan harga yang sama dengan periode awal yang dipilih. Anda dapat mematikan perpanjangan otomatis langganan MEGA &#160; Pro anda selambat-lambatnya 24 jam sebelum pembayaran langganan berikutnya jatuh tempo melalui Langganan di [A]Google Play[/A].</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
-    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your Gallery</string>
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Izinkan akses ke Galeri anda</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Izinkan Akses</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
@@ -4997,7 +4996,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
+    <string name="photos_camera_uploads_low_battery">Unggahan dijeda karena baterai di bawah %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Unggahan kamera berhenti berfungsi. Coba aktifkan kembali unggahan kamera untuk menyelesaikannya. Jika masalah berlanjut, hubungi dukungan.</string>
     <!-- Camera uploads pending info in Photos screen. -->
@@ -5141,15 +5140,36 @@
     <!-- Hidden nodes show items -->
     <string name="hidden_nodes_show_items">Tampilkan item tersembunyi</string>
     <!-- Hidden nodes show items description -->
-    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
+    <string name="hidden_nodes_show_items_description">Semua item tersembunyi akan terlihat, tetapi kabur untuk menunjukkan status “tersembunyi” mereka</string>
     <!-- Button text for photo option in camera screen -->
-    <string name="camera_photo_button">Photo</string>
+    <string name="camera_photo_button">Foto</string>
     <!--  -->
-    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_on">Mode flash aktif</string>
     <!--  -->
-    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_off">Mode flash mati</string>
     <!--  -->
-    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_flash_mode_auto">Mode flash otomatis</string>
     <!--  -->
-    <string name="camera_send_to">Send to %1$s</string>
+    <string name="camera_send_to">Kirim ke %1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">Selebihnya</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">Raise hand</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">Lower hand</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">Put call on hold</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">Swap calls</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">Lanjutkan panggilan</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">New feature: Raise hand</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">You raised your hand</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="one">You and %1$d other raised your hands</item>
+        <item quantity="other">You and %1$d others raised your hands</item>
+    </plurals>
 </resources>

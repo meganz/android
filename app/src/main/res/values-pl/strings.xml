@@ -3745,7 +3745,7 @@
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">Katalog o nazwie [B]%1$s[/B] już&#160;istnieje w tej lokalizacji.</string>
     <!-- Banner text to indicate poor network quality -->
-    <string name="calls_call_screen_poor_network_quality">Złe połączenie</string>
+    <string name="calls_call_screen_poor_network_quality">Słabe połączenie</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Nie można nawiązać ponownego połączenia</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -5692,7 +5692,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
+    <string name="photos_camera_uploads_low_battery">Przesyłanie wstrzymane, ponieważ bateria jest poniżej %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Przesyłanie wgraj kamery przestało działać. Spróbuj ponownie włączyć przesyłanie z kamery, aby rozwiązać ten problem. Jeśli problem nadal występuje, skontaktuj kontakt wsparcie.</string>
     <!-- Camera uploads pending info in Photos screen. -->
@@ -5859,4 +5859,27 @@
     <string name="camera_flash_mode_auto">Tryb Flash automatyczny</string>
     <!--  -->
     <string name="camera_send_to">Wyślij do %1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">Więcej</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">Podnieś rękę</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">Opuść ręka</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">Wstrzymaj połączenie</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">Przełącz</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">Wznów połączenie</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">Nowa funkcja: Podnieś rękę</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">Podniosłeś rękę</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="one">Ty i %1$d innych podnieśli ręce</item>
+        <item quantity="few">Ty i %1$d innych podnieśli ręce</item>
+        <item quantity="many">Ty i %1$d innych podnieśli ręce</item>
+        <item quantity="other">Ty i %1$d innych podnieśli ręce</item>
+    </plurals>
 </resources>

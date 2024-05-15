@@ -3466,7 +3466,7 @@
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">此目的地已存在名稱為[B]%1$s[/B]的資料夾。</string>
     <!-- Banner text to indicate poor network quality -->
-    <string name="calls_call_screen_poor_network_quality">連線不穩</string>
+    <string name="calls_call_screen_poor_network_quality">連線品質不良</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">無法重新連線</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -4996,7 +4996,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">由於沒有網路連線，上傳已暫停</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
+    <string name="photos_camera_uploads_low_battery">由於電池電量低於%1$d%%，上傳已暫停</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">相機上傳停止運作。嘗試重新啟用相機上傳來解決問題。如果問題仍然存在，聯繫客服。</string>
     <!-- Camera uploads pending info in Photos screen. -->
@@ -5151,4 +5151,24 @@
     <string name="camera_flash_mode_auto">閃光燈模式自動</string>
     <!--  -->
     <string name="camera_send_to">發送至%1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">更多</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">舉手</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">放下手</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">保留通話</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">切換通話</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">恢復通話</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">新功能：舉手</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">您舉起手</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="other">您和其他%1$d個人舉起了手</item>
+    </plurals>
 </resources>

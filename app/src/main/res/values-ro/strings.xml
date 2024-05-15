@@ -3652,7 +3652,7 @@
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">Un folder numit [B]%1$s[/B] există deja la această destinație.</string>
     <!-- Banner text to indicate poor network quality -->
-    <string name="calls_call_screen_poor_network_quality">Conexiune proastă</string>
+    <string name="calls_call_screen_poor_network_quality">Conexiune slabă</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Nu se poate reconecta</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -5623,4 +5623,26 @@
     <string name="camera_flash_mode_auto">Flash automat</string>
     <!--  -->
     <string name="camera_send_to">Trimiteți la %1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">Mai multe</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">Ridicați mâna</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">Coborâți mâna</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">Puneți apelul în așteptare</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">Schimbați apelurile</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">Reia apelul</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">Funcție nouă: Ridicați mâna</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">Ați ridicat mâna</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="one">Dvs. și încă %1$d&#160;persoană ați ridicat mâna</item>
+        <item quantity="few">Dvs. și alte %1$d&#160;persoane ați ridicat mâna</item>
+        <item quantity="other">Dvs. și alte %1$d de persoane ați ridicat mâna</item>
+    </plurals>
 </resources>

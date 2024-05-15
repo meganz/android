@@ -5228,7 +5228,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Upload onderbroken omdat er geen internetverbinding is</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
+    <string name="photos_camera_uploads_low_battery">Het uploaden is gepauzeerd omdat de batterij lager is dan %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Camera-uploads werken niet meer. Probeer camera-uploads opnieuw in te schakelen om het probleem op te lossen. Als het probleem zich blijft voordoen, neem contact op met de klantenservice.</string>
     <!-- Camera uploads pending info in Photos screen. -->
@@ -5387,4 +5387,25 @@
     <string name="camera_flash_mode_auto">Flitsmodus automatisch</string>
     <!--  -->
     <string name="camera_send_to">Verzenden naar %1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">Meer</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">Hand opsteken</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">Hand omlaag doen</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">Oproep in de wacht zetten</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">Oproepen wisselen</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">Oproep hervatten</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">Nieuw kenmerk: hand opsteken</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">U heeft uw hand opgestoken</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="one">U en %1$d andere stak en de handen op</item>
+        <item quantity="other">U en %1$d anderen staken de handen op</item>
+    </plurals>
 </resources>

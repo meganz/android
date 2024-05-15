@@ -3931,7 +3931,7 @@
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">يوجد ملف اسمه [B]%1$s[/B] بالفعل في هذا الموقع.</string>
     <!-- Banner text to indicate poor network quality -->
-    <string name="calls_call_screen_poor_network_quality">اتصال سيء</string>
+    <string name="calls_call_screen_poor_network_quality">اتصال ضعيف</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">غير قادر على إعادة الاتصال</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -6327,4 +6327,25 @@
     <string name="camera_flash_mode_auto">Flash mode auto</string>
     <!--  -->
     <string name="camera_send_to">Send to %1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">المزيد</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">Raise hand</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">Lower hand</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">Put call on hold</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">Swap calls</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">استئناف المكالمة</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">New feature: Raise hand</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">You raised your hand</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="one">You and %1$d other raised your hands</item>
+        <item quantity="other">You and %1$d others raised your hands</item>
+    </plurals>
 </resources>

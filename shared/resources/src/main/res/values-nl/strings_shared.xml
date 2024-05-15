@@ -259,7 +259,7 @@
     <!-- Option to don't use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_only_this_time_option">Alleen deze keer</string>
     <!-- Option to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_always_here_option">Always download here</string>
+    <string name="transfers_dialog_save_download_location_always_here_option">Altijd hier downloaden</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
     <string name="transfers_dialog_save_download_location_always_ask_option">Vraag altijd naar de bestemming</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
@@ -267,11 +267,11 @@
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">Starting from %1$s&#160;%2$s, find the perfect fit for your storage needs.</string>
+    <string name="dialog_onboarding_feature_storage_description">Vanaf %1$s&#160;%2$s, vind de perfecte oplossing voor uw opslagbehoeften.</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">Onvoldoende opslagruimte</string>
     <!-- Body text of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_body">The size of this folder will take your MEGA account over its storage limit. To be able to sync it, you will need to either free up some space or upgrade your MEGA account.</string>
+    <string name="sync_error_dialog_insufficient_storage_body">De grootte van deze map zorgt ervoor dat uw MEGA-account de opslaglimiet overschrijdt. Om het te kunnen synchroniseren, moet u ofwel wat ruimte vrijmaken ofwel uw MEGA-account upgraden.</string>
     <!-- Confirm button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_confirm_button">Zie abonnementen</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
@@ -279,9 +279,21 @@
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
     <string name="account_confirm_email_misspelled_email_description">Als u uw e-mailadres verkeerd hebt gespeld, corrigeer het en tik op [A]Opnieuw versturen[/A].</string>
     <!-- Title of the insufficient storage error banner -->
-    <string name="sync_error_storage_over_quota_banner_title">Syncing paused, your MEGA plan has run out of storage.</string>
+    <string name="sync_error_storage_over_quota_banner_title">Synchronisatie is gepauzeerd, uw MEGA-abonnement heeft geen opslagruimte meer</string>
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">Upgraden</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Upload paused, phone is not charging</string>
+    <string name="camera_uploads_phone_not_charging_message">Het uploaden is gepauzeerd, de telefoon wordt niet opgeladen</string>
+    <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
+    <string name="device_center_list_view_item_status_nothing_setup">Geen synchronisaties ingesteld</string>
+    <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
+    <string name="account_pro_flexi_account_deactivated_dialog_title">Account gedeactiveerd</string>
+    <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
+    <string name="account_pro_flexi_account_deactivated_dialog_body">Your Pro&#160;Flexi account has been deactivated due to payment failure or you’ve cancelled your subscription. You won’t be able to access the data stored in your account. \nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
+    <string name="general_low_tier_plan_starter_label">Starter</string>
+    <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
+    <string name="general_low_tier_plan_basic_label">Basic</string>
+    <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
+    <string name="general_low_tier_plan_essential_label">Essential</string>
 </resources>

@@ -5460,7 +5460,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">La subida está en pausa porque la batería está por debajo %1$d&#160;%%</string>
+    <string name="photos_camera_uploads_low_battery">La subida está en pausa porque la batería está por debajo del %1$d&#160;%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Las subidas de la cámara han dejado de funcionar. Intenta volver a activarlas para solucionarlo. Si el problema persiste, contactar con el servicio de soporte.</string>
     <!-- Camera uploads pending info in Photos screen. -->
@@ -5623,4 +5623,26 @@
     <string name="camera_flash_mode_auto">Modo flash automático</string>
     <!--  -->
     <string name="camera_send_to">Enviar a %1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">Más</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">Levantar la mano</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">Bajar la mano</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">Poner la llamada en espera</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">Cambiar llamada</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">Reanudar llamada</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">Nueva función: Levantar la mano</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">Has levantado la mano</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="one">Tú y %1$d persona habéis levantado la mano</item>
+        <item quantity="many">Tú y %1$d personas habéis levantado la mano</item>
+        <item quantity="other">Tú y %1$d personas habéis levantado la mano</item>
+    </plurals>
 </resources>

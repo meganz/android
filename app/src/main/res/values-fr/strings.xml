@@ -3652,7 +3652,7 @@
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">Un dossier du même nom [B]%1$s[/B] existe déjà dans cette destination.</string>
     <!-- Banner text to indicate poor network quality -->
-    <string name="calls_call_screen_poor_network_quality">La connexion est mauvaise</string>
+    <string name="calls_call_screen_poor_network_quality">La connexion est de mauvaise qualité</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Impossible de se reconnecter</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -5623,4 +5623,26 @@
     <string name="camera_flash_mode_auto">Flash automatique</string>
     <!--  -->
     <string name="camera_send_to">Envoyer vers %1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">Plus</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">Lever la main</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">Baisser la main</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">Mettre l’appel en attente</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">Changer d’appel</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">Reprendre l’appel</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">Nouvelle fonction&#160;: lever la main</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">Vous avez levé la main</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="one">Vous et %1$d&#160;autre ont levé la main</item>
+        <item quantity="many">Vous et %1$d&#160;autres ont levé la main</item>
+        <item quantity="other">Vous et %1$d&#160;autres ont levé la main</item>
+    </plurals>
 </resources>

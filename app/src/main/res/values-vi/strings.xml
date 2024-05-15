@@ -3466,7 +3466,7 @@
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">Đã có một thư mục mang tên [B]%1$s[/B] ở tại chỗ này rồi.</string>
     <!-- Banner text to indicate poor network quality -->
-    <string name="calls_call_screen_poor_network_quality">Đường truyền kém</string>
+    <string name="calls_call_screen_poor_network_quality">Mạng yếu</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Không thể kết nối lại</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -5151,4 +5151,24 @@
     <string name="camera_flash_mode_auto">Đèn flash tự&#160;động</string>
     <!--  -->
     <string name="camera_send_to">Gửi đến %1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">Hiện thêm</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">Giơ tay lên</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">Bỏ tay xuống</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">Đặt tạm giữ cuộc gọi</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">Hoán đổi cuộc gọi</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">Tiếp tục cuộc gọi</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">Tính&#160;năng mới: Giơ tay</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">Bạn đang giơ tay lên</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="other">Bạn và %1$d người khác đang giơ tay</item>
+    </plurals>
 </resources>

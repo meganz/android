@@ -834,7 +834,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">尝试登录次数过多，请一小时后再试。</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">查看您的电子邮件收件箱并跟随链接确认您的帐户。</string>
+    <string name="account_not_validated_login">检查您的电子邮件收件箱并点击链接以确认您的帐户。</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">文件夹链接不可用</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -1593,7 +1593,7 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%sKB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3170,7 +3170,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">加入全球最大的安全云存储和协作平台。</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">获得20&#160;GB免费存储空间</string>
+    <string name="left_meeting_bonus_title">免费获得20&#160;GB存储空间</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">立即注册并免费享受全球领先的协作平台。</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -5151,4 +5151,24 @@
     <string name="camera_flash_mode_auto">闪光模式自动</string>
     <!--  -->
     <string name="camera_send_to">发送至%1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">更多</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">举手</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">放手</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">保留通话</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">切换通话</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">恢复通话</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">新功能：举手</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">您举起您的手</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="other">您和其他%1$d个人举起了手</item>
+    </plurals>
 </resources>

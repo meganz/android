@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">File tidak dapat disinkronkan satu per satu. Anda perlu mengatur sinkronisasi dari folder.</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Initial scan failed. You will need to re-enable your sync or backup from the desktop app.</string>
+    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Pemindaian awal gagal. Anda harus mengaktifkan kembali sinkronisasi atau cadangan dari aplikasi desktop.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">Folder di MEGA tidak dapat ditemukan karena telah dipindahkan atau dihapus, atau anda mungkin tidak memiliki akses.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->

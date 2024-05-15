@@ -4996,7 +4996,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">การอัปโหลดถูกหยุดชั่วคราวเนื่องจากการเชื่อมต่ออินเทอร์เน็ตขาดหายไป</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
+    <string name="photos_camera_uploads_low_battery">การอัปโหลดถูกหยุดชั่วคราว เนื่องจากแบตเตอรี่เหลือต่ำกว่า %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">การอัปโหลดจากกล้องหยุดทำงาน ลองเปิดใช้งานการอัปโหลดรูปภาพจากกล้องอีกครั้งเพื่อแก้ไข หากปัญหายังมีอยู่ กรุณาติดต่อฝ่ายสนับสนุน</string>
     <!-- Camera uploads pending info in Photos screen. -->
@@ -5151,4 +5151,24 @@
     <string name="camera_flash_mode_auto">โหมดแฟลชอัตโนมัติ</string>
     <!--  -->
     <string name="camera_send_to">ส่งไปที่ %1$s</string>
+    <!-- Title of call button to show more options in call screen -->
+    <string name="meetings_more_call_option_button">เพิ่มเติม</string>
+    <!-- Title of raise hand button in call screen -->
+    <string name="meetings_raise_hand_option_button">ยกมือ</string>
+    <!-- Title of lower hand button in call screen -->
+    <string name="meetings_lower_hand_option_button">เอามือลง</string>
+    <!-- Title of put call on hold button in call screen -->
+    <string name="meetings_put_call_on_hold_option_button">พักสาย</string>
+    <!-- Title of swap calls button in call screen -->
+    <string name="meetings_swap_calls_option_button">สลับสาย</string>
+    <!-- Title of resume call button in call screen -->
+    <string name="meetings_resume_call_option_button">เลิกพักสาย</string>
+    <!-- Text of pop up informing about the Raise hand feature -->
+    <string name="meetings_new_feature_raise_hand_layout">ฟีเจอร์ใหม่: ยกมือขึ้น</string>
+    <!-- The snackbar message of your hand is raised -->
+    <string name="meeting_your_hand_is_raised_message">คุณได้ยกมือแล้ว</string>
+    <!-- The snackbar message of you and others raised your hands -->
+    <plurals name="meeting_you_and_others_raised_your_hands_message">
+        <item quantity="other">คุณและคนอื่น ๆ อีก %1$d คนได้ยกมือ</item>
+    </plurals>
 </resources>
