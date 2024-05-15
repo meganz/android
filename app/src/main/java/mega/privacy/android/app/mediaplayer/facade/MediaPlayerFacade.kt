@@ -239,24 +239,23 @@ class MediaPlayerFacade @Inject constructor(
     override fun mediaItemRemoved(index: Int): String? =
         player?.let { player ->
             crashReporter.log(
-                "playingItem: ${player.currentMediaItem?.mediaId} removed item: ${
-                    player.getMediaItemAt(
-                        index
-                    ).mediaId
-                } play sources size: ${player.mediaItemCount} removed item: $index"
+                "playingItem: ${player.currentMediaItem?.mediaId}, " +
+                        "playing item index:${player.currentMediaItemIndex}, " +
+                        "play sources size: ${player.mediaItemCount}, removed item: $index"
             )
 
             var result: String? = null
             if (index < player.mediaItemCount) {
                 val nextIndex = player.nextMediaItemIndex
+                crashReporter.log(
+                    "nextIndex is $nextIndex, play sources size: ${player.mediaItemCount}"
+                )
                 player.removeMediaItem(index)
                 if (nextIndex != C.INDEX_UNSET) {
                     if (nextIndex < player.mediaItemCount)
                         result = player.getMediaItemAt(nextIndex).mediaId
                 }
-                crashReporter.log(
-                    "nextIndex is $nextIndex, play sources size: ${player.mediaItemCount} next media id: $result"
-                )
+                crashReporter.log("next media id: $result")
             }
             result
         }
