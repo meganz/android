@@ -76,7 +76,7 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
-import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsComposeActivity
+import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
@@ -291,7 +291,7 @@ class SettingsFragment :
         val key = preference.key
         when (key) {
             KEY_FEATURES_CAMERA_UPLOAD -> {
-                startActivity(Intent(context, SettingsCameraUploadsComposeActivity::class.java))
+                startActivity(Intent(context, SettingsCameraUploadsActivity::class.java))
             }
 
             KEY_FEATURES_CHAT ->

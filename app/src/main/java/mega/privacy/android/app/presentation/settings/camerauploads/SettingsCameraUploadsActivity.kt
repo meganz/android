@@ -16,10 +16,10 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 import javax.inject.Inject
 
 /**
- * An Activity that shows the Settings Camera Uploads screen in Jetpack Compose
+ * An Activity that shows the Settings Camera Uploads screen
  */
 @AndroidEntryPoint
-class SettingsCameraUploadsComposeActivity : ComponentActivity() {
+class SettingsCameraUploadsActivity : ComponentActivity() {
 
     /**
      * Retrieves the Device Theme Mode

@@ -13,7 +13,7 @@ import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivityV2
-import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsComposeActivity
+import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -36,7 +36,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             activity.startActivity(
                 Intent(
                     activity,
-                    SettingsCameraUploadsComposeActivity::class.java,
+                    SettingsCameraUploadsActivity::class.java,
                 )
             )
         }
