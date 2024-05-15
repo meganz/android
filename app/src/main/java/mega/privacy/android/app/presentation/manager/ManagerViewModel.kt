@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
+import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
@@ -70,6 +71,7 @@ import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
+import mega.privacy.android.domain.usecase.environment.MonitorDevicePowerConnectionStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
@@ -243,6 +245,7 @@ class ManagerViewModel @Inject constructor(
     private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase,
     private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
     private val monitorUpgradeDialogClosedUseCase: MonitorUpgradeDialogClosedUseCase,
+    private val monitorDevicePowerConnectionStateUseCase: MonitorDevicePowerConnectionStateUseCase,
 ) : ViewModel() {
 
     /**
@@ -320,7 +323,7 @@ class ManagerViewModel @Inject constructor(
         get() = isConnectedToInternetUseCase()
 
     private val isFirstLogin = savedStateHandle.getStateFlow(
-        key = isFirstLoginKey,
+        key = IS_FIRST_LOGIN_KEY,
         initialValue = false
     )
 
@@ -503,6 +506,22 @@ class ManagerViewModel @Inject constructor(
                 _state.update { it.copy(shouldUpgradeToProPlan = false) }
             }
         }
+
+        viewModelScope.launch {
+            monitorDevicePowerConnectionStateUseCase().catch {
+                Timber.e(
+                    "An error occurred while monitoring the Device Power Connection State",
+                    it,
+                )
+            }.collect { state ->
+                Timber.d("The Device Power Connection State is $state")
+                if (state == DevicePowerConnectionState.Connected &&
+                    getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)
+                ) {
+                    startCameraUploadUseCase()
+                }
+            }
+        }
     }
 
     /**
@@ -612,7 +631,7 @@ class ManagerViewModel @Inject constructor(
      * Set first login status
      */
     fun setIsFirstLogin(newIsFirstLogin: Boolean) {
-        savedStateHandle[isFirstLoginKey] = newIsFirstLogin
+        savedStateHandle[IS_FIRST_LOGIN_KEY] = newIsFirstLogin
     }
 
     /**
@@ -1246,7 +1265,7 @@ class ManagerViewModel @Inject constructor(
     }
 
     internal companion object {
-        internal const val isFirstLoginKey = "EXTRA_FIRST_LOGIN"
+        internal const val IS_FIRST_LOGIN_KEY = "EXTRA_FIRST_LOGIN"
         private const val INVALID_HANDLE = -1L
     }
 }

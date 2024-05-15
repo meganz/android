@@ -44,6 +44,7 @@ import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
+import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
@@ -163,7 +164,7 @@ class ManagerViewModelTest {
     private val sendStatisticsMediaDiscoveryUseCase = mock<SendStatisticsMediaDiscoveryUseCase>()
     private val savedStateHandle = SavedStateHandle(
         mapOf(
-            ManagerViewModel.isFirstLoginKey to initialIsFirsLoginValue
+            ManagerViewModel.IS_FIRST_LOGIN_KEY to initialIsFirsLoginValue
         )
     )
     private val monitorStorageState = mock<MonitorStorageStateEventUseCase> {
@@ -303,6 +304,8 @@ class ManagerViewModelTest {
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
     private val fakeCallUpdatesFlow = MutableSharedFlow<ChatCall>()
+    private var monitorDevicePowerConnectionFakeFlow =
+        MutableSharedFlow<DevicePowerConnectionState>()
 
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock {
         onBlocking { invoke() }.thenReturn(fakeCallUpdatesFlow)
@@ -392,7 +395,10 @@ class ManagerViewModelTest {
             getUsersCallLimitRemindersUseCase = getUsersCallLimitRemindersUseCase,
             setUsersCallLimitRemindersUseCase = setUsersCallLimitRemindersUseCase,
             broadcastHomeBadgeCountUseCase = broadcastHomeBadgeCountUseCase,
-            monitorUpgradeDialogClosedUseCase = monitorUpgradeDialogClosedUseCase
+            monitorUpgradeDialogClosedUseCase = monitorUpgradeDialogClosedUseCase,
+            monitorDevicePowerConnectionStateUseCase = mock {
+                on { invoke() }.thenReturn(monitorDevicePowerConnectionFakeFlow)
+            },
         )
     }
 
@@ -440,7 +446,7 @@ class ManagerViewModelTest {
             getUsersCallLimitRemindersUseCase,
             setUsersCallLimitRemindersUseCase,
             broadcastHomeBadgeCountUseCase,
-            monitorUpgradeDialogClosedUseCase
+            monitorUpgradeDialogClosedUseCase,
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
@@ -457,6 +463,7 @@ class ManagerViewModelTest {
         monitorNodeUpdatesFakeFlow = MutableSharedFlow()
         monitorSyncsUseCaseFakeFlow = MutableSharedFlow()
         monitorMyAccountUpdateFakeFlow = MutableSharedFlow()
+        monitorDevicePowerConnectionFakeFlow = MutableSharedFlow()
         initViewModel()
     }
 
@@ -1404,6 +1411,78 @@ class ManagerViewModelTest {
         Arguments.of(ChatCallStatus.TerminatingUserParticipation),
         Arguments.of(ChatCallStatus.GenericNotification),
     )
+
+    @Test
+    fun `test that camera uploads automatically starts when the device begins charging and the charging feature flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
+                true
+            )
+            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Connected)
+            testScheduler.advanceUntilIdle()
+
+            verify(startCameraUploadUseCase).invoke()
+        }
+
+    @Test
+    fun `test that camera uploads does not automatically start when the device begins charging and the charging feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
+                false
+            )
+            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Connected)
+            testScheduler.advanceUntilIdle()
+
+            verifyNoInteractions(startCameraUploadUseCase)
+        }
+
+    @Test
+    fun `test that camera uploads does not automatically start when the device is not charging and the charging feature flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
+                true
+            )
+            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Disconnected)
+            testScheduler.advanceUntilIdle()
+
+            verifyNoInteractions(startCameraUploadUseCase)
+        }
+
+    @Test
+    fun `test that camera uploads does not automatically start when the device is not charging and the charging feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
+                false
+            )
+            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Disconnected)
+            testScheduler.advanceUntilIdle()
+
+            verifyNoInteractions(startCameraUploadUseCase)
+        }
+
+    @Test
+    fun `test that camera uploads does not automatically start when the device charging state is unknown and the feature flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
+                true
+            )
+            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Unknown)
+            testScheduler.advanceUntilIdle()
+
+            verifyNoInteractions(startCameraUploadUseCase)
+        }
+
+    @Test
+    fun `test that camera uploads does not automatically start when the device charging state is unknown and the feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
+                false
+            )
+            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Unknown)
+            testScheduler.advanceUntilIdle()
+
+            verifyNoInteractions(startCameraUploadUseCase)
+        }
 
     companion object {
         @JvmField
