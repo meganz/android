@@ -75,7 +75,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     private MegaListChatExplorerAdapter adapterList;
 
     private LinearLayoutManager mLayoutManager;
-    private ArrayList<String> addedItemsSaved;
 
     private int lastFirstVisiblePosition;
 
@@ -208,12 +207,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         megaChatApi.signalPresenceActivity();
 
-        if (savedInstanceState != null) {
-            addedItemsSaved = savedInstanceState.getStringArrayList("addedItemsSaved");
-        } else {
-            addedItemsSaved = new ArrayList<>();
-        }
-
         viewModel = new ViewModelProvider(this).get(ChatExplorerViewModel.class);
 
         collectFlows();
@@ -283,7 +276,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 viewModel.getUiState(),
                 Lifecycle.State.STARTED,
                 uiState -> {
-                    if (this.uiState != null && this.uiState.getItems() != uiState.getItems()) {
+                    if (this.uiState != null && this.uiState.getItems() != uiState.getItems() && !uiState.isItemUpdated()) {
                         ArrayList<ChatExplorerListItem> items = new ArrayList<>(uiState.getItems());
                         if (adapterList == null) {
                             Timber.w("AdapterList is NULL");
@@ -304,10 +297,22 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
                         addedList.setAdapter(adapterAdded);
 
-                        if (addedItemsSaved != null && !addedItemsSaved.isEmpty()) {
-                            this.uiState = uiState;
-                            new RecoverSavedItemsTask().execute();
-                            return Unit.INSTANCE;
+                        if (!uiState.getSelectedItems().isEmpty()) {
+                            int selectedItemCount = 0;
+                            for (ChatExplorerListItem item : uiState.getItems()) {
+                                if (item.isSelected()) {
+                                    selectedItemCount++;
+                                    int position = adapterList.getPosition(item);
+                                    if (position != -1) {
+                                        adapterList.toggleSelection(position);
+                                    }
+                                }
+
+                                if (selectedItemCount == uiState.getSelectedItems().size()) break;
+                            }
+                            if (context instanceof FileExplorerActivity) {
+                                ((FileExplorerActivity) context).hideTabs(true, CHAT_FRAGMENT);
+                            }
                         }
 
                         setFinalViews(uiState.getItems());
@@ -353,8 +358,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             if (!adapterList.getItems().equals(uiState.getItems())) {
                 adapterList.setItems(new ArrayList<>(uiState.getItems()));
             }
-            int togglePossition = adapterList.getPosition(item);
-            adapterList.toggleSelection(togglePossition);
+            int togglePosition = adapterList.getPosition(item);
+            adapterList.toggleSelection(togglePosition);
         } else {
             adapterList.toggleSelection(position);
         }
@@ -413,18 +418,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         if (listView.getLayoutManager() != null) {
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
         }
-
-        if (!uiState.getSelectedItems().isEmpty()) {
-            if (addedItemsSaved == null) {
-                addedItemsSaved = new ArrayList<>();
-            } else {
-                addedItemsSaved.clear();
-            }
-            for (ChatExplorerListItem item : uiState.getSelectedItems()) {
-                addedItemsSaved.add(item.getId());
-            }
-            outState.putStringArrayList("addedItemsSaved", addedItemsSaved);
-        }
     }
 
     @Override
@@ -477,6 +470,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 if (itemToUpdate != null) {
                     if (itemToUpdate.getContactItem() != null) {
                         if (getMegaContactHandle(itemToUpdate.getContactItem()) == userhandle) {
+                            itemToUpdate.getContactItem().setLastGreen(formattedDate);
+                            adapterList.updateItemContactStatus(itrReplace.nextIndex() - 1);
                             viewModel.updateItemLastGreenDateByContact(itemToUpdate.getContactItem(), formattedDate);
                             break;
                         }
@@ -645,10 +640,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         adapterAdded = null;
 
         viewModel.clearSelections();
-
-        if (addedItemsSaved != null) {
-            addedItemsSaved.clear();
-        }
     }
 
     public void search(String s) {
@@ -659,34 +650,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         searchTask.execute(s);
     }
 
-    private class RecoverSavedItemsTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            for (String id : addedItemsSaved) {
-                for (ChatExplorerListItem item : uiState.getItems()) {
-                    if (!item.isHeader() && item.getId() != null && item.getId().equals(id)) {
-                        int position = adapterList.getPosition(item);
-                        if (position != -1) {
-                            addedList.post(() -> adapterList.toggleSelection(position));
-                        }
-                        break;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (context instanceof FileExplorerActivity && !uiState.getSelectedItems().isEmpty()) {
-                ((FileExplorerActivity) context).hideTabs(true, CHAT_FRAGMENT);
-            }
-
-            setFinalViews(uiState.getItems());
-        }
-    }
-
     private class SearchTask extends AsyncTask<String, Void, Void> {
 
         ArrayList<ChatExplorerListItem> searchItems = new ArrayList<>();
@@ -695,11 +658,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         @Override
         protected Void doInBackground(String... strings) {
             String s = strings[0];
-            boolean areAddedItems = false;
+            boolean areAddedItems = !uiState.getSelectedItems().isEmpty();
 
-            if (!uiState.getSelectedItems().isEmpty()) {
-                areAddedItems = true;
-            }
             ArrayList<ChatExplorerListItem> copiedItems = new ArrayList<>(uiState.getItems());
             for (ChatExplorerListItem item : copiedItems) {
                 if (item.getTitle() != null && !item.isHeader() && item.getTitle().toLowerCase().contains(s.toLowerCase())) {

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
@@ -39,7 +39,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChatExplorerViewModelTest {
 
@@ -67,7 +66,8 @@ class ChatExplorerViewModelTest {
             getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             getVisibleContactsWithoutChatRoomUseCase = getVisibleContactsWithoutChatRoomUseCase,
-            userContactMapper = userContactMapper
+            userContactMapper = userContactMapper,
+            defaultDispatcher = extension.testDispatcher
         )
     }
 
@@ -131,6 +131,17 @@ class ChatExplorerViewModelTest {
         val cachedContact = newContact()
         whenever(getContactFromCacheByHandleUseCase(secondPeerHandle)) doReturn cachedContact
 
+        underTest.addSelectedItem(
+            ChatExplorerListItem(
+                contactItem = ContactItemUiState(
+                    contact = cachedContact,
+                    user = user
+                ),
+                chat = thirdItem,
+                title = thirdItem.title,
+                id = thirdItem.chatId.toString()
+            )
+        )
         underTest.getChats()
 
         underTest.uiState.test {
@@ -147,7 +158,8 @@ class ChatExplorerViewModelTest {
                     chat = thirdItem,
                     title = thirdItem.title,
                     id = thirdItem.chatId.toString(),
-                    isRecent = true
+                    isRecent = true,
+                    isSelected = true
                 ),
                 ChatExplorerListItem(
                     contactItem = null,
@@ -262,6 +274,14 @@ class ChatExplorerViewModelTest {
             val archivedChats = listOf(firstItem, secondItem, thirdItem)
             whenever(getArchivedChatListItemsUseCase()) doReturn archivedChats
 
+            underTest.addSelectedItem(
+                ChatExplorerListItem(
+                    contactItem = null,
+                    chat = firstItem,
+                    title = firstItem.title,
+                    id = firstItem.chatId.toString()
+                )
+            )
             underTest.getChats()
 
             underTest.uiState.test {
@@ -271,7 +291,8 @@ class ChatExplorerViewModelTest {
                         contactItem = null,
                         chat = firstItem,
                         title = firstItem.title,
-                        id = firstItem.chatId.toString()
+                        id = firstItem.chatId.toString(),
+                        isSelected = true
                     ),
                     ChatExplorerListItem(
                         contactItem = null,
@@ -290,16 +311,24 @@ class ChatExplorerViewModelTest {
             val userContact = UserContact(contact = newContact(), user = newUser())
             whenever(getVisibleContactsWithoutChatRoomUseCase()) doReturn listOf(userContact)
 
+            val mappedContact = userContactMapper(userContact)
+            underTest.addSelectedItem(
+                ChatExplorerListItem(
+                    contactItem = mappedContact,
+                    title = mappedContact.contact?.fullName,
+                    id = mappedContact.user?.handle?.toString()
+                )
+            )
             underTest.getChats()
 
             underTest.uiState.test {
-                val mappedContact = userContactMapper(userContact)
                 val expected = listOf(
                     ChatExplorerListItem(isHeader = true),
                     ChatExplorerListItem(
                         contactItem = mappedContact,
                         title = mappedContact.contact?.fullName,
-                        id = mappedContact.user?.handle?.toString()
+                        id = mappedContact.user?.handle?.toString(),
+                        isSelected = true
                     )
                 )
                 assertThat(expectMostRecentItem().items).isEqualTo(expected)
@@ -328,7 +357,9 @@ class ChatExplorerViewModelTest {
         underTest.addSelectedItem(item)
 
         underTest.uiState.test {
-            assertThat(expectMostRecentItem().selectedItems).isEqualTo(listOf(item))
+            val uiItem = expectMostRecentItem()
+            assertThat(uiItem.selectedItems).isEqualTo(listOf(item))
+            assertThat(uiItem.isItemUpdated).isTrue()
         }
     }
 
@@ -340,19 +371,42 @@ class ChatExplorerViewModelTest {
         underTest.removeSelectedItem(item)
 
         underTest.uiState.test {
-            assertThat(expectMostRecentItem().selectedItems).isEmpty()
+            val uiItem = expectMostRecentItem()
+            assertThat(uiItem.selectedItems).isEmpty()
+            assertThat(uiItem.isItemUpdated).isTrue()
         }
     }
 
     @Test
     fun `test that the selected item list is cleared correctly`() = runTest {
-        val item = ChatExplorerListItem(title = "title")
+        val userContact = UserContact(contact = newContact(), user = newUser())
+        whenever(getVisibleContactsWithoutChatRoomUseCase()) doReturn listOf(userContact)
 
-        underTest.addSelectedItem(item)
+        val mappedContact = userContactMapper(userContact)
+        underTest.addSelectedItem(
+            ChatExplorerListItem(
+                contactItem = mappedContact,
+                title = mappedContact.contact?.fullName,
+                id = mappedContact.user?.handle?.toString()
+            )
+        )
+        underTest.getChats()
         underTest.clearSelections()
 
         underTest.uiState.test {
-            assertThat(expectMostRecentItem().selectedItems).isEmpty()
+            val uiItem = expectMostRecentItem()
+            assertThat(uiItem.items).isEqualTo(
+                listOf(
+                    ChatExplorerListItem(isHeader = true),
+                    ChatExplorerListItem(
+                        contactItem = mappedContact,
+                        title = mappedContact.contact?.fullName,
+                        id = mappedContact.user?.handle?.toString()
+                    )
+                )
+            )
+            assertThat(uiItem.selectedItems).isEmpty()
+            assertThat(uiItem.isItemUpdated).isFalse()
         }
     }
 
@@ -409,6 +463,7 @@ class ChatExplorerViewModelTest {
                     ChatExplorerListItem(title = "title2")
                 )
                 assertThat(item.selectedItems).isEqualTo(expectedSelectedItems)
+                assertThat(item.isItemUpdated).isTrue()
             }
         }
 
@@ -477,6 +532,15 @@ class ChatExplorerViewModelTest {
 
             verify(requestUserLastGreenUseCase, never()).invoke(userHandle)
         }
+
+    @Test
+    fun `test that the item updated is set to false when getting the chat items`() = runTest {
+        underTest.getChats()
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().isItemUpdated).isFalse()
+        }
+    }
 
     private fun newChatListItem(
         withChatId: Long = -1L,
@@ -555,4 +619,10 @@ class ChatExplorerViewModelTest {
         hasPendingRequest = withHasPendingRequest,
         isVisible = withIsVisible
     )
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension()
+    }
 }

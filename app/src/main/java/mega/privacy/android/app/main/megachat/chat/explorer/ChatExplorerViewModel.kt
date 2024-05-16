@@ -3,6 +3,7 @@ package mega.privacy.android.app.main.megachat.chat.explorer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus.Invalid
 import mega.privacy.android.domain.entity.contacts.UserChatStatus.Online
 import mega.privacy.android.domain.entity.contacts.UserContact
 import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.chat.GetActiveChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetArchivedChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.explorer.GetVisibleContactsWithoutChatRoomUseCase
@@ -49,6 +51,7 @@ class ChatExplorerViewModel @Inject constructor(
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     private val getVisibleContactsWithoutChatRoomUseCase: GetVisibleContactsWithoutChatRoomUseCase,
     private val userContactMapper: UserContactMapper,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatExplorerUiState())
@@ -62,8 +65,13 @@ class ChatExplorerViewModel @Inject constructor(
      * Get the list of chats both active and non-active.
      */
     fun getChats() {
-        _uiState.update { it.copy(items = emptyList()) }
-        viewModelScope.launch {
+        _uiState.update {
+            it.copy(
+                items = emptyList(),
+                isItemUpdated = false
+            )
+        }
+        viewModelScope.launch(defaultDispatcher) {
             val items = buildList {
                 // Add the active/recent chat rooms
                 addAll(getActiveChatRooms())
@@ -103,7 +111,10 @@ class ChatExplorerViewModel @Inject constructor(
                                     chat = chat,
                                     title = chat.title,
                                     id = chat.chatId.toString(),
-                                    isRecent = index < RECENT_CHATS_MAX_SIZE
+                                    isRecent = index < RECENT_CHATS_MAX_SIZE,
+                                    isSelected = _uiState.value.selectedItems.any {
+                                        chat.chatId.toString() == it.id
+                                    }
                                 )
                             )
                         }
@@ -138,7 +149,10 @@ class ChatExplorerViewModel @Inject constructor(
                                 contactItem = contact,
                                 chat = chat,
                                 title = chat.title,
-                                id = chat.chatId.toString()
+                                id = chat.chatId.toString(),
+                                isSelected = _uiState.value.selectedItems.any {
+                                    chat.chatId.toString() == it.id
+                                }
                             )
                         )
                     }
@@ -178,13 +192,16 @@ class ChatExplorerViewModel @Inject constructor(
         Timber.d("Retrieving the visible contacts without chat rooms")
         runCatching { getVisibleContactsWithoutChatRoomUseCase() }
             .onSuccess { contacts ->
-                contacts.forEach {
-                    val contactItemUiState = userContactMapper(it)
+                contacts.forEach { userContact ->
+                    val contactItemUiState = userContactMapper(userContact)
                     add(
                         ChatExplorerListItem(
                             contactItem = contactItemUiState,
                             title = contactItemUiState.contact?.fullName,
-                            id = contactItemUiState.user?.handle?.toString()
+                            id = contactItemUiState.user?.handle?.toString(),
+                            isSelected = _uiState.value.selectedItems.any {
+                                contactItemUiState.user?.handle?.toString() == it.id
+                            }
                         )
                     )
                 }
@@ -195,27 +212,56 @@ class ChatExplorerViewModel @Inject constructor(
 
     /**
      * Add a new selected item.
+     *
+     * @param item The [ChatExplorerListItem] that needs to be added to the selected items
      */
     fun addSelectedItem(item: ChatExplorerListItem) {
-        _uiState.update { it.copy(selectedItems = it.selectedItems + item) }
+        _uiState.update { uiState ->
+            uiState.copy(
+                selectedItems = uiState.selectedItems + item,
+                isItemUpdated = true
+            )
+        }
     }
 
     /**
      * Remove a selected item.
+     *
+     * @param item The [ChatExplorerListItem] that needs to be removed from the selected items
      */
     fun removeSelectedItem(item: ChatExplorerListItem) {
-        _uiState.update { it.copy(selectedItems = it.selectedItems - item) }
+        _uiState.update { uiState ->
+            uiState.copy(
+                selectedItems = uiState.selectedItems.filterNot { it == item },
+                isItemUpdated = true
+            )
+        }
     }
 
     /**
      * Clear all selections.
      */
     fun clearSelections() {
-        _uiState.update { it.copy(selectedItems = emptyList()) }
+        _uiState.update { uiState ->
+            uiState.copy(
+                items = uiState.items.map {
+                    if (it.isSelected) {
+                        it.copy(isSelected = false)
+                    } else {
+                        it
+                    }
+                },
+                selectedItems = emptyList(),
+                isItemUpdated = false
+            )
+        }
     }
 
     /**
      * Update the last green date for a specific contact item
+     *
+     * @param contactItem The [ContactItemUiState] that needs to be updated
+     * @param date The updated last green time
      */
     fun updateItemLastGreenDateByContact(contactItem: ContactItemUiState, date: String) {
         _uiState.update {
@@ -233,7 +279,8 @@ class ChatExplorerViewModel @Inject constructor(
                     } else {
                         item
                     }
-                }
+                },
+                isItemUpdated = true
             )
         }
     }
