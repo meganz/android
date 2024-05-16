@@ -2,6 +2,7 @@ package mega.privacy.android.app.mediaplayer
 
 import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
+import android.app.ActivityManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -240,8 +241,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         val playerServiceIntent = Intent(this, AudioPlayerService::class.java).putExtras(extras)
 
         if (savedInstanceState == null) {
-            PermissionUtils.checkNotificationsPermission(this)
-            if (rebuildPlaylist) {
+            if (rebuildPlaylist && !isServiceRunning()) {
+                PermissionUtils.checkNotificationsPermission(this)
                 playerServiceIntent.setDataAndType(intent.data, intent.type)
                 Util.startForegroundService(this, playerServiceIntent)
             }
@@ -256,6 +257,14 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             showNotAllowPlayAlert()
         }
     }
+
+    @Suppress("DEPRECATION")
+    private fun isServiceRunning() =
+        (getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager)?.let { activityManager ->
+            activityManager.getRunningServices(Int.MAX_VALUE)?.any {
+                it.service.className == AudioPlayerService::class.java.name
+            }
+        } ?: false
 
     @OptIn(FlowPreview::class)
     private fun setupObserver() {

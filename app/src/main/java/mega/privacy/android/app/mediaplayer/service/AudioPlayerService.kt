@@ -591,8 +591,6 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         private const val INTENT_KEY_STATE = "state"
         private const val STATE_HEADSET_UNPLUGGED = 0
 
-        private const val AUDIO_SERVICE_NAME = "AudioPlayerService"
-
         /**
          * Pause the audio player when play video, play/record audio clip, start/receive call.
          *
@@ -660,8 +658,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         @Suppress("DEPRECATION")
         private fun sendCommandToAudioPlayer(context: Context, command: Int) {
             val am = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
-            am.getRunningServices(50).firstOrNull { runningServiceInfo ->
-                runningServiceInfo.service.className.endsWith(AUDIO_SERVICE_NAME)
+            am.getRunningServices(Int.MAX_VALUE).firstOrNull { runningServiceInfo ->
+                runningServiceInfo.service.className == AudioPlayerService::class.java.name
             }?.let { runningServiceInfo ->
                 if (runningServiceInfo.started) {
                     Timber.d("sendCommandToAudioPlayer invoked")
