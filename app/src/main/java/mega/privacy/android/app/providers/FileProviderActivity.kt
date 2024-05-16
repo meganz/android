@@ -9,13 +9,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.StatFs
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
@@ -43,11 +43,11 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.BaseActivity.Companion.showSimpleSnackbar
-import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -57,6 +57,7 @@ import mega.privacy.android.app.main.providers.CloudDriveProviderFragment
 import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment
 import mega.privacy.android.app.main.providers.ProviderPageAdapter
 import mega.privacy.android.app.presentation.provider.FileProviderViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.ChatUtil
@@ -69,13 +70,13 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.cloudRootHandle
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.account.SetUserCredentialsUseCase
@@ -327,6 +328,7 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
                 }
             } else {
                 setContentView(R.layout.activity_file_provider)
+                addStartTransfersView(findViewById(R.id.provider_container))
                 Timber.d("megaApi.getRootNode() NOT null")
                 aBL = findViewById(R.id.app_bar_layout_provider)
 
@@ -447,6 +449,16 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
                 )
             }
         }
+    }
+
+    private fun addStartTransfersView(root: ViewGroup) {
+        root.addView(
+            createStartTransferView(
+                this,
+                viewModel.uiState.map { it.startDownloadEvent },
+                viewModel::consumeTransferTriggerEvent
+            )
+        )
     }
 
     private fun onAttachClicked() {
@@ -996,14 +1008,7 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
         }
         val destination: File? = cacheDir
         val pathToDownload = destination?.path
-        var availableFreeSpace = Double.MAX_VALUE
-        try {
-            val stat = StatFs(destination?.path)
-            availableFreeSpace = stat.availableBlocksLong.toDouble() * stat.blockSizeLong.toDouble()
-        } catch (ex: Exception) {
-            Timber.w("Exception: $ex")
-        }
-        val dlFiles: MutableMap<MegaNode, String> = HashMap()
+        val nodesToDownload = ArrayList<MegaNode>()
         if (hashes != null && hashes.isNotEmpty()) {
             for (hash in hashes) {
                 val tempNode = megaApi.getNodeByHandle(hash)
@@ -1082,28 +1087,11 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
                         finish()
                     }
                 }
-                dlFiles[tempNode] = pathToDownload.orEmpty()
+                nodesToDownload.add(tempNode)
             }
         }
-        if (dlFiles.isNotEmpty()) {
-            for (document in dlFiles.keys) {
-                val path = dlFiles[document]
-                if (availableFreeSpace < document.size) {
-                    Util.showErrorAlertDialog(
-                        getString(R.string.error_not_enough_free_space) + " (" + document.name + ")",
-                        false,
-                        this@FileProviderActivity
-                    )
-                    continue
-                }
-                checkNotificationsPermission(this@FileProviderActivity)
-                val service = Intent(this@FileProviderActivity, DownloadService::class.java)
-                service.putExtra(DownloadService.EXTRA_HASH, document.handle)
-                service.putExtra(DownloadService.EXTRA_SIZE, document.size)
-                service.putExtra(DownloadService.EXTRA_PATH, path)
-                service.putExtra(DownloadService.EXTRA_OPEN_FILE, false)
-                startService(service)
-            }
+        if (nodesToDownload.isNotEmpty()) {
+            viewModel.startDownload(nodesToDownload.map { NodeId(it.handle) })
         }
     }
 
