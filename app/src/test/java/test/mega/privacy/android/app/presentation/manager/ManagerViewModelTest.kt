@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
@@ -25,6 +26,7 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
@@ -1209,7 +1211,7 @@ class ManagerViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().message).isNull()
             underTest.removeShares(listOf(1L))
-            assertThat(awaitItem().message).isEqualTo(message)
+            assertThat(awaitItem().message).isEqualTo(InfoToShow.RawString(message))
         }
     }
 
@@ -1222,7 +1224,7 @@ class ManagerViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().message).isNull()
             underTest.removeShares(listOf(1L))
-            assertThat(awaitItem().message).isEqualTo(message)
+            assertThat(awaitItem().message).isEqualTo(InfoToShow.RawString(message))
         }
         underTest.markHandledMessage()
         underTest.state.test {
@@ -1239,7 +1241,7 @@ class ManagerViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().message).isNull()
             underTest.disableExport(listOf(1L))
-            assertThat(awaitItem().message).isEqualTo(message)
+            assertThat(awaitItem().message).isEqualTo(InfoToShow.RawString(message))
         }
     }
 
@@ -1482,6 +1484,20 @@ class ManagerViewModelTest {
             testScheduler.advanceUntilIdle()
 
             verifyNoInteractions(startCameraUploadUseCase)
+        }
+
+    @Test
+    fun `test that message update correctly when chat call update status emit the call with too many participants code`() =
+        runTest {
+            val call = mock<ChatCall> {
+                on { status } doReturn ChatCallStatus.TerminatingUserParticipation
+                on { termCode } doReturn ChatCallTermCodeType.TooManyParticipants
+            }
+            fakeCallUpdatesFlow.emit(call)
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().message).isEqualTo(InfoToShow.SimpleString(R.string.call_error_too_many_participants))
+            }
         }
 
     companion object {

@@ -15,6 +15,13 @@ sealed class InfoToShow {
      */
     data class SimpleString(@StringRes val stringId: Int) : InfoToShow()
 
+    /**
+     * Raw 'string
+     *
+     * @property value
+     */
+    data class RawString(val value: String) : InfoToShow()
+
 
     /**
      * Show quantity string.

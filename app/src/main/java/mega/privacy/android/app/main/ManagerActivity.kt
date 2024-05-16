@@ -196,6 +196,7 @@ import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
+import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
 import mega.privacy.android.app.presentation.meeting.view.dialog.CallRecordingConsentDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
@@ -1913,8 +1914,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 viewModel.onChatArchivedEventConsumed()
             }
 
-            if (!managerState.message.isNullOrEmpty()) {
-                showSnackbar(content = managerState.message)
+            if (managerState.message != null) {
+                showSnackbar(content = managerState.message.getInfo(this))
                 viewModel.markHandledMessage()
             }
 

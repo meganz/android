@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.manager.model
 
+import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -51,7 +52,7 @@ data class ManagerState(
     val restoreNodeResult: Result<RestoreNodeResult>? = null,
     val nodeNameCollisionResult: NodeNameCollisionResult? = null,
     val moveRequestResult: Result<MoveRequestResult>? = null,
-    val message: String? = null,
+    val message: InfoToShow? = null,
     val chatLinkContent: Result<ChatLinkContent>? = null,
     val androidSyncServiceEnabled: Boolean = false,
     val userRootBackupsFolderHandle: NodeId = NodeId(-1L),

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
@@ -26,6 +27,7 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -411,6 +413,14 @@ class ManagerViewModel @Inject constructor(
                                                 shouldUpgradeToProPlan = true
                                             )
                                         }
+                                    }
+                                } else if (termCode == ChatCallTermCodeType.TooManyParticipants) {
+                                    _state.update { state ->
+                                        state.copy(
+                                            message = InfoToShow.SimpleString(
+                                                R.string.call_error_too_many_participants
+                                            )
+                                        )
                                     }
                                 }
 
@@ -1021,7 +1031,7 @@ class ManagerViewModel @Inject constructor(
                 val message = removeShareResultMapper(result)
                 _state.update { state ->
                     state.copy(
-                        message = message,
+                        message = InfoToShow.RawString(message),
                     )
                 }
             }
@@ -1042,7 +1052,7 @@ class ManagerViewModel @Inject constructor(
                 val message = removePublicLinkResultMapper(result)
                 _state.update { state ->
                     state.copy(
-                        message = message,
+                        message = InfoToShow.RawString(message),
                     )
                 }
             }
