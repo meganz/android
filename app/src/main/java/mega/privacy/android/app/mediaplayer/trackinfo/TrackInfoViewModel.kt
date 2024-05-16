@@ -1,9 +1,10 @@
 package mega.privacy.android.app.mediaplayer.trackinfo
 
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -13,9 +14,8 @@ import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.app.utils.OfflineUtils.saveOffline
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodeByHandleUseCase
@@ -71,13 +71,20 @@ class TrackInfoViewModel @Inject constructor(
     /**
      * Make a node available offline, or remove it from offline.
      */
-    fun makeAvailableOffline(handle: Long, activity: FragmentActivity) =
+    fun makeAvailableOffline(handle: Long) =
         viewModelScope.launch {
             val audioNode = getAudioNodeByHandleUseCase(handle, false) ?: return@launch
             if (isAvailableOfflineUseCase(audioNode)) {
                 removeOfflineNode(handle)
             } else {
-                saveOfflineNode(handle = handle, audioNode = audioNode, activity = activity)
+                _state.update {
+                    it.copy(
+                        transferTriggerEvent = triggered(
+                            TransferTriggerEvent.StartDownloadForOffline(audioNode)
+                        ),
+                        availableOffline = true,
+                    )
+                }
             }
         }
 
@@ -87,7 +94,7 @@ class TrackInfoViewModel @Inject constructor(
                 loadNodeInfo(handle)
                 _state.update {
                     it.copy(
-                        offlineRemoveSnackBarShow = true
+                        offlineRemovedEvent = triggered
                     )
                 }
             }
@@ -96,32 +103,29 @@ class TrackInfoViewModel @Inject constructor(
             }
     }
 
-    private suspend fun saveOfflineNode(
-        handle: Long,
-        audioNode: TypedAudioNode,
-        activity: FragmentActivity,
-    ) {
-        val node = getNodeByHandle(handle) ?: return
-        val offlineParent = getOfflinePathForNodeUseCase(audioNode) ?: return
-        val parentFile = File(offlineParent)
-        if (parentFile.exists().not()) {
-            parentFile.mkdirs()
-        }
-
-        // we need call legacy code OfflineUtils.saveOffline to save node for offline, which require
-        // activity :(
-        saveOffline(parentFile, node, activity)
-        _state.update {
-            it.copy(
-                availableOffline = true,
-                offlineRemoveSnackBarShow = false
-            )
-        }
-    }
-
 
     /**
      * Get latest value of StorageState
      */
     fun getStorageState() = monitorStorageStateEventUseCase.getState()
+
+    /**
+     * Consume transfer trigger event
+     */
+    fun consumeTransferEvent() {
+        _state.update {
+            it.copy(transferTriggerEvent = consumed())
+        }
+    }
+
+    /**
+     * Consume offline removed event
+     */
+    fun consumeOfflineRemovedEvent() {
+        _state.update {
+            it.copy(
+                offlineRemovedEvent = consumed
+            )
+        }
+    }
 }

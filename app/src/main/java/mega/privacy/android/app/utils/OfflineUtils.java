@@ -1,6 +1,5 @@
 package mega.privacy.android.app.utils;
 
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.FROM_BACKUPS;
 import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
@@ -22,11 +21,9 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.shareNodes;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isOnline;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.StatFs;
 
 import androidx.core.content.FileProvider;
 
@@ -40,18 +37,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import kotlin.Unit;
-import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
-import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
-import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.data.gateway.api.MegaApiGateway;
-import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.transfer.Transfer;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -68,57 +60,6 @@ public class OfflineUtils {
 
     public static final String DB_FILE = "0";
     private static final String DB_FOLDER = "1";
-
-    public static void saveOffline(File destination, MegaNode node, Activity activity) {
-        if (StorageStateExtensionsKt.getStorageState() == StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning();
-            return;
-        }
-
-        destination.mkdirs();
-
-        double availableFreeSpace = Double.MAX_VALUE;
-        try {
-            StatFs stat = new StatFs(destination.getAbsolutePath());
-            availableFreeSpace = (double) stat.getAvailableBlocks() * (double) stat.getBlockSize();
-        } catch (Exception ex) {
-        }
-
-        Map<MegaNode, String> dlFiles = new HashMap<>();
-        if (node.getType() == MegaNode.TYPE_FOLDER) {
-            Timber.d("Is Folder");
-            MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
-            MegaNodeUtil.getDlList(megaApi, dlFiles, node, new File(destination, node.getName()));
-        } else {
-            Timber.d("Is File");
-            dlFiles.put(node, destination.getAbsolutePath());
-        }
-
-        PermissionUtils.checkNotificationsPermission(activity);
-
-        for (MegaNode document : dlFiles.keySet()) {
-
-            String path = dlFiles.get(document);
-
-            if (availableFreeSpace < document.getSize()) {
-                RunOnUIThreadUtils.INSTANCE.post(() -> {
-                    Util.showErrorAlertDialog(
-                            activity.getString(R.string.error_not_enough_free_space)
-                                    + " (" + document.getName() + ")",
-                            false, activity);
-                    return Unit.INSTANCE;
-                });
-                return;
-            }
-
-            Intent service = new Intent(activity, DownloadService.class);
-            service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-            service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-            service.putExtra(DownloadService.EXTRA_PATH, path);
-            service.putExtra(DownloadService.EXTRA_DOWNLOAD_FOR_OFFLINE, true);
-            activity.startService(service);
-        }
-    }
 
     /**
      * @deprecated

@@ -1,6 +1,10 @@
 package mega.privacy.android.app.mediaplayer.trackinfo
 
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.LocationInfo
 import java.io.File
 
@@ -14,8 +18,9 @@ import java.io.File
  * @property added the human readable added time of this node
  * @property lastModified the human readable last modified time of this node
  * @property durationString the duration string of the audio
- * @property offlineRemoveSnackBarShow if the offline remove snackBar should be shown
+ * @property offlineRemovedEvent file removed from offline event
  * @property metadata the metadata of the audio
+ * @property transferTriggerEvent transfer trigger state event
  */
 data class TrackInfoState(
     val thumbnail: File? = null,
@@ -25,6 +30,7 @@ data class TrackInfoState(
     val added: Long = 0,
     val lastModified: Long = 0,
     val durationString: String = "",
-    val offlineRemoveSnackBarShow: Boolean? = null,
-    val metadata: Metadata? = null
+    val offlineRemovedEvent: StateEvent = consumed,
+    val metadata: Metadata? = null,
+    val transferTriggerEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
 )

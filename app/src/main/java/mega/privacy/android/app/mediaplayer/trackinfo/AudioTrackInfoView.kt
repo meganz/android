@@ -46,6 +46,7 @@ import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_TITLE_TEST
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.OFFLINE_OPTION_TEST_TAG
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 import java.io.File
 
@@ -306,9 +307,29 @@ fun AudioNodeInfoView(
     }
 }
 
-@Preview
+@CombinedThemePreviews
 @Composable
-private fun PreviewAudioInfoView() {
+private fun AudioTrackInfoViewPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        AudioTrackInfoView(
+            uiState = TrackInfoState(
+                durationString = "00:35"
+            ),
+            metadata = Metadata(
+                title = "Great song",
+                album = "Great album",
+                artist = "The best artist",
+                nodeName = "Node name"
+            ),
+            {},
+            {}
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun AudioInfoViewPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         AudioInfoView(
             thumbnail = null,
@@ -320,9 +341,9 @@ private fun PreviewAudioInfoView() {
     }
 }
 
-@Preview
+@CombinedThemePreviews
 @Composable
-private fun PreviewAudioNodeInfoView() {
+private fun AudioNodeInfoViewPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         AudioNodeInfoView(
             onCheckedChange = {},

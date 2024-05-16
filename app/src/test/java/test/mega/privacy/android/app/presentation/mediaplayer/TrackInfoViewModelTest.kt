@@ -2,6 +2,8 @@ package test.mega.privacy.android.app.presentation.mediaplayer
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.drop
@@ -12,6 +14,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoViewModel
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
@@ -97,7 +100,8 @@ class TrackInfoViewModelTest {
             assertThat(actual.added).isEqualTo(0)
             assertThat(actual.lastModified).isEqualTo(0)
             assertThat(actual.durationString).isEmpty()
-            assertThat(actual.offlineRemoveSnackBarShow).isNull()
+            assertThat(actual.offlineRemovedEvent).isEqualTo(consumed)
+            assertThat(actual.transferTriggerEvent).isEqualTo(consumed())
         }
     }
 
@@ -139,7 +143,7 @@ class TrackInfoViewModelTest {
     }
 
     @Test
-    fun `test the state is updated correctly after makeAvailableOffline is invoked if isAvailableOffline`() =
+    fun `test that the state is updated correctly after makeAvailableOffline is invoked if isAvailableOffline is true`() =
         runTest {
             val testNodeId = NodeId(1L)
             val testAudioNode = mock<TypedAudioNode> {
@@ -153,10 +157,33 @@ class TrackInfoViewModelTest {
             whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn("")
 
             initUnderTest()
-            underTest.makeAvailableOffline(testNodeId.longValue, mock())
+            underTest.makeAvailableOffline(testNodeId.longValue)
 
             underTest.state.drop(1).test {
-                assertThat(awaitItem().offlineRemoveSnackBarShow).isTrue()
+                assertThat(awaitItem().offlineRemovedEvent).isEqualTo(triggered)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the state is updated correctly after makeAvailableOffline is invoked if isAvailableOffline is false`() =
+        runTest {
+            val testNodeId = NodeId(1L)
+            val testAudioNode = mock<TypedAudioNode> {
+                on { id }.thenReturn(testNodeId)
+            }
+            whenever(getAudioNodeByHandleUseCase(anyOrNull(), anyOrNull()))
+                .thenReturn(testAudioNode)
+            whenever(isAvailableOfflineUseCase(anyOrNull())).thenReturn(false)
+            whenever(fileSizeStringMapper(anyOrNull())).thenReturn("")
+            whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn("")
+
+            initUnderTest()
+            underTest.makeAvailableOffline(testNodeId.longValue)
+
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().transferTriggerEvent)
+                    .isEqualTo(triggered(TransferTriggerEvent.StartDownloadForOffline(testAudioNode)))
                 cancelAndIgnoreRemainingEvents()
             }
         }

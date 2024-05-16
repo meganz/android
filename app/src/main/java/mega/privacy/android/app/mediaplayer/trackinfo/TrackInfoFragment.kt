@@ -4,7 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -12,13 +15,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.app.utils.Util
@@ -58,6 +60,7 @@ class TrackInfoFragment : Fragment() {
                 val uiState = viewModel.state.collectAsStateWithLifecycle().value
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val snackbarHostState = remember { SnackbarHostState() }
                 MegaAppTheme(isDark = mode.isDarkMode()) {
                     AudioTrackInfoView(
                         uiState = uiState,
@@ -73,8 +76,26 @@ class TrackInfoFragment : Fragment() {
                                 return@AudioTrackInfoView
                             }
 
-                            viewModel.makeAvailableOffline(args.handle, requireActivity())
+                            viewModel.makeAvailableOffline(args.handle)
                         })
+                    // Snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet because this fragment is inside an activity with the toolbar, etc.
+                    LaunchedEffect(snackbarHostState.currentSnackbarData) {
+                        snackbarHostState.currentSnackbarData?.message?.let {
+                            Util.showSnackbar(activity, it)
+                        }
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                    }
+                    StartTransferComponent(
+                        event = uiState.transferTriggerEvent,
+                        onConsumeEvent = viewModel::consumeTransferEvent,
+                        snackBarHostState = snackbarHostState,
+                    )
+                    EventEffect(
+                        event = uiState.offlineRemovedEvent,
+                        onConsumed = viewModel::consumeOfflineRemovedEvent
+                    ) {
+                        snackbarHostState.showSnackbar(getString(R.string.file_removed_offline))
+                    }
                 }
             }
         }
@@ -86,13 +107,6 @@ class TrackInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (requireActivity() as MediaPlayerActivity).showToolbar(false)
-        collectFlow(
-            viewModel.state.map { it.offlineRemoveSnackBarShow }.distinctUntilChanged()
-        ) { show ->
-            if (show == true) {
-                Util.showSnackbar(activity, getString(R.string.file_removed_offline))
-            }
-        }
         viewModel.loadTrackInfo(args.handle)
     }
 }
