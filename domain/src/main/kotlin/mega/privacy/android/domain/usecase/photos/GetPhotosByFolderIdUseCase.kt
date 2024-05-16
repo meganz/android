@@ -32,25 +32,28 @@ class GetPhotosByFolderIdUseCase @Inject constructor(
     operator fun invoke(
         folderId: NodeId,
         recursive: Boolean,
+        isFromFolderLink: Boolean = false,
     ): Flow<List<Photo>> {
-        return flow { emitAll(getMonitoredList(folderId, recursive)) }
-            .onStart { emit(getFolderPhotos(folderId, recursive)) }
+        return flow { emitAll(getMonitoredList(folderId, recursive, isFromFolderLink)) }
+            .onStart { emit(getFolderPhotos(folderId, recursive, isFromFolderLink)) }
             .cancellable()
     }
 
     private suspend fun getFolderPhotos(
         folderId: NodeId,
         recursive: Boolean,
+        isFromFolderLink: Boolean,
     ): List<Photo> =
         photosRepository.getPhotosByFolderId(
             folderId = folderId,
-            recursive = recursive
+            recursive = recursive,
+            isFromFolderLink = isFromFolderLink
         )
 
 
-    private fun getMonitoredList(folderId: NodeId, recursive: Boolean) =
+    private fun getMonitoredList(folderId: NodeId, recursive: Boolean, isFromFolderLink: Boolean) =
         nodeRepository.monitorNodeUpdates()
             .conflate()
-            .map { getFolderPhotos(folderId, recursive) }
+            .map { getFolderPhotos(folderId, recursive, isFromFolderLink) }
             .cancellable()
 }

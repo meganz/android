@@ -71,7 +71,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUse
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
-import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdInFolderLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
@@ -85,9 +84,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MediaDiscoveryViewModel @Inject constructor(
     private val getNodeListByIds: GetNodeListByIds,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val getPhotosByFolderIdUseCase: GetPhotosByFolderIdUseCase,
-    private val getPhotosByFolderIdInFolderLinkUseCase: GetPhotosByFolderIdInFolderLinkUseCase,
     private val getCameraSortOrder: GetCameraSortOrder,
     private val setCameraSortOrder: SetCameraSortOrder,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
@@ -235,41 +233,26 @@ class MediaDiscoveryViewModel @Inject constructor(
                 monitorSubFolderMediaDiscoverySettingsUseCase()
                     .catch { Timber.e(it) }
                     .collectLatest { isRecursive ->
-                        getPhotos(folderId, isRecursive)
+                        getPhotosByFolderId(folderId, isRecursive, fromFolderLink == true)
                     }
             }
         }
     }
 
-    private suspend fun getPhotos(
+
+    private suspend fun getPhotosByFolderId(
         folderId: Long,
         isRecursive: Boolean,
+        isFromFolderLink: Boolean,
     ) {
-        if (fromFolderLink == true) {
-            getPhotosByFolderIdInFolderLink(folderId, isRecursive)
-        } else {
-            getPhotosByFolderId(folderId, isRecursive)
-        }
-    }
-
-    private suspend fun getPhotosByFolderId(folderId: Long, isRecursive: Boolean) {
         getPhotosByFolderIdUseCase(
             folderId = NodeId(folderId),
-            recursive = isRecursive
+            recursive = isRecursive,
+            isFromFolderLink = isFromFolderLink
         )
             .catch { Timber.e(it) }
             .conflate()
             .collect { sourcePhotos ->
-                handleFolderPhotosAndLogic(sourcePhotos)
-            }
-    }
-
-    private suspend fun getPhotosByFolderIdInFolderLink(folderId: Long, isRecursive: Boolean) {
-        getPhotosByFolderIdInFolderLinkUseCase(
-            folderId = NodeId(folderId),
-            recursive = isRecursive
-        ).catch { Timber.e(it) }
-            .collectLatest { sourcePhotos ->
                 handleFolderPhotosAndLogic(sourcePhotos)
             }
     }

@@ -43,6 +43,8 @@ import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMa
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesRetriever
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
+import mega.privacy.android.data.repository.CancelTokenProvider
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.Offline
@@ -60,6 +62,8 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
@@ -69,6 +73,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaSearchFilter
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -99,6 +104,8 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val megaNodeMapper: MegaNodeMapper,
+    private val megaSearchFilterMapper: MegaSearchFilterMapper,
+    private val cancelTokenProvider: CancelTokenProvider,
 ) : PhotosRepository {
     @Volatile
     private var isInitialized: Boolean = false
@@ -179,11 +186,11 @@ internal class DefaultPhotosRepository @Inject constructor(
     }
 
     private suspend fun fetchImageNodes(): List<MegaNode> = withContext(ioDispatcher) {
-        searchImages().filter { isImageNodeValid(it) }
+        getMegaNodeByCategory(searchCategory = SearchCategory.IMAGES).filter { isImageNodeValid(it) }
     }
 
     private suspend fun fetchVideoNodes(): List<MegaNode> = withContext(ioDispatcher) {
-        searchVideos().filter { isVideoNodeValid(it) }
+        getMegaNodeByCategory(searchCategory = SearchCategory.VIDEO).filter { isVideoNodeValid(it) }
     }
 
     private suspend fun isImageNodeValid(
@@ -365,10 +372,6 @@ internal class DefaultPhotosRepository @Inject constructor(
         return megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
     }
 
-    private suspend fun getMegaNodeByFolderApi(nodeId: NodeId): MegaNode? {
-        return megaApiFolder.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
-    }
-
     override suspend fun getPublicLinksCount(): Int = withContext(ioDispatcher) {
         megaApiFacade.getPublicLinks().size
     }
@@ -417,122 +420,87 @@ internal class DefaultPhotosRepository @Inject constructor(
         folderId: NodeId,
         searchString: String,
         recursive: Boolean,
-    ): List<Photo> =
-        withContext(ioDispatcher) {
-            val parent = getMegaNode(folderId)
-            parent?.let { parentNode ->
-                val token = MegaCancelToken.createInstance()
-                val images = async {
-                    val imageNodes = megaApiFacade.searchByType(
-                        parentNode = parentNode,
-                        searchString = searchString,
-                        cancelToken = token,
-                        recursive = recursive,
-                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                        type = MegaApiAndroid.FILE_TYPE_PHOTO
-                    )
-                    mapPhotoNodesToImages(imageNodes)
-                }
-                val videos = async {
-                    val videoNodes = megaApiFacade.searchByType(
-                        parentNode = parentNode,
-                        searchString = searchString,
-                        cancelToken = token,
-                        recursive = recursive,
-                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                        type = MegaApiAndroid.FILE_TYPE_VIDEO
-                    )
-                    mapPhotoNodesToVideos(videoNodes)
-                }
-                val photos = images.await() + videos.await()
-                suspendCancellableCoroutine { continuation ->
-                    continuation.resumeWith(Result.success(photos))
-                    continuation.invokeOnCancellation {
-                        token.cancel()
-                    }
-                }
-                token.cancel()
-                photos
-            } ?: emptyList()
+        isFromFolderLink: Boolean,
+    ): List<Photo> = withContext(ioDispatcher) {
+        val images = async {
+            val imageNodes = getMegaNodeByCategory(
+                parentId = folderId,
+                recursive = recursive,
+                query = searchString,
+                searchCategory = SearchCategory.IMAGES,
+                isFromFolderLink = isFromFolderLink
+            )
+            mapPhotoNodesToImages(imageNodes)
         }
-
-    override suspend fun getPhotosByFolderIdInFolderLink(
-        folderId: NodeId,
-        searchString: String,
-        recursive: Boolean,
-    ): List<Photo> =
-        withContext(ioDispatcher) {
-            val parent = megaApiFolder.getMegaNodeByHandle(folderId.longValue)
-            parent?.let { parentNode ->
-                val token = MegaCancelToken.createInstance()
-                val images = async {
-                    val imageNodes = megaApiFolder.searchByType(
-                        parentNode = parentNode,
-                        searchString = searchString,
-                        cancelToken = token,
-                        recursive = recursive,
-                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                        type = MegaApiAndroid.FILE_TYPE_PHOTO
-                    )
-                    mapPhotoNodesToImages(imageNodes)
-                }
-                val videos = async {
-                    val videoNodes = megaApiFolder.searchByType(
-                        parentNode = parentNode,
-                        searchString = searchString,
-                        cancelToken = token,
-                        recursive = recursive,
-                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                        type = MegaApiAndroid.FILE_TYPE_VIDEO
-                    )
-                    mapPhotoNodesToVideos(videoNodes)
-                }
-                val photos = images.await() + videos.await()
-                suspendCancellableCoroutine { continuation ->
-                    continuation.resumeWith(Result.success(photos))
-                    continuation.invokeOnCancellation {
-                        token.cancel()
-                    }
-                }
-                token.cancel()
-                photos
-            } ?: emptyList()
+        val videos = async {
+            val videoNodes = getMegaNodeByCategory(
+                parentId = folderId,
+                recursive = recursive,
+                query = searchString,
+                searchCategory = SearchCategory.VIDEO,
+                isFromFolderLink = isFromFolderLink
+            )
+            mapPhotoNodesToVideos(videoNodes)
         }
-
-    private suspend fun searchImages(): List<MegaNode> = withContext(ioDispatcher) {
-        val token = MegaCancelToken.createInstance()
-        val imageNodes = megaApiFacade.searchByType(
-            token,
-            MegaApiAndroid.ORDER_MODIFICATION_DESC,
-            MegaApiAndroid.FILE_TYPE_PHOTO,
-            MegaApiAndroid.SEARCH_TARGET_ROOTNODE
-        )
-        suspendCancellableCoroutine { continuation ->
-            continuation.resumeWith(Result.success(imageNodes))
-            continuation.invokeOnCancellation {
-                token.cancel()
-            }
-        }
-        token.cancel()
-        imageNodes
+        val photos = images.await() + videos.await()
+        photos
     }
 
-    private suspend fun searchVideos(): List<MegaNode> = withContext(ioDispatcher) {
-        val token = MegaCancelToken.createInstance()
-        val videosNodes = megaApiFacade.searchByType(
-            token,
-            MegaApiAndroid.ORDER_MODIFICATION_DESC,
-            MegaApiAndroid.FILE_TYPE_VIDEO,
-            MegaApiAndroid.SEARCH_TARGET_ROOTNODE
+    private suspend fun getMegaNodeByCategory(
+        parentId: NodeId = NodeId(-1L),
+        recursive: Boolean = true,
+        query: String = "",
+        searchCategory: SearchCategory,
+        isFromFolderLink: Boolean = false,
+    ): List<MegaNode> {
+        val token = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = megaSearchFilterMapper(
+            parentHandle = parentId,
+            searchQuery = query,
+            searchTarget = SearchTarget.ALL,
+            searchCategory = searchCategory,
         )
-        suspendCancellableCoroutine { continuation ->
-            continuation.resumeWith(Result.success(videosNodes))
-            continuation.invokeOnCancellation {
-                token.cancel()
-            }
+        return if (isFromFolderLink) {
+            getNodeByCategorySearchFromFolderLink(recursive, filter, token)
+        } else {
+            getNodeByCategorySearch(recursive, filter, token)
         }
-        token.cancel()
-        videosNodes
+    }
+
+    private suspend fun getNodeByCategorySearchFromFolderLink(
+        recursive: Boolean,
+        filter: MegaSearchFilter,
+        token: MegaCancelToken,
+    ): List<MegaNode> = if (recursive) {
+        megaApiFolder.search(
+            filter = filter,
+            order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+            megaCancelToken = token
+        )
+    } else {
+        megaApiFolder.getChildren(
+            filter = filter,
+            order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+            megaCancelToken = token
+        )
+    }
+
+    private suspend fun getNodeByCategorySearch(
+        recursive: Boolean,
+        filter: MegaSearchFilter,
+        token: MegaCancelToken,
+    ) = if (recursive) {
+        megaApiFacade.searchWithFilter(
+            filter = filter,
+            order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+            megaCancelToken = token
+        )
+    } else {
+        megaApiFacade.getChildren(
+            filter = filter,
+            order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+            megaCancelToken = token
+        )
     }
 
     /**
@@ -540,11 +508,10 @@ internal class DefaultPhotosRepository @Inject constructor(
      */
     private suspend fun mapMegaNodeToPhoto(megaNode: MegaNode, filterSvg: Boolean = true): Photo? {
         val fileType = fileTypeInfoMapper(megaNode)
-        val isValid =
-            megaNode.isFile
-                    && (fileType is VideoFileTypeInfo
-                    || (fileType is ImageFileTypeInfo && checkSvg(filterSvg, fileType))
-                    && !megaApiFacade.isInRubbish(megaNode))
+        val isValid = megaNode.isFile
+                && (fileType is VideoFileTypeInfo
+                || (fileType is ImageFileTypeInfo && checkSvg(filterSvg, fileType))
+                && !megaApiFacade.isInRubbish(megaNode))
         if (isValid.not()) return null
         return if (fileType is ImageFileTypeInfo) {
             mapMegaNodeToImage(megaNode)
@@ -839,28 +806,19 @@ internal class DefaultPhotosRepository @Inject constructor(
         parentId: NodeId,
         recursive: Boolean,
     ): List<ImageNode> = withContext(ioDispatcher) {
-        val parentNode = getMegaNode(parentId) ?: return@withContext emptyList()
-
-        val token = MegaCancelToken.createInstance()
         val nodes = awaitAll(
             async {
-                megaApiFacade.searchByType(
-                    parentNode = parentNode,
-                    searchString = "*",
-                    cancelToken = token,
-                    recursive = recursive,
-                    order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                    type = MegaApiAndroid.FILE_TYPE_PHOTO,
+                getMegaNodeByCategory(
+                    parentId = parentId,
+                    searchCategory = SearchCategory.IMAGES,
+                    recursive = recursive
                 ).filter { isImageNodeValid(it) }
             },
             async {
-                megaApiFacade.searchByType(
-                    parentNode = parentNode,
-                    searchString = "*",
-                    cancelToken = token,
-                    recursive = recursive,
-                    order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                    type = MegaApiAndroid.FILE_TYPE_VIDEO,
+                getMegaNodeByCategory(
+                    parentId = parentId,
+                    searchCategory = SearchCategory.VIDEO,
+                    recursive = recursive
                 ).filter { isVideoNodeValid(it) }
             },
         ).flatten()
@@ -879,28 +837,21 @@ internal class DefaultPhotosRepository @Inject constructor(
         parentId: NodeId,
         recursive: Boolean,
     ): List<ImageNode> = withContext(ioDispatcher) {
-        val parentNode = getMegaNodeByFolderApi(parentId) ?: return@withContext emptyList()
-
-        val token = MegaCancelToken.createInstance()
         val nodes = awaitAll(
             async {
-                megaApiFolder.searchByType(
-                    parentNode = parentNode,
-                    searchString = "*",
-                    cancelToken = token,
+                getMegaNodeByCategory(
+                    parentId = parentId,
+                    searchCategory = SearchCategory.IMAGES,
                     recursive = recursive,
-                    order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                    type = MegaApiAndroid.FILE_TYPE_PHOTO,
+                    isFromFolderLink = true
                 ).filter { isImageNodeValid(it) }
             },
             async {
-                megaApiFolder.searchByType(
-                    parentNode = parentNode,
-                    searchString = "*",
-                    cancelToken = token,
+                getMegaNodeByCategory(
+                    parentId = parentId,
+                    searchCategory = SearchCategory.VIDEO,
                     recursive = recursive,
-                    order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                    type = MegaApiAndroid.FILE_TYPE_VIDEO,
+                    isFromFolderLink = true
                 ).filter { isVideoNodeValid(it) }
             },
         ).flatten()

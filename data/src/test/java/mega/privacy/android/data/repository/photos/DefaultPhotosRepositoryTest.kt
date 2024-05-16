@@ -22,6 +22,8 @@ import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMa
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesRetriever
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
+import mega.privacy.android.data.repository.CancelTokenProvider
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
@@ -31,12 +33,16 @@ import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaStringMap
 import org.junit.Before
 import org.junit.Test
@@ -79,6 +85,8 @@ class DefaultPhotosRepositoryTest {
         mock<CameraUploadsSettingsPreferenceGateway>()
 
     private val success = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
+    private val cancelTokenProvider = mock<CancelTokenProvider>()
+    private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
 
     @Before
     fun setUp() {
@@ -291,6 +299,8 @@ class DefaultPhotosRepositoryTest {
         megaNodeMapper = megaNodeMapper,
         sensitivesMapper = megaStringMapSensitivesMapper,
         sensitivesRetriever = megaStringMapSensitivesRetriever,
+        cancelTokenProvider = cancelTokenProvider,
+        megaSearchFilterMapper = megaSearchFilterMapper,
     )
 
     private fun createMegaNode(
@@ -389,4 +399,229 @@ class DefaultPhotosRepositoryTest {
             return UnknownFileTypeInfo(mimeType = "", extension = "")
         }
     }
+
+    @Test
+    fun `test that getPhotosByFolderId returns list of photos when it is opened from cloud drive recursively`() =
+        runTest {
+            val token = mock<MegaCancelToken>()
+            val imageNode = mock<MegaNode> {
+                on { handle }.thenReturn(-1L)
+                on { name }.thenReturn("image.jpg")
+                on { hasThumbnail() }.thenReturn(true)
+            }
+            val videoNode = mock<MegaNode> {
+                on { handle }.thenReturn(-2L)
+                on { name }.thenReturn("video.mp4")
+                on { hasThumbnail() }.thenReturn(true)
+            }
+            val imageFilter = mock<MegaSearchFilter>()
+            val videoFilter = mock<MegaSearchFilter>()
+            whenever(nodeRepository.isNodeInRubbishBin(NodeId(-1L))).thenReturn(false)
+            whenever(nodeRepository.isNodeInRubbishBin(NodeId(-2L))).thenReturn(false)
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = NodeId(-1),
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ALL,
+                    searchCategory = SearchCategory.IMAGES,
+                )
+            ).thenReturn(imageFilter)
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = NodeId(-1),
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ALL,
+                    searchCategory = SearchCategory.VIDEO,
+                )
+            ).thenReturn(videoFilter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(
+                megaApiGateway.searchWithFilter(
+                    filter = imageFilter,
+                    order = MegaApiJava.ORDER_MODIFICATION_DESC,
+                    megaCancelToken = token
+                ),
+            ).thenReturn(listOf(imageNode))
+            whenever(
+                megaApiGateway.searchWithFilter(
+                    filter = videoFilter,
+                    order = MegaApiJava.ORDER_MODIFICATION_DESC,
+                    megaCancelToken = token
+                ),
+            ).thenReturn(listOf(videoNode))
+            underTest = createUnderTest(this)
+            val actualPhotos = underTest.getPhotosByFolderId(NodeId(-1L), recursive = true)
+            assertThat(actualPhotos).isNotEmpty()
+        }
+
+    @Test
+    fun `test that getPhotosByFolderId returns list of photos when it is opened from cloud drive non recursively`() =
+        runTest {
+            val token = mock<MegaCancelToken>()
+            val imageNode = mock<MegaNode> {
+                on { handle }.thenReturn(-1L)
+                on { name }.thenReturn("image.jpg")
+                on { hasThumbnail() }.thenReturn(true)
+            }
+            val videoNode = mock<MegaNode> {
+                on { handle }.thenReturn(-2L)
+                on { name }.thenReturn("video.mp4")
+                on { hasThumbnail() }.thenReturn(true)
+            }
+            val imageFilter = mock<MegaSearchFilter>()
+            val videoFilter = mock<MegaSearchFilter>()
+            whenever(nodeRepository.isNodeInRubbishBin(NodeId(-1L))).thenReturn(false)
+            whenever(nodeRepository.isNodeInRubbishBin(NodeId(-2L))).thenReturn(false)
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = NodeId(-1),
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ALL,
+                    searchCategory = SearchCategory.IMAGES,
+                )
+            ).thenReturn(imageFilter)
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = NodeId(-1),
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ALL,
+                    searchCategory = SearchCategory.VIDEO,
+                )
+            ).thenReturn(videoFilter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(
+                megaApiGateway.getChildren(
+                    filter = imageFilter,
+                    order = MegaApiJava.ORDER_MODIFICATION_DESC,
+                    megaCancelToken = token
+                ),
+            ).thenReturn(listOf(imageNode))
+            whenever(
+                megaApiGateway.getChildren(
+                    filter = videoFilter,
+                    order = MegaApiJava.ORDER_MODIFICATION_DESC,
+                    megaCancelToken = token
+                ),
+            ).thenReturn(listOf(videoNode))
+            underTest = createUnderTest(this)
+            val actualPhotos = underTest.getPhotosByFolderId(NodeId(-1L), recursive = false)
+            assertThat(actualPhotos).isNotEmpty()
+        }
+
+
+    @Test
+    fun `test that getPhotosByFolderId returns list of photos when it is opened from folder link recursively`() =
+        runTest {
+            val token = mock<MegaCancelToken>()
+            val imageNode = mock<MegaNode> {
+                on { handle }.thenReturn(-1L)
+                on { name }.thenReturn("image.jpg")
+                on { hasThumbnail() }.thenReturn(true)
+            }
+            val videoNode = mock<MegaNode> {
+                on { handle }.thenReturn(-2L)
+                on { name }.thenReturn("video.mp4")
+                on { hasThumbnail() }.thenReturn(true)
+            }
+            val imageFilter = mock<MegaSearchFilter>()
+            val videoFilter = mock<MegaSearchFilter>()
+            whenever(nodeRepository.isNodeInRubbishBin(NodeId(-1L))).thenReturn(false)
+            whenever(nodeRepository.isNodeInRubbishBin(NodeId(-2L))).thenReturn(false)
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = NodeId(-1),
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ALL,
+                    searchCategory = SearchCategory.IMAGES,
+                )
+            ).thenReturn(imageFilter)
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = NodeId(-1),
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ALL,
+                    searchCategory = SearchCategory.VIDEO,
+                )
+            ).thenReturn(videoFilter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(
+                megaApiFolder.search(
+                    filter = imageFilter,
+                    order = MegaApiJava.ORDER_MODIFICATION_DESC,
+                    megaCancelToken = token
+                ),
+            ).thenReturn(listOf(imageNode))
+            whenever(
+                megaApiFolder.search(
+                    filter = videoFilter,
+                    order = MegaApiJava.ORDER_MODIFICATION_DESC,
+                    megaCancelToken = token
+                ),
+            ).thenReturn(listOf(videoNode))
+            underTest = createUnderTest(this)
+            val actualPhotos = underTest.getPhotosByFolderId(
+                NodeId(-1L),
+                recursive = true,
+                isFromFolderLink = true
+            )
+            assertThat(actualPhotos).isNotEmpty()
+        }
+
+    @Test
+    fun `test that getPhotosByFolderId returns list of photos when it is opened from folder link non recursively`() =
+        runTest {
+            val token = mock<MegaCancelToken>()
+            val imageNode = mock<MegaNode> {
+                on { handle }.thenReturn(-1L)
+                on { name }.thenReturn("image.jpg")
+                on { hasThumbnail() }.thenReturn(true)
+            }
+            val videoNode = mock<MegaNode> {
+                on { handle }.thenReturn(-2L)
+                on { name }.thenReturn("video.mp4")
+                on { hasThumbnail() }.thenReturn(true)
+            }
+            val imageFilter = mock<MegaSearchFilter>()
+            val videoFilter = mock<MegaSearchFilter>()
+            whenever(nodeRepository.isNodeInRubbishBin(NodeId(-1L))).thenReturn(false)
+            whenever(nodeRepository.isNodeInRubbishBin(NodeId(-2L))).thenReturn(false)
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = NodeId(-1),
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ALL,
+                    searchCategory = SearchCategory.IMAGES,
+                )
+            ).thenReturn(imageFilter)
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = NodeId(-1),
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ALL,
+                    searchCategory = SearchCategory.VIDEO,
+                )
+            ).thenReturn(videoFilter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(
+                megaApiFolder.getChildren(
+                    filter = imageFilter,
+                    order = MegaApiJava.ORDER_MODIFICATION_DESC,
+                    megaCancelToken = token
+                ),
+            ).thenReturn(listOf(imageNode))
+            whenever(
+                megaApiFolder.getChildren(
+                    filter = videoFilter,
+                    order = MegaApiJava.ORDER_MODIFICATION_DESC,
+                    megaCancelToken = token
+                ),
+            ).thenReturn(listOf(videoNode))
+            underTest = createUnderTest(this)
+            val actualPhotos = underTest.getPhotosByFolderId(
+                NodeId(-1L),
+                recursive = false,
+                isFromFolderLink = true
+            )
+            assertThat(actualPhotos).isNotEmpty()
+        }
 }

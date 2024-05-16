@@ -48,7 +48,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUse
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
-import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdInFolderLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
@@ -77,8 +76,6 @@ class MediaDiscoveryViewModelTest {
     private val getNodeListByIds = mock<GetNodeListByIds>()
     private val savedStateHandle = mock<SavedStateHandle>()
     private val getPhotosByFolderIdUseCase = mock<GetPhotosByFolderIdUseCase>()
-    private val getPhotosByFolderIdInFolderLinkUseCase =
-        mock<GetPhotosByFolderIdInFolderLinkUseCase>()
     private val getCameraSortOrder = mock<GetCameraSortOrder>()
     private val setCameraSortOrder = mock<SetCameraSortOrder>()
     private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView>()
@@ -128,7 +125,6 @@ class MediaDiscoveryViewModelTest {
             getNodeListByIds = getNodeListByIds,
             savedStateHandle = savedStateHandle,
             getPhotosByFolderIdUseCase = getPhotosByFolderIdUseCase,
-            getPhotosByFolderIdInFolderLinkUseCase = getPhotosByFolderIdInFolderLinkUseCase,
             getCameraSortOrder = getCameraSortOrder,
             setCameraSortOrder = setCameraSortOrder,
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
@@ -176,7 +172,6 @@ class MediaDiscoveryViewModelTest {
         getNodeListByIds,
         savedStateHandle,
         getPhotosByFolderIdUseCase,
-        getPhotosByFolderIdInFolderLinkUseCase,
         getCameraSortOrder,
         setCameraSortOrder,
         monitorMediaDiscoveryView,

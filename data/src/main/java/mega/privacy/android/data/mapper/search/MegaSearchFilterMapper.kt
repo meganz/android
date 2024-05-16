@@ -29,8 +29,8 @@ class MegaSearchFilterMapper @Inject constructor(
      * @param creationDate [DateFilterOption]
      */
     operator fun invoke(
-        searchQuery: String,
         parentHandle: NodeId,
+        searchQuery: String = "",
         searchTarget: SearchTarget = SearchTarget.ROOT_NODES,
         searchCategory: SearchCategory? = SearchCategory.ALL,
         modificationDate: DateFilterOption? = null,
