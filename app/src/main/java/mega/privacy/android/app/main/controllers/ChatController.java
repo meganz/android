@@ -44,7 +44,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
@@ -818,17 +817,7 @@ public class ChatController {
                 continue;
             }
 
-            Intent service = new Intent(context, DownloadService.class);
-            document = authorizeNodeIfPreview(document, chatRoom);
-            String serializeString = document.serialize();
-            Timber.d("serializeString: %s", serializeString);
-            service.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
-            service.putExtra(DownloadService.EXTRA_PATH, path);
-            service.putExtra(DownloadService.EXTRA_DOWNLOAD_FOR_OFFLINE, true);
-            if (fromMediaViewer) {
-                service.putExtra("fromMV", true);
-            }
-            context.startService(service);
+            Timber.d("Download service has been removed, this should not be called as new chat is using ChatUploadsWorker");
         }
 
     }
