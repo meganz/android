@@ -968,6 +968,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.video_playlist,
+                R.id.video_queue,
                 -> {
                     // Pause the video when the playlist page is opened, and allow the video to
                     // revert to playing after back to the video player page.

@@ -12,11 +12,21 @@
         <action
             android:id="@+id/action_video_player_to_playlist"
             app:destination="@+id/video_playlist" />
+
+        <action
+            android:id="@+id/action_video_player_to_queue"
+            app:destination="@+id/video_queue" />
     </fragment>
 
     <fragment android:id="@+id/video_playlist"
         android:name="mega.privacy.android.app.mediaplayer.playlist.VideoPlaylistFragment"
         android:label=""
         tools:layout="@layout/fragment_media_playlist">
+    </fragment>
+
+    <fragment
+        android:id="@+id/video_queue"
+        android:name="mega.privacy.android.app.mediaplayer.queue.video.VideoQueueFragment"
+        android:label="">
     </fragment>
 </navigation>

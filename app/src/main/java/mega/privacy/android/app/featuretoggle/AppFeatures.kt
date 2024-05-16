@@ -14,6 +14,13 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+    /**
+     * Enables new video queue
+     */
+    NewVideoQueue(
+        "Enable new video queue",
+        false,
+    ),
 
     /**
      * Enables report issue via email in login screen

@@ -49,6 +49,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
@@ -65,6 +66,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
 import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
@@ -82,6 +84,12 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class VideoPlayerFragment : Fragment() {
+    /**
+     * Inject [GetFeatureFlagValueUseCase] to the Fragment
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
     /**
      * MediaPlayerGateway for video player
      */
@@ -331,8 +339,15 @@ class VideoPlayerFragment : Fragment() {
                 setupPlaylistButton(viewModel.getPlaylistItems()) {
                     videoPlayerActivity?.setDraggable(false)
                     findNavController().let {
-                        if (it.currentDestination?.id == R.id.video_main_player) {
-                            it.navigate(VideoPlayerFragmentDirections.actionVideoPlayerToPlaylist())
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            if (it.currentDestination?.id == R.id.video_main_player) {
+                                it.navigate(
+                                    if (getFeatureFlagValueUseCase(AppFeatures.NewVideoQueue))
+                                        VideoPlayerFragmentDirections.actionVideoPlayerToQueue()
+                                    else
+                                        VideoPlayerFragmentDirections.actionVideoPlayerToPlaylist()
+                                )
+                            }
                         }
                     }
                 }
