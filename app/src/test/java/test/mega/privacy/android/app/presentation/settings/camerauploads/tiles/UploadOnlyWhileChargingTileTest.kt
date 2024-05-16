@@ -37,6 +37,7 @@ internal class UploadOnlyWhileChargingTileTest {
         with(composeTestRule) {
             onNodeWithTag(UPLOAD_ONLY_WHILE_CHARGING_TILE).assertIsDisplayed()
             onNodeWithText(SharedR.string.settings_camera_uploads_upload_only_while_charging_option_name).assertExists()
+            onNodeWithText(SharedR.string.settings_camera_uploads_upload_only_while_charging_option_body).assertExists()
             onNodeWithTag(UPLOAD_ONLY_WHILE_CHARGING_TILE_SWITCH).assertIsDisplayed()
             onNodeWithTag(UPLOAD_ONLY_WHILE_CHARGING_TILE_DIVIDER).assertIsDisplayed()
         }

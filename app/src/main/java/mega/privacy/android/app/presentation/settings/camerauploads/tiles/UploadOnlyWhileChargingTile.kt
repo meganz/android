@@ -33,6 +33,8 @@ internal fun UploadOnlyWhileChargingTile(
         GenericTwoLineListItem(
             modifier = Modifier.testTag(UPLOAD_ONLY_WHILE_CHARGING_TILE),
             title = stringResource(SharedR.string.settings_camera_uploads_upload_only_while_charging_option_name),
+            subtitle = stringResource(SharedR.string.settings_camera_uploads_upload_only_while_charging_option_body),
+            showEntireSubtitle = true,
             trailingIcons = {
                 MegaSwitch(
                     modifier = Modifier.testTag(UPLOAD_ONLY_WHILE_CHARGING_TILE_SWITCH),
