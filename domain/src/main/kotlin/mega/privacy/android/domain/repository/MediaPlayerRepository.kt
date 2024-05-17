@@ -83,7 +83,7 @@ interface MediaPlayerRepository {
     suspend fun getAudioNodesByParentHandle(
         parentHandle: Long,
         order: SortOrder,
-    ): List<TypedAudioNode>?
+    ): List<TypedAudioNode>
 
     /**
      * Get video children by parent node handle
@@ -95,7 +95,7 @@ interface MediaPlayerRepository {
     suspend fun getVideoNodesByParentHandle(
         parentHandle: Long,
         order: SortOrder,
-    ): List<TypedVideoNode>?
+    ): List<TypedVideoNode>
 
     /**
      * Get audio children by parent handle from MegaApiFolder
@@ -107,7 +107,7 @@ interface MediaPlayerRepository {
     suspend fun getAudiosByParentHandleFromMegaApiFolder(
         parentHandle: Long,
         order: SortOrder,
-    ): List<TypedAudioNode>?
+    ): List<TypedAudioNode>
 
     /**
      * Get video children by parent handle from MegaApiFolder
@@ -119,7 +119,7 @@ interface MediaPlayerRepository {
     suspend fun getVideosByParentHandleFromMegaApiFolder(
         parentHandle: Long,
         order: SortOrder,
-    ): List<TypedVideoNode>?
+    ): List<TypedVideoNode>
 
     /**
      * Get audio nodes from public links

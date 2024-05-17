@@ -29,7 +29,7 @@ class MegaSearchFilterMapper @Inject constructor(
      * @param creationDate [DateFilterOption]
      */
     operator fun invoke(
-        parentHandle: NodeId,
+        parentHandle: NodeId? = null,
         searchQuery: String = "",
         searchTarget: SearchTarget = SearchTarget.ROOT_NODES,
         searchCategory: SearchCategory? = SearchCategory.ALL,
@@ -43,7 +43,7 @@ class MegaSearchFilterMapper @Inject constructor(
         }
 
         // Set the parent node to search, if parentHandle is null, search in all nodes
-        if (parentHandle.longValue == -1L) {
+        if (parentHandle == null || parentHandle.longValue == -1L) {
             byLocation(searchTargetIntMapper(searchTarget))
         } else {
             byLocationHandle(parentHandle.longValue)

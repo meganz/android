@@ -447,7 +447,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     }
 
     private suspend fun getMegaNodeByCategory(
-        parentId: NodeId = NodeId(-1L),
+        parentId: NodeId? = null,
         recursive: Boolean = true,
         query: String = "",
         searchCategory: SearchCategory,

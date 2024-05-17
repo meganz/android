@@ -16,5 +16,5 @@ class GetSRTSubtitleFileListUseCase @Inject constructor(
      * @return SRT subtitle file info list
      */
     suspend operator fun invoke(): List<SubtitleFileInfo> =
-        mediaPlayerRepository.getSubtitleFileInfoList("*.srt")
+        mediaPlayerRepository.getSubtitleFileInfoList(".srt")
 }

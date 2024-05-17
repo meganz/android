@@ -20,6 +20,7 @@ import mega.privacy.android.data.mapper.audios.TypedAudioNodeMapper
 import mega.privacy.android.data.mapper.mediaplayer.RepeatToggleModeMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.Offline
@@ -29,13 +30,10 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.MediaPlayerRepository
-import nz.mega.sdk.MegaApiJava.FILE_TYPE_AUDIO
-import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
-import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
@@ -55,10 +53,12 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private val fileGateway: FileGateway,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val appPreferencesGateway: AppPreferencesGateway,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val subtitleFileInfoMapper: SubtitleFileInfoMapper,
     private val mediaPlayerPreferencesGateway: MediaPlayerPreferencesGateway,
     private val repeatToggleModeMapper: RepeatToggleModeMapper,
+    private val searchFilterMapper: MegaSearchFilterMapper,
+    private val cancelTokenProvider: CancelTokenProvider,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : MediaPlayerRepository {
 
     private val playbackInfoMap = mutableMapOf<Long, PlaybackInformation>()
@@ -89,32 +89,20 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         }
 
     override suspend fun getAudioNodes(order: SortOrder): List<TypedAudioNode> =
-        withContext(ioDispatcher) {
-            megaApi.searchByType(
-                MegaCancelToken.createInstance(),
-                sortOrderIntMapper(order),
-                FILE_TYPE_AUDIO,
-                SEARCH_TARGET_ROOTNODE
-            ).filter {
-                it.isFile && filterByNodeName(true, it.name)
-            }.map { megaNode ->
-                convertToTypedAudioNode(megaNode)
-            }
+        getMegaNodeByCategory(
+            searchCategory = SearchCategory.AUDIO,
+            order = order
+        ).map { megaNode ->
+            convertToTypedAudioNode(megaNode)
         }
 
 
     override suspend fun getVideoNodes(order: SortOrder): List<TypedVideoNode> =
-        withContext(ioDispatcher) {
-            megaApi.searchByType(
-                MegaCancelToken.createInstance(),
-                sortOrderIntMapper(order),
-                FILE_TYPE_VIDEO,
-                SEARCH_TARGET_ROOTNODE
-            ).filter {
-                it.isFile && filterByNodeName(false, it.name)
-            }.map { megaNode ->
-                convertToTypedVideoNode(megaNode)
-            }
+        getMegaNodeByCategory(
+            searchCategory = SearchCategory.VIDEO,
+            order = order
+        ).map { megaNode ->
+            convertToTypedVideoNode(megaNode)
         }
 
 
@@ -153,73 +141,77 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     override suspend fun getAudioNodesByParentHandle(
         parentHandle: Long,
         order: SortOrder,
-    ): List<TypedAudioNode>? =
-        withContext(ioDispatcher) {
-            megaApi.getMegaNodeByHandle(parentHandle)?.let { parent ->
-                megaApi.getChildren(parent, sortOrderIntMapper(order)).filter {
-                    it.isFile && filterByNodeName(true, it.name)
-                }.map { node ->
-                    convertToTypedAudioNode(node)
-                }
-            }
+    ): List<TypedAudioNode> = withContext(ioDispatcher) {
+        getMegaNodeByCategory(
+            parentId = NodeId(parentHandle),
+            searchCategory = SearchCategory.AUDIO,
+            order = order,
+            recursive = false
+        ).map { megaNode ->
+            convertToTypedAudioNode(megaNode)
         }
+    }
 
     override suspend fun getVideoNodesByParentHandle(
         parentHandle: Long,
         order: SortOrder,
-    ): List<TypedVideoNode>? =
-        withContext(ioDispatcher) {
-            megaApi.getMegaNodeByHandle(parentHandle)?.let { parent ->
-                megaApi.getChildren(parent, sortOrderIntMapper(order)).filter {
-                    it.isFile && filterByNodeName(false, it.name)
-                }.map { node ->
-                    convertToTypedVideoNode(node)
-                }
-            }
+    ): List<TypedVideoNode> = withContext(ioDispatcher) {
+        getMegaNodeByCategory(
+            parentId = NodeId(parentHandle),
+            searchCategory = SearchCategory.VIDEO,
+            order = order,
+            recursive = false
+        ).map { megaNode ->
+            convertToTypedVideoNode(megaNode)
         }
+    }
 
     override suspend fun getAudiosByParentHandleFromMegaApiFolder(
         parentHandle: Long,
         order: SortOrder,
-    ): List<TypedAudioNode>? =
-        withContext(ioDispatcher) {
-            megaApiFolder.getMegaNodeByHandle(parentHandle)?.let { parent ->
-                megaApiFolder.getChildren(parent, sortOrderIntMapper(order)).filter {
-                    it.isFile && filterByNodeName(true, it.name)
-                }.map { node ->
-                    convertToTypedAudioNode(node)
-                }
-            }
+    ): List<TypedAudioNode> = withContext(ioDispatcher) {
+        getMegaNodeByCategoryFromFolderLink(
+            parentId = NodeId(parentHandle),
+            searchCategory = SearchCategory.AUDIO,
+            order = order,
+            recursive = false
+        ).map { megaNode ->
+            convertToTypedAudioNode(megaNode)
         }
+    }
 
     override suspend fun getVideosByParentHandleFromMegaApiFolder(
         parentHandle: Long,
         order: SortOrder,
-    ): List<TypedVideoNode>? =
-        withContext(ioDispatcher) {
-            megaApiFolder.getMegaNodeByHandle(parentHandle)?.let { parent ->
-                megaApiFolder.getChildren(parent, sortOrderIntMapper(order)).filter {
-                    it.isFile && filterByNodeName(false, it.name)
-                }.map { node ->
-                    convertToTypedVideoNode(node)
-                }
-            }
+    ): List<TypedVideoNode> = withContext(ioDispatcher) {
+        getMegaNodeByCategoryFromFolderLink(
+            parentId = NodeId(parentHandle),
+            searchCategory = SearchCategory.VIDEO,
+            order = order,
+            recursive = false
+        ).map { megaNode ->
+            convertToTypedVideoNode(megaNode)
         }
+    }
 
     override suspend fun getAudioNodesFromPublicLinks(order: SortOrder): List<TypedAudioNode> =
         withContext(ioDispatcher) {
-            megaApi.getPublicLinks(sortOrderIntMapper(order)).filter {
-                it.isFile && filterByNodeName(true, it.name)
-            }.map { node ->
+            getMegaNodeByCategory(
+                searchCategory = SearchCategory.AUDIO,
+                order = order,
+                searchTarget = SearchTarget.LINKS_SHARE
+            ).map { node ->
                 convertToTypedAudioNode(node)
             }
         }
 
     override suspend fun getVideoNodesFromPublicLinks(order: SortOrder): List<TypedVideoNode> =
         withContext(ioDispatcher) {
-            megaApi.getPublicLinks(sortOrderIntMapper(order)).filter {
-                it.isFile && filterByNodeName(false, it.name)
-            }.map { node ->
+            getMegaNodeByCategory(
+                searchCategory = SearchCategory.VIDEO,
+                order = order,
+                searchTarget = SearchTarget.LINKS_SHARE
+            ).map { node ->
                 convertToTypedVideoNode(node)
             }
         }
@@ -227,18 +219,22 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun getAudioNodesFromInShares(order: SortOrder): List<TypedAudioNode> =
         withContext(ioDispatcher) {
-            megaApi.getInShares(sortOrderIntMapper(order)).filter {
-                it.isFile && filterByNodeName(true, it.name)
-            }.map { node ->
+            getMegaNodeByCategory(
+                searchCategory = SearchCategory.AUDIO,
+                order = order,
+                searchTarget = SearchTarget.INCOMING_SHARE
+            ).map { node ->
                 convertToTypedAudioNode(node)
             }
         }
 
     override suspend fun getVideoNodesFromInShares(order: SortOrder): List<TypedVideoNode> =
         withContext(ioDispatcher) {
-            megaApi.getInShares(sortOrderIntMapper(order)).filter {
-                it.isFile && filterByNodeName(false, it.name)
-            }.map { node ->
+            getMegaNodeByCategory(
+                searchCategory = SearchCategory.VIDEO,
+                order = order,
+                searchTarget = SearchTarget.INCOMING_SHARE
+            ).map { node ->
                 convertToTypedVideoNode(node)
             }
         }
@@ -246,50 +242,30 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     override suspend fun getAudioNodesFromOutShares(
         lastHandle: Long,
         order: SortOrder,
-    ): List<TypedAudioNode> =
-        withContext(ioDispatcher) {
-            var handle: Long? = lastHandle
-            val result = mutableListOf<MegaNode>()
-            megaApi.getOutShares(sortOrderIntMapper(order)).map { megaShare ->
-                megaApi.getMegaNodeByHandle(megaShare.nodeHandle)
-            }.let { nodes ->
-                for (node in nodes) {
-                    if (node != null && node.handle != handle) {
-                        handle = node.handle
-                        result.add(node)
-                    }
-                }
-            }
-            result.filter { megaNode ->
-                megaNode.isFile && filterByNodeName(true, megaNode.name)
-            }.map { node ->
-                convertToTypedAudioNode(node)
-            }
+    ): List<TypedAudioNode> = withContext(ioDispatcher) {
+        getMegaNodeByCategory(
+            searchCategory = SearchCategory.AUDIO,
+            order = order,
+            parentId = NodeId(lastHandle),
+            searchTarget = SearchTarget.OUTGOING_SHARE
+        ).map { node ->
+            convertToTypedAudioNode(node)
         }
+    }
 
     override suspend fun getVideoNodesFromOutShares(
         lastHandle: Long,
         order: SortOrder,
-    ): List<TypedVideoNode> =
-        withContext(ioDispatcher) {
-            var handle: Long? = lastHandle
-            val result = mutableListOf<MegaNode>()
-            megaApi.getOutShares(sortOrderIntMapper(order)).map { megaShare ->
-                megaApi.getMegaNodeByHandle(megaShare.nodeHandle)
-            }.let { nodes ->
-                for (node in nodes) {
-                    if (node != null && node.handle != handle) {
-                        handle = node.handle
-                        result.add(node)
-                    }
-                }
-            }
-            result.filter { megaNode ->
-                megaNode.isFile && filterByNodeName(false, megaNode.name)
-            }.map { node ->
-                convertToTypedVideoNode(node)
-            }
+    ): List<TypedVideoNode> = withContext(ioDispatcher) {
+        getMegaNodeByCategory(
+            searchCategory = SearchCategory.VIDEO,
+            order = order,
+            parentId = NodeId(lastHandle),
+            searchTarget = SearchTarget.OUTGOING_SHARE
+        ).map { megaNode ->
+            convertToTypedVideoNode(megaNode)
         }
+    }
 
     override suspend fun getAudioNodesByEmail(email: String): List<TypedAudioNode>? =
         withContext(ioDispatcher) {
@@ -473,21 +449,18 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun getSubtitleFileInfoList(fileSuffix: String) =
         withContext(ioDispatcher) {
-            megaApi.getRootNode()?.let { rootNode ->
-                megaApi.search(
-                    parent = rootNode,
-                    query = fileSuffix,
-                    megaCancelToken = MegaCancelToken.createInstance(),
-                    order = ORDER_DEFAULT_DESC
-                )
-            }?.map { megaNode ->
+            getMegaNodeByCategory(
+                query = fileSuffix,
+                searchCategory = SearchCategory.ALL,
+                order = SortOrder.ORDER_DEFAULT_DESC
+            ).map { megaNode ->
                 subtitleFileInfoMapper(
                     id = megaNode.handle,
                     name = megaNode.name,
                     url = megaApi.httpServerGetLocalLink(megaNode),
                     parentName = megaApi.getParentNode(megaNode)?.name
                 )
-            } ?: emptyList()
+            }
         }
 
     override fun monitorAudioBackgroundPlayEnabled() =
@@ -557,37 +530,93 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         searchString: String,
         recursive: Boolean,
         order: SortOrder,
-    ): List<TypedVideoNode>? =
-        megaApi.getMegaNodeByHandle(nodeHandle = handle)?.let { parent ->
-            megaApi.searchByType(
-                parent,
-                searchString,
-                MegaCancelToken.createInstance(),
-                recursive,
-                sortOrderIntMapper(order),
-                FILE_TYPE_VIDEO,
-            ).map { node ->
-                convertToTypedVideoNode(node)
-            }
+    ): List<TypedVideoNode> {
+        val nodes = getMegaNodeByCategory(
+            parentId = NodeId(handle),
+            recursive = recursive,
+            query = searchString,
+            searchCategory = SearchCategory.VIDEO,
+            order = order
+        )
+        return nodes.map { node ->
+            convertToTypedVideoNode(node)
         }
+    }
+
+    private suspend fun getMegaNodeByCategory(
+        parentId: NodeId? = null,
+        recursive: Boolean = true,
+        query: String = "",
+        searchCategory: SearchCategory,
+        order: SortOrder,
+        searchTarget: SearchTarget = SearchTarget.ROOT_NODES,
+    ): List<MegaNode> {
+        val token = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = searchFilterMapper(
+            parentHandle = parentId,
+            searchQuery = query,
+            searchTarget = searchTarget,
+            searchCategory = searchCategory,
+        )
+        return if (recursive) {
+            megaApi.searchWithFilter(
+                filter = filter,
+                order = sortOrderIntMapper(order),
+                megaCancelToken = token
+            )
+        } else {
+            megaApi.getChildren(
+                filter = filter,
+                order = sortOrderIntMapper(order),
+                megaCancelToken = token
+            )
+        }
+    }
+
+    private suspend fun getMegaNodeByCategoryFromFolderLink(
+        parentId: NodeId = NodeId(-1L),
+        recursive: Boolean = true,
+        query: String = "",
+        searchCategory: SearchCategory,
+        order: SortOrder,
+    ): List<MegaNode> {
+        val token = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = searchFilterMapper(
+            parentHandle = parentId,
+            searchQuery = query,
+            searchTarget = SearchTarget.ROOT_NODES,
+            searchCategory = searchCategory,
+        )
+        return if (recursive) {
+            megaApiFolder.search(
+                filter = filter,
+                order = sortOrderIntMapper(order),
+                megaCancelToken = token
+            )
+        } else {
+            megaApiFolder.getChildren(
+                filter = filter,
+                order = sortOrderIntMapper(order),
+                megaCancelToken = token
+            )
+        }
+    }
 
     private suspend fun convertToTypedVideoNode(
         node: MegaNode,
         offline: Offline? = null,
-    ): TypedVideoNode =
-        typedVideoNodeMapper(
-            fileNode = node.convertToFileNode(offline),
-            node.duration
-        )
+    ): TypedVideoNode = typedVideoNodeMapper(
+        fileNode = node.convertToFileNode(offline),
+        node.duration
+    )
 
     private suspend fun convertToTypedAudioNode(
         node: MegaNode,
         offline: Offline? = null,
-    ): TypedAudioNode =
-        typedAudioNodeMapper(
-            fileNode = node.convertToFileNode(offline),
-            node.duration,
-        )
+    ): TypedAudioNode = typedAudioNodeMapper(
+        fileNode = node.convertToFileNode(offline),
+        node.duration,
+    )
 
     private suspend fun MegaNode.convertToFileNode(offline: Offline?) = fileNodeMapper(
         megaNode = this, requireSerializedData = false, offline = offline
