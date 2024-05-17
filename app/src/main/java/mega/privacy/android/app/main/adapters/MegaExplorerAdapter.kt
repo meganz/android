@@ -53,6 +53,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.TimeUtils.getVideoDuration
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.scaleWidthPx
+import mega.privacy.android.domain.entity.account.AccountDetail
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -97,6 +98,8 @@ class MegaExplorerAdapter(
     private var placeholderCount: Int = 0
 
     private var outMetrics: DisplayMetrics
+
+    private var accountDetail: AccountDetail? = null
 
     init {
         this.parentHandle = parentHandle
@@ -403,6 +406,10 @@ class MegaExplorerAdapter(
         visibilityFastScroller()
     }
 
+    fun setAccountDetail(accountDetail: AccountDetail?) {
+        this.accountDetail = accountDetail
+    }
+
     /**
      * Get nodes
      */
@@ -531,6 +538,10 @@ class MegaExplorerAdapter(
          */
         fun bind(position: Int, node: MegaNode) {
             with(binding) {
+                itemView.alpha = 0.5f.takeIf {
+                    !node.isInShare && accountDetail?.levelDetail?.accountType?.isPaid == true &&
+                            (node.isMarkedSensitive || megaApi.isSensitiveInherited(node))
+                } ?: 1f
                 imageView = binding.fileExplorerThumbnail
                 itemView.setOnClickListener(null)
                 itemView.setOnLongClickListener(null)
@@ -698,6 +709,10 @@ class MegaExplorerAdapter(
                 return
             }
 
+            itemView.alpha = 0.5f.takeIf {
+                !node.isInShare && accountDetail?.levelDetail?.accountType?.isPaid == true &&
+                        (node.isMarkedSensitive || megaApi.isSensitiveInherited(node))
+            } ?: 1f
             itemView.setOnClickListener(null)
             itemView.setOnLongClickListener(null)
 

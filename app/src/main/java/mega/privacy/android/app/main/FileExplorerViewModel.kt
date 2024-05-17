@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
@@ -23,6 +24,7 @@ import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -31,10 +33,12 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import timber.log.Timber
 import java.io.File
@@ -58,6 +62,8 @@ class FileExplorerViewModel @Inject constructor(
     private val attachNodeUseCase: AttachNodeUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
 
     private var dataAlreadyRequested = false
@@ -108,6 +114,21 @@ class FileExplorerViewModel @Inject constructor(
      * Gets the latest used target path of move
      */
     val moveTargetPathFlow: StateFlow<Long?> = _moveTargetPathFlow.asStateFlow()
+
+    private var _accountDetail: AccountDetail? = null
+
+    val accountDetail: AccountDetail? get() = _accountDetail
+
+    private var _showHiddenItems: Boolean = true
+
+    val showHiddenItems: Boolean get() = _showHiddenItems
+
+    fun init() = viewModelScope.launch {
+        if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            _accountDetail = monitorAccountDetailUseCase().firstOrNull()
+            _showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull() ?: true
+        }
+    }
 
     /**
      * Set file names

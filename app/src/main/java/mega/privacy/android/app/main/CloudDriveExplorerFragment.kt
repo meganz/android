@@ -349,6 +349,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         }
 
         initOriginalData()
+        fileExplorerViewModel.init()
 
         when (modeCloud) {
             FileExplorerActivity.MOVE,
@@ -739,9 +740,17 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      *
      * @param data original nodes
      */
-    fun updateNodesByAdapter(data: List<MegaNode?>) {
+    fun updateNodesByAdapter(sourceData: List<MegaNode?>) {
+        val data = if (fileExplorerViewModel.showHiddenItems) {
+            sourceData
+        } else {
+            sourceData.filter {
+                it != null && !it.isMarkedSensitive && !megaApi.isSensitiveInherited(it)
+            }
+        }
         data.toList().let {
             nodes.clear()
+            adapter.setAccountDetail(fileExplorerViewModel.accountDetail)
             adapter.setNodes(it)
             nodes.addAll(it)
             updateView()

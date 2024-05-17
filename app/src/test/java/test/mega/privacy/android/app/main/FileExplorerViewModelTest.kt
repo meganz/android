@@ -66,6 +66,8 @@ class FileExplorerViewModelTest {
             attachNodeUseCase = attachNodeUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
+            monitorAccountDetailUseCase = mock(),
+            monitorShowHiddenItemsUseCase = mock(),
         )
     }
 
