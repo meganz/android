@@ -843,60 +843,6 @@ interface MegaApiGateway {
     )
 
     /**
-     * Allow to search nodes with the specific options, [order] & [type] & [target]
-     *
-     * @param cancelToken
-     * @param order
-     * @param type
-     * @param target
-     * @return Mega list
-     */
-    suspend fun searchByType(
-        cancelToken: MegaCancelToken,
-        order: Int,
-        type: Int,
-        target: Int,
-    ): List<MegaNode>
-
-    /**
-     *
-     * Allow to search nodes with the following options:
-     * - Search given a parent node of the tree to explore
-     * - Search recursively
-     * - Containing a search string in their name
-     * - Filter by the type of the node
-     * - Order the returned list
-     *
-     * @param parentNode parentNode
-     * @param searchString containing a search string in their name
-     * @param cancelToken use for cancel search
-     * @param recursive is search recursively
-     * @param order
-     * @param type type of nodes requested in the search
-     *
-     * @return List of nodes that match with the search parameters
-     */
-    suspend fun searchByType(
-        parentNode: MegaNode,
-        searchString: String,
-        cancelToken: MegaCancelToken,
-        recursive: Boolean,
-        order: Int,
-        type: Int,
-    ): List<MegaNode>
-
-    /**
-     * Get children nodes by megaNodeList
-     * @param parentNodes parent nodes
-     * @param order order for the returned list
-     * @return children nodes list
-     */
-    suspend fun getChildren(
-        parentNodes: MegaNodeList,
-        order: Int,
-    ): List<MegaNode>
-
-    /**
      * Get children nodes by megaNodeList
      * @param parent parent node
      * @param order order for the returned list
@@ -2367,57 +2313,6 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun localLogout(listener: MegaRequestListenerInterface)
-
-    /**
-     * Search query in inshares
-     * @param query Querry String
-     * @param megaCancelToken [MegaCancelToken]
-     * @param order [SortOrder]
-     */
-    suspend fun searchOnInShares(
-        query: String,
-        megaCancelToken: MegaCancelToken,
-        order: Int,
-    ): List<MegaNode>
-
-    /**
-     * Search query in Outshares
-     * @param query Querry String
-     * @param megaCancelToken [MegaCancelToken]
-     * @param order [SortOrder]
-     */
-    suspend fun searchOnOutShares(
-        query: String,
-        megaCancelToken: MegaCancelToken,
-        order: Int,
-    ): List<MegaNode>
-
-    /**
-     * Search query in Linkshares
-     * @param query Querry String
-     * @param megaCancelToken [MegaCancelToken]
-     * @param order [SortOrder]
-     */
-    suspend fun searchOnLinkShares(
-        query: String,
-        megaCancelToken: MegaCancelToken,
-        order: Int,
-    ): List<MegaNode>
-
-    /**
-     * Search query in node
-     *
-     * @param parent [MegaNode]
-     * @param query Query to be searched
-     * @param megaCancelToken [MegaCancelToken]
-     * @param order [SortOrder]
-     */
-    suspend fun search(
-        parent: MegaNode,
-        query: String,
-        megaCancelToken: MegaCancelToken,
-        order: Int,
-    ): List<MegaNode>
 
     /**
      * Search query with search filter

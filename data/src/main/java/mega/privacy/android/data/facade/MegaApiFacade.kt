@@ -578,23 +578,6 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.inviteContact(email, message, action, listener)
 
-    override suspend fun searchByType(
-        cancelToken: MegaCancelToken,
-        order: Int,
-        type: Int,
-        target: Int,
-    ): List<MegaNode> = megaApi.searchByType(cancelToken, order, type, target)
-
-    override suspend fun searchByType(
-        parentNode: MegaNode,
-        searchString: String,
-        cancelToken: MegaCancelToken,
-        recursive: Boolean,
-        order: Int,
-        type: Int,
-    ): List<MegaNode> =
-        megaApi.searchByType(parentNode, searchString, cancelToken, recursive, order, type)
-
     override suspend fun getPublicLinks(): List<MegaNode> = megaApi.publicLinks
 
     override fun getPreview(
@@ -627,9 +610,6 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun isInBackups(node: MegaNode): Boolean = megaApi.isInInbox(node)
 
     override suspend fun isInCloudDrive(node: MegaNode): Boolean = megaApi.isInCloud(node)
-
-    override suspend fun getChildren(parentNodes: MegaNodeList, order: Int): List<MegaNode> =
-        megaApi.getChildren(parentNodes, order)
 
     override suspend fun getChildren(parent: MegaNode, order: Int): List<MegaNode> =
         megaApi.getChildren(parent, order)
@@ -1168,56 +1148,6 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.checkSMSVerificationCode(pin, listener)
 
     override fun localLogout(listener: MegaRequestListenerInterface) = megaApi.localLogout(listener)
-    override suspend fun searchOnInShares(
-        query: String,
-        megaCancelToken: MegaCancelToken,
-        order: Int,
-    ): List<MegaNode> {
-        return megaApi.searchOnInShares(
-            query,
-            megaCancelToken,
-            order
-        )
-    }
-
-    override suspend fun searchOnOutShares(
-        query: String,
-        megaCancelToken: MegaCancelToken,
-        order: Int,
-    ): List<MegaNode> {
-        return megaApi.searchOnOutShares(
-            query,
-            megaCancelToken,
-            order
-        )
-    }
-
-    override suspend fun searchOnLinkShares(
-        query: String,
-        megaCancelToken: MegaCancelToken,
-        order: Int,
-    ): List<MegaNode> {
-        return megaApi.searchOnPublicLinks(
-            query,
-            megaCancelToken,
-            order
-        )
-    }
-
-    override suspend fun search(
-        parent: MegaNode,
-        query: String,
-        megaCancelToken: MegaCancelToken,
-        order: Int,
-    ): List<MegaNode> {
-        return megaApi.search(
-            parent,
-            query,
-            megaCancelToken,
-            true,
-            order
-        )
-    }
 
     override suspend fun searchWithFilter(
         filter: MegaSearchFilter,

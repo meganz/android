@@ -92,7 +92,7 @@ interface MegaApiFolderGateway {
      * @param order order for the returned list
      * @return children nodes list
      */
-    suspend fun getChildren(parent: MegaNode, order: Int, ): List<MegaNode>
+    suspend fun getChildren(parent: MegaNode, order: Int): List<MegaNode>
 
     /**
      * Get thumbnail from server
