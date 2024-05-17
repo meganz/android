@@ -166,6 +166,7 @@ class BackgroundRequestListener @Inject constructor(
             if (dbH.myChatFilesFolderHandle == INVALID_HANDLE) {
                 megaApi.getMyChatFilesFolder(listener)
             }
+            MegaApplication.getInstance().setupMegaChatApi()
             applicationScope.launch {
                 // Init CU sync data after login successfully
                 runCatching {

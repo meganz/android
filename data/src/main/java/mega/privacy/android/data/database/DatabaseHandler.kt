@@ -6,7 +6,6 @@ import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -124,6 +123,7 @@ interface DatabaseHandler {
     fun setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp: Long)
     fun setLastPublicHandleTimeStamp()
     fun setInvalidateSdkCache(invalidateSdkCache: Boolean)
+    fun clearCredentials()
     @Deprecated("Call to ClearEphemeralCredentialsUseCase instead")
     fun clearEphemeral()
     fun clearPreferences()
