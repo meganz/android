@@ -14,11 +14,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUiEntity
 import mega.privacy.android.app.presentation.recentactions.view.previewdataprovider.SampleRecentActionDataProvider
+import mega.privacy.android.core.ui.controls.lists.RecentActionListViewItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.RecentActionBucket
@@ -87,7 +89,7 @@ fun RecentActionsListView(
                     time = item.time,
                     updatedByText = item.updatedByText,
                     isFavourite = item.isFavourite,
-                    labelColor = item.labelColor,
+                    labelColor = item.labelColorId?.let { colorResource(id = it) },
                     isSensitive = accountType?.isPaid == true && isSensitive && showHiddenItems,
                     onItemClick = { onItemClick(item.bucket) },
                     onMenuClick = { onMenuClick(item.bucket.nodes.first()) }

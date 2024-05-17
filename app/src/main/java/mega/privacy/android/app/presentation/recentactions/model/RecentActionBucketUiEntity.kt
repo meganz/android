@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.RecentActionBucket
  * @property time The time to be displayed
  * @property updatedByText The text to be displayed for the updated by field
  * @property isFavourite Whether the item is a favourite
- * @property labelColor The color of the label
+ * @property labelColorId The color of the label
  * @property bucket The recent action bucket
  */
 data class RecentActionBucketUiEntity(
@@ -31,6 +31,6 @@ data class RecentActionBucketUiEntity(
     val time: String,
     val updatedByText: String?,
     val isFavourite: Boolean,
-    @ColorRes val labelColor: Int?,
+    @ColorRes val labelColorId: Int?,
     val bucket: RecentActionBucket,
 )

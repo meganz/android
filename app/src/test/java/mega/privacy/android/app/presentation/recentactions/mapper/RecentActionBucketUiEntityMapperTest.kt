@@ -96,7 +96,7 @@ class RecentActionBucketUiEntityMapperTest {
         assertThat(recentActionBucketUiEntity.time).isNotEmpty()
         assertThat(recentActionBucketUiEntity.updatedByText).isNull()
         assertThat(recentActionBucketUiEntity.isFavourite).isTrue()
-        assertThat(recentActionBucketUiEntity.labelColor).isNull()
+        assertThat(recentActionBucketUiEntity.labelColorId).isNull()
     }
 
     @Test

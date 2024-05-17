@@ -75,7 +75,7 @@ class RecentActionBucketUiEntityMapper @Inject constructor(
             actionIcon = if (item.isUpdate) R.drawable.ic_versions_small else R.drawable.ic_recents_up,
             showMenuButton = isSingleNode,
             isFavourite = isSingleNode && node.isFavourite,
-            labelColor = if (isSingleNode && node.label != MegaNode.NODE_LBL_UNKNOWN)
+            labelColorId = if (isSingleNode && node.label != MegaNode.NODE_LBL_UNKNOWN)
                 MegaNodeUtil.getNodeLabelColor(
                     node.label
                 )

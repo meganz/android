@@ -1,8 +1,7 @@
-package mega.privacy.android.app.presentation.recentactions.view
+package mega.privacy.android.core.ui.controls.lists
 
 import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.icon.pack.R as IconPackR
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,33 +15,32 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.R
+import mega.privacy.android.core.ui.controls.dividers.DividerType
+import mega.privacy.android.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.model.MegaSpanStyle
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.tokens.TextColor
-import mega.privacy.android.shared.theme.MegaAppTheme
 
 
 /**
@@ -53,13 +51,13 @@ fun RecentActionListViewItem(
     firstLineText: String,
     @DrawableRes icon: Int = IconPackR.drawable.ic_generic_medium_solid,
     @DrawableRes shareIcon: Int? = null,
-    @DrawableRes actionIcon: Int = R.drawable.ic_recents_up,
+    @DrawableRes actionIcon: Int,
     parentFolderName: String,
     showMenuButton: Boolean = true,
     time: String,
     updatedByText: String? = null,
     isFavourite: Boolean = false,
-    @ColorRes labelColor: Int? = null,
+    labelColor: Color? = null,
     isSensitive: Boolean = false,
     onMenuClick: () -> Unit = {},
     onItemClick: () -> Unit = {},
@@ -106,7 +104,7 @@ fun RecentActionListViewItem(
                                 .size(10.dp)
                                 .background(
                                     shape = CircleShape,
-                                    color = colorResource(id = labelColor)
+                                    color = labelColor
                                 )
                                 .testTag(LABEL_TEST_TAG)
                         )
@@ -147,17 +145,17 @@ fun RecentActionListViewItem(
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
                 ) {
-
-                    Text(
+                    MegaText(
                         text = parentFolderName,
+                        textColor = TextColor.Secondary,
+                        style = MaterialTheme.typography.caption,
+                        overflow = LongTextBehaviour.MiddleEllipsis,
                         modifier = Modifier
+                            .weight(1f, false)
                             .padding(end = 8.dp)
                             .testTag(FOLDER_NAME_TEST_TAG),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.caption,
-                        color = MaterialTheme.colors.textColorSecondary
                     )
 
                     shareIcon?.let { icon ->
@@ -174,7 +172,7 @@ fun RecentActionListViewItem(
                     Image(
                         modifier = Modifier
                             .padding(end = 8.dp)
-                            .size(14.dp)
+                            .size(16.dp)
                             .testTag(ACTION_ICON_TEST_TAG),
                         colorFilter = ColorFilter.tint(
                             MaterialTheme.colors.grey_alpha_054_white_alpha_054
@@ -183,13 +181,12 @@ fun RecentActionListViewItem(
                         contentDescription = "Action"
                     )
 
-                    Text(
+                    MegaText(
                         text = time,
-                        modifier = Modifier.testTag(TIME_TEST_TAG),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                        textColor = TextColor.Secondary,
                         style = MaterialTheme.typography.caption,
-                        color = MaterialTheme.colors.textColorSecondary
+                        modifier = Modifier
+                            .testTag(TIME_TEST_TAG),
                     )
                 }
             }
@@ -208,12 +205,11 @@ fun RecentActionListViewItem(
             }
         }
 
-        Divider(
+        MegaDivider(
+            dividerType = DividerType.FullSize,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 72.dp),
-            color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
-            thickness = 1.dp
         )
     }
 }
@@ -232,11 +228,12 @@ internal const val MENU_TEST_TAG = "recent_action_list_view_item:menu"
 @CombinedThemePreviews
 @Composable
 private fun RecentActionListViewItemPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         RecentActionListViewItem(
             firstLineText = "First line text",
             time = "12:00 PM",
-            parentFolderName = "Folder Name"
+            parentFolderName = "Folder Name",
+            actionIcon = IconPackR.drawable.ic_corner_up_right_medium_regular_outline
         )
     }
 }
@@ -244,15 +241,16 @@ private fun RecentActionListViewItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RecentActionListViewItem2Preview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         RecentActionListViewItem(
             firstLineText = "First line text",
             updatedByText = "[A]Updated by[/A] [B]John Doe[/B]",
             isFavourite = true,
-            labelColor = R.color.red_200,
+            labelColor = MaterialTheme.colors.textColorSecondary,
             shareIcon = IconPackR.drawable.ic_folder_incoming_medium_solid,
             time = "08:00 PM",
-            parentFolderName = "Folder Name"
+            parentFolderName = "Very Long Folder Name, Very Long Folder Name",
+            actionIcon = IconPackR.drawable.ic_corner_up_right_medium_regular_outline
         )
     }
 }
