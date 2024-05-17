@@ -227,6 +227,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     UploadWorker(
         "Enables UploadWorker for download files, instead of UploadService. This is a work in progress feature.",
         false,
+    ),
+
+    /**
+     * Enables new confirm email fragment compose page
+     */
+    NewConfirmEmailFragment(
+        "Enable new confirm email fragment",
+        true
     );
 
     companion object : FeatureFlagValueProvider {

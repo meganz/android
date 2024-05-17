@@ -28,6 +28,8 @@ import mega.privacy.android.app.databinding.FragmentConfirmEmailBinding
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragmentV2.Companion.TEMPORARY_EMAIL_ARG
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragmentV2.Companion.TEMPORARY_FIRST_NAME_ARG
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
@@ -59,9 +61,21 @@ class ConfirmEmailFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    var emailTemp: String? = null
-    var firstNameTemp: String? = null
+    private var emailTemp: String? = null
+    private var firstNameTemp: String? = null
 
+    /**
+     * Called to do initial creation of a fragment.
+     */
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        emailTemp = arguments?.getString(TEMPORARY_EMAIL_ARG)
+        firstNameTemp = arguments?.getString(TEMPORARY_FIRST_NAME_ARG)
+    }
+
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -225,5 +239,25 @@ class ConfirmEmailFragment : Fragment() {
             setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint)
         }
         confirmEmailNewEmailErrorIcon.isVisible = false
+    }
+
+    companion object {
+
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         *
+         * @param tempEmail The temporary email.
+         * @param tempFirstName The temporary first name.
+         * @return A new instance of fragment ConfirmEmailFragment.
+         */
+        @JvmStatic
+        fun newInstance(tempEmail: String?, tempFirstName: String?) =
+            ConfirmEmailFragment().apply {
+                arguments = Bundle().apply {
+                    putString(TEMPORARY_EMAIL_ARG, tempEmail)
+                    putString(TEMPORARY_FIRST_NAME_ARG, tempFirstName)
+                }
+            }
     }
 }

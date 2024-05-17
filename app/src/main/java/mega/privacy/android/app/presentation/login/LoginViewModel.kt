@@ -213,6 +213,11 @@ class LoginViewModel @Inject constructor(
                         state.copy(enabledFlags = if (enabled) state.enabledFlags + AppFeatures.LoginReportIssueButton else state.enabledFlags - AppFeatures.LoginReportIssueButton)
                     }
                 },
+                flowOf(getFeatureFlagValueUseCase(AppFeatures.NewConfirmEmailFragment)).map { enabled ->
+                    { state: LoginState ->
+                        state.copy(enabledFlags = if (enabled) state.enabledFlags + AppFeatures.NewConfirmEmailFragment else state.enabledFlags - AppFeatures.NewConfirmEmailFragment)
+                    }
+                },
             ).collect {
                 _state.update(it)
             }
