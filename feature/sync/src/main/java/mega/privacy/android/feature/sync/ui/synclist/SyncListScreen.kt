@@ -192,6 +192,8 @@ private fun SyncListScreenContent(
     var checkedChip by rememberSaveable { mutableStateOf(SYNC_FOLDERS) }
 
     val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
+    val syncStalledIssuesState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
+    val syncSolvedIssuesState by syncSolvedIssuesViewModel.state.collectAsStateWithLifecycle()
 
     val pullToRefreshState = rememberPullRefreshState(
         refreshing = syncFoldersState.isRefreshing,
@@ -220,10 +222,16 @@ private fun SyncListScreenContent(
                 onCloseClick = null
             )
         }
-        HeaderChips(
-            selectedChip = checkedChip,
-            stalledIssuesCount = stalledIssuesCount,
-            onChipSelected = { checkedChip = it })
+
+        if (syncStalledIssuesState.stalledIssues.isNotEmpty() || syncSolvedIssuesState.solvedIssues.isNotEmpty()) {
+            HeaderChips(
+                selectedChip = checkedChip,
+                stalledIssuesCount = stalledIssuesCount,
+                onChipSelected = { checkedChip = it })
+        } else {
+            checkedChip = SYNC_FOLDERS
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
