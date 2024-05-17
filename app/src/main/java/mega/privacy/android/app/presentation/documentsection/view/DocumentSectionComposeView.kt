@@ -35,10 +35,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.documentsection.model.DocumentSectionUiState
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
-import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.white_black
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId

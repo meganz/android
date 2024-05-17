@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.presentation.meeting.chat.view.message
 
 import com.google.common.truth.Truth
-import mega.privacy.android.core.ui.controls.chat.messages.toFormattedText
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.toFormattedText
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest

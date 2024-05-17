@@ -15,10 +15,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.ui.controls.skeleton.ListItemLoadingSkeleton
-import mega.privacy.android.core.ui.preview.BooleanProvider
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.utils.shimmerEffect
+import mega.privacy.android.shared.original.core.ui.controls.skeleton.ListItemLoadingSkeleton
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
 
 /**
  * Loading state view for Recent Actions

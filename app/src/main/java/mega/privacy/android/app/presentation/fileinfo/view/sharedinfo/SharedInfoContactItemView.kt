@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM_SHARED
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM_SHARED_DOTS
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 

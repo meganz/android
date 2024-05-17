@@ -29,12 +29,12 @@ import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.mode
 import mega.privacy.android.app.presentation.view.NodeGridView
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.core.ui.controls.dividers.DividerType
-import mega.privacy.android.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.core.ui.controls.lists.NodeGridViewItem
-import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
+import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.preference.ViewType
 

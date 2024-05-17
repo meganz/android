@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.menuaction.OpenWithMenuAction
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
-import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode

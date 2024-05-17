@@ -37,8 +37,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.theme.grey_alpha_012
-import mega.privacy.android.core.ui.theme.white_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 
 /**
  * TextField for the App

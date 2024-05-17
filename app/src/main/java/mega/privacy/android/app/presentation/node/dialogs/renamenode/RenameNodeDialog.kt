@@ -17,7 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnLoadNodeName

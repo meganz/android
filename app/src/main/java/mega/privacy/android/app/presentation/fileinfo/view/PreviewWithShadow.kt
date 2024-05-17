@@ -17,9 +17,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.grey_alpha_026
-import mega.privacy.android.core.ui.theme.grey_alpha_050
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_026
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_050
 
 @Composable
 internal fun PreviewWithShadow(

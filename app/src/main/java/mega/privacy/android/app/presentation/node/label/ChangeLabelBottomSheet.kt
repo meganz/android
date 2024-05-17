@@ -23,11 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.dividers.DividerType
-import mega.privacy.android.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.core.ui.controls.text.MegaText
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.theme.MegaAppTheme

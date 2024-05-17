@@ -22,10 +22,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.images.ThumbnailView
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable

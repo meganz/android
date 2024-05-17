@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 
 
 @OptIn(ExperimentalMaterialApi::class)

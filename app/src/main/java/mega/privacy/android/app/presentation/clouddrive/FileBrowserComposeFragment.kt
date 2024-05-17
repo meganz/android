@@ -72,7 +72,7 @@ import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FolderNode

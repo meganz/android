@@ -35,11 +35,11 @@ import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
-import mega.privacy.android.core.ui.controls.chat.TEST_TAG_ATTACHMENT_ICON
-import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.shared.original.core.ui.controls.chat.TEST_TAG_ATTACHMENT_ICON
+import mega.privacy.android.shared.original.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain

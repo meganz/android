@@ -19,9 +19,9 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
-import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactData

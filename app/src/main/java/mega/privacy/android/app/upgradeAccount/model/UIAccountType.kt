@@ -2,12 +2,12 @@ package mega.privacy.android.app.upgradeAccount.model
 
 import androidx.compose.ui.graphics.Color
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.theme.green_200
-import mega.privacy.android.core.ui.theme.green_500
-import mega.privacy.android.core.ui.theme.orange_300
-import mega.privacy.android.core.ui.theme.orange_500
-import mega.privacy.android.core.ui.theme.red_300
-import mega.privacy.android.core.ui.theme.red_600
+import mega.privacy.android.shared.original.core.ui.theme.green_200
+import mega.privacy.android.shared.original.core.ui.theme.green_500
+import mega.privacy.android.shared.original.core.ui.theme.orange_300
+import mega.privacy.android.shared.original.core.ui.theme.orange_500
+import mega.privacy.android.shared.original.core.ui.theme.red_300
+import mega.privacy.android.shared.original.core.ui.theme.red_600
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**

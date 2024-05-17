@@ -16,10 +16,10 @@ import mega.privacy.android.app.presentation.node.view.ToolbarMenuItem
 import mega.privacy.android.app.presentation.node.view.toolbar.NodeToolbarViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRoute
-import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
-import mega.privacy.android.core.ui.model.MenuActionWithClick
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.legacy.core.ui.controls.appbar.CollapsedSearchAppBar

@@ -41,9 +41,9 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.core.ui.controls.chat.VoiceClipRecordEvent
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReactionUser
+import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.EventType

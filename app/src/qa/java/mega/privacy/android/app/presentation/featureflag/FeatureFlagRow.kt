@@ -23,9 +23,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mega.privacy.android.core.ui.controls.controlssliders.MegaRadioButton
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.grey_700
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaRadioButton
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.grey_700
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

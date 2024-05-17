@@ -5,7 +5,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import javax.inject.Inject
 
 /**

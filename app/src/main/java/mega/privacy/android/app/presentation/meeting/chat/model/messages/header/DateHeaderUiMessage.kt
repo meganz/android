@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.ui.controls.chat.messages.DateHeader
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.DateHeader
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**

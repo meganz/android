@@ -4,11 +4,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.model.PasswordStrengthAttribute
-import mega.privacy.android.core.ui.theme.extensions.dark_blue_500_dark_blue_200
-import mega.privacy.android.core.ui.theme.extensions.green_500_green_400
-import mega.privacy.android.core.ui.theme.extensions.lime_green_500_lime_green_200
-import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
-import mega.privacy.android.core.ui.theme.extensions.yellow_600_yellow_300
+import mega.privacy.android.shared.original.core.ui.theme.extensions.dark_blue_500_dark_blue_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.green_500_green_400
+import mega.privacy.android.shared.original.core.ui.theme.extensions.lime_green_500_lime_green_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
+import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_600_yellow_300
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 
 @Composable

@@ -11,10 +11,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.message.voiceclip.VoiceClipMessageViewModel
-import mega.privacy.android.core.ui.controls.chat.messages.CoreVoiceClipMessageView
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.CoreVoiceClipMessageView
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
 
 /**
  * UI message for voice clip

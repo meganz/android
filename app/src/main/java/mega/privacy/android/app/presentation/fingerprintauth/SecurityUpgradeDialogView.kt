@@ -30,9 +30,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.theme.body2
-import mega.privacy.android.core.ui.theme.jade_300
-import mega.privacy.android.core.ui.theme.subtitle1
+import mega.privacy.android.shared.original.core.ui.theme.body2
+import mega.privacy.android.shared.original.core.ui.theme.jade_300
+import mega.privacy.android.shared.original.core.ui.theme.subtitle1
 
 /**
  * Security upgrade dialog body

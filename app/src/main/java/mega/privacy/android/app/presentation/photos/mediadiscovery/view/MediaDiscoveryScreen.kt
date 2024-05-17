@@ -52,9 +52,9 @@ import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.core.ui.theme.extensions.black_white
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
-import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
+import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.domain.entity.photos.Photo
 
 

@@ -23,10 +23,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
-import mega.privacy.android.core.ui.theme.grey_alpha_054
-import mega.privacy.android.core.ui.theme.grey_alpha_087
-import mega.privacy.android.core.ui.theme.white_alpha_054
-import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
 
 @Composable
 internal fun SortByDialog(

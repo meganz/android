@@ -46,15 +46,15 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.model.AuthenticityCredentialsState
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.BooleanProvider
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.grey_020
-import mega.privacy.android.core.ui.theme.grey_800
-import mega.privacy.android.core.ui.theme.white
-import mega.privacy.android.core.ui.theme.yellow_100
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.grey_020
+import mega.privacy.android.shared.original.core.ui.theme.grey_800
+import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.theme.yellow_100
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 

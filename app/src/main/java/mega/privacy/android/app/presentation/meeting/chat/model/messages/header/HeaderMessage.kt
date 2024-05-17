@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.header
 
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 
 /**
  * Header message

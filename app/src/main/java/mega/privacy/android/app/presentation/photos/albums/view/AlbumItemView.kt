@@ -40,8 +40,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.view.isSelected
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.ui.theme.grey_alpha_032
-import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_032
+import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
 

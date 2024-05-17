@@ -33,9 +33,9 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatRoom

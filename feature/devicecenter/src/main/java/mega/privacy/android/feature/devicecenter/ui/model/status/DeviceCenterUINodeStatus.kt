@@ -6,7 +6,7 @@ import mega.privacy.android.feature.devicecenter.R as DeviceCenterR
 import mega.privacy.android.shared.resources.R as SharedR
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import mega.privacy.android.core.ui.controls.status.StatusColor
+import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
 import mega.privacy.android.feature.devicecenter.R
 
 /**

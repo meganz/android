@@ -46,7 +46,7 @@ import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_TITLE_TEST
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.OFFLINE_OPTION_TEST_TAG
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 import java.io.File
 

@@ -10,7 +10,7 @@ GMS_APK_BUILD_LOG = "gms_build.log"
 BUILD_WARNING_FILE = "buildWarnings.json"
 WARNING_SOURCE_FILE = "warningResultLog.txt"
 
-MODULE_LIST = ['app', 'domain', 'data', 'core-ui']
+MODULE_LIST = ['app', 'domain', 'data', 'shared/original-core-ui']
 
 LINT_REPORT_SUMMARY_MAP = [:]
 

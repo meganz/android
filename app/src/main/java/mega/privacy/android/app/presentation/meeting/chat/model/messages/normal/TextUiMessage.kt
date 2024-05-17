@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.normal.ChatMessageTextView
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 
 /**

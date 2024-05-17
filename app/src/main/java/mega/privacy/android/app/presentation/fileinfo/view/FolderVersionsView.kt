@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 
 /**
  * Shows several Titled texts with information of versions contained in a folder

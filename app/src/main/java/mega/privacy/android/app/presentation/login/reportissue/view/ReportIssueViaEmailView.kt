@@ -22,13 +22,13 @@ import mega.privacy.android.app.presentation.node.model.menuaction.SendMenuActio
 import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueBackHandler
 import mega.privacy.android.app.presentation.settings.reportissue.view.DescriptionTextField
 import mega.privacy.android.app.presentation.settings.reportissue.view.ErrorBanner
-import mega.privacy.android.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.core.ui.controls.dividers.DividerType
-import mega.privacy.android.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.core.ui.controls.text.MegaText
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

@@ -4,7 +4,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.core.ui.controls.textfields.GENERIC_TEXT_FIELD_ERROR_TAG
+import mega.privacy.android.shared.original.core.ui.controls.textfields.GENERIC_TEXT_FIELD_ERROR_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

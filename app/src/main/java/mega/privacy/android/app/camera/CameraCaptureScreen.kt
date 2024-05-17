@@ -33,12 +33,12 @@ import mega.privacy.android.app.camera.state.FlashMode
 import mega.privacy.android.app.camera.state.rememberCameraState
 import mega.privacy.android.app.camera.state.rememberSaveableCamSelector
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.core.ui.controls.camera.CameraBottomAppBar
-import mega.privacy.android.core.ui.controls.camera.CameraTimer
-import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.core.ui.utils.rememberPermissionState
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.camera.CameraBottomAppBar
+import mega.privacy.android.shared.original.core.ui.controls.camera.CameraTimer
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 

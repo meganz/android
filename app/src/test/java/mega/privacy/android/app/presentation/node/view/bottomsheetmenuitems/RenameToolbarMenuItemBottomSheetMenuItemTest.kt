@@ -4,7 +4,7 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.search.navigation.searchRenameDialog
-import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode

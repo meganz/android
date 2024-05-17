@@ -15,8 +15,8 @@ import mega.privacy.android.app.presentation.node.model.menuaction.OpenWithMenuA
 import mega.privacy.android.app.presentation.search.navigation.cannotOpenFileDialog
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.model.MenuAction
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo

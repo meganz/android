@@ -36,8 +36,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip

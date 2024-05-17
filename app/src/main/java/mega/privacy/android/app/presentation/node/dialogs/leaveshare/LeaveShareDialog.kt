@@ -6,8 +6,8 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

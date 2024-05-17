@@ -7,8 +7,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

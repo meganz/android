@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message
 
-import mega.privacy.android.core.ui.controls.chat.messages.TimeHeader as CoreTimeHeader
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.TimeHeader as CoreTimeHeader
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue

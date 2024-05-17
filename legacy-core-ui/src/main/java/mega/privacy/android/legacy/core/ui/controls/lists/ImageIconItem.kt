@@ -25,9 +25,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 
 /**

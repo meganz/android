@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.Ch
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.meta.LocationUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextLinkUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextUiMessage
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage

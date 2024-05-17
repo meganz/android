@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 
 /**
  * A custom divider

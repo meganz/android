@@ -8,9 +8,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.text.MegaText
-import mega.privacy.android.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 
 /**
  * Composable UI for Title Choose the right plan to reuse on different screens

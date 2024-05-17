@@ -7,8 +7,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchFolderShareDialog
-import mega.privacy.android.core.ui.model.MenuAction
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType

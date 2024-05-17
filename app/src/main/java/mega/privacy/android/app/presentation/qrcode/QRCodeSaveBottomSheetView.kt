@@ -13,10 +13,10 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.shared.theme.MegaAppTheme
 

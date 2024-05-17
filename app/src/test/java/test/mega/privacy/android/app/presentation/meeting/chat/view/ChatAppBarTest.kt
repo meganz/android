@@ -18,8 +18,8 @@ import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_NOTIFICATION_MUTE
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_PRIVATE_ICON
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.TEST_TAG_USER_CHAT_STATE
-import mega.privacy.android.core.ui.controls.appbar.TEST_TAG_APP_BAR
-import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
+import mega.privacy.android.shared.original.core.ui.controls.appbar.TEST_TAG_APP_BAR
+import mega.privacy.android.shared.original.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.UserChatStatus

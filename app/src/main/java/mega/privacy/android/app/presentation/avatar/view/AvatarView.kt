@@ -37,8 +37,8 @@ import mega.privacy.android.app.presentation.avatar.model.EmojiAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.theme.dark_grey
-import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.theme.dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.white
 
 /**
  * Avatar Composable

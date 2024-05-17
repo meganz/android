@@ -17,10 +17,10 @@ import com.google.accompanist.placeholder.placeholder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.view.SKIP_BUTTON
 import mega.privacy.android.app.upgradeAccount.view.VIEW_PRO_PLAN_BUTTON
-import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
-import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
+import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

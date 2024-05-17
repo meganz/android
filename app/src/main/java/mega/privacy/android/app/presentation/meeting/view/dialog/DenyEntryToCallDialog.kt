@@ -10,7 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

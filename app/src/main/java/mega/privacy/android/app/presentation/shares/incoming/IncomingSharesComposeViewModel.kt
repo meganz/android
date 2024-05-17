@@ -19,9 +19,9 @@ import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.core.ui.utils.pop
-import mega.privacy.android.core.ui.utils.push
-import mega.privacy.android.core.ui.utils.toMutableArrayDeque
+import mega.privacy.android.shared.original.core.ui.utils.pop
+import mega.privacy.android.shared.original.core.ui.utils.push
+import mega.privacy.android.shared.original.core.ui.utils.toMutableArrayDeque
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode

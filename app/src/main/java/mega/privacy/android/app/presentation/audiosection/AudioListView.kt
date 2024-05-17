@@ -17,8 +17,8 @@ import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.icon.pack.R

@@ -49,16 +49,16 @@ import mega.privacy.android.app.presentation.twofactorauthentication.extensions.
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.toSeedArray
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.dark_grey
-import mega.privacy.android.core.ui.theme.extensions.body1Medium
-import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.white_grey_700
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.extensions.body1Medium
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_800
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_700
 
 
 @Composable

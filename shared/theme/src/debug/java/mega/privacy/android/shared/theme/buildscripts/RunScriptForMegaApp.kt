@@ -1,6 +1,7 @@
 package mega.privacy.android.shared.theme.buildscripts
 
-import mega.privacy.android.core.ui.buildscripts.GenerateTokens
+import mega.privacy.android.shared.original.core.ui.buildscripts.GenerateTokens
+
 
 /**
  * Runs the Script to generate Kotlin files with the tokens from json files

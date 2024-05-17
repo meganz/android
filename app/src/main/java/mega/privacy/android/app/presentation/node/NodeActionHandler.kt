@@ -18,7 +18,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.SelectAllMenu
 import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
-import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 

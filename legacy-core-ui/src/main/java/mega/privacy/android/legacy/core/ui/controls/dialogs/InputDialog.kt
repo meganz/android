@@ -33,10 +33,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.core.ui.controls.textfields.GenericTextField
-import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 /**
  * Alert dialog with a text input field and a confirmation button with optional cancel button

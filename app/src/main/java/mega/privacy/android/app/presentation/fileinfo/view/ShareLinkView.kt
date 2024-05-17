@@ -16,11 +16,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
-import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
+import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.theme.MegaAppTheme
 import java.time.Instant.now
 

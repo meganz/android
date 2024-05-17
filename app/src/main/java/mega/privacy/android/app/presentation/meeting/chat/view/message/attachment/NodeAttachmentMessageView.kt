@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.attachme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
-import mega.privacy.android.core.ui.controls.chat.messages.file.FileMessageView
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.file.FileMessageView
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 
 /**

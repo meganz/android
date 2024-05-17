@@ -1,7 +1,7 @@
 package mega.privacy.android.shared.theme
 
 import androidx.compose.runtime.Composable
-import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
 import mega.privacy.android.shared.theme.tokens.MegaAppSemanticTokensDark
 import mega.privacy.android.shared.theme.tokens.MegaAppSemanticTokensLight
 

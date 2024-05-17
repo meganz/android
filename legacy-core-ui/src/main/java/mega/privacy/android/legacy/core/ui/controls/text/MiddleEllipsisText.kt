@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import java.text.BreakIterator
 
 /**

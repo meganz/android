@@ -47,15 +47,15 @@ import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailView
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
-import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.core.ui.controls.text.MegaText
-import mega.privacy.android.core.ui.controls.textfields.LabelTextField
-import mega.privacy.android.core.ui.model.MegaSpanStyle
-import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.controls.textfields.LabelTextField
+import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
+import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @OptIn(ExperimentalComposeUiApi::class)

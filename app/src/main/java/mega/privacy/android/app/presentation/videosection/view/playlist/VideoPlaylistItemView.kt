@@ -35,9 +35,9 @@ import androidx.constraintlayout.compose.Visibility
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_800
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @OptIn(ExperimentalFoundationApi::class)

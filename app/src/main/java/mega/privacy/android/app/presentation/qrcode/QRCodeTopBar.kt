@@ -25,9 +25,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.BooleanProvider
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 
 /**
  * App bar for QR code screen

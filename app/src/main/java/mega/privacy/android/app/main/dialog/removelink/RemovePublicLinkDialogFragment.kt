@@ -19,7 +19,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject

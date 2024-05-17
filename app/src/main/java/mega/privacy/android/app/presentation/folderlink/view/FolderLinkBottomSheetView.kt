@@ -38,11 +38,11 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.core.ui.controls.images.ThumbnailView
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.grey_alpha_012
-import mega.privacy.android.core.ui.theme.white_alpha_012
+import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode

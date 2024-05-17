@@ -26,9 +26,9 @@ import mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_DAY
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_MONTH_30
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_WEEK
-import mega.privacy.android.core.ui.controls.dialogs.CONFIRMATION_DIALOG_CANCEL_BUTTON_TAG
-import mega.privacy.android.core.ui.controls.dialogs.CONFIRMATION_DIALOG_CONFIRM_BUTTON_TAG
-import mega.privacy.android.core.ui.controls.dialogs.internal.CONFIRM_TAG
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.CONFIRMATION_DIALOG_CANCEL_BUTTON_TAG
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.CONFIRMATION_DIALOG_CONFIRM_BUTTON_TAG
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CONFIRM_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

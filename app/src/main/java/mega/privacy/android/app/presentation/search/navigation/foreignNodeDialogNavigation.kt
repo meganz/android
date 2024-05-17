@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.dialog
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 
 internal fun NavGraphBuilder.foreignNodeDialogNavigation(navHostController: NavHostController) {
     dialog(searchForeignNodeDialog) {

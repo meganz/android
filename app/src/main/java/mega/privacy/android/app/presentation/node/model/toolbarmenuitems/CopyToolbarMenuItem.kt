@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
 

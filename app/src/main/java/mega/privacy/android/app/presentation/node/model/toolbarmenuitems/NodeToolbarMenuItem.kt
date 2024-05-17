@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**

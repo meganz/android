@@ -37,10 +37,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.chat.list.view.ChatDivider
 import mega.privacy.android.app.presentation.chat.list.view.ChatUserStatusView
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem

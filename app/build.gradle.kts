@@ -167,7 +167,7 @@ dependencies {
     // Modules
     implementation(project(":core:formatter"))
     implementation(project(":domain"))
-    implementation(project(":core-ui"))
+    implementation(project(":shared:original-core-ui"))
     implementation(project(":shared:theme"))
     implementation(project(":legacy-core-ui"))
     implementation(project(":data"))

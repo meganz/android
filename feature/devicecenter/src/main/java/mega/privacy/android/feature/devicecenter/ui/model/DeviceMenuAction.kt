@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.devicecenter.ui.model
 
-import mega.privacy.android.core.ui.model.MenuAction
-import mega.privacy.android.core.ui.model.MenuActionWithoutIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.feature.devicecenter.R
 
 /**

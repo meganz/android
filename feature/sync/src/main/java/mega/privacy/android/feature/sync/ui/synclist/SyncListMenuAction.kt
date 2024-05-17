@@ -1,9 +1,9 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import mega.privacy.android.core.ui.model.MenuAction
-import mega.privacy.android.core.ui.model.MenuActionWithoutIcon
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.feature.sync.R
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 
 /**
  * Sync menu action

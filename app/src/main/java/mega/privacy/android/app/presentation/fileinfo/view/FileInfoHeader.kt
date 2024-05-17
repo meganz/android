@@ -16,10 +16,10 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
-import mega.privacy.android.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.core.ui.controls.layouts.CollapsibleHeaderWithTitle
-import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.layouts.CollapsibleHeaderWithTitle
+import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable

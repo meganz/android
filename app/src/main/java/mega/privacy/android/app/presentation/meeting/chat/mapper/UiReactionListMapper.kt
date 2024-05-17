@@ -1,9 +1,8 @@
 package mega.privacy.android.app.presentation.meeting.chat.mapper
 
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReactionUser
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import javax.inject.Inject
 

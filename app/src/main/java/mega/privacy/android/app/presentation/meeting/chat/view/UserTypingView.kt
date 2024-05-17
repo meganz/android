@@ -14,11 +14,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.core.ui.model.MegaSpanStyle
-import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
+import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

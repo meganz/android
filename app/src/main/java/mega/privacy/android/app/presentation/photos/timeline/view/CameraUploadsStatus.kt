@@ -13,9 +13,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.theme.amber_400
-import mega.privacy.android.core.ui.theme.blue_400
-import mega.privacy.android.core.ui.theme.green_400
+import mega.privacy.android.shared.original.core.ui.theme.amber_400
+import mega.privacy.android.shared.original.core.ui.theme.blue_400
+import mega.privacy.android.shared.original.core.ui.theme.green_400
 
 @Composable
 fun CameraUploadsStatusSync(

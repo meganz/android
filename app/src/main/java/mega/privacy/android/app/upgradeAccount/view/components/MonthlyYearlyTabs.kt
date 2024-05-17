@@ -18,14 +18,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.body2medium
-import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.tokens.TextColor
-import mega.privacy.android.core.ui.theme.transparent
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
+import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.transparent
 
 
 /**

@@ -36,7 +36,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.view.screen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.InitialisationScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationSetupScreen
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

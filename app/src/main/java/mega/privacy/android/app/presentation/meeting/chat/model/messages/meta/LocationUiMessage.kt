@@ -12,8 +12,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.ChatLocationMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openLocationActivity
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 
 /**

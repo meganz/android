@@ -19,12 +19,12 @@ import mega.privacy.android.app.presentation.view.extension.getNodeLabel
 import mega.privacy.android.app.presentation.view.extension.getNodeTitle
 import mega.privacy.android.app.presentation.view.extension.getSharesIcon
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
-import mega.privacy.android.core.ui.controls.dividers.DividerType
-import mega.privacy.android.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
-import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode

@@ -17,10 +17,10 @@ import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEnt
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.core.ui.controls.dividers.DividerType
-import mega.privacy.android.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo

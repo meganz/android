@@ -9,9 +9,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
-import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.core.ui.model.MenuActionWithClick
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**

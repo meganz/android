@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.achievements.invites.inviteFriendsS
 import mega.privacy.android.app.presentation.achievements.invites.navigateToInviteFriends
 import mega.privacy.android.app.presentation.achievements.referral.navigateToReferralBonus
 import mega.privacy.android.app.presentation.achievements.referral.referralBonusScreen
-import mega.privacy.android.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 
 /**
  * Scaffold for the Achievements Flow Screen

@@ -45,7 +45,7 @@ import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode

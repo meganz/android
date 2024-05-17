@@ -14,9 +14,9 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
-import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
-import mega.privacy.android.core.ui.preview.BooleanProvider
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.shared.theme.MegaAppTheme
 

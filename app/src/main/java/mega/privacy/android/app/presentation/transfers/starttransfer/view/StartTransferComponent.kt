@@ -58,10 +58,10 @@ import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.core.ui.navigation.launchFolderPicker
-import mega.privacy.android.core.ui.utils.MinimumTimeVisibility
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
+import mega.privacy.android.shared.original.core.ui.utils.MinimumTimeVisibility
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber

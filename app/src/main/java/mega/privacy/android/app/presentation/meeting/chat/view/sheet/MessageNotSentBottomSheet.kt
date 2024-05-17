@@ -8,8 +8,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageBottomSheetAction
-import mega.privacy.android.core.ui.controls.dividers.DividerType
-import mega.privacy.android.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 
 /**

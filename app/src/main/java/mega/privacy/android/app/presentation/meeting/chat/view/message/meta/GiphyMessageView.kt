@@ -24,8 +24,8 @@ import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.services.GiphyService
-import mega.privacy.android.core.ui.controls.chat.messages.GiphyMessagePlaceHolder
-import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.GiphyMessagePlaceHolder
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 import timber.log.Timber
 

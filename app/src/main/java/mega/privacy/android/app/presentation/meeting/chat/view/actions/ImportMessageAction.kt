@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.attachmen
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileExplorerActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openNameCollisionActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuEvent

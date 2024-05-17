@@ -10,7 +10,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
-import mega.privacy.android.core.ui.controls.sheets.MegaBottomSheetLayout
+import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper

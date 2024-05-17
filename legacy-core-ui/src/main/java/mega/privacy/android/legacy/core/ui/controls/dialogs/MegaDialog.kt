@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import mega.privacy.android.core.ui.theme.h6
+import mega.privacy.android.shared.original.core.ui.theme.h6
 
 /**
  * A reusable Dialog

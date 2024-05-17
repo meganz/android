@@ -27,9 +27,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.theme.extensions.dark_blue_500_dark_blue_200
-import mega.privacy.android.core.ui.theme.extensions.red_600_red_400
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.dark_blue_500_dark_blue_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_400
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 @Composable
 internal fun AchievementListItem(

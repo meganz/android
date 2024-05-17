@@ -55,10 +55,10 @@ import mega.privacy.android.app.presentation.search.view.EmptySearchView
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.theme.grey_alpha_012
-import mega.privacy.android.core.ui.theme.grey_alpha_054
-import mega.privacy.android.core.ui.theme.white_alpha_012
-import mega.privacy.android.core.ui.theme.white_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
@@ -287,7 +287,8 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
             text = stringResource(id = R.string.invite_contacts_to_start_chat),
             style = MaterialTheme.typography.subtitle2,
             textAlign = TextAlign.Center,
-            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054
+        )
 
         Spacer(modifier = Modifier.height(40.dp))
 

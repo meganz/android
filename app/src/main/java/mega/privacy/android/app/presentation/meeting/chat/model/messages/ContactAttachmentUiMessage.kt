@@ -25,9 +25,9 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.C
 import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.ContactMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openSentRequests
-import mega.privacy.android.core.ui.controls.chat.UiChatStatus
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.chat.UiChatStatus
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.user.UserVisibility
 

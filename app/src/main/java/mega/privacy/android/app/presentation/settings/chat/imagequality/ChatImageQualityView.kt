@@ -27,7 +27,7 @@ import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.settings.chat.imagequality.model.SettingsChatImageQualityState
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.theme.Typography
+import mega.privacy.android.shared.original.core.ui.theme.Typography
 import mega.privacy.android.domain.entity.ChatImageQuality
 
 @Composable

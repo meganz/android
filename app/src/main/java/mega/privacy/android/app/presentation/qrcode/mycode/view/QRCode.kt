@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
-import mega.privacy.android.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 
 /**
  * QR code for a [text]

@@ -13,8 +13,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.slideshow.SlideshowSettingViewModel
 import mega.privacy.android.app.presentation.slideshow.view.SlideshowSettingsView
-import mega.privacy.android.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 
 @Composable
 fun SlideshowSettingScreen(

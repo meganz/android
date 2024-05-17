@@ -37,7 +37,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToC
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
-import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.jupiter.api.Test

@@ -25,10 +25,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.UserTypingView
-import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
-import mega.privacy.android.core.ui.controls.chat.VoiceClipRecordEvent
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.utils.ComposableLifecycle
+import mega.privacy.android.shared.original.core.ui.controls.chat.ChatInputTextToolbar
+import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable

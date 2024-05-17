@@ -8,7 +8,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
-import mega.privacy.android.core.ui.model.KeyboardState
+import mega.privacy.android.shared.original.core.ui.model.KeyboardState
 
 /**
  * Control keyboard state.

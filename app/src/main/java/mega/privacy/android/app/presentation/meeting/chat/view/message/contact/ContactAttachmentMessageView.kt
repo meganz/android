@@ -1,12 +1,12 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.contact
 
-import mega.privacy.android.core.ui.controls.chat.messages.ContactAttachmentMessageView as CoreContactAttachmentMessageView
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ContactAttachmentMessageView as CoreContactAttachmentMessageView
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
-import mega.privacy.android.core.ui.controls.chat.UiChatStatus
+import mega.privacy.android.shared.original.core.ui.controls.chat.UiChatStatus
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 
 /**

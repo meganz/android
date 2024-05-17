@@ -8,7 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.text.SpanStyle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -7,7 +7,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
-import mega.privacy.android.core.ui.controls.chat.ReturnToCallBanner
+import mega.privacy.android.shared.original.core.ui.controls.chat.ReturnToCallBanner
 
 @Composable
 internal fun ReturnToCallBanner(

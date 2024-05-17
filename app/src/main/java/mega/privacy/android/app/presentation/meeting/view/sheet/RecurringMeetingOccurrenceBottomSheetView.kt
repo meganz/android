@@ -32,9 +32,9 @@ import mega.privacy.android.app.presentation.extensions.getDayAndMonth
 import mega.privacy.android.app.presentation.extensions.getTimeFormatted
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingAvatarView
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import java.time.Instant

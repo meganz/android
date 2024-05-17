@@ -29,9 +29,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
 import mega.privacy.android.app.objects.GifData
-import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItem
-import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AttachItem
+import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent

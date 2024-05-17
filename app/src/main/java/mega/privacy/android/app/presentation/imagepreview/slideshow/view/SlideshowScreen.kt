@@ -50,10 +50,10 @@ import mega.privacy.android.app.presentation.imagepreview.slideshow.model.Slides
 import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
 import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
-import mega.privacy.android.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.core.ui.theme.extensions.black_white
-import mega.privacy.android.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder

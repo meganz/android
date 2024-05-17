@@ -36,9 +36,9 @@ import mega.privacy.android.app.presentation.testpassword.view.Constants.BOTTOM_
 import mega.privacy.android.app.presentation.testpassword.view.Constants.BOTTOM_SHEET_PRINT
 import mega.privacy.android.app.presentation.testpassword.view.Constants.BOTTOM_SHEET_SAVE
 import mega.privacy.android.app.presentation.testpassword.view.Constants.BOTTOM_SHEET_TITLE
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

@@ -34,7 +34,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber

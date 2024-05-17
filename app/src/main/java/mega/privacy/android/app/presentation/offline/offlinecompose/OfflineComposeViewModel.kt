@@ -13,8 +13,8 @@ import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUiState
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
-import mega.privacy.android.core.ui.utils.pop
-import mega.privacy.android.core.ui.utils.push
+import mega.privacy.android.shared.original.core.ui.utils.pop
+import mega.privacy.android.shared.original.core.ui.utils.push
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase

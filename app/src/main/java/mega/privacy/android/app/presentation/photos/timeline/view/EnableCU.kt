@@ -42,13 +42,13 @@ import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.dark_grey
-import mega.privacy.android.core.ui.theme.grey_200
-import mega.privacy.android.core.ui.theme.grey_500
-import mega.privacy.android.core.ui.theme.teal_200
-import mega.privacy.android.core.ui.theme.teal_300
-import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.grey_200
+import mega.privacy.android.shared.original.core.ui.theme.grey_500
+import mega.privacy.android.shared.original.core.ui.theme.teal_200
+import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.white
 
 /**
  * Enable Camera Uploads View

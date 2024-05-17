@@ -20,11 +20,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 @Composable
 internal fun FileLinkContent(

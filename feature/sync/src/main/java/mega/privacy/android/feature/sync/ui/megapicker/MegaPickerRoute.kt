@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.FolderClicked

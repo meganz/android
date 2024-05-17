@@ -31,8 +31,8 @@ import mega.privacy.android.app.data.extensions.toStorageString
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.AchievementsOverviewViewModel
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_020_dark_grey
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 

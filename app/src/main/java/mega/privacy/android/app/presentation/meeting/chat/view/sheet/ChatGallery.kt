@@ -51,14 +51,14 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPartialMediaPermission
-import mega.privacy.android.core.ui.controls.chat.attachpanel.AskGalleryPermissionView
-import mega.privacy.android.core.ui.controls.chat.attachpanel.ChatGalleryItem
-import mega.privacy.android.core.ui.controls.chat.attachpanel.PartialPermissionView
-import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
-import mega.privacy.android.core.ui.controls.text.MegaText
-import mega.privacy.android.core.ui.preview.BooleanProvider
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AskGalleryPermissionView
+import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.ChatGalleryItem
+import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.PartialPermissionView
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.shared.theme.MegaAppTheme
 

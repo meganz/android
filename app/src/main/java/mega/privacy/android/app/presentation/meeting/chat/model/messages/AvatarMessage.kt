@@ -9,9 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.app.presentation.meeting.chat.view.LastItemAvatarPosition
-import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.core.ui.theme.extensions.conditional
+import mega.privacy.android.shared.original.core.ui.controls.chat.ChatMessageContainer
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**

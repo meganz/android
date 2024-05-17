@@ -37,7 +37,7 @@ if (!shouldUsePrebuiltSdk() || isServerBuild()) {
 include(":app")
 include(":domain")
 include(":core:formatter")
-include("core-ui")
+include(":shared:original-core-ui")
 include(":data")
 include(":lint")
 include(":feature:sync")

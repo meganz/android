@@ -22,13 +22,13 @@ import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.view.STORAGE_DESCRIPTION_ROW
-import mega.privacy.android.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
-import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_900
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 
 /**
  * Composable UI for feature description to reuse on Onboarding dialog for both Variants (A and B)

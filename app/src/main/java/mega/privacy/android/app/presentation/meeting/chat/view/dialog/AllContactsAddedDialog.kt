@@ -8,8 +8,8 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 
 /**
  * All contacts added dialog

@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import mega.privacy.android.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.legacy.core.ui.model.SpanStyleWithAnnotation
 
 /**

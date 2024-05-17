@@ -12,17 +12,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.dark_grey
-import mega.privacy.android.core.ui.theme.grey_300
-import mega.privacy.android.core.ui.theme.grey_700
-import mega.privacy.android.core.ui.theme.lime_green_300
-import mega.privacy.android.core.ui.theme.lime_green_500
-import mega.privacy.android.core.ui.theme.orange_300
-import mega.privacy.android.core.ui.theme.orange_400
-import mega.privacy.android.core.ui.theme.salmon_300
-import mega.privacy.android.core.ui.theme.salmon_700
-import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.grey_300
+import mega.privacy.android.shared.original.core.ui.theme.grey_700
+import mega.privacy.android.shared.original.core.ui.theme.lime_green_300
+import mega.privacy.android.shared.original.core.ui.theme.lime_green_500
+import mega.privacy.android.shared.original.core.ui.theme.orange_300
+import mega.privacy.android.shared.original.core.ui.theme.orange_400
+import mega.privacy.android.shared.original.core.ui.theme.salmon_300
+import mega.privacy.android.shared.original.core.ui.theme.salmon_700
+import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
 /**

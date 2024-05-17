@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.CanNotOpenFileDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
-import mega.privacy.android.core.ui.model.MenuActionWithClick
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.mobile.analytics.event.ChatConversationOpenWithActionMenuItemEvent

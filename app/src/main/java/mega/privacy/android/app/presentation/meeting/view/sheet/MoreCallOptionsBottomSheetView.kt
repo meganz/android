@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
-import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.CallOnHoldType
 

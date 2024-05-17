@@ -38,8 +38,8 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber

@@ -33,7 +33,7 @@
             android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
     </RelativeLayout>
 
-    <mega.privacy.android.core.ui.controls.banners.WarningBanner
+    <mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
         android:id="@+id/offline_warning"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

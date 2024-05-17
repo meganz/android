@@ -11,8 +11,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import mega.privacy.android.core.ui.controls.lists.StatusListViewItem
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.lists.StatusListViewItem
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode

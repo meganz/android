@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.meeting.chat.model
 
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.model.MenuAction
-import mega.privacy.android.core.ui.model.MenuActionString
-import mega.privacy.android.core.ui.model.MenuActionWithoutIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuActionString
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 
 /**
  * Chat room menu action.

@@ -4,18 +4,18 @@
 //
 package mega.privacy.android.shared.theme.tokens
 
-import mega.privacy.android.core.ui.theme.tokens.Background
-import mega.privacy.android.core.ui.theme.tokens.Border
-import mega.privacy.android.core.ui.theme.tokens.Button
-import mega.privacy.android.core.ui.theme.tokens.Components
-import mega.privacy.android.core.ui.theme.tokens.Focus
-import mega.privacy.android.core.ui.theme.tokens.Icon
-import mega.privacy.android.core.ui.theme.tokens.Indicator
-import mega.privacy.android.core.ui.theme.tokens.Link
-import mega.privacy.android.core.ui.theme.tokens.Notifications
-import mega.privacy.android.core.ui.theme.tokens.SemanticTokens
-import mega.privacy.android.core.ui.theme.tokens.Support
-import mega.privacy.android.core.ui.theme.tokens.Text
+import mega.privacy.android.shared.original.core.ui.theme.tokens.Background
+import mega.privacy.android.shared.original.core.ui.theme.tokens.Border
+import mega.privacy.android.shared.original.core.ui.theme.tokens.Button
+import mega.privacy.android.shared.original.core.ui.theme.tokens.Components
+import mega.privacy.android.shared.original.core.ui.theme.tokens.Focus
+import mega.privacy.android.shared.original.core.ui.theme.tokens.Icon
+import mega.privacy.android.shared.original.core.ui.theme.tokens.Indicator
+import mega.privacy.android.shared.original.core.ui.theme.tokens.Link
+import mega.privacy.android.shared.original.core.ui.theme.tokens.Notifications
+import mega.privacy.android.shared.original.core.ui.theme.tokens.SemanticTokens
+import mega.privacy.android.shared.original.core.ui.theme.tokens.Support
+import mega.privacy.android.shared.original.core.ui.theme.tokens.Text
 
 internal object MegaAppSemanticTokensLight : SemanticTokens {
     override val background: Background = Background(

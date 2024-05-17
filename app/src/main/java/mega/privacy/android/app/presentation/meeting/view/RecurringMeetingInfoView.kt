@@ -65,14 +65,14 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManag
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelOccurrenceAndMeetingDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelScheduledMeetingOccurrenceDialog
 import mega.privacy.android.legacy.core.ui.controls.dialogs.EditOccurrenceDialog
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.grey_alpha_012
-import mega.privacy.android.core.ui.theme.grey_alpha_054
-import mega.privacy.android.core.ui.theme.grey_alpha_087
-import mega.privacy.android.core.ui.theme.white
-import mega.privacy.android.core.ui.theme.white_alpha_012
-import mega.privacy.android.core.ui.theme.white_alpha_054
-import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
+import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 

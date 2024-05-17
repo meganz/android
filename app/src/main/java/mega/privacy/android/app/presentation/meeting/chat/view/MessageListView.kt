@@ -43,8 +43,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatM
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ParticipantUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
-import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.LoadingMessagesHeader
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage

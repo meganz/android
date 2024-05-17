@@ -6,9 +6,9 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.ReactionsInfoView
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReactionUser
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.ReactionsInfoView
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
 
 /**
  * Bottom sheet for reactions for a message

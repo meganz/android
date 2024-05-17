@@ -19,10 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.BooleanProvider
-import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.grey_alpha_087
-import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
 
 /**
  * A switch with a label

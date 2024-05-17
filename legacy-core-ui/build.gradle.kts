@@ -32,7 +32,7 @@ dependencies {
     lintChecks(project(":lint"))
 
     implementation(project(":icon-pack"))
-    implementation(project(":core-ui"))
+    implementation(project(":shared:original-core-ui"))
     implementation(project(":shared:theme"))
     testImplementation(project(":core-ui-test"))
 

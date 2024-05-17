@@ -3,9 +3,9 @@ package mega.privacy.android.app.presentation.notification.view.components
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
-import mega.privacy.android.core.ui.controls.text.MegaText
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 
 @Composable
 internal fun NotificationDate(dateText: String, modifier: Modifier) {

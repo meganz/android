@@ -21,14 +21,14 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.core.content.withStyledAttributes
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.core.ui.controls.text.MegaSpannedClickableText
-import mega.privacy.android.core.ui.model.MegaSpanStyle
-import mega.privacy.android.core.ui.model.MegaSpanStyleWithAnnotation
-import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.core.ui.preview.BooleanProvider
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
+import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
+import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
+import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

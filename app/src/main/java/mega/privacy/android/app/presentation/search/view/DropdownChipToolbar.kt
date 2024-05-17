@@ -11,9 +11,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.chip.Chip
-import mega.privacy.android.core.ui.controls.chip.ChipBar
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.chip.Chip
+import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable

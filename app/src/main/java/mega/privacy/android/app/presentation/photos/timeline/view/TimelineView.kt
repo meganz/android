@@ -54,20 +54,20 @@ import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.isScrolledToEnd
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.grey_alpha_012
-import mega.privacy.android.core.ui.theme.grey_alpha_038
-import mega.privacy.android.core.ui.theme.grey_alpha_087
-import mega.privacy.android.core.ui.theme.teal_100
-import mega.privacy.android.core.ui.theme.teal_200
-import mega.privacy.android.core.ui.theme.teal_300
-import mega.privacy.android.core.ui.theme.white
-import mega.privacy.android.core.ui.theme.white_alpha_012
-import mega.privacy.android.core.ui.theme.white_alpha_038
-import mega.privacy.android.core.ui.theme.white_alpha_087
-import mega.privacy.android.core.ui.theme.yellow_100
-import mega.privacy.android.core.ui.theme.yellow_700
-import mega.privacy.android.core.ui.theme.yellow_700_alpha_015
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
+import mega.privacy.android.shared.original.core.ui.theme.teal_100
+import mega.privacy.android.shared.original.core.ui.theme.teal_200
+import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
+import mega.privacy.android.shared.original.core.ui.theme.yellow_100
+import mega.privacy.android.shared.original.core.ui.theme.yellow_700
+import mega.privacy.android.shared.original.core.ui.theme.yellow_700_alpha_015
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 
 /**

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <mega.privacy.android.core.ui.controls.banners.WarningBanner
+    <mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
         android:id="@+id/backup_error_banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

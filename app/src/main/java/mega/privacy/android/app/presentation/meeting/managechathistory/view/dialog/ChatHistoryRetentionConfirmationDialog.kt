@@ -17,8 +17,8 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ChatHistoryRetentionOption
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

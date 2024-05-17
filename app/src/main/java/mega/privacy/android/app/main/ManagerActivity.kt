@@ -290,7 +290,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
-import mega.privacy.android.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.ChatRoomPermission

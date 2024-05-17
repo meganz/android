@@ -36,13 +36,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.dark_grey
-import mega.privacy.android.core.ui.theme.teal_200
-import mega.privacy.android.core.ui.theme.teal_200_alpha_038
-import mega.privacy.android.core.ui.theme.teal_300
-import mega.privacy.android.core.ui.theme.teal_300_alpha_038
-import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.teal_200
+import mega.privacy.android.shared.original.core.ui.theme.teal_200_alpha_038
+import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.teal_300_alpha_038
+import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
 

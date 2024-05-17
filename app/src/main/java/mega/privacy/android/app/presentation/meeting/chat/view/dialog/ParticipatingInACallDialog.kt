@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 
 @Composable
 internal fun ParticipatingInACallDialog(onDismiss: () -> Unit = {}, onConfirm: () -> Unit = {}) {

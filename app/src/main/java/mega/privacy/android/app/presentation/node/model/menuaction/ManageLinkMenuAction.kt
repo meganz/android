@@ -4,7 +4,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import javax.inject.Inject
 
 /**

@@ -44,14 +44,14 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.caption
-import mega.privacy.android.core.ui.theme.grey_300
-import mega.privacy.android.core.ui.theme.red_400
-import mega.privacy.android.core.ui.theme.red_900
-import mega.privacy.android.core.ui.theme.teal_200
-import mega.privacy.android.core.ui.theme.teal_300
-import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.caption
+import mega.privacy.android.shared.original.core.ui.theme.grey_300
+import mega.privacy.android.shared.original.core.ui.theme.red_400
+import mega.privacy.android.shared.original.core.ui.theme.red_900
+import mega.privacy.android.shared.original.core.ui.theme.teal_200
+import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.mobile.analytics.event.CreateNewAlbumDialogEvent
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)

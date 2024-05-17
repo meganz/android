@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.GiphyMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openGiphyViewerActivity
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 
 private const val MAX_SIZE_FOR_AUTO_PLAY = 1024 * 1024 * 4  // 4MB

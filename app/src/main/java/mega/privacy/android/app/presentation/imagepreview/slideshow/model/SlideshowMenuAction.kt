@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.imagepreview.slideshow.model
 
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.model.MenuAction
-import mega.privacy.android.core.ui.model.MenuActionString
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 
 /**
  * Slideshow Menu action

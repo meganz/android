@@ -7,7 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getDayAndMonth
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import java.time.Instant
 import java.time.temporal.ChronoField

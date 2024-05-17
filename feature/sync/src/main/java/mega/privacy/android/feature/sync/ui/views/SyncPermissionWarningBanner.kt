@@ -14,9 +14,9 @@ import androidx.lifecycle.Lifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
-import mega.privacy.android.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.core.ui.utils.ComposableLifecycle
-import mega.privacy.android.core.ui.utils.rememberPermissionState
+import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
+import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
+import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 

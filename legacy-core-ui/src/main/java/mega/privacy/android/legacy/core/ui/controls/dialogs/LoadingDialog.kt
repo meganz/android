@@ -18,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.core.ui.theme.extensions.conditional
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 /**
  *  A common loading dialog with a [MegaCircularProgressIndicator] and text.

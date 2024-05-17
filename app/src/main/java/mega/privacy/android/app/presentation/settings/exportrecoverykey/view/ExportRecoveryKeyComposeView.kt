@@ -38,10 +38,10 @@ import androidx.print.PrintHelper
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.model.RecoveryKeyUIState
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.white
 import java.io.File
 
 private typealias ExportRecoveryAction = () -> Unit

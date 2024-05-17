@@ -27,7 +27,7 @@ import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider
 import mega.privacy.android.app.upgradeAccount.view.components.ButtonsRow
 import mega.privacy.android.app.upgradeAccount.view.components.FeatureRow
 import mega.privacy.android.app.upgradeAccount.view.components.GetProPlanColumn
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.resources.R.string.dialog_onboarding_feature_storage_description
 import mega.privacy.android.shared.theme.MegaAppTheme
 

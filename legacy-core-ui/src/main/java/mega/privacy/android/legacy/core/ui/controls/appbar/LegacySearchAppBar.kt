@@ -51,9 +51,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import mega.privacy.android.core.ui.controls.appbar.ProvideDefaultMegaAppBarColors
-import mega.privacy.android.core.ui.controls.menus.MenuActions
-import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.controls.appbar.ProvideDefaultMegaAppBarColors
+import mega.privacy.android.shared.original.core.ui.controls.menus.MenuActions
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.legacy.core.ui.R
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 

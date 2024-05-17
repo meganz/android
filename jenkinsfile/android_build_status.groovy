@@ -8,7 +8,7 @@ BUILD_STEP = ""
 GMS_APK_BUILD_LOG = "gms_build.log"
 QA_APK_BUILD_LOG = "qa_build.log"
 
-MODULE_LIST = ['app', 'domain', 'core-ui', 'data']
+MODULE_LIST = ['app', 'domain', 'shared/original-core-ui', 'data']
 
 LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
@@ -352,9 +352,9 @@ pipeline {
                                         }
 
                                         try {
-                                            sh "./gradlew core-ui:testDebugUnitTest"
+                                            sh "./gradlew shared:original-core-ui:testDebugUnitTest"
                                         } finally {
-                                            COREUI_UNIT_TEST_RESULT = unitTestArchiveLink("core-ui/build/reports/tests/testDebugUnitTest", "core_ui_unit_test_result.zip")
+                                            COREUI_UNIT_TEST_RESULT = unitTestArchiveLink("shared/original-core-ui/build/reports/tests/testDebugUnitTest", "shared_original_core_ui_unit_test_result.zip")
                                         }
 
                                         // below code is only run when UnitTest is OK, before test reports are cleaned up.
@@ -786,7 +786,7 @@ def archiveLintReports() {
     """
 
     MODULE_LIST.eachWithIndex { module, _ ->
-        sh("cp -fv ${module}/build/reports/lint*.html ${WORKSPACE}/${LINT_REPORT_FOLDER}/${module}_lint_report.html")
+        sh("cp -fv ${module}/build/reports/lint*.html ${WORKSPACE}/${LINT_REPORT_FOLDER}/${module.replace('/', '_')}_lint_report.html")
     }
 
     sh """

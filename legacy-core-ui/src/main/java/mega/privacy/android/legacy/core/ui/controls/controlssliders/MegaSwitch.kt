@@ -13,16 +13,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.BooleanProvider
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.grey_010
-import mega.privacy.android.core.ui.theme.grey_100
-import mega.privacy.android.core.ui.theme.grey_400
-import mega.privacy.android.core.ui.theme.grey_400_alpha_038
-import mega.privacy.android.core.ui.theme.teal_100
-import mega.privacy.android.core.ui.theme.teal_200
-import mega.privacy.android.core.ui.theme.teal_200_alpha_038
-import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.grey_010
+import mega.privacy.android.shared.original.core.ui.theme.grey_100
+import mega.privacy.android.shared.original.core.ui.theme.grey_400
+import mega.privacy.android.shared.original.core.ui.theme.grey_400_alpha_038
+import mega.privacy.android.shared.original.core.ui.theme.teal_100
+import mega.privacy.android.shared.original.core.ui.theme.teal_200
+import mega.privacy.android.shared.original.core.ui.theme.teal_200_alpha_038
+import mega.privacy.android.shared.original.core.ui.theme.teal_300
 
 /**
  * Material switch with MEGA colours

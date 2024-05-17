@@ -26,14 +26,14 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.core.ui.model.MegaSpanStyle
-import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.tokens.TextColor
-import mega.privacy.android.core.ui.utils.composeLet
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
+import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.composeLet
 
 /**
  * Alert dialog to edit a Scheduled meeting occurrence

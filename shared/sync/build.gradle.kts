@@ -1,4 +1,3 @@
-import groovy.lang.Closure
 import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
@@ -26,7 +25,7 @@ android {
     }
     dependencies {
         lintChecks(project(":lint"))
-        implementation(project(":core-ui"))
+        implementation(project(":shared:original-core-ui"))
 
         implementation(platform(androidx.compose.bom))
         implementation(androidx.bundles.compose.bom)

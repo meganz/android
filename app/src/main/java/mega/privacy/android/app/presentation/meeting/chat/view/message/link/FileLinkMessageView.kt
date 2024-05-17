@@ -14,12 +14,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
-import mega.privacy.android.core.ui.controls.chat.messages.RichLinkContentView
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ChatBubble
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.RichLinkContentView
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.core.ui.mapper.IconType
-import mega.privacy.android.core.ui.preview.BooleanProvider
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

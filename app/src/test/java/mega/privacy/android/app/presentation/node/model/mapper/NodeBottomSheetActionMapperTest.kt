@@ -6,7 +6,7 @@ import androidx.compose.ui.res.painterResource
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.NodeBottomSheetMenuItem
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import org.junit.jupiter.api.BeforeEach

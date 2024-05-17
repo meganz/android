@@ -22,9 +22,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.BooleanProvider
-import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
 
 /**

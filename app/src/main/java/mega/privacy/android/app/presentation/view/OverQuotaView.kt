@@ -19,9 +19,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import java.util.concurrent.TimeUnit
 
 /**

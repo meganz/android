@@ -10,11 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageBottomSheetAction
-import mega.privacy.android.core.ui.controls.chat.MegaEmojiPickerView
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.AddReactionsSheetItem
-import mega.privacy.android.core.ui.controls.dividers.DividerType
-import mega.privacy.android.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.chat.MegaEmojiPickerView
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.AddReactionsSheetItem
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

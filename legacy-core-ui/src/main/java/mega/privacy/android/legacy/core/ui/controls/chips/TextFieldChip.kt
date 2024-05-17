@@ -35,12 +35,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.ui.model.KeyboardState
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.preview.TextFieldProvider
-import mega.privacy.android.core.ui.preview.TextFieldState
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.model.KeyboardState
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
+import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
 import mega.privacy.android.shared.theme.MegaAppTheme
 

@@ -5,8 +5,8 @@ import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ManageShareFolderMenuAction
-import mega.privacy.android.core.ui.model.MenuAction
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject

@@ -9,9 +9,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.notification.model.Notification
-import mega.privacy.android.core.ui.theme.grey_alpha_012
-import mega.privacy.android.core.ui.theme.white_alpha_012
-import mega.privacy.android.core.ui.utils.intToDp
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
+import mega.privacy.android.shared.original.core.ui.utils.intToDp
 
 @Composable
 internal fun NotificationDivider(horizontalPadding: Int) {

@@ -13,9 +13,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
-import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
-import mega.privacy.android.core.ui.controls.chat.messages.MessageText
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ChatBubble
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.MessageText
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.shared.theme.MegaAppTheme
 

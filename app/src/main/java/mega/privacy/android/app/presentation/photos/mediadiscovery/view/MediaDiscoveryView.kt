@@ -78,9 +78,9 @@ import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
-import mega.privacy.android.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.photos.Photo
 
 @Composable

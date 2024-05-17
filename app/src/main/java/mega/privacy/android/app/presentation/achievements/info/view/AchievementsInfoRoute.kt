@@ -37,14 +37,14 @@ import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoV
 import mega.privacy.android.app.presentation.achievements.info.model.AchievementsInfoUIState
 import mega.privacy.android.app.presentation.achievements.info.util.toAchievementsInfoAttribute
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.conditional
-import mega.privacy.android.core.ui.theme.extensions.dark_blue_500_dark_blue_200
-import mega.privacy.android.core.ui.theme.extensions.grey_020_dark_grey
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.extensions.white_transparent
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
+import mega.privacy.android.shared.original.core.ui.theme.extensions.dark_blue_500_dark_blue_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.white_transparent
 import mega.privacy.android.domain.entity.achievement.AchievementType
 
 internal object AchievementsInfoViewTestTags {

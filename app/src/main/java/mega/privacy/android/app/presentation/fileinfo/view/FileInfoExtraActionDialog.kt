@@ -8,9 +8,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.domain.entity.shares.AccessPermission
 
 @Composable

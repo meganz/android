@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 
 internal sealed interface CameraMenuAction : MenuActionWithIcon {
     class FlashOff : CameraMenuAction {

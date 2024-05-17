@@ -26,11 +26,11 @@ import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_yellow_700
-import mega.privacy.android.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
-import mega.privacy.android.core.ui.utils.ListGridStateMap
-import mega.privacy.android.core.ui.utils.getState
-import mega.privacy.android.core.ui.utils.sync
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_yellow_700
+import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
+import mega.privacy.android.shared.original.core.ui.utils.ListGridStateMap
+import mega.privacy.android.shared.original.core.ui.utils.getState
+import mega.privacy.android.shared.original.core.ui.utils.sync
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper

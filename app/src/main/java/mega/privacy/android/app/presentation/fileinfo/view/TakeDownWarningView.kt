@@ -14,9 +14,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
+import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.legacy.core.ui.model.SpanStyleWithAnnotation
 

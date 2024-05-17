@@ -35,7 +35,7 @@ import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.Tras
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.VerifyBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.VersionsBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.ViewInFolderBottomSheetMenuItem
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 
 /**
  * Toolbar module

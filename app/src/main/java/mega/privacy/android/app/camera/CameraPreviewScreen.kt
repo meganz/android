@@ -8,10 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.core.ui.controls.camera.CameraPreviewBottomBar
-import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.camera.CameraPreviewBottomBar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 
 @Composable
 internal fun CameraPreviewScreen(

@@ -16,11 +16,11 @@ import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.VideosFilterOptionEntity
-import mega.privacy.android.core.ui.controls.lists.SettingsItemWithRadioButton
-import mega.privacy.android.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.core.ui.controls.text.MegaText
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.lists.SettingsItemWithRadioButton
+import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @OptIn(ExperimentalMaterialApi::class)

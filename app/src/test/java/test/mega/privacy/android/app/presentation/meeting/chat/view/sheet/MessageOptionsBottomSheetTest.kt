@@ -6,8 +6,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageOptionsBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_MESSAGE_OPTIONS_PANEL
-import mega.privacy.android.core.ui.controls.chat.TEST_TAG_EMOJI_PICKER_VIEW
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.TEST_TAG_ADD_REACTIONS_SHEET_ITEM
+import mega.privacy.android.shared.original.core.ui.controls.chat.TEST_TAG_EMOJI_PICKER_VIEW
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.TEST_TAG_ADD_REACTIONS_SHEET_ITEM
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

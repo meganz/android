@@ -59,9 +59,9 @@ import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetin
 import mega.privacy.android.app.presentation.meeting.model.CustomRecurrenceState
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.DropdownOccurrenceType
 import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption

@@ -14,7 +14,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlag
-import mega.privacy.android.core.ui.controls.textfields.GenericTextField
+import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 
 /**
  * Calls the @FeatureFlagListContainer compose view to set the layout

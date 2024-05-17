@@ -18,8 +18,8 @@ import mega.privacy.android.app.presentation.achievements.info.model.Achievement
 import mega.privacy.android.app.presentation.achievements.info.util.toAchievementsInfoAttribute
 import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoView
 import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoViewTestTags
-import mega.privacy.android.core.ui.theme.red_300
-import mega.privacy.android.core.ui.theme.red_600
+import mega.privacy.android.shared.original.core.ui.theme.red_300
+import mega.privacy.android.shared.original.core.ui.theme.red_600
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.shared.theme.MegaAppTheme
 import org.junit.Rule

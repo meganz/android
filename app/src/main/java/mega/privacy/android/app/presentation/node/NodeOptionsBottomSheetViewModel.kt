@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.node.model.NodeBottomSheetState
 import mega.privacy.android.app.presentation.node.model.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.app.presentation.node.model.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.NodeBottomSheetMenuItem
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode

@@ -4,7 +4,7 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.node.model.menuaction.RemoveLinkDropdownMenuAction
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkRoute
-import mega.privacy.android.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import java.io.File

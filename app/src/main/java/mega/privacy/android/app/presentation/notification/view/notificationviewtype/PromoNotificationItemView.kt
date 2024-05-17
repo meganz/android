@@ -28,15 +28,15 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.view.components.GreenIconView
 import mega.privacy.android.app.presentation.notification.view.components.NotificationDate
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.ui.controls.dividers.DividerType
-import mega.privacy.android.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
-import mega.privacy.android.core.ui.controls.text.MegaText
-import mega.privacy.android.core.ui.preview.BooleanProvider
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.body2medium
-import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
-import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_800
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.shared.theme.MegaAppTheme
 

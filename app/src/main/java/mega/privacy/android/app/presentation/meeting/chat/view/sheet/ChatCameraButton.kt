@@ -41,8 +41,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.chat.attachpanel.ChatGalleryItem
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.ChatGalleryItem
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 

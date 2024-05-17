@@ -52,10 +52,10 @@ import mega.privacy.android.app.presentation.meeting.view.sheet.CallParticipantB
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.shared.theme.MegaAppTheme
-import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.core.ui.theme.extensions.black_white
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData

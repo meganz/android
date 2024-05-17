@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.fileinfo.view.TakeDownWarningView
-import mega.privacy.android.core.ui.controls.banners.TEST_TAG_WARNING_BANNER_CLOSE
+import mega.privacy.android.shared.original.core.ui.controls.banners.TEST_TAG_WARNING_BANNER_CLOSE
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

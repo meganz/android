@@ -17,7 +17,7 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
+import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 
 /**
  * Show compose view snackbar in meeting fragment

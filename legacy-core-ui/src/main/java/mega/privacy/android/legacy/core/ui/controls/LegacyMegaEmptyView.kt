@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.core.ui.model.SpanIndicator
-import mega.privacy.android.core.ui.theme.extensions.grey_300_grey_600
-import mega.privacy.android.core.ui.theme.extensions.grey_300_white_alpha_087
-import mega.privacy.android.core.ui.theme.extensions.grey_900_grey_100
-import mega.privacy.android.core.ui.theme.extensions.light_grey_light_black
+import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_300_grey_600
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_300_white_alpha_087
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_900_grey_100
+import mega.privacy.android.shared.original.core.ui.theme.extensions.light_grey_light_black
 
 /**
  * Reusable EmptyView with Icon & Text

@@ -61,10 +61,10 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.Requir
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.UploadOnlyWhileChargingTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoCompressionTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoQualityTile
-import mega.privacy.android.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.theme.MegaAppTheme
 

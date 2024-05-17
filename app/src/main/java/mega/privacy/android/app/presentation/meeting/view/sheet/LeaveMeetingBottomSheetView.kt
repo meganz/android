@@ -24,12 +24,12 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
-import mega.privacy.android.core.ui.controls.buttons.OutlinedWithoutBackgroundMegaButton
-import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultErrorMegaButton
-import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedWithoutBackgroundMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultErrorMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**

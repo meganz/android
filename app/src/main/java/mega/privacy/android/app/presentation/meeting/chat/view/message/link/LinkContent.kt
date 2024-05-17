@@ -11,7 +11,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatFragment
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileLinkActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFolderLinkActivity
-import mega.privacy.android.core.ui.controls.chat.messages.ContactMessageContentView
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ContactMessageContentView
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.contacts.ContactLink

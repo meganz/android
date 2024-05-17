@@ -1,10 +1,12 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
+import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,11 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.core.ui.controls.text.MegaText
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -29,11 +29,11 @@ import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.CardExpanded
 import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
-import mega.privacy.android.shared.resources.R as sharedResR
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import mega.privacy.android.core.ui.theme.extensions.h6Medium
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable

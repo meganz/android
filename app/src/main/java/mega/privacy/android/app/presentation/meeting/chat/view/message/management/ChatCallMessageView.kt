@@ -10,8 +10,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.core.ui.controls.chat.messages.ChatManagementMessage
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ChatManagementMessage
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.messages.management.CallEndedMessage

@@ -9,8 +9,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.ReturnToCallBanner
-import mega.privacy.android.core.ui.controls.chat.TEST_TAG_RETURN_TO_CALL
-import mega.privacy.android.core.ui.controls.chat.TEST_TAG_RETURN_TO_CALL_CHRONOMETER
+import mega.privacy.android.shared.original.core.ui.controls.chat.TEST_TAG_RETURN_TO_CALL
+import mega.privacy.android.shared.original.core.ui.controls.chat.TEST_TAG_RETURN_TO_CALL_CHRONOMETER
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus

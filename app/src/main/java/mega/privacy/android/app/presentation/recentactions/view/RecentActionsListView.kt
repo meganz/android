@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUiEntity
 import mega.privacy.android.app.presentation.recentactions.view.previewdataprovider.SampleRecentActionDataProvider
-import mega.privacy.android.core.ui.controls.lists.RecentActionListViewItem
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.controls.lists.RecentActionListViewItem
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType

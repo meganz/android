@@ -8,8 +8,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.chat.ChatUnreadMessageView
-import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.shared.original.core.ui.controls.chat.ChatUnreadMessageView
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**

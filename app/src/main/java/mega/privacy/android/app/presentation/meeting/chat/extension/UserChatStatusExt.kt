@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.extension
 
-import mega.privacy.android.core.ui.controls.chat.UiChatStatus
+import mega.privacy.android.shared.original.core.ui.controls.chat.UiChatStatus
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
 /**
