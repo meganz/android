@@ -1883,6 +1883,11 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
+    override fun clearCredentials() {
+        Timber.w("Clear local credentials!")
+        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_CREDENTIALS")
+    }
+
     override fun clearEphemeral() {
         writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_EPHEMERAL")
         legacyDatabaseMigration.onCreate(writableDatabase)

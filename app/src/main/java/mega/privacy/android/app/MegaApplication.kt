@@ -334,7 +334,11 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         }
     }
 
-    private fun setupMegaChatApi() {
+    /**
+     * Setup mega chat api
+     *
+     */
+    fun setupMegaChatApi() {
         if (!registeredChatListeners) {
             Timber.d("Add listeners of megaChatApi")
             megaChatApi.apply {

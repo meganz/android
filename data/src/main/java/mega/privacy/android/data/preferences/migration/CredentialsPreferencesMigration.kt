@@ -21,6 +21,8 @@ internal class CredentialsPreferencesMigration @Inject constructor(
         databaseHandler.credentials?.let {
             return currentData.toMutablePreferences().apply {
                 migrate(this, it)
+            }.also {
+                databaseHandler.clearCredentials()
             }
         }
         return currentData
