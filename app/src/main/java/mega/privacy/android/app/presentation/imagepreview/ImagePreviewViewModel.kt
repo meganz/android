@@ -740,8 +740,10 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun isAvailableOffline(imageNode: ImageNode): Boolean {
-        val typedNode = addImageTypeUseCase(imageNode)
-        return isAvailableOfflineUseCase(typedNode)
+        return runCatching {
+            val typedNode = addImageTypeUseCase(imageNode)
+            isAvailableOfflineUseCase(typedNode)
+        }.onFailure { Timber.e(it) }.getOrDefault(false)
     }
 
     /**
@@ -767,20 +769,26 @@ class ImagePreviewViewModel @Inject constructor(
 
     suspend fun getFallbackImagePath(imageResult: ImageResult?): String? {
         return imageResult?.run {
-            checkUri(previewUri) ?: checkUri(thumbnailUri)
+            safeCheckUri(previewUri) ?: safeCheckUri(thumbnailUri)
         }
     }
 
     suspend fun getHighestResolutionImagePath(imageResult: ImageResult?): String? {
         return imageResult?.run {
-            checkUri(fullSizeUri) ?: checkUri(previewUri) ?: checkUri(thumbnailUri)
+            safeCheckUri(fullSizeUri) ?: safeCheckUri(previewUri) ?: safeCheckUri(thumbnailUri)
         }
     }
 
     suspend fun getLowestResolutionImagePath(imageResult: ImageResult?): String? {
         return imageResult?.run {
-            checkUri(thumbnailUri) ?: checkUri(previewUri) ?: checkUri(fullSizeUri)
+            safeCheckUri(thumbnailUri) ?: safeCheckUri(previewUri) ?: safeCheckUri(fullSizeUri)
         }
+    }
+
+    private suspend fun safeCheckUri(uriPath: String?): String? {
+        return runCatching {
+            checkUri(uriPath)
+        }.onFailure { Timber.e(it) }.getOrNull()
     }
 
     /**
@@ -836,14 +844,21 @@ class ImagePreviewViewModel @Inject constructor(
      * Hide the node (mark as sensitive)
      */
     fun hideNode(nodeId: NodeId) = viewModelScope.launch {
-        updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = true)
+        runCatching {
+            updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = true)
+        }.onFailure {
+            Timber.e(it)
+        }
     }
 
     /**
      * Unhide the node (unmark as sensitive)
      */
     fun unhideNode(nodeId: NodeId) = viewModelScope.launch {
-        updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = false)
+        runCatching {
+            updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = false)
+        }.onFailure { Timber.e(it) }
+
     }
 
     fun playVideo(
