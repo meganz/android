@@ -41,4 +41,8 @@ internal class OngoingCallViewModel @Inject constructor(
     fun setShow(show: Boolean) {
         _state.update { it.copy(isShown = show) }
     }
+
+    fun isShowing(): Boolean {
+        return state.value.isShown && state.value.currentCall != null
+    }
 }

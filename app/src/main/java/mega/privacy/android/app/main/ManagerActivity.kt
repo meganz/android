@@ -3676,7 +3676,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         drawerItem = item ?: DrawerItem.CLOUD_DRIVE
         callInProgressViewModel.setShow(
-            drawerItem != DrawerItem.TRANSFERS && drawerItem != DrawerItem.NOTIFICATIONS && drawerItem != DrawerItem.HOMEPAGE
+            resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+                    && drawerItem != DrawerItem.TRANSFERS && drawerItem != DrawerItem.NOTIFICATIONS && drawerItem != DrawerItem.HOMEPAGE
         )
 
         // Homepage may hide the Appbar before
@@ -7517,6 +7518,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else if (mElevationCause and cause > 0) {
             mElevationCause = mElevationCause xor cause
         }
+
+        if (mElevationCause == ELEVATION_CALL_IN_PROGRESS && !callInProgressViewModel.isShowing()) return
 
         // If any Tablayout is visible, set the background of the toolbar to transparent (or its elevation
         // overlay won't be correctly set via AppBarLayout) and then set the elevation of AppBarLayout,
