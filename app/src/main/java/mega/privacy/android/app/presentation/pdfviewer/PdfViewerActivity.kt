@@ -1687,6 +1687,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     override fun onDestroy() {
         Timber.d("onDestroy()")
+        binding.pdfView.recycle()
         val needStopHttpServer =
             intent.getBooleanExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false)
         megaApi.removeTransferListener(this)
