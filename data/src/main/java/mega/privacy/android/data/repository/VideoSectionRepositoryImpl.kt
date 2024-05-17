@@ -19,6 +19,7 @@ import mega.privacy.android.data.listener.RemoveSetsListenerInterface
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.data.mapper.videosection.VideoPlaylistMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -26,12 +27,12 @@ import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.VideoSectionRepository
-import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
-import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSet
@@ -52,6 +53,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val userSetMapper: UserSetMapper,
     private val videoPlaylistMapper: VideoPlaylistMapper,
+    private val megaSearchFilterMapper: MegaSearchFilterMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : VideoSectionRepository {
     private val videoPlaylistsMap: MutableMap<Long, UserSet> = mutableMapOf()
@@ -61,11 +63,14 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val offlineItems = getAllOfflineNodeHandle()
             val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
-            megaApiGateway.searchByType(
-                megaCancelToken,
+            val filter = megaSearchFilterMapper(
+                searchTarget = SearchTarget.ROOT_NODES,
+                searchCategory = SearchCategory.VIDEO
+            )
+            megaApiGateway.searchWithFilter(
+                filter,
                 sortOrderIntMapper(order),
-                FILE_TYPE_VIDEO,
-                SEARCH_TARGET_ROOTNODE
+                megaCancelToken,
             ).map { megaNode ->
                 typedVideoNodeMapper(
                     fileNode = megaNode.convertToFileNode(

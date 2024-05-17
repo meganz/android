@@ -13,12 +13,16 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.data.mapper.videosection.VideoPlaylistMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.repository.VideoSectionRepository
@@ -29,6 +33,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaSetElementList
@@ -54,10 +59,10 @@ class VideoSectionRepositoryImplTest {
     private val fileNodeMapper = mock<FileNodeMapper>()
     private val typedVideoNodeMapper = mock<TypedVideoNodeMapper>()
     private val cancelTokenProvider = mock<CancelTokenProvider>()
-    private val megaCancelToken = mock<MegaCancelToken>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val userSetMapper: UserSetMapper = ::createUserSet
     private val videoPlaylistMapper = mock<VideoPlaylistMapper>()
+    private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -74,6 +79,7 @@ class VideoSectionRepositoryImplTest {
             megaLocalRoomGateway = megaLocalRoomGateway,
             userSetMapper = userSetMapper,
             videoPlaylistMapper = videoPlaylistMapper,
+            megaSearchFilterMapper = megaSearchFilterMapper,
             ioDispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -97,13 +103,42 @@ class VideoSectionRepositoryImplTest {
 
     @Test
     fun `test that get all videos returns successfully`() = runTest {
-        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(megaCancelToken)
+        val node = mock<MegaNode> {
+            on { isFile }.thenReturn(true)
+            on { isFolder }.thenReturn(false)
+            on { duration }.thenReturn(100)
+        }
+        val fileNode = mock<FileNode>()
+        val filter = mock<MegaSearchFilter>()
+        val token = mock<MegaCancelToken>()
+        val typedVideoNode = mock<TypedVideoNode> {
+            on { thumbnailPath }.thenReturn(null)
+        }
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
         whenever(sortOrderIntMapper(SortOrder.ORDER_MODIFICATION_DESC))
             .thenReturn(ORDER_DEFAULT_DESC)
-        whenever(megaApiGateway.searchByType(any(), any(), any(), any()))
-            .thenReturn(listOf(mock(), mock()))
-        whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
-        whenever(typedVideoNodeMapper(any(), any(), any())).thenReturn(mock())
+        whenever(
+            megaSearchFilterMapper(
+                searchTarget = SearchTarget.ROOT_NODES,
+                searchCategory = SearchCategory.VIDEO
+            )
+        ).thenReturn(filter)
+        whenever(
+            megaApiGateway.searchWithFilter(
+                filter,
+                sortOrderIntMapper(SortOrder.ORDER_MODIFICATION_DESC),
+                token
+            )
+        ).thenReturn(listOf(node, node))
+        whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(null)
+        whenever(
+            fileNodeMapper(
+                megaNode = node,
+                requireSerializedData = false,
+                offline = null
+            )
+        ).thenReturn(fileNode)
+        whenever(typedVideoNodeMapper(fileNode, node.duration, null)).thenReturn(typedVideoNode)
 
         val actual = underTest.getAllVideos(SortOrder.ORDER_MODIFICATION_DESC)
         assertThat(actual.isNotEmpty()).isTrue()

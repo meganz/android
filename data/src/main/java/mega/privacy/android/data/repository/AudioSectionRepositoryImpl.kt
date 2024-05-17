@@ -7,13 +7,14 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.audios.TypedAudioNodeMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedAudioNode
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AudioSectionRepository
-import nz.mega.sdk.MegaApiJava.FILE_TYPE_AUDIO
-import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -27,17 +28,21 @@ internal class AudioSectionRepositoryImpl @Inject constructor(
     private val typedAudioNodeMapper: TypedAudioNodeMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
+    private val megaSearchFilterMapper: MegaSearchFilterMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AudioSectionRepository {
     override suspend fun getAllAudios(order: SortOrder): List<TypedAudioNode> =
         withContext(ioDispatcher) {
             val offlineItems = getAllOfflineNodeHandle()
             val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
-            megaApiGateway.searchByType(
-                megaCancelToken,
+            val filter = megaSearchFilterMapper(
+                searchTarget = SearchTarget.ROOT_NODES,
+                searchCategory = SearchCategory.AUDIO
+            )
+            megaApiGateway.searchWithFilter(
+                filter,
                 sortOrderIntMapper(order),
-                FILE_TYPE_AUDIO,
-                SEARCH_TARGET_ROOTNODE
+                megaCancelToken,
             ).map { megaNode ->
                 typedAudioNodeMapper(
                     fileNode = megaNode.convertToFileNode(

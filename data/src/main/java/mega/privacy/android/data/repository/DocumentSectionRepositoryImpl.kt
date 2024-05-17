@@ -6,12 +6,14 @@ import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.DocumentSectionRepository
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -24,17 +26,21 @@ internal class DocumentSectionRepositoryImpl @Inject constructor(
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val nodeMapper: NodeMapper,
     private val cancelTokenProvider: CancelTokenProvider,
+    private val megaSearchFilterMapper: MegaSearchFilterMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : DocumentSectionRepository {
     override suspend fun getAllDocuments(order: SortOrder): List<UnTypedNode> =
         withContext(ioDispatcher) {
             val offlineItems = getAllOfflineNodeHandle()
             val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
-            megaApiGateway.searchByType(
-                megaCancelToken,
+            val filter = megaSearchFilterMapper(
+                searchTarget = SearchTarget.ROOT_NODES,
+                searchCategory = SearchCategory.ALL_DOCUMENTS
+            )
+            megaApiGateway.searchWithFilter(
+                filter,
                 sortOrderIntMapper(order),
-                MegaApiJava.FILE_TYPE_ALL_DOCS,
-                MegaApiJava.SEARCH_TARGET_ROOTNODE
+                megaCancelToken,
             ).map { megaNode ->
                 convertToUnTypedNode(
                     node = megaNode,
