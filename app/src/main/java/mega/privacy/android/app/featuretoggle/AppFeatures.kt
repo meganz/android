@@ -68,7 +68,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     SettingsCameraUploadsUploadWhileCharging(
         description = "Shows the Upload only while charging Option in the refactored Settings Camera " +
                 "Uploads screen.",
-        defaultValue = false,
+        defaultValue = true,
     ),
 
     /**
