@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.megachat.chat.explorer
 
+import android.util.SparseBooleanArray
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.main.model.chat.explorer.ChatExplorerSearchUiState
 import mega.privacy.android.app.main.model.chat.explorer.ChatExplorerUiState
 import mega.privacy.android.app.presentation.contact.mapper.UserContactMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -60,6 +62,51 @@ class ChatExplorerViewModel @Inject constructor(
      * The public property of [ChatExplorerUiState].
      */
     val uiState = _uiState.asStateFlow()
+
+    private val _searchUiState = MutableStateFlow(ChatExplorerSearchUiState())
+
+    /**
+     * The public property of [ChatExplorerSearchUiState].
+     */
+    val searchUiState = _searchUiState.asStateFlow()
+
+    /**
+     * Search items based on given query.
+     *
+     * @param query The search query.
+     */
+    fun search(query: String?) {
+        if (query == null) {
+            _searchUiState.update { state ->
+                state.copy(
+                    items = emptyList(),
+                    selectedItems = SparseBooleanArray()
+                )
+            }
+            return
+        }
+
+        viewModelScope.launch(defaultDispatcher) {
+            val searchItems = mutableListOf<ChatExplorerListItem>()
+            val selectedSearchItems = SparseBooleanArray()
+            _uiState.value.items.forEach {
+                if (!it.isHeader && it.title?.lowercase()?.contains(query.lowercase()) == true) {
+                    searchItems.add(it)
+                    val isItemSelected = _uiState.value.selectedItems.isNotEmpty() &&
+                            _uiState.value.selectedItems.contains(it)
+                    if (isItemSelected) {
+                        selectedSearchItems.put(searchItems.indexOf(it), true)
+                    }
+                }
+            }
+            _searchUiState.update { state ->
+                state.copy(
+                    items = searchItems,
+                    selectedItems = selectedSearchItems
+                )
+            }
+        }
+    }
 
     /**
      * Get the list of chats both active and non-active.

@@ -23,13 +23,11 @@ import mega.privacy.android.domain.usecase.contact.GetContactFromCacheByHandleUs
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
@@ -38,8 +36,9 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@RunWith(RobolectricTestRunner::class)
 class ChatExplorerViewModelTest {
 
     private lateinit var underTest: ChatExplorerViewModel
@@ -54,7 +53,7 @@ class ChatExplorerViewModelTest {
         mock()
     private lateinit var userContactMapper: UserContactMapper
 
-    @BeforeEach
+    @Before
     fun setUp() {
         userContactMapper = UserContactMapper()
         commonStub()
@@ -78,7 +77,7 @@ class ChatExplorerViewModelTest {
         whenever(getUserUseCase(UserId(any()))) doReturn null
     }
 
-    @AfterEach
+    @After
     fun tearDown() {
         reset(
             getActiveChatListItemsUseCase,
@@ -182,15 +181,14 @@ class ChatExplorerViewModelTest {
 
     @Test
     fun `test that the total recent items are six`() = runTest {
-        val chatIds = listOf(1L, 2L, 3L, 4L, 5L, 6L, 7L)
         val activeChats = listOf(
-            newChatListItem(withChatId = chatIds[0]),
-            newChatListItem(withChatId = chatIds[1]),
-            newChatListItem(withChatId = chatIds[2]),
-            newChatListItem(withChatId = chatIds[3]),
-            newChatListItem(withChatId = chatIds[4]),
-            newChatListItem(withChatId = chatIds[5]),
-            newChatListItem(withChatId = chatIds[6]),
+            newChatListItem(withChatId = 1L),
+            newChatListItem(withChatId = 2L),
+            newChatListItem(withChatId = 3L),
+            newChatListItem(withChatId = 4L),
+            newChatListItem(withChatId = 5L),
+            newChatListItem(withChatId = 6L),
+            newChatListItem(withChatId = 7L),
         )
         whenever(getActiveChatListItemsUseCase()) doReturn activeChats
 
@@ -203,43 +201,43 @@ class ChatExplorerViewModelTest {
                     isHeader = true
                 ),
                 ChatExplorerListItem(
-                    id = chatIds[0].toString(),
+                    id = activeChats[0].chatId.toString(),
                     chat = activeChats[0],
                     title = activeChats[0].title,
                     isRecent = true
                 ),
                 ChatExplorerListItem(
-                    id = chatIds[1].toString(),
+                    id = activeChats[1].chatId.toString(),
                     chat = activeChats[1],
                     title = activeChats[1].title,
                     isRecent = true
                 ),
                 ChatExplorerListItem(
-                    id = chatIds[2].toString(),
+                    id = activeChats[2].chatId.toString(),
                     chat = activeChats[2],
                     title = activeChats[2].title,
                     isRecent = true
                 ),
                 ChatExplorerListItem(
-                    id = chatIds[3].toString(),
+                    id = activeChats[3].chatId.toString(),
                     chat = activeChats[3],
                     title = activeChats[3].title,
                     isRecent = true
                 ),
                 ChatExplorerListItem(
-                    id = chatIds[4].toString(),
+                    id = activeChats[4].chatId.toString(),
                     chat = activeChats[4],
                     title = activeChats[4].title,
                     isRecent = true
                 ),
                 ChatExplorerListItem(
-                    id = chatIds[5].toString(),
+                    id = activeChats[5].chatId.toString(),
                     chat = activeChats[5],
                     title = activeChats[5].title,
                     isRecent = true
                 ),
                 ChatExplorerListItem(
-                    id = chatIds[6].toString(),
+                    id = activeChats[6].chatId.toString(),
                     chat = activeChats[6],
                     title = activeChats[6].title,
                     isRecent = false
@@ -487,9 +485,8 @@ class ChatExplorerViewModelTest {
             verify(getUserOnlineStatusByHandleUseCase).invoke(peerHandle)
         }
 
-    @ParameterizedTest(name = "when the current user''s online status is {0}")
-    @EnumSource(value = UserChatStatus::class, names = ["Offline", "Away"])
-    fun `test that the user's last green time is requested correctly`(userStatus: UserChatStatus) =
+    @Test
+    fun `test that the user's last green time is requested correctly when the current user's online status is Offline`() =
         runTest {
             val peerHandle = 456L
             val item = newChatListItem(
@@ -502,7 +499,7 @@ class ChatExplorerViewModelTest {
             whenever(getArchivedChatListItemsUseCase()) doReturn listOf(item)
             val userHandle = 2L
             whenever(getUserUseCase(UserId(peerHandle))) doReturn newUser(withHandle = userHandle)
-            whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn userStatus
+            whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn UserChatStatus.Offline
             whenever(getContactFromCacheByHandleUseCase(peerHandle)) doReturn null
 
             underTest.getChats()
@@ -510,9 +507,8 @@ class ChatExplorerViewModelTest {
             verify(requestUserLastGreenUseCase).invoke(userHandle)
         }
 
-    @ParameterizedTest(name = "when the current user''s online status is {0}")
-    @EnumSource(value = UserChatStatus::class, names = ["Online", "Busy", "Invalid"])
-    fun `test that the user's last green time is not requested`(userStatus: UserChatStatus) =
+    @Test
+    fun `test that the user's last green time is requested correctly when the current user's online status is Away`() =
         runTest {
             val peerHandle = 456L
             val item = newChatListItem(
@@ -525,7 +521,73 @@ class ChatExplorerViewModelTest {
             whenever(getArchivedChatListItemsUseCase()) doReturn listOf(item)
             val userHandle = 2L
             whenever(getUserUseCase(UserId(peerHandle))) doReturn newUser(withHandle = userHandle)
-            whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn userStatus
+            whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn UserChatStatus.Away
+            whenever(getContactFromCacheByHandleUseCase(peerHandle)) doReturn null
+
+            underTest.getChats()
+
+            verify(requestUserLastGreenUseCase).invoke(userHandle)
+        }
+
+    @Test
+    fun `test that the user's last green time is not requested when the current user''s online status is Online`() =
+        runTest {
+            val peerHandle = 456L
+            val item = newChatListItem(
+                withChatId = 123L,
+                withTitle = "item",
+                withLastTimestamp = System.currentTimeMillis(),
+                withOwnPrivilege = ChatRoomPermission.Moderator,
+                withPeerHandle = peerHandle
+            )
+            whenever(getArchivedChatListItemsUseCase()) doReturn listOf(item)
+            val userHandle = 2L
+            whenever(getUserUseCase(UserId(peerHandle))) doReturn newUser(withHandle = userHandle)
+            whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn UserChatStatus.Online
+            whenever(getContactFromCacheByHandleUseCase(peerHandle)) doReturn null
+
+            underTest.getChats()
+
+            verify(requestUserLastGreenUseCase, never()).invoke(userHandle)
+        }
+
+    @Test
+    fun `test that the user's last green time is not requested when the current user''s online status is Busy`() =
+        runTest {
+            val peerHandle = 456L
+            val item = newChatListItem(
+                withChatId = 123L,
+                withTitle = "item",
+                withLastTimestamp = System.currentTimeMillis(),
+                withOwnPrivilege = ChatRoomPermission.Moderator,
+                withPeerHandle = peerHandle
+            )
+            whenever(getArchivedChatListItemsUseCase()) doReturn listOf(item)
+            val userHandle = 2L
+            whenever(getUserUseCase(UserId(peerHandle))) doReturn newUser(withHandle = userHandle)
+            whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn UserChatStatus.Busy
+            whenever(getContactFromCacheByHandleUseCase(peerHandle)) doReturn null
+
+            underTest.getChats()
+
+            verify(requestUserLastGreenUseCase, never()).invoke(userHandle)
+        }
+
+    @Test
+    fun `test that the user's last green time is not requested when the current user''s online status is Invalid`() =
+        runTest {
+            val peerHandle = 456L
+            val item = newChatListItem(
+                withChatId = 123L,
+                withTitle = "item",
+                withLastTimestamp = System.currentTimeMillis(),
+                withOwnPrivilege = ChatRoomPermission.Moderator,
+                withPeerHandle = peerHandle
+            )
+            whenever(getArchivedChatListItemsUseCase()) doReturn listOf(item)
+            val userHandle = 2L
+            whenever(getUserUseCase(UserId(peerHandle))) doReturn newUser(withHandle = userHandle)
+            whenever(getUserOnlineStatusByHandleUseCase(peerHandle)) doReturn UserChatStatus.Invalid
             whenever(getContactFromCacheByHandleUseCase(peerHandle)) doReturn null
 
             underTest.getChats()
@@ -539,6 +601,71 @@ class ChatExplorerViewModelTest {
 
         underTest.uiState.test {
             assertThat(expectMostRecentItem().isItemUpdated).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that the search items and search selected items are reset when the query is NULL`() =
+        runTest {
+            underTest.search(null)
+
+            underTest.searchUiState.test {
+                val item = expectMostRecentItem()
+                assertThat(item.items).isEmpty()
+                assertThat(item.selectedItems.size()).isEqualTo(0)
+            }
+        }
+
+    @Test
+    fun `test that the correct search items are returned given a search query`() = runTest {
+        val query = "query"
+        val chatIds = listOf(1L, 2L, 3L, 4L, 5L, 6L, 7L)
+        val activeChats = listOf(
+            newChatListItem(withChatId = chatIds[0], withTitle = "containsQuery"),
+            newChatListItem(withChatId = chatIds[1], withTitle = "QUERY"),
+            newChatListItem(withChatId = chatIds[2], withTitle = "title"),
+            newChatListItem(withChatId = chatIds[3], withTitle = "query"),
+            newChatListItem(withChatId = chatIds[4]),
+            newChatListItem(withChatId = chatIds[5]),
+            newChatListItem(withChatId = chatIds[6]),
+        )
+        whenever(getActiveChatListItemsUseCase()) doReturn activeChats
+
+        underTest.getChats()
+        underTest.addSelectedItem(
+            ChatExplorerListItem(
+                id = activeChats[3].chatId.toString(),
+                chat = activeChats[3],
+                title = activeChats[3].title,
+                isRecent = true
+            )
+        )
+        underTest.search(query)
+
+        underTest.searchUiState.test {
+            val item = expectMostRecentItem()
+            val items = listOf(
+                ChatExplorerListItem(
+                    id = chatIds[0].toString(),
+                    chat = activeChats[0],
+                    title = activeChats[0].title,
+                    isRecent = true
+                ),
+                ChatExplorerListItem(
+                    id = chatIds[1].toString(),
+                    chat = activeChats[1],
+                    title = activeChats[1].title,
+                    isRecent = true
+                ),
+                ChatExplorerListItem(
+                    id = chatIds[3].toString(),
+                    chat = activeChats[3],
+                    title = activeChats[3].title,
+                    isRecent = true
+                )
+            )
+            assertThat(item.items).isEqualTo(items)
+            assertThat(item.selectedItems.get(2)).isTrue()
         }
     }
 

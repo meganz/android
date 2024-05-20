@@ -8,12 +8,10 @@ import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -94,8 +92,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     private RecyclerView addedList;
     private MegaChipChatExplorerAdapter adapterAdded;
     private LinearLayoutManager addedLayoutManager;
-
-    private SearchTask searchTask;
 
     private PositionDividerItemDecoration positionDividerItemDecoration;
     private SimpleDividerItemDecoration simpleDividerItemDecoration;
@@ -209,6 +205,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         viewModel = new ViewModelProvider(this).get(ChatExplorerViewModel.class);
 
+        resetSearch();
+
         collectFlows();
 
         setChats();
@@ -318,6 +316,21 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                         setFinalViews(uiState.getItems());
                     }
                     this.uiState = uiState;
+                    return Unit.INSTANCE;
+                });
+
+        ViewExtensionsKt.collectFlow(
+                this,
+                viewModel.getSearchUiState(),
+                Lifecycle.State.STARTED,
+                searchUiState -> {
+                    if (adapterList != null) {
+                        adapterList.setSearchSelectedItems(searchUiState.getSelectedItems());
+                        if (adapterList.isSearchEnabled()) {
+                            adapterList.setItems(new ArrayList<>(searchUiState.getItems()));
+                            setListVisibility();
+                        }
+                    }
                     return Unit.INSTANCE;
                 });
     }
@@ -582,6 +595,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 ((FileExplorerActivity) context).showFabButton(false);
             }
         } else {
+            resetSearch();
             listView.removeItemDecoration(simpleDividerItemDecoration);
             listView.addItemDecoration(positionDividerItemDecoration);
             listView.invalidateItemDecorations();
@@ -610,6 +624,10 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             }
         }
         setListVisibility();
+    }
+
+    private void resetSearch() {
+        viewModel.search(null);
     }
 
     private void setListVisibility() {
@@ -643,48 +661,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     }
 
     public void search(String s) {
-        if (searchTask != null && searchTask.getStatus() != AsyncTask.Status.FINISHED) {
-            searchTask.cancel(true);
-        }
-        searchTask = new SearchTask();
-        searchTask.execute(s);
-    }
-
-    private class SearchTask extends AsyncTask<String, Void, Void> {
-
-        ArrayList<ChatExplorerListItem> searchItems = new ArrayList<>();
-        SparseBooleanArray searchSelectedItems = new SparseBooleanArray();
-
-        @Override
-        protected Void doInBackground(String... strings) {
-            String s = strings[0];
-            boolean areAddedItems = !uiState.getSelectedItems().isEmpty();
-
-            ArrayList<ChatExplorerListItem> copiedItems = new ArrayList<>(uiState.getItems());
-            for (ChatExplorerListItem item : copiedItems) {
-                if (item.getTitle() != null && !item.isHeader() && item.getTitle().toLowerCase().contains(s.toLowerCase())) {
-                    searchItems.add(item);
-                    if (areAddedItems && uiState.getSelectedItems().contains(item)) {
-                        searchSelectedItems.put(searchItems.indexOf(item), true);
-                    }
-                }
-            }
-
-            if (adapterList != null) {
-                adapterList.setSearchSelectedItems(searchSelectedItems);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (adapterList != null) {
-                if (!adapterList.isSearchEnabled()) {
-                    return;
-                }
-                adapterList.setItems(searchItems);
-                setListVisibility();
-            }
-        }
+        viewModel.search(s);
     }
 }
