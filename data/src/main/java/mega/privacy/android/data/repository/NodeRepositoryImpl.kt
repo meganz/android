@@ -574,10 +574,12 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun copyNode(
         nodeToCopy: NodeId,
+        nodeToCopySerializedData: String?,
         newNodeParent: NodeId,
         newNodeName: String?,
     ): NodeId = withContext(ioDispatcher) {
         val node = getMegaNodeByHandle(nodeToCopy, true)
+            ?: nodeToCopySerializedData?.let { MegaNode.unserialize(it) }
         val parent = getMegaNodeByHandle(newNodeParent, true)
         requireNotNull(node) { "Node to copy with handle $nodeToCopy not found" }
         requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
