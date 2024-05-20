@@ -20,6 +20,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
@@ -27,16 +28,16 @@ import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.utils.LocationInfo
+import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.contacts.ContactPermission
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.FolderTreeInfo
-import mega.privacy.android.domain.entity.contacts.ContactPermission
-import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.shared.theme.MegaAppTheme
 import java.time.Instant
 import kotlin.time.Duration.Companion.days
@@ -116,6 +117,7 @@ internal fun FileInfoScreen(
                     ?.takeIf { viewState.isIncomingSharedNode },
             )
         },
+        headerSpacerHeight = if (viewState.iconResource != null && !viewState.hasPreview) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp,
         headerBelowTopBar = actionModeSelect, //actionMode doesn't have collapsible title, the header needs to be drawn below the app bar
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState) { data ->
@@ -347,3 +349,6 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
         )
     }
 }
+
+private const val MAX_HEADER_HEIGHT = 96
+private const val APP_BAR_HEIGHT = 56

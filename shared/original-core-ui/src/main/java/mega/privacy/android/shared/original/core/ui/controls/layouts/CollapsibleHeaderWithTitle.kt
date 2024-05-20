@@ -100,10 +100,7 @@ fun CollapsibleHeaderWithTitle(
     modifier: Modifier = Modifier,
     titleIcons: @Composable (RowScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
-) = Box(
-    modifier = modifier
-        .fillMaxWidth()
-) {
+) = Box(modifier = modifier.fillMaxWidth()) {
     content()
     val titleDisplacement = LocalCollapsibleHeaderTitleTransition.current.offset
     Box(

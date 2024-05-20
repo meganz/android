@@ -84,6 +84,7 @@ fun ScaffoldWithCollapsibleHeader(
     floatingActionButton: @Composable () -> Unit = {},
     titleDisplacementFactor: Float = 0.5f,
     headerBelowTopBar: Boolean = false,
+    headerSpacerHeight: Dp = SPACER_HEIGHT.dp,
     snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
     content: @Composable () -> Unit,
 ) {
@@ -107,23 +108,20 @@ fun ScaffoldWithCollapsibleHeader(
 
         val headerHeight by remember {
             derivedStateOf {
-                (HEADER_MAX_HEIGHT - (scrollState.value / density))
-                    .coerceAtLeast(HEADER_MIN_HEIGHT)
+                (HEADER_MAX_HEIGHT - (scrollState.value / density)).coerceAtLeast(HEADER_MIN_HEIGHT)
             }
         }
 
         val headerAlpha by remember {
             derivedStateOf {
-                ((headerHeight - HEADER_GONE_HEIGHT)
-                        / (HEADER_START_GONE_HEIGHT - HEADER_GONE_HEIGHT))
+                ((headerHeight - HEADER_GONE_HEIGHT) / (HEADER_START_GONE_HEIGHT - HEADER_GONE_HEIGHT))
                     .coerceIn(0f, 1f)
             }
         }
         val topBarBackgroundAlpha by remember(hasHeaderBelowSystemBar) {
             derivedStateOf {
                 if (hasHeaderBelowSystemBar) {
-                    (topBarOpacityTransitionDelta(headerHeight) * 10)
-                        .coerceIn(0f, 1f)
+                    (topBarOpacityTransitionDelta(headerHeight) * 10).coerceIn(0f, 1f)
                 } else {
                     1f
                 }
@@ -168,30 +166,29 @@ fun ScaffoldWithCollapsibleHeader(
         val collapsibleHeaderTitleTransition by remember {
             derivedStateOf {
                 //The offset is 0 when it's collapsed, and it grows [titleDisplacementFactor] of the expansion when expanded.
-                val offset = ((headerHeight - HEADER_GONE_HEIGHT)
-                        * titleDisplacementFactor).coerceAtLeast(0f).dp
+                val offset =
+                    ((headerHeight - HEADER_GONE_HEIGHT) * titleDisplacementFactor).coerceAtLeast(0f).dp
                 // alpha transition will be done in last 20dp, title alpha will start earlier because we want the title to be opaque all the time (to views with 0.5f alpha are like 0.75 alpha, not 1f alpha)
                 val startShowingToolbarTitle = 20.dp
                 val startHidingHeaderTitle = 15.dp
                 val headerTitleAlpha = (offset / startHidingHeaderTitle).coerceIn(0f, 1f)
-                val toolbarTitleAlpha = 1 -
-                        ((offset - startHidingHeaderTitle) / (startShowingToolbarTitle - startHidingHeaderTitle))
-                            .coerceIn(0f, 1f)
+                val toolbarTitleAlpha =
+                    1 - ((offset - startHidingHeaderTitle) / (startShowingToolbarTitle - startHidingHeaderTitle))
+                        .coerceIn(0f, 1f)
                 CollapsibleHeaderTitleTransition(offset, headerTitleAlpha, toolbarTitleAlpha)
             }
         }
 
         //set the status bar color to match toolbar color
         if (!LocalView.current.isInEditMode) {
-            val statusColor = MegaTheme.colors.background.pageBackground
-                .copy(LocalMegaAppBarColors.current.backgroundAlpha)
-                .surfaceColorAtElevation(absoluteElevation = appBarElevation)
-                .copy(alpha = topBarBackgroundAlpha)
+            val statusColor =
+                MegaTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha)
+                    .surfaceColorAtElevation(absoluteElevation = appBarElevation)
+                    .copy(alpha = topBarBackgroundAlpha)
             val systemUiController = rememberSystemUiController()
             DisposableEffect(systemUiController, statusColor) {
                 systemUiController.setStatusBarColor(
-                    color = statusColor,
-                    darkIcons = systemUiController.statusBarDarkContentEnabled
+                    color = statusColor, darkIcons = systemUiController.statusBarDarkContentEnabled
                 )
                 onDispose { }
             }
@@ -200,18 +197,16 @@ fun ScaffoldWithCollapsibleHeader(
         //draw the composables
         val (headerRef, headerBelowRef) = createRefs()
         if (headerIncludingSystemBar != null && headerAlpha > 0) {
-            Box(
-                modifier = Modifier
-                    .constrainAs(headerBelowRef) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        bottom.linkTo(headerRef.bottom)
-                        height = Dimension.fillToConstraints
-                        width = Dimension.fillToConstraints
-                    }
-                    .alpha(headerAlpha)
-            ) {
+            Box(modifier = Modifier
+                .constrainAs(headerBelowRef) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(headerRef.bottom)
+                    height = Dimension.fillToConstraints
+                    width = Dimension.fillToConstraints
+                }
+                .alpha(headerAlpha)) {
                 CompositionLocalProvider(
                     LocalMegaAppBarColors provides MegaAppBarColors(
                         iconsTintColor = iconTintColor,
@@ -266,10 +261,9 @@ fun ScaffoldWithCollapsibleHeader(
                         .verticalScroll(scrollState)
                         .padding(innerPadding)
                 ) {
-                    Spacer(Modifier.height(SPACER_HEIGHT.dp)) //to give space for the header (that it's outside this column)
+                    Spacer(Modifier.height(headerSpacerHeight)) //to give space for the header (that it's outside this column)
                     Box(
-                        modifier = Modifier
-                            .heightIn(min = this@BoxWithConstraints.maxHeight),
+                        modifier = Modifier.heightIn(min = this@BoxWithConstraints.maxHeight),
                     ) {
                         content()
                     }
@@ -304,18 +298,16 @@ private fun ConstraintLayoutScope.DrawHeader(
     subtitleColor: Color,
     header: @Composable BoxScope.() -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .statusBarsPadding()
-            .constrainAs(headerRef) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                height = Dimension.wrapContent
-                width = Dimension.fillToConstraints
-            }
-            .alpha(collapsibleHeaderTitleTransition.headerAlpha)
-    ) {
+    Box(modifier = Modifier
+        .statusBarsPadding()
+        .constrainAs(headerRef) {
+            top.linkTo(parent.top)
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+            height = Dimension.wrapContent
+            width = Dimension.fillToConstraints
+        }
+        .alpha(collapsibleHeaderTitleTransition.headerAlpha)) {
         if (headerAlpha > 0) {
             CompositionLocalProvider(
                 LocalMegaAppBarColors provides MegaAppBarColors(
@@ -352,13 +344,12 @@ internal val LocalCollapsibleHeaderTitleTransition =
 internal const val APP_BAR_HEIGHT = 56f
 private const val HEADER_MIN_HEIGHT = APP_BAR_HEIGHT
 private const val HEADER_MAX_HEIGHT = HEADER_MIN_HEIGHT + 96f
-private const val HEADER_START_GONE_HEIGHT = HEADER_MIN_HEIGHT + 96f
-private const val HEADER_GONE_HEIGHT = HEADER_MIN_HEIGHT + 56f
-private const val SPACER_HEIGHT = HEADER_MAX_HEIGHT - APP_BAR_HEIGHT + 56f
+private const val HEADER_START_GONE_HEIGHT = HEADER_MIN_HEIGHT + 76f
+private const val HEADER_GONE_HEIGHT = HEADER_MIN_HEIGHT + 18f
+private const val SPACER_HEIGHT = HEADER_MAX_HEIGHT - APP_BAR_HEIGHT
 
 private fun topBarOpacityTransitionDelta(headerHeight: Float) =
-    1 - ((headerHeight - HEADER_MIN_HEIGHT)
-            / (HEADER_GONE_HEIGHT - HEADER_MIN_HEIGHT))
+    1 - ((headerHeight - HEADER_MIN_HEIGHT) / (HEADER_GONE_HEIGHT - HEADER_MIN_HEIGHT))
         .coerceIn(0f, 1f)
 
 @Composable
@@ -438,8 +429,7 @@ private fun ScaffoldWithCollapsibleHeaderWithSubtitlePreview() {
                     title = title,
                     subtitle = subtitle,
                     titleIcons = titleIcons,
-                ) {
-                }
+                ) {}
             },
             headerIncludingSystemBar = {
                 Header()
@@ -471,6 +461,8 @@ private fun Header() = Box(
 )
 
 private fun getSampleToolbarActions(): List<MenuAction> = listOf(
-    object : MenuActionString(iconPackR.drawable.ic_alert_circle_regular_medium_outline, R.string.password_text, "circle") {},
+    object : MenuActionString(
+        iconPackR.drawable.ic_alert_circle_regular_medium_outline, R.string.password_text, "circle"
+    ) {},
     object : MenuActionWithoutIcon(R.string.password_text, "password") {},
 )
