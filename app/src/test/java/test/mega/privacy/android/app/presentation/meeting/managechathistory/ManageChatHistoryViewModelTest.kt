@@ -9,8 +9,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomUiMapper
 import mega.privacy.android.app.presentation.meeting.managechathistory.ManageChatHistoryViewModel
-import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
-import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -55,7 +53,6 @@ class ManageChatHistoryViewModelTest {
     private val getChatRoomUseCase = mock<GetChatRoomUseCase>()
     private val getContactHandleUseCase = mock<GetContactHandleUseCase>()
     private val getChatRoomByUserUseCase = mock<GetChatRoomByUserUseCase>()
-    private val snackBarHandler = mock<SnackBarHandler>()
 
     private lateinit var chatRoomUiMapper: ChatRoomUiMapper
 
@@ -80,7 +77,6 @@ class ManageChatHistoryViewModelTest {
             getContactHandleUseCase = getContactHandleUseCase,
             getChatRoomByUserUseCase = getChatRoomByUserUseCase,
             savedStateHandle = savedStateHandle,
-            snackBarHandler = snackBarHandler,
             chatRoomUiMapper = chatRoomUiMapper
         )
     }
@@ -94,8 +90,7 @@ class ManageChatHistoryViewModelTest {
             setChatRetentionTimeUseCase,
             getChatRoomUseCase,
             getContactHandleUseCase,
-            getChatRoomByUserUseCase,
-            snackBarHandler
+            getChatRoomByUserUseCase
         )
     }
 
@@ -126,10 +121,9 @@ class ManageChatHistoryViewModelTest {
         runTest {
             underTest.clearChatHistory(chatRoomId)
 
-            verify(snackBarHandler).postSnackbarMessage(
-                resId = R.string.clear_history_success,
-                snackbarDuration = MegaSnackbarDuration.Long,
-            )
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().statusMessageResId).isEqualTo(R.string.clear_history_success)
+            }
         }
 
     @Test
@@ -139,10 +133,22 @@ class ManageChatHistoryViewModelTest {
 
             underTest.clearChatHistory(chatRoomId)
 
-            verify(snackBarHandler).postSnackbarMessage(
-                resId = R.string.clear_history_error,
-                snackbarDuration = MegaSnackbarDuration.Long
-            )
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().statusMessageResId).isEqualTo(R.string.clear_history_error)
+            }
+        }
+
+    @Test
+    fun `test that the snack bar message is reset successfully`() =
+        runTest {
+            whenever(clearChatHistoryUseCase(chatRoomId)) doThrow RuntimeException()
+
+            underTest.clearChatHistory(chatRoomId)
+            underTest.onStatusMessageDisplayed()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().statusMessageResId).isNull()
+            }
         }
 
     @Test

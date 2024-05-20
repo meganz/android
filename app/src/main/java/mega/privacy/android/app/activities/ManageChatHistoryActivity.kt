@@ -11,6 +11,7 @@ import android.widget.NumberPicker.OnScrollListener
 import android.widget.NumberPicker.OnValueChangeListener
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -149,6 +150,13 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                LaunchedEffect(uiState.statusMessageResId) {
+                    uiState.statusMessageResId?.let {
+                        showSnackbar(binding.root, getString(it))
+                        viewModel.onStatusMessageDisplayed()
+                    }
+                }
+
                 if (shouldShowClearChatConfirmation) {
                     uiState.chatRoom?.apply {
                         ClearChatConfirmationDialog(

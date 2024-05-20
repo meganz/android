@@ -14,8 +14,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomUiMapper
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ManageChatHistoryUIState
 import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.ManageChatHistoryArgs
-import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
-import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -42,7 +40,6 @@ class ManageChatHistoryViewModel @Inject constructor(
     private val getContactHandleUseCase: GetContactHandleUseCase,
     private val getChatRoomByUserUseCase: GetChatRoomByUserUseCase,
     private val savedStateHandle: SavedStateHandle,
-    private val snackBarHandler: SnackBarHandler,
     private val chatRoomUiMapper: ChatRoomUiMapper,
 ) : ViewModel() {
 
@@ -159,19 +156,24 @@ class ManageChatHistoryViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching { clearChatHistoryUseCase(chatId) }
                 .onSuccess {
-                    snackBarHandler.postSnackbarMessage(
-                        resId = R.string.clear_history_success,
-                        snackbarDuration = MegaSnackbarDuration.Long,
-                    )
+                    showStatusMessage(R.string.clear_history_success)
                 }
                 .onFailure {
                     Timber.e("Error clearing history", it)
-                    snackBarHandler.postSnackbarMessage(
-                        resId = R.string.clear_history_error,
-                        snackbarDuration = MegaSnackbarDuration.Long
-                    )
+                    showStatusMessage(R.string.clear_history_error)
                 }
         }
+    }
+
+    private fun showStatusMessage(messageId: Int) {
+        _uiState.update { it.copy(statusMessageResId = messageId) }
+    }
+
+    /**
+     * Reset the error message
+     */
+    internal fun onStatusMessageDisplayed() {
+        _uiState.update { it.copy(statusMessageResId = null) }
     }
 
     /**
