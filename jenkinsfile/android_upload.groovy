@@ -477,7 +477,7 @@ pipeline {
 
                         def xmlUnitTestReportPath = "build/unittest/junit"
                         APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/$xmlUnitTestReportPath")
-                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/$xmlUnitTestReportPath")
+                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/$xmlUnitTestReportPath")
                         DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/$xmlUnitTestReportPath")
 
                         def coverageReportPath = "build/coverage-report/coverage.csv"
