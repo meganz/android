@@ -1734,18 +1734,21 @@ class VideoPlayerViewModel @Inject constructor(
      * @param target the position of to item
      */
     internal fun swapItems(current: Int, target: Int) {
-        if (playlistItemsChanged.isEmpty()) {
-            playlistItemsChanged.addAll(_playlistItemsState.value.first)
-        }
-        Collections.swap(playlistItemsChanged, current, target)
-        val index = playlistItemsChanged[current].index
-        playlistItemsChanged[current] =
-            playlistItemsChanged[current].copy(index = playlistItemsChanged[target].index)
-        playlistItemsChanged[target] = playlistItemsChanged[target].copy(index = index)
+        val indicesOfItems = playlistItemsState.value.first.indices
+        if (target in indicesOfItems && current in indicesOfItems) {
+            if (playlistItemsChanged.isEmpty()) {
+                playlistItemsChanged.addAll(playlistItemsState.value.first)
+            }
+            Collections.swap(playlistItemsChanged, current, target)
+            val index = playlistItemsChanged[current].index
+            playlistItemsChanged[current] =
+                playlistItemsChanged[current].copy(index = playlistItemsChanged[target].index)
+            playlistItemsChanged[target] = playlistItemsChanged[target].copy(index = index)
 
-        initPlayerSourceChanged()
-        // Swap the items of play source
-        Collections.swap(playSourceChanged, current, target)
+            initPlayerSourceChanged()
+            // Swap the items of play source
+            Collections.swap(playSourceChanged, current, target)
+        }
     }
 
     /**
@@ -1762,21 +1765,30 @@ class VideoPlayerViewModel @Inject constructor(
             index in playlistItems.indices
         }
 
+    internal fun getIndexFromPlaylistItems(handle: Long): Int? =
+        playlistItems.indexOfFirst {
+            it.nodeHandle == handle
+        }.takeIf { index ->
+            index in playlistItems.indices
+        }
+
     /**
      * Updated the play source of exoplayer after reordered.
      */
     internal fun updatePlaySource() {
-        _playlistItemsState.update {
-            it.copy(playlistItemsChanged.toList())
+        if (playlistItemsChanged.isNotEmpty() && playSourceChanged.isNotEmpty()) {
+            _playlistItemsState.update {
+                it.copy(playlistItemsChanged.toList())
+            }
+            _playerSourcesState.update {
+                it.copy(
+                    mediaItems = playSourceChanged.toList(),
+                    newIndexForCurrentItem = playingPosition
+                )
+            }
+            playSourceChanged.clear()
+            playlistItemsChanged.clear()
         }
-        _playerSourcesState.update {
-            it.copy(
-                mediaItems = playSourceChanged.toList(),
-                newIndexForCurrentItem = playingPosition
-            )
-        }
-        playSourceChanged.clear()
-        playlistItemsChanged.clear()
     }
 
     /**

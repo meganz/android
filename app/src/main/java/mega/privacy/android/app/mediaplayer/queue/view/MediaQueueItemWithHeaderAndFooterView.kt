@@ -48,9 +48,17 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
             .background(
                 colorResource(
                     id = if (!isSearchMode && queueItemType == MediaQueueItemType.Next) {
-                        R.color.grey_020_grey_800
+                        if (isAudio) {
+                            R.color.grey_020_grey_800
+                        } else {
+                            R.color.grey_800
+                        }
                     } else {
-                        R.color.white_dark_grey
+                        if (isAudio) {
+                            R.color.white_dark_grey
+                        } else {
+                            R.color.dark_grey
+                        }
                     }
                 )
             )
@@ -114,7 +122,8 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
                 } else {
                     Visibility.Gone
                 }
-            }
+            },
+            isAudio = isAudio
         )
 
         MediaQueueItemDivider(
@@ -127,6 +136,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
                     Visibility.Gone
                 }
             },
+            isAudio = isAudio,
             isLightColor = queueItemType == MediaQueueItemType.Previous || isSearchMode
         )
     }
@@ -135,11 +145,20 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
 @Composable
 private fun MediaQueueFooter(
     modifier: Modifier,
+    isAudio: Boolean = true,
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(colorResource(id = R.color.grey_020_grey_800))
+            .background(
+                colorResource(
+                    id = if (isAudio) {
+                        R.color.grey_020_grey_800
+                    } else {
+                        R.color.grey_800
+                    }
+                )
+            )
             .testTag(MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG)
     ) {
         MegaText(
@@ -157,15 +176,28 @@ private fun MediaQueueFooter(
 private fun MediaQueueItemDivider(
     modifier: Modifier,
     isLightColor: Boolean,
+    isAudio: Boolean = true,
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .background(
                 if (isLightColor)
-                    colorResource(id = R.color.white_dark_grey)
+                    colorResource(
+                        id = if (isAudio) {
+                            R.color.white_dark_grey
+                        } else {
+                            R.color.dark_grey
+                        }
+                    )
                 else
-                    colorResource(id = R.color.grey_020_grey_800)
+                    colorResource(
+                        id = if (isAudio) {
+                            R.color.grey_020_grey_800
+                        } else {
+                            R.color.grey_800
+                        }
+                    )
             )
             .testTag(MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG)
     ) {
@@ -174,11 +206,13 @@ private fun MediaQueueItemDivider(
                 .fillMaxWidth()
                 .padding(start = 72.dp)
                 .testTag(MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG),
-            color = if (isLightColor) {
-                colorResource(id = R.color.grey_012_white_012)
-            } else {
-                colorResource(id = R.color.grey_012_white_012)
-            },
+            color = colorResource(
+                id = if (isAudio) {
+                    R.color.grey_012_white_012
+                } else {
+                    R.color.white_alpha_012
+                }
+            ),
             thickness = 1.dp
         )
     }
@@ -198,7 +232,7 @@ private fun PlayingMediaQueueItemPreview() {
             isHeaderVisible = true,
             isFooterVisible = true,
             queueItemType = MediaQueueItemType.Playing,
-            isAudio = true,
+            isAudio = false,
             isPaused = false,
             isSelected = false,
             isSearchMode = false

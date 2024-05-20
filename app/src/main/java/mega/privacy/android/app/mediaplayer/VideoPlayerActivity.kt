@@ -1417,7 +1417,8 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     override fun setupToolbarColors(showElevation: Boolean) {
         val isDarkMode = isDarkMode(this)
         val isMainPlayer = navController.currentDestination?.id == R.id.video_main_player
-        val isPlaylist = navController.currentDestination?.id == R.id.video_playlist
+        val isPlaylist = navController.currentDestination?.id == R.id.video_playlist ||
+                navController.currentDestination?.id == R.id.video_queue
         @ColorRes val toolbarBackgroundColor: Int
         @ColorInt val statusBarColor: Int
         val toolbarElevation: Float
@@ -1439,7 +1440,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
         WindowCompat.setDecorFitsSystemWindows(window, !isMainPlayer || !isPlaylist)
 
-        updatePaddingForSystemUI(isMainPlayer, isPlaylist)
+        updatePaddingForSystemUI()
 
         binding.rootLayout.setBackgroundColor(getColor(R.color.black))
 
@@ -1497,12 +1498,13 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         window.navigationBarColor = getColor(android.R.color.transparent)
     }
 
-    private fun updatePaddingForSystemUI(
-        isVideoPlayerMainView: Boolean,
-        isVideoPlaylist: Boolean,
-    ) {
+    private fun updatePaddingForSystemUI() {
         binding.rootLayout.post {
             ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { _, windowInsets ->
+                val isVideoPlayerMainView =
+                    navController.currentDestination?.id == R.id.video_main_player
+                val isVideoPlaylist = navController.currentDestination?.id == R.id.video_playlist ||
+                        navController.currentDestination?.id == R.id.video_queue
                 if (isVideoPlayerMainView || isVideoPlaylist) {
                     windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()).let { insets ->
                         val horizontalInsets: Pair<Int, Int> =
