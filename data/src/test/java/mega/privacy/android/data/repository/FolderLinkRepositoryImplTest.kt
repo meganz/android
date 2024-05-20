@@ -18,16 +18,22 @@ import mega.privacy.android.data.mapper.FolderInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.domain.entity.FolderInfo
+import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedImageNode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.SynchronisationException
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFolderInfo
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaSearchFilter
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -36,6 +42,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
@@ -55,6 +62,8 @@ class FolderLinkRepositoryImplTest {
     private val folderInfoMapper: FolderInfoMapper = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val imageNodeMapper: ImageNodeMapper = mock()
+    private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
+    private val cancelTokenProvider = mock<CancelTokenProvider>()
 
     @Before
     fun setup() {
@@ -69,6 +78,8 @@ class FolderLinkRepositoryImplTest {
                 folderInfoMapper = folderInfoMapper,
                 fileTypeInfoMapper = fileTypeInfoMapper,
                 imageNodeMapper = imageNodeMapper,
+                megaSearchFilterMapper = megaSearchFilterMapper,
+                cancelTokenProvider = cancelTokenProvider,
                 ioDispatcher = UnconfinedTestDispatcher()
             )
     }
@@ -254,5 +265,54 @@ class FolderLinkRepositoryImplTest {
                 requireSerializedData = false,
                 offline = null
             )
+        }
+
+    @Test
+    fun `test that untyped nodes from gateway are returned when getNodeChildren is invoked`() =
+        runTest {
+            val megaNode = mock<MegaNode> {
+                on { handle }.thenReturn(1L)
+            }
+            val expectedOrder = MegaApiJava.ORDER_NONE
+            val token = mock<MegaCancelToken>()
+            val filter = mock<MegaSearchFilter>()
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(megaSearchFilterMapper(NodeId(megaNode.handle))).thenReturn(filter)
+            val child = mock<MegaNode>()
+            megaApiFolderGateway.stub {
+                onBlocking { getChildren(filter, expectedOrder, token) }.thenReturn(listOf(child))
+            }
+            whenever(nodeMapper(child, fromFolderLink = true)).thenReturn(untypedNode)
+            val id = 1L
+            val order = 0
+            whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
+            val actual = underTest.getNodeChildren(id, order)
+            assertThat(actual).containsExactly(untypedNode)
+        }
+
+    @Test
+    fun `test that image nodes are returned when getFolderLinkImageNodes is invoked`() =
+        runTest {
+            val megaNode = mock<MegaNode> {
+                on { handle }.thenReturn(1L)
+            }
+            val expectedOrder = MegaApiJava.ORDER_NONE
+            val token = mock<MegaCancelToken>()
+            val filter = mock<MegaSearchFilter>()
+            val imageNode = mock<TypedImageNode>()
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(megaSearchFilterMapper(NodeId(megaNode.handle))).thenReturn(filter)
+            val child = mock<MegaNode>()
+            megaApiFolderGateway.stub {
+                onBlocking { getChildren(filter, expectedOrder, token) }.thenReturn(listOf(child))
+            }
+            whenever(fileTypeInfoMapper(child)).thenReturn(mock<RawFileTypeInfo>())
+            whenever(nodeMapper(child, fromFolderLink = true)).thenReturn(untypedNode)
+            whenever(imageNodeMapper(any(), any(), any(), anyOrNull())).thenReturn(imageNode)
+            val id = 1L
+            val order = 0
+            whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
+            val actual = underTest.getFolderLinkImageNodes(id, order)
+            assertThat(actual).containsExactly(imageNode)
         }
 }

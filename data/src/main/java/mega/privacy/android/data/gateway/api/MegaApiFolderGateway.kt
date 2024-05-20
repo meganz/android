@@ -87,14 +87,6 @@ interface MegaApiFolderGateway {
     suspend fun getRootNode(): MegaNode?
 
     /**
-     * Get children nodes by megaNodeList
-     * @param parent parent node
-     * @param order order for the returned list
-     * @return children nodes list
-     */
-    suspend fun getChildren(parent: MegaNode, order: Int): List<MegaNode>
-
-    /**
      * Get thumbnail from server
      *
      * @param node
@@ -142,14 +134,6 @@ interface MegaApiFolderGateway {
      * @return child files number
      */
     suspend fun getNumChildFiles(node: MegaNode): Int
-
-    /**
-     * Get children nodes by node
-     * @param parentNode parent node
-     * @param order order for the returned list, if null the default order is applied
-     * @return children nodes list
-     */
-    suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): List<MegaNode>
 
     /**
      * Get the parent node of a MegaNode

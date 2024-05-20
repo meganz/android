@@ -48,9 +48,6 @@ internal class MegaApiFolderFacade @Inject constructor(
 
     override suspend fun getRootNode(): MegaNode? = megaApiFolder.rootNode
 
-    override suspend fun getChildren(parent: MegaNode, order: Int): List<MegaNode> =
-        megaApiFolder.getChildren(parent, order)
-
     override fun getThumbnail(
         node: MegaNode,
         thumbnailFilePath: String,
@@ -71,12 +68,6 @@ internal class MegaApiFolderFacade @Inject constructor(
 
     override suspend fun getNumChildFiles(node: MegaNode): Int =
         megaApiFolder.getNumChildFiles(node)
-
-    override suspend fun getChildrenByNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
-        if (order == null)
-            megaApiFolder.getChildren(parentNode)
-        else
-            megaApiFolder.getChildren(parentNode, order)
 
     override suspend fun getParentNode(node: MegaNode): MegaNode? =
         megaApiFolder.getParentNode(node)

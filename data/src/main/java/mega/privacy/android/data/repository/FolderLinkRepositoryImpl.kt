@@ -13,6 +13,7 @@ import mega.privacy.android.data.mapper.FolderInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -42,6 +43,8 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
     private val folderInfoMapper: FolderInfoMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val imageNodeMapper: ImageNodeMapper,
+    private val megaSearchFilterMapper: MegaSearchFilterMapper,
+    private val cancelTokenProvider: CancelTokenProvider,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FolderLinkRepository {
 
@@ -127,15 +130,13 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
             ?.let { convertToUntypedNode(it) }
 
 
-    @Throws(SynchronisationException::class)
-    override suspend fun getNodeChildren(handle: Long, order: Int?): List<UnTypedNode> {
-        return withContext(ioDispatcher) {
-            megaApiFolderGateway.getMegaNodeByHandle(handle)?.let { parent ->
-                megaApiFolderGateway.getChildrenByNode(parent, order)
-                    .map { convertToUntypedNode(it) }
-            } ?: throw SynchronisationException("Non null node found be null when fetched from api")
+    override suspend fun getNodeChildren(handle: Long, order: Int?): List<UnTypedNode> =
+        withContext(ioDispatcher) {
+            val token = cancelTokenProvider.getOrCreateCancelToken()
+            val filter = megaSearchFilterMapper(parentHandle = NodeId(handle))
+            megaApiFolderGateway.getChildren(filter, order ?: MegaApiJava.ORDER_NONE, token)
+                .map { convertToUntypedNode(it) }
         }
-    }
 
     private suspend fun convertToUntypedNode(node: MegaNode): UnTypedNode =
         nodeMapper(node, fromFolderLink = true)
@@ -158,14 +159,13 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
         }
 
     @Throws(SynchronisationException::class)
-    override suspend fun getFolderLinkImageNodes(handle: Long, order: Int?): List<ImageNode> {
-        return withContext(ioDispatcher) {
-            megaApiFolderGateway.getMegaNodeByHandle(handle)?.let { parent ->
-                megaApiFolderGateway.getChildrenByNode(parent, order)
-                    .mapNotNull { convertToImageNode(it) }
-            } ?: throw SynchronisationException("Non null node found be null when fetched from api")
+    override suspend fun getFolderLinkImageNodes(handle: Long, order: Int?): List<ImageNode> =
+        withContext(ioDispatcher) {
+            val token = cancelTokenProvider.getOrCreateCancelToken()
+            val filter = megaSearchFilterMapper(parentHandle = NodeId(handle))
+            megaApiFolderGateway.getChildren(filter, order ?: MegaApiJava.ORDER_NONE, token)
+                .mapNotNull { convertToImageNode(it) }
         }
-    }
 
     private suspend fun convertToImageNode(node: MegaNode): ImageNode? {
         val fileTypeInfo = fileTypeInfoMapper(node)
