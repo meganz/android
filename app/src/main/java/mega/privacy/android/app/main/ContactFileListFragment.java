@@ -76,7 +76,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity;
-import mega.privacy.android.app.presentation.imagepreview.fetcher.ContactFileListImageNodeFetcher;
+import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher;
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource;
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
@@ -506,16 +506,20 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                         if (isEnabled != null && isEnabled) {
                             MegaNode anchorNode = contactNodes.get(position);
                             long anchorNodeHandle = anchorNode.getHandle();
+                            MegaNode parentNode = megaApi.getParentNode(anchorNode);
+                            if (parentNode == null) {
+                                return Unit.INSTANCE;
+                            }
 
-                            long parentNodeHandle = megaApi.getParentNode(anchorNode).getHandle();
+                            long parentNodeHandle = parentNode.getHandle();
 
                             Map<String, Object> previewParams = new HashMap<>();
-                            previewParams.put(ContactFileListImageNodeFetcher.PARENT_ID, parentNodeHandle);
+                            previewParams.put(SharedItemsImageNodeFetcher.PARENT_ID, parentNodeHandle);
 
                             Intent intent = ImagePreviewActivity.Companion.createSecondaryIntent(
                                     requireContext(),
-                                    ImagePreviewFetcherSource.CONTACT_FILE_LIST,
-                                    ImagePreviewMenuSource.CONTACT_FILE_LIST,
+                                    ImagePreviewFetcherSource.SHARED_ITEMS,
+                                    ImagePreviewMenuSource.SHARED_ITEMS,
                                     anchorNodeHandle,
                                     previewParams,
                                     false,

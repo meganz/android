@@ -19,5 +19,4 @@ enum class ImagePreviewFetcherSource {
     BACKUPS,
     RUBBISH_BIN,
     ZIP,
-    CONTACT_FILE_LIST,
 }

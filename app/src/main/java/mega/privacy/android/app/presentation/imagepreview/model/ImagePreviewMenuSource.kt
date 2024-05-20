@@ -18,5 +18,4 @@ enum class ImagePreviewMenuSource {
     BACKUPS,
     RUBBISH_BIN,
     ZIP,
-    CONTACT_FILE_LIST,
 }

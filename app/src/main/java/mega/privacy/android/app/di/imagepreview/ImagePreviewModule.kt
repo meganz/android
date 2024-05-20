@@ -10,7 +10,6 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumSharingIm
 import mega.privacy.android.app.presentation.imagepreview.fetcher.BackupsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.fetcher.ContactFileListImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
@@ -102,11 +101,6 @@ internal interface ImagePreviewModule {
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.ZIP)
     fun bindZipFetcher(fetcher: ZipImageNodeFetcher): ImageNodeFetcher
-
-    @Binds
-    @IntoMap
-    @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.CONTACT_FILE_LIST)
-    fun bindContactFileListFetcher(fetcher: ContactFileListImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
