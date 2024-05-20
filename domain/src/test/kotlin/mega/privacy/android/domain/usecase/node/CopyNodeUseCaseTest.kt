@@ -42,7 +42,14 @@ class CopyNodeUseCaseTest {
         val newNodeParent = NodeId(456L)
         val newNodeName = "new Node"
         val expected = NodeId(789L)
-        whenever(nodeRepository.copyNode(nodeToCopy, newNodeParent, newNodeName)).thenReturn(
+        whenever(
+            nodeRepository.copyNode(
+                nodeToCopy,
+                nodeToCopySerializedData = null,
+                newNodeParent = newNodeParent,
+                newNodeName = newNodeName
+            )
+        ).thenReturn(
             expected
         )
         val actual = underTest(nodeToCopy, newNodeParent, newNodeName)

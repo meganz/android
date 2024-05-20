@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.node.chat.GetChatFilesUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -18,14 +19,13 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 internal class CopyCollidedNodeUseCaseTest {
 
     private val getChatFilesUseCase: GetChatFilesUseCase = mock()
     private val copyTypedNodeUseCase: CopyTypedNodeUseCase = mock()
-    private val copyNodeUseCase: CopyNodeUseCase = mock()
+    private val nodeRepository: NodeRepository = mock()
 
     private lateinit var underTest: CopyCollidedNodeUseCase
 
@@ -34,13 +34,13 @@ internal class CopyCollidedNodeUseCaseTest {
         underTest = CopyCollidedNodeUseCase(
             getChatFilesUseCase = getChatFilesUseCase,
             copyTypedNodeUseCase = copyTypedNodeUseCase,
-            copyNodeUseCase = copyNodeUseCase
+            nodeRepository = nodeRepository
         )
     }
 
     @AfterEach
     fun resetMocks() {
-        reset(copyNodeUseCase, copyTypedNodeUseCase, getChatFilesUseCase)
+        reset(nodeRepository, copyTypedNodeUseCase, getChatFilesUseCase)
     }
 
     @Test
@@ -50,8 +50,16 @@ internal class CopyCollidedNodeUseCaseTest {
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
                 on { renameName } doReturn "new name"
+                on { serializedData } doReturn null
             }
-            whenever(copyNodeUseCase(NodeId(any()), NodeId(any()), anyOrNull())).thenReturn(
+            whenever(
+                nodeRepository.copyNode(
+                    NodeId(any()),
+                    any(),
+                    NodeId(any()),
+                    anyOrNull()
+                )
+            ).thenReturn(
                 NodeId(
                     1L
                 )
@@ -59,7 +67,6 @@ internal class CopyCollidedNodeUseCaseTest {
 
             val result = underTest(nodeNameCollision, rename = true)
 
-            verify(copyNodeUseCase).invoke(NodeId(1L), NodeId(2L), "new name")
             assertThat(result.count).isEqualTo(1)
             assertThat(result.errorCount).isEqualTo(0)
         }
@@ -71,10 +78,12 @@ internal class CopyCollidedNodeUseCaseTest {
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
                 on { renameName } doReturn "new name"
+                on { serializedData } doReturn null
             }
             whenever(
-                copyNodeUseCase(
+                nodeRepository.copyNode(
                     NodeId(any()),
+                    anyOrNull(),
                     NodeId(any()),
                     anyOrNull()
                 )
@@ -82,7 +91,6 @@ internal class CopyCollidedNodeUseCaseTest {
 
             val result = underTest(nodeNameCollision, rename = true)
 
-            verify(copyNodeUseCase).invoke(NodeId(1L), NodeId(2L), "new name")
             assertThat(result.count).isEqualTo(1)
             assertThat(result.errorCount).isEqualTo(1)
         }
@@ -98,6 +106,7 @@ internal class CopyCollidedNodeUseCaseTest {
                 on { parentHandle } doReturn 2L
                 on { chatId } doReturn 1L
                 on { messageId } doReturn 1L
+                on { serializedData } doReturn null
             }
             whenever(getChatFilesUseCase(1L, 1L)).thenReturn(listOf(chatFile))
             whenever(copyTypedNodeUseCase(chatFile, NodeId(2L), null)).thenReturn(NodeId(2L))
@@ -164,8 +173,16 @@ internal class CopyCollidedNodeUseCaseTest {
             val nodeNameCollision = mock<NodeNameCollision.Default> {
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
+                on { serializedData } doReturn null
             }
-            whenever(copyNodeUseCase(NodeId(any()), NodeId(any()), anyOrNull()))
+            whenever(
+                nodeRepository.copyNode(
+                    NodeId(any()),
+                    anyOrNull(),
+                    NodeId(any()),
+                    anyOrNull()
+                )
+            )
                 .thenThrow(ForeignNodeException::class.java)
 
             assertThrows<ForeignNodeException> {
@@ -179,8 +196,16 @@ internal class CopyCollidedNodeUseCaseTest {
             val nodeNameCollision = mock<NodeNameCollision.Default> {
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
+                on { serializedData } doReturn "data"
             }
-            whenever(copyNodeUseCase(NodeId(any()), NodeId(any()), anyOrNull()))
+            whenever(
+                nodeRepository.copyNode(
+                    NodeId(any()),
+                    anyOrNull(),
+                    NodeId(any()),
+                    anyOrNull()
+                )
+            )
                 .thenAnswer {
                     throw NotEnoughQuotaMegaException(1, "")
                 }
@@ -195,8 +220,16 @@ internal class CopyCollidedNodeUseCaseTest {
             val nodeNameCollision = mock<NodeNameCollision.Default> {
                 on { nodeHandle } doReturn 1L
                 on { parentHandle } doReturn 2L
+                on { serializedData } doReturn "data"
             }
-            whenever(copyNodeUseCase(NodeId(any()), NodeId(any()), anyOrNull()))
+            whenever(
+                nodeRepository.copyNode(
+                    NodeId(any()),
+                    anyOrNull(),
+                    NodeId(any()),
+                    anyOrNull()
+                )
+            )
                 .thenAnswer {
                     throw QuotaExceededMegaException(1, "")
                 }

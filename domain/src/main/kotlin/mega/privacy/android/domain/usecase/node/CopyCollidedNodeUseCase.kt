@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.exception.extension.shouldEmitErrorForNodeMovement
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.node.chat.GetChatFilesUseCase
 import javax.inject.Inject
 
@@ -13,7 +14,7 @@ import javax.inject.Inject
 class CopyCollidedNodeUseCase @Inject constructor(
     private val getChatFilesUseCase: GetChatFilesUseCase,
     private val copyTypedNodeUseCase: CopyTypedNodeUseCase,
-    private val copyNodeUseCase: CopyNodeUseCase,
+    private val nodeRepository: NodeRepository,
 ) {
 
     /**
@@ -42,8 +43,9 @@ class CopyCollidedNodeUseCase @Inject constructor(
                     newNodeName = if (rename) nameCollision.renameName else null
                 )
             } else {
-                copyNodeUseCase(
+                nodeRepository.copyNode(
                     nodeToCopy = NodeId(nameCollision.nodeHandle),
+                    nodeToCopySerializedData = nameCollision.serializedData,
                     newNodeParent = NodeId(nameCollision.parentHandle),
                     newNodeName = if (rename) nameCollision.renameName else null
                 )
