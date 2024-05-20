@@ -38,9 +38,9 @@ internal fun FileInfoHeader(
             modifier = Modifier
                 .testTag(TEST_TAG_ICON)
                 .constrainAs(icon) {
-                    start.linkTo(parent.start, 16.dp)
-                    end.linkTo(parent.end, 16.dp)
-                    top.linkTo(titleConstrainedLayoutReference.bottom, 32.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(titleConstrainedLayoutReference.bottom, 16.dp)
                     width = Dimension.value(96.dp)
                     height = Dimension.value(96.dp)
                 },
