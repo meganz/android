@@ -7,6 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
@@ -28,6 +29,7 @@ class LocationUiMessage(
         interactionEnabled: Boolean,
         onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
+        navHostController: NavHostController,
     ) {
         val context = LocalContext.current
         val snackbarHostState = LocalSnackBarHostState.current

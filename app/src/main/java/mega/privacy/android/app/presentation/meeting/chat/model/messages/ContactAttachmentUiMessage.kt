@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -47,6 +48,7 @@ data class ContactAttachmentUiMessage(
         interactionEnabled: Boolean,
         onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
+        navHostController: NavHostController,
     ) {
         val viewModel: ContactMessageViewModel = hiltViewModel()
         var status by remember { mutableStateOf<UiChatStatus?>(null) }

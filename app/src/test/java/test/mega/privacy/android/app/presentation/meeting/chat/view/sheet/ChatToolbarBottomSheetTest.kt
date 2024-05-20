@@ -1,7 +1,9 @@
 package test.mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
+import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -13,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryState
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
@@ -23,8 +26,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_AT
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_LOCATION
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_SCAN
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_GALLERY_LIST
-import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
-import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationLocationMenuItemEvent
 import org.junit.Rule
 import org.junit.Test
@@ -45,7 +46,7 @@ class ChatToolbarBottomSheetTest {
     @get:Rule
     val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
-    private val onAttachFileClicked: () -> Unit = mock()
+    private val onAttachFileClicked: (List<Uri>) -> Unit = mock()
     private val onAttachContactClicked: () -> Unit = mock()
     private val onPickLocation: () -> Unit = mock()
 
@@ -103,22 +104,6 @@ class ChatToolbarBottomSheetTest {
     }
 
     @Test
-    fun `test that contact button click is passed to upper caller`() {
-        initComposeRuleContent()
-        composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_CONTACT).performClick()
-        verify(onAttachContactClicked).invoke()
-        assertThat(analyticsRule.events).contains(ChatConversationContactMenuItemEvent)
-    }
-
-    @Test
-    fun `test that file button click is passed to upper caller`() {
-        initComposeRuleContent()
-        composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_FILE).performClick()
-        verify(onAttachFileClicked).invoke()
-        assertThat(analyticsRule.events).contains(ChatConversationFileMenuItemEvent)
-    }
-
-    @Test
     fun `test that location button click is passed to upper caller`() {
         initComposeRuleContent()
         composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_LOCATION).performClick()
@@ -132,13 +117,16 @@ class ChatToolbarBottomSheetTest {
                 LocalViewModelStoreOwner provides viewModelStoreOwner
             ) {
                 ChatToolbarBottomSheet(
-                    onAttachFileClicked = onAttachFileClicked,
-                    onAttachContactClicked = onAttachContactClicked,
                     onPickLocation = onPickLocation,
                     onSendGiphyMessage = { },
-                    onTakePicture = {},
                     hideSheet = {},
                     isVisible = true,
+                    closeModal = {},
+                    uiState = ChatUiState(),
+                    scaffoldState = rememberScaffoldState(),
+                    navigateToFileModal = {},
+                    onAttachContacts = {},
+                    onAttachFiles = onAttachFileClicked,
                 )
             }
         }

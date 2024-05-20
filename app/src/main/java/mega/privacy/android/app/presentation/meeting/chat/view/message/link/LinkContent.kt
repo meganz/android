@@ -6,9 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.meeting.chat.extension.toUiChatStatus
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
-import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatFragment
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.navigateToChatViewGraph
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileLinkActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFolderLinkActivity
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ContactMessageContentView
@@ -36,7 +37,7 @@ sealed interface LinkContent {
     /**
      * Action to do when this link is clicked
      */
-    fun onClick(context: Context) {}
+    fun onClick(context: Context, navHostController: NavHostController) {}
 }
 
 /**
@@ -66,7 +67,7 @@ data class ContactLinkContent(
         )
     }
 
-    override fun onClick(context: Context) {
+    override fun onClick(context: Context, navHostController: NavHostController) {
         onClick()
     }
 }
@@ -95,9 +96,9 @@ data class ChatGroupLinkContent(
         )
     }
 
-    override fun onClick(context: Context) {
+    override fun onClick(context: Context, navHostController: NavHostController) {
         if (isChatAvailable) {
-            openChatFragment(context, chatId, link)
+            navHostController.navigateToChatViewGraph(chatId, link)
         }
     }
 }
@@ -119,7 +120,7 @@ data class FolderLinkContent(
         )
     }
 
-    override fun onClick(context: Context) {
+    override fun onClick(context: Context, navHostController: NavHostController) {
         openFolderLinkActivity(context, link.toUri())
     }
 }
@@ -145,7 +146,7 @@ data class FileLinkContent(
         )
     }
 
-    override fun onClick(context: Context) {
+    override fun onClick(context: Context, navHostController: NavHostController) {
         openFileLinkActivity(context, link.toUri())
     }
 }

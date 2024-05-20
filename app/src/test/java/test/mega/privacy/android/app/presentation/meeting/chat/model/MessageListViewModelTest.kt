@@ -46,9 +46,12 @@ internal class MessageListViewModelTest {
     private val getChatPagingSourceUseCase: GetChatPagingSourceUseCase = mock()
     private val chatMessageDateSeparatorMapper = mock<ChatMessageDateSeparatorMapper>()
     private val remoteMediatorFactory: PagedChatMessageRemoteMediatorFactory = mock()
-    private val savedStateHandle: SavedStateHandle = mock {
-        on { get<Long?>(Constants.CHAT_ID) } doReturn chatId
-    }
+    private val savedStateHandle: SavedStateHandle = SavedStateHandle(
+        mapOf(
+            "chatId" to chatId.toString(),
+            "chatAction" to Constants.ACTION_CHAT_SHOW_MESSAGES,
+        )
+    )
     private val getLastMessageSeenIdUseCase: GetLastMessageSeenIdUseCase = mock()
     private val setMessageSeenUseCase: SetMessageSeenUseCase = mock()
     private val monitorContactCacheUpdates: MonitorContactCacheUpdates = mock {
@@ -120,9 +123,7 @@ internal class MessageListViewModelTest {
 
     @Test
     fun `test that userUpdates is updated when user updates`() = runTest {
-
         val updateFlow = MutableSharedFlow<UserUpdate>()
-        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(monitorContactCacheUpdates()).thenReturn(updateFlow)
         initTestClass()
         underTest.state.test {

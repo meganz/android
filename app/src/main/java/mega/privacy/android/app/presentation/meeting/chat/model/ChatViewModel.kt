@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting.chat.model
 import android.content.Intent
 import android.net.Uri
 import android.util.Base64
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,7 +36,10 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageBottomSheetAction
+import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.INVALID_LOCATION_MESSAGE_ID
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.ChatArgs
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
@@ -77,7 +81,6 @@ import mega.privacy.android.domain.usecase.chat.CloseChatPreviewUseCase
 import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
-import mega.privacy.android.domain.usecase.chat.GetChatMuteOptionListUseCase
 import mega.privacy.android.domain.usecase.chat.GetCustomSubtitleListUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
@@ -206,7 +209,6 @@ class ChatViewModel @Inject constructor(
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val startCallUseCase: StartCallUseCase,
     private val chatManagement: ChatManagement,
-    private val getChatMuteOptionListUseCase: GetChatMuteOptionListUseCase,
     private val muteChatNotificationForChatRoomsUseCase: MuteChatNotificationForChatRoomsUseCase,
     private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
@@ -256,18 +258,20 @@ class ChatViewModel @Inject constructor(
     private val broadcastUpgradeDialogClosedUseCase: BroadcastUpgradeDialogClosedUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val pauseAllTransfersUseCase: PauseAllTransfersUseCase,
+    actionFactories: Set<@JvmSuppressWildcards (ChatViewModel) -> MessageAction>,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
 
-    private val chatId: Long = savedStateHandle[Constants.CHAT_ID]
-        ?: throw IllegalStateException("Chat screen must have a chat room id")
-
-    private val chatLink: String
-        get() = savedStateHandle.get<String>(EXTRA_LINK).orEmpty()
+    private val conversationArgs = ChatArgs(savedStateHandle)
+    private val chatId = conversationArgs.chatId
+    private val launchAction = conversationArgs.action
+    private val chatLink = conversationArgs.link.orEmpty()
 
     private val usersTyping = Collections.synchronizedMap(mutableMapOf<Long, String?>())
     private val jobs = mutableMapOf<Long, Job>()
+
+    private val actions = actionFactories.map { it(this) }
 
     private val ChatRoom.haveAtLeastReadPermission: Boolean
         get() = ownPrivilege != ChatRoomPermission.Unknown
@@ -345,9 +349,8 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun loadChatOrPreview() {
-        val action = savedStateHandle.get<String>(EXTRA_ACTION).orEmpty()
         if (chatLink.isNotEmpty()) {
-            val requireJoin = action == Constants.ACTION_JOIN_OPEN_CHAT_LINK
+            val requireJoin = launchAction == Constants.ACTION_JOIN_OPEN_CHAT_LINK
             viewModelScope.launch {
                 runCatching {
                     openChatLinkUseCase(
@@ -798,25 +801,6 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
-     * Show the dialog of selecting chat mute options
-     */
-    fun showMutePushNotificationDialog() {
-        viewModelScope.launch {
-            val muteOptionList = getChatMuteOptionListUseCase(listOf(chatId))
-            _state.update {
-                it.copy(mutePushNotificationDialogEvent = triggered(muteOptionList))
-            }
-        }
-    }
-
-    /**
-     * Consume the event of showing the dialog of selecting chat mute options.
-     */
-    fun onShowMutePushNotificationDialogConsumed() {
-        _state.update { state -> state.copy(mutePushNotificationDialogEvent = consumed()) }
-    }
-
-    /**
      * Mute chat push notification based on user selection. And once mute operation succeeds,
      * send [InfoToShow] to show a message to indicate the result in UI.
      *
@@ -1180,7 +1164,7 @@ class ChatViewModel @Inject constructor(
      * Sets pending link to join.
      */
     fun onSetPendingJoinLink() {
-        chatManagement.pendingJoinLink = savedStateHandle[EXTRA_LINK]
+        chatManagement.pendingJoinLink = chatLink
     }
 
     /**
@@ -1686,6 +1670,56 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
+
+    fun selectMessages(messages: Set<TypedMessage>) {
+        _state.update { state -> state.copy(selectedMessages = messages) }
+    }
+
+    fun setSelectMode(enabled: Boolean) {
+        _state.update { state ->
+            if (!enabled) {
+                state.copy(
+                    selectedMessages = emptySet(),
+                    isSelectMode = false
+                )
+            } else {
+                state.copy(isSelectMode = true)
+            }
+        }
+    }
+
+    fun setPendingAction(action: (@Composable () -> Unit)?) {
+        _state.update { state -> state.copy(pendingAction = action) }
+    }
+
+    fun setSelectedReaction(reaction: String) {
+        _state.update { state -> state.copy(selectedReaction = reaction) }
+    }
+
+    fun setReactionList(reactions: List<UIReaction>) {
+        _state.update { state -> state.copy(reactionList = reactions) }
+    }
+
+    fun setAddingReactionTo(id: Long?) {
+        _state.update { state -> state.copy(addingReactionTo = id) }
+    }
+
+    fun getApplicableBotomsheetActions(hideBottomSheet: () -> Unit): List<MessageBottomSheetAction> =
+        getApplicableActions().map { action ->
+            MessageBottomSheetAction(
+                action.bottomSheetMenuItem(
+                    messages = _state.value.selectedMessages,
+                    hideBottomSheet = hideBottomSheet,
+                    setAction = this::setPendingAction
+                ), action.group
+            )
+        }
+
+    fun getApplicableActions(): List<MessageAction> =
+        if (_state.value.selectedMessages.isEmpty()) emptyList()
+        else actions.filter { action ->
+            action.appliesTo(_state.value.selectedMessages)
+        }
 
     /**
      * Checks if transfers are paused.

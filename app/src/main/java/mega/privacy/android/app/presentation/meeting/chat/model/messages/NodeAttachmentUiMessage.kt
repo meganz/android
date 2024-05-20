@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
@@ -54,6 +55,7 @@ data class NodeAttachmentUiMessage(
         interactionEnabled: Boolean,
         onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
+        navHostController: NavHostController,
     ) {
         val viewModel: NodeAttachmentMessageViewModel = hiltViewModel()
         val chatViewModel: ChatViewModel = hiltViewModel()

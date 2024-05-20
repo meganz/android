@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.PendingAttachmentMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.PendingVoiceClipMessageView
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
@@ -22,6 +23,7 @@ data class PendingAttachmentUiMessage(
         interactionEnabled: Boolean,
         onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
+        navHostController: NavHostController,
     ) {
         val modifier = initialiseModifier {
             //click here will never occur as a pending message is always a not sent message

@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.meeting.chat
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -10,7 +11,10 @@ import androidx.compose.ui.test.performClick
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.R
@@ -26,11 +30,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.MessageListUiSta
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBarViewModel
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_ENABLE_GEOLOCATION_DIALOG
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryState
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryViewModel
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_LOCATION
 import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
@@ -38,20 +39,20 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.shared.original.core.ui.controls.chat.TEST_TAG_ATTACHMENT_ICON
 import mega.privacy.android.shared.original.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import test.mega.privacy.android.app.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class ChatViewTest {
-
     private val actionPressed = mock<(ChatRoomMenuAction) -> Unit>()
 
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
@@ -92,6 +93,13 @@ class ChatViewTest {
         on { viewModelStore } doReturn viewModelStore
     }
 
+
+    private val showNoContactToAddDialog = mock<() -> Unit>()
+    private val showEndCallDialog = mock<() -> Unit>()
+    private val showClearChatConfirmationDialog = mock<(Boolean) -> Unit>()
+    private val showParticipatingInACallDialog = mock<(Long) -> Unit>()
+    private val showAllContactsParticipateInChat = mock<() -> Unit>()
+
     @Test
     fun `test that participating in a call dialog show when click to audio call and user is in another call`() {
         initComposeRuleContent(
@@ -107,8 +115,7 @@ class ChatViewTest {
             assertIsDisplayed()
             performClick()
         }
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.ongoing_call_content))
-            .assertIsDisplayed()
+        verify(showParticipatingInACallDialog).invoke(any())
     }
 
     @Test
@@ -142,8 +149,7 @@ class ChatViewTest {
         )
         composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
         composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).performClick()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.chat_add_participants_no_contacts_message))
-            .assertIsDisplayed()
+        verify(showNoContactToAddDialog).invoke()
     }
 
     @Test
@@ -164,10 +170,7 @@ class ChatViewTest {
             performClick()
         }
         composeTestRule.onNodeWithTag(TEST_TAG_ADD_PARTICIPANTS_ACTION).performClick()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.chat_add_participants_no_contacts_left_to_add_message))
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.chat_add_participants_no_contacts_left_to_add_title))
-            .assertIsDisplayed()
+        verify(showAllContactsParticipateInChat).invoke()
     }
 
     @Test
@@ -186,24 +189,10 @@ class ChatViewTest {
             performClick()
         }
         composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_ACTION).performClick()
-        composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG).assertIsDisplayed()
+        verify(showClearChatConfirmationDialog).invoke(any())
     }
 
-    @Test
-    fun `test that enable geolocation dialog shows when geolocation is not enabled and user clicks on location`() {
-        initComposeRuleContent(
-            ChatUiState(
-                chat = mock<ChatRoom> { on { ownPrivilege } doReturn ChatRoomPermission.Standard },
-                isGeolocationEnabled = false,
-            )
-        )
-        composeTestRule.onNodeWithTag(TEST_TAG_ATTACHMENT_ICON, true).apply {
-            assertIsDisplayed()
-            performClick()
-        }
-        composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_LOCATION).performClick()
-        composeTestRule.onNodeWithTag(TEST_TAG_ENABLE_GEOLOCATION_DIALOG).assertIsDisplayed()
-    }
+//    }
 
     @Test
     fun `test that end call for all dialog show when click to end call for all menu option`() {
@@ -222,11 +211,9 @@ class ChatViewTest {
             performClick()
         }
         composeTestRule.onNodeWithTag(TEST_TAG_END_CALL_FOR_ALL_ACTION).performClick()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.meetings_chat_screen_dialog_title_end_call_for_all))
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.meetings_chat_screen_dialog_description_end_call_for_all))
-            .assertIsDisplayed()
+        verify(showEndCallDialog).invoke()
     }
+
 
     @Test
     fun `test that last green label shows if the chat is 1to1 and the contacts last green is not null`() {
@@ -240,6 +227,7 @@ class ChatViewTest {
         composeTestRule.onNodeWithText("Last seen a long time ago").assertIsDisplayed()
     }
 
+    @OptIn(ExperimentalMaterialNavigationApi::class)
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             CompositionLocalProvider(
@@ -249,6 +237,36 @@ class ChatViewTest {
                     uiState = state,
                     onBackPressed = {},
                     onMenuActionPressed = actionPressed,
+                    navHostController = rememberNavController(),
+                    bottomSheetNavigator = rememberBottomSheetNavigator(),
+                    scaffoldState = rememberScaffoldState(),
+                    setSelectedMessages = {},
+                    setSelectMode = {},
+                    setSelectedReaction = {},
+                    setReactionList = {},
+                    setPendingAction = {},
+                    setAddingReactionTo = {},
+                    getApplicableActions = { emptyList() },
+                    navigateToFreePlanLimitParticipants = {},
+                    showOptionsModal = {},
+                    showEmojiModal = {},
+                    showNoContactToAddDialog = showNoContactToAddDialog,
+                    showParticipatingInACallDialog = showParticipatingInACallDialog,
+                    showAllContactsParticipateInChat = showAllContactsParticipateInChat,
+                    showGroupOrContactInfoActivity = {},
+                    showClearChatConfirmationDialog = showClearChatConfirmationDialog,
+                    showMutePushNotificationDialog = {},
+                    showEndCallForAllDialog = showEndCallDialog,
+                    showToolbarModal = {},
+                    showJoinCallDialog = { _, _ -> },
+                    showUpgradeToProDialog = {},
+                    navigateToChat = {},
+                    navigateToContactInfo = {},
+                    navigateToMeeting = { _, _, _ -> },
+                    navigateToWaitingRoom = {},
+                    navigateToReactionInfo = {},
+                    navigateToNotSentModal = {},
+                    navigateToConversation = {},
                 )
             }
         }

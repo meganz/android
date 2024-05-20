@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.model.messages.header
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.DateHeader
@@ -27,6 +28,7 @@ class DateHeaderUiMessage(
         onForwardClicked: (TypedMessage) -> Unit,
         onSelectedChanged: (Boolean) -> Unit,
         onNotSentClick: (TypedMessage) -> Unit,
+        navHostController: NavHostController,
     ) {
         val context = LocalContext.current
         DateHeader(

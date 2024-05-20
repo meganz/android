@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -16,7 +17,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -24,11 +28,19 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
+import mega.privacy.android.app.camera.CameraArg
+import mega.privacy.android.app.camera.InAppCameraLauncher
+import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.objects.GifData
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
+import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AttachItem
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -52,15 +64,16 @@ import nz.mega.documentscanner.DocumentScannerActivity
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatToolbarBottomSheet(
-    onAttachFileClicked: () -> Unit,
-    onAttachContactClicked: () -> Unit,
-    onTakePicture: () -> Unit,
+    closeModal: () -> Unit,
     onPickLocation: () -> Unit,
     onSendGiphyMessage: (GifData?) -> Unit,
     hideSheet: () -> Unit,
     isVisible: Boolean,
+    uiState: ChatUiState,
+    scaffoldState: ScaffoldState,
+    onAttachContacts: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
-    onCameraPermissionDenied: () -> Unit = {},
+    navigateToFileModal: () -> Unit,
     onAttachFiles: (List<Uri>) -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -99,6 +112,71 @@ fun ChatToolbarBottomSheet(
             }
             hideSheet()
         }
+
+    val attachContactLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            result.data?.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
+                ?.let { contactList ->
+                    onAttachContacts(contactList.toList())
+                }
+            hideSheet()
+        }
+
+    val coroutineScope = rememberCoroutineScope()
+    val onAttachContactClicked: () -> Unit = {
+        if (uiState.hasAnyContact) {
+            openAttachContactActivity(context, attachContactLauncher)
+        } else {
+            coroutineScope.launch {
+                scaffoldState.snackbarHostState.showSnackbar(context.getString(R.string.no_contacts_invite))
+            }
+        }
+    }
+
+    val onCameraPermissionDenied: () -> Unit = {
+        showPermissionNotAllowedSnackbar(
+            context,
+            coroutineScope,
+            scaffoldState.snackbarHostState,
+            R.string.chat_attach_pick_from_camera_deny_permission
+        )
+    }
+
+    val takePictureLauncher =
+        rememberLauncherForActivityResult(
+            contract = InAppCameraLauncher()
+        ) { uri ->
+            uri?.let {
+                onAttachFiles(listOf(it))
+            }
+            closeModal()
+        }
+
+    val capturePhotoOrVideoPermissionsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionsResult ->
+        if (permissionsResult[Manifest.permission.CAMERA] == true) {
+            takePictureLauncher.launch(CameraArg(uiState.title.orEmpty()))
+        } else {
+            showPermissionNotAllowedSnackbar(
+                context,
+                coroutineScope,
+                scaffoldState.snackbarHostState,
+                R.string.chat_attach_pick_from_camera_deny_permission
+            )
+        }
+    }
+
+    val onTakePicture: () -> Unit = {
+        capturePhotoOrVideoPermissionsLauncher.launch(
+            arrayOf(
+                PermissionUtils.getCameraPermission(),
+                PermissionUtils.getRecordAudioPermission()
+            )
+        )
+    }
 
     Column(modifier = modifier.fillMaxWidth()) {
         ChatGallery(
@@ -145,7 +223,7 @@ fun ChatToolbarBottomSheet(
                 itemName = pluralStringResource(id = R.plurals.general_num_files, count = 1),
                 onItemClick = {
                     Analytics.tracker.trackEvent(ChatConversationFileMenuItemEvent)
-                    onAttachFileClicked()
+                    navigateToFileModal()
                 },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_FILE)
             )
@@ -188,7 +266,6 @@ fun ChatToolbarBottomSheet(
                 itemName = stringResource(id = R.string.attachment_upload_panel_contact),
                 onItemClick = {
                     Analytics.tracker.trackEvent(ChatConversationContactMenuItemEvent)
-                    hideSheet()
                     onAttachContactClicked()
                 },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_CONTACT)
@@ -224,12 +301,14 @@ private fun openDocumentScanner(
 private fun ChatToolbarBottomSheetPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatToolbarBottomSheet(
-            onAttachFileClicked = {},
-            onAttachContactClicked = {},
+            onAttachContacts = {},
+            uiState = ChatUiState(),
+            scaffoldState = rememberScaffoldState(),
             onPickLocation = {},
             onSendGiphyMessage = {},
-            onTakePicture = {},
+            closeModal = {},
             hideSheet = {},
+            navigateToFileModal = {},
             isVisible = true,
         )
     }

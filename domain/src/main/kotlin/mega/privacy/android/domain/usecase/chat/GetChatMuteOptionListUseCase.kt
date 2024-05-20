@@ -15,8 +15,10 @@ class GetChatMuteOptionListUseCase @Inject constructor(
      * @param chatList List of chat ids to get the conditional option.
      * @return List of [ChatPushNotificationMuteOption]
      */
-    operator fun invoke(chatList: List<Long>): List<ChatPushNotificationMuteOption> {
-        val conditionalOption = if (chatList.isNotEmpty()) {
+    operator fun invoke(
+        emptyChatList: Boolean = false,
+    ): List<ChatPushNotificationMuteOption> {
+        val conditionalOption = if (!emptyChatList) {
             ChatPushNotificationMuteOption.MuteUntilTurnBackOn
         } else {
             getUntilMorningConditionalOption()

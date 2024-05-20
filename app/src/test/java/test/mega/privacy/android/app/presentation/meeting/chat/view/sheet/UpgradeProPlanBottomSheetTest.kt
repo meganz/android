@@ -55,7 +55,7 @@ class UpgradeProPlanBottomSheetTest {
     private fun initComposeRule() {
         composeRule.setContent {
             UpgradeProPlanBottomSheet(
-                onUpgrade = onUpgrade
+                hideSheet = onUpgrade
             )
         }
     }

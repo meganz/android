@@ -26,25 +26,18 @@ class MessageOptionsBottomSheetTest {
 
     @Test
     fun `test that reactions picker is not shown but sheet is`() {
-        initComposeRule(showReactionPicker = false)
+        initComposeRule()
         composeRule.onNodeWithTag(TEST_TAG_EMOJI_PICKER_VIEW).assertDoesNotExist()
         composeRule.onNodeWithTag(TEST_TAG_MESSAGE_OPTIONS_PANEL).assertIsDisplayed()
     }
 
-    @Test
-    fun `test that reactions picker is shown and not sheet options`() {
-        initComposeRule(showReactionPicker = true)
-        composeRule.onNodeWithTag(TEST_TAG_EMOJI_PICKER_VIEW).assertIsDisplayed()
-        composeRule.onNodeWithTag(TEST_TAG_MESSAGE_OPTIONS_PANEL).assertDoesNotExist()
-    }
-
-    private fun initComposeRule(showReactionPicker: Boolean = false) {
+    private fun initComposeRule() {
         composeRule.setContent {
             MessageOptionsBottomSheet(
-                showReactionPicker = showReactionPicker,
                 onReactionClicked = {},
                 onMoreReactionsClicked = {},
                 actions = emptyList(),
+                messageId = -1L,
             )
         }
     }

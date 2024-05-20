@@ -9,6 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.ChatRichLinkMessageView
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.OpenMessageLink
@@ -30,6 +31,7 @@ data class ChatRichLinkUiMessage(
         interactionEnabled: Boolean,
         onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
+        navHostController: NavHostController,
     ) {
         var clickedLink by rememberSaveable { mutableStateOf<String?>(null) }
 

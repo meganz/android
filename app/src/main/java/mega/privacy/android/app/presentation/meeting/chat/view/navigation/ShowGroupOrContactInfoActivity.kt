@@ -9,7 +9,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.Constants
 import timber.log.Timber
 
-internal fun showGroupOrContactInfoActivity(context: Context, uiState: ChatUiState) {
+fun showGroupOrContactInfoActivity(context: Context, uiState: ChatUiState) {
     with(uiState) {
         if (schedIsPending && isActive) {
             Timber.d("show scheduled meeting info")

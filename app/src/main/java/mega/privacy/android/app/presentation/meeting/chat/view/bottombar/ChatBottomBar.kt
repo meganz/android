@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.bottombar
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -31,21 +33,6 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.shared.theme.MegaAppTheme
 
-@Composable
-internal fun ChatBottomBar(
-    param: ChatBottomBarParameter,
-) {
-    ChatBottomBar(
-        uiState = param.uiState,
-        showEmojiPicker = param.showEmojiPicker,
-        onSendClick = param.onSendClick,
-        onAttachmentClick = param.onAttachmentClick,
-        onEmojiClick = param.onEmojiClick,
-        interactionSourceTextInput = param.interactionSourceTextInput,
-        onCloseEditing = param.onCloseEditing,
-        onVoiceClipEvent = param.onVoiceClipEvent,
-    )
-}
 
 /**
  * Chat bottom bar
@@ -60,11 +47,8 @@ internal fun ChatBottomBar(
 @Composable
 internal fun ChatBottomBar(
     uiState: ChatUiState,
-    showEmojiPicker: Boolean,
     onSendClick: (String) -> Unit,
     onAttachmentClick: () -> Unit,
-    onEmojiClick: () -> Unit,
-    interactionSourceTextInput: MutableInteractionSource,
     onCloseEditing: () -> Unit,
     onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
     viewModel: ChatBottomBarViewModel = hiltViewModel(),
@@ -90,6 +74,28 @@ internal fun ChatBottomBar(
             viewModel.saveDraftMessage(textFieldValue.text, uiState.editingMessageId)
         }
     }
+
+    var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
+    BackHandler(enabled = showEmojiPicker) {
+        showEmojiPicker = false
+    }
+    val onEmojiClick: () -> Unit = {
+        showEmojiPicker = !showEmojiPicker
+
+        if (showEmojiPicker) {
+            keyboardController?.hide()
+        } else {
+            keyboardController?.show()
+        }
+    }
+    val interactionSourceTextInput = remember { MutableInteractionSource() }
+    val isTextInputPressed by interactionSourceTextInput.collectIsPressedAsState()
+    LaunchedEffect(isTextInputPressed) {
+        if (isTextInputPressed) {
+            showEmojiPicker = false
+        }
+    }
+
 
     ChatBottomBarContent(
         uiState = uiState,
@@ -183,14 +189,3 @@ private fun ChatBottomBarPreview() {
         )
     }
 }
-
-internal data class ChatBottomBarParameter(
-    val uiState: ChatUiState,
-    val showEmojiPicker: Boolean,
-    val onSendClick: (String) -> Unit,
-    val onAttachmentClick: () -> Unit,
-    val onEmojiClick: () -> Unit,
-    val interactionSourceTextInput: MutableInteractionSource,
-    val onCloseEditing: () -> Unit,
-    val onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit,
-)

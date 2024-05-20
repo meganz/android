@@ -39,71 +39,66 @@ fun ChatLocationView(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
-    var showEnableGeolocationDialog by rememberSaveable { mutableStateOf(false) }
-    var waitingForPickLocation by rememberSaveable { mutableStateOf(false) }
-    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
+    var showEnableGeolocationDialog by rememberSaveable { mutableStateOf(!isGeolocationEnabled) }
+    var waitingForLocation by rememberSaveable {
+        mutableStateOf(false)
+    }
     val locationPickerLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
         ) {
-            onSendLocationMessage(it.data)
+            it.data?.let { location -> onSendLocationMessage(location) }
             onDismissView()
         }
-    val locationPermissionsLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            openLocationPicker(context, locationPickerLauncher, msgId)
-        } else {
-            showPermissionNotAllowedSnackbar(
-                context,
-                coroutineScope,
-                scaffoldState.snackbarHostState,
-                R.string.chat_attach_location_deny_permission
-            )
-            onDismissView()
+    val locationPermissionState =
+        rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION) { isGranted ->
+            if (isGranted) {
+                waitingForLocation = true
+                openLocationPicker(context, locationPickerLauncher, msgId)
+            } else {
+                showPermissionNotAllowedSnackbar(
+                    context,
+                    coroutineScope,
+                    scaffoldState.snackbarHostState,
+                    R.string.chat_attach_location_deny_permission
+                )
+                onDismissView()
+            }
         }
-    }
 
     Spacer(modifier = Modifier.testTag(CHAT_LOCATION_VIEW_TAG))
 
-    when {
-        !isGeolocationEnabled -> {
-            showEnableGeolocationDialog = true
-        }
+    if (!waitingForLocation) {
+        when {
+            !locationPermissionState.status.isGranted -> {
+                SideEffect {
+                    locationPermissionState.launchPermissionRequest()
+                }
+            }
 
-        !locationPermissionState.status.isGranted -> {
-            SideEffect {
-                locationPermissionsLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            showEnableGeolocationDialog -> {
+                EnableGeolocationDialog(
+                    onConfirm = {
+                        onEnableGeolocation()
+                        waitingForLocation = true
+                        openLocationPicker(context, locationPickerLauncher, msgId)
+                    },
+                    onDismiss = {
+                        showEnableGeolocationDialog = false
+                        onDismissView()
+                    },
+                )
+            }
+
+            else -> {
+                SideEffect {
+                    waitingForLocation = true
+                    openLocationPicker(context, locationPickerLauncher, msgId)
+                }
             }
         }
-
-        else -> {
-            SideEffect {
-                openLocationPicker(context, locationPickerLauncher, msgId)
-            }
-        }
     }
 
-    if (showEnableGeolocationDialog) {
-        EnableGeolocationDialog(
-            onConfirm = {
-                waitingForPickLocation = true
-                onEnableGeolocation()
-            },
-            onDismiss = {
-                showEnableGeolocationDialog = false
-                onDismissView()
-            },
-        )
-    }
-
-    if (waitingForPickLocation && isGeolocationEnabled) {
-        waitingForPickLocation = false
-        SideEffect {
-            openLocationPicker(context, locationPickerLauncher, msgId)
-        }
-    }
 }
 
 internal const val CHAT_LOCATION_VIEW_TAG = "chat:location_view"

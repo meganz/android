@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -52,29 +53,6 @@ import timber.log.Timber
 
 @Composable
 internal fun MessageListView(
-    parameter: MessageListParameter,
-) {
-    MessageListView(
-        uiState = parameter.uiState,
-        scrollState = parameter.scrollState,
-        bottomPadding = parameter.bottomPadding,
-        onMoreReactionsClicked = parameter.onMoreReactionsClicked,
-        onReactionClicked = parameter.onReactionClicked,
-        onReactionLongClick = parameter.onReactionLongClick,
-        onNotSentClick = parameter.onNotSentClick,
-        onMessageLongClick = parameter.onMessageLongClick,
-        onForwardClicked = parameter.onForwardClicked,
-        onCanSelectChanged = parameter.onCanSelectChanged,
-        selectMode = parameter.selectMode,
-        selectedItems = parameter.selectedItems,
-        selectItem = parameter.selectItem,
-        deselectItem = parameter.deselectItem,
-        showUnreadIndicator = parameter.showUnreadIndicator,
-    )
-}
-
-@Composable
-internal fun MessageListView(
     uiState: ChatUiState,
     scrollState: LazyListState,
     bottomPadding: Dp,
@@ -90,6 +68,7 @@ internal fun MessageListView(
     selectItem: (TypedMessage) -> Unit,
     deselectItem: (TypedMessage) -> Unit,
     showUnreadIndicator: (Int) -> Unit,
+    navHostController: NavHostController,
     viewModel: MessageListViewModel = hiltViewModel(),
 ) {
     val pagingItems = viewModel.pagedMessages.collectAsLazyPagingItems()
@@ -274,6 +253,7 @@ internal fun MessageListView(
                             onForwardClicked = onForwardClicked,
                             onSelectedChanged = onSelectedChanged,
                             onNotSentClick = onNotSentClick,
+                            navHostController = navHostController,
                         )
                     }
                 }
@@ -330,42 +310,6 @@ private fun computeLastItemAvatarPosition(
         }
     }
 }
-
-
-/**
- * Message list parameter
- *
- * @property uiState
- * @property scrollState
- * @property bottomPadding
- * @property onMessageLongClick
- * @property onMoreReactionsClicked
- * @property onReactionClicked
- * @property onReactionLongClick
- * @property onForwardClicked
- * @property onCanSelectChanged
- * @property selectMode
- * @property selectedItems
- * @property selectItem
- * @property deselectItem
- */
-internal data class MessageListParameter(
-    val uiState: ChatUiState,
-    val scrollState: LazyListState,
-    val bottomPadding: Dp,
-    val onMessageLongClick: (TypedMessage) -> Unit,
-    val onMoreReactionsClicked: (Long) -> Unit,
-    val onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
-    val onReactionLongClick: (String, List<UIReaction>) -> Unit,
-    val onForwardClicked: (TypedMessage) -> Unit,
-    val onNotSentClick: (TypedMessage) -> Unit,
-    val onCanSelectChanged: (Boolean) -> Unit,
-    val selectMode: Boolean,
-    val selectedItems: Set<Long>,
-    val selectItem: (TypedMessage) -> Unit,
-    val deselectItem: (TypedMessage) -> Unit,
-    val showUnreadIndicator: (Int) -> Unit,
-)
 
 private fun LazyPagingItems<UiChatMessage>.peekOrNull(index: Int) =
     index.takeIf { it in 0..<this.itemCount }?.let { this.peek(it) }

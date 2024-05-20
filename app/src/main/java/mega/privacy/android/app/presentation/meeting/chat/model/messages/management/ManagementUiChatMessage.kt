@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.shared.original.core.ui.controls.chat.ChatMessageContainer
@@ -39,6 +40,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
         onForwardClicked: (TypedMessage) -> Unit,
         onSelectedChanged: (Boolean) -> Unit,
         onNotSentClick: (TypedMessage) -> Unit,
+        navHostController: NavHostController,
     ) {
         ChatMessageContainer(
             isMine = displayAsMine,

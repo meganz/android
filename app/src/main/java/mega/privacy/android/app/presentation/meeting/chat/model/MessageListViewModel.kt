@@ -34,7 +34,7 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMa
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.HeaderMessage
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.ChatArgs
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.room.update.MessageReceived
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
@@ -76,7 +76,8 @@ class MessageListViewModel @Inject constructor(
     monitorPendingMessagesUseCase: MonitorPendingMessagesUseCase,
 ) : ViewModel() {
 
-    private val chatId = savedStateHandle.get<Long?>(Constants.CHAT_ID) ?: -1
+    private val conversationArgs = ChatArgs(savedStateHandle)
+    private val chatId = conversationArgs.chatId
 
     private val unreadCount = MutableStateFlow<Int?>(null)
 

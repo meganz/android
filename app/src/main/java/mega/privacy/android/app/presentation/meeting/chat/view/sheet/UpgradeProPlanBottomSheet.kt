@@ -39,7 +39,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 @Composable
 fun UpgradeProPlanBottomSheet(
     modifier: Modifier = Modifier,
-    onUpgrade: () -> Unit = {},
+    hideSheet: () -> Unit = {},
 ) {
     val context = LocalContext.current
     Column(
@@ -94,7 +94,7 @@ fun UpgradeProPlanBottomSheet(
                         UpgradeAccountActivity::class.java
                     )
                 )
-                onUpgrade()
+                hideSheet()
             }
         )
         Spacer(modifier = Modifier.padding(top = 24.dp))

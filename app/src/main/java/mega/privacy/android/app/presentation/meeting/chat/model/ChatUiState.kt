@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.model
 
+import androidx.compose.runtime.Composable
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -7,16 +8,15 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
-import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 
 /**
- * Chat ui state
- *
- * @property chat [ChatRoom]
+ *@property chat [ChatRoom]
  * @property isChatNotificationMute whether notification is mute
  * @property userChatStatus User chat status if is a 1to1 conversation, null otherwise.
  * @property userLastGreen User chat last green if is a 1to1 conversation and if chat status is different than online, null otherwise.
@@ -37,7 +37,6 @@ import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
  * @property sendingText Text that is being sent.
  * @property isStartingCall True if it is starting a call, false otherwise.
  * @property chatHistoryLoadStatus [ChatHistoryLoadStatus]. Until this is not [ChatHistoryLoadStatus.NONE], we can request for more messages.
- * @property mutePushNotificationDialogEvent Event to show the dialog to mute push notifications.
  * @property openWaitingRoomScreen True if should open waiting room screen, false otherwise.
  * @property isGeolocationEnabled True if geolocation internal permission (not device one) is granted, false otherwise.
  * @property isAnonymousMode True if the chat is in anonymous mode, false otherwise.
@@ -51,7 +50,13 @@ import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
  * @property shouldUpgradeToProPlan State event to show the upgrade to Pro plan dialog.
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * @property usersCallLimitReminders   [UsersCallLimitReminders]
- */
+ * @property isSelectMode Indicates if the chat is in select mode.
+ * @property selectedMessages Set of selected messages.
+ * @property selectedReaction The selected reaction.
+ * @property reactionList List of reactions.
+ * @property pendingAction The pending action.
+ * @property addingReactionTo The id of the message to which a reaction is being added.
+ **/
 data class ChatUiState(
     val chat: ChatRoom? = null,
     val isChatNotificationMute: Boolean = false,
@@ -74,7 +79,6 @@ data class ChatUiState(
     val sendingText: String = "",
     val isStartingCall: Boolean = false,
     val chatHistoryLoadStatus: ChatHistoryLoadStatus? = null,
-    val mutePushNotificationDialogEvent: StateEventWithContent<List<ChatPushNotificationMuteOption>> = consumed(),
     val openWaitingRoomScreen: Boolean = false,
     val isGeolocationEnabled: Boolean = false,
     val isAnonymousMode: Boolean = false,
@@ -87,7 +91,13 @@ data class ChatUiState(
     val callEndedDueToFreePlanLimits: Boolean = false,
     val shouldUpgradeToProPlan: Boolean = false,
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
-    val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled
+    val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled,
+    val isSelectMode: Boolean = false,
+    val selectedMessages: Set<TypedMessage> = emptySet(),
+    val selectedReaction: String = "",
+    val reactionList: List<UIReaction> = emptyList(),
+    val pendingAction: (@Composable () -> Unit)? = null,
+    val addingReactionTo: Long? = null,
 ) {
 
     /**

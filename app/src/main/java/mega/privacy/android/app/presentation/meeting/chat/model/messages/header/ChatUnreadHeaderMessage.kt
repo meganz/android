@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.pluralStringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.core.R
@@ -27,6 +28,7 @@ class ChatUnreadHeaderMessage(private val unreadCount: Int) : HeaderMessage() {
         onForwardClicked: (TypedMessage) -> Unit,
         onSelectedChanged: (Boolean) -> Unit,
         onNotSentClick: (TypedMessage) -> Unit,
+        navHostController: NavHostController,
     ) {
         val viewModel = hiltViewModel<MessageListViewModel>()
         val listState by viewModel.state.collectAsStateWithLifecycle()

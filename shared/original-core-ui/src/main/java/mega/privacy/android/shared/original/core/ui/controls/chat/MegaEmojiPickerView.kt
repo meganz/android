@@ -30,7 +30,7 @@ import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
 @Composable
 fun MegaEmojiPickerView(
     onEmojiPicked: (EmojiViewItem) -> Unit,
-    showEmojiPicker: Boolean,
+    showEmojiPicker: Boolean = true,
 ) = Column {
     val isPortrait =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT

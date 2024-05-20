@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.GiphyMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openGiphyViewerActivity
@@ -31,6 +32,7 @@ class ChatGiphyUiMessage(
         interactionEnabled: Boolean,
         onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
+        navHostController: NavHostController,
     ) {
         message.chatGifInfo?.let { giphy ->
             var autoPlayGif: Boolean by remember { mutableStateOf(giphy.webpSize < MAX_SIZE_FOR_AUTO_PLAY) }

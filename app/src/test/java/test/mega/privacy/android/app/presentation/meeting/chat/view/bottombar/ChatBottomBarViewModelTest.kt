@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -26,9 +25,12 @@ internal class ChatBottomBarViewModelTest {
     private val setChatDraftMessageUseCase: SetChatDraftMessageUseCase = mock()
     private val applicationScope: CoroutineScope = CoroutineScope(dispatcher)
     private val chatId = 123L
-    private val savedStateHandle: SavedStateHandle = mock {
-        on { get<Long>(Constants.CHAT_ID) } doReturn chatId
-    }
+    private val savedStateHandle: SavedStateHandle = SavedStateHandle(
+        mapOf(
+            "chatId" to chatId.toString(),
+            "chatAction" to Constants.ACTION_CHAT_SHOW_MESSAGES,
+        )
+    )
 
     @BeforeAll
     fun setup() {
@@ -39,7 +41,6 @@ internal class ChatBottomBarViewModelTest {
     fun resetMocks() {
         reset(
             setChatDraftMessageUseCase,
-            savedStateHandle,
         )
     }
 

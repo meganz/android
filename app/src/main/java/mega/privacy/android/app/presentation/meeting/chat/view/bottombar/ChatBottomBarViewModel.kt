@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.ChatArgs
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.chat.SetChatDraftMessageUseCase
 import timber.log.Timber
@@ -21,8 +21,8 @@ class ChatBottomBarViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private val chatId: Long = savedStateHandle[Constants.CHAT_ID]
-        ?: throw IllegalStateException("Chat screen must have a chat room id")
+    private val conversationArgs = ChatArgs(savedStateHandle)
+    private val chatId = conversationArgs.chatId
 
     /**
      * Save draft message

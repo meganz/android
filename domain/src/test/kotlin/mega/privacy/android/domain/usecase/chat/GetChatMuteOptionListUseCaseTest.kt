@@ -33,7 +33,7 @@ class GetChatMuteOptionListUseCaseTest {
     @Test
     fun `test that MuteUntilTurnBackOn is included in result when the chat list is not empty`() {
         val chatList = listOf(1L)
-        assertThat(underTest(chatList)).isEqualTo(
+        assertThat(underTest(emptyChatList = false)).isEqualTo(
             commonResults + ChatPushNotificationMuteOption.MuteUntilTurnBackOn
         )
     }
@@ -43,7 +43,7 @@ class GetChatMuteOptionListUseCaseTest {
         whenever(timeSystemRepository.getCurrentHourOfDay()).thenReturn(7)
         whenever(timeSystemRepository.getCurrentMinute()).thenReturn(0)
 
-        assertThat(underTest(emptyList())).isEqualTo(
+        assertThat(underTest(emptyChatList = true)).isEqualTo(
             commonResults + ChatPushNotificationMuteOption.MuteUntilThisMorning
 
         )
@@ -54,7 +54,7 @@ class GetChatMuteOptionListUseCaseTest {
         whenever(timeSystemRepository.getCurrentHourOfDay()).thenReturn(8)
         whenever(timeSystemRepository.getCurrentMinute()).thenReturn(0)
 
-        assertThat(underTest(emptyList())).isEqualTo(
+        assertThat(underTest(emptyChatList = true)).isEqualTo(
             commonResults + ChatPushNotificationMuteOption.MuteUntilThisMorning
         )
     }
@@ -64,7 +64,7 @@ class GetChatMuteOptionListUseCaseTest {
         whenever(timeSystemRepository.getCurrentHourOfDay()).thenReturn(9)
         whenever(timeSystemRepository.getCurrentMinute()).thenReturn(0)
 
-        assertThat(underTest(emptyList())).isEqualTo(
+        assertThat(underTest(emptyChatList = true)).isEqualTo(
             commonResults + ChatPushNotificationMuteOption.MuteUntilTomorrowMorning
         )
     }

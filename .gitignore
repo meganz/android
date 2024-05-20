@@ -11,6 +11,7 @@
 .idea/compiler.xml
 .idea/kotlinc.xml
 .idea/inspectionProfiles/Project_Default.xml
+.idea/deploymentTargetSelector.xml
 
 # User-specific stuff:
 .idea/workspace.xml
@@ -49,6 +50,7 @@ captures
 ## Google API key files
 /app/src/debug/res/values/google_maps_api.xml
 /app/src/release/res/values/google_maps_api.xml
+/app/src/qa/res/values/google_maps_api.xml
 
 ## Transifex script project
 /transifex/

@@ -3,7 +3,7 @@ package mega.privacy.android.app.di.chat
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.FragmentComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.AvailableOfflineMessageAction
@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.actions.SendMessa
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.ShareMessageAction
 
 @Module
-@InstallIn(FragmentComponent::class)
+@InstallIn(SingletonComponent::class)
 internal class MessageActionModule {
 
     /**

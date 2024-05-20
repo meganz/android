@@ -26,8 +26,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -76,7 +76,7 @@ internal fun StartTransferComponent(
     event: StateEventWithContent<TransferTriggerEvent>,
     onConsumeEvent: () -> Unit,
     snackBarHostState: SnackbarHostState,
-    viewModel: StartTransfersComponentViewModel = viewModel(),
+    viewModel: StartTransfersComponentViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
