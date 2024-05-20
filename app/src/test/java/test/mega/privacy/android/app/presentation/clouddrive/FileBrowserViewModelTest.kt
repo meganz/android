@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -104,6 +105,11 @@ class FileBrowserViewModelTest {
             runBlocking { invoke() }
         }.thenReturn(false)
     }
+    private val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase>() {
+        on {
+            runBlocking { invoke(NodeId(any())) }
+        }.thenReturn(false)
+    }
 
     @BeforeEach
     fun setUp() {
@@ -136,6 +142,7 @@ class FileBrowserViewModelTest {
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
         )
     }
 

@@ -574,6 +574,8 @@ class LinksComposeFragment : Fragment() {
                 )
 
                 // Slight customization for links page
+                control.hide().isVisible = false
+                control.unhide().isVisible = false
                 control.move().isVisible = false
                 control.removeShare().isVisible = false
                 control.shareFolder().isVisible = false

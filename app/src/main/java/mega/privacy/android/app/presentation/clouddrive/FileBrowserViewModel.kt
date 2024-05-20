@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -104,6 +105,7 @@ class FileBrowserViewModel @Inject constructor(
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -828,4 +830,10 @@ class FileBrowserViewModel @Inject constructor(
     fun onCloudDriveSortOrderChanged() {
         setPendingRefreshNodes()
     }
+
+    /**
+     * Check if the current node can be hidden
+     */
+    suspend fun isHidingActionAllowed(nodeId: NodeId): Boolean =
+        isHidingActionAllowedUseCase(nodeId)
 }

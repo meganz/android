@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -131,6 +132,12 @@ class FavouritesViewModelTest {
         }.thenReturn(false)
     }
 
+    private val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase>() {
+        on {
+            runBlocking { invoke(NodeId(any())) }
+        }.thenReturn(false)
+    }
+
     @BeforeEach
     fun setUp() {
         Mockito.reset(
@@ -163,6 +170,7 @@ class FavouritesViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
+            isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
         )
     }
 

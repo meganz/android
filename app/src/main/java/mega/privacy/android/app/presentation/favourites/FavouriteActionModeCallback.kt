@@ -59,13 +59,15 @@ class FavouriteActionModeCallback(
         mainActivity.lifecycleScope.launch {
             val isHiddenNodesEnabled =
                 mainActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
-            if (isHiddenNodesEnabled) {
+            val selectedNode = viewModel.getItemsSelected().mapNotNull { it.value.typedNode }
+            val isHidingActionAllowed = selectedNode.all {
+                viewModel.isHidingActionAllowed(it.id)
+            }
+            if (isHiddenNodesEnabled && isHidingActionAllowed) {
                 val isPaid =
                     viewModel.getIsPaidAccount()
 
-                val hasNonSensitiveNode =
-                    viewModel.getItemsSelected().mapNotNull { it.value.typedNode }
-                        .any { !it.isMarkedSensitive }
+                val hasNonSensitiveNode = selectedNode.any { !it.isMarkedSensitive }
                 menu.findItem(R.id.cab_menu_hide)?.isVisible =
                     hasNonSensitiveNode || !isPaid
 

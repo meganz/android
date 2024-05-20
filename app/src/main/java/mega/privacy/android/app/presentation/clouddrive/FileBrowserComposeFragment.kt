@@ -48,6 +48,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -72,7 +73,6 @@ import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -82,6 +82,8 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
 import timber.log.Timber
@@ -133,6 +135,9 @@ class FileBrowserComposeFragment : Fragment() {
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     private var tempNodeIds: List<NodeId> = listOf()
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * onAttach
@@ -488,6 +493,7 @@ class FileBrowserComposeFragment : Fragment() {
             val selected =
                 fileBrowserViewModel.state.value.selectedNodeHandles.takeUnless { it.isEmpty() }
                     ?: return false
+            val nodeList = fileBrowserViewModel.state.value.nodesList
             menu.findItem(R.id.cab_menu_share_link).title =
                 resources.getQuantityString(sharedR.plurals.label_share_links, selected.size)
             lifecycleScope.launch {
@@ -496,8 +502,38 @@ class FileBrowserComposeFragment : Fragment() {
                     totalNodes = fileBrowserViewModel.state.value.nodesList.size
                 )
                 CloudStorageOptionControlUtil.applyControl(menu, control)
+
+                handleHiddeNodes(selected, nodeList, menu)
             }
             return true
+        }
+
+        private suspend fun handleHiddeNodes(
+            selected: List<Long>,
+            nodeList: List<NodeUIItem<TypedNode>>,
+            menu: Menu,
+        ) {
+            val isHiddenNodesEnabled =
+                getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val isHidingActionAllowed = selected.all {
+                fileBrowserViewModel.isHidingActionAllowed(NodeId(it))
+            }
+            if (isHiddenNodesEnabled && isHidingActionAllowed) {
+                val selectedNodes = selected.mapNotNull { nodeId ->
+                    nodeList.find { it.id.longValue == nodeId }
+                }
+                val hasNonSensitiveNode =
+                    selectedNodes.any { !it.isMarkedSensitive }
+                val isPaid =
+                    fileBrowserViewModel.state.value.accountType?.isPaid
+                        ?: false
+
+                menu.findItem(R.id.cab_menu_hide)?.isVisible =
+                    (hasNonSensitiveNode || !isPaid)
+
+                menu.findItem(R.id.cab_menu_unhide)?.isVisible =
+                    !hasNonSensitiveNode && isPaid
+            }
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {

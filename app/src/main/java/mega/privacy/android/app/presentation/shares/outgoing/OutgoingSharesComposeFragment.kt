@@ -480,6 +480,8 @@ class OutgoingSharesComposeFragment : Fragment() {
                 )
                 // Slight customization for outgoing shares page
                 control.move().isVisible = false
+                control.hide().isVisible = false
+                control.unhide().isVisible = false
                 val areAllNotTakenDown = selected.any { it.isTakenDown.not() }
                 if (areAllNotTakenDown) {
                     if (viewModel.state.value.isInRootLevel) {

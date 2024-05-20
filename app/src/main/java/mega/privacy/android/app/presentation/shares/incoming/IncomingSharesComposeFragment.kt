@@ -486,6 +486,8 @@ class IncomingSharesComposeFragment : Fragment() {
                     totalNodes = viewModel.state.value.nodesList.size
                 )
                 // Slight customization for incoming shares page
+                control.hide().isVisible = false
+                control.unhide().isVisible = false
                 control.shareFolder().isVisible = false
                 control.shareOut().isVisible = false
                 if (selected.size == 1 && selected.first().shareData?.access == AccessPermission.FULL) {
