@@ -871,10 +871,14 @@ internal class DefaultPhotosRepository @Inject constructor(
         order: SortOrder?,
         includeRubbishBin: Boolean,
     ): List<ImageNode> = withContext(ioDispatcher) {
-        val parentNode = getMegaNode(parentId) ?: return@withContext emptyList()
-        val megaNodes = megaApiFacade.getChildrenByNode(
-            parentNode = parentNode,
-            order = order?.let { sortOrderIntMapper(it) },
+        val token = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = megaSearchFilterMapper(
+            parentHandle = parentId,
+        )
+        val megaNodes = megaApiFacade.getChildren(
+            filter = filter,
+            order = sortOrderIntMapper(order ?: SortOrder.ORDER_NONE),
+            megaCancelToken = token
         ).filter {
             isImageNodeValid(
                 node = it,

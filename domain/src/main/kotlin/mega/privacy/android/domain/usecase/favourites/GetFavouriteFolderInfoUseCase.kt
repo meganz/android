@@ -36,7 +36,7 @@ class GetFavouriteFolderInfoUseCase @Inject constructor(
     private suspend fun getFavouriteFolderInfo(parentHandle: Long): FavouriteFolderInfo {
         val parent = nodeRepository.getNodeById(NodeId(parentHandle)) as? FolderNode
             ?: throw ParentNotAFolderException("Attempted to fetch favourite folder info for node: $parentHandle")
-        val children = nodeRepository.getNodeChildren(parent)
+        val children = nodeRepository.getNodeChildren(parent.id)
             .map { addNodeType(it) }
         return FavouriteFolderInfo(
             children = children,

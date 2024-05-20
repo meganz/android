@@ -355,12 +355,6 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getChildNode(parentNode: MegaNode?, name: String?): MegaNode? =
         megaApi.getChildNode(parentNode, name)
 
-    override suspend fun getChildrenByNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
-        if (order == null)
-            megaApi.getChildren(parentNode)
-        else
-            megaApi.getChildren(parentNode, order)
-
     override suspend fun getIncomingSharesNode(order: Int?): List<MegaNode> =
         if (order == null)
             megaApi.inShares
@@ -610,9 +604,6 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun isInBackups(node: MegaNode): Boolean = megaApi.isInInbox(node)
 
     override suspend fun isInCloudDrive(node: MegaNode): Boolean = megaApi.isInCloud(node)
-
-    override suspend fun getChildren(parent: MegaNode, order: Int): List<MegaNode> =
-        megaApi.getChildren(parent, order)
 
     override suspend fun moveTransferToLast(
         transfer: MegaTransfer,

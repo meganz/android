@@ -57,7 +57,7 @@ class GetFavouriteFolderInfoUseCaseTest {
         }
         val nodeId = NodeId(1)
         whenever(nodeRepository.getNodeById(nodeId)).thenReturn(folderNode)
-        whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(emptyList())
+        whenever(nodeRepository.getNodeChildren(folderNode.id)).thenReturn(emptyList())
 
         underTest(nodeId.longValue).test {
             assertThat(awaitItem().name).isEqualTo(first)
@@ -75,7 +75,7 @@ class GetFavouriteFolderInfoUseCaseTest {
         val nodeId = NodeId(1)
         val children = listOf(mock<FileNode>())
         whenever(nodeRepository.getNodeById(nodeId)).thenReturn(folderNode)
-        whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(children)
+        whenever(nodeRepository.getNodeChildren(folderNode.id)).thenReturn(children)
 
         underTest(nodeId.longValue).test {
             assertThat(awaitItem().children).isNotEmpty()

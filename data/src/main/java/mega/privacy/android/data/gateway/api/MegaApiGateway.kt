@@ -396,14 +396,6 @@ interface MegaApiGateway {
     )
 
     /**
-     * Get children nodes by node
-     * @param parentNode parent node
-     * @param order order for the returned list, if null the default order is applied
-     * @return children nodes list
-     */
-    suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): List<MegaNode>
-
-    /**
      * Get a list of all incoming shares
      *
      * @param order sort order, if null the default order is applied
@@ -842,13 +834,6 @@ interface MegaApiGateway {
         listener: MegaRequestListenerInterface,
     )
 
-    /**
-     * Get children nodes by megaNodeList
-     * @param parent parent node
-     * @param order order for the returned list
-     * @return children nodes list
-     */
-    suspend fun getChildren(parent: MegaNode, order: Int): List<MegaNode>
 
     /**
      * Get a list with all public links

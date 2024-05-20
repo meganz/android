@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
@@ -17,26 +18,30 @@ import javax.inject.Inject
 /**
  * Get Photos from a folder by  its id
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class GetTypedNodesFromFolderUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val addNodeType: AddNodeType,
 ) {
 
-    operator fun invoke(folderId: NodeId): Flow<List<TypedNode>> {
-        return flow {
-            val nodes = getChildren(folderId)
-            emit(nodes)
-            val nodeIds = nodes.map { it.id } + folderId
-            emitAll(getMonitoredList(folderId, nodeIds))
-        }.mapLatest { nodeList ->
-            nodeList.map { addNodeType(it) }
-        }
+    /**
+     * Get children nodes by node
+     *
+     * @param folderId parent node id
+     */
+    operator fun invoke(folderId: NodeId): Flow<List<TypedNode>> = flow {
+        val nodes = getChildren(folderId)
+        emit(nodes)
+        val nodeIds = nodes.map { it.id } + folderId
+        emitAll(getMonitoredList(folderId, nodeIds))
+    }.mapLatest { nodeList ->
+        nodeList.map { addNodeType(it) }
     }
 
     private suspend fun getChildren(folderId: NodeId): List<UnTypedNode> {
         val folder = nodeRepository.getNodeById(folderId) as? FolderNode
             ?: throw ParentNotAFolderException("Attempted to fetch folder node: $folderId")
-        return nodeRepository.getNodeChildren(folder)
+        return nodeRepository.getNodeChildren(folder.id)
 
     }
 

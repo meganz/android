@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
@@ -47,6 +48,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.repository.NodeRepository
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
@@ -55,6 +57,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaShare.ACCESS_READ
 import nz.mega.sdk.MegaUser
@@ -111,6 +114,8 @@ class NodeRepositoryImplTest {
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper = mock()
     private val megaNodeMapper = mock<MegaNodeMapper>()
+    private val cancelTokenProvider = mock<CancelTokenProvider>()
+    private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
     private val fileNodeMapper = FileNodeMapper(
         cacheGateway = cacheGateway,
         megaApiGateway = megaApiGateway,
@@ -157,7 +162,9 @@ class NodeRepositoryImplTest {
             accessPermissionIntMapper = accessPermissionIntMapper,
             megaLocalRoomGateway = megaLocalRoomGateway,
             megaNodeMapper = megaNodeMapper,
-            nodeLabelIntMapper = nodeLabelIntMapper
+            nodeLabelIntMapper = nodeLabelIntMapper,
+            cancelTokenProvider = cancelTokenProvider,
+            megaSearchFilterMapper = megaSearchFilterMapper,
         )
     }
 
@@ -1201,12 +1208,38 @@ class NodeRepositoryImplTest {
             on { isFolder }.thenReturn(true)
         }
         val childNodes = listOf(childNode1, childNode2)
+        val parentFilter = mock<MegaSearchFilter>()
+        val childFilter1 = mock<MegaSearchFilter>()
+        val childFilter2 = mock<MegaSearchFilter>()
+        val token = mock<MegaCancelToken>()
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+        whenever(megaSearchFilterMapper(NodeId(parentNode.handle))).thenReturn(parentFilter)
+        whenever(megaSearchFilterMapper(NodeId(childNode1.handle))).thenReturn(childFilter1)
+        whenever(megaSearchFilterMapper(NodeId(childNode2.handle))).thenReturn(childFilter2)
         whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(parentNode)
-        whenever(megaApiGateway.getMegaNodeByHandle(2L)).thenReturn(null)
-        whenever(megaApiGateway.getMegaNodeByHandle(3L)).thenReturn(null)
-        whenever(megaApiGateway.getChildrenByNode(parentNode)).thenReturn(childNodes)
-        whenever(megaApiGateway.getChildrenByNode(childNode1)).thenReturn(emptyList())
-        whenever(megaApiGateway.getChildrenByNode(childNode2)).thenReturn(emptyList())
+        whenever(megaApiGateway.getMegaNodeByHandle(2L)).thenReturn(childNode1)
+        whenever(megaApiGateway.getMegaNodeByHandle(3L)).thenReturn(childNode2)
+        whenever(
+            megaApiGateway.getChildren(
+                parentFilter,
+                sortOrderIntMapper(SortOrder.ORDER_NONE),
+                token
+            )
+        ).thenReturn(childNodes)
+        whenever(
+            megaApiGateway.getChildren(
+                childFilter1,
+                sortOrderIntMapper(SortOrder.ORDER_NONE),
+                token
+            )
+        ).thenReturn(emptyList())
+        whenever(
+            megaApiGateway.getChildren(
+                childFilter2,
+                sortOrderIntMapper(SortOrder.ORDER_NONE),
+                token
+            )
+        ).thenReturn(emptyList())
 
         val actual = underTest.isEmptyFolder(typedNode)
         assertThat(actual).isTrue()

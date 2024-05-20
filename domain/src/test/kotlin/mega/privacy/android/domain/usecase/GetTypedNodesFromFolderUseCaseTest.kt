@@ -22,7 +22,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class GetTypedNodesFromFolderUseCaseTest {
     lateinit var underTest: GetTypedNodesFromFolderUseCase
 
@@ -59,7 +58,7 @@ class GetTypedNodesFromFolderUseCaseTest {
             val fileNodeId = NodeId(2)
             val childNode = mock<FileNode> { on { id }.thenReturn(fileNodeId) }
             whenever(nodeRepository.getNodeById(nodeId)).thenReturn(folderNode)
-            whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(
+            whenever(nodeRepository.getNodeChildren(folderNode.id)).thenReturn(
                 listOf(childNode)
             )
             val map = mapOf<Node, List<NodeChanges>>(childNode to emptyList())
@@ -80,7 +79,7 @@ class GetTypedNodesFromFolderUseCaseTest {
             val folderNode = mock<FolderNode>()
             val nodeId = NodeId(1)
             whenever(nodeRepository.getNodeById(nodeId)).thenReturn(folderNode)
-            whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(list)
+            whenever(nodeRepository.getNodeChildren(folderNode.id)).thenReturn(list)
             underTest(nodeId).test {
                 assertThat(awaitItem()).isNotEmpty()
                 cancelAndIgnoreRemainingEvents()
@@ -94,7 +93,7 @@ class GetTypedNodesFromFolderUseCaseTest {
             val folderNode = mock<FolderNode>()
             val nodeId = NodeId(1)
             whenever(nodeRepository.getNodeById(nodeId)).thenReturn(folderNode)
-            whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(emptyList())
+            whenever(nodeRepository.getNodeChildren(folderNode.id)).thenReturn(emptyList())
             underTest(nodeId).test {
                 assertThat(awaitItem()).isEmpty()
                 cancelAndIgnoreRemainingEvents()
@@ -109,7 +108,7 @@ class GetTypedNodesFromFolderUseCaseTest {
         val fileNodeId = NodeId(2)
         val childNode = mock<FileNode> { on { id }.thenReturn(fileNodeId) }
         whenever(nodeRepository.getNodeById(folderId)).thenReturn(folderNode)
-        whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(
+        whenever(nodeRepository.getNodeChildren(folderNode.id)).thenReturn(
             listOf(childNode)
         )
         val map = mapOf<Node, List<NodeChanges>>(folderNode to emptyList())
@@ -128,10 +127,8 @@ class GetTypedNodesFromFolderUseCaseTest {
         runTest {
             val folderId = NodeId(1)
             val folderNode = mock<FolderNode> { on { id }.thenReturn(folderId) }
-            val fileNodeId = NodeId(2)
-            val childNode = mock<FileNode> { on { id }.thenReturn(fileNodeId) }
             whenever(nodeRepository.getNodeById(folderId)).thenReturn(folderNode)
-            whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(
+            whenever(nodeRepository.getNodeChildren(folderNode.id)).thenReturn(
                 emptyList()
             )
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(

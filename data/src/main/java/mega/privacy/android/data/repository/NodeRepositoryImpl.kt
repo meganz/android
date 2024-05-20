@@ -36,6 +36,7 @@ import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
@@ -62,6 +63,7 @@ import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
@@ -115,6 +117,8 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val megaNodeMapper: MegaNodeMapper,
     private val nodeLabelIntMapper: NodeLabelIntMapper,
+    private val megaSearchFilterMapper: MegaSearchFilterMapper,
+    private val cancelTokenProvider: CancelTokenProvider,
 ) : NodeRepository {
     override suspend fun getOutgoingSharesNode(order: SortOrder) =
         withContext(ioDispatcher) {
@@ -261,43 +265,23 @@ internal class NodeRepositoryImpl @Inject constructor(
         } ?: ""
     }
 
-    override suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode> {
-        return withContext(ioDispatcher) {
-            val offlineNodes = getAllOfflineNodeHandle()
-            megaApiGateway.getMegaNodeByHandle(folderNode.id.longValue)?.let { parent ->
-                megaApiGateway.getChildrenByNode(parent)
-                    .map {
-                        convertToUnTypedNode(
-                            node = it,
-                            offline = offlineNodes?.get(it.handle.toString())
-                        )
-                    }
-            } ?: throw SynchronisationException("Non null node found be null when fetched from api")
-        }
-    }
-
     override suspend fun getNodeChildren(
         nodeId: NodeId,
         order: SortOrder?,
-    ): List<UnTypedNode> {
-        return withContext(ioDispatcher) {
-            return@withContext megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { parent ->
-                val offlineItems = async { getAllOfflineNodeHandle() }
-                val childList = async {
-                    order?.let { sortOrder ->
-                        megaApiGateway.getChildrenByNode(
-                            parent,
-                            sortOrderIntMapper(sortOrder)
-                        )
-                    } ?: run {
-                        megaApiGateway.getChildrenByNode(parent)
-                    }
-                }
-                mapMegaNodesToUnTypedNodes(childList.await(), offlineItems.await())
-            } ?: run {
-                emptyList()
-            }
+    ): List<UnTypedNode> = withContext(ioDispatcher) {
+        val token = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = megaSearchFilterMapper(
+            parentHandle = nodeId,
+        )
+        val offlineItems = async { getAllOfflineNodeHandle() }
+        val childList = async {
+            megaApiGateway.getChildren(
+                filter,
+                sortOrderIntMapper(order ?: SortOrder.ORDER_NONE),
+                token
+            )
         }
+        mapMegaNodesToUnTypedNodes(childList.await(), offlineItems.await())
     }
 
     private suspend fun mapMegaNodesToUnTypedNodes(
@@ -1132,7 +1116,11 @@ internal class NodeRepositoryImpl @Inject constructor(
     }
 
     private suspend fun isChildrenEmpty(parent: MegaNode): Boolean {
-        megaApiGateway.getChildrenByNode(parent).let {
+        val token = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = megaSearchFilterMapper(
+            parentHandle = NodeId(parent.handle),
+        )
+        megaApiGateway.getChildren(filter, sortOrderIntMapper(SortOrder.ORDER_NONE), token).let {
             if (it.isNotEmpty()) {
                 it.forEach { childNode ->
                     if (childNode.isFolder.not() || isChildrenEmpty(childNode).not()) {

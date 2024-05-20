@@ -157,7 +157,11 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
 
     override suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder): List<MegaNode> =
         withContext(ioDispatcher) {
-            megaApiGateway.getChildrenByNode(parentNode, sortOrderIntMapper(order))
+            val token = cancelTokenProvider.getOrCreateCancelToken()
+            val filter = megaSearchFilterMapper(
+                parentHandle = NodeId(parentNode.handle),
+            )
+            megaApiGateway.getChildren(filter, sortOrderIntMapper(order), token)
         }
 
     override suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode? =

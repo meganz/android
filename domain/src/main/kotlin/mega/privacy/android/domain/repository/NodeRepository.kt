@@ -142,13 +142,6 @@ interface NodeRepository {
      */
     suspend fun getNodePathById(nodeId: NodeId): String
 
-    /**
-     * Get node children
-     *
-     * @param folderNode
-     * @return
-     */
-    suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode>
 
     /**
      * Get node children
@@ -157,7 +150,7 @@ interface NodeRepository {
      * @param order [SortOrder]
      * @return
      */
-    suspend fun getNodeChildren(nodeId: NodeId, order: SortOrder?): List<UnTypedNode>
+    suspend fun getNodeChildren(nodeId: NodeId, order: SortOrder? = null): List<UnTypedNode>
 
     /**
      * Get the number of versions of the node, including the current version
