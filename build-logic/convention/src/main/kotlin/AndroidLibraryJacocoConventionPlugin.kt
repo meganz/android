@@ -51,11 +51,11 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
                         val testTaskName = "test${capitalise(sourceName)}UnitTest"
 
                         val javaTree = this@with.fileTree(
-                            "dir" to "${project.buildDir}/intermediates/javac/$sourceName/classes",
+                            "dir" to "${layout.buildDirectory.get()}/intermediates/javac/$sourceName/classes",
                             "excludes" to excludedFileList,
                         )
                         val kotlinTree = this@with.fileTree(
-                            "dir" to "${project.buildDir}/tmp/kotlin-classes/$sourceName",
+                            "dir" to "${layout.buildDirectory.get()}/tmp/kotlin-classes/$sourceName",
                             "excludes" to excludedFileList
                         )
                         tasks.register("${testTaskName}Coverage", JacocoReport::class.java) {
@@ -71,7 +71,7 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
                                 )
                             )
                             executionData.setFrom(
-                                files("${project.buildDir}/jacoco/${testTaskName}.exec")
+                                files("${layout.buildDirectory.get()}/jacoco/${testTaskName}.exec")
                             )
                             val coverageSourceDirs = listOf(
                                 "src/main/java",
@@ -81,20 +81,20 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
                             sourceDirectories.setFrom(files(coverageSourceDirs))
                             additionalSourceDirs.setFrom(files(coverageSourceDirs))
 
+                            val reportPath = "${layout.buildDirectory.get()}/coverage-report"
                             reports {
-                                xml.required.set(true)
                                 csv.required.set(true)
+                                csv.outputLocation.set(file("$reportPath/coverage.csv"))
+                                xml.required.set(true)
+                                xml.outputLocation.set(file("$reportPath/coverage.xml"))
                                 html.required.set(true)
-                                html.setDestination(file("${buildDir}/coverage-report"))
+                                html.outputLocation.set(file("$reportPath/html"))
                             }
                         }
                     }
                 }
             }
-
         }
-
-
     }
 
     private val excludedFileList = listOf(

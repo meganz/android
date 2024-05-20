@@ -471,21 +471,20 @@ pipeline {
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
                     ]) {
                         String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
-                        // domain coverage
                         sh "./gradlew domain:jacocoTestReport"
-
-                        // data coverage
                         sh "./gradlew data:testDebugUnitTestCoverage"
-
-                        // run coverage for app module
                         sh "./gradlew app:createUnitTestCoverageReport"
 
-                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
-                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
-                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testDebugUnitTest")
-                        DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
-                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.csv")}"
-                        APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
+                        def xmlUnitTestReportPath = "build/unittest/junit"
+                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/$xmlUnitTestReportPath")
+                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/$xmlUnitTestReportPath")
+                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/$xmlUnitTestReportPath")
+
+                        def coverageReportPath = "build/coverage-report/coverage.csv"
+                        DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/${coverageReportPath}")}"
+                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/${coverageReportPath}")}"
+                        APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/${coverageReportPath}")}"
+
                         def appSummaryCoverageArray = APP_COVERAGE.split('=')[1].split('/')
                         def domainSummaryCoverageArray = DOMAIN_COVERAGE.split('=')[1].split('/')
                         def dataSummaryCoverageArray = DATA_COVERAGE.split('=')[1].split('/')
@@ -519,7 +518,6 @@ pipeline {
                                 "${dataSummaryArray[2]} | " +
                                 "${dataSummaryArray[3]} | " +
                                 "${dataSummaryArray[4]} | "
-
 
                         writeFile file: 'coverage_summary.txt', text: "$appTestResultsRow\n$domainTestResultsRow\n$dataTestResultsRow"
 

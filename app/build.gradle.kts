@@ -26,6 +26,7 @@ import mega.privacy.android.build.shouldUsePrebuiltSdk
 
 plugins {
     alias(convention.plugins.mega.android.app)
+    alias(convention.plugins.mega.android.test)
     id("kotlin-parcelize")
     id("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
@@ -36,7 +37,6 @@ plugins {
     id("com.google.firebase.crashlytics")
     id("com.google.firebase.firebase-perf")
     id("androidx.baselineprofile")
-    alias(convention.plugins.mega.android.test)
 }
 
 configurations {
@@ -493,8 +493,9 @@ tasks.register("createUnitTestCoverageReport") {
                         "fileset"("dir" to "src/test/java")
                     }
                 }
-                "html"("destdir" to "${buildDir.path}/reports/jacoco/html")
-                "csv"("destfile" to "${buildDir.path}/reports/jacoco/gmsDebugUnitTestCoverage.csv")
+                "html"("destdir" to "${buildDir.path}/coverage-report/html")
+                "csv"("destfile" to "${buildDir.path}/coverage-report/coverage.csv")
+                "xml"("destfile" to "${buildDir.path}/coverage-report/coverage.xml")
             }
         }
     }

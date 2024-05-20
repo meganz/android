@@ -2,6 +2,7 @@ package mega.privacy.android.gradle
 
 
 import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.UnitTestOptions
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
@@ -37,6 +38,7 @@ fun Project.configureTestOptionsIfAndroidApplication() {
             testOptions.unitTests {
                 isIncludeAndroidResources = true
                 isReturnDefaultValues = true
+                setTestReportPath(this)
             }
         }
     }
@@ -51,7 +53,22 @@ fun Project.configureTestOptionsIfAndroidLibrary() {
             testOptions.unitTests {
                 isIncludeAndroidResources = true
                 isReturnDefaultValues = true
+                setTestReportPath(this)
             }
+        }
+    }
+}
+
+private fun Project.setTestReportPath(unitTestOptions: UnitTestOptions) {
+    unitTestOptions.all {
+        it.reports {
+            val path = "${layout.buildDirectory.get()}/unittest"
+
+            html.required.set(true)
+            html.outputLocation.set(file("$path/html"))
+
+            junitXml.required.set(true)
+            junitXml.outputLocation.set(file("$path/junit"))
         }
     }
 }

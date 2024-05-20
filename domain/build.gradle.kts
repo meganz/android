@@ -3,6 +3,7 @@ import mega.privacy.android.build.shouldApplyDefaultConfiguration
 plugins {
     alias(convention.plugins.mega.jvm.library)
     alias(convention.plugins.mega.jvm.test)
+    alias(convention.plugins.mega.jvm.jacoco)
     id("com.android.lint")
     id("kotlin-kapt")
     kotlin("plugin.serialization") version "1.9.21"
@@ -12,9 +13,6 @@ lint {
     abortOnError = false
     xmlOutput = file("build/reports/lint-results.xml")
 }
-
-apply(plugin = "jacoco")
-apply(from = "${project.rootDir}/tools/jacoco.gradle")
 
 dependencies {
     lintChecks(project(":lint"))

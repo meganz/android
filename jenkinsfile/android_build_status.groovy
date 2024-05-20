@@ -27,8 +27,6 @@ FEATURE_DEVICECENTER_UNIT_TEST_RESULT = ""
 APP_COVERAGE = ""
 DOMAIN_COVERAGE = ""
 DATA_COVERAGE = ""
-COVERAGE_ARCHIVE = "coverage.zip"
-COVERAGE_FOLDER = "coverage"
 ARTIFACTORY_DEVELOP_CODE_COVERAGE = ""
 
 JSON_LINT_REPORT_LINK = ""
@@ -312,57 +310,61 @@ pipeline {
                                             "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
                                             "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}"
                                     ]) {
+                                        def htmlTestReportPath = "build/unittest/html"
                                         // domain coverage
                                         try {
                                             sh "./gradlew domain:jacocoTestReport"
                                         } finally {
-                                            DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports/tests/test", "domain_unit_test_result.zip")
+                                            DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/$htmlTestReportPath", "domain_unit_test_result.zip")
                                         }
-                                        DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
+
+                                        def coverageReportPath = "build/coverage-report/coverage.csv"
+                                        DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/$coverageReportPath")}"
                                         println("DOMAIN_COVERAGE = ${DOMAIN_COVERAGE}")
 
                                         // data coverage
                                         try {
                                             sh "./gradlew data:testDebugUnitTestCoverage"
                                         } finally {
-                                            DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testDebugUnitTest", "data_unit_test_result.zip")
+                                            DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/$htmlTestReportPath", "data_unit_test_result.zip")
                                         }
-                                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.csv")}"
+                                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/$coverageReportPath")}"
                                         println("DATA_COVERAGE = ${DATA_COVERAGE}")
 
                                         // run coverage for app module
                                         try {
                                             sh "./gradlew app:createUnitTestCoverageReport"
                                         } finally {
-                                            APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports/tests/testGmsDebugUnitTest", "app_unit_test_result.zip")
+                                            APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/$htmlTestReportPath", "app_unit_test_result.zip")
                                         }
-                                        APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
+                                        APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/$coverageReportPath")}"
                                         println("APP_COVERAGE = ${APP_COVERAGE}")
 
                                         try {
                                             sh "./gradlew feature:devicecenter:testDebugUnitTest"
                                         } finally {
-                                            FEATURE_DEVICECENTER_UNIT_TEST_RESULT = unitTestArchiveLink("feature/devicecenter/build/reports/tests/testDebugUnitTest", "feature_devicecenter_unit_test_result.zip")
+                                            FEATURE_DEVICECENTER_UNIT_TEST_RESULT = unitTestArchiveLink("feature/devicecenter/$htmlTestReportPath", "feature_devicecenter_unit_test_result.zip")
                                         }
 
                                         try {
                                             sh "./gradlew feature:sync:testDebugUnitTest"
                                         } finally {
-                                            FEATURE_SYNC_UNIT_TEST_RESULT = unitTestArchiveLink("feature/sync/build/reports/tests/testDebugUnitTest", "feature_sync_unit_test_result.zip")
+                                            FEATURE_SYNC_UNIT_TEST_RESULT = unitTestArchiveLink("feature/sync/$htmlTestReportPath", "feature_sync_unit_test_result.zip")
                                         }
 
                                         try {
                                             sh "./gradlew shared:original-core-ui:testDebugUnitTest"
                                         } finally {
-                                            COREUI_UNIT_TEST_RESULT = unitTestArchiveLink("shared/original-core-ui/build/reports/tests/testDebugUnitTest", "shared_original_core_ui_unit_test_result.zip")
+                                            COREUI_UNIT_TEST_RESULT = unitTestArchiveLink("core-ui/$htmlTestReportPath", "core_ui_unit_test_result.zip")
                                         }
 
                                         // below code is only run when UnitTest is OK, before test reports are cleaned up.
                                         // If UnitTest is failed, summary is collected at post.failure{} phase
                                         // We have to collect the report here, before they are cleaned in the last stage.
-                                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
-                                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
-                                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testDebugUnitTest")
+                                        def xmlUnitTestReportPath = "build/unittest/junit"
+                                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/$xmlUnitTestReportPath")
+                                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/$xmlUnitTestReportPath")
+                                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/$xmlUnitTestReportPath")
 
                                         // Compare Coverage
                                         String developCoverageLocation = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/coverage_summary.txt"
@@ -792,23 +794,6 @@ def archiveLintReports() {
     sh """
         cd ${WORKSPACE}
         zip -r ${LINT_REPORT_ARCHIVE} ${LINT_REPORT_FOLDER}/*.html
-    """
-}
-
-/**
- * Archive all HTML coverage reports into one zip file
- */
-def archiveCoverageReport() {
-    sh """
-        cd ${WORKSPACE}
-        rm -frv ${COVERAGE_FOLDER}
-        mkdir -pv ${COVERAGE_FOLDER}/app
-        mkdir -pv ${COVERAGE_FOLDER}/domain
-        mv -v ${WORKSPACE}/domain/build/coverage-report/* $WORKSPACE/$COVERAGE_FOLDER/domain/
-        mv -v ${WORKSPACE}/app/build/reports/jacoco/html/* $WORKSPACE/$COVERAGE_FOLDER/app/
-        
-        zip -r ${COVERAGE_ARCHIVE} $WORKSPACE/$COVERAGE_FOLDER/*
-        ls -l ${COVERAGE_ARCHIVE}
     """
 }
 
