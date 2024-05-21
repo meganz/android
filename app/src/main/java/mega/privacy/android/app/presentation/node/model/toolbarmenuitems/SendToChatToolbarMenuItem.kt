@@ -12,6 +12,7 @@ import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.chat.GetNodeToAttachUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -41,14 +42,18 @@ class SendToChatToolbarMenuItem @Inject constructor(
     ): () -> Unit = {
         onDismiss()
         parentScope.launch {
-            withContext(NonCancellable) {
-                val attachableNodes = selectedNodes.mapNotNull {
-                    if (it is TypedFileNode) {
-                        getNodeToAttachUseCase(it)
-                    } else null
+            runCatching {
+                withContext(NonCancellable) {
+                    val attachableNodes = selectedNodes.mapNotNull {
+                        if (it is TypedFileNode) {
+                            getNodeToAttachUseCase(it)
+                        } else null
+                    }
+                    parentScope.ensureActive()
+                    actionHandler(menuAction, attachableNodes)
                 }
-                parentScope.ensureActive()
-                actionHandler(menuAction, attachableNodes)
+            }.onFailure {
+                Timber.e(it, "Error getting node to attach")
             }
         }
     }
