@@ -1,18 +1,18 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.backup.BackupInfoType
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Use Case that updates the Backup name of the Primary Folder
  *
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  * @property isCameraUploadsEnabledUseCase [IsCameraUploadsEnabledUseCase]
  * @property updateBackupUseCase [UpdateBackupUseCase]
  */
 class UpdatePrimaryFolderBackupNameUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val updateBackupUseCase: UpdateBackupUseCase,
 ) {
@@ -23,7 +23,7 @@ class UpdatePrimaryFolderBackupNameUseCase @Inject constructor(
      */
     suspend operator fun invoke(backupName: String) {
         if (isCameraUploadsEnabledUseCase() && backupName.isNotBlank()) {
-            cameraUploadRepository.getCuBackUp()?.let { backup ->
+            cameraUploadsRepository.getCuBackUp()?.let { backup ->
                 updateBackupUseCase(
                     backupId = backup.backupId,
                     backupName = backupName,

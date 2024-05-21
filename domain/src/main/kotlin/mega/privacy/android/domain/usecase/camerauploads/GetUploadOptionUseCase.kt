@@ -1,16 +1,16 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Use Case to retrieve the type of content to be uploaded by Camera Uploads
  *
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  */
 class GetUploadOptionUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -20,5 +20,5 @@ class GetUploadOptionUseCase @Inject constructor(
      * returned as default if there was no existing [UploadOption] set
      */
     suspend operator fun invoke(): UploadOption =
-        cameraUploadRepository.getUploadOption() ?: UploadOption.PHOTOS_AND_VIDEOS
+        cameraUploadsRepository.getUploadOption() ?: UploadOption.PHOTOS_AND_VIDEOS
 }

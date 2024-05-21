@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -29,13 +29,13 @@ class GetSecondaryFolderPathUseCaseTest {
 
     private lateinit var underTest: GetSecondaryFolderPathUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val fileSystemRepository = mock<FileSystemRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = GetSecondaryFolderPathUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             fileSystemRepository = fileSystemRepository,
         )
     }
@@ -43,7 +43,7 @@ class GetSecondaryFolderPathUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            cameraUploadRepository,
+            cameraUploadsRepository,
             fileSystemRepository,
         )
     }
@@ -51,7 +51,7 @@ class GetSecondaryFolderPathUseCaseTest {
     @ParameterizedTest(name = "path: {0}")
     @ValueSource(strings = ["", " ", "test/path/"])
     fun `test that the local secondary folder path is returned`(path: String) = runTest {
-        cameraUploadRepository.stub {
+        cameraUploadsRepository.stub {
             onBlocking { getSecondaryFolderLocalPath() }.thenReturn(path)
         }
         fileSystemRepository.stub {
@@ -66,7 +66,7 @@ class GetSecondaryFolderPathUseCaseTest {
         runTest {
             val testPath = "test/path/"
 
-            cameraUploadRepository.stub {
+            cameraUploadsRepository.stub {
                 onBlocking { getSecondaryFolderLocalPath() }.thenReturn(testPath)
             }
             fileSystemRepository.stub {
@@ -76,7 +76,7 @@ class GetSecondaryFolderPathUseCaseTest {
             val expected = underTest()
             assertThat(expected).isNotEqualTo(testPath)
             assertThat(expected).isEmpty()
-            verify(cameraUploadRepository).setSecondaryFolderLocalPath("")
+            verify(cameraUploadsRepository).setSecondaryFolderLocalPath("")
         }
 
     @ParameterizedTest(name = "when the original path is {0}, the new path becomes {1}")
@@ -85,7 +85,7 @@ class GetSecondaryFolderPathUseCaseTest {
         originalPath: String,
         newPath: String,
     ) = runTest {
-        cameraUploadRepository.stub {
+        cameraUploadsRepository.stub {
             onBlocking { getSecondaryFolderLocalPath() }.thenReturn(originalPath)
         }
         fileSystemRepository.stub {

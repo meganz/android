@@ -1,15 +1,15 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Use Case that listens to new Photos and Videos captured by the Device
  *
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  */
 class ListenToNewMediaUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -19,5 +19,5 @@ class ListenToNewMediaUseCase @Inject constructor(
      *                     Used for enqueueing the same worker from itself
      */
     suspend operator fun invoke(forceEnqueue: Boolean) =
-        cameraUploadRepository.listenToNewMedia(forceEnqueue)
+        cameraUploadsRepository.listenToNewMedia(forceEnqueue)
 }

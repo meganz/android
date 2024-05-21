@@ -5,7 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +30,7 @@ internal class UpdateSecondaryFolderBackupNameUseCaseTest {
 
     private lateinit var underTest: UpdateSecondaryFolderBackupNameUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
     private val updateBackupUseCase = mock<UpdateBackupUseCase>()
 
@@ -49,7 +49,7 @@ internal class UpdateSecondaryFolderBackupNameUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest = UpdateSecondaryFolderBackupNameUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             updateBackupUseCase = updateBackupUseCase,
         )
@@ -57,14 +57,14 @@ internal class UpdateSecondaryFolderBackupNameUseCaseTest {
 
     @BeforeEach
     fun resetMocks() =
-        reset(cameraUploadRepository, isSecondaryFolderEnabled, updateBackupUseCase)
+        reset(cameraUploadsRepository, isSecondaryFolderEnabled, updateBackupUseCase)
 
     @Test
     fun `test that the secondary folder backup name is updated`() = runTest {
         val testBackupName = "test secondary backup name"
 
         whenever(isSecondaryFolderEnabled()).thenReturn(true)
-        whenever(cameraUploadRepository.getMuBackUp()).thenReturn(testBackup)
+        whenever(cameraUploadsRepository.getMuBackUp()).thenReturn(testBackup)
 
         underTest(testBackupName)
 
@@ -83,7 +83,7 @@ internal class UpdateSecondaryFolderBackupNameUseCaseTest {
         isSecondaryFolderBackupSet: Boolean,
     ) = runTest {
         whenever(isSecondaryFolderEnabled()).thenReturn(isSecondaryFolderUploadsEnabled)
-        whenever(cameraUploadRepository.getMuBackUp()).thenReturn(if (isSecondaryFolderBackupSet) testBackup else null)
+        whenever(cameraUploadsRepository.getMuBackUp()).thenReturn(if (isSecondaryFolderBackupSet) testBackup else null)
 
         underTest(backupName)
 

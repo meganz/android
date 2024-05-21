@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.camerauploads.mapper.CameraUploadsRecordMapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -27,13 +27,13 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
 
     private lateinit var underTest: RetrieveMediaFromMediaStoreUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val cameraUploadsRecordMapper = mock<CameraUploadsRecordMapper>()
 
     @BeforeAll
     fun setUp() {
         underTest = RetrieveMediaFromMediaStoreUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             cameraUploadsRecordMapper = cameraUploadsRecordMapper,
         )
     }
@@ -41,7 +41,7 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            cameraUploadRepository,
+            cameraUploadsRepository,
             cameraUploadsRecordMapper,
         )
     }
@@ -60,16 +60,16 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
 
             val cameraUploadsMediaList1 = listOf<CameraUploadsMedia>(mock(), mock())
             val cameraUploadsMediaList2 = listOf<CameraUploadsMedia>(mock())
-            whenever(cameraUploadRepository.getMediaSelectionQuery(parentPath))
+            whenever(cameraUploadsRepository.getMediaSelectionQuery(parentPath))
                 .thenReturn(selectionQuery)
             whenever(
-                cameraUploadRepository.getMediaList(
+                cameraUploadsRepository.getMediaList(
                     mediaStoreFileType1,
                     selectionQuery
                 )
             ).thenReturn(cameraUploadsMediaList1)
             whenever(
-                cameraUploadRepository.getMediaList(
+                cameraUploadsRepository.getMediaList(
                     mediaStoreFileType2,
                     selectionQuery
                 )
@@ -103,7 +103,7 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
                 )
             }
 
-            whenever(cameraUploadRepository.getAllCameraUploadsRecords()).thenReturn(emptyList())
+            whenever(cameraUploadsRepository.getAllCameraUploadsRecords()).thenReturn(emptyList())
 
             val expected = cameraUploadsRecordList1 + cameraUploadsRecordList2
 
@@ -125,16 +125,16 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
 
             val cameraUploadsMediaList1 = listOf<CameraUploadsMedia>(mock(), mock())
             val cameraUploadsMediaList2 = listOf<CameraUploadsMedia>(mock())
-            whenever(cameraUploadRepository.getMediaSelectionQuery(parentPath))
+            whenever(cameraUploadsRepository.getMediaSelectionQuery(parentPath))
                 .thenReturn(selectionQuery)
             whenever(
-                cameraUploadRepository.getMediaList(
+                cameraUploadsRepository.getMediaList(
                     mediaStoreFileType1,
                     selectionQuery
                 )
             ).thenReturn(cameraUploadsMediaList1)
             whenever(
-                cameraUploadRepository.getMediaList(
+                cameraUploadsRepository.getMediaList(
                     mediaStoreFileType2,
                     selectionQuery
                 )
@@ -167,7 +167,7 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
                 )
             }
 
-            whenever(cameraUploadRepository.getAllCameraUploadsRecords()).thenReturn(emptyList())
+            whenever(cameraUploadsRepository.getAllCameraUploadsRecords()).thenReturn(emptyList())
 
             assertThat(underTest(parentPath, types, folderType, fileType, tempRoot))
                 .isEqualTo(cameraUploadsRecordList1)
@@ -196,10 +196,10 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
             }
 
             val cameraUploadsMediaList1 = listOf(media1, mock())
-            whenever(cameraUploadRepository.getMediaSelectionQuery(parentPath))
+            whenever(cameraUploadsRepository.getMediaSelectionQuery(parentPath))
                 .thenReturn(selectionQuery)
             whenever(
-                cameraUploadRepository.getMediaList(mediaStoreFileType1, selectionQuery)
+                cameraUploadsRepository.getMediaList(mediaStoreFileType1, selectionQuery)
             ).thenReturn(cameraUploadsMediaList1)
 
             val cameraUploadsRecordList1 = listOf<CameraUploadsRecord>(mock(), mock())
@@ -211,7 +211,7 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
                 )
             }
 
-            whenever(cameraUploadRepository.getAllCameraUploadsRecords())
+            whenever(cameraUploadsRepository.getAllCameraUploadsRecords())
                 .thenReturn(listOf(cameraUploadsRecord1))
 
 

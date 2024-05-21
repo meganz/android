@@ -4,7 +4,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -25,18 +25,18 @@ class GetUploadVideoQualityUseCaseTest {
 
     private lateinit var underTest: GetUploadVideoQualityUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = GetUploadVideoQualityUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @ParameterizedTest(name = "and returns {0}, and use case returns {0}")
@@ -45,7 +45,7 @@ class GetUploadVideoQualityUseCaseTest {
         input: VideoQuality?,
         expected: VideoQuality,
     ) = runTest {
-        whenever(cameraUploadRepository.getUploadVideoQuality()).thenReturn(input)
+        whenever(cameraUploadsRepository.getUploadVideoQuality()).thenReturn(input)
         val actual = underTest()
         Truth.assertThat(actual).isEqualTo(expected)
     }

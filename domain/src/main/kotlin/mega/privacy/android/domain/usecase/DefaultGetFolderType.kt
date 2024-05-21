@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
@@ -12,7 +12,7 @@ import javax.inject.Inject
  * Default [GetFolderType] implementation
  */
 class DefaultGetFolderType @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
     private val chatRepository: ChatRepository,
     private val monitorBackupFolder: MonitorBackupFolder,
     private val hasAncestor: HasAncestor,
@@ -31,8 +31,8 @@ class DefaultGetFolderType @Inject constructor(
 
 
     private suspend fun isMediaSyncFolder(folder: NodeId) =
-        folder.longValue in listOf(cameraUploadRepository.getPrimarySyncHandle(),
-            cameraUploadRepository.getSecondarySyncHandle())
+        folder.longValue in listOf(cameraUploadsRepository.getPrimarySyncHandle(),
+            cameraUploadsRepository.getSecondarySyncHandle())
 
     private suspend fun isChatFolder(folder: NodeId) =
         chatRepository.getChatFilesFolderId() == folder

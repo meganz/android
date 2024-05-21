@@ -6,8 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
-import mega.privacy.android.domain.repository.CameraUploadRepository
-import org.junit.jupiter.api.Assertions.*
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,7 +21,7 @@ class MonitorCameraUploadsStatusInfoUseCaseTest {
 
     private lateinit var underTest: MonitorCameraUploadsStatusInfoUseCase
 
-    private val cameraUploadsRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {

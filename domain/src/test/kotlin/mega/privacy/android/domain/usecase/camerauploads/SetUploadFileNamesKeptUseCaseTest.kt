@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -22,18 +22,18 @@ class SetUploadFileNamesKeptUseCaseTest {
 
     private lateinit var underTest: SetUploadFileNamesKeptUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = SetUploadFileNamesKeptUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @ParameterizedTest(name = "keep file names: {0}")
@@ -41,6 +41,6 @@ class SetUploadFileNamesKeptUseCaseTest {
     fun `test that the file names for uploads are handled`(keepFileNames: Boolean) = runTest {
         underTest(keepFileNames)
 
-        verify(cameraUploadRepository, times(1)).setUploadFileNamesKept(keepFileNames)
+        verify(cameraUploadsRepository, times(1)).setUploadFileNamesKept(keepFileNames)
     }
 }

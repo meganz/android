@@ -1,9 +1,7 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.BroadcastFolderDestinationUpdateUseCase
-import mega.privacy.android.domain.usecase.backup.SetupOrUpdateCameraUploadsBackupUseCase
 import javax.inject.Inject
 
 /**

@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -19,24 +19,24 @@ class SetVideoCompressionSizeLimitUseCaseTest {
 
     private lateinit var underTest: SetVideoCompressionSizeLimitUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = SetVideoCompressionSizeLimitUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
     @BeforeAll
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @Test
     fun `test that the new video compression size limit is set`() = runTest {
         underTest(300)
 
-        verify(cameraUploadRepository).setVideoCompressionSizeLimit(300)
+        verify(cameraUploadsRepository).setVideoCompressionSizeLimit(300)
     }
 }

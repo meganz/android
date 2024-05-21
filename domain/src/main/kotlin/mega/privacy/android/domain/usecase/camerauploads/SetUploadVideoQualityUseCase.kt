@@ -1,16 +1,16 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Use Case to set the Video Quality of Videos to be uploaded
  *
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  */
 class SetUploadVideoQualityUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -19,5 +19,5 @@ class SetUploadVideoQualityUseCase @Inject constructor(
      * @param videoQuality The new [VideoQuality]
      */
     suspend operator fun invoke(videoQuality: VideoQuality) =
-        cameraUploadRepository.setUploadVideoQuality(videoQuality)
+        cameraUploadsRepository.setUploadVideoQuality(videoQuality)
 }

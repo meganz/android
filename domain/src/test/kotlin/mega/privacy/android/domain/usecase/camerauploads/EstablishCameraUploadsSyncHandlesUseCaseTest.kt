@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +25,7 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
 
     private lateinit var underTest: EstablishCameraUploadsSyncHandlesUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val getCameraUploadsSyncHandlesUseCase = mock<GetCameraUploadsSyncHandlesUseCase>()
     private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
     private val setSetPrimaryNodeIdUseCase = mock<SetPrimaryNodeIdUseCase>()
@@ -34,7 +34,7 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest = EstablishCameraUploadsSyncHandlesUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             getCameraUploadsSyncHandlesUseCase = getCameraUploadsSyncHandlesUseCase,
             isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
             setPrimaryNodeIdUseCase = setSetPrimaryNodeIdUseCase,
@@ -45,7 +45,7 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            cameraUploadRepository,
+            cameraUploadsRepository,
             getCameraUploadsSyncHandlesUseCase,
             isNodeInRubbishOrDeletedUseCase,
             setSetPrimaryNodeIdUseCase,
@@ -82,8 +82,8 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
 
             underTest()
 
-            verify(setSetPrimaryNodeIdUseCase).invoke(NodeId(cameraUploadRepository.getInvalidHandle()))
-            verify(setSecondaryNodeIdUseCase).invoke(NodeId(cameraUploadRepository.getInvalidHandle()))
+            verify(setSetPrimaryNodeIdUseCase).invoke(NodeId(cameraUploadsRepository.getInvalidHandle()))
+            verify(setSecondaryNodeIdUseCase).invoke(NodeId(cameraUploadsRepository.getInvalidHandle()))
         }
 
     companion object {

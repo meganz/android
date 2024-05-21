@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,18 +24,18 @@ import org.mockito.kotlin.verify
 internal class UpdateBackupStateUseCaseTest {
     private lateinit var underTest: UpdateBackupStateUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = UpdateBackupStateUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @Test
@@ -54,7 +54,7 @@ internal class UpdateBackupStateUseCaseTest {
             targetFolderPath = "",
         )
 
-        cameraUploadRepository.stub {
+        cameraUploadsRepository.stub {
             onBlocking {
                 updateRemoteBackupState(
                     backupId = backupId,
@@ -68,7 +68,7 @@ internal class UpdateBackupStateUseCaseTest {
             backupId = backupId,
             backupState = newBackupState,
         )
-        verify(cameraUploadRepository).updateLocalBackup(backup.copy(state = newBackupState))
+        verify(cameraUploadsRepository).updateLocalBackup(backup.copy(state = newBackupState))
     }
 
     @Test
@@ -76,7 +76,7 @@ internal class UpdateBackupStateUseCaseTest {
         val backupId = 123L
         val newBackupState = BackupState.ACTIVE
 
-        cameraUploadRepository.stub {
+        cameraUploadsRepository.stub {
             onBlocking {
                 updateRemoteBackupState(
                     backupId = backupId,
@@ -90,6 +90,6 @@ internal class UpdateBackupStateUseCaseTest {
             backupId = backupId,
             backupState = newBackupState,
         )
-        verify(cameraUploadRepository, never()).updateLocalBackup(any())
+        verify(cameraUploadsRepository, never()).updateLocalBackup(any())
     }
 }

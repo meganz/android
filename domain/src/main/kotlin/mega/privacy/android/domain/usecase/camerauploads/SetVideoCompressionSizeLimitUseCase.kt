@@ -1,13 +1,13 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Use Case that sets the maximum video file size that can be compressed
  */
 class SetVideoCompressionSizeLimitUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -16,5 +16,5 @@ class SetVideoCompressionSizeLimitUseCase @Inject constructor(
      * @param size The maximum video file size that can be compressed
      */
     suspend operator fun invoke(size: Int) =
-        cameraUploadRepository.setVideoCompressionSizeLimit(size)
+        cameraUploadsRepository.setVideoCompressionSizeLimit(size)
 }

@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.Assert
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -21,13 +21,13 @@ class SetupSecondaryFolderUseCaseTest {
     private lateinit var underTest: SetupSecondaryFolderUseCase
     private val invalidHandle = -1L
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val setSecondaryNodeIdUseCase = mock<SetSecondaryNodeIdUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = SetupSecondaryFolderUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             setSecondaryNodeIdUseCase = setSecondaryNodeIdUseCase,
         )
     }
@@ -35,7 +35,7 @@ class SetupSecondaryFolderUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            cameraUploadRepository,
+            cameraUploadsRepository,
             setSecondaryNodeIdUseCase,
         )
     }
@@ -44,8 +44,8 @@ class SetupSecondaryFolderUseCaseTest {
     fun `test that if setup secondary folder returns a success that secondary attributes get updated`() =
         runTest {
             val result = 69L
-            whenever(cameraUploadRepository.setupSecondaryFolder(any())).thenReturn(69L)
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
+            whenever(cameraUploadsRepository.setupSecondaryFolder(any())).thenReturn(69L)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(invalidHandle)
             underTest(any())
             verify(setSecondaryNodeIdUseCase).invoke(NodeId(result))
         }
@@ -53,18 +53,18 @@ class SetupSecondaryFolderUseCaseTest {
     @Test
     fun `test that if setup secondary folder returns an invalid handle that secondary attributes do not update`() =
         runTest {
-            whenever(cameraUploadRepository.setupSecondaryFolder(any())).thenReturn(invalidHandle)
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
+            whenever(cameraUploadsRepository.setupSecondaryFolder(any())).thenReturn(invalidHandle)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(invalidHandle)
             underTest(any())
-            verify(cameraUploadRepository).setupSecondaryFolder(any())
-            verify(cameraUploadRepository).getInvalidHandle()
+            verify(cameraUploadsRepository).setupSecondaryFolder(any())
+            verify(cameraUploadsRepository).getInvalidHandle()
             verifyNoInteractions(setSecondaryNodeIdUseCase)
         }
 
     @Test
     fun `test that if setup secondary folder returns an error, then throws an error`() =
         runTest {
-            whenever(cameraUploadRepository.setupSecondaryFolder(any())).thenAnswer { throw Exception() }
+            whenever(cameraUploadsRepository.setupSecondaryFolder(any())).thenAnswer { throw Exception() }
             Assert.assertThrows(Exception::class.java) {
                 runBlocking { underTest(any()) }
             }

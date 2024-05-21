@@ -1,16 +1,16 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Clear the camera uploads record
  *
- * @param cameraUploadRepository
+ * @param cameraUploadsRepository
  */
 class ClearCameraUploadsRecordUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -19,5 +19,5 @@ class ClearCameraUploadsRecordUseCase @Inject constructor(
      * @param folderTypes a list of folder type (Primary, Secondary, or both)
      */
     suspend operator fun invoke(folderTypes: List<CameraUploadFolderType>) =
-        cameraUploadRepository.clearRecords(folderTypes)
+        cameraUploadsRepository.clearRecords(folderTypes)
 }

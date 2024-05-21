@@ -11,7 +11,7 @@ import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.camerauploads.mapper.CameraUploadsRecordMapper
 import javax.inject.Inject
 
@@ -19,7 +19,7 @@ import javax.inject.Inject
  * Retrieve a list of [CameraUploadsMedia] from the media store
  */
 class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
     private val cameraUploadsRecordMapper: CameraUploadsRecordMapper,
 ) {
 
@@ -38,15 +38,15 @@ class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
         fileType: CameraUploadsRecordType,
         tempRoot: String,
     ): List<CameraUploadsRecord> = coroutineScope {
-        val selectionQuery = cameraUploadRepository.getMediaSelectionQuery(parentPath)
+        val selectionQuery = cameraUploadsRepository.getMediaSelectionQuery(parentPath)
 
         val (recordsInPrimaryFolder, recordsInSecondaryFolder) =
-            cameraUploadRepository.getAllCameraUploadsRecords()
+            cameraUploadsRepository.getAllCameraUploadsRecords()
                 .partition { it.folderType == CameraUploadFolderType.Primary }
 
         val semaphore = Semaphore(8)
         return@coroutineScope types.flatMap {
-            cameraUploadRepository.getMediaList(
+            cameraUploadsRepository.getMediaList(
                 mediaStoreFileType = it,
                 selectionQuery = selectionQuery,
             ).map {

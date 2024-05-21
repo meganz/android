@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.backup
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.backup.BackupInfoType
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadBackupIDUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateBackupUseCase
@@ -32,7 +32,7 @@ internal class SetupOrUpdateMediaUploadsBackupUseCaseTest {
     private val getMediaUploadBackupIDUseCase: GetMediaUploadBackupIDUseCase = mock()
     private val setupMediaUploadsBackupUseCase: SetupMediaUploadsBackupUseCase = mock()
     private val updateBackupUseCase: UpdateBackupUseCase = mock()
-    private val cameraUploadRepository: CameraUploadRepository = mock()
+    private val cameraUploadsRepository: CameraUploadsRepository = mock()
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled = mock()
 
     @BeforeAll
@@ -41,7 +41,7 @@ internal class SetupOrUpdateMediaUploadsBackupUseCaseTest {
             getMediaUploadBackupIDUseCase,
             setupMediaUploadsBackupUseCase,
             updateBackupUseCase,
-            cameraUploadRepository,
+            cameraUploadsRepository,
             isSecondaryFolderEnabled,
         )
     }
@@ -52,7 +52,7 @@ internal class SetupOrUpdateMediaUploadsBackupUseCaseTest {
             getMediaUploadBackupIDUseCase,
             setupMediaUploadsBackupUseCase,
             updateBackupUseCase,
-            cameraUploadRepository,
+            cameraUploadsRepository,
             isSecondaryFolderEnabled,
         )
     }
@@ -66,7 +66,7 @@ internal class SetupOrUpdateMediaUploadsBackupUseCaseTest {
                 getMediaUploadBackupIDUseCase,
                 setupMediaUploadsBackupUseCase,
                 updateBackupUseCase,
-                cameraUploadRepository,
+                cameraUploadsRepository,
             )
         }
 
@@ -78,7 +78,7 @@ internal class SetupOrUpdateMediaUploadsBackupUseCaseTest {
             val backupName = "Media Uploads"
             whenever(isSecondaryFolderEnabled()).thenReturn(true)
             whenever(getMediaUploadBackupIDUseCase()).thenReturn(backupId)
-            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(backupName)
+            whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(backupName)
             underTest(targetNode = 456L, localFolder = "/path/to/local/folder")
             verify(setupMediaUploadsBackupUseCase).invoke(backupName)
         }
@@ -92,7 +92,7 @@ internal class SetupOrUpdateMediaUploadsBackupUseCaseTest {
             val localFolder = "/path/to/local/folder"
             whenever(isSecondaryFolderEnabled()).thenReturn(true)
             whenever(getMediaUploadBackupIDUseCase()).thenReturn(backupId)
-            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(backupName)
+            whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(backupName)
             underTest(targetNode = targetNode, localFolder = localFolder)
             verify(updateBackupUseCase).invoke(
                 backupId = backupId,

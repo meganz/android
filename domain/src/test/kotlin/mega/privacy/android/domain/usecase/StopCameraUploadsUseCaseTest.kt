@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -22,13 +22,13 @@ class StopCameraUploadsUseCaseTest {
     private lateinit var underTest: StopCameraUploadsUseCase
 
     private val disableCameraUploadsUseCase = mock<DisableCameraUploadsUseCase>()
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = StopCameraUploadsUseCase(
             disableCameraUploadsUseCase = disableCameraUploadsUseCase,
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
@@ -36,56 +36,56 @@ class StopCameraUploadsUseCaseTest {
     fun resetMocks() {
         reset(
             disableCameraUploadsUseCase,
-            cameraUploadRepository,
+            cameraUploadsRepository,
         )
     }
 
     @Test
     fun `test that Camera Uploads is not disabled if the Camera Uploads were previously disabled`() =
         runTest {
-            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(false)
+            whenever(cameraUploadsRepository.isCameraUploadsEnabled()).thenReturn(false)
             underTest(mock())
-            verify(cameraUploadRepository, never()).stopCameraUploads()
+            verify(cameraUploadsRepository, never()).stopCameraUploads()
         }
 
     @Test
     fun `test that Camera Uploads is disabled if the Camera Uploads were previously enabled`() =
         runTest {
-            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
+            whenever(cameraUploadsRepository.isCameraUploadsEnabled()).thenReturn(true)
             underTest(mock())
-            verify(cameraUploadRepository).stopCameraUploads()
+            verify(cameraUploadsRepository).stopCameraUploads()
         }
 
     @Test
     fun `test that Camera Uploads should restart immediately if restart mode is RestartImmediately `() =
         runTest {
-            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
+            whenever(cameraUploadsRepository.isCameraUploadsEnabled()).thenReturn(true)
             underTest(CameraUploadsRestartMode.RestartImmediately)
-            verify(cameraUploadRepository).startCameraUploads()
+            verify(cameraUploadsRepository).startCameraUploads()
         }
 
     @Test
     fun `test that Camera Uploads should be rescheduled immediately if restart mode is Reschedule`() =
         runTest {
-            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
+            whenever(cameraUploadsRepository.isCameraUploadsEnabled()).thenReturn(true)
             underTest(CameraUploadsRestartMode.Reschedule)
-            verify(cameraUploadRepository).scheduleCameraUploads()
+            verify(cameraUploadsRepository).scheduleCameraUploads()
         }
 
     @Test
     fun `test that Camera Uploads should be stopped if restart mode is Stop`() =
         runTest {
-            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
+            whenever(cameraUploadsRepository.isCameraUploadsEnabled()).thenReturn(true)
             underTest(CameraUploadsRestartMode.Stop)
-            verify(cameraUploadRepository).stopCameraUploads()
+            verify(cameraUploadsRepository).stopCameraUploads()
         }
 
     @Test
     fun `test that Camera Uploads should be disabled if restart mode is StopAndDisable`() =
         runTest {
-            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
+            whenever(cameraUploadsRepository.isCameraUploadsEnabled()).thenReturn(true)
             underTest(CameraUploadsRestartMode.StopAndDisable)
-            verify(cameraUploadRepository).stopCameraUploadsAndBackupHeartbeat()
+            verify(cameraUploadsRepository).stopCameraUploadsAndBackupHeartbeat()
             verify(disableCameraUploadsUseCase).invoke()
         }
 }

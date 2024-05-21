@@ -1,16 +1,16 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Use Case to set the Upload Option of Camera Uploads
  *
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  */
 class SetUploadOptionUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -19,5 +19,5 @@ class SetUploadOptionUseCase @Inject constructor(
      * @param uploadOption The [UploadOption] to set
      */
     suspend operator fun invoke(uploadOption: UploadOption) =
-        cameraUploadRepository.setUploadOption(uploadOption)
+        cameraUploadsRepository.setUploadOption(uploadOption)
 }

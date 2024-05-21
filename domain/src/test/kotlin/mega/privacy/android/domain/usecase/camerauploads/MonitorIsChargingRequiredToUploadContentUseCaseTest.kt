@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,22 +21,22 @@ internal class MonitorIsChargingRequiredToUploadContentUseCaseTest {
 
     private lateinit var underTest: MonitorIsChargingRequiredToUploadContentUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = MonitorIsChargingRequiredToUploadContentUseCase(cameraUploadRepository)
+        underTest = MonitorIsChargingRequiredToUploadContentUseCase(cameraUploadsRepository)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @Test
     fun `test that the charging state is returned`() = runTest {
         val chargingRequired = true
-        whenever(cameraUploadRepository.monitorIsChargingRequiredToUploadContent()).thenReturn(
+        whenever(cameraUploadsRepository.monitorIsChargingRequiredToUploadContent()).thenReturn(
             flowOf(chargingRequired)
         )
 
@@ -48,7 +48,7 @@ internal class MonitorIsChargingRequiredToUploadContentUseCaseTest {
 
     @Test
     fun `test that the charging state defaults to false if it cannot be retrieved`() = runTest {
-        whenever(cameraUploadRepository.monitorIsChargingRequiredToUploadContent()).thenReturn(
+        whenever(cameraUploadsRepository.monitorIsChargingRequiredToUploadContent()).thenReturn(
             flowOf(null)
         )
 

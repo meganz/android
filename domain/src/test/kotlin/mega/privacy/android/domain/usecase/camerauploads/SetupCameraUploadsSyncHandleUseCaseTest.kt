@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.backup.SetupOrUpdateCameraUploadsBackupUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -21,28 +21,28 @@ class SetupCameraUploadsSyncHandleUseCaseTest {
 
     private lateinit var underTest: SetupCameraUploadsSyncHandleUseCase
 
-    private val cameraUploadRepository: CameraUploadRepository = mock()
+    private val cameraUploadsRepository: CameraUploadsRepository = mock()
     private val setupOrUpdateCameraUploadsBackupUseCase: SetupOrUpdateCameraUploadsBackupUseCase =
         mock()
 
     @BeforeAll
     fun setUp() {
         underTest = SetupCameraUploadsSyncHandleUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             setupOrUpdateCameraUploadsBackupUseCase = setupOrUpdateCameraUploadsBackupUseCase
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository, setupOrUpdateCameraUploadsBackupUseCase)
+        reset(cameraUploadsRepository, setupOrUpdateCameraUploadsBackupUseCase)
     }
 
     @Test
     fun `test that it sets up camera uploads sync handle when invoked`() = runTest {
         val handle = 1234L
         underTest(handle)
-        verify(cameraUploadRepository).setPrimarySyncHandle(handle)
+        verify(cameraUploadsRepository).setPrimarySyncHandle(handle)
         verify(setupOrUpdateCameraUploadsBackupUseCase).invoke(
             targetNode = handle,
             localFolder = null

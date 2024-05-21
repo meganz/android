@@ -6,9 +6,8 @@ import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -26,14 +25,14 @@ import java.util.stream.Stream
 class GetPendingCameraUploadsRecordsUseCaseTest {
     private lateinit var underTest: GetPendingCameraUploadsRecordsUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
 
     @BeforeAll
     fun setUp() {
         underTest = GetPendingCameraUploadsRecordsUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             getUploadOptionUseCase = getUploadOptionUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
         )
@@ -42,7 +41,7 @@ class GetPendingCameraUploadsRecordsUseCaseTest {
     @BeforeEach
     fun resetMock() {
         reset(
-            cameraUploadRepository,
+            cameraUploadsRepository,
             getUploadOptionUseCase,
             isSecondaryFolderEnabled,
         )
@@ -77,7 +76,7 @@ class GetPendingCameraUploadsRecordsUseCaseTest {
 
         underTest()
 
-        verify(cameraUploadRepository)
+        verify(cameraUploadsRepository)
             .getCameraUploadsRecordsBy(
                 expectedUploadStatus,
                 expectedTypes,

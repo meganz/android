@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.backup
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.backup.BackupInfoType
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadBackupIDUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateBackupUseCase
@@ -32,7 +32,7 @@ internal class SetupOrUpdateCameraUploadsBackupUseCaseTest {
     private val getCameraUploadBackupIDUseCase: GetCameraUploadBackupIDUseCase = mock()
     private val setupCameraUploadsBackupUseCase: SetupCameraUploadsBackupUseCase = mock()
     private val updateBackupUseCase: UpdateBackupUseCase = mock()
-    private val cameraUploadRepository: CameraUploadRepository = mock()
+    private val cameraUploadsRepository: CameraUploadsRepository = mock()
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase = mock()
 
     @BeforeAll
@@ -41,7 +41,7 @@ internal class SetupOrUpdateCameraUploadsBackupUseCaseTest {
             getCameraUploadBackupIDUseCase = getCameraUploadBackupIDUseCase,
             setupCameraUploadsBackupUseCase = setupCameraUploadsBackupUseCase,
             updateBackupUseCase = updateBackupUseCase,
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
         )
     }
@@ -52,7 +52,7 @@ internal class SetupOrUpdateCameraUploadsBackupUseCaseTest {
             getCameraUploadBackupIDUseCase,
             setupCameraUploadsBackupUseCase,
             updateBackupUseCase,
-            cameraUploadRepository,
+            cameraUploadsRepository,
             isCameraUploadsEnabledUseCase
         )
     }
@@ -66,7 +66,7 @@ internal class SetupOrUpdateCameraUploadsBackupUseCaseTest {
                 getCameraUploadBackupIDUseCase,
                 setupCameraUploadsBackupUseCase,
                 updateBackupUseCase,
-                cameraUploadRepository,
+                cameraUploadsRepository,
             )
         }
 
@@ -78,7 +78,7 @@ internal class SetupOrUpdateCameraUploadsBackupUseCaseTest {
             val backupName = "Camera Uploads"
             whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
             whenever(getCameraUploadBackupIDUseCase()).thenReturn(backupId)
-            whenever(cameraUploadRepository.getCameraUploadsName()).thenReturn(backupName)
+            whenever(cameraUploadsRepository.getCameraUploadsName()).thenReturn(backupName)
             underTest(targetNode = 456L, localFolder = "/path/to/local/folder")
             verify(setupCameraUploadsBackupUseCase).invoke(backupName)
         }
@@ -92,7 +92,7 @@ internal class SetupOrUpdateCameraUploadsBackupUseCaseTest {
             val localFolder = "/path/to/local/folder"
             whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
             whenever(getCameraUploadBackupIDUseCase()).thenReturn(backupId)
-            whenever(cameraUploadRepository.getCameraUploadsName()).thenReturn(backupName)
+            whenever(cameraUploadsRepository.getCameraUploadsName()).thenReturn(backupName)
             underTest(targetNode = targetNode, localFolder = localFolder)
             verify(updateBackupUseCase).invoke(
                 backupId = backupId,

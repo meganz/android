@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,7 +24,7 @@ internal class UpdateSecondaryFolderBackupStateUseCaseTest {
 
     private lateinit var underTest: UpdateSecondaryFolderBackupStateUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val updateBackupStateUseCase = mock<UpdateBackupStateUseCase>()
 
     private val invalidHandle = -1L
@@ -56,21 +56,21 @@ internal class UpdateSecondaryFolderBackupStateUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest = UpdateSecondaryFolderBackupStateUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             updateBackupStateUseCase = updateBackupStateUseCase,
         )
     }
 
     @BeforeEach
     fun resetMock() {
-        reset(cameraUploadRepository, updateBackupStateUseCase)
+        reset(cameraUploadsRepository, updateBackupStateUseCase)
     }
 
     @Test
     fun `test that the secondary folder backup state is updated when sync is enabled and backup id exists and is valid and has changed`() =
         runTest {
-            whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
-            whenever(cameraUploadRepository.getMuBackUp()).thenReturn(fakeBackup)
+            whenever(cameraUploadsRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
+            whenever(cameraUploadsRepository.getMuBackUp()).thenReturn(fakeBackup)
 
             underTest(BackupState.ACTIVE)
             verify(updateBackupStateUseCase).invoke(
@@ -82,7 +82,7 @@ internal class UpdateSecondaryFolderBackupStateUseCaseTest {
     @Test
     fun `test that the secondary folder backup state is not updated when sync is disabled`() =
         runTest {
-            whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(false)
+            whenever(cameraUploadsRepository.isSecondaryMediaFolderEnabled()).thenReturn(false)
             underTest(BackupState.ACTIVE)
             verifyNoInteractions(updateBackupStateUseCase)
         }
@@ -90,9 +90,9 @@ internal class UpdateSecondaryFolderBackupStateUseCaseTest {
     @Test
     fun `test that the secondary folder backup state is not updated when sync is enabled and backup id is invalid`() =
         runTest {
-            whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(false)
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
-            whenever(cameraUploadRepository.getMuBackUp()).thenReturn(invalidBackup)
+            whenever(cameraUploadsRepository.isSecondaryMediaFolderEnabled()).thenReturn(false)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(invalidHandle)
+            whenever(cameraUploadsRepository.getMuBackUp()).thenReturn(invalidBackup)
 
             underTest(backupState = BackupState.ACTIVE)
             verifyNoInteractions(updateBackupStateUseCase)
@@ -101,8 +101,8 @@ internal class UpdateSecondaryFolderBackupStateUseCaseTest {
     @Test
     fun `test that the secondary folder backup state is not updated when sync is enabled and backup id exists and is valid but not changed`() =
         runTest {
-            whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
-            whenever(cameraUploadRepository.getMuBackUp()).thenReturn(fakeBackup)
+            whenever(cameraUploadsRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
+            whenever(cameraUploadsRepository.getMuBackUp()).thenReturn(fakeBackup)
 
             underTest(backupState = BackupState.INVALID)
             verifyNoInteractions(updateBackupStateUseCase)
@@ -111,8 +111,8 @@ internal class UpdateSecondaryFolderBackupStateUseCaseTest {
     @Test
     fun `test that the secondary folder backup state is not updated when sync is enabled and backup is null`() =
         runTest {
-            whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
-            whenever(cameraUploadRepository.getMuBackUp()).thenReturn(null)
+            whenever(cameraUploadsRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
+            whenever(cameraUploadsRepository.getMuBackUp()).thenReturn(null)
 
             underTest(backupState = BackupState.INVALID)
             verifyNoInteractions(updateBackupStateUseCase)

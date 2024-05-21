@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.node
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,16 +16,16 @@ import org.mockito.kotlin.verify
 class RenameNodeUseCaseTest {
 
     private lateinit var underTest: RenameNodeUseCase
-    private val cameraUploadRepository: CameraUploadRepository = mock()
+    private val cameraUploadsRepository: CameraUploadsRepository = mock()
 
     @BeforeAll
     fun setUp() {
-        underTest = RenameNodeUseCase(cameraUploadRepository)
+        underTest = RenameNodeUseCase(cameraUploadsRepository)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @Test
@@ -36,6 +36,6 @@ class RenameNodeUseCaseTest {
 
             underTest(nodeHandle, newName)
 
-            verify(cameraUploadRepository).renameNode(nodeHandle, newName)
+            verify(cameraUploadsRepository).renameNode(nodeHandle, newName)
         }
 }

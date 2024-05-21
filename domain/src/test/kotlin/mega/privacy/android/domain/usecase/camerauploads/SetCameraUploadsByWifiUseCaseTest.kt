@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -21,18 +21,18 @@ class SetCameraUploadsByWifiUseCaseTest {
 
     private lateinit var underTest: SetCameraUploadsByWifiUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = SetCameraUploadsByWifiUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @ParameterizedTest(name = "wifi only: {0}")
@@ -41,6 +41,6 @@ class SetCameraUploadsByWifiUseCaseTest {
         runTest {
             underTest(wifiOnly)
 
-            verify(cameraUploadRepository).setCameraUploadsByWifi(wifiOnly)
+            verify(cameraUploadsRepository).setCameraUploadsByWifi(wifiOnly)
         }
 }

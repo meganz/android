@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFolderState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -19,10 +19,10 @@ private const val ACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30L
 
 /**
  * Send Backup Heart Beat Use Case when camera uploads process is ongoing
- * @param cameraUploadRepository [CameraUploadRepository]
+ * @param cameraUploadsRepository [CameraUploadsRepository]
  */
 class SendBackupHeartBeatSyncUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
 ) {
@@ -36,7 +36,7 @@ class SendBackupHeartBeatSyncUseCase @Inject constructor(
     ) = flow {
         while (true) {
             emit(Unit)
-            cameraUploadRepository.getCuBackUp()?.let {
+            cameraUploadsRepository.getCuBackUp()?.let {
                 sendCameraUploadsHeartbeatIfNeeded(
                     cameraUploadsFolderState = cameraUploadsStateProvider().primaryCameraUploadsState,
                     backup = it,
@@ -44,7 +44,7 @@ class SendBackupHeartBeatSyncUseCase @Inject constructor(
                 )
             }
 
-            cameraUploadRepository.getMuBackUp()?.let {
+            cameraUploadsRepository.getMuBackUp()?.let {
                 sendCameraUploadsHeartbeatIfNeeded(
                     cameraUploadsFolderState = cameraUploadsStateProvider().secondaryCameraUploadsState,
                     backup = it,
@@ -62,7 +62,7 @@ class SendBackupHeartBeatSyncUseCase @Inject constructor(
     ) {
         with(cameraUploadsFolderState) {
             if (shouldSendCameraUploadsHeartbeat(this, backup, cameraUploadsFolderType)) {
-                cameraUploadRepository.sendBackupHeartbeatSync(
+                cameraUploadsRepository.sendBackupHeartbeatSync(
                     backupId = backup.backupId,
                     progress = progress,
                     ups = pendingCount,

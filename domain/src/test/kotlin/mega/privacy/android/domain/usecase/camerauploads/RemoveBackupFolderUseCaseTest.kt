@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,53 +23,53 @@ class RemoveBackupFolderUseCaseTest {
 
     private lateinit var underTest: RemoveBackupFolderUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val backupId = Random.nextLong()
 
     @BeforeAll
     fun setUp() {
         underTest = RemoveBackupFolderUseCase(
-            cameraUploadRepository = cameraUploadRepository
+            cameraUploadsRepository = cameraUploadsRepository
         )
     }
 
     @BeforeEach
     fun resetMock() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @Test
     fun `test that remove backup folder is not called when the backup id is null`() = runTest {
-        whenever(cameraUploadRepository.getBackupFolderId(any())).thenReturn(null)
+        whenever(cameraUploadsRepository.getBackupFolderId(any())).thenReturn(null)
         underTest(cameraUploadFolderType = CameraUploadFolderType.Primary)
-        verify(cameraUploadRepository, never()).removeBackupFolder(any())
+        verify(cameraUploadsRepository, never()).removeBackupFolder(any())
     }
 
     @Test
     fun `test that the backup folder is deleted from the database when removeBackupFolder return success response`() =
         runTest {
-            whenever(cameraUploadRepository.getBackupFolderId(any())).thenReturn(backupId)
-            whenever(cameraUploadRepository.removeBackupFolder(backupId))
+            whenever(cameraUploadsRepository.getBackupFolderId(any())).thenReturn(backupId)
+            whenever(cameraUploadsRepository.removeBackupFolder(backupId))
                 .thenReturn(Pair(backupId, 0))
             underTest(cameraUploadFolderType = CameraUploadFolderType.Primary)
-            verify(cameraUploadRepository).deleteBackupById(backupId)
+            verify(cameraUploadsRepository).deleteBackupById(backupId)
         }
 
     @Test
     fun `test that the backup folder is set as outdated when removeBackupFolder did not return success response`() {
         runTest {
-            whenever(cameraUploadRepository.getBackupFolderId(any())).thenReturn(backupId)
-            whenever(cameraUploadRepository.removeBackupFolder(backupId))
+            whenever(cameraUploadsRepository.getBackupFolderId(any())).thenReturn(backupId)
+            whenever(cameraUploadsRepository.removeBackupFolder(backupId))
                 .thenReturn(Pair(backupId, 120))
             underTest(cameraUploadFolderType = CameraUploadFolderType.Primary)
-            verify(cameraUploadRepository).setBackupAsOutdated(backupId)
+            verify(cameraUploadsRepository).setBackupAsOutdated(backupId)
         }
     }
 
     @Test
     fun `test that error is thrown when removeBackUpFolder throws some error`() = runTest {
-        whenever(cameraUploadRepository.getBackupFolderId(any())).thenReturn(backupId)
-        whenever(cameraUploadRepository.removeBackupFolder(backupId = backupId))
+        whenever(cameraUploadsRepository.getBackupFolderId(any())).thenReturn(backupId)
+        whenever(cameraUploadsRepository.removeBackupFolder(backupId = backupId))
             .thenThrow(RuntimeException("remove backup folder failed"))
         assertThrows<RuntimeException> {
             underTest(cameraUploadFolderType = CameraUploadFolderType.Primary)

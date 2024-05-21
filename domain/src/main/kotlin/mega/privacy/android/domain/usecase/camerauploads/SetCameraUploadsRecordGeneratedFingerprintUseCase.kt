@@ -1,14 +1,14 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Set the generated fingerprint for the camera uploads record
  */
 class SetCameraUploadsRecordGeneratedFingerprintUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -24,7 +24,7 @@ class SetCameraUploadsRecordGeneratedFingerprintUseCase @Inject constructor(
         timestamp: Long,
         folderType: CameraUploadFolderType,
         generatedFingerprint: String,
-    ) = cameraUploadRepository.setRecordGeneratedFingerprint(
+    ) = cameraUploadsRepository.setRecordGeneratedFingerprint(
         mediaId = mediaId,
         timestamp = timestamp,
         folderType = folderType,

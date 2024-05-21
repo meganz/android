@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -19,12 +19,12 @@ class GetMediaUploadBackupIDUseCaseTest {
 
     private lateinit var underTest: GetMediaUploadBackupIDUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = GetMediaUploadBackupIDUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
@@ -32,7 +32,7 @@ class GetMediaUploadBackupIDUseCaseTest {
     internal fun `test that media upload backup id is returned when invoked`() =
         runTest {
             val expected = 1L
-            whenever(cameraUploadRepository.getMuBackUpId()).thenReturn(expected)
+            whenever(cameraUploadsRepository.getMuBackUpId()).thenReturn(expected)
             val actual = underTest()
             assertThat(actual).isEqualTo(expected)
         }

@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +25,7 @@ class SetupDefaultSecondaryFolderUseCaseTest {
     private val validHandle = 69L
     private val folderName = "Media Uploads"
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val getUploadFolderHandleUseCase = mock<GetUploadFolderHandleUseCase>()
     private val getDefaultNodeHandleUseCase = mock<GetDefaultNodeHandleUseCase>()
     private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
@@ -34,7 +34,7 @@ class SetupDefaultSecondaryFolderUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest = SetupDefaultSecondaryFolderUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             getUploadFolderHandleUseCase = getUploadFolderHandleUseCase,
             getDefaultNodeHandleUseCase = getDefaultNodeHandleUseCase,
             isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
@@ -45,7 +45,7 @@ class SetupDefaultSecondaryFolderUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            cameraUploadRepository,
+            cameraUploadsRepository,
             getUploadFolderHandleUseCase,
             getDefaultNodeHandleUseCase,
             isNodeInRubbishOrDeletedUseCase,
@@ -59,7 +59,7 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 validHandle
             )
-            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
+            whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest()
@@ -72,7 +72,7 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 validHandle
             )
-            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
+            whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest()
@@ -82,11 +82,11 @@ class SetupDefaultSecondaryFolderUseCaseTest {
     @Test
     fun `test that if secondary folder handle is invalid and deleted and default handle is invalid, that no new secondary folder gets setup`() =
         runTest {
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(invalidHandle)
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 invalidHandle
             )
-            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
+            whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest()
@@ -96,11 +96,11 @@ class SetupDefaultSecondaryFolderUseCaseTest {
     @Test
     fun `test that if secondary folder handle is valid and deleted and default handle is invalid, that no new secondary folder gets setup`() =
         runTest {
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(invalidHandle)
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 validHandle
             )
-            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
+            whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest()
@@ -113,7 +113,7 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 invalidHandle
             )
-            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
+            whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest()
@@ -126,7 +126,7 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 validHandle
             )
-            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
+            whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest()
@@ -136,11 +136,11 @@ class SetupDefaultSecondaryFolderUseCaseTest {
     @Test
     fun `test that if secondary folder handle is invalid and not deleted and default handle is valid, that a new secondary folder gets setup`() =
         runTest {
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(invalidHandle)
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 invalidHandle
             )
-            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
+            whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest()
@@ -153,7 +153,7 @@ class SetupDefaultSecondaryFolderUseCaseTest {
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)).thenReturn(
                 invalidHandle
             )
-            whenever(cameraUploadRepository.getMediaUploadsName()).thenReturn(folderName)
+            whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(folderName)
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest()

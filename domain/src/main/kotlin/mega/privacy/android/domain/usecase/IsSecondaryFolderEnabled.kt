@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
@@ -9,7 +9,7 @@ import javax.inject.Inject
  * @return true, if secondary enabled
  */
 class IsSecondaryFolderEnabled @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -17,5 +17,5 @@ class IsSecondaryFolderEnabled @Inject constructor(
      *
      * @return if secondary is enabled
      */
-    suspend operator fun invoke() = cameraUploadRepository.isSecondaryMediaFolderEnabled() ?: false
+    suspend operator fun invoke() = cameraUploadsRepository.isSecondaryMediaFolderEnabled() ?: false
 }

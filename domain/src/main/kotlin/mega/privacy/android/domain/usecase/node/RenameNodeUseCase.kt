@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.node
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
@@ -8,7 +8,7 @@ import javax.inject.Inject
  *
  */
 class RenameNodeUseCase @Inject constructor(
-    private val defaultCameraUploadsRepository: CameraUploadRepository,
+    private val defaultCameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**

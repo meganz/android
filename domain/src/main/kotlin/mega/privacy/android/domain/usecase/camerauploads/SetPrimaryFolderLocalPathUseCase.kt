@@ -1,15 +1,15 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Use Case that sets the new Primary Folder local path
  *
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  */
 class SetPrimaryFolderLocalPathUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -18,5 +18,5 @@ class SetPrimaryFolderLocalPathUseCase @Inject constructor(
      * @param localPath The new Primary Folder local path
      */
     suspend operator fun invoke(localPath: String) =
-        cameraUploadRepository.setPrimaryFolderLocalPath(localPath)
+        cameraUploadsRepository.setPrimaryFolderLocalPath(localPath)
 }

@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import org.junit.Before
 import org.junit.Test
@@ -39,7 +39,7 @@ class DefaultGetFolderTypeTest {
         }
         )
     }
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val hasAncestor = mock<HasAncestor> {
         onBlocking { invoke(folderId, backupFolderId.getOrThrow()) }.thenReturn(false)
     }
@@ -49,7 +49,7 @@ class DefaultGetFolderTypeTest {
     @Before
     fun setUp() {
         underTest = DefaultGetFolderType(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             chatRepository = chatRepository,
             monitorBackupFolder = monitorBackupFolder,
             hasAncestor = hasAncestor,
@@ -66,7 +66,7 @@ class DefaultGetFolderTypeTest {
 
     @Test
     fun `test that the primary sync folder is marked as a mediaFolder`() = runTest {
-        cameraUploadRepository.stub {
+        cameraUploadsRepository.stub {
             onBlocking { getPrimarySyncHandle() }.thenReturn(folderId.longValue)
         }
         val actual = underTest(testFolder)
@@ -76,7 +76,7 @@ class DefaultGetFolderTypeTest {
 
     @Test
     fun `tet that the secondary sync folder is marked as a media folder`() = runTest {
-        cameraUploadRepository.stub {
+        cameraUploadsRepository.stub {
             onBlocking { getSecondarySyncHandle() }.thenReturn(folderId.longValue)
         }
         val actual = underTest(testFolder)

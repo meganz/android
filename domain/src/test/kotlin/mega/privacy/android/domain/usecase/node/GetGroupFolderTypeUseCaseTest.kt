@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import org.junit.jupiter.api.BeforeAll
@@ -19,7 +19,7 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetGroupFolderTypeUseCaseTest {
 
-    private val cameraUploadRepository: CameraUploadRepository = mock()
+    private val cameraUploadsRepository: CameraUploadsRepository = mock()
     private val chatRepository: ChatRepository = mock()
     private val monitorBackupFolder: MonitorBackupFolder = mock()
     private lateinit var getGroupFolderTypeUseCase: GetGroupFolderTypeUseCase
@@ -27,12 +27,12 @@ class GetGroupFolderTypeUseCaseTest {
     @BeforeAll
     fun setUp() {
         getGroupFolderTypeUseCase =
-            GetGroupFolderTypeUseCase(cameraUploadRepository, chatRepository, monitorBackupFolder)
+            GetGroupFolderTypeUseCase(cameraUploadsRepository, chatRepository, monitorBackupFolder)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository, chatRepository, monitorBackupFolder)
+        reset(cameraUploadsRepository, chatRepository, monitorBackupFolder)
     }
 
     @Test
@@ -44,8 +44,8 @@ class GetGroupFolderTypeUseCaseTest {
             NodeId(4) to FolderType.RootBackup
         )
 
-        whenever(cameraUploadRepository.getPrimarySyncHandle()).thenReturn(1L)
-        whenever(cameraUploadRepository.getSecondarySyncHandle()).thenReturn(2L)
+        whenever(cameraUploadsRepository.getPrimarySyncHandle()).thenReturn(1L)
+        whenever(cameraUploadsRepository.getSecondarySyncHandle()).thenReturn(2L)
         whenever(chatRepository.getChatFilesFolderId()).thenReturn(NodeId(3))
         whenever(monitorBackupFolder()).thenReturn(flowOf(Result.success(NodeId(4))))
 

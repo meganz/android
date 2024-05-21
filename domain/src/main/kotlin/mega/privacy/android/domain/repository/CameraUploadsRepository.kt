@@ -18,15 +18,14 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 
 /**
- * Camera Upload Repository
+ * Repository containing all Camera Uploads related operations
  */
-interface CameraUploadRepository {
+interface CameraUploadsRepository {
 
     /**
      * Get Invalid Handle
      */
     fun getInvalidHandle(): Long
-
 
     /**
      * Get Invalid Backup type

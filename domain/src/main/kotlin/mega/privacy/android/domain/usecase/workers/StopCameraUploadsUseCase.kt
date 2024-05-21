@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.workers
 
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import javax.inject.Inject
 
@@ -10,32 +10,32 @@ import javax.inject.Inject
  */
 class StopCameraUploadsUseCase @Inject constructor(
     private val disableCameraUploadsUseCase: DisableCameraUploadsUseCase,
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
     /**
      * invoke
      * @param restartMode [CameraUploadsRestartMode]
      */
     suspend operator fun invoke(restartMode: CameraUploadsRestartMode) {
-        if (cameraUploadRepository.isCameraUploadsEnabled() == true) {
+        if (cameraUploadsRepository.isCameraUploadsEnabled() == true) {
             when (restartMode) {
                 CameraUploadsRestartMode.RestartImmediately -> {
-                    cameraUploadRepository.stopCameraUploads()
-                    cameraUploadRepository.startCameraUploads()
+                    cameraUploadsRepository.stopCameraUploads()
+                    cameraUploadsRepository.startCameraUploads()
                 }
 
                 CameraUploadsRestartMode.Reschedule -> {
-                    cameraUploadRepository.stopCameraUploads()
-                    cameraUploadRepository.scheduleCameraUploads()
+                    cameraUploadsRepository.stopCameraUploads()
+                    cameraUploadsRepository.scheduleCameraUploads()
                 }
 
                 CameraUploadsRestartMode.StopAndDisable -> {
-                    cameraUploadRepository.stopCameraUploadsAndBackupHeartbeat()
+                    cameraUploadsRepository.stopCameraUploadsAndBackupHeartbeat()
                     disableCameraUploadsUseCase()
                 }
 
                 CameraUploadsRestartMode.Stop -> {
-                    cameraUploadRepository.stopCameraUploads()
+                    cameraUploadsRepository.stopCameraUploads()
                 }
             }
         }

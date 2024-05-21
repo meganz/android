@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,20 +23,20 @@ internal class IsSecondaryFolderNodeValidUseCaseTest {
 
     private lateinit var underTest: IsSecondaryFolderNodeValidUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = IsSecondaryFolderNodeValidUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository, getPrimarySyncHandleUseCase)
+        reset(cameraUploadsRepository, getPrimarySyncHandleUseCase)
     }
 
     @Test
@@ -51,7 +51,7 @@ internal class IsSecondaryFolderNodeValidUseCaseTest {
         primaryFolderNodeHandle: Long,
         isSecondaryFolderNodeValid: Boolean,
     ) = runTest {
-        whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(-1L)
+        whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(-1L)
         whenever(getPrimarySyncHandleUseCase()).thenReturn(primaryFolderNodeHandle)
 
         assertThat(underTest(secondaryFolderNodeHandle)).isEqualTo(isSecondaryFolderNodeValid)

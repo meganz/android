@@ -48,7 +48,7 @@ import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -57,9 +57,9 @@ import javax.inject.Inject
 import kotlin.coroutines.Continuation
 
 /**
- * Default implementation of [CameraUploadRepository]
+ * Implementation of [CameraUploadsRepository]
  */
-internal class DefaultCameraUploadRepository @Inject constructor(
+internal class CameraUploadsRepositoryImpl @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
     private val cameraUploadsMediaGateway: CameraUploadsMediaGateway,
@@ -80,7 +80,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val cameraUploadsStatusInfoMapper: CameraUploadsStatusInfoMapper,
-) : CameraUploadRepository {
+) : CameraUploadsRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
 
@@ -198,7 +198,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         "Replace with data flow after refactoring of CameraUploadsPreferencesActivity ",
         replaceWith = ReplaceWith("BroadcastCameraUploadFolderIconUpdateUseCase")
     )
-
     override suspend fun sendUpdateFolderDestinationBroadcast(
         nodeHandle: Long,
         isSecondary: Boolean,

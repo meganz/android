@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.photos
 
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
@@ -16,7 +16,7 @@ import javax.inject.Inject
  * Use Case to enable Camera Uploads in the Photos feature
  *
  * @property listenToNewMediaUseCase [ListenToNewMediaUseCase]
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  * @property setCameraUploadsByWifiUseCase [SetCameraUploadsByWifiUseCase]
  * @property setChargingRequiredForVideoCompressionUseCase [SetChargingRequiredForVideoCompressionUseCase]
  * @property setDefaultPrimaryFolderPathUseCase [SetDefaultPrimaryFolderPathUseCase]
@@ -25,7 +25,7 @@ import javax.inject.Inject
  */
 class EnableCameraUploadsInPhotosUseCase @Inject constructor(
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setChargingRequiredForVideoCompressionUseCase: SetChargingRequiredForVideoCompressionUseCase,
     private val setDefaultPrimaryFolderPathUseCase: SetDefaultPrimaryFolderPathUseCase,
@@ -51,7 +51,7 @@ class EnableCameraUploadsInPhotosUseCase @Inject constructor(
     ) {
         setDefaultPrimaryFolderPathUseCase()
         setCameraUploadsByWifiUseCase(shouldUseWiFiOnly)
-        cameraUploadRepository.setUploadOption(if (shouldSyncVideos) UploadOption.PHOTOS_AND_VIDEOS else UploadOption.PHOTOS)
+        cameraUploadsRepository.setUploadOption(if (shouldSyncVideos) UploadOption.PHOTOS_AND_VIDEOS else UploadOption.PHOTOS)
         setUploadVideoQualityUseCase(videoUploadQuality)
         setChargingRequiredForVideoCompressionUseCase(true)
         setVideoCompressionSizeLimitUseCase(videoCompressionSizeLimit)

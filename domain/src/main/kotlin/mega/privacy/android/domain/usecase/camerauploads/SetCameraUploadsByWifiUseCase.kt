@@ -1,15 +1,15 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Use Case to set whether Camera Uploads should only run through Wi-Fi / Wi-Fi or Mobile Data
  *
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  */
 class SetCameraUploadsByWifiUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -19,5 +19,5 @@ class SetCameraUploadsByWifiUseCase @Inject constructor(
      * If false, Camera Uploads can run through either Wi-Fi or Mobile Data
      */
     suspend operator fun invoke(wifiOnly: Boolean) =
-        cameraUploadRepository.setCameraUploadsByWifi(wifiOnly)
+        cameraUploadsRepository.setCameraUploadsByWifi(wifiOnly)
 }

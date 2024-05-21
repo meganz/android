@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
@@ -30,7 +30,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
     private lateinit var underTest: EnableCameraUploadsInPhotosUseCase
 
     private val listenToNewMediaUseCase = mock<ListenToNewMediaUseCase>()
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
     private val setChargingRequiredForVideoCompressionUseCase =
         mock<SetChargingRequiredForVideoCompressionUseCase>()
@@ -43,7 +43,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
     fun setUp() {
         underTest = EnableCameraUploadsInPhotosUseCase(
             listenToNewMediaUseCase = listenToNewMediaUseCase,
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
             setDefaultPrimaryFolderPathUseCase = setDefaultPrimaryFolderPathUseCase,
@@ -57,7 +57,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
     fun resetMocks() {
         reset(
             listenToNewMediaUseCase,
-            cameraUploadRepository,
+            cameraUploadsRepository,
             setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase,
             setDefaultPrimaryFolderPathUseCase,
@@ -82,7 +82,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
 
         val inOrder = inOrder(
             listenToNewMediaUseCase,
-            cameraUploadRepository,
+            cameraUploadsRepository,
             setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase,
             setDefaultPrimaryFolderPathUseCase,
@@ -93,7 +93,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
 
         inOrder.verify(setDefaultPrimaryFolderPathUseCase).invoke()
         inOrder.verify(setCameraUploadsByWifiUseCase).invoke(expectedShouldUseWiFiOnly)
-        inOrder.verify(cameraUploadRepository).setUploadOption(UploadOption.PHOTOS_AND_VIDEOS)
+        inOrder.verify(cameraUploadsRepository).setUploadOption(UploadOption.PHOTOS_AND_VIDEOS)
         inOrder.verify(setUploadVideoQualityUseCase).invoke(expectedVideoUploadQuality)
         inOrder.verify(setChargingRequiredForVideoCompressionUseCase).invoke(true)
         inOrder.verify(setVideoCompressionSizeLimitUseCase)

@@ -1,15 +1,15 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Use Case that checks whether the File Names are kept or not when uploading content
  *
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  */
 class AreUploadFileNamesKeptUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -18,5 +18,5 @@ class AreUploadFileNamesKeptUseCase @Inject constructor(
      * @return true if the File Names should be left as is, and false if otherwise
      */
     suspend operator fun invoke(): Boolean =
-        cameraUploadRepository.areUploadFileNamesKept() ?: false
+        cameraUploadsRepository.areUploadFileNamesKept() ?: false
 }

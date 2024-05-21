@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -21,18 +21,18 @@ class ListenToNewMediaUseCaseTest {
 
     private lateinit var underTest: ListenToNewMediaUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = ListenToNewMediaUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @ParameterizedTest(name = "when forceEnqueue is {0}")
@@ -40,6 +40,6 @@ class ListenToNewMediaUseCaseTest {
     fun `test that listen to new media is invoked`(forceEnqueue: Boolean) = runTest {
         underTest(forceEnqueue = forceEnqueue)
 
-        verify(cameraUploadRepository).listenToNewMedia(forceEnqueue = forceEnqueue)
+        verify(cameraUploadsRepository).listenToNewMedia(forceEnqueue = forceEnqueue)
     }
 }

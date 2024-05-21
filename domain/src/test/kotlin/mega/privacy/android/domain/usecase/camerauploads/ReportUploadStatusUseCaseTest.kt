@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,24 +25,24 @@ internal class ReportUploadStatusUseCaseTest {
 
     private lateinit var underTest: ReportUploadStatusUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = ReportUploadStatusUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @Test
     fun `test that camera uploads status is sent when the backup id exists`() =
         runTest {
-            whenever(cameraUploadRepository.getCuBackUpId()).thenReturn(69L)
+            whenever(cameraUploadsRepository.getCuBackUpId()).thenReturn(69L)
             underTest(
                 cameraUploadFolderType = CameraUploadFolderType.Primary,
                 heartbeatStatus = HeartbeatStatus.values().random(),
@@ -50,7 +50,7 @@ internal class ReportUploadStatusUseCaseTest {
                 lastNodeHandle = 1L,
                 lastTimestamp = 60L,
             )
-            verify(cameraUploadRepository).sendBackupHeartbeat(
+            verify(cameraUploadsRepository).sendBackupHeartbeat(
                 any(), any(), any(),
                 any(), any(), any()
             )
@@ -59,7 +59,7 @@ internal class ReportUploadStatusUseCaseTest {
     @Test
     fun `test that media uploads status is sent when the backup id exists`() =
         runTest {
-            whenever(cameraUploadRepository.getMuBackUpId()).thenReturn(69L)
+            whenever(cameraUploadsRepository.getMuBackUpId()).thenReturn(69L)
             underTest(
                 cameraUploadFolderType = CameraUploadFolderType.Secondary,
                 heartbeatStatus = HeartbeatStatus.values().random(),
@@ -67,7 +67,7 @@ internal class ReportUploadStatusUseCaseTest {
                 lastNodeHandle = 1L,
                 lastTimestamp = 60L,
             )
-            verify(cameraUploadRepository).sendBackupHeartbeat(
+            verify(cameraUploadsRepository).sendBackupHeartbeat(
                 any(), any(), any(),
                 any(), any(), any()
             )
@@ -76,7 +76,7 @@ internal class ReportUploadStatusUseCaseTest {
     @Test
     fun `test that camera uploads status is not sent when the backup id does not exist`() =
         runTest {
-            whenever(cameraUploadRepository.getCuBackUpId()).thenReturn(null)
+            whenever(cameraUploadsRepository.getCuBackUpId()).thenReturn(null)
             underTest(
                 cameraUploadFolderType = CameraUploadFolderType.Primary,
                 heartbeatStatus = HeartbeatStatus.values().random(),
@@ -84,7 +84,7 @@ internal class ReportUploadStatusUseCaseTest {
                 lastNodeHandle = 1L,
                 lastTimestamp = 60L,
             )
-            verify(cameraUploadRepository, times(0)).sendBackupHeartbeat(
+            verify(cameraUploadsRepository, times(0)).sendBackupHeartbeat(
                 any(), any(), any(),
                 any(), any(), any()
             )
@@ -93,7 +93,7 @@ internal class ReportUploadStatusUseCaseTest {
     @Test
     fun `test that media uploads status is not sent when the backup id does not exist`() =
         runTest {
-            whenever(cameraUploadRepository.getMuBackUpId()).thenReturn(null)
+            whenever(cameraUploadsRepository.getMuBackUpId()).thenReturn(null)
             underTest(
                 cameraUploadFolderType = CameraUploadFolderType.Secondary,
                 heartbeatStatus = HeartbeatStatus.values().random(),
@@ -101,7 +101,7 @@ internal class ReportUploadStatusUseCaseTest {
                 lastNodeHandle = 1L,
                 lastTimestamp = 60L,
             )
-            verify(cameraUploadRepository, times(0)).sendBackupHeartbeat(
+            verify(cameraUploadsRepository, times(0)).sendBackupHeartbeat(
                 any(), any(), any(),
                 any(), any(), any()
             )

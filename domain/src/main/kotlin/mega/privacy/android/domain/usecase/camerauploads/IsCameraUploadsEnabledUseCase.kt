@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
@@ -8,12 +8,12 @@ import javax.inject.Inject
  *
  */
 class IsCameraUploadsEnabledUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
     /**
      * Invoke
      *
      * @return true if camera uploads is enabled
      */
-    suspend operator fun invoke() = cameraUploadRepository.isCameraUploadsEnabled() ?: false
+    suspend operator fun invoke() = cameraUploadsRepository.isCameraUploadsEnabled() ?: false
 }

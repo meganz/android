@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,23 +21,23 @@ internal class IsChargingRequiredToUploadContentUseCaseTest {
 
     private lateinit var underTest: IsChargingRequiredToUploadContentUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = IsChargingRequiredToUploadContentUseCase(cameraUploadRepository)
+        underTest = IsChargingRequiredToUploadContentUseCase(cameraUploadsRepository)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @ParameterizedTest(name = "is charging required to upload content: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that the state is retrieved`(chargingRequired: Boolean) =
         runTest {
-            whenever(cameraUploadRepository.isChargingRequiredToUploadContent()).thenReturn(
+            whenever(cameraUploadsRepository.isChargingRequiredToUploadContent()).thenReturn(
                 chargingRequired
             )
 
@@ -46,7 +46,7 @@ internal class IsChargingRequiredToUploadContentUseCaseTest {
 
     @Test
     fun `test that the state is false if the repository function returns null`() = runTest {
-        whenever(cameraUploadRepository.isChargingRequiredToUploadContent()).thenReturn(null)
+        whenever(cameraUploadsRepository.isChargingRequiredToUploadContent()).thenReturn(null)
 
         assertThat(underTest()).isFalse()
     }

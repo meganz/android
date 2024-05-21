@@ -1,17 +1,17 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * UseCase that  Setup CameraUpload Setting and backup
  *
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  * @property removeBackupFolderUseCase [RemoveBackupFolderUseCase]
  */
 class SetupCameraUploadsSettingUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
     private val removeBackupFolderUseCase: RemoveBackupFolderUseCase,
 ) {
 
@@ -21,7 +21,7 @@ class SetupCameraUploadsSettingUseCase @Inject constructor(
      * @param isEnabled [Boolean]
      */
     suspend operator fun invoke(isEnabled: Boolean) {
-        cameraUploadRepository.setCameraUploadsEnabled(isEnabled)
+        cameraUploadsRepository.setCameraUploadsEnabled(isEnabled)
         if (!isEnabled) {
             removeBackupFolderUseCase(CameraUploadFolderType.Primary)
         }

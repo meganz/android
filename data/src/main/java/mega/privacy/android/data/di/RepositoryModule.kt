@@ -14,7 +14,7 @@ import mega.privacy.android.data.repository.ChatRepositoryImpl
 import mega.privacy.android.data.repository.DefaultAlbumRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
 import mega.privacy.android.data.repository.DefaultBillingRepository
-import mega.privacy.android.data.repository.DefaultCameraUploadRepository
+import mega.privacy.android.data.repository.CameraUploadsRepositoryImpl
 import mega.privacy.android.data.repository.DefaultCancelTokenRepository
 import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
 import mega.privacy.android.data.repository.DefaultClipboardRepository
@@ -81,7 +81,7 @@ import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.CallRepository
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.CancelTokenRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
@@ -198,7 +198,7 @@ internal abstract class RepositoryModule {
     abstract fun bindDomainTransfersRepository(repository: DefaultTransfersRepository): TransferRepository
 
     @Binds
-    abstract fun bindCameraUploadRepository(repository: DefaultCameraUploadRepository): CameraUploadRepository
+    abstract fun bindCameraUploadsRepository(repository: CameraUploadsRepositoryImpl): CameraUploadsRepository
 
     @Binds
     abstract fun bindGlobalUpdatesRepository(repository: DefaultGlobalStatesRepository): GlobalStatesRepository

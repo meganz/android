@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.backup
 
 import mega.privacy.android.domain.entity.backup.BackupInfoType
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadBackupIDUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateBackupUseCase
@@ -14,7 +14,7 @@ class SetupOrUpdateMediaUploadsBackupUseCase @Inject constructor(
     private val getMediaUploadBackupIDUseCase: GetMediaUploadBackupIDUseCase,
     private val setupMediaUploadsBackupUseCase: SetupMediaUploadsBackupUseCase,
     private val updateBackupUseCase: UpdateBackupUseCase,
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
 ) {
 
@@ -28,12 +28,12 @@ class SetupOrUpdateMediaUploadsBackupUseCase @Inject constructor(
             getMediaUploadBackupIDUseCase()?.takeIf { it != -1L }?.let {
                 updateBackupUseCase(
                     backupId = it,
-                    backupName = cameraUploadRepository.getMediaUploadsName(),
+                    backupName = cameraUploadsRepository.getMediaUploadsName(),
                     backupType = BackupInfoType.MEDIA_UPLOADS,
                     targetNode = targetNode,
                     localFolder = localFolder
                 )
-            } ?: setupMediaUploadsBackupUseCase(cameraUploadRepository.getMediaUploadsName())
+            } ?: setupMediaUploadsBackupUseCase(cameraUploadsRepository.getMediaUploadsName())
         }
     }
 }

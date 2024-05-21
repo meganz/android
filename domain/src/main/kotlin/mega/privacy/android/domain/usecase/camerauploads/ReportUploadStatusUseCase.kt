@@ -2,15 +2,15 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Report Camera Uploads Status Backup Heart Beat Use Case
- * @param cameraUploadRepository [CameraUploadRepository]
+ * @param cameraUploadsRepository [CameraUploadsRepository]
  */
 class ReportUploadStatusUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -29,10 +29,10 @@ class ReportUploadStatusUseCase @Inject constructor(
         lastTimestamp: Long,
     ) {
         when (cameraUploadFolderType) {
-            CameraUploadFolderType.Primary -> cameraUploadRepository.getCuBackUpId()
-            CameraUploadFolderType.Secondary -> cameraUploadRepository.getMuBackUpId()
+            CameraUploadFolderType.Primary -> cameraUploadsRepository.getCuBackUpId()
+            CameraUploadFolderType.Secondary -> cameraUploadsRepository.getMuBackUpId()
         }?.let { backupId ->
-            cameraUploadRepository.sendBackupHeartbeat(
+            cameraUploadsRepository.sendBackupHeartbeat(
                 backupId = backupId,
                 heartbeatStatus = heartbeatStatus,
                 ups = pendingUploads,

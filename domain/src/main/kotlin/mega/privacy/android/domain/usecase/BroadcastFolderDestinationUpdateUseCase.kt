@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
@@ -8,7 +8,7 @@ import javax.inject.Inject
  *
  */
 class BroadcastFolderDestinationUpdateUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
     /**
      * Invoke
@@ -17,5 +17,5 @@ class BroadcastFolderDestinationUpdateUseCase @Inject constructor(
      * @param isSecondary   if updated node handle is secondary folder
      */
     suspend operator fun invoke(nodeHandle: Long, isSecondary: Boolean) =
-        cameraUploadRepository.sendUpdateFolderDestinationBroadcast(nodeHandle, isSecondary)
+        cameraUploadsRepository.sendUpdateFolderDestinationBroadcast(nodeHandle, isSecondary)
 }

@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +25,7 @@ internal class GetPrimaryFolderNodeUseCaseTest {
 
     private lateinit var underTest: GetPrimaryFolderNodeUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val setupCameraUploadsSyncHandleUseCase = mock<SetupCameraUploadsSyncHandleUseCase>()
@@ -33,7 +33,7 @@ internal class GetPrimaryFolderNodeUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest = GetPrimaryFolderNodeUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             setupCameraUploadsSyncHandleUseCase = setupCameraUploadsSyncHandleUseCase,
@@ -43,7 +43,7 @@ internal class GetPrimaryFolderNodeUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            cameraUploadRepository,
+            cameraUploadsRepository,
             getNodeByIdUseCase,
             getPrimarySyncHandleUseCase,
             setupCameraUploadsSyncHandleUseCase,
@@ -63,7 +63,7 @@ internal class GetPrimaryFolderNodeUseCaseTest {
         runTest {
             val invalidHandle = -1L
             whenever(getPrimarySyncHandleUseCase()).thenReturn(invalidHandle)
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(invalidHandle)
 
             assertThat(underTest()).isNull()
         }
@@ -71,7 +71,7 @@ internal class GetPrimaryFolderNodeUseCaseTest {
     @Test
     fun `test that null is returned when the node id provided is invalid`() = runTest {
         val invalidHandle = -1L
-        whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
+        whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(invalidHandle)
 
         assertThat(underTest(NodeId(invalidHandle))).isNull()
     }
@@ -79,7 +79,7 @@ internal class GetPrimaryFolderNodeUseCaseTest {
     @Test
     fun `test that null is returned when the primary folder node retrieved from the provided valid node id is null`() =
         runTest {
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(-1L)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(-1L)
             whenever(getNodeByIdUseCase(NodeId(any()))).thenReturn(null)
 
             assertThat(underTest(NodeId(123456L))).isNull()
@@ -89,7 +89,7 @@ internal class GetPrimaryFolderNodeUseCaseTest {
     fun `test that null is returned when the primary folder node retrieved from a valid primary folder handle api call is null`() =
         runTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(123456L)
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(-1L)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(-1L)
             whenever(getNodeByIdUseCase(NodeId(any()))).thenReturn(null)
 
             assertThat(underTest()).isNull()
@@ -100,7 +100,7 @@ internal class GetPrimaryFolderNodeUseCaseTest {
         runTest {
             val invalidHandle = -1L
             whenever(getPrimarySyncHandleUseCase()).thenReturn(123456L)
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(invalidHandle)
             whenever(getNodeByIdUseCase(NodeId(any()))).thenReturn(null)
 
             underTest()
@@ -113,7 +113,7 @@ internal class GetPrimaryFolderNodeUseCaseTest {
         runTest {
             val expectedNode = mock<TypedFolderNode>()
             whenever(getPrimarySyncHandleUseCase()).thenReturn(123456L)
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(-1L)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(-1L)
             whenever(getNodeByIdUseCase(NodeId(any()))).thenReturn(expectedNode)
 
             assertThat(underTest()).isEqualTo(expectedNode)
@@ -123,7 +123,7 @@ internal class GetPrimaryFolderNodeUseCaseTest {
     fun `test that the primary folder node is retrieved using the provided primary folder node id`() =
         runTest {
             val expectedNode = mock<TypedFolderNode>()
-            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(-1L)
+            whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(-1L)
             whenever(getNodeByIdUseCase(NodeId(any()))).thenReturn(expectedNode)
 
             assertThat(underTest(NodeId(123456L))).isEqualTo(expectedNode)

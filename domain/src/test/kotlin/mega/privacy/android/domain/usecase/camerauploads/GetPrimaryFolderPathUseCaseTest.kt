@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -24,19 +24,19 @@ class GetPrimaryFolderPathUseCaseTest {
 
     private lateinit var underTest: GetPrimaryFolderPathUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = GetPrimaryFolderPathUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            cameraUploadRepository,
+            cameraUploadsRepository,
         )
     }
 
@@ -46,7 +46,7 @@ class GetPrimaryFolderPathUseCaseTest {
         originalPath: String?,
         newPath: String,
     ) = runTest {
-        cameraUploadRepository.stub {
+        cameraUploadsRepository.stub {
             onBlocking { getPrimaryFolderLocalPath() }.thenReturn(originalPath)
         }
 

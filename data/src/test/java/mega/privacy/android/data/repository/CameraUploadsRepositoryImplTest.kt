@@ -39,7 +39,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import org.junit.jupiter.api.BeforeAll
@@ -64,13 +64,13 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.test.assertFailsWith
 
 /**
- * Test class for [DefaultCameraUploadRepository]
+ * Test class for [CameraUploadsRepositoryImpl]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalContracts
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class DefaultCameraUploadRepositoryTest {
-    private lateinit var underTest: CameraUploadRepository
+class CameraUploadsRepositoryImplTest {
+    private lateinit var underTest: CameraUploadsRepository
 
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val megaApiGateway = mock<MegaApiGateway>()
@@ -96,7 +96,7 @@ class DefaultCameraUploadRepositoryTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = DefaultCameraUploadRepository(
+        underTest = CameraUploadsRepositoryImpl(
             localStorageGateway = localStorageGateway,
             megaApiGateway = megaApiGateway,
             cameraUploadsMediaGateway = cameraUploadsMediaGateway,

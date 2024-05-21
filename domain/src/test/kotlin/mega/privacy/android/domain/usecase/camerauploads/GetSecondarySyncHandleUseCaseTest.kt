@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -26,36 +26,36 @@ class GetSecondarySyncHandleUseCaseTest {
 
     private lateinit var underTest: GetSecondarySyncHandleUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = GetSecondarySyncHandleUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @ParameterizedTest(name = "handle from repository: {0}")
     @ValueSource(longs = [100L])
     @NullSource
     fun `test that the correct secondary sync handle is returned`(syncHandle: Long?) = runTest {
-        whenever(cameraUploadRepository.getSecondarySyncHandle()).thenReturn(syncHandle)
-        whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(-1)
+        whenever(cameraUploadsRepository.getSecondarySyncHandle()).thenReturn(syncHandle)
+        whenever(cameraUploadsRepository.getInvalidHandle()).thenReturn(-1)
 
         val retrievedSyncHandle = underTest()
-        verify(cameraUploadRepository, times(1)).getSecondarySyncHandle()
+        verify(cameraUploadsRepository, times(1)).getSecondarySyncHandle()
 
         if (syncHandle != null) {
             assertThat(retrievedSyncHandle).isEqualTo(syncHandle)
-            verify(cameraUploadRepository, never()).getInvalidHandle()
+            verify(cameraUploadsRepository, never()).getInvalidHandle()
         } else {
             assertThat(retrievedSyncHandle).isEqualTo(-1)
-            verify(cameraUploadRepository, times(1)).getSecondarySyncHandle()
+            verify(cameraUploadsRepository, times(1)).getSecondarySyncHandle()
         }
     }
 }

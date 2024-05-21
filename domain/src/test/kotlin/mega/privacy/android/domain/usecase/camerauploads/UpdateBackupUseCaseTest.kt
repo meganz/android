@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.repository.BackupRepository
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,19 +28,19 @@ internal class UpdateBackupUseCaseTest {
     private lateinit var underTest: UpdateBackupUseCase
 
     private val backupRepository = mock<BackupRepository>()
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = UpdateBackupUseCase(
             backupRepository = backupRepository,
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(backupRepository, cameraUploadRepository)
+        reset(backupRepository, cameraUploadsRepository)
     }
 
     @Test
@@ -59,7 +59,7 @@ internal class UpdateBackupUseCaseTest {
             targetFolderPath = "",
         )
 
-        whenever(cameraUploadRepository.getBackupById(backupId)).thenReturn(backup)
+        whenever(cameraUploadsRepository.getBackupById(backupId)).thenReturn(backup)
         underTest(
             backupId = backupId,
             backupName = newBackupName,
@@ -74,7 +74,7 @@ internal class UpdateBackupUseCaseTest {
             localFolder = null,
             state = BackupState.INVALID
         )
-        verify(cameraUploadRepository).updateLocalBackup(backup.copy(backupName = newBackupName))
+        verify(cameraUploadsRepository).updateLocalBackup(backup.copy(backupName = newBackupName))
     }
 
     @Test
@@ -82,7 +82,7 @@ internal class UpdateBackupUseCaseTest {
         val backupId = 1L
         val newBackupName = "backup"
 
-        whenever(cameraUploadRepository.getBackupById(backupId)).thenReturn(null)
+        whenever(cameraUploadsRepository.getBackupById(backupId)).thenReturn(null)
         underTest(
             backupId = backupId,
             backupName = newBackupName,
@@ -97,6 +97,6 @@ internal class UpdateBackupUseCaseTest {
             localFolder = null,
             state = BackupState.INVALID
         )
-        verify(cameraUploadRepository, never()).updateLocalBackup(any())
+        verify(cameraUploadsRepository, never()).updateLocalBackup(any())
     }
 }

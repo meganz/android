@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import java.io.File
 import javax.inject.Inject
@@ -8,11 +8,11 @@ import javax.inject.Inject
 /**
  * Use Case that retrieves the Secondary Folder path
  *
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  * @property fileSystemRepository [FileSystemRepository]
  */
 class GetSecondaryFolderPathUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
     private val fileSystemRepository: FileSystemRepository,
 ) {
     /**
@@ -31,14 +31,14 @@ class GetSecondaryFolderPathUseCase @Inject constructor(
      * @return the Secondary Folder local path
      */
     private suspend fun getLocalPath(): String {
-        val localPath = cameraUploadRepository.getSecondaryFolderLocalPath()
+        val localPath = cameraUploadsRepository.getSecondaryFolderLocalPath()
 
         return if (localPath.isNullOrBlank() ||
             (localPath.isNotBlank() && fileSystemRepository.doesFolderExists(localPath))
         ) {
             localPath ?: ""
         } else {
-            cameraUploadRepository.setSecondaryFolderLocalPath("")
+            cameraUploadsRepository.setSecondaryFolderLocalPath("")
             ""
         }
     }

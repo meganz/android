@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -21,18 +21,18 @@ class SetChargingRequiredForVideoCompressionUseCaseTest {
 
     private lateinit var underTest: SetChargingRequiredForVideoCompressionUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = SetChargingRequiredForVideoCompressionUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(cameraUploadRepository)
+        reset(cameraUploadsRepository)
     }
 
     @ParameterizedTest(name = "chargingRequired: {0}")
@@ -41,6 +41,6 @@ class SetChargingRequiredForVideoCompressionUseCaseTest {
         runTest {
             underTest(chargingRequired)
 
-            verify(cameraUploadRepository).setChargingRequiredForVideoCompression(chargingRequired)
+            verify(cameraUploadsRepository).setChargingRequiredForVideoCompression(chargingRequired)
         }
 }

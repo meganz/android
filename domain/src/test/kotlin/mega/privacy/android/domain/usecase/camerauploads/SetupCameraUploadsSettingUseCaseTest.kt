@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -24,13 +24,13 @@ class SetupCameraUploadsSettingUseCaseTest {
 
     private lateinit var underTest: SetupCameraUploadsSettingUseCase
 
-    private val cameraUploadRepository: CameraUploadRepository = mock()
+    private val cameraUploadsRepository: CameraUploadsRepository = mock()
     private val removeBackupFolderUseCase: RemoveBackupFolderUseCase = mock()
 
     @BeforeAll
     fun setUp() {
         underTest = SetupCameraUploadsSettingUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            cameraUploadsRepository = cameraUploadsRepository,
             removeBackupFolderUseCase = removeBackupFolderUseCase
         )
     }
@@ -38,7 +38,7 @@ class SetupCameraUploadsSettingUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            cameraUploadRepository,
+            cameraUploadsRepository,
             removeBackupFolderUseCase
         )
     }
@@ -47,9 +47,9 @@ class SetupCameraUploadsSettingUseCaseTest {
     @ValueSource(booleans = [true, false])
     fun `test that camera uploads setting is set when invoked`(isEnabled: Boolean) = runTest {
         val cameraUploadsName = "Camera Uploads"
-        whenever(cameraUploadRepository.getCameraUploadsName()).thenReturn(cameraUploadsName)
+        whenever(cameraUploadsRepository.getCameraUploadsName()).thenReturn(cameraUploadsName)
         underTest(isEnabled)
-        verify(cameraUploadRepository).setCameraUploadsEnabled(isEnabled)
+        verify(cameraUploadsRepository).setCameraUploadsEnabled(isEnabled)
         if (!isEnabled) {
             verify(removeBackupFolderUseCase).invoke(CameraUploadFolderType.Primary)
         } else {

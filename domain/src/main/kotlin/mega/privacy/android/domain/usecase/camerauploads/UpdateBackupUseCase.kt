@@ -3,18 +3,18 @@ package mega.privacy.android.domain.usecase.camerauploads
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.repository.BackupRepository
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Use Case that updates the Name of a specific Backup
  *
  * @property backupRepository [BackupRepository]
- * @property cameraUploadRepository [BackupRepository]
+ * @property cameraUploadsRepository [BackupRepository]
  */
 class UpdateBackupUseCase @Inject constructor(
     private val backupRepository: BackupRepository,
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
     /**
      * Invocation function
@@ -42,8 +42,8 @@ class UpdateBackupUseCase @Inject constructor(
             localFolder = localFolder,
             state = state ?: BackupState.INVALID
         )
-        cameraUploadRepository.getBackupById(backupId)?.let { backup ->
-            cameraUploadRepository.updateLocalBackup(
+        cameraUploadsRepository.getBackupById(backupId)?.let { backup ->
+            cameraUploadsRepository.updateLocalBackup(
                 backup.copy(backupName = backupName)
             )
         }

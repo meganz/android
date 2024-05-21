@@ -1,18 +1,18 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import javax.inject.Inject
 
 /**
  * Use Case that checks whether the Node Handle of the Primary Folder is valid or not
  *
- * @property cameraUploadRepository [CameraUploadRepository]
+ * @property cameraUploadsRepository [CameraUploadsRepository]
  * @property getSecondarySyncHandleUseCase [GetSecondarySyncHandleUseCase]
  * @property isSecondaryFolderEnabled [IsSecondaryFolderEnabled]
  */
 class IsPrimaryFolderNodeValidUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
 ) {
@@ -30,5 +30,5 @@ class IsPrimaryFolderNodeValidUseCase @Inject constructor(
         }
     } ?: false
 
-    private fun Long?.isNotAnInvalidHandle() = this != cameraUploadRepository.getInvalidHandle()
+    private fun Long?.isNotAnInvalidHandle() = this != cameraUploadsRepository.getInvalidHandle()
 }

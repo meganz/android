@@ -2,14 +2,14 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
 
 /**
  * Set the upload status for the camera uploads record
  */
 class SetCameraUploadsRecordUploadStatusUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val cameraUploadsRepository: CameraUploadsRepository,
 ) {
 
     /**
@@ -25,7 +25,7 @@ class SetCameraUploadsRecordUploadStatusUseCase @Inject constructor(
         timestamp: Long,
         folderType: CameraUploadFolderType,
         uploadStatus: CameraUploadsRecordUploadStatus,
-    ) = cameraUploadRepository.setRecordUploadStatus(
+    ) = cameraUploadsRepository.setRecordUploadStatus(
         mediaId = mediaId,
         timestamp = timestamp,
         folderType = folderType,
