@@ -273,7 +273,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                 .catch { Timber.e(it) }
                 .flowOn(ioDispatcher)
                 .collect {
-                    getMyChatsFilesFolderIdFromGateway()
+                    runCatching {
+                        getMyChatsFilesFolderIdFromGateway()
+                    }.onFailure {
+                        Timber.e(it)
+                    }
                 }
         }
     }
