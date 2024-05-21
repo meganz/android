@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.exportrecoverykey
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
@@ -9,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.model.RecoveryKeyUIState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
@@ -29,7 +29,7 @@ class ExportRecoveryKeyViewModel @Inject constructor(
     private val setMasterKeyExportedUseCase: SetMasterKeyExportedUseCase,
     private val getPrintRecoveryKeyFileUseCase: GetPrintRecoveryKeyFileUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : BaseRxViewModel() {
+) : ViewModel() {
     private val _uiState = MutableStateFlow(RecoveryKeyUIState())
 
     /**

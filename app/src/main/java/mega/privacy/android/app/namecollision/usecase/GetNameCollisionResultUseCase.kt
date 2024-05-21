@@ -18,7 +18,6 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
-import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -363,4 +362,11 @@ class GetNameCollisionResultUseCase @Inject constructor(
 
         return renameName.plus(extension)
     }
+
+    private fun <T : Any> Single<T>.blockingGetOrNull(): T? =
+        try {
+            blockingGet()
+        } catch (ignore: Exception) {
+            null
+        }
 }

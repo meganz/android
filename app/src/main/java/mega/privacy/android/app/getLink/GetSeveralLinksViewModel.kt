@@ -3,6 +3,7 @@ package mega.privacy.android.app.getLink
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -10,7 +11,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
@@ -38,7 +38,7 @@ class GetSeveralLinksViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val exportNodesUseCase: ExportNodesUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
-) : BaseRxViewModel() {
+) : ViewModel() {
 
     private val linkItemsList: MutableLiveData<List<LinkItem>> = MutableLiveData()
     fun getLinkItems(): LiveData<List<LinkItem>> = linkItemsList

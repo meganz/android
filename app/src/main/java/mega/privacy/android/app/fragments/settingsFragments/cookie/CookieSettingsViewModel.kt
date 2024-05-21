@@ -3,13 +3,13 @@ package mega.privacy.android.app.fragments.settingsFragments.cookie
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.fragments.settingsFragments.cookie.model.CookieSettingsUIState
 import mega.privacy.android.app.utils.notifyObserver
@@ -31,7 +31,7 @@ class CookieSettingsViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
     private val getSessionTransferURLUseCase: GetSessionTransferURLUseCase,
-) : BaseRxViewModel() {
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CookieSettingsUIState())
 

@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +19,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -34,7 +36,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants
@@ -191,9 +192,10 @@ class InMeetingViewModel @Inject constructor(
     private val getPluralStringFromStringResMapper: GetPluralStringFromStringResMapper,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     @ApplicationContext private val context: Context,
-) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
+) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
 
+    private val composite = CompositeDisposable()
     /**
      * private UI state
      */
@@ -2596,6 +2598,8 @@ class InMeetingViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+
+        composite.clear()
 
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .removeObserver(updateCallObserver)

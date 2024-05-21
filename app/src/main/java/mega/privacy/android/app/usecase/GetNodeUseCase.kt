@@ -17,7 +17,6 @@ import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
@@ -421,5 +420,12 @@ class GetNodeUseCase @Inject constructor(
             }
 
             return@fromCallable true
+        }
+
+    private fun <T : Any> Single<T>.blockingGetOrNull(): T? =
+        try {
+            blockingGet()
+        } catch (ignore: Exception) {
+            null
         }
 }

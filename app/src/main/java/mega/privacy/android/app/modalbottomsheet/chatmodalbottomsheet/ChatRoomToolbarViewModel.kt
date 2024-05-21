@@ -1,6 +1,7 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet
 
 import android.Manifest
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -9,7 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -24,7 +24,7 @@ class ChatRoomToolbarViewModel @Inject constructor(
     private val getAllGalleryVideos: GetAllGalleryVideos,
     private val getAllGalleryImages: GetAllGalleryImages,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : BaseRxViewModel() {
+) : ViewModel() {
 
     private val _filesGallery =
         MutableStateFlow<List<FileGalleryItem>>(ArrayList())

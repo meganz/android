@@ -7,6 +7,7 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
@@ -25,7 +26,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -132,7 +132,9 @@ class ImageViewerViewModel @Inject constructor(
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     private val getImageByAlbumImportNodeUseCase: GetImageByAlbumImportNodeUseCase,
     @ApplicationContext private val context: Context,
-) : BaseRxViewModel() {
+) : ViewModel() {
+
+    private val composite = CompositeDisposable()
 
     companion object {
         private const val SLIDESHOW_DELAY = 4L
@@ -156,6 +158,7 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        composite.clear()
         timerComposite.dispose()
         Fresco.getImagePipeline()?.clearMemoryCaches()
         super.onCleared()

@@ -1,11 +1,10 @@
 package mega.privacy.android.app.usecase.chat
 
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.usecase.exception.AttachmentDoesNotExistException
 import mega.privacy.android.app.usecase.exception.ChatDoesNotExistException
 import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
-import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatMessage
@@ -91,5 +90,12 @@ class GetChatMessageUseCase @Inject constructor(
                 emitter.isDisposed -> return@create
                 else -> emitter.onSuccess(nodes)
             }
+        }
+
+    private fun <T : Any> Single<T>.blockingGetOrNull(): T? =
+        try {
+            blockingGet()
+        } catch (ignore: Exception) {
+            null
         }
 }

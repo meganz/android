@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -46,7 +47,6 @@ import mega.privacy.android.app.utils.FileUtil.getTotalSize
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
-import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
@@ -492,4 +492,9 @@ class NodeSaver(
 
         private const val STATE_KEY_SAVING = "saving"
     }
+
+    private fun logErr(context: String): Consumer<in Throwable> =
+        Consumer { throwable: Throwable? ->
+            Timber.e(throwable, "$context onError")
+        }
 }

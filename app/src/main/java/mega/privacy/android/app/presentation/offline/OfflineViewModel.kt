@@ -4,11 +4,15 @@ import android.content.Context
 import androidx.collection.SparseArrayCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Maybe
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,10 +24,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.app.fragments.homepage.Event
-import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.app.presentation.offline.model.OfflineNode
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.BACK_PRESS_HANDLED
@@ -35,10 +36,11 @@ import mega.privacy.android.app.utils.FileUtil.getFileInfo
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getURLOfflineFileContent
-import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import timber.log.Timber
 import java.io.File
@@ -55,7 +57,9 @@ class OfflineViewModel @Inject constructor(
     private val getThumbnailUseCase: GetThumbnailUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
-) : BaseRxViewModel() {
+) : ViewModel() {
+
+    private val composite = CompositeDisposable()
 
     private var order = SortOrder.ORDER_DEFAULT_ASC
     private var searchQuery: String? = null
@@ -520,4 +524,19 @@ class OfflineViewModel @Inject constructor(
             getFileInfo(file, context)
         }
     }
+
+
+    private fun add(disposable: Disposable) {
+        composite.add(disposable)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        composite.clear()
+    }
+
+    private fun logErr(context: String): Consumer<in Throwable> =
+        Consumer { throwable: Throwable? ->
+            Timber.e(throwable, "$context onError")
+        }
 }

@@ -3,16 +3,17 @@ package mega.privacy.android.app.fragments.homepage.main
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
@@ -31,7 +32,9 @@ class HomePageViewModel @Inject constructor(
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorLogoutUseCase: MonitorLogoutUseCase,
     private val monitorHomeBadgeCountUseCase: MonitorHomeBadgeCountUseCase,
-) : BaseRxViewModel() {
+) : ViewModel() {
+
+    private val composite = CompositeDisposable()
 
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
@@ -84,6 +87,9 @@ class HomePageViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+
+        composite.clear()
+
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .removeObserver(chatOnlineStatusObserver)
     }
@@ -110,4 +116,5 @@ class HomePageViewModel @Inject constructor(
             _bannerList.value = it
         }
     }
+
 }

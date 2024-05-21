@@ -1,9 +1,11 @@
 package mega.privacy.android.app.getLink
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -13,8 +15,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.Util
@@ -48,7 +48,7 @@ class GetLinkViewModel @Inject constructor(
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     @ApplicationContext private val context: Context,
-) : BaseRxViewModel() {
+) : ViewModel() {
 
     private val linkText: MutableLiveData<String> = MutableLiveData()
     private val expiryDate: MutableLiveData<String> = MutableLiveData()

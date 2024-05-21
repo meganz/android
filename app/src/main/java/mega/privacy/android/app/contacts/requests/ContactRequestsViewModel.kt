@@ -2,15 +2,16 @@ package mega.privacy.android.app.contacts.requests
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs.INCOMING
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs.OUTGOING
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
@@ -31,7 +32,9 @@ import javax.inject.Inject
 class ContactRequestsViewModel @Inject constructor(
     private val getContactRequestsUseCase: GetContactRequestsUseCase,
     private val manageContactRequestUseCase: ManageContactRequestUseCase,
-) : BaseRxViewModel() {
+) : ViewModel() {
+
+    private val composite = CompositeDisposable()
 
     private val contactRequests: MutableLiveData<List<ContactRequestItem>> = MutableLiveData()
     private var queryString: String? = null
@@ -120,5 +123,10 @@ class ContactRequestsViewModel @Inject constructor(
             )
             .addTo(composite)
         return result
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        composite.clear()
     }
 }

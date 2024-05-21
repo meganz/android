@@ -15,7 +15,6 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.database.DatabaseHandler
@@ -342,4 +341,11 @@ class GetImageHandlesUseCase @Inject constructor(
                 )
             }
     }
+
+    private fun <T : Any> Single<T>.blockingGetOrNull(): T? =
+        try {
+            blockingGet()
+        } catch (ignore: Exception) {
+            null
+        }
 }

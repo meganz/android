@@ -14,7 +14,6 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
-import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.exception.EmptyFolderException
@@ -494,5 +493,12 @@ class CheckNameCollisionUseCase @Inject constructor(
                 emitter.isDisposed -> return@create
                 else -> emitter.onSuccess(Pair(collisions, nodesWithoutCollision))
             }
+        }
+
+    private fun <T : Any> Single<T>.blockingGetOrNull(): T? =
+        try {
+            blockingGet()
+        } catch (ignore: Exception) {
+            null
         }
 }

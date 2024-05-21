@@ -3,12 +3,14 @@ package mega.privacy.android.app.contacts.list
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -20,7 +22,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.list.data.ContactActionItem
 import mega.privacy.android.app.contacts.list.data.ContactActionItem.Type
@@ -32,7 +33,6 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
@@ -79,7 +79,9 @@ class ContactListViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
     @ApplicationContext private val context: Context,
-) : BaseRxViewModel() {
+) : ViewModel() {
+
+    private val composite = CompositeDisposable()
 
     companion object {
         private const val REQUEST_TIMEOUT_IN_MS = 100L
@@ -129,7 +131,9 @@ class ContactListViewModel @Inject constructor(
 
     private fun retrieveContacts(avatarFolder: File) {
         getContactsUseCase.get(avatarFolder)
-            .debounceImmediate(REQUEST_TIMEOUT_IN_MS, TimeUnit.MILLISECONDS)
+            .publish {
+                it.take(1).concatWith(it.debounce(REQUEST_TIMEOUT_IN_MS, TimeUnit.MILLISECONDS))
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -358,5 +362,10 @@ class ContactListViewModel @Inject constructor(
         createShareKeyUseCase(typedNode)
     }.onFailure {
         Timber.e(it)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        composite.clear()
     }
 }
