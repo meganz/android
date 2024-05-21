@@ -13,7 +13,7 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageDate
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageTimeSeparatorMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
-    import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextUiMessage
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
@@ -22,7 +22,6 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
-import mega.privacy.android.domain.usecase.chat.message.GetLastMessageSeenIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.SetMessageSeenUseCase
 import mega.privacy.android.domain.usecase.chat.message.paging.GetChatPagingSourceUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -52,7 +51,6 @@ internal class MessageListViewModelTest {
             "chatAction" to Constants.ACTION_CHAT_SHOW_MESSAGES,
         )
     )
-    private val getLastMessageSeenIdUseCase: GetLastMessageSeenIdUseCase = mock()
     private val setMessageSeenUseCase: SetMessageSeenUseCase = mock()
     private val monitorContactCacheUpdates: MonitorContactCacheUpdates = mock {
         onBlocking { invoke() } doReturn emptyFlow()
@@ -71,7 +69,6 @@ internal class MessageListViewModelTest {
             getChatPagingSourceUseCase,
             chatMessageDateSeparatorMapper,
             remoteMediatorFactory,
-            getLastMessageSeenIdUseCase,
             setMessageSeenUseCase
         )
     }
@@ -83,7 +80,6 @@ internal class MessageListViewModelTest {
             chatMessageDateSeparatorMapper = chatMessageDateSeparatorMapper,
             remoteMediatorFactory = remoteMediatorFactory,
             savedStateHandle = savedStateHandle,
-            getLastMessageSeenIdUseCase = getLastMessageSeenIdUseCase,
             setMessageSeenUseCase = setMessageSeenUseCase,
             monitorChatRoomMessageUpdatesUseCase = mock(),
             monitorReactionUpdatesUseCase = mock(),
@@ -94,17 +90,8 @@ internal class MessageListViewModelTest {
     }
 
     @Test
-    fun `test that last seen message id updates correctly`() = runTest {
-        val lastSeenMessageId = 321L
-        whenever(getLastMessageSeenIdUseCase(chatId)).thenReturn(lastSeenMessageId)
-        initTestClass()
-        underTest.state.test {
-            assertThat(awaitItem().lastSeenMessageId).isEqualTo(lastSeenMessageId)
-        }
-    }
-
-    @Test
     fun `test that isJumpingToLastSeenMessage updates correctly when handled`() = runTest {
+        initTestClass()
         underTest.state.test {
             assertThat(awaitItem().isJumpingToLastSeenMessage).isEqualTo(false)
         }
@@ -161,7 +148,6 @@ internal class MessageListViewModelTest {
         verify(setMessageSeenUseCase).invoke(chatId, messageId)
         underTest.state.test {
             val actual = awaitItem()
-            assertThat(actual.lastSeenMessageId).isEqualTo(-1L)
             assertThat(actual.extraUnreadCount).isEqualTo(0)
         }
     }
@@ -186,11 +172,13 @@ internal class MessageListViewModelTest {
 
     @Test
     fun `test that scrolled to the last seen message update state correctly`() = runTest {
+        initTestClass()
         underTest.state.test {
             val actual = awaitItem()
             assertThat(actual.isJumpingToLastSeenMessage).isFalse()
         }
         underTest.onScrolledToLastSeenMessage()
+        advanceUntilIdle()
         underTest.state.test {
             val actual = awaitItem()
             assertThat(actual.isJumpingToLastSeenMessage).isTrue()
