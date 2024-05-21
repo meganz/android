@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
@@ -76,7 +77,8 @@ internal fun OfflineFileInfoScreen(
                 iconResource = iconResource,
                 accessPermissionDescription = null,
             )
-        }
+        },
+        headerSpacerHeight = if (iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp,
     ) {
         OfflineFileInfoContent(uiState = uiState, onRemoveFromOffline = {
             showRemoveFromOfflineDialog = true
@@ -154,3 +156,6 @@ internal class OfflineFileInfoViewStatePreviewsProvider :
         )
     }
 }
+
+private const val MAX_HEADER_HEIGHT = 96
+private const val APP_BAR_HEIGHT = 56
