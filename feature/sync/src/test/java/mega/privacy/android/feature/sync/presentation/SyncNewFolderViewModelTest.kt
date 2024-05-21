@@ -1,7 +1,9 @@
 package mega.privacy.android.feature.sync.presentation
 
 import android.net.Uri
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,11 +15,13 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -36,6 +40,7 @@ internal class SyncNewFolderViewModelTest {
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase = mock()
     private val syncFolderPairUseCase: SyncFolderPairUseCase = mock()
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase = mock()
+    private val getLocalDCIMFolderPathUseCase: GetLocalDCIMFolderPathUseCase = mock()
     private lateinit var underTest: SyncNewFolderViewModel
 
     @AfterEach
@@ -45,6 +50,7 @@ internal class SyncNewFolderViewModelTest {
             monitorSelectedMegaFolderUseCase,
             syncFolderPairUseCase,
             isStorageOverQuotaUseCase,
+            getLocalDCIMFolderPathUseCase,
         )
     }
 
@@ -56,16 +62,49 @@ internal class SyncNewFolderViewModelTest {
             "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
         val localFolderUri: Uri = mock()
         val localFolderFolderStoragePath = "/storage/emulated/0/Sync/someFolder"
+        val localDCIMFolderPath = "/storage/emulated/0/DCIM"
         val expectedState = SyncNewFolderState(selectedLocalFolder = localFolderFolderStoragePath)
         whenever(getExternalPathByContentUriUseCase.invoke(localFolderContentUri)).thenReturn(
             localFolderFolderStoragePath
         )
         whenever(localFolderUri.toString()).thenReturn(localFolderContentUri)
+        whenever(getLocalDCIMFolderPathUseCase.invoke()).thenReturn(
+            localDCIMFolderPath
+        )
 
         underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(localFolderUri))
 
         assertThat(expectedState.selectedLocalFolder).isEqualTo(underTest.state.value.selectedLocalFolder)
     }
+
+    @Test
+    fun `test that snackbar with warning message is displayed if try to select DCIM as local device folder`() =
+        runTest {
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
+            initViewModel()
+            val localFolderContentUri =
+                "content://com.android.externalstorage.documents/tree/primary%3ADCIM"
+            val localFolderUri: Uri = mock()
+            val localFolderFolderStoragePath = "/storage/emulated/0/DCIM"
+            val localDCIMFolderPath = "/storage/emulated/0/DCIM"
+            whenever(getExternalPathByContentUriUseCase.invoke(localFolderContentUri)).thenReturn(
+                localFolderFolderStoragePath
+            )
+            whenever(localFolderUri.toString()).thenReturn(localFolderContentUri)
+            whenever(getLocalDCIMFolderPathUseCase.invoke()).thenReturn(
+                localDCIMFolderPath
+            )
+
+            underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(localFolderUri))
+
+            with(underTest) {
+                state.test {
+                    val result =
+                        (awaitItem().showSnackbar as StateEventWithContentTriggered).content
+                    assertThat(result).isEqualTo(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
+                }
+            }
+        }
 
     @Test
     fun `test that when mega folder is updated state is also updated`() = runTest {
@@ -157,6 +196,7 @@ internal class SyncNewFolderViewModelTest {
             monitorSelectedMegaFolderUseCase,
             syncFolderPairUseCase,
             isStorageOverQuotaUseCase,
+            getLocalDCIMFolderPathUseCase,
         )
     }
 }

@@ -306,4 +306,6 @@
     <string name="device_center_sync_add_new_syn_button_option">Add new sync</string>
     <!-- Text for the Sync solved issues chip -->
     <string name="device_center_sync_solved_issues_chip_text">Solved issues</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">You can’t sync folders that are currently synced folders.</string>
 </resources>

@@ -35,6 +35,7 @@ internal fun SyncNewFolderScreenRoute(
         showStorageOverQuota = state.value.showStorageOverQuota,
         onDismissStorageOverQuota = { viewModel.handleAction(SyncNewFolderAction.StorageOverquotaShown) },
         onOpenUpgradeAccount = { openUpgradeAccount() },
+        viewModel = viewModel,
     )
 
     EventEffect(event = state.value.openSyncListScreen, onConsumed = {

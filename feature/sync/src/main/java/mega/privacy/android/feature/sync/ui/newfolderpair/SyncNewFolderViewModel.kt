@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
+import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,6 +25,7 @@ internal class SyncNewFolderViewModel @Inject constructor(
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase,
     private val syncFolderPairUseCase: SyncFolderPairUseCase,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
+    private val getLocalDCIMFolderPathUseCase: GetLocalDCIMFolderPathUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncNewFolderState())
@@ -43,8 +46,15 @@ internal class SyncNewFolderViewModel @Inject constructor(
             is SyncNewFolderAction.LocalFolderSelected -> {
                 viewModelScope.launch {
                     getExternalPathByContentUriUseCase(action.path.toString())?.let { path ->
-                        _state.update { state ->
-                            state.copy(selectedLocalFolder = path)
+                        val localDCIMFolderPath = getLocalDCIMFolderPathUseCase()
+                        if (localDCIMFolderPath.isNotEmpty() && path.contains(localDCIMFolderPath)) {
+                            _state.update { state ->
+                                state.copy(showSnackbar = triggered(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message))
+                            }
+                        } else {
+                            _state.update { state ->
+                                state.copy(selectedLocalFolder = path)
+                            }
                         }
                     }
                 }
@@ -87,5 +97,12 @@ internal class SyncNewFolderViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Consumes the event of showing snackbar.
+     */
+    fun onShowSnackbarConsumed() {
+        _state.update { state -> state.copy(showSnackbar = consumed()) }
     }
 }

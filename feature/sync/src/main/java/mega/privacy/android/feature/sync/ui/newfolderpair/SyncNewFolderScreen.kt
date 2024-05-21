@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +30,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
@@ -57,34 +61,52 @@ internal fun SyncNewFolderScreen(
     showStorageOverQuota: Boolean,
     onDismissStorageOverQuota: () -> Unit,
     onOpenUpgradeAccount: () -> Unit,
+    viewModel: SyncNewFolderViewModel = hiltViewModel(),
 ) {
-    MegaScaffold(topBar = {
-        MegaAppBar(
-            modifier = Modifier.testTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR),
-            appBarType = AppBarType.BACK_NAVIGATION,
-            title = stringResource(R.string.sync_toolbar_title),
-            onNavigationPressed = { onBackClicked() },
-            elevation = 0.dp
-        )
-    }, content = { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            SyncNewFolderScreenContent(
-                localFolderSelected = localFolderSelected,
-                selectMegaFolderClicked = selectMegaFolderClicked,
-                selectedLocalFolder = selectedLocalFolder,
-                selectedMegaFolder = selectedMegaFolder,
-                syncClicked = syncClicked,
-                syncPermissionsManager = syncPermissionsManager,
-                showStorageOverQuota = showStorageOverQuota,
-                onDismissStorageOverQuota = onDismissStorageOverQuota,
-                onOpenUpgradeAccount = onOpenUpgradeAccount
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val scaffoldState = rememberScaffoldState()
+
+    MegaScaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
+            MegaAppBar(
+                modifier = Modifier.testTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR),
+                appBarType = AppBarType.BACK_NAVIGATION,
+                title = stringResource(R.string.sync_toolbar_title),
+                onNavigationPressed = { onBackClicked() },
+                elevation = 0.dp
             )
-        }
-    })
+        },
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                SyncNewFolderScreenContent(
+                    localFolderSelected = localFolderSelected,
+                    selectMegaFolderClicked = selectMegaFolderClicked,
+                    selectedLocalFolder = selectedLocalFolder,
+                    selectedMegaFolder = selectedMegaFolder,
+                    syncClicked = syncClicked,
+                    syncPermissionsManager = syncPermissionsManager,
+                    showStorageOverQuota = showStorageOverQuota,
+                    onDismissStorageOverQuota = onDismissStorageOverQuota,
+                    onOpenUpgradeAccount = onOpenUpgradeAccount
+                )
+
+                val context = LocalContext.current
+                EventEffect(
+                    event = uiState.showSnackbar,
+                    onConsumed = { viewModel.onShowSnackbarConsumed() },
+                ) { stringId ->
+                    stringId?.let {
+                        scaffoldState.snackbarHostState.showSnackbar(context.getString(stringId))
+                    }
+                }
+            }
+        },
+    )
 }
 
 @Composable
