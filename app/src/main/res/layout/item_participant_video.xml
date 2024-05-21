@@ -55,6 +55,17 @@
         rounded:corner_radius="60dp" />
 
     <ImageView
+        android:id="@+id/on_hand_raised_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:src="@drawable/raised_hand_icon"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
         android:id="@+id/on_hold_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

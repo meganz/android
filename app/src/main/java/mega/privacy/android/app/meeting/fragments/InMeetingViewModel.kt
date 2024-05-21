@@ -451,6 +451,8 @@ class InMeetingViewModel @Inject constructor(
                             _state.update { it.copy(previousState = status) }
                         }
                         handleFreeCallEndWarning()
+                        getMyUserHandle()
+                        isEphemeralAccount()
                     }
                 }
             }.onFailure { exception ->
@@ -518,7 +520,8 @@ class InMeetingViewModel @Inject constructor(
                             }
 
                             contains(ChatCallChanges.CallRaiseHand) -> {
-                                Timber.d("CallRaiseHand change. Flag: ${call.flag}")
+                                updateParticipantsWithRaisedHand()
+
                                 if (state.value.showRaisedHandSnackbar && call.flag) {
                                     _state.update { state ->
                                         state.copy(
@@ -548,6 +551,44 @@ class InMeetingViewModel @Inject constructor(
                 }
         }
     }
+
+    /**
+     * Update participants with hand raised list
+     */
+    private fun updateParticipantsWithRaisedHand() {
+        val listWithChanges: MutableList<Long> = mutableListOf()
+        state.value.call?.let { call ->
+            participants.value = participants.value?.map { participant ->
+                call.usersRaiseHands.filter { it.key == participant.peerId }.forEach {
+                    if (participant.isRaisedHand != it.value) {
+                        listWithChanges.add(participant.peerId)
+                        return@map participant.copy(
+                            isRaisedHand = it.value
+                        )
+                    }
+                }
+
+                when {
+                    participant.isRaisedHand -> {
+                        listWithChanges.add(participant.peerId)
+                        return@map participant.copy(
+                            isRaisedHand = false
+                        )
+                    }
+
+                    else -> return@map participant
+                }
+            }?.toMutableList()
+        }
+
+        _state.update { state -> state.copy(userIdsWithChangesInRaisedHand = listWithChanges.toMutableList()) }
+    }
+
+    /**
+     * clear user ids with changes in raised hand list
+     */
+    fun cleanParticipantsWithRaisedOrLoweredHandsChanges() =
+        _state.update { state -> state.copy(userIdsWithChangesInRaisedHand = emptyList()) }
 
     /**
      * Check if exists another call on hold
@@ -808,7 +849,7 @@ class InMeetingViewModel @Inject constructor(
         MegaApplication.getChatManagement().stopCounterToFinishCall()
         _showOnlyMeBanner.value = false
         _showWaitingForOthersBanner.value = false
-        checkBeforeHangCurrentCall()
+        hangCurrentCall()
 
         viewModelScope.launch {
             kotlin.runCatching {
@@ -2057,6 +2098,15 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
+     * Get list of participants with same peer ID
+     *
+     * @param peerId    Peer ID
+     * @return list of [Participant]
+     */
+    fun getParticipants(peerId: Long): List<Participant>? =
+        participants.value?.filter { it.peerId == peerId }
+
+    /**
      * Get participant or screen share from peerId and clientId
      *
      * @param peerId peer ID of a participant
@@ -3047,19 +3097,9 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Hang up the current call
      */
-    private fun hangCurrentCall() {
+    fun hangCurrentCall() {
         state.value.call?.apply {
             hangCall(callId)
-        }
-    }
-
-    /**
-     * Check if is my hand raised before hang the call
-     */
-    fun checkBeforeHangCurrentCall() {
-        when (state.value.isMyHandRaisedToSpeak) {
-            true -> lowerHandToStopSpeak(shouldHangCall = true)
-            false -> hangCurrentCall()
         }
     }
 
@@ -3068,7 +3108,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun checkClickEndButton() {
         if (isOneToOneCall()) {
-            checkBeforeHangCurrentCall()
+            hangCurrentCall()
             return
         }
 
@@ -3078,13 +3118,13 @@ class InMeetingViewModel @Inject constructor(
                     EventConstants.EVENT_REMOVE_CALL_NOTIFICATION,
                     Long::class.java
                 ).post(callId)
-                checkBeforeHangCurrentCall()
+                hangCurrentCall()
             }
             return
         }
 
         if (numParticipants() == 0) {
-            checkBeforeHangCurrentCall()
+            hangCurrentCall()
             return
         }
 
@@ -3098,7 +3138,7 @@ class InMeetingViewModel @Inject constructor(
                     )
                 }
 
-                else -> checkBeforeHangCurrentCall()
+                else -> hangCurrentCall()
             }
         }
     }
@@ -3254,7 +3294,6 @@ class InMeetingViewModel @Inject constructor(
                 raiseHandToSpeakUseCase(_state.value.currentChatId)
             }.onSuccess {
                 moreCallOptionsBottomPanelDismiss()
-
             }.onFailure { exception ->
                 Timber.e(exception)
             }
@@ -3264,15 +3303,12 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Lower hand to stop speak
      */
-    fun lowerHandToStopSpeak(shouldHangCall: Boolean = false) {
+    fun lowerHandToStopSpeak() {
         viewModelScope.launch {
             runCatching {
                 lowerHandToStopSpeakUseCase(_state.value.currentChatId)
             }.onSuccess {
                 moreCallOptionsBottomPanelDismiss()
-                if (shouldHangCall) {
-                    hangCurrentCall()
-                }
             }.onFailure { exception ->
                 Timber.e(exception)
             }
@@ -3283,6 +3319,8 @@ class InMeetingViewModel @Inject constructor(
      * load my user handle and save to ui state
      */
     private fun getMyUserHandle() {
+        if (state.value.myUserHandle != null) return
+
         viewModelScope.launch {
             runCatching {
                 val myUserHandle = getMyUserHandleUseCase()
@@ -3295,6 +3333,8 @@ class InMeetingViewModel @Inject constructor(
      * Is ephemeral account plus plus
      */
     private fun isEphemeralAccount() {
+        if (state.value.isEphemeralAccount != null) return
+
         viewModelScope.launch {
             runCatching {
                 val isEphemeralAccount = isEphemeralPlusPlusUseCase()

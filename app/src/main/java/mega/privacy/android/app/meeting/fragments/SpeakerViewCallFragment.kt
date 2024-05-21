@@ -616,6 +616,19 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     /**
+     * Update hand raised participants
+     *
+     * @param listPeers List of users ids
+     */
+    fun updateHandRaised(listPeers: MutableSet<Long>) {
+        listPeers.forEach { id ->
+            inMeetingViewModel.getParticipants(peerId = id)?.onEach {
+                adapter.updateHandRaised(it)
+            }
+        }
+    }
+
+    /**
      * Check changes in remote A/V flags
      *
      * @param type [TypeRemoteAVFlagChange]

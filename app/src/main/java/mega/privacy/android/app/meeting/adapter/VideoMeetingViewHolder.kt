@@ -187,6 +187,7 @@ class VideoMeetingViewHolder(
             }
 
             updateAudioIcon(participant)
+            updateHandRaisedIcon(participant)
             updatePeerSelected(participant)
         }
     }
@@ -443,6 +444,17 @@ class VideoMeetingViewHolder(
             binding.avatar.alpha =
                 if (isCallOnHold) AVATAR_WITH_TRANSPARENCY else AVATAR_VIDEO_VISIBLE
         }
+    }
+
+    /**
+     * Check hand raised of a participant
+     *
+     * @param participant    [Participant]
+     */
+    fun updateHandRaisedIcon(participant: Participant) {
+        if (isInvalid(participant)) return
+
+        binding.onHandRaisedIcon.isVisible = participant.isRaisedHand
     }
 
     /**

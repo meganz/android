@@ -235,6 +235,24 @@ class GridViewCallFragment : MeetingBaseFragment() {
     }
 
     /**
+     * Update hand raised participants
+     *
+     * @param listPeers List of users ids
+     */
+    fun updateHandRaised(listPeers: MutableSet<Long>) {
+        listPeers.forEach { id ->
+            (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipants(peerId = id)
+                ?.onEach {
+                    adapterPager.updateHandRaised(
+                        it,
+                        currentPage,
+                        viewDataBinding.gridViewPager
+                    )
+                }
+        }
+    }
+
+    /**
      * Method to control when the video listener should be added or removed.
      *
      * @param participant The participant whose listener of the video is to be added or deleted

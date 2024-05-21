@@ -16,7 +16,6 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property error                                  String resource id for showing an error.
  * @property isOpenInvite                           True if it's enabled, false if not.
  * @property callUIStatus                           [CallUIStatusType]
- * @property participantsInCall                     List of [Participant]
  * @property call                                   [ChatCall]
  * @property currentChatId                          Chat Id
  * @property previousState                          [ChatCallStatus]
@@ -51,13 +50,13 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property isEphemeralAccount                     True, if it's ephemeral account. False, if not.
  * @property showRaisedHandSnackbar                 Show raised hand snackbar
  * @property showOnlyMeEndCallTime                  Show only me end call remaining time
- * @property participantsChanges                     Message to show when a participant changes
+ * @property participantsChanges                    Message to show when a participant changes
+ * @property userIdsWithChangesInRaisedHand         User identifiers with changes in the raised hand
  */
 data class InMeetingUiState(
     val error: Int? = null,
     val isOpenInvite: Boolean? = null,
     var callUIStatus: CallUIStatusType = CallUIStatusType.None,
-    val participantsInCall: List<Participant> = emptyList(),
     val call: ChatCall? = null,
     val currentChatId: Long = -1L,
     val previousState: ChatCallStatus = ChatCallStatus.Initial,
@@ -90,9 +89,10 @@ data class InMeetingUiState(
     val showCallOptionsBottomSheet: Boolean = false,
     val myUserHandle: Long? = null,
     val showRaisedHandSnackbar: Boolean = false,
-    val isEphemeralAccount: Boolean = false,
+    val isEphemeralAccount: Boolean? = null,
     val showOnlyMeEndCallTime: Long? = null,
     val participantsChanges: ParticipantsChange? = null,
+    val userIdsWithChangesInRaisedHand: List<Long> = emptyList(),
 ) {
     /**
      * Is call on hold
@@ -109,6 +109,11 @@ data class InMeetingUiState(
                 it
             )
         } ?: false
+
+    /**
+     * Check if the participant's hand is raised
+     */
+    fun isParticipantHandRaisedToSpeak(peerId: Long) = call?.usersRaiseHands?.get(peerId) ?: false
 
     /**
      * Get number of users with hand raised

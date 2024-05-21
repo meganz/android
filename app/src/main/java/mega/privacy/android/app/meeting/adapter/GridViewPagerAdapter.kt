@@ -428,6 +428,28 @@ class GridViewPagerAdapter(
     }
 
     /**
+     * Update participant when raise hand
+     *
+     * @param participant
+     * @param currentPage the current page number
+     * @param pager the ViewPager2
+     */
+    fun updateHandRaised(
+        participant: Participant,
+        currentPage: Int,
+        pager: ViewPager2,
+    ) {
+        getHolder(currentPage, pager)?.let {
+            adapterList.forEach {
+                it?.updateHandRaised(participant)
+            }
+            return
+        }
+
+        notifyItemChanged(currentPage)
+    }
+
+    /**
      * Update participant on hold session
      *
      * @param participant

@@ -153,6 +153,29 @@ class VideoListViewAdapter(
     }
 
     /**
+     * Update participant hand raised
+     *
+     * @param participant Participant to update
+     */
+    fun updateHandRaised(participant: Participant) {
+        val position = getParticipantPosition(
+            participant.peerId,
+            participant.clientId,
+            participant.isScreenShared
+        )
+        if (position == INVALID_POSITION)
+            return
+
+        getHolder(position)?.let {
+            it.updateHandRaisedIcon(participant)
+            return
+        }
+
+        listView.recycledViewPool.clear()
+        notifyItemChanged(position)
+    }
+
+    /**
      * Update participant on hold session
      *
      * @param participant Participant to update

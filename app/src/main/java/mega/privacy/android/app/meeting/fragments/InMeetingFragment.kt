@@ -44,6 +44,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -684,7 +685,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         onAssignAndLeaveClick = {
                             showAssignModeratorFragment()
                         },
-                        onLeaveAnywayClick = inMeetingViewModel::checkBeforeHangCurrentCall,
+                        onLeaveAnywayClick = inMeetingViewModel::hangCurrentCall,
                         onEndForAllClick = inMeetingViewModel::endCallForAll,
                         onDismiss = inMeetingViewModel::hideBottomPanels
                     )
@@ -1011,16 +1012,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         }
                     }
                 }
+
+                state.chatTitle.isNotEmpty() -> toolbarTitle?.apply {
+                    text = state.chatTitle
+                }
+            }
+
+            state.userIdsWithChangesInRaisedHand.takeIf { it.isNotEmpty() }?.let {
+                updateParticipantsWithHandRaised(it)
             }
 
             floatingBottomSheet.isVisible =
                 !state.showEndMeetingAsOnlyHostBottomPanel && !state.showCallOptionsBottomSheet
 
-            if (state.chatTitle.isNotEmpty()) {
-                toolbarTitle?.apply {
-                    text = state.chatTitle
-                }
-            }
+
             state.call?.let {
                 if (callStatus != it.status) {
                     callStatus = it.status
@@ -1130,7 +1135,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             inMeetingViewModel.hideBottomPanels()
                         }
                         setLeaveMeetingCallBack {
-                            inMeetingViewModel.checkBeforeHangCurrentCall()
+                            inMeetingViewModel.hangCurrentCall()
                         }
                         setEndForAllCallBack {
                             inMeetingViewModel.endCallForAll()
@@ -1218,6 +1223,26 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 if (bottomFloatingPanelViewHolder?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
                     bottomFloatingPanelViewHolder?.expand()
                 }
+            }
+        }
+    }
+
+    /**
+     * Update participants with hand raised
+     *
+     * @param list  List of ids of participants with hand raised
+     */
+    private fun updateParticipantsWithHandRaised(list: List<Long>) {
+        inMeetingViewModel.cleanParticipantsWithRaisedOrLoweredHandsChanges()
+        gridViewCallFragment?.apply {
+            if (isAdded) {
+                updateHandRaised(list.toMutableSet())
+            }
+        }
+
+        speakerViewCallFragment?.apply {
+            if (isAdded) {
+                updateHandRaised(list.toMutableSet())
             }
         }
     }
