@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.managechathistory.view.scr
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -253,6 +254,7 @@ private fun HistoryClearingOption(
     val isChecked = rememberSaveable(retentionTime) {
         retentionTime != DISABLED_RETENTION_TIME
     }
+    val interactionSource = remember { MutableInteractionSource() }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -268,11 +270,15 @@ private fun HistoryClearingOption(
             MegaText(
                 modifier = Modifier
                     .padding(top = 2.dp)
-                    .clickable {
-                        if (!formattedRetentionTime.isNullOrBlank()) {
-                            onHistoryClearingOptionSubtitleClick()
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onClick = {
+                            if (!formattedRetentionTime.isNullOrBlank()) {
+                                onHistoryClearingOptionSubtitleClick()
+                            }
                         }
-                    }
+                    )
                     .testTag(HISTORY_CLEARING_OPTION_SUBTITLE_TAG),
                 text = if (!formattedRetentionTime.isNullOrBlank()) {
                     stringResource(id = R.string.subtitle_properties_manage_chat)
