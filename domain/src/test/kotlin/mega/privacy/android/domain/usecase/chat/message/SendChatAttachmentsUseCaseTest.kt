@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.GetFileForChatUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -31,7 +31,7 @@ class SendChatAttachmentsUseCaseTest {
     private lateinit var underTest: SendChatAttachmentsUseCase
 
     private val startChatUploadsWithWorkerUseCase = mock<StartChatUploadsWithWorkerUseCase>()
-    private val getFileForChatUploadUseCase = mock<GetFileForChatUploadUseCase>()
+    private val getFileForUploadUseCase = mock<GetFileForUploadUseCase>()
     private val chatMessageRepository = mock<ChatMessageRepository>()
     private val deviceCurrentTimeUseCase = mock<GetDeviceCurrentTimeUseCase>()
     private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
@@ -43,7 +43,7 @@ class SendChatAttachmentsUseCaseTest {
     fun setup() {
         underTest = SendChatAttachmentsUseCase(
             startChatUploadsWithWorkerUseCase,
-            getFileForChatUploadUseCase,
+            getFileForUploadUseCase,
             chatMessageRepository,
             deviceCurrentTimeUseCase,
             getMyChatsFilesFolderIdUseCase,
@@ -54,7 +54,7 @@ class SendChatAttachmentsUseCaseTest {
     fun resetMocks() = runTest {
         reset(
             startChatUploadsWithWorkerUseCase,
-            getFileForChatUploadUseCase,
+            getFileForUploadUseCase,
             chatMessageRepository,
             deviceCurrentTimeUseCase,
             getMyChatsFilesFolderIdUseCase,
@@ -79,7 +79,7 @@ class SendChatAttachmentsUseCaseTest {
         commonStub()
         uris.keys.forEach {
             val file = mockFile()
-            whenever(getFileForChatUploadUseCase(it)).thenReturn(file)
+            whenever(getFileForUploadUseCase(it, true)).thenReturn(file)
         }
         underTest(uris, false, chatId).test {
             cancelAndIgnoreRemainingEvents()
@@ -139,7 +139,7 @@ class SendChatAttachmentsUseCaseTest {
             commonStub(myChatFolderId = myChatFolderId)
             uris.keys.forEach {
                 val file = mockFile()
-                whenever(getFileForChatUploadUseCase(it)).thenReturn(file)
+                whenever(getFileForUploadUseCase(it, true)).thenReturn(file)
             }
             underTest(uris, false, chatId).test {
                 cancelAndConsumeRemainingEvents()
@@ -159,7 +159,7 @@ class SendChatAttachmentsUseCaseTest {
         whenever(startChatUploadsWithWorkerUseCase(any(), NodeId(any()), any())).thenReturn(
             flowOf(event)
         )
-        whenever(getFileForChatUploadUseCase(any())).thenReturn(file)
+        whenever(getFileForUploadUseCase(any(), any())).thenReturn(file)
         whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(myChatFolderId)
     }
 

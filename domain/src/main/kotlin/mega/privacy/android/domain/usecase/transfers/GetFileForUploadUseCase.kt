@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.transfers.chatuploads
+package mega.privacy.android.domain.usecase.transfers
 
 import mega.privacy.android.domain.repository.FileSystemRepository
 import java.io.File
@@ -10,8 +10,8 @@ import javax.inject.Inject
  * - If the Uri is already representing a file it returns the file
  * - If the Uri is a content uri, it makes a copy in the chat cache folder
  */
-class GetFileForChatUploadUseCase @Inject constructor(
-    private val getCacheFileForChatUploadUseCase: GetCacheFileForChatUploadUseCase,
+class GetFileForUploadUseCase @Inject constructor(
+    private val getCacheFileForUploadUseCase: GetCacheFileForUploadUseCase,
     private val fileSystemRepository: FileSystemRepository,
 ) {
     /**
@@ -19,7 +19,7 @@ class GetFileForChatUploadUseCase @Inject constructor(
      *
      * @param uriOrPathString a string representing the Uri
      */
-    suspend operator fun invoke(uriOrPathString: String): File? {
+    suspend operator fun invoke(uriOrPathString: String, isChatUpload: Boolean): File? {
         return when {
             fileSystemRepository.isFilePath(uriOrPathString) -> {
                 fileSystemRepository.getFileByPath(uriOrPathString)
@@ -31,7 +31,10 @@ class GetFileForChatUploadUseCase @Inject constructor(
 
             fileSystemRepository.isContentUri(uriOrPathString) -> {
                 fileSystemRepository.getFileNameFromUri(uriOrPathString)?.let {
-                    getCacheFileForChatUploadUseCase(File(it))?.also { destination ->
+                    getCacheFileForUploadUseCase(
+                        file = File(it),
+                        isChatUpload = isChatUpload,
+                    )?.also { destination ->
                         fileSystemRepository.copyContentUriToFile(uriOrPathString, destination)
                     }
                 }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
+import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
 import java.io.File
 import javax.inject.Inject
 
@@ -13,7 +14,7 @@ import javax.inject.Inject
  */
 class DownscaleImageForChatUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
-    private val getCacheFileForChatUploadUseCase: GetCacheFileForChatUploadUseCase,
+    private val getCacheFileForUploadUseCase: GetCacheFileForUploadUseCase,
 ) {
     /**
      * Invoke
@@ -21,7 +22,7 @@ class DownscaleImageForChatUseCase @Inject constructor(
      * @return the state of the compression.
      */
     suspend operator fun invoke(file: File): Flow<ChatUploadCompressionState> {
-        return getCacheFileForChatUploadUseCase(file)?.let { destination ->
+        return getCacheFileForUploadUseCase(file, true)?.let { destination ->
             fileSystemRepository.downscaleImage(
                 file = file,
                 destination = destination,

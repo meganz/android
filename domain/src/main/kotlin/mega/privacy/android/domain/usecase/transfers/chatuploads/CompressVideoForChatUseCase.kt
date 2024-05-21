@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
+import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
 import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
 import java.io.File
 import javax.inject.Inject
@@ -19,7 +20,7 @@ import javax.inject.Inject
  */
 class CompressVideoForChatUseCase @Inject constructor(
     private val defaultSettingsRepository: SettingsRepository,
-    private val getCacheFileForChatUploadUseCase: GetCacheFileForChatUploadUseCase,
+    private val getCacheFileForUploadUseCase: GetCacheFileForUploadUseCase,
     private val compressVideoUseCase: CompressVideoUseCase,
 ) {
 
@@ -35,7 +36,7 @@ class CompressVideoForChatUseCase @Inject constructor(
                 ChatUploadNotCompressedReason.CompressionNotNeeded
             )
         )
-        return getCacheFileForChatUploadUseCase(file)?.let { destination ->
+        return getCacheFileForUploadUseCase(file, true)?.let { destination ->
             compressVideoUseCase(
                 rootPath = destination.parent,
                 filePath = file.absolutePath,

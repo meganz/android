@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
+import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
 import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -30,8 +31,8 @@ class CompressVideoForChatUseCaseTest {
     private lateinit var underTest: CompressVideoForChatUseCase
 
     private val defaultSettingsRepository = mock<SettingsRepository>()
-    private val getCacheFileForChatUploadUseCase =
-        mock<GetCacheFileForChatUploadUseCase>()
+    private val getCacheFileForUploadUseCase =
+        mock<GetCacheFileForUploadUseCase>()
     private val compressVideoUseCase = mock<CompressVideoUseCase>()
 
 
@@ -39,7 +40,7 @@ class CompressVideoForChatUseCaseTest {
     fun setup() {
         underTest = CompressVideoForChatUseCase(
             defaultSettingsRepository,
-            getCacheFileForChatUploadUseCase,
+            getCacheFileForUploadUseCase,
             compressVideoUseCase,
         )
     }
@@ -48,7 +49,7 @@ class CompressVideoForChatUseCaseTest {
     fun resetMocks() =
         reset(
             defaultSettingsRepository,
-            getCacheFileForChatUploadUseCase,
+            getCacheFileForUploadUseCase,
             compressVideoUseCase,
         )
 
@@ -112,7 +113,7 @@ class CompressVideoForChatUseCaseTest {
             on { it.parent } doReturn "root"
             on { it.exists() } doReturn true
         }
-        whenever(getCacheFileForChatUploadUseCase(any())) doReturn destination
+        whenever(getCacheFileForUploadUseCase(any(), any())) doReturn destination
         return destination
     }
 

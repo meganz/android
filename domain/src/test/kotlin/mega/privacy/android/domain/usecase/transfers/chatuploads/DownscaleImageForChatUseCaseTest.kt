@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
+import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.DownscaleImageForChatUseCase.Companion.DOWNSCALE_IMAGES_PX
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -25,14 +26,14 @@ class DownscaleImageForChatUseCaseTest {
     private lateinit var underTest: DownscaleImageForChatUseCase
 
     private val fileSystemRepository = mock<FileSystemRepository>()
-    private val getCacheFileForChatUploadUseCase =
-        mock<GetCacheFileForChatUploadUseCase>()
+    private val getCacheFileForUploadUseCase =
+        mock<GetCacheFileForUploadUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = DownscaleImageForChatUseCase(
             fileSystemRepository,
-            getCacheFileForChatUploadUseCase,
+            getCacheFileForUploadUseCase,
         )
     }
 
@@ -40,7 +41,7 @@ class DownscaleImageForChatUseCaseTest {
     fun resetMocks() =
         reset(
             fileSystemRepository,
-            getCacheFileForChatUploadUseCase,
+            getCacheFileForUploadUseCase,
         )
 
     @Test
@@ -78,7 +79,7 @@ class DownscaleImageForChatUseCaseTest {
         runTest {
             val file = File("img.jpg")
             val expected = stubDestination()
-            whenever(getCacheFileForChatUploadUseCase(any())) doReturn null
+            whenever(getCacheFileForUploadUseCase(any(), any())) doReturn null
             underTest(file).test {
                 assertThat(awaitItem())
                     .isEqualTo(
@@ -96,7 +97,7 @@ class DownscaleImageForChatUseCaseTest {
             on { it.name } doReturn "destination"
             on { it.exists() } doReturn exists
         }
-        whenever(getCacheFileForChatUploadUseCase(any())) doReturn destination
+        whenever(getCacheFileForUploadUseCase(any(), any())) doReturn destination
         return destination
     }
 }
