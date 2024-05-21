@@ -497,13 +497,17 @@ class FileBrowserComposeFragment : Fragment() {
             menu.findItem(R.id.cab_menu_share_link).title =
                 resources.getQuantityString(sharedR.plurals.label_share_links, selected.size)
             lifecycleScope.launch {
-                val control = getOptionsForToolbarMapper(
-                    selectedNodeHandleList = fileBrowserViewModel.state.value.selectedNodeHandles,
-                    totalNodes = fileBrowserViewModel.state.value.nodesList.size
-                )
-                CloudStorageOptionControlUtil.applyControl(menu, control)
+                runCatching {
+                    val control = getOptionsForToolbarMapper(
+                        selectedNodeHandleList = fileBrowserViewModel.state.value.selectedNodeHandles,
+                        totalNodes = fileBrowserViewModel.state.value.nodesList.size
+                    )
+                    CloudStorageOptionControlUtil.applyControl(menu, control)
 
-                handleHiddeNodes(selected, nodeList, menu)
+                    handleHiddeNodes(selected, nodeList, menu)
+                }.onFailure {
+                    Timber.e(it)
+                }
             }
             return true
         }
@@ -533,6 +537,9 @@ class FileBrowserComposeFragment : Fragment() {
 
                 menu.findItem(R.id.cab_menu_unhide)?.isVisible =
                     !hasNonSensitiveNode && isPaid
+            } else {
+                menu.findItem(R.id.cab_menu_hide)?.isVisible = false
+                menu.findItem(R.id.cab_menu_unhide)?.isVisible = false
             }
         }
 

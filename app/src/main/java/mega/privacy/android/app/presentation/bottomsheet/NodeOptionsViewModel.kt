@@ -105,14 +105,18 @@ class NodeOptionsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-            val isHidingActionAllowed =
-                isHidingActionAllowed(NodeId(_state.value.node?.handle ?: 0))
-            _state.update {
-                it.copy(
-                    isHiddenNodesOnboarded = isHiddenNodesOnboarded,
-                    isHidingActionAllowed = isHidingActionAllowed,
-                )
+            runCatching {
+                val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+                val isHidingActionAllowed =
+                    isHidingActionAllowedUseCase(NodeId(_state.value.node?.handle ?: 0))
+                _state.update {
+                    it.copy(
+                        isHiddenNodesOnboarded = isHiddenNodesOnboarded,
+                        isHidingActionAllowed = isHidingActionAllowed,
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }
@@ -216,12 +220,6 @@ class NodeOptionsViewModel @Inject constructor(
                 }
         }
     }
-
-    /**
-     * Check if the current node can be hidden
-     */
-    private suspend fun isHidingActionAllowed(nodeId: NodeId): Boolean =
-        isHidingActionAllowedUseCase(nodeId)
 
     /**
      * Retrieves the Node Information of the Unverified Node with the Contact Name

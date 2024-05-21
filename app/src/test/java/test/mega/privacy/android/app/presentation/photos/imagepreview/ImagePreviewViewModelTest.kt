@@ -41,7 +41,6 @@ import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloadsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -88,7 +87,6 @@ class ImagePreviewViewModelTest {
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase = mock()
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase =
         mock()
-    private val resetTotalDownloadsUseCase: ResetTotalDownloadsUseCase = mock()
     private val deleteNodesUseCase: DeleteNodesUseCase = mock()
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase = mock()
     private val imagePreviewVideoLauncher: ImagePreviewVideoLauncher = mock()
@@ -127,7 +125,6 @@ class ImagePreviewViewModelTest {
         getFeatureFlagValueUseCase,
         getPublicChildNodeFromIdUseCase,
         getPublicNodeFromSerializedDataUseCase,
-        resetTotalDownloadsUseCase,
         deleteNodesUseCase,
         updateNodeSensitiveUseCase,
         imagePreviewVideoLauncher,
@@ -163,7 +160,6 @@ class ImagePreviewViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPublicChildNodeFromIdUseCase = getPublicChildNodeFromIdUseCase,
             getPublicNodeFromSerializedDataUseCase = getPublicNodeFromSerializedDataUseCase,
-            resetTotalDownloadsUseCase = resetTotalDownloadsUseCase,
             deleteNodesUseCase = deleteNodesUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             imagePreviewVideoLauncher = imagePreviewVideoLauncher,
