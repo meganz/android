@@ -5,7 +5,6 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
@@ -15,6 +14,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.Text
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -39,6 +39,8 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.banners.ActionBanner
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
+import mega.privacy.android.shared.original.core.ui.controls.chip.Chip
+import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
@@ -62,7 +64,6 @@ import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIs
 import mega.privacy.android.feature.sync.ui.views.ConflictDetailsDialog
 import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
 import mega.privacy.android.feature.sync.ui.views.SyncPermissionWarningBanner
-import mega.privacy.android.legacy.core.ui.controls.chips.PhotoChip
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -257,26 +258,34 @@ private fun HeaderChips(
     onChipSelected: (SyncChip) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(modifier.padding(16.dp)) {
-        PhotoChip(
-            text = stringResource(id = R.string.sync_folders),
+    ChipBar(modifier = modifier.padding(vertical = 8.dp)) {
+        Chip(
+            selected = selectedChip == SYNC_FOLDERS,
+            contentDescription = stringResource(id = R.string.sync_folders),
             onClick = { onChipSelected(SYNC_FOLDERS) },
-            isChecked = selectedChip == SYNC_FOLDERS
-        )
-        PhotoChip(
-            text = if (stalledIssuesCount > 0) stringResource(
-                R.string.sync_stalled_issues,
-                stalledIssuesCount
-            ) else stringResource(id = R.string.sync_stalled_issue_zero),
+        ) {
+            Text(text = stringResource(id = R.string.sync_folders))
+        }
+        Chip(
+            selected = selectedChip == STALLED_ISSUES,
+            contentDescription = stringResource(id = R.string.sync_stalled_issue_zero),
             onClick = { onChipSelected(STALLED_ISSUES) },
-            Modifier.padding(horizontal = 8.dp),
-            isChecked = selectedChip == STALLED_ISSUES,
-        )
-        PhotoChip(
-            text = stringResource(id = R.string.sync_solved_issues),
+        ) {
+            Text(
+                text = if (stalledIssuesCount > 0) {
+                    stringResource(R.string.sync_stalled_issues, stalledIssuesCount)
+                } else {
+                    stringResource(id = R.string.sync_stalled_issue_zero)
+                }
+            )
+        }
+        Chip(
+            selected = selectedChip == SOLVED_ISSUES,
+            contentDescription = stringResource(id = sharedR.string.device_center_sync_solved_issues_chip_text),
             onClick = { onChipSelected(SOLVED_ISSUES) },
-            isChecked = selectedChip == SOLVED_ISSUES,
-        )
+        ) {
+            Text(text = stringResource(id = sharedR.string.device_center_sync_solved_issues_chip_text))
+        }
     }
 }
 

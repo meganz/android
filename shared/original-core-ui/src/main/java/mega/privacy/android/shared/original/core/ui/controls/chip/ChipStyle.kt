@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 
 /**
  * Chip colors
@@ -165,5 +166,5 @@ object DefaultChipStyle : ChipStyle {
      * Typography style of chip
      */
     @Composable
-    override fun typography(): TextStyle = MaterialTheme.typography.subtitle2
+    override fun typography(): TextStyle = MaterialTheme.typography.subtitle2medium
 }

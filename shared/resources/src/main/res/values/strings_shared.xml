@@ -301,7 +301,9 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">No syncs set up</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sync a local folder on your device that would sync a folder on MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">Sync a local folder on your device with a folder on MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Add new sync</string>
+    <!-- Text for the Sync solved issues chip -->
+    <string name="device_center_sync_solved_issues_chip_text">Solved issues</string>
 </resources>
