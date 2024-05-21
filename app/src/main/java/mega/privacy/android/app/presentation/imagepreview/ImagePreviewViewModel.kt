@@ -77,7 +77,6 @@ import timber.log.Timber
 import java.io.File
 import java.lang.ref.WeakReference
 import javax.inject.Inject
-
 @HiltViewModel
 class ImagePreviewViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
@@ -872,13 +871,13 @@ class ImagePreviewViewModel @Inject constructor(
         )
     }
 
-    private suspend fun isHidingActionAllowed(): Boolean =
+    private suspend fun isHidingActionAllowed(): Boolean = runCatching {
         (getParentNodeUseCase(NodeId(currentImageNodeIdValue))?.id?.longValue ?: 0) !in listOf(
             getPrimarySyncHandleUseCase(),
             getSecondarySyncHandleUseCase(),
             getMyChatsFilesFolderIdUseCase(),
         )
-
+    }.getOrElse { false }
 
     companion object {
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"
@@ -888,3 +887,4 @@ class ImagePreviewViewModel @Inject constructor(
         const val IMAGE_PREVIEW_IS_FOREIGN = "image_preview_is_foreign"
     }
 }
+
