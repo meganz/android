@@ -163,6 +163,7 @@ internal fun FileLinkView(
                 )
             }
         },
+        headerSpacerHeight = if (viewState.iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp,
         modifier = modifier,
     ) {
         FileLinkContent(
@@ -296,3 +297,5 @@ private fun PreviewFileLinkView() {
 internal const val animationDuration = 300
 internal const val animationScale = 0.2f
 internal val animationSpecs = TweenSpec<Float>(durationMillis = animationDuration)
+private const val MAX_HEADER_HEIGHT = 96
+private const val APP_BAR_HEIGHT = 56
