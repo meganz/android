@@ -3,7 +3,7 @@ package mega.privacy.android.app.uploadFolder.usecase
 import android.content.Context
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx3.rxSingle
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.data.extensions.getInfo
@@ -119,17 +119,16 @@ class GetFolderContentUseCase @Inject constructor(
             }
 
             if (folderItem.isFolder) {
-                val newParentNodeId = runBlocking {
-                    runCatching {
-                        getChildNodeUseCase(parentNodeId, folderName)?.id
-                            ?: createFolderNodeUseCase(folderName, parentNodeId)
-                    }.onFailure { error ->
-                        emitter.onError(error)
-                    }.getOrNull()
-                } ?: run {
-                    if (!emitter.isDisposed) {
-                        emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                    }
+                val newParentNodeId = rxSingle {
+                    getChildNodeUseCase(parentNodeId, folderName)?.id
+                        ?: createFolderNodeUseCase(folderName, parentNodeId)
+                }.blockingGetOrNull()
+
+                if (emitter.isDisposed) {
+                    return@create
+                }
+                if (newParentNodeId == null) {
+                    emitter.onError(MegaNodeException.ParentDoesNotExistException())
                     return@create
                 }
 
@@ -229,15 +228,14 @@ class GetFolderContentUseCase @Inject constructor(
         collisionsResolution: List<NameCollisionResult>?,
     ): Single<Int> =
         Single.create { emitter ->
-            val parentNodeExists = runBlocking {
-                runCatching {
-                    doesNodeExistUseCase(parentNodeId)
-                }.onFailure { error ->
-                    emitter.onError(error)
-                }.getOrNull()
+            val parentNodeExists =
+                rxSingle { doesNodeExistUseCase(parentNodeId) }.blockingGetOrNull()
+
+            if (emitter.isDisposed) {
+                return@create
             }
 
-            if (parentNodeExists == false) {
+            if (parentNodeExists != true) {
                 emitter.onError(MegaNodeException.ParentDoesNotExistException())
                 return@create
             }
@@ -394,26 +392,32 @@ class GetFolderContentUseCase @Inject constructor(
                         folders.sortBy { item -> item.name }
                         files.sortBy { item -> item.name }
                     }
+
                     SortOrder.ORDER_DEFAULT_DESC -> {
                         folders.sortByDescending { item -> item.name }
                         files.sortByDescending { item -> item.name }
                     }
+
                     SortOrder.ORDER_MODIFICATION_ASC -> {
                         folders.sortBy { item -> item.name }
                         files.sortBy { item -> item.lastModified }
                     }
+
                     SortOrder.ORDER_MODIFICATION_DESC -> {
                         folders.sortBy { item -> item.name }
                         files.sortByDescending { item -> item.lastModified }
                     }
+
                     SortOrder.ORDER_SIZE_ASC -> {
                         folders.sortBy { item -> item.name }
                         files.sortBy { item -> item.size }
                     }
+
                     SortOrder.ORDER_SIZE_DESC -> {
                         folders.sortBy { item -> item.name }
                         files.sortByDescending { item -> item.size }
                     }
+
                     else -> {}
                 }
 
@@ -618,5 +622,12 @@ class GetFolderContentUseCase @Inject constructor(
                         onSuccess = { finalSearchList -> emitter.onSuccess(finalSearchList) }
                     )
                 })
+        }
+
+    private fun <T : Any> Single<T>.blockingGetOrNull(): T? =
+        try {
+            blockingGet()
+        } catch (ignore: Exception) {
+            null
         }
 }
