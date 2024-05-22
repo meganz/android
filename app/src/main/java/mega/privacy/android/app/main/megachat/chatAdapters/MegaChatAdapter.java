@@ -3191,7 +3191,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holder.urlOwnMessageIconAndLinkLayout.setVisibility(View.VISIBLE);
             holder.urlOwnMessageLink.setText(androidMessage.getRichLinkMessage().getServer());
 
-            holder.urlOwnMessageIcon.setImageResource(R.drawable.ic_launcher);
+            holder.urlOwnMessageIcon.setImageResource(R.drawable.ic_mega_round);
             holder.urlOwnMessageIcon.setVisibility(View.VISIBLE);
 
             holder.urlOwnMessageText.setLinksClickable(false);
@@ -3352,7 +3352,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holder.urlContactMessageIconAndLinkLayout.setVisibility(View.VISIBLE);
             holder.urlContactMessageLink.setText(androidMessage.getRichLinkMessage().getServer());
 
-            holder.urlContactMessageIcon.setImageResource(R.drawable.ic_launcher);
+            holder.urlContactMessageIcon.setImageResource(R.drawable.ic_mega_round);
             holder.urlContactMessageIcon.setVisibility(View.VISIBLE);
 
             holder.urlContactMessageText.setLinksClickable(false);
