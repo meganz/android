@@ -2,8 +2,8 @@ package mega.privacy.android.app.usecase
 
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaGlobalListenerInterface
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaEvent
@@ -37,7 +37,7 @@ class GetGlobalChangesUseCase @Inject constructor(
         object OnAccountUpdate : Result()
     }
 
-    fun get(): Flowable<Result> =
+    operator fun invoke(): Flowable<Result> =
         Flowable.create({ emitter ->
             val listener = OptionalMegaGlobalListenerInterface(
                 onUsersUpdate = { users ->

@@ -160,7 +160,7 @@ internal class ImageViewerViewModelTest {
     private fun stubCommon() {
         runBlocking {
             whenever(isUserLoggedIn.invoke()).thenReturn(true)
-            whenever(getGlobalChangesUseCase.get()).thenAnswer {
+            whenever(getGlobalChangesUseCase()).thenAnswer {
                 Flowable.just(
                     GetGlobalChangesUseCase.Result.OnNodesUpdate(
                         emptyList()

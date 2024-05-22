@@ -194,7 +194,7 @@ class GetContactsUseCase @Inject constructor(
                 onError = Timber::e
             ).addTo(disposable)
 
-        getGlobalChangesUseCase.get()
+        getGlobalChangesUseCase()
             .filter { it is GetGlobalChangesUseCase.Result.OnUsersUpdate }
             .map { (it as GetGlobalChangesUseCase.Result.OnUsersUpdate).users ?: emptyList() }
             .subscribeBy(

@@ -511,7 +511,7 @@ class ImageViewerViewModel @Inject constructor(
      */
     @Suppress("SENSELESS_COMPARISON")
     private fun subscribeToNodeChanges() {
-        getGlobalChangesUseCase.get()
+        getGlobalChangesUseCase()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .filter { change -> change is Result.OnNodesUpdate }

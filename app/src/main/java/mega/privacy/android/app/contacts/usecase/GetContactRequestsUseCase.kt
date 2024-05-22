@@ -16,7 +16,6 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
@@ -24,6 +23,7 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.view.TextDrawable
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.USER_ATTR_AVATAR
 import nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME
@@ -92,7 +92,7 @@ class GetContactRequestsUseCase @Inject constructor(
                 }
             )
 
-            val globalSubscription = getGlobalChangesUseCase.get()
+            val globalSubscription = getGlobalChangesUseCase()
                 .filter { it is Result.OnContactRequestsUpdate }
                 .map { (it as Result.OnContactRequestsUpdate).contactRequests ?: emptyList() }
                 .subscribeBy(
@@ -151,7 +151,7 @@ class GetContactRequestsUseCase @Inject constructor(
                 emitter.onNext(requestsSize.first)
             })
 
-            val globalSubscription = getGlobalChangesUseCase.get()
+            val globalSubscription = getGlobalChangesUseCase()
                 .filter { change -> change is Result.OnContactRequestsUpdate }
                 .subscribeBy(
                     onNext = {
