@@ -179,7 +179,8 @@ fun SearchComposeView(
                         gridState = gridState,
                         modifier = Modifier.padding(padding),
                         fileTypeIconMapper = fileTypeIconMapper,
-                        inSelectionMode = state.selectedNodes.isNotEmpty()
+                        inSelectionMode = state.selectedNodes.isNotEmpty(),
+                        accountType = state.accountType,
                     )
                 } else {
                     LegacyMegaEmptyViewForSearch(

@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -75,18 +76,21 @@ fun NodeListViewItem(
     labelColor: Color? = null,
     showLink: Boolean = false,
     showFavourite: Boolean = false,
+    isSensitive: Boolean = false,
     onMoreClicked: (() -> Unit)? = null,
     onInfoClicked: (() -> Unit)? = null,
     onItemClicked: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
 ) {
     GenericTwoLineListItem(
-        modifier = modifier.combinedClickable(
-            onLongClick = onLongClick,
-            onClick = {
-                onItemClicked?.invoke()
-            }
-        ),
+        modifier = modifier
+            .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
+            .combinedClickable(
+                onLongClick = onLongClick,
+                onClick = {
+                    onItemClicked?.invoke()
+                }
+            ),
         fillSubTitleText = showIsVerified.not(),
         icon = {
             AnimatedContent(targetState = isSelected, label = "node thumbnail") {

@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -82,6 +83,7 @@ fun NodeGridViewItem(
     onLongClick: () -> Unit = {},
     onMenuClick: (() -> Unit)? = null,
     inVisible: Boolean = false,
+    isSensitive: Boolean = false,
 ) {
 
     if (inVisible) {
@@ -94,6 +96,7 @@ fun NodeGridViewItem(
         Column(
             modifier = modifier
                 .fillMaxWidth()
+                .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
                 .border(
                     width = 1.dp,
                     color = if (isSelected) MegaTheme.colors.border.subtleSelected

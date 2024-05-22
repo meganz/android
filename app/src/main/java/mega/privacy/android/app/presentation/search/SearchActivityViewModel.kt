@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.updateItemAt
@@ -38,12 +40,15 @@ import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -81,6 +86,8 @@ class SearchActivityViewModel @Inject constructor(
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     stateHandle: SavedStateHandle,
 ) : ViewModel() {
     /**
@@ -99,11 +106,15 @@ class SearchActivityViewModel @Inject constructor(
     private val parentHandle =
         stateHandle.get<Long>(SearchActivity.PARENT_HANDLE) ?: MegaApiJava.INVALID_HANDLE
 
+    private var showHiddenItems: Boolean = true
+
     init {
         checkDropdownChipsFlag()
         monitorNodeUpdatesForSearch()
         initializeSearch()
         checkViewType()
+        monitorAccountDetail()
+        monitorShowHiddenItems()
     }
 
     private fun checkDropdownChipsFlag() {
@@ -202,7 +213,8 @@ class SearchActivityViewModel @Inject constructor(
         }
     }
 
-    private suspend fun onSearchSuccess(searchResults: List<TypedNode>?) {
+    private suspend fun onSearchSuccess(sourceSearchResults: List<TypedNode>?) {
+        val searchResults = filterNonSensitiveNodes(sourceSearchResults)
         if (searchResults.isNullOrEmpty()) {
             val emptyState = getEmptySearchState()
             _state.update {
@@ -224,6 +236,15 @@ class SearchActivityViewModel @Inject constructor(
                     sortOrder = cloudSortOrder
                 )
             }
+        }
+    }
+
+    private fun filterNonSensitiveNodes(nodes: List<TypedNode>?): List<TypedNode>? {
+        val accountType = _state.value.accountType ?: return nodes
+        return if (showHiddenItems || !accountType.isPaid) {
+            nodes
+        } else {
+            nodes?.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
         }
     }
 
@@ -551,5 +572,30 @@ class SearchActivityViewModel @Inject constructor(
             state.copy(navigationLevel = list)
         }
         performSearch()
+    }
+
+    private fun monitorAccountDetail() {
+        monitorAccountDetailUseCase()
+            .onEach { accountDetail ->
+                _state.update {
+                    it.copy(accountType = accountDetail.levelDetail?.accountType)
+                }
+                if (_state.value.isSearching) return@onEach
+
+                performSearch()
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun monitorShowHiddenItems() {
+        monitorShowHiddenItemsUseCase()
+            .conflate()
+            .onEach { show ->
+                showHiddenItems = show
+                if (_state.value.isSearching) return@onEach
+
+                performSearch()
+            }
+            .launchIn(viewModelScope)
     }
 }

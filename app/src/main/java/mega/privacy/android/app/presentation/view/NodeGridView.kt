@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.getIcon
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -63,6 +64,7 @@ fun <T : TypedNode> NodeGridView(
     isPublicNode: Boolean = false,
     inSelectionMode: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
+    accountType: AccountType? = null,
 ) {
     LazyVerticalGrid(
         state = gridState,
@@ -104,6 +106,7 @@ fun <T : TypedNode> NodeGridView(
                 }
             },
         ) {
+            val node = nodeUIItems[it].node
             NodeGridViewItem(
                 isSelected = nodeUIItems[it].isSelected,
                 name = nodeUIItems[it].node.name,
@@ -117,6 +120,7 @@ fun <T : TypedNode> NodeGridView(
                 isVideoNode = (nodeUIItems[it].node as? FileNode)?.type is VideoFileTypeInfo,
                 isFolderNode = nodeUIItems[it].node is TypedFolderNode,
                 inVisible = nodeUIItems[it].isInvisible,
+                isSensitive = accountType?.isPaid == true && (node.isMarkedSensitive || node.isSensitiveInherited),
             )
         }
     }

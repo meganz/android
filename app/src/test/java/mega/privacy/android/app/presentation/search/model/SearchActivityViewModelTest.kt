@@ -18,7 +18,11 @@ import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -33,6 +37,7 @@ import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
@@ -40,6 +45,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -78,6 +84,9 @@ class SearchActivityViewModelTest {
     private val dateFilterStringMapper: DateFilterOptionStringResMapper = mock()
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase = mock()
     private val searchUseCase: SearchUseCase = mock()
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
+    private val accountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
 
 
     private val nodeList = mutableListOf<TypedNode>()
@@ -110,6 +119,8 @@ class SearchActivityViewModelTest {
             typeFilterOptionStringResMapper = typeFilterStringMapper,
             dateFilterOptionStringResMapper = dateFilterStringMapper,
             searchUseCase = searchUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
         )
     }
 
@@ -419,6 +430,100 @@ class SearchActivityViewModelTest {
             }
         }
 
+    @Test
+    fun `test that sensitive nodes should be filtered with subscribed account`() = runTest {
+        // given
+        val accountDetail = AccountDetail(
+            levelDetail = AccountLevelDetail(
+                accountType = AccountType.BUSINESS,
+                subscriptionStatus = null,
+                subscriptionRenewTime = 0L,
+                accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                proExpirationTime = 0L,
+            )
+        )
+        accountDetailFakeFlow.emit(accountDetail)
+
+        val query = "query"
+        val typedFolderNode = mock<TypedFolderNode> {
+            on { id }.thenReturn(NodeId(345L))
+            on { name }.thenReturn("folder node")
+        }
+        val typedFileNode = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(123L))
+            on { name }.thenReturn("file node")
+            on { isMarkedSensitive }.thenReturn(true)
+            on { isSensitiveInherited }.thenReturn(true)
+        }
+
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
+        whenever(
+            searchUseCase(
+                query = query,
+                parentHandle = NodeId(parentHandle),
+                nodeSourceType = nodeSourceType,
+            )
+        ).thenReturn(listOf(typedFileNode, typedFolderNode))
+
+        // when
+        underTest.updateSearchQuery(query)
+
+        // then
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.searchItemList.size).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `test that sensitive nodes should not be filtered with non-subscribed account`() = runTest {
+        // given
+        val accountDetail = AccountDetail(
+            levelDetail = AccountLevelDetail(
+                accountType = AccountType.FREE,
+                subscriptionStatus = null,
+                subscriptionRenewTime = 0L,
+                accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                proExpirationTime = 0L,
+            )
+        )
+        accountDetailFakeFlow.emit(accountDetail)
+
+        val query = "query"
+        val typedFolderNode = mock<TypedFolderNode> {
+            on { id }.thenReturn(NodeId(345L))
+            on { name }.thenReturn("folder node")
+            on { isMarkedSensitive }.thenReturn(true)
+            on { isSensitiveInherited }.thenReturn(true)
+        }
+        val typedFileNode = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(123L))
+            on { name }.thenReturn("file node")
+            on { isMarkedSensitive }.thenReturn(true)
+            on { isSensitiveInherited }.thenReturn(true)
+        }
+
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
+        whenever(
+            searchUseCase(
+                query = query,
+                parentHandle = NodeId(parentHandle),
+                nodeSourceType = nodeSourceType,
+            )
+        ).thenReturn(listOf(typedFileNode, typedFolderNode))
+
+        // when
+        underTest.updateSearchQuery(query)
+
+        // then
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.searchItemList.size).isEqualTo(2)
+        }
+    }
+
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
@@ -432,6 +537,8 @@ class SearchActivityViewModelTest {
         whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
             false
         )
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
     }
 
     @Test

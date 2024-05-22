@@ -25,6 +25,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewI
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
@@ -73,6 +74,7 @@ fun <T : TypedNode> NodeListView(
     showPublicLinkCreationTime: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     inSelectionMode: Boolean = false,
+    accountType: AccountType? = null,
 ) {
     LazyColumn(
         state = listState,
@@ -124,6 +126,7 @@ fun <T : TypedNode> NodeListView(
                 showIsVerified = nodeUiItem.isIncomingShare && (nodeUiItem.node as? ShareFolderNode)?.shareData?.isContactCredentialsVerified == true,
                 showVersion = nodeUiItem.hasVersion,
                 isTakenDown = nodeUiItem.isTakenDown,
+                isSensitive = accountType?.isPaid == true && (nodeUiItem.isMarkedSensitive || nodeUiItem.isSensitiveInherited),
             )
             MegaDivider(dividerType = DividerType.BigStartPadding)
         }

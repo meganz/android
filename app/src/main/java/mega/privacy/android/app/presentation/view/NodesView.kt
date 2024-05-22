@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.AccountType
 
 
 /**
@@ -69,6 +70,7 @@ fun <T : TypedNode> NodesView(
     inSelectionMode: Boolean = false,
     onEnterMediaDiscoveryClick: () -> Unit = {},
     listContentPadding: PaddingValues = PaddingValues(0.dp),
+    accountType: AccountType? = null,
 ) {
     val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
     val orientation = LocalConfiguration.current.orientation
@@ -99,7 +101,8 @@ fun <T : TypedNode> NodesView(
             isPublicNode = isPublicNode,
             showPublicLinkCreationTime = showPublicLinkCreationTime,
             fileTypeIconMapper = fileTypeIconMapper,
-            inSelectionMode = inSelectionMode
+            inSelectionMode = inSelectionMode,
+            accountType = accountType,
         )
     } else {
         val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = span)
@@ -127,7 +130,8 @@ fun <T : TypedNode> NodesView(
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             isPublicNode = isPublicNode,
             fileTypeIconMapper = fileTypeIconMapper,
-            inSelectionMode = inSelectionMode
+            inSelectionMode = inSelectionMode,
+            accountType = accountType,
         )
     }
     if (takenDownDialog.value.first) {

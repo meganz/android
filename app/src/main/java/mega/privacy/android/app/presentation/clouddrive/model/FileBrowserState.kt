@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property mediaDiscoveryViewSettings current settings for displaying discovery view
  * @property isPendingRefresh
  * @property nodesList list of [NodeUIItem]
+ * @property sourceNodesList list of [NodeUIItem]
  * @property isInSelection if list is in selection mode or not
  * @property itemIndex index of item clicked
  * @property currentFileNode [FileNode]
@@ -61,6 +62,7 @@ data class FileBrowserState(
     val mediaDiscoveryViewSettings: Int = MediaDiscoveryViewSettings.INITIAL.ordinal,
     val isPendingRefresh: Boolean = false,
     val nodesList: List<NodeUIItem<TypedNode>> = emptyList(),
+    val sourceNodesList: List<NodeUIItem<TypedNode>> = emptyList(),
     val isInSelection: Boolean = false,
     val selectedNodeHandles: List<Long> = emptyList(),
     val selectedFileNodes: Int = 0,
