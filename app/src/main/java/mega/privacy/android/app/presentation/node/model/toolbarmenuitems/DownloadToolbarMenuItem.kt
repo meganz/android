@@ -14,7 +14,7 @@ class DownloadToolbarMenuItem @Inject constructor(
     override val menuAction: DownloadMenuAction,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

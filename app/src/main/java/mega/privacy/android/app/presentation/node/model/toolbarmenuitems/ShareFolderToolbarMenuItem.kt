@@ -29,7 +29,7 @@ class ShareFolderToolbarMenuItem @Inject constructor(
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

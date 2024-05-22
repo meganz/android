@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node
 
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
+import mega.privacy.android.app.activities.contract.HiddenNodeOnboardingActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
@@ -11,6 +12,8 @@ import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOffl
 import mega.privacy.android.app.presentation.node.model.menuaction.ClearSelectionMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.HideDropdownMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.HideMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.MoveMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.OpenWithMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.RestoreMenuAction
@@ -18,9 +21,9 @@ import mega.privacy.android.app.presentation.node.model.menuaction.SelectAllMenu
 import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
 
 /**
  * Node bottom sheet action handler
@@ -109,6 +112,13 @@ class NodeActionHandler(
             }
         }
 
+    private val hiddenNodesOnboardingLauncher =
+        (activity as? AppCompatActivity)?.registerForActivityResult(
+            HiddenNodeOnboardingActivityContract()
+        ) { result ->
+            nodeActionsViewModel.handleHiddenNodesOnboardingResult(result)
+        }
+
     /**
      * handles actions from bottom sheet
      *
@@ -127,6 +137,7 @@ class NodeActionHandler(
             is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview()
             is DownloadMenuAction -> nodeActionsViewModel.downloadNode()
             is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline()
+            is HideMenuAction -> hiddenNodesOnboardingLauncher?.launch(longArrayOf(node.id.longValue))
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }
     }
@@ -174,6 +185,11 @@ class NodeActionHandler(
             is RestoreMenuAction -> {
                 val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
                 restoreFromRubbishLauncher?.launch(nodeHandleArray)
+            }
+
+            is HideDropdownMenuAction -> {
+                val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
+                hiddenNodesOnboardingLauncher?.launch(nodeHandleArray)
             }
 
             else -> throw NotImplementedError("Action $action does not have a handler.")

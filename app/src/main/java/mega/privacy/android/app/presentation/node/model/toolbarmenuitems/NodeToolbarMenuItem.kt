@@ -31,7 +31,7 @@ interface NodeToolbarMenuItem<T : MenuAction> {
      * @param resultCount
      * @return [Boolean]
      */
-    fun shouldDisplay(
+    suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

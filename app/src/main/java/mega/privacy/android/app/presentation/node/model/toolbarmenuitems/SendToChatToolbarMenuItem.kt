@@ -23,7 +23,7 @@ class SendToChatToolbarMenuItem @Inject constructor(
     private val getNodeToAttachUseCase: GetNodeToAttachUseCase,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

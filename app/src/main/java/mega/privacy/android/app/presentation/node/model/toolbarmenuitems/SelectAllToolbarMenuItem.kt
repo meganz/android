@@ -15,7 +15,7 @@ class SelectAllToolbarMenuItem @Inject constructor(
     override val menuAction: SelectAllMenuAction,
 ) : NodeToolbarMenuItem<MenuAction> {
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

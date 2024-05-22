@@ -22,7 +22,7 @@ class RemoveLinkToolbarMenuItem @Inject constructor(
 
     override val menuAction = RemoveLinkMenuAction(170)
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

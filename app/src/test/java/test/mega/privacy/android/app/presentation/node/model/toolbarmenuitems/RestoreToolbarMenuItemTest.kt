@@ -59,7 +59,7 @@ class RestoreToolbarMenuItemTest {
         noNodeIsTakenDown: Boolean,
         selectedNodes: List<TypedNode>,
         expected: Boolean,
-    ) {
+    ) = runTest {
         val result = underTest.shouldDisplay(
             hasNodeAccessPermission = false,
             selectedNodes = selectedNodes,

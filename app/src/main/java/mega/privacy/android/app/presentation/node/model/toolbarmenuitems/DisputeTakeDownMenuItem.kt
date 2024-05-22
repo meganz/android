@@ -21,7 +21,7 @@ class DisputeTakeDownMenuItem @Inject constructor(
     override val menuAction: DisputeTakeDownMenuAction,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

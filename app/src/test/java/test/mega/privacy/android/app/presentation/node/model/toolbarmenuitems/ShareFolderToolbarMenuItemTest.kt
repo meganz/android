@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
@@ -38,7 +39,7 @@ class ShareFolderToolbarMenuItemTest {
         noNodeTakenDown: Boolean,
         selectedNodes: List<TypedNode>,
         expected: Boolean,
-    ) {
+    ) = runTest {
         val result = underTest.shouldDisplay(
             hasNodeAccessPermission = false,
             selectedNodes = selectedNodes,

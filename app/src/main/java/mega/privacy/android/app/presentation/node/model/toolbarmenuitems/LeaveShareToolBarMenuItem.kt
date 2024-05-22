@@ -24,7 +24,7 @@ class LeaveShareToolBarMenuItem @Inject constructor(
     private val stringWithDelimitersMapper: ListToStringWithDelimitersMapper,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.node.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.ShareData
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @property downloadEvent Download event
  * @property selectAll Select All event
  * @property clearAll clear All Event
+ * @property infoToShowEvent Info to show event
  */
 data class NodeActionState(
     val selectedNodes: List<TypedNode> = emptyList(),
@@ -38,4 +40,5 @@ data class NodeActionState(
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val selectAll: StateEvent = consumed,
     val clearAll: StateEvent = consumed,
+    val infoToShowEvent: StateEventWithContent<InfoToShow?> = consumed(),
 )

@@ -20,7 +20,7 @@ class GetLinkToolbarMenuItem @Inject constructor(
     override val menuAction: GetLinkMenuAction,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

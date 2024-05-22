@@ -23,7 +23,7 @@ class MultiSelectManageLinkToolbarMenuItem @Inject constructor() :
     NodeToolbarMenuItem<MenuActionWithIcon> {
 
     override val menuAction = ManageLinkMenuAction()
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

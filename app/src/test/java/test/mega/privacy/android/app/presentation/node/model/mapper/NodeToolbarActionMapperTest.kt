@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.mapper
 
 import com.google.common.truth.Truth
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.ClearSelectionMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
@@ -37,9 +38,9 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToC
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 
@@ -93,7 +94,7 @@ class NodeToolbarActionMapperTest {
     )
 
     @Test
-    fun `test that node toolbar mapper returns list of menu action`() {
+    fun `test that node toolbar mapper returns list of menu action`() = runTest {
         val mappedOptions = underTest.invoke(
             toolbarOptions = toolbarList,
             hasNodeAccessPermission = true,
@@ -106,30 +107,33 @@ class NodeToolbarActionMapperTest {
     }
 
     @Test
-    fun `test that any selected node is a folder then send to chat option will not be shown to the user`() {
-        val mappedOptions = underTest.invoke(
-            toolbarOptions = toolbarList,
-            hasNodeAccessPermission = true,
-            selectedNodes = listOf(mock<TypedFolderNode>()),
-            allNodeCanBeMovedToTarget = true,
-            noNodeInBackups = true,
-            resultCount = 10,
-        )
-        Truth.assertThat(mappedOptions).doesNotContain(SendToChatMenuAction())
-    }
+    fun `test that any selected node is a folder then send to chat option will not be shown to the user`() =
+        runTest {
+            val mappedOptions = underTest.invoke(
+                toolbarOptions = toolbarList,
+                hasNodeAccessPermission = true,
+                selectedNodes = listOf(mock<TypedFolderNode>()),
+                allNodeCanBeMovedToTarget = true,
+                noNodeInBackups = true,
+                resultCount = 10,
+            )
+            Truth.assertThat(mappedOptions).doesNotContain(SendToChatMenuAction())
+        }
 
     @Test
-    fun `test that any selected node is taken down then send to chat option will not be shown to the user`() {
-        val mappedOptions = underTest.invoke(
-            toolbarOptions = toolbarList,
-            hasNodeAccessPermission = true,
-            selectedNodes = listOf(mock<TypedFolderNode> {
-                on { isTakenDown }.thenReturn(true)
-            }),
-            allNodeCanBeMovedToTarget = true,
-            noNodeInBackups = true,
-            resultCount = 10,
-        )
-        Truth.assertThat(mappedOptions).doesNotContain(GetLinkToolbarMenuItem(GetLinkMenuAction()))
-    }
+    fun `test that any selected node is taken down then send to chat option will not be shown to the user`() =
+        runTest {
+            val mappedOptions = underTest.invoke(
+                toolbarOptions = toolbarList,
+                hasNodeAccessPermission = true,
+                selectedNodes = listOf(mock<TypedFolderNode> {
+                    on { isTakenDown }.thenReturn(true)
+                }),
+                allNodeCanBeMovedToTarget = true,
+                noNodeInBackups = true,
+                resultCount = 10,
+            )
+            Truth.assertThat(mappedOptions)
+                .doesNotContain(GetLinkToolbarMenuItem(GetLinkMenuAction()))
+        }
 }

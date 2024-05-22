@@ -13,6 +13,7 @@ import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.Down
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.EditBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.FavouriteBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.GetLinkBottomSheetMenuItem
+import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.HideBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.InfoBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.LabelBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.LeaveShareBottomSheetMenuItem
@@ -32,6 +33,7 @@ import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.Shar
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.ShareFolderBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.SlideshowBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.TrashBottomSheetMenuItem
+import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.UnhideBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.VerifyBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.VersionsBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.ViewInFolderBottomSheetMenuItem
@@ -74,6 +76,8 @@ abstract class BottomSheetItemModule {
             removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
             removeShareMenuAction: RemoveShareBottomSheetMenuItem,
             renameMenuAction: RenameBottomSheetMenuItem,
+            hideMenuAction: HideBottomSheetMenuItem,
+            unhideMenuAction: UnhideBottomSheetMenuItem,
             restoreMenuAction: RestoreBottomSheetMenuItem,
             sendToChatMenuAction: SendToChatBottomSheetMenuItem,
             shareMenuAction: ShareBottomSheetMenuItem,
@@ -105,6 +109,8 @@ abstract class BottomSheetItemModule {
                 removeLinkMenuAction,
                 removeShareMenuAction,
                 renameMenuAction,
+                hideMenuAction,
+                unhideMenuAction,
                 restoreMenuAction,
                 sendToChatMenuAction,
                 shareMenuAction,

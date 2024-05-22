@@ -15,7 +15,7 @@ class ClearSelectionToolbarMenuItem @Inject constructor(
     override val menuAction: ClearSelectionMenuAction,
 ) : NodeToolbarMenuItem<MenuAction> {
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

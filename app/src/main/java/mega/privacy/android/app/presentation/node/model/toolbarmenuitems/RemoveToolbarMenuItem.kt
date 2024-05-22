@@ -22,7 +22,7 @@ class RemoveToolbarMenuItem @Inject constructor(
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

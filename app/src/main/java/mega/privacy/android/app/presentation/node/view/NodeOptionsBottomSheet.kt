@@ -26,16 +26,16 @@ import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewMode
 import mega.privacy.android.app.presentation.view.extension.fileInfo
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.app.presentation.view.extension.getIcon
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import timber.log.Timber
 
 
@@ -60,6 +60,7 @@ internal fun NodeOptionsBottomSheetContent(
         keyboardController?.hide()
         viewModel.getBottomSheetOptions(nodeId)
     }
+
     val sortedMap = remember(uiState.actions) {
         mutableStateOf(
             uiState.actions

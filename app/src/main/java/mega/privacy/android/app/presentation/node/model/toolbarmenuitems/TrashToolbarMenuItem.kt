@@ -22,7 +22,7 @@ class TrashToolbarMenuItem @Inject constructor(
 ) : NodeToolbarMenuItem<MenuAction> {
 
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.CopyToo
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLinkToolbarMenuItem
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.HideDropdownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MoveToolbarMenuItem
@@ -23,17 +24,18 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSe
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkDropDownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareDropDown
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareDropDown
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropdownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAllToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChatToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.UnhideDropdownMenuItem
 
 /**
  * Toolbar module
@@ -159,6 +161,8 @@ abstract class ToolbarItemModule {
         fun provideCloudDriveToolbarItems(
             selectAllToolbarMenuItem: SelectAllToolbarMenuItem,
             clearSelectionToolbarMenuItem: ClearSelectionToolbarMenuItem,
+            hideDropdownMenuItem: HideDropdownMenuItem,
+            unhideDropdownMenuItem: UnhideDropdownMenuItem,
             renameToolbarMenuItem: RenameToolbarMenuItem,
             manageLink: MultiSelectManageLinkToolbarMenuItem,
             getLinkToolbarMenuItem: GetLinkToolbarMenuItem,
@@ -176,6 +180,8 @@ abstract class ToolbarItemModule {
             return setOf(
                 selectAllToolbarMenuItem,
                 clearSelectionToolbarMenuItem,
+                hideDropdownMenuItem,
+                unhideDropdownMenuItem,
                 download,
                 disputeTakeDownMenuItem,
                 moveToolbarMenuItem,

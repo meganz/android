@@ -14,7 +14,7 @@ class MoveToolbarMenuItem @Inject constructor(
     override val menuAction: MoveMenuAction,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

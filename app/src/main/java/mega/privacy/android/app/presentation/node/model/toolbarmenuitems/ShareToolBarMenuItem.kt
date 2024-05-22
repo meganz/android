@@ -34,7 +34,7 @@ class ShareToolBarMenuItem @Inject constructor(
     private val getFileUriUseCase: GetFileUriUseCase,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

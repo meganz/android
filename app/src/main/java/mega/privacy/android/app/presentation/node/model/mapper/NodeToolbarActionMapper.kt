@@ -21,7 +21,7 @@ class NodeToolbarActionMapper @Inject constructor() {
      * @param noNodeInBackups checks if no node is part of back ups
      * @param allNodeCanBeMovedToTarget checks if node can be moved to rubbish bin
      */
-    operator fun invoke(
+    suspend operator fun invoke(
         toolbarOptions: Set<@JvmSuppressWildcards NodeToolbarMenuItem<*>>,
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,

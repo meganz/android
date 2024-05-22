@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -27,7 +28,7 @@ class DownloadToolbarMenuItemTest {
     fun `test that the download item visibility is adjusted`(
         noNodeIsTakenDown: Boolean,
         expected: Boolean,
-    ) {
+    ) = runTest {
         val result = underTest.shouldDisplay(
             hasNodeAccessPermission = false,
             selectedNodes = multipleNodes,

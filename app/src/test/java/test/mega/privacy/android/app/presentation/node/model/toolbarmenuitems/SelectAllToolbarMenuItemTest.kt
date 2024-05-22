@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.menuaction.SelectAllMenuAction
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAllToolbarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -29,7 +30,7 @@ class SelectAllToolbarMenuItemTest {
         selectedNodes: List<TypedNode>,
         resultCount: Int,
         expected: Boolean,
-    ) {
+    ) = runTest {
         val result = underTest.shouldDisplay(
             hasNodeAccessPermission = false,
             selectedNodes = selectedNodes,

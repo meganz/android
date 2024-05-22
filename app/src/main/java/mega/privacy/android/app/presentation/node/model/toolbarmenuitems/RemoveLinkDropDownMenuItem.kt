@@ -21,7 +21,7 @@ class RemoveLinkDropDownMenuItem @Inject constructor(
 
     override val menuAction = RemoveLinkDropdownMenuAction()
 
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,

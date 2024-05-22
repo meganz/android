@@ -15,7 +15,7 @@ import javax.inject.Inject
 class RenameToolbarMenuItem @Inject constructor() : NodeToolbarMenuItem<MenuActionWithIcon> {
 
     override val menuAction = RenameMenuAction()
-    override fun shouldDisplay(
+    override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
         canBeMovedToTarget: Boolean,
