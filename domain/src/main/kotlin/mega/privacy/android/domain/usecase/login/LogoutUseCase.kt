@@ -9,6 +9,7 @@ import javax.inject.Inject
  */
 class LogoutUseCase @Inject constructor(
     private val loginRepository: LoginRepository,
+    private val setLogoutInProgressFlagUseCase: SetLogoutInProgressFlagUseCase,
     private val logoutTasks: Set<@JvmSuppressWildcards LogoutTask>,
 ) {
 
@@ -16,14 +17,14 @@ class LogoutUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke() {
-        loginRepository.setLogoutInProgressFlag(true)
+        setLogoutInProgressFlagUseCase(true)
         runCatching {
             logoutTasks.forEach {
                 it()
             }
             loginRepository.logout()
         }.onFailure {
-            loginRepository.setLogoutInProgressFlag(false)
+            setLogoutInProgressFlagUseCase(false)
             throw it
         }
     }
