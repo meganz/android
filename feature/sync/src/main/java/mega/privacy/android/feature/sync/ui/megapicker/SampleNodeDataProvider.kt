@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 
 internal class SampleNodeDataProvider {
@@ -130,9 +129,12 @@ internal class SampleNodeDataProvider {
             override val versionCount: Int = 0
         }
 
-        val values: List<TypedNode> =
+        val values: List<TypedNodeUiModel> =
             listOf(
-                nodeUIItem1, nodeUIItem2, nodeUIItem3, nodeUIItem4
+                TypedNodeUiModel(nodeUIItem1),
+                TypedNodeUiModel(nodeUIItem2, isDisabled = true),
+                TypedNodeUiModel(nodeUIItem3),
+                TypedNodeUiModel(nodeUIItem4)
             )
     }
 }

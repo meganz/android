@@ -16,24 +16,24 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.extension.getIcon
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun MegaFolderPickerView(
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
-    nodesList: List<TypedNode>,
+    nodesList: List<TypedNodeUiModel>,
     sortOrder: String,
     showSortOrder: Boolean,
     showChangeViewType: Boolean,
@@ -58,9 +58,9 @@ internal fun MegaFolderPickerView(
         }
         items(count = nodesList.size,
             key = {
-                nodesList[it].id.longValue
+                nodesList[it].node.id.longValue
             }) {
-            val nodeEntity = nodesList[it]
+            val nodeEntity = nodesList[it].node
 
             val icon = when (nodeEntity) {
                 is FolderNode -> nodeEntity.getIcon()
@@ -89,8 +89,8 @@ internal fun MegaFolderPickerView(
                 isTakenDown = false,
                 isFavourite = false,
                 isSharedWithPublicLink = false,
-                onClick = { onFolderClick(nodesList[it]) },
-                isEnabled = nodeEntity is FolderNode,
+                onClick = { onFolderClick(nodeEntity) },
+                isEnabled = nodeEntity is FolderNode && nodesList[it].isDisabled.not(),
             )
             Divider(
                 modifier = Modifier

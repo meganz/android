@@ -15,16 +15,19 @@ import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerState
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerViewModel
+import mega.privacy.android.feature.sync.ui.megapicker.TypedNodeUiModel
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -46,15 +49,14 @@ internal class MegaPickerViewModelTest {
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
     private val tryNodeSyncUseCase: TryNodeSyncUseCase = mock()
     private val deviceFolderUINodeErrorMessageMapper: DeviceFolderUINodeErrorMessageMapper = mock()
+    private val getCameraUploadsFolderHandleUseCase: GetPrimarySyncHandleUseCase = mock()
+    private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase = mock()
+    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase = mock()
 
-    private val childrenNodes: List<TypedNode> = mock()
+    private val typedNodeUiModels: List<TypedNodeUiModel> = emptyList()
+    private val childrenNodes: List<TypedNode> = emptyList()
 
     private lateinit var underTest: MegaPickerViewModel
-
-    @BeforeEach
-    fun setUp() {
-        initViewModel()
-    }
 
     @AfterEach
     fun resetAndTearDown() {
@@ -64,7 +66,10 @@ internal class MegaPickerViewModelTest {
             getTypedNodesFromFolder,
             getNodeByHandleUseCase,
             tryNodeSyncUseCase,
-            deviceFolderUINodeErrorMessageMapper
+            deviceFolderUINodeErrorMessageMapper,
+            getCameraUploadsFolderHandleUseCase,
+            getMediaUploadsFolderHandleUseCase,
+            getMyChatsFilesFolderIdUseCase
         )
     }
 
@@ -79,9 +84,53 @@ internal class MegaPickerViewModelTest {
             emit(childrenNodes)
             awaitCancellation()
         })
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+
         initViewModel()
         val expectedState = MegaPickerState(
-            currentFolder = rootFolder, nodes = childrenNodes
+            currentFolder = rootFolder, nodes = typedNodeUiModels
+        )
+
+        underTest.state.test {
+            assertThat(awaitItem()).isEqualTo(expectedState)
+        }
+    }
+
+    @Test
+    fun `test that viewmodel disables CU and chat directories`() = runTest {
+        val rootFolderId = NodeId(123456L)
+        val cameraUploadsFolderId = NodeId(146L)
+        val mediaUploadsFolderId = NodeId(147L)
+        val mediaUploadsFolder = mock<TypedNode> {
+            on { id } doReturn mediaUploadsFolderId
+        }
+        val chatFilesFolderId = NodeId(3211L)
+        val rootFolder: FolderNode = mock {
+            on { id } doReturn rootFolderId
+        }
+        val childrenNodesWithCUAndChat =
+            listOf(
+                cameraUploadsFolderId, mediaUploadsFolderId, chatFilesFolderId
+            ).map { nodeId ->
+                mock<TypedNode> { on { id } doReturn nodeId }
+            }
+        whenever(getRootNodeUseCase()).thenReturn(rootFolder)
+        whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(flow {
+            emit(childrenNodesWithCUAndChat)
+            awaitCancellation()
+        })
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(cameraUploadsFolderId.longValue)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(mediaUploadsFolder)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(chatFilesFolderId)
+
+        initViewModel()
+        val expectedState = MegaPickerState(
+            currentFolder = rootFolder,
+            nodes = childrenNodesWithCUAndChat.map {
+                TypedNodeUiModel(it, true)
+            }
         )
 
         underTest.state.test {
@@ -96,12 +145,15 @@ internal class MegaPickerViewModelTest {
         val clickedFolder: TypedFolderNode = mock {
             on { id } doReturn clickedFolderId
         }
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
         whenever(getTypedNodesFromFolder(clickedFolderId)).thenReturn(flow {
             emit(childrenNodes)
             awaitCancellation()
         })
         val expectedState = MegaPickerState(
-            currentFolder = clickedFolder, nodes = childrenNodes
+            currentFolder = clickedFolder, nodes = typedNodeUiModels
         )
 
         underTest.handleAction(MegaPickerAction.FolderClicked(clickedFolder))
@@ -122,6 +174,9 @@ internal class MegaPickerViewModelTest {
         val parentFolder: TypedFolderNode = mock {
             on { id } doReturn parentFolderId
         }
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
         whenever(getRootNodeUseCase()).thenReturn(currentFolder)
         whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
             emit(childrenNodes)
@@ -133,8 +188,9 @@ internal class MegaPickerViewModelTest {
             awaitCancellation()
         })
         val expectedState = MegaPickerState(
-            currentFolder = parentFolder, nodes = childrenNodes
+            currentFolder = parentFolder, nodes = typedNodeUiModels
         )
+
         initViewModel()
 
         underTest.handleAction(MegaPickerAction.BackClicked)
@@ -152,11 +208,15 @@ internal class MegaPickerViewModelTest {
             on { id } doReturn currentFolderId
             on { name } doReturn currentFolderName
         }
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
         whenever(getRootNodeUseCase()).thenReturn(currentFolder)
         whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
             emit(childrenNodes)
             awaitCancellation()
         })
+
         initViewModel()
 
         underTest.handleAction(
@@ -168,8 +228,7 @@ internal class MegaPickerViewModelTest {
 
         verify(setSelectedMegaFolderUseCase).invoke(
             RemoteFolder(
-                currentFolderId.longValue,
-                currentFolderName
+                currentFolderId.longValue, currentFolderName
             )
         )
     }
@@ -177,6 +236,7 @@ internal class MegaPickerViewModelTest {
     @Test
     fun `test that all files access permission is shown when it is not granted`() = runTest {
         whenever(tryNodeSyncUseCase(NodeId(0))).thenReturn(Unit)
+
         initViewModel()
 
         underTest.handleAction(
@@ -220,8 +280,7 @@ internal class MegaPickerViewModelTest {
             )
 
             underTest.state.test {
-                assertThat(awaitItem().showDisableBatteryOptimizationsDialog)
-                    .isEqualTo(true)
+                assertThat(awaitItem().showDisableBatteryOptimizationsDialog).isEqualTo(true)
             }
         }
 
@@ -266,6 +325,9 @@ internal class MegaPickerViewModelTest {
             )
             whenever(deviceFolderUINodeErrorMessageMapper(syncError)).thenReturn(errorStringRes)
             doAnswer { throw error }.whenever(tryNodeSyncUseCase).invoke(currentFolderId)
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
             initViewModel()
 
             underTest.handleAction(
@@ -280,18 +342,18 @@ internal class MegaPickerViewModelTest {
         }
 
     @Test
-    fun `test that error message event is null when viewmodel handle action is called`() =
-        runTest {
-            initViewModel()
+    fun `test that error message event is null when viewmodel handle action is called`() = runTest {
 
-            underTest.handleAction(
-                MegaPickerAction.ErrorMessageShown
-            )
+        initViewModel()
 
-            underTest.state.test {
-                assertThat(awaitItem().errorMessageId).isEqualTo(null)
-            }
+        underTest.handleAction(
+            MegaPickerAction.ErrorMessageShown
+        )
+
+        underTest.state.test {
+            assertThat(awaitItem().errorMessageId).isEqualTo(null)
         }
+    }
 
     private fun initViewModel() {
         underTest = MegaPickerViewModel(
@@ -300,7 +362,10 @@ internal class MegaPickerViewModelTest {
             getTypedNodesFromFolder,
             getNodeByHandleUseCase,
             tryNodeSyncUseCase,
-            deviceFolderUINodeErrorMessageMapper
+            deviceFolderUINodeErrorMessageMapper,
+            getCameraUploadsFolderHandleUseCase,
+            getMediaUploadsFolderHandleUseCase,
+            getMyChatsFilesFolderIdUseCase
         )
     }
 }

@@ -18,22 +18,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacyTopAppBar
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaApiJava
 
 @Composable
 internal fun MegaPickerScreen(
     currentFolder: Node?,
-    nodes: List<TypedNode>,
+    nodes: List<TypedNodeUiModel>,
     folderClicked: (TypedNode) -> Unit,
     currentFolderSelected: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
@@ -94,7 +94,7 @@ internal fun MegaPickerScreen(
 
 @Composable
 private fun MegaPickerScreenContent(
-    nodes: List<TypedNode>,
+    nodes: List<TypedNodeUiModel>,
     folderClicked: (TypedNode) -> Unit,
     currentFolderSelected: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,

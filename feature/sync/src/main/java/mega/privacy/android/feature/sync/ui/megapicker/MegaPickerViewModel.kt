@@ -17,11 +17,15 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,6 +36,9 @@ internal class MegaPickerViewModel @Inject constructor(
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val tryNodeSyncUseCase: TryNodeSyncUseCase,
     private val deviceFolderUINodeErrorMessageMapper: DeviceFolderUINodeErrorMessageMapper,
+    private val getCameraUploadsFolderHandleUseCase: GetPrimarySyncHandleUseCase,
+    private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase,
+    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MegaPickerState())
@@ -40,9 +47,11 @@ internal class MegaPickerViewModel @Inject constructor(
     private var allFilesPermissionShown = false
     private var disableBatteryOptimizationsPermissionShown = false
 
+    private var rootFolder: Node? = null
+
     init {
         viewModelScope.launch {
-            val rootFolder = getRootNodeUseCase()
+            rootFolder = getRootNodeUseCase()
             rootFolder?.let(::fetchFolders)
         }
     }
@@ -163,12 +172,47 @@ internal class MegaPickerViewModel @Inject constructor(
 
     private fun fetchFolders(currentFolder: Node) {
         viewModelScope.launch {
-            getTypedNodesFromFolder(currentFolder.id).collectLatest { childFolders ->
-                _state.update {
-                    it.copy(
-                        currentFolder = currentFolder, nodes = childFolders
-                    )
+            val excludeFolders = if (currentFolder.id == rootFolder?.id) {
+                runCatching {
+                    val cameraUploadsFolderHandle = getCameraUploadsFolderHandleUseCase()
+                    val mediaUploadsFolderHandle = getMediaUploadsFolderHandleUseCase()?.id
+                    val myChatsUploadsFolderHandle = getMyChatsFilesFolderIdUseCase()
+
+                    listOfNotNull(
+                        NodeId(cameraUploadsFolderHandle),
+                        mediaUploadsFolderHandle,
+                        myChatsUploadsFolderHandle
+                    ).filterNot { it == NodeId(-1L) }
+                        .ifEmpty { null }
                 }
+                    .onFailure {
+                        Timber.d(it, "Error getting handles of CU and MyChat files")
+                    }
+                    .getOrNull()
+            } else {
+                null
+            }
+
+            runCatching {
+                getTypedNodesFromFolder(currentFolder.id).collectLatest { childFolders ->
+                    _state.update { megaPickerState ->
+                        megaPickerState.copy(
+                            currentFolder = currentFolder,
+                            nodes = if (excludeFolders != null) {
+                                childFolders.map {
+                                    TypedNodeUiModel(
+                                        it,
+                                        excludeFolders.contains(it.id)
+                                    )
+                                }
+                            } else {
+                                childFolders.map { TypedNodeUiModel(it, false) }
+                            }
+                        )
+                    }
+                }
+            }.onFailure {
+                Timber.d(it, "Error getting child folders of current folder ${currentFolder.name}")
             }
         }
     }
