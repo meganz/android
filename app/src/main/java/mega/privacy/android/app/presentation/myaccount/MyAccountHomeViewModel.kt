@@ -188,7 +188,7 @@ class MyAccountHomeViewModel @Inject constructor(
                     it.copy(
                         accountType = accountDetails.accountTypeIdentifier,
                         isBusinessAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
-                        isProFlexiAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.PRO_FLEXI,
+                        isProFlexiAccount = accountDetails.accountTypeIdentifier == AccountType.PRO_FLEXI,
                         isMasterBusinessAccount = accountDetails.isMasterBusinessAccount,
                     )
                 }

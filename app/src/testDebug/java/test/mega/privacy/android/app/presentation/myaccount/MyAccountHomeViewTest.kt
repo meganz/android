@@ -524,7 +524,7 @@ class MyAccountHomeViewTest {
         composeTestRule.setContent {
             AccountTypeSection(
                 accountType = accountType,
-                showButton = true,
+                showUpgradeButton = true,
                 onButtonClickListener = {}
             )
         }

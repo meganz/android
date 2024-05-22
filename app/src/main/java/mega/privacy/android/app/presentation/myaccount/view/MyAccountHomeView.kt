@@ -486,6 +486,7 @@ private fun AccountInfoSection(
 
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
     var showChangeSFUIdDialog by rememberSaveable { mutableStateOf(false) }
+    val isUpgradeButtonEnabled = (uiState.isBusinessAccount || uiState.isProFlexiAccount).not()
 
     Column(
         modifier = modifier
@@ -499,11 +500,9 @@ private fun AccountInfoSection(
                 .wrapContentHeight()
                 .padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 8.dp),
             accountType = uiState.accountType,
-            showButton = (uiState.isBusinessAccount || uiState.isProFlexiAccount).not(),
+            showUpgradeButton = isUpgradeButtonEnabled,
             onButtonClickListener = {
-                if (uiState.isBusinessAccount.not()) {
-                    uiActions.onUpgradeAccount()
-                }
+                uiActions.onUpgradeAccount()
             }
         )
 
@@ -680,7 +679,7 @@ private fun getAccountDescriptionResId(accountType: AccountType?): Int =
 @Composable
 internal fun AccountTypeSection(
     accountType: AccountType?,
-    showButton: Boolean,
+    showUpgradeButton: Boolean,
     onButtonClickListener: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -734,7 +733,7 @@ internal fun AccountTypeSection(
             color = MaterialTheme.colors.textColorPrimary,
         )
 
-        if (showButton) {
+        if (showUpgradeButton) {
             RaisedDefaultMegaButton(
                 textId = R.string.my_account_upgrade_pro,
                 onClick = onButtonClickListener,
