@@ -291,7 +291,7 @@ class MyAccountHomeViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.accountType).isEqualTo(expected.accountTypeIdentifier)
-                assertThat(state.isProFlexiAccount).isEqualTo(expected.isBusinessAccount && expected.accountTypeIdentifier == AccountType.PRO_FLEXI)
+                assertThat(state.isProFlexiAccount).isEqualTo(expected.accountTypeIdentifier == AccountType.PRO_FLEXI)
                 assertThat(state.isBusinessProFlexiStatusActive).isTrue()
             }
         }
