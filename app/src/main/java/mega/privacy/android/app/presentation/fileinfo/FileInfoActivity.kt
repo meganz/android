@@ -157,6 +157,7 @@ class FileInfoActivity : BaseActivity() {
                         )
                     },
                     onVersionsClick = this::navigateToVersions,
+                    onSetDescriptionClick = viewModel::setNodeDescription,
                     onSharedWithContactClick = { this.navigateToUserDetails(it.contactItem) },
                     onSharedWithContactSelected = { viewModel.contactSelectedInSharedList(it.contactItem.email) },
                     onSharedWithContactUnselected = { viewModel.contactUnselectedInSharedList(it.contactItem.email) },

@@ -46,6 +46,8 @@ import nz.mega.sdk.MegaShare
  * @param showLink Share link should be shown
  * @param creationTime creation time of the node
  * @param modificationTime modification time of the node in case of file node
+ * @param nodeDescriptionEnabled enable node description with feature flag
+ * @param descriptionText description for node
  * @param hasPreview this node has a preview (Images, pdf, videos, etc.)
  * @param actions a list of [FileInfoMenuAction] representing available actions for this node
  * @param requiredExtraAction an initiated action that needs to be confirmed by the user or more data needs to be specified (typically by an alert dialog)
@@ -84,6 +86,8 @@ internal data class FileInfoViewState(
     val showLink: Boolean = false,
     val creationTime: Long? = null,
     val modificationTime: Long? = null,
+    val nodeDescriptionEnabled: Boolean = false,
+    val descriptionText: String = "",
     val hasPreview: Boolean = false,
     val actions: List<FileInfoMenuAction> = emptyList(),
     val requiredExtraAction: FileInfoExtraAction? = null,

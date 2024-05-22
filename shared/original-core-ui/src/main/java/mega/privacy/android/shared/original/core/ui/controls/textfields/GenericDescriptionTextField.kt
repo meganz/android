@@ -9,43 +9,40 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldDefaults.indicatorLine
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 /**
  * TextField Generic Description
@@ -63,11 +60,13 @@ fun GenericDescriptionTextField(
     charLimit: Int,
     onValueChange: (String) -> Unit,
     initiallyFocused: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
+    imeAction: ImeAction = ImeAction.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     @StringRes placeholderId: Int? = null,
     @StringRes charLimitErrorId: Int? = null,
     @StringRes titleId: Int? = null,
     onSizeChange: () -> Unit = {},
-
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     visualTransformation: VisualTransformation = VisualTransformation.None,
 ) {
@@ -105,7 +104,7 @@ fun GenericDescriptionTextField(
 
         val keyboardOption = KeyboardOptions(
             keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Default,
+            imeAction = imeAction,
             capitalization = KeyboardCapitalization.Sentences
         )
 
@@ -130,6 +129,7 @@ fun GenericDescriptionTextField(
             @OptIn(ExperimentalMaterialApi::class)
             (BasicTextField(
                 value = value,
+                maxLines = maxLines,
                 modifier = modifier
                     .defaultMinSize(
                         minWidth = TextFieldDefaults.MinWidth,
@@ -161,7 +161,7 @@ fun GenericDescriptionTextField(
                 ),
                 cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
                 keyboardOptions = keyboardOption,
-                keyboardActions = KeyboardActions.Default,
+                keyboardActions = keyboardActions,
                 interactionSource = interactionSource,
                 decorationBox = @Composable { innerTextField ->
                     TextFieldDefaults.TextFieldDecorationBox(

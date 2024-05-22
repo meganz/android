@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo.model
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
@@ -45,6 +46,18 @@ sealed interface FileInfoOneOffViewEvent {
          * Offline file has been removed
          */
         object RemovedOffline : Message(R.string.file_removed_offline)
+
+        /**
+         * Node description has been set
+         */
+        object NodeDescriptionAdded :
+            Message(sharedR.string.file_info_information_snackbar_description_added)
+
+        /**
+         * Node description has been updated
+         */
+        object NodeDescriptionUpdated :
+            Message(sharedR.string.file_info_information_snackbar_description_updated)
     }
 
     /**

@@ -64,6 +64,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
@@ -74,6 +75,7 @@ import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
+import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
@@ -128,6 +130,7 @@ internal class FileInfoViewModelTest {
     private val getNodeLocationInfo: GetNodeLocationInfo = mock()
     private val getOutShares: GetOutShares = mock()
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase = mock()
+    private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase = mock()
     private val isAvailableOffline: IsAvailableOfflineUseCase = mock()
     private val removeAvailableOfflineUseCase: RemoveAvailableOfflineUseCase = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
@@ -137,6 +140,7 @@ internal class FileInfoViewModelTest {
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase = mock()
     private val monitorChatOnlineStatusUseCase = mock<MonitorChatOnlineStatusUseCase>()
     private val clipboardGateway = mock<ClipboardGateway>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
@@ -184,6 +188,7 @@ internal class FileInfoViewModelTest {
             getNodeLocationInfo,
             getOutShares,
             getNodeOutSharesUseCase,
+            setNodeDescriptionUseCase,
             isAvailableOffline,
             removeAvailableOfflineUseCase,
             getNodeAccessPermission,
@@ -193,6 +198,7 @@ internal class FileInfoViewModelTest {
             getAvailableNodeActionsUseCase,
             monitorChatOnlineStatusUseCase,
             clipboardGateway,
+            getFeatureFlagValueUseCase,
             getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase,
             isCameraUploadsEnabledUseCase,
@@ -229,6 +235,7 @@ internal class FileInfoViewModelTest {
             getNodeLocationInfo = getNodeLocationInfo,
             getOutShares = getOutShares,
             getNodeOutSharesUseCase = getNodeOutSharesUseCase,
+            setNodeDescriptionUseCase = setNodeDescriptionUseCase,
             isAvailableOfflineUseCase = isAvailableOffline,
             removeAvailableOfflineUseCase = removeAvailableOfflineUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
@@ -238,6 +245,7 @@ internal class FileInfoViewModelTest {
             nodeActionMapper = nodeActionMapper,
             monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,
             clipboardGateway = clipboardGateway,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,

@@ -308,4 +308,12 @@
     <string name="device_center_sync_solved_issues_chip_text">Solved issues</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
     <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">You can’t sync folders that are currently synced folders.</string>
+    <!-- Label for the file info information screen description field -->
+    <string name="file_info_information_description_label">Description</string>
+    <!-- Placeholder for the file info information screen description field -->
+    <string name="file_info_information_description_placeholder">Add description</string>
+    <!-- Description added snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_added">Description added</string>
+    <!-- Description updated snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_updated">Description updated</string>
 </resources>

@@ -1,10 +1,12 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -27,10 +29,12 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.contacts.ContactPermission
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
@@ -51,6 +55,7 @@ internal fun FileInfoContent(
     onShowMoreContactsClick: () -> Unit,
     onPublicLinkCopyClick: () -> Unit,
     onVerifyContactClick: (String) -> Unit,
+    onSetDescriptionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isShareContactExpanded by remember { mutableStateOf(false) }
@@ -190,6 +195,23 @@ internal fun FileInfoContent(
                 )
             }
 
+            //description
+            if (viewState.nodeDescriptionEnabled) {
+                FileInfoDescriptionField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    descriptionText = viewState.descriptionText,
+                    labelId = sharedR.string.file_info_information_description_label,
+                    placeholderId = sharedR.string.file_info_information_description_placeholder,
+                    descriptionLimit = Constants.MAX_DESCRIPTION_SIZE,
+                    isEditable = accessPermission == AccessPermission.READWRITE ||
+                            accessPermission == AccessPermission.FULL ||
+                            accessPermission == AccessPermission.OWNER,
+                    onConfirmDescription = onSetDescriptionClick,
+                )
+            }
+
             //link
             if (showLink && publicLink != null) {
                 FileInfoContentDivider(paddingBottom = 8.dp)
@@ -248,6 +270,7 @@ private fun FileInfoContentPreview(
             onPublicLinkCopyClick = {},
             onLocationClick = {},
             onVerifyContactClick = {},
+            onSetDescriptionClick = {},
             modifier = Modifier.verticalScroll(scrollState)
         )
     }

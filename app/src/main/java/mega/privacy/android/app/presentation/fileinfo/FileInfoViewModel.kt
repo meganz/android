@@ -18,6 +18,7 @@ import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.RemoveAvailableOfflineUseCase
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
@@ -65,6 +66,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
@@ -75,6 +77,7 @@ import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
+import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
@@ -116,11 +119,13 @@ class FileInfoViewModel @Inject constructor(
     private val getOutShares: GetOutShares,
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase,
     private val getNodeLocationInfo: GetNodeLocationInfo,
+    private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val removeAvailableOfflineUseCase: RemoveAvailableOfflineUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val setOutgoingPermissions: SetOutgoingPermissions,
     private val stopSharingNode: StopSharingNode,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
@@ -162,10 +167,45 @@ class FileInfoViewModel @Inject constructor(
     val nodeId get() = typedNode.id
 
     init {
+        checkDescriptionFlag()
         viewModelScope.launch {
             val isRemindersForContactVerificationEnabled =
                 getContactVerificationWarningUseCase()
             _uiState.update { it.copy(isRemindersForContactVerificationEnabled = isRemindersForContactVerificationEnabled) }
+        }
+    }
+
+    private fun checkDescriptionFlag() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.NodeWithDescription)
+            }.onSuccess { flag ->
+                _uiState.update {
+                    it.copy(nodeDescriptionEnabled = flag)
+                }
+            }.onFailure {
+                Timber.e("Get feature flag failed $it")
+            }
+        }
+    }
+
+    /**
+     * Set a node description
+     */
+    fun setNodeDescription(description: String) {
+        viewModelScope.launch {
+            runCatching {
+                setNodeDescriptionUseCase(nodeHandle = nodeId, description = description)
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionAdded),
+                        descriptionText = description
+                    )
+                }
+            }.onFailure {
+                Timber.e("Set Node Description Failed $it")
+            }
         }
     }
 

@@ -54,6 +54,7 @@ internal fun FileInfoScreen(
     onLocationClick: () -> Unit,
     availableOfflineChanged: (checked: Boolean) -> Unit,
     onVersionsClick: () -> Unit,
+    onSetDescriptionClick: (String) -> Unit,
     onSharedWithContactClick: (ContactPermission) -> Unit,
     onSharedWithContactSelected: (ContactPermission) -> Unit,
     onSharedWithContactUnselected: (ContactPermission) -> Unit,
@@ -139,6 +140,7 @@ internal fun FileInfoScreen(
             onShowMoreContactsClick = onShowMoreSharedWithContactsClick,
             onPublicLinkCopyClick = onPublicLinkCopyClick,
             onVerifyContactClick = onVerifyContactClick,
+            onSetDescriptionClick = onSetDescriptionClick,
         )
         viewState.jobInProgressState?.progressMessage?.let {
             LoadingDialog(text = stringResource(id = it))
@@ -164,6 +166,7 @@ private fun FileInfoScreenPreview(
                 state = state.copy(isAvailableOffline = !state.isAvailableOffline)
             },
             onVersionsClick = {},
+            onSetDescriptionClick = { },
             onSharedWithContactClick = {},
             onSharedWithContactSelected = {
                 state =
