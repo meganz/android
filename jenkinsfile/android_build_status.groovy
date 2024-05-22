@@ -1,33 +1,20 @@
 import groovy.json.JsonSlurperClassic
 
-import java.math.RoundingMode
-import java.text.DecimalFormat
-
 BUILD_STEP = ""
 
 GMS_APK_BUILD_LOG = "gms_build.log"
 QA_APK_BUILD_LOG = "qa_build.log"
 
-MODULE_LIST = ['app', 'domain', 'shared/original-core-ui', 'data']
+MODULE_LIST = ['app', 'domain', 'shared/original-core-ui', 'data', 'feature/sync','feature/devicecenter','legacy-core-ui']
 
 LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
 LINT_REPORT_SUMMARY_MAP = [:]
 
-APP_UNIT_TEST_SUMMARY = ""
-DOMAIN_UNIT_TEST_SUMMARY = ""
-DATA_UNIT_TEST_SUMMARY = ""
-APP_UNIT_TEST_RESULT = ""
-DOMAIN_UNIT_TEST_RESULT = ""
-DATA_UNIT_TEST_RESULT = ""
-COREUI_UNIT_TEST_RESULT = ""
-FEATURE_SYNC_UNIT_TEST_RESULT = ""
-FEATURE_DEVICECENTER_UNIT_TEST_RESULT = ""
+COVERAGE_SUMMARY = ""
 
-APP_COVERAGE = ""
-DOMAIN_COVERAGE = ""
-DATA_COVERAGE = ""
-ARTIFACTORY_DEVELOP_CODE_COVERAGE = ""
+// key is module name, value is the link of the unit test html report uploaded to GitLab
+UNIT_TEST_RESULT_LINK_MAP = [:]
 
 JSON_LINT_REPORT_LINK = ""
 
@@ -38,7 +25,6 @@ NODE_LABELS = 'mac-jenkins-slave-android || mac-jenkins-slave'
  * Folder to contain build outputs, including APK, AAG and symbol files
  */
 ARCHIVE_FOLDER = "archive"
-NATIVE_SYMBOLS_FILE = "symbols.zip"
 
 /**
  * common.groovy file with common methods
@@ -124,29 +110,11 @@ pipeline {
                     String jsonJenkinsLog = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
 
                     // upload unit test report if unit test fail
+
                     String unitTestResult = ""
-                    if (BUILD_STEP == "Unit Test and Code Coverage") {
-                        if (!APP_UNIT_TEST_RESULT.isEmpty()) {
-                            unitTestResult += "<br>App Unit Test: ${APP_UNIT_TEST_RESULT}"
-                        }
-                        if (!DOMAIN_UNIT_TEST_RESULT.isEmpty()) {
-                            unitTestResult += "<br>Domain Unit Test: ${DOMAIN_UNIT_TEST_RESULT}"
-                        }
-                        if (!DATA_UNIT_TEST_RESULT.isEmpty()) {
-                            unitTestResult += "<br>Data Unit Test: ${DATA_UNIT_TEST_RESULT}"
-                        }
-
-                        if (!COREUI_UNIT_TEST_RESULT.isEmpty()) {
-                            unitTestResult += "<br>CoreUi Unit Test: ${COREUI_UNIT_TEST_RESULT}"
-                        }
-
-                        if (!FEATURE_SYNC_UNIT_TEST_RESULT.isEmpty()) {
-                            unitTestResult += "<br>feature/sync Unit Test: ${FEATURE_SYNC_UNIT_TEST_RESULT}"
-                        }
-
-                        if (!FEATURE_DEVICECENTER_UNIT_TEST_RESULT.isEmpty()) {
-                            unitTestResult += "<br>feature/devicecenter Unit Test: ${FEATURE_DEVICECENTER_UNIT_TEST_RESULT}"
-                        }
+                    for (def module in UNIT_TEST_RESULT_LINK_MAP.keySet()) {
+                        String result = UNIT_TEST_RESULT_LINK_MAP[module]
+                        unitTestResult += "<br>$module Unit Test: ${result}"
                     }
 
                     def failureMessage = ":x: Build Failed(Build: ${env.BUILD_NUMBER})" +
@@ -186,18 +154,9 @@ pipeline {
                                 "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
                                 "**Build Warnings:**\n" + getBuildWarnings() + "\n\n" +
                                 buildLintSummaryTable(JSON_LINT_REPORT_LINK) + "\n\n" +
-                                buildCodeComparisonResults()
+                                COVERAGE_SUMMARY
 
-                        // Send mergeRequestMessage to MR
                         common.sendToMR(mergeRequestMessage)
-
-                        def successSlackMessage = "Android Line Code Coverage:" +
-                                "\nCommit:\t${env.GIT_COMMIT}" +
-                                "\nBranch:\t${env.GIT_BRANCH}" +
-                                "\n- app coverage: $APP_COVERAGE" +
-                                "\n- domain coverage: $DOMAIN_COVERAGE" +
-                                "\n- data coverage: $DATA_COVERAGE"
-                        slackSend color: "good", message: successSlackMessage
                     }
                 }
             }
@@ -301,7 +260,6 @@ pipeline {
                         }
                         gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
                             script {
-
                                 withCredentials([
                                         string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
                                         string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
@@ -310,84 +268,55 @@ pipeline {
                                             "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
                                             "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}"
                                     ]) {
-                                        def htmlTestReportPath = "build/unittest/html"
-                                        // domain coverage
+                                        String buildReportPath = "build/unittest/html"
                                         try {
                                             sh "./gradlew domain:jacocoTestReport"
                                         } finally {
-                                            DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/$htmlTestReportPath", "domain_unit_test_result.zip")
+                                            // if gradle command fails, we collect the test report. And the build will discontinue.
+                                            UNIT_TEST_RESULT_LINK_MAP.put("domain", unitTestArchiveLink("domain/$buildReportPath", "unit_test_result_domain.zip"))
                                         }
 
-                                        def coverageReportPath = "build/coverage-report/coverage.csv"
-                                        DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/$coverageReportPath")}"
-                                        println("DOMAIN_COVERAGE = ${DOMAIN_COVERAGE}")
-
-                                        // data coverage
                                         try {
                                             sh "./gradlew data:testDebugUnitTestCoverage"
                                         } finally {
-                                            DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/$htmlTestReportPath", "data_unit_test_result.zip")
+                                            UNIT_TEST_RESULT_LINK_MAP.put("data", unitTestArchiveLink("data/$buildReportPath", "unit_test_result_data.zip"))
                                         }
-                                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/$coverageReportPath")}"
-                                        println("DATA_COVERAGE = ${DATA_COVERAGE}")
 
-                                        // run coverage for app module
                                         try {
                                             sh "./gradlew app:createUnitTestCoverageReport"
                                         } finally {
-                                            APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/$htmlTestReportPath", "app_unit_test_result.zip")
-                                        }
-                                        APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/$coverageReportPath")}"
-                                        println("APP_COVERAGE = ${APP_COVERAGE}")
-
-                                        try {
-                                            sh "./gradlew feature:devicecenter:testDebugUnitTest"
-                                        } finally {
-                                            FEATURE_DEVICECENTER_UNIT_TEST_RESULT = unitTestArchiveLink("feature/devicecenter/$htmlTestReportPath", "feature_devicecenter_unit_test_result.zip")
+                                            UNIT_TEST_RESULT_LINK_MAP.put("app", unitTestArchiveLink("app/$buildReportPath", "unit_test_result_app.zip"))
                                         }
 
                                         try {
-                                            sh "./gradlew feature:sync:testDebugUnitTest"
+                                            sh "./gradlew feature:devicecenter:testDebugUnitTestCoverage"
                                         } finally {
-                                            FEATURE_SYNC_UNIT_TEST_RESULT = unitTestArchiveLink("feature/sync/$htmlTestReportPath", "feature_sync_unit_test_result.zip")
+                                            UNIT_TEST_RESULT_LINK_MAP.put("feature/devicecenter", unitTestArchiveLink("feature/devicecenter/$buildReportPath", "unit_test_result_feature_devicecenter.zip"))
                                         }
 
                                         try {
-                                            sh "./gradlew shared:original-core-ui:testDebugUnitTest"
+                                            sh "./gradlew feature:sync:testDebugUnitTestCoverage"
                                         } finally {
-                                            COREUI_UNIT_TEST_RESULT = unitTestArchiveLink("core-ui/$htmlTestReportPath", "core_ui_unit_test_result.zip")
+                                            UNIT_TEST_RESULT_LINK_MAP.put("feature/sync", unitTestArchiveLink("feature/sync/$buildReportPath", "unit_test_result_feature_sync.zip"))
                                         }
 
-                                        // below code is only run when UnitTest is OK, before test reports are cleaned up.
-                                        // If UnitTest is failed, summary is collected at post.failure{} phase
-                                        // We have to collect the report here, before they are cleaned in the last stage.
-                                        def xmlUnitTestReportPath = "build/unittest/junit"
-                                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/$xmlUnitTestReportPath")
-                                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/$xmlUnitTestReportPath")
-                                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/$xmlUnitTestReportPath")
+                                        try {
+                                            sh "./gradlew shared:original-core-ui:testDebugUnitTestCoverage"
+                                        } finally {
+                                            UNIT_TEST_RESULT_LINK_MAP.put("shared/original-core-ui", unitTestArchiveLink("shared/original-core-ui/$buildReportPath", "unit_test_result_shared_original_core_ui.zip"))
+                                        }
 
-                                        // Compare Coverage
-                                        String developCoverageLocation = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/coverage_summary.txt"
+                                        try {
+                                            sh "./gradlew legacy-core-ui:testDebugUnitTestCoverage"
+                                        } finally {
+                                            UNIT_TEST_RESULT_LINK_MAP.put("legacy-core-ui", unitTestArchiveLink("legacy-core-ui/$buildReportPath", "unit_test_result_legacy_core_ui.zip"))
+                                        }
 
-                                        // Navigate to the "/cicd/coverage/" path
-                                        // Download the code coverage from Artifactory.
-                                        // Afterwards, rename the downloaded code coverage text file to "develop_coverage_summary.txt"
-                                        sh """
-                                            cd ${WORKSPACE}
-                                            rm -frv cicd
-                                            mkdir -pv ${WORKSPACE}/cicd/coverage
-                                            cd ${WORKSPACE}/cicd/coverage
-                                            curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -o develop_coverage_summary.txt ${developCoverageLocation}
-                                            ls
-                                        """
-
-                                        // Once the file has been downloaded, call the script to parse the Code Coverage results
-                                        ARTIFACTORY_DEVELOP_CODE_COVERAGE = "${getArtifactoryDevelopCodeCoverage("$WORKSPACE/cicd/coverage/develop_coverage_summary.txt")}"
-                                        println("ARTIFACTORY_DEVELOP_CODE_COVERAGE from Groovy: ${ARTIFACTORY_DEVELOP_CODE_COVERAGE}")
+                                        String htmlOutput = "coverage.html"
+                                        sh "./gradlew collectCoverage --modules \"${MODULE_LIST.join(",")}\" --html-output ${htmlOutput}"
+                                        COVERAGE_SUMMARY = getCoverageHtmlReport(htmlOutput)
                                     }
                                 }
-
-
                             }
                         }
                     }
@@ -500,213 +429,14 @@ String buildLintSummaryTable(String jsonLintReportLink) {
     lintSummary
 }
 
-/**
- * Compares the Code Coverage results of all available modules between the source branch and
- * the latest develop branch from Artifactory
- *
- * @return A Markdown-formatted table String that contains the Code Coverage results of all
- * available modules between the source branch and the latest develop branch from Artifactory
- */
-String buildCodeComparisonResults() {
-    println("Entering buildCodeComparisonResults()")
-    def latestDevelopResults = new JsonSlurperClassic().parseText(ARTIFACTORY_DEVELOP_CODE_COVERAGE)
-
-    String codeComparisonSummary = "<details><summary><b>Code Coverage and Comparison:</b>"
-
-    String tableString = "\n\n".concat("| Module | Test Cases | Coverage | Coverage Change |").concat("\n")
-            .concat("|:---|:---|:---|:---|").concat("\n")
-
-    def currentModuleTestCases = []
-    def currentModuleCoverage = ""
-    def currentModuleTestResultsLink = ""
-    def isCoverageReduced = false
-
-    for (def latestDevelopModuleResults in latestDevelopResults) {
-        // Compare the name from moduleResult with a static module name
-        switch (latestDevelopModuleResults.name) {
-            case "**app**":
-                currentModuleTestCases = APP_UNIT_TEST_SUMMARY.split(',')
-                currentModuleCoverage = APP_COVERAGE
-                currentModuleTestResultsLink = APP_UNIT_TEST_RESULT
-                break
-            case "**domain**":
-                currentModuleTestCases = DOMAIN_UNIT_TEST_SUMMARY.split(',')
-                currentModuleCoverage = DOMAIN_COVERAGE
-                currentModuleTestResultsLink = DOMAIN_UNIT_TEST_RESULT
-                break
-            case "**data**":
-                currentModuleTestCases = DATA_UNIT_TEST_SUMMARY.split(',')
-                currentModuleCoverage = DATA_COVERAGE
-                currentModuleTestResultsLink = DATA_UNIT_TEST_RESULT
-                break
-        }
-        println("Current Coverage of ${latestDevelopModuleResults.name}: $currentModuleCoverage")
-
-        // Build the Columns
-        String testCasesColumn = buildTestCasesColumn(currentModuleTestCases, currentModuleTestResultsLink, latestDevelopModuleResults)
-        String coverageColumn = buildCoverageColumn(currentModuleCoverage, latestDevelopModuleResults)
-
-        def currentModuleLinePercentage = currentModuleCoverage.split("%")[0]
-        def currentModuleBigDecimal = new BigDecimal(currentModuleLinePercentage).setScale(2, RoundingMode.HALF_UP)
-
-        def latestDevelopTotalLines = Float.parseFloat(latestDevelopModuleResults.totalLines)
-        def latestDevelopCoveredLines = Float.parseFloat(latestDevelopModuleResults.coveredLines)
-        def latestDevelopLinePercentage = (latestDevelopCoveredLines / latestDevelopTotalLines) * 100
-        def latestDevelopBigDecimal = new BigDecimal(latestDevelopLinePercentage).setScale(2, RoundingMode.HALF_UP)
-
-        if (currentModuleBigDecimal < latestDevelopBigDecimal) {
-            isCoverageReduced = true
-        }
-
-        String coverageChangeColumn = buildCoverageChangeColumn(currentModuleBigDecimal, latestDevelopBigDecimal)
-
-        // Add a Column for every item in the list
-        tableString = tableString.concat("| ${latestDevelopModuleResults.name} | $testCasesColumn | $coverageColumn | $coverageChangeColumn |").concat("\n")
-
-        //Build a summary for every item in the list and add it to header
-        codeComparisonSummary += " ${latestDevelopModuleResults.name.replaceAll('\\*', '')}(${coverageChangeColumn.replaceAll('\\*', '')})"
-    }
-
-    def result = ""
-    if (isCoverageReduced) {
-        result = ":warning: This MR has caused a reduction in the test coverage. Please add some unit tests.\n\n".concat(codeComparisonSummary).concat("</b></summary>").concat(tableString).concat("</details>")
+String getCoverageHtmlReport(String reportPath) {
+    String coverageReport
+    if (fileExists(reportPath)) {
+        coverageReport = readFile(reportPath)
     } else {
-        result = codeComparisonSummary.concat("</b></summary>").concat(tableString).concat("</details>")
+        coverageReport = "No coverage report found"
     }
-
-    return result
-}
-
-/**
- * Builds a Markdown-formatted String of the test cases of a specific module from the current
- * branch and the latest develop branch in Artifactory
- *
- * @param currentModuleTestCases The Module results of the current branch
- * @param currentModuleTestResultsLink The link to the Module test results of the current branch
- * @param latestDevelopModuleTestCases The Module results of the latest develop branch in Artifactory
- *
- * @return A String that serves as an entry for the "Test Cases" column
- */
-String buildTestCasesColumn(def currentModuleTestCases,
-                            def currentModuleTestResultsLink,
-                            def latestDevelopModuleTestCases
-) {
-    println("Entering buildTestCasesColumn")
-    println("currentModuleTestCases = $currentModuleTestCases")
-    println("currentModuleTestResultsLink = $currentModuleTestResultsLink")
-    println("latestDevelopModuleTestCases = $latestDevelopModuleTestCases")
-
-    // Build the "Current Branch" Column first
-    String currentBranchColumn = "**Current Branch:**".concat("<br><br>")
-
-    if (currentModuleTestCases[0].toInteger() > 0) {
-        currentBranchColumn = currentBranchColumn.concat("_Total Cases:_ ")
-                .concat("**${currentModuleTestCases[0]}**").concat("<br>")
-    }
-    if (currentModuleTestCases[1].toInteger() > 0) {
-        currentBranchColumn = currentBranchColumn.concat("_Skipped Cases:_ ")
-                .concat("**${currentModuleTestCases[1]}**").concat("<br>")
-    }
-    if (currentModuleTestCases[2].toInteger() > 0) {
-        currentBranchColumn = currentBranchColumn.concat("_Error Cases:_ ")
-                .concat("**${currentModuleTestCases[2]}**").concat("<br>")
-    }
-    if (currentModuleTestCases[3].toInteger() > 0) {
-        currentBranchColumn = currentBranchColumn.concat("_Failed Cases:_ ")
-                .concat("**${currentModuleTestCases[3]}**").concat("<br>")
-    }
-    currentBranchColumn = currentBranchColumn.concat("_Duration (s):_ ")
-            .concat("**${currentModuleTestCases[4]}**").concat("<br>")
-    currentBranchColumn = currentBranchColumn.concat("_Test Report Link:_")
-            .concat("<br>").concat(currentModuleTestResultsLink).concat("<br><br>")
-
-
-    // Afterwards, build the "Latest develop Branch" Column
-    String latestDevelopColumn = "**Latest develop Branch:**".concat("<br><br>")
-
-    if (latestDevelopModuleTestCases.totalTestCases.toInteger() > 0) {
-        latestDevelopColumn = latestDevelopColumn.concat("_Total Cases:_ ")
-                .concat("**${latestDevelopModuleTestCases.totalTestCases}**").concat("<br>")
-    }
-    if (latestDevelopModuleTestCases.skippedTestCases.toInteger() > 0) {
-        latestDevelopColumn = latestDevelopColumn.concat("_Skipped Cases:_ ")
-                .concat("**${latestDevelopModuleTestCases.skippedTestCases}**").concat("<br>")
-    }
-    if (latestDevelopModuleTestCases.errorTestCases.toInteger() > 0) {
-        latestDevelopColumn = latestDevelopColumn.concat("_Error Cases:_ ")
-                .concat("**${latestDevelopModuleTestCases.errorTestCases}**").concat("<br>")
-    }
-    if (latestDevelopModuleTestCases.failedTestCases.toInteger() > 0) {
-        latestDevelopColumn = latestDevelopColumn.concat("_Failed Cases:_ ")
-                .concat("**${latestDevelopModuleTestCases.failedTestCases}**").concat("<br>")
-    }
-    latestDevelopColumn = latestDevelopColumn.concat("_Duration (s):_ ")
-            .concat("**${latestDevelopModuleTestCases.duration}**")
-
-    currentBranchColumn.concat(latestDevelopColumn)
-}
-
-/**
- * Builds a Markdown-formatted String of the coverage of a specific module from the current
- * branch and the latest develop branch in Artifactory
- *
- * @param currentModuleCoverage The Module results of the current branch
- * @param latestDevelopModuleCoverage The Module results of the latest develop branch in Artifactory
- *
- * @return A String that serves as an entry for the "Coverage" column
- */
-String buildCoverageColumn(def currentModuleCoverage, def latestDevelopModuleCoverage) {
-    def df = new DecimalFormat("0.00")
-
-    // Build the "Current Branch" Column first
-    String currentBranchColumn = "**Current Branch:**".concat("<br><br>")
-
-    def currentInitialArray = currentModuleCoverage.split('=')
-    def currentLineArray = currentInitialArray[1].split('/')
-
-    currentBranchColumn = currentBranchColumn.concat("_Total Lines:_ ")
-            .concat("**${currentLineArray[1]}**").concat("<br>")
-    currentBranchColumn = currentBranchColumn.concat("_Covered Lines:_ ")
-            .concat("**${currentLineArray[0]}**").concat("<br>")
-    currentBranchColumn = currentBranchColumn.concat("_Percentage Covered_: ")
-            .concat("**${currentInitialArray[0]}**").concat("<br><br>")
-
-    // Afterwards, build the "Latest develop Branch" Column
-    String latestDevelopColumn = "**Latest develop Branch:**".concat("<br><br>")
-
-    def latestDevelopTotalLines = Float.parseFloat(latestDevelopModuleCoverage.totalLines)
-    def latestDevelopCoveredLines = Float.parseFloat(latestDevelopModuleCoverage.coveredLines)
-    def latestDevelopLinePercentage = df.format((latestDevelopCoveredLines / latestDevelopTotalLines) * 100)
-
-    latestDevelopColumn = latestDevelopColumn.concat("_Total Lines:_ ")
-            .concat("**${latestDevelopModuleCoverage.totalLines}**").concat("<br>")
-    latestDevelopColumn = latestDevelopColumn.concat("_Covered Lines:_ ")
-            .concat("**${latestDevelopModuleCoverage.coveredLines}**").concat("<br>")
-    latestDevelopColumn = latestDevelopColumn.concat("_Percentage Covered_: ")
-            .concat("**$latestDevelopLinePercentage%**")
-
-    return currentBranchColumn.concat(latestDevelopColumn)
-}
-
-/**
- * Builds a Markdown-formatted String of the coverage change of a specific module from the current
- * branch and the latest develop branch in Artifactory
- *
- * @param currentModuleCoverage The Module results of the current branch
- * @param latestDevelopModuleResults The Module results of the latest develop branch in Artifactory
- *
- * @return A String that serves as an entry for the "Coverage Change" column
- */
-String buildCoverageChangeColumn(def currentModuleBigDecimal, def latestDevelopBigDecimal) {
-    def result = currentModuleBigDecimal - latestDevelopBigDecimal
-
-    if (result > 0) {
-        return "**+$result%**"
-    } else if (result < 0) {
-        return "**$result%**"
-    } else {
-        return "**No Change**"
-    }
+    return coverageReport
 }
 
 /**
@@ -745,17 +475,6 @@ String wrapBuildWarnings(String rawWarning) {
     } else {
         return rawWarning.split('\n').join("<br/>")
     }
-}
-
-/**
- * Analyse unit test report and get the summary string
- * @param testReportPath path of the unit test report in xml format
- * @return summary string of unit test
- */
-String unitTestSummary(String testReportPath) {
-    return sh(
-            script: "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportPath}",
-            returnStdout: true).trim()
 }
 
 /**
@@ -837,40 +556,4 @@ def unitTestArchiveLink(String reportPath, String archiveTargetName) {
         result = "Unit Test report not available, perhaps test code has compilation error. Please check full build log."
     }
     return result
-}
-
-/**
- * Reads and calculates the Test Coverage by a given csv format report
- * @param csvReportPath path to the csv coverage file, generated by JaCoCo
- * @return a String containing the Test Coverage report
- */
-String getTestCoverageSummary(String csvReportPath) {
-    summary = sh(
-            script: "python3 ${WORKSPACE}/jenkinsfile/coverage_report.py ${csvReportPath}",
-            returnStdout: true).trim()
-    print("coverage path(${csvReportPath}): ${summary}")
-    return summary
-}
-
-/**
- * Parses the file that contains the Code Coverage results of the latest develop branch from Artifactory
- * into a formatted String, so that the results can be easily transformed and displayed in the Gitlab MR
- * @param coveragePath The full path to the file containing the Code Coverage from the latest develop
- * @return A formatted String of the Code Coverage
- */
-String getArtifactoryDevelopCodeCoverage(String coveragePath) {
-    summary = sh(
-            script: "python3 ${WORKSPACE}/jenkinsfile/artifactory_develop_code_coverage.py ${coveragePath}",
-            returnStdout: true).trim()
-    print("artifactory develop coverage path(${coveragePath}): ${summary}")
-    return summary
-}
-
-/**
- * check if a certain value is defined by checking the tag value
- * @param value value of tag
- * @return true if tag has a value. false if tag is null or zero length
- */
-static boolean isDefined(String value) {
-    return value != null && !value.isEmpty()
 }

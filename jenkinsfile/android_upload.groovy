@@ -12,14 +12,6 @@ MEGACHAT_BRANCH = 'develop'
 SDK_COMMIT = ""
 MEGACHAT_COMMIT = ""
 
-APP_UNIT_TEST_SUMMARY = ""
-DOMAIN_UNIT_TEST_SUMMARY = ""
-DATA_UNIT_TEST_SUMMARY = ""
-
-APP_COVERAGE = ""
-DOMAIN_COVERAGE = ""
-DATA_COVERAGE = ""
-
 /**
  * Folder to contain build outputs, including APK, AAG and symbol files
  */
@@ -470,58 +462,19 @@ pipeline {
                             string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
                     ]) {
-                        String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
+
                         sh "./gradlew domain:jacocoTestReport"
                         sh "./gradlew data:testDebugUnitTestCoverage"
                         sh "./gradlew app:createUnitTestCoverageReport"
+                        sh "./gradlew feature:devicecenter:testDebugUnitTestCoverage"
+                        sh "./gradlew feature:sync:testDebugUnitTestCoverage"
+                        sh "./gradlew shared:original-core-ui:testDebugUnitTestCoverage"
+                        sh "./gradlew legacy-core-ui:testDebugUnitTestCoverage"
 
-                        def xmlUnitTestReportPath = "build/unittest/junit"
-                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/$xmlUnitTestReportPath")
-                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/$xmlUnitTestReportPath")
-                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/$xmlUnitTestReportPath")
-
-                        def coverageReportPath = "build/coverage-report/coverage.csv"
-                        DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/${coverageReportPath}")}"
-                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/${coverageReportPath}")}"
-                        APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/${coverageReportPath}")}"
-
-                        def appSummaryCoverageArray = APP_COVERAGE.split('=')[1].split('/')
-                        def domainSummaryCoverageArray = DOMAIN_COVERAGE.split('=')[1].split('/')
-                        def dataSummaryCoverageArray = DATA_COVERAGE.split('=')[1].split('/')
-                        def appSummaryArray = APP_UNIT_TEST_SUMMARY.split(',')
-                        def domainSummaryArray = DOMAIN_UNIT_TEST_SUMMARY.split(',')
-                        def dataSummaryArray = DATA_UNIT_TEST_SUMMARY.split(',')
-
-                        String appTestResultsRow = "| **app** | " +
-                                "${appSummaryCoverageArray[0]} | " +
-                                "${appSummaryCoverageArray[1]} | " +
-                                "${appSummaryArray[0]} | " +
-                                "${appSummaryArray[1]} | " +
-                                "${appSummaryArray[2]} | " +
-                                "${appSummaryArray[3]} | " +
-                                "${appSummaryArray[4]} | "
-
-                        String domainTestResultsRow = "| **domain** | " +
-                                "${domainSummaryCoverageArray[0]} | " +
-                                "${domainSummaryCoverageArray[1]} | " +
-                                "${domainSummaryArray[0]} | " +
-                                "${domainSummaryArray[1]} | " +
-                                "${domainSummaryArray[2]} | " +
-                                "${domainSummaryArray[3]} | " +
-                                "${domainSummaryArray[4]} | "
-
-                        String dataTestResultsRow = "| **data** | " +
-                                "${dataSummaryCoverageArray[0]} | " +
-                                "${dataSummaryCoverageArray[1]} | " +
-                                "${dataSummaryArray[0]} | " +
-                                "${dataSummaryArray[1]} | " +
-                                "${dataSummaryArray[2]} | " +
-                                "${dataSummaryArray[3]} | " +
-                                "${dataSummaryArray[4]} | "
-
-                        writeFile file: 'coverage_summary.txt', text: "$appTestResultsRow\n$domainTestResultsRow\n$dataTestResultsRow"
-
-                        sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"$WORKSPACE/coverage_summary.txt\" \"${targetPath}/coverage_summary.txt\""
+                        String artifactoryTargetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
+                        String coverageSummaryFile = "coverage_summary.csv"
+                        sh "./gradlew collectCoverage --modules \"app,data,domain,shared/original-core-ui,feature/sync,feature/devicecenter,legacy-core-ui\" --csv-output ${coverageSummaryFile}"
+                        sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"$WORKSPACE/$coverageSummaryFile\" \"${artifactoryTargetPath}/$coverageSummaryFile\""
                     }
                 }
             }
@@ -898,27 +851,4 @@ String getSdkGitHash() {
  */
 String getMegaChatSdkGitHash() {
     return sh(script: "cd $WORKSPACE/sdk/src/main/jni/megachat/sdk && git rev-parse --short HEAD", returnStdout: true).trim()
-}
-/**
- * Analyse unit test report and get the summary string
- * @param testReportPath path of the unit test report in xml format
- * @return summary string of unit test
- */
-String unitTestSummary(String testReportPath) {
-    return sh(
-            script: "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportPath}",
-            returnStdout: true).trim()
-}
-
-/**
- * Reads and calculates the Test Coverage by a given csv format report
- * @param csvReportPath path to the csv coverage file, generated by JaCoCo
- * @return a String containing the Test Coverage report
- */
-String getTestCoverageSummary(String csvReportPath) {
-    summary = sh(
-            script: "python3 ${WORKSPACE}/jenkinsfile/coverage_report.py ${csvReportPath}",
-            returnStdout: true).trim()
-    print("coverage path(${csvReportPath}): ${summary}")
-    return summary
 }

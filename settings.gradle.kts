@@ -11,8 +11,10 @@ pluginManagement {
     }
     resolutionStrategy {
         eachPlugin {
-            if (requested.id.id == "mega.android.release") {
-                useModule("mega.privacy:megagradle:${requested.version}")
+            when (requested.id.id) {
+                "mega.android.release" -> useModule("mega.privacy:megagradle:${requested.version}")
+                "mega.android.cicd" -> useModule("mega.privacy:megagradle:${requested.version}")
+                else -> {}
             }
         }
     }
