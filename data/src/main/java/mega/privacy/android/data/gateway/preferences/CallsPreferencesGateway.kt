@@ -7,6 +7,9 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 
+/**
+ * Gateway to manage calls preferences.
+ */
 interface CallsPreferencesGateway {
 
     /**
@@ -78,6 +81,18 @@ interface CallsPreferencesGateway {
      * @param usersCallLimitReminders True, if must be enabled. False, if must be disabled.
      */
     suspend fun setUsersCallLimitRemindersPreference(usersCallLimitReminders: UsersCallLimitReminders)
+
+
+    /**
+     * Get raise to hand suggestion preference
+     */
+    suspend fun getRaiseToHandSuggestionPreference(): Boolean?
+
+
+    /**
+     * Set raise to hand suggestion preference
+     */
+    suspend fun setRaiseToHandSuggestionPreference()
 
     /**
      * Clears calls preferences.

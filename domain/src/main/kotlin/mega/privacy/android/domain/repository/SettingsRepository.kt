@@ -476,4 +476,14 @@ interface SettingsRepository {
      * @return the uri string that points to the sd card folder configured by the user, if any
      */
     suspend fun getDownloadToSdCardUri(): String?
+
+    /**
+     * check whether raise to hand feature tooltip is shown or not
+     */
+    suspend fun isRaiseToHandSuggestionShown(): Boolean?
+
+    /**
+     * set raise to hand feature tooltip shown
+     */
+    suspend fun setRaiseToHandSuggestionShown()
 }

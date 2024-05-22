@@ -168,7 +168,7 @@ internal class DefaultSettingsRepositoryTest {
     @ParameterizedTest(name = "expected: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that megaLocalStorageGateway value is returned when isAskSetDownloadLocation is invoked`(
-        expected: Boolean
+        expected: Boolean,
     ) =
         runTest {
             whenever(megaLocalStorageGateway.isAskSetDownloadLocation()).thenReturn(expected)
@@ -178,7 +178,7 @@ internal class DefaultSettingsRepositoryTest {
     @ParameterizedTest(name = "expected: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that megaLocalStorageGateway is set with correct value when setAskSetDownloadLocation is invoked`(
-        expected: Boolean
+        expected: Boolean,
     ) =
         runTest {
             underTest.setAskSetDownloadLocation(expected)
@@ -198,10 +198,30 @@ internal class DefaultSettingsRepositoryTest {
     @ParameterizedTest(name = "expected: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that megaLocalStorageGateway is set with correct value when setStorageAskAlways is invoked`(
-        expected: Boolean
+        expected: Boolean,
     ) =
         runTest {
             underTest.setStorageAskAlways(expected)
             verify(megaLocalStorageGateway).setStorageAskAlways(expected)
+        }
+
+    @ParameterizedTest(name = "expected: {0}")
+    @ValueSource(booleans = [true, false])
+    @NullSource
+    fun `test that correct value is returned when getRaiseToHandSuggestionPreference is invoked`(
+        expected: Boolean?,
+    ) =
+        runTest {
+            whenever(callsPreferencesGateway.getRaiseToHandSuggestionPreference()).thenReturn(
+                expected
+            )
+            assertThat(underTest.isRaiseToHandSuggestionShown()).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that callPreferenceGateway is set with correct value when setRaiseToHandSuggestionShown is invoked`() =
+        runTest {
+            underTest.setRaiseToHandSuggestionShown()
+            verify(callsPreferencesGateway).setRaiseToHandSuggestionPreference()
         }
 }

@@ -607,4 +607,12 @@ internal class DefaultSettingsRepository @Inject constructor(
 
         request?.megaStringMap
     }
+
+    override suspend fun isRaiseToHandSuggestionShown() = withContext(ioDispatcher) {
+        callsPreferencesGateway.getRaiseToHandSuggestionPreference()
+    }
+
+    override suspend fun setRaiseToHandSuggestionShown() = withContext(ioDispatcher) {
+        callsPreferencesGateway.setRaiseToHandSuggestionPreference()
+    }
 }

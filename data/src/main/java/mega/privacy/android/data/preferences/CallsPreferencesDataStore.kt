@@ -3,6 +3,7 @@ package mega.privacy.android.data.preferences
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -11,8 +12,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
@@ -48,6 +51,8 @@ internal class CallsPreferencesDataStore @Inject constructor(
         stringPreferencesKey("WAITING_ROOM_REMINDERS")
     private val usersCallLimitRemindersPreferenceKey =
         stringPreferencesKey("USERS_CALL_LIMIT_REMINDERS")
+    private val raiseToHandSuggestionPreferenceKey =
+        booleanPreferencesKey("RAISE_TO_HAND_SUGGESTION")
 
     override fun getCallsSoundNotificationsPreference(): Flow<CallsSoundNotifications> =
         context.callsDataStore.data
@@ -123,6 +128,19 @@ internal class CallsPreferencesDataStore @Inject constructor(
                         ?: UsersCallLimitReminders.DEFAULT.name
                 )
             }
+
+    override suspend fun getRaiseToHandSuggestionPreference(): Boolean? =
+        withContext(ioDispatcher) {
+            context.callsDataStore.data.monitor(raiseToHandSuggestionPreferenceKey).firstOrNull()
+        }
+
+    override suspend fun setRaiseToHandSuggestionPreference() {
+        withContext(ioDispatcher) {
+            context.callsDataStore.edit {
+                it[raiseToHandSuggestionPreferenceKey] = true
+            }
+        }
+    }
 
     override suspend fun setCallsSoundNotificationsPreference(soundNotifications: CallsSoundNotifications) {
         withContext(ioDispatcher) {
