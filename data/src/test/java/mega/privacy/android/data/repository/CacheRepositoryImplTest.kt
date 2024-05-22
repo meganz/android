@@ -1,15 +1,17 @@
 package mega.privacy.android.data.repository
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CacheFolderGateway
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -69,6 +71,17 @@ class CacheRepositoryImplTest {
         val actual = underTest.getPreviewDownloadPathForNode()
         verify(cacheFolderGateway).getPreviewDownloadPathForNode()
         assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `test that cache folder is returned from gateway`() = runTest {
+        val expected = mock<File>()
+        val folderName = "folderName"
+        whenever(cacheFolderGateway.getCacheFolderAsync(folderName)) doReturn expected
+
+        val actual = underTest.getCacheFolder((folderName))
+
+        assertThat(actual).isEqualTo(expected)
     }
 
 }

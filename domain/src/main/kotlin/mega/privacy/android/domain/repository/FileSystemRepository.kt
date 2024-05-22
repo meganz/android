@@ -347,9 +347,14 @@ interface FileSystemRepository {
     suspend fun isExternalStorageContentUri(uriString: String): Boolean
 
     /**
-     * @return the file name of the file represented by [uriString]
+     * @return the file name of the file identified by [uriString], or null if unknown
      */
     suspend fun getFileNameFromUri(uriString: String): String?
+
+    /**
+     *  @return the file size of the file identified by [uriString], or null if unknown
+     */
+    suspend fun getFileSizeFromUri(uriString: String): Long?
 
     /**
      * Copies the file represented by a content [uriString] to the destination File. Usually, it is to make a content file returned by a share intent usable by the SDK.

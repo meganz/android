@@ -372,6 +372,16 @@ class FileFacade @Inject constructor(
         }
     }
 
+    override suspend fun getFileSizeFromUri(uriString: String): Long? {
+        val cursor = context.contentResolver.query(uriString.toUri(), null, null, null, null)
+        return cursor?.use {
+            if (cursor.moveToFirst()) {
+                cursor.getColumnIndex(OpenableColumns.SIZE).takeIf { it >= 0 }
+                    ?.let { cursor.getLong(it) }
+            } else null
+        }
+    }
+
     override suspend fun copyContentUriToFile(uriString: String, file: File) {
         val uri = uriString.toUri()
         require(uri.scheme == "content")

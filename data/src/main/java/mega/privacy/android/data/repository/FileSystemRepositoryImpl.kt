@@ -555,6 +555,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.getFileNameFromUri(uriString)
         }
 
+    override suspend fun getFileSizeFromUri(uriString: String): Long? =
+        withContext(ioDispatcher) {
+            fileGateway.getFileSizeFromUri(uriString)
+        }
+
     override suspend fun copyContentUriToFile(uriString: String, file: File) {
         withContext(ioDispatcher) {
             fileGateway.copyContentUriToFile(uriString, file)

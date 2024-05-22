@@ -26,6 +26,10 @@ internal class CacheRepositoryImpl @Inject constructor(
     override fun getCacheFile(folderName: String, fileName: String): File? =
         cacheFolderGateway.getCacheFile(folderName, fileName)
 
+    override suspend fun getCacheFolder(folderName: String): File? = withContext(ioDispatcher) {
+        cacheFolderGateway.getCacheFolderAsync(folderName)
+    }
+
     override suspend fun getPreviewFile(fileName: String): File? =
         cacheFolderGateway.getPreviewFile(fileName)
 

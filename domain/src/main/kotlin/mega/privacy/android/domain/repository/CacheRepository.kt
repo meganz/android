@@ -24,6 +24,13 @@ interface CacheRepository {
     fun getCacheFile(folderName: String, fileName: String): File?
 
     /**
+     * Get the folder [File] of the cache folder
+     *
+     * @return the folder [File] of the cache folder
+     */
+    suspend fun getCacheFolder(folderName: String): File?
+
+    /**
      * Get preview file
      *
      * @param fileName The name of the file

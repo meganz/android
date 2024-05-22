@@ -2,8 +2,10 @@ package mega.privacy.android.data.facade
 
 import android.content.ContentResolver
 import android.content.Context
+import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
+import android.provider.OpenableColumns
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -135,5 +137,49 @@ internal class FileFacadeTest {
         val result = underTest.deleteFileByUri(contentUriMock)
 
         assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `test that getFileNameFromUri returns correct result from content resolver`() = runTest {
+        mockStatic(Uri::class.java).use { _ ->
+            val expected = "File name"
+            val testUri = "uri://example"
+            val sizeColumn = 3
+            val uri = mock<Uri>()
+            val contentResolver = mock<ContentResolver>()
+            val cursor = mock<Cursor>()
+            whenever(Uri.parse(testUri)).thenReturn(uri)
+            whenever(context.contentResolver) doReturn contentResolver
+            whenever(contentResolver.query(uri, null, null, null, null)) doReturn cursor
+            whenever(cursor.moveToFirst()) doReturn true
+            whenever(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)) doReturn sizeColumn
+            whenever(cursor.getString(sizeColumn)) doReturn expected
+
+            val actual = underTest.getFileNameFromUri(testUri)
+
+            assertThat(actual).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that getFileSizeFromUri returns correct result from content resolver`() = runTest {
+        mockStatic(Uri::class.java).use { _ ->
+            val expected = 897455L
+            val testUri = "uri://example"
+            val sizeColumn = 2
+            val uri = mock<Uri>()
+            val contentResolver = mock<ContentResolver>()
+            val cursor = mock<Cursor>()
+            whenever(Uri.parse(testUri)).thenReturn(uri)
+            whenever(context.contentResolver) doReturn contentResolver
+            whenever(contentResolver.query(uri, null, null, null, null)) doReturn cursor
+            whenever(cursor.moveToFirst()) doReturn true
+            whenever(cursor.getColumnIndex(OpenableColumns.SIZE)) doReturn sizeColumn
+            whenever(cursor.getLong(sizeColumn)) doReturn expected
+
+            val actual = underTest.getFileSizeFromUri(testUri)
+
+            assertThat(actual).isEqualTo(expected)
+        }
     }
 }

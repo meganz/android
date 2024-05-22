@@ -407,11 +407,19 @@ internal class FileSystemRepositoryImplTest {
     }
 
     @Test
-    fun `test that getFileNameFromUri returns correct value`() = runTest {
+    fun `test that getFileNameFromUri returns correct value from gateway`() = runTest {
         val uri = "uri//:example.txt"
         val expected = "example"
         whenever(fileGateway.getFileNameFromUri(any())).thenReturn(expected)
         assertThat(underTest.getFileNameFromUri(uri)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that getFileSizeFromUri returns correct value from gateway`() = runTest {
+        val uri = "uri//:example.txt"
+        val expected = 56534465L
+        whenever(fileGateway.getFileSizeFromUri(any())).thenReturn(expected)
+        assertThat(underTest.getFileSizeFromUri(uri)).isEqualTo(expected)
     }
 
     @Test
