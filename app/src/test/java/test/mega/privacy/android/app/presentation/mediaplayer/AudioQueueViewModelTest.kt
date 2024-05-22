@@ -285,21 +285,26 @@ class AudioQueueViewModelTest {
     @Test
     fun `test that state is updated correctly after clearing all selected items`() =
         runTest {
-            val item = getMockedMediaQueueItem(NodeId(1L))
-            val testItem = getMockedMediaQueueItem(NodeId(1L), testIsSelected = true)
+            val item1 = getMockedMediaQueueItem(NodeId(1L))
+            val item2 = getMockedMediaQueueItem(NodeId(2L))
+            val item3 = getMockedMediaQueueItem(NodeId(3L))
+            initMediaQueueItemMapperResult(1, item1)
+            initMediaQueueItemMapperResult(2, item2)
+            initMediaQueueItemMapperResult(3, item3)
+            val testSelectedItem = getMockedMediaQueueItem(NodeId(1L), testIsSelected = true)
+            val testItem = getMockedMediaQueueItem(NodeId(1L), testIsSelected = false)
             val list = (1..3).map {
-                if (it == 1) {
-                    initMediaQueueItemMapperResult(it.toLong(), item)
-                } else {
-                    initMediaQueueItemMapperResult(it.toLong())
-                }
                 getPlaylistItem(it.toLong())
             }
-            whenever(item.copy(isSelected = true)).thenReturn(testItem)
+
+            whenever(item1.copy(isSelected = true)).thenReturn(testSelectedItem)
+            whenever(item2.copy(isSelected = false)).thenReturn(testItem)
+            whenever(item3.copy(isSelected = false)).thenReturn(testItem)
+            whenever(testSelectedItem.copy(isSelected = false)).thenReturn(testItem)
             initUnderTest()
 
             underTest.initMediaQueueItemList(list)
-            underTest.onItemClicked(0, item)
+            underTest.onItemClicked(0, item1)
             underTest.uiState.test {
                 assertThat(awaitItem().selectedItemHandles).isNotEmpty()
                 underTest.clearAllSelectedItems()

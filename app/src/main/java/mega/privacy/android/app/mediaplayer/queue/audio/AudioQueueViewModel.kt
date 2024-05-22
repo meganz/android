@@ -165,7 +165,7 @@ class AudioQueueViewModel @Inject constructor(
         } else this
 
     internal fun clearAllSelectedItems() {
-        val updatedItems = clearItemsSelected()
+        val updatedItems = clearItemsSelected().updateOriginalData().filterItemBySearchQuery()
         _uiState.update {
             it.copy(
                 items = updatedItems,
