@@ -91,7 +91,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
@@ -291,7 +290,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
-import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -328,6 +326,7 @@ import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.CloudDriveSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
@@ -3479,8 +3478,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 fragmentContainer.visibility = View.VISIBLE
             }
         }
-        LiveEventBus.get(Constants.EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
-            .post(drawerItem === DrawerItem.HOMEPAGE)
         closeDrawer()
     }
 

@@ -28,7 +28,6 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
-import com.jeremyliao.liveeventbus.LiveEventBus
 import com.zhpan.bannerview.BannerViewPager
 import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.bannerview.utils.BannerUtils
@@ -53,7 +52,6 @@ import mega.privacy.android.app.presentation.startconversation.StartConversation
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.utils.Constants.EVENT_HOMEPAGE_VISIBILITY
 import mega.privacy.android.app.utils.Constants.REQUEST_CREATE_CHAT
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
@@ -133,12 +131,6 @@ class HomepageFragment : Fragment() {
 
     private var startScreenDialog: AlertDialog? = null
 
-    private val homepageVisibilityChangeObserver = androidx.lifecycle.Observer<Boolean> {
-        if (it) {
-            post { setBottomSheetMaxHeight() }
-        }
-    }
-
     var isFabExpanded = false
 
     private val pageChangeCallback by lazy {
@@ -168,9 +160,6 @@ class HomepageFragment : Fragment() {
     ): View {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
-
-        LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
-            .observeForever(homepageVisibilityChangeObserver)
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
@@ -233,10 +222,6 @@ class HomepageFragment : Fragment() {
         super.onDestroyView()
 
         tabsChildren.clear()
-
-        LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
-            .removeObserver(homepageVisibilityChangeObserver)
-
         searchInputView.stopCallAnimation()
         startScreenDialog?.dismiss()
         viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
