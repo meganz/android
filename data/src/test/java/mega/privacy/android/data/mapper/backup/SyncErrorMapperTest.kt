@@ -112,7 +112,6 @@ internal class SyncErrorMapperTest {
             SyncError.TOO_MANY_ACTION_PACKETS,
         ),
         Arguments.of(Error.LOGGED_OUT.swigValue(), SyncError.LOGGED_OUT),
-        Arguments.of(Error.MISSING_PARENT_NODE.swigValue(), SyncError.MISSING_PARENT_NODE),
         Arguments.of(Error.BACKUP_MODIFIED.swigValue(), SyncError.BACKUP_MODIFIED),
         Arguments.of(
             Error.BACKUP_SOURCE_NOT_BELOW_DRIVE.swigValue(),

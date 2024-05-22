@@ -44,7 +44,6 @@ class SyncErrorMapper @Inject constructor() {
         Error.UNKNOWN_TEMPORARY_ERROR.swigValue() -> SyncError.UNKNOWN_TEMPORARY_ERROR
         Error.TOO_MANY_ACTION_PACKETS.swigValue() -> SyncError.TOO_MANY_ACTION_PACKETS
         Error.LOGGED_OUT.swigValue() -> SyncError.LOGGED_OUT
-        Error.MISSING_PARENT_NODE.swigValue() -> SyncError.MISSING_PARENT_NODE
         Error.BACKUP_MODIFIED.swigValue() -> SyncError.BACKUP_MODIFIED
         Error.BACKUP_SOURCE_NOT_BELOW_DRIVE.swigValue() -> SyncError.BACKUP_SOURCE_NOT_BELOW_DRIVE
         Error.SYNC_CONFIG_WRITE_FAILURE.swigValue() -> SyncError.SYNC_CONFIG_WRITE_FAILURE

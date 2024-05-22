@@ -141,12 +141,6 @@ enum class SyncError {
     LOGGED_OUT,
 
     /**
-     * Represents a Sub State in which setting a new Parent to a Parent whose Local Node is missing
-     * its corresponding Node cross reference
-     */
-    MISSING_PARENT_NODE,
-
-    /**
      * Represents a Sub State in which the Backup has been externally modified
      */
     BACKUP_MODIFIED,
