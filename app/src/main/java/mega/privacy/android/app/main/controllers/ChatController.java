@@ -16,7 +16,6 @@ import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.USER_HANDLES;
 import static mega.privacy.android.app.utils.ContactUtil.getContactEmailDB;
 import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
 import static mega.privacy.android.app.utils.ContactUtil.getFirstNameDB;
@@ -52,15 +51,11 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CopyListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
-import mega.privacy.android.app.listeners.TruncateHistoryListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
-import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MeetingUtil;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
@@ -70,12 +65,10 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatContainsMeta;
-import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
-import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 public class ChatController {
@@ -103,85 +96,11 @@ public class ChatController {
         }
     }
 
-    public static Intent getSelectChatsToAttachContactIntent(Context context, MegaUser contact) {
-        Timber.d("selectChatsToAttachContact");
-
-        long[] longArray = new long[1];
-        longArray[0] = contact.getHandle();
-
-        Intent intent = new Intent(context, ChatExplorerActivity.class);
-        intent.putExtra(USER_HANDLES, longArray);
-        return intent;
-    }
-
-    public void selectChatsToAttachContacts(ArrayList<MegaUser> contacts) {
-        long[] longArray = new long[contacts.size()];
-
-        for (int i = 0; i < contacts.size(); i++) {
-            longArray[i] = contacts.get(i).getHandle();
-        }
-
-        Intent i = new Intent(context, ChatExplorerActivity.class);
-        i.putExtra(USER_HANDLES, longArray);
-
-        if (context instanceof ManagerActivity) {
-            ((ManagerActivity) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
-        }
-    }
-
-    /**
-     * Clear chat history.
-     *
-     * @param chat MegaChatRoom
-     * @deprecated Use ClearChatHistoryUseCase instead.
-     */
-    public void clearHistory(MegaChatRoom chat) {
-        Timber.d("Chat ID: %s", chat.getChatId());
-        clearHistory(chat.getChatId());
-    }
-
-    /**
-     * Clear chat history.
-     *
-     * @param chatId MegaChatRoom
-     * @deprecated Use ClearChatHistoryUseCase instead.
-     */
-    public void clearHistory(long chatId) {
-        Timber.d("Chat ID: %s", chatId);
-        dbH.removePendingMessageByChatId(chatId);
-        megaChatApi.clearChatHistory(chatId, new TruncateHistoryListener(context));
-    }
-
-    public void archiveChat(long chatId) {
-        Timber.d("Chat ID: %s", chatId);
-        if (context instanceof ManagerActivity) {
-            megaChatApi.archiveChat(chatId, true, (ManagerActivity) context);
-        }
-    }
-
-    public void archiveChat(MegaChatListItem chatItem) {
-        Timber.d("Chat ID: %s", chatItem.getChatId());
-        if (context instanceof ManagerActivity) {
-            megaChatApi.archiveChat(chatItem.getChatId(), !chatItem.isArchived(), (ManagerActivity) context);
-        }
-    }
-
     public void archiveChat(MegaChatRoom chat) {
         Timber.d("Chat ID: %s", chat.getChatId());
         if (context instanceof GroupChatInfoActivity) {
 
             megaChatApi.archiveChat(chat.getChatId(), !chat.isArchived(), (GroupChatInfoActivity) context);
-        } else if (context instanceof ChatActivity) {
-            megaChatApi.archiveChat(chat.getChatId(), !chat.isArchived(), (ChatActivity) context);
-        }
-    }
-
-    public void archiveChats(ArrayList<MegaChatListItem> chats) {
-        Timber.d("Chat ID: %s", chats.size());
-        if (context instanceof ManagerActivity) {
-            for (int i = 0; i < chats.size(); i++) {
-                megaChatApi.archiveChat(chats.get(i).getChatId(), !chats.get(i).isArchived(), null);
-            }
         }
     }
 
@@ -189,22 +108,6 @@ public class ChatController {
         Timber.d("Messages to delete: %s", messages.size());
         for (int i = 0; i < messages.size(); i++) {
             deleteMessage(messages.get(i), chat.getChatId());
-        }
-    }
-
-    public void deleteAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat) {
-        Timber.d("Messages to delete: %s", messages.size());
-        for (int i = 0; i < messages.size(); i++) {
-            deleteMessage(messages.get(i).getMessage(), chat.getChatId());
-        }
-    }
-
-    public void deleteMessageById(long messageId, long chatId) {
-        Timber.d("Message ID: %d, Chat ID: %d", messageId, chatId);
-        MegaChatMessage message = getMegaChatMessage(context, megaChatApi, chatId, messageId);
-
-        if (message != null) {
-            deleteMessage(message, chatId);
         }
     }
 
@@ -230,9 +133,6 @@ public class ChatController {
 
         if (messageToDelete == null) {
             Timber.d("The message cannot be deleted");
-        } else if (context instanceof ChatActivity) {
-            Timber.d("The message has been deleted");
-            ((ChatActivity) context).updatingRemovedMessage(message);
         }
     }
 
@@ -295,25 +195,6 @@ public class ChatController {
                 }
         }
     }
-
-    public String createSingleManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
-        Timber.d("Message ID: %d, Chat ID: %d", androidMessage.getMessage().getMsgId(), chatRoom.getChatId());
-
-        String text = createManagementString(androidMessage.getMessage(), chatRoom);
-        if ((text != null) && (!text.isEmpty())) {
-            text = text.substring(text.indexOf(":") + 2);
-            String strEdited = " " + context.getString(R.string.edited_message_text);
-            if (text.contains(strEdited)) {
-                int index = text.indexOf(strEdited);
-                text = text.substring(0, index);
-            }
-        } else {
-            text = "";
-
-        }
-        return text;
-    }
-
 
     public String createManagementString(MegaChatMessage message, MegaChatRoom chatRoom) {
         if (message == null) {
@@ -865,53 +746,9 @@ public class ChatController {
         }
         intent.putExtra("HANDLES_IMPORT_CHAT", longArray);
 
-        if (context instanceof ChatActivity) {
-            if (typeImport == IMPORT_TO_SHARE_OPTION) {
-                ((ChatActivity) context).importNodeToShare(messages, exportListener);
-            } else {
-                ((ChatActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
-            }
-        } else if (context instanceof NodeAttachmentHistoryActivity) {
+        if (context instanceof NodeAttachmentHistoryActivity) {
             ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
         }
-    }
-
-    /**
-     * Method to prepare selected messages that are of type TYPE_NODE_ATTACHMENT or type TYPE_VOICE_CLIP to be imported and shared.
-     *
-     * @param androidMessagesSelected The selected messages.
-     * @param idChat                  The chat ID.
-     */
-    public void prepareMessagesToShare(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat) {
-        if (androidMessagesSelected == null || androidMessagesSelected.isEmpty())
-            return;
-
-        Timber.d("Number of messages: %d,Chat ID: %d", androidMessagesSelected.size(), idChat);
-        ArrayList<MegaChatMessage> messagesToImport = new ArrayList<>();
-        ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
-        for (AndroidMegaChatMessage androidMsg : androidMessagesSelected) {
-            messagesSelected.add(androidMsg.getMessage());
-            int type = androidMsg.getMessage().getType();
-            if (type == MegaChatMessage.TYPE_NODE_ATTACHMENT || type == MegaChatMessage.TYPE_VOICE_CLIP) {
-                messagesToImport.add(androidMsg.getMessage());
-            }
-
-        }
-
-        if (!messagesToImport.isEmpty() && context instanceof ChatActivity) {
-            ((ChatActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
-            ((ChatActivity) context).setExportListener(exportListener);
-            ((ChatActivity) context).handleStoredData();
-        }
-    }
-
-    public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat) {
-        ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
-
-        for (int i = 0; i < androidMessagesSelected.size(); i++) {
-            messagesSelected.add(androidMessagesSelected.get(i).getMessage());
-        }
-        prepareMessagesToForward(messagesSelected, idChat);
     }
 
     public void prepareMessagesToForward(ArrayList<MegaChatMessage> messagesSelected, long idChat) {
@@ -934,10 +771,7 @@ public class ChatController {
         if (messagesToImport.isEmpty()) {
             forwardMessages(messagesSelected, idChat);
         } else {
-            if (context instanceof ChatActivity) {
-                ((ChatActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
-                ((ChatActivity) context).handleStoredData();
-            } else if (context instanceof NodeAttachmentHistoryActivity) {
+            if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
                 if (existsMyChatFilesFolder()) {
                     ((NodeAttachmentHistoryActivity) context).setMyChatFilesFolder(getMyChatFilesFolder());
@@ -1020,9 +854,7 @@ public class ChatController {
         i.putExtra(ID_MESSAGES, idMessages);
         i.putExtra(ID_CHAT_FROM, idChat);
         i.setAction(ACTION_FORWARD_MESSAGES);
-        if (context instanceof ChatActivity) {
-            ((ChatActivity) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
-        } else if (context instanceof NodeAttachmentHistoryActivity) {
+        if (context instanceof NodeAttachmentHistoryActivity) {
             ((NodeAttachmentHistoryActivity) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
     }

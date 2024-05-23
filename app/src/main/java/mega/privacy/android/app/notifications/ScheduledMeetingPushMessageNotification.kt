@@ -13,8 +13,6 @@ import androidx.core.app.PendingIntentCompat
 import androidx.core.content.ContextCompat
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
@@ -24,7 +22,6 @@ import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMAR
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
 import mega.privacy.android.domain.entity.pushes.PushMessage
 import mega.privacy.android.domain.entity.pushes.PushMessage.ScheduledMeetingPushMessage
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationJoinButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationMessageButtonEvent
 import javax.inject.Inject
@@ -36,7 +33,6 @@ import javax.inject.Inject
  */
 class ScheduledMeetingPushMessageNotification @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
 
     /**
@@ -108,13 +104,12 @@ class ScheduledMeetingPushMessageNotification @Inject constructor(
      * @param chatId    Chat Id
      * @return          PendingIntent
      */
-    private suspend fun getShowChatIntent(context: Context, chatId: Long): PendingIntent? {
+    private fun getShowChatIntent(context: Context, chatId: Long): PendingIntent? {
         Analytics.initialise(context)
         Analytics.tracker.trackEvent(ScheduledMeetingReminderNotificationMessageButtonEvent)
-        val isNewChatEnable = getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)
         val intent = Intent(
             context,
-            if (isNewChatEnable) ChatHostActivity::class.java else ChatActivity::class.java
+            ChatHostActivity::class.java
         ).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             action = Constants.ACTION_CHAT_SHOW_MESSAGES

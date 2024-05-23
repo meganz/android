@@ -3,11 +3,13 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
-import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatPeerList
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaUser
 
 class InviteToChatRoomListener(context: Context) : ChatBaseListener(context) {
 
@@ -51,12 +53,6 @@ class InviteToChatRoomListener(context: Context) : ChatBaseListener(context) {
             if (context is GroupChatInfoActivity) {
                 (context as GroupChatInfoActivity).updateParticipants()
                 (context as GroupChatInfoActivity).showSnackbar(message)
-            } else if (context is ChatActivity) {
-                (context as ChatActivity).showSnackbar(
-                    SNACKBAR_TYPE,
-                    message,
-                    MEGACHAT_INVALID_HANDLE
-                )
             }
         }
     }

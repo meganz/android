@@ -6,30 +6,17 @@ import android.content.Context;
 
 import java.util.HashMap;
 
-import mega.privacy.android.app.main.controllers.ChatController;
-import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.MegaChatParticipant;
-import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import timber.log.Timber;
 
 public class GetPeerAttributesListener extends ChatBaseListener {
 
     private HashMap<Integer, MegaChatParticipant> participantRequests;
-
-    private boolean isChatMessageRequest;
-    private MegaChatAdapter.ViewHolderMessageChat holder;
-    private MegaChatAdapter adapter;
-
-    public GetPeerAttributesListener(Context context) {
-        super(context);
-    }
-
     /**
      * Constructor used to request for participants' attributes from GroupChatInfoActivity.
      *
@@ -43,21 +30,6 @@ public class GetPeerAttributesListener extends ChatBaseListener {
         this.participantRequests = new HashMap<>(participantRequests);
     }
 
-    /**
-     * Constructor used to request for participant's attributes from a chat message.
-     *
-     * @param context current Context
-     * @param holder  item view to update in the adapter
-     * @param adapter adapter in which the message has to be updated
-     */
-    public GetPeerAttributesListener(Context context, MegaChatAdapter.ViewHolderMessageChat holder, MegaChatAdapter adapter) {
-        super(context);
-
-        this.holder = holder;
-        this.adapter = adapter;
-        isChatMessageRequest = true;
-    }
-
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         if (request.getType() != MegaChatRequest.TYPE_GET_PEER_ATTRIBUTES) return;
@@ -69,12 +41,6 @@ public class GetPeerAttributesListener extends ChatBaseListener {
             if (chatHandle != INVALID_HANDLE && handleList != null) {
                 if (context instanceof GroupChatInfoActivity) {
                     ((GroupChatInfoActivity) context).updateParticipants(chatHandle, participantRequests, handleList);
-                } else if (context instanceof ChatActivity) {
-                    if (isChatMessageRequest) {
-                        updateMessage(api.getChatRoom(chatHandle), handleList.get(0));
-                    } else {
-                        ((ChatActivity) context).updateCustomSubtitle(chatHandle, handleList);
-                    }
                 }
             } else {
                 Timber.e("Error asking for user attributes. Chat handle: %s handleList: %s", chatHandle, handleList == null ? "NULL" : "not null");
@@ -82,23 +48,5 @@ public class GetPeerAttributesListener extends ChatBaseListener {
         } else {
             Timber.e("Error asking for user attributes: %s", e.getErrorString());
         }
-    }
-
-    /**
-     * Updates a message with the user's attributes received in the request.
-     *
-     * @param chat       MegaChatRoom in which the message has to be updated
-     * @param peerHandle user's identifier whose attributes has been requested
-     */
-    private void updateMessage(MegaChatRoom chat, long peerHandle) {
-        if (adapter == null || chat == null || adapter.getChatRoom() == null
-                || adapter.getChatRoom().getChatId() != chat.getChatId()
-                || holder == null || holder.getUserHandle() != peerHandle) {
-            Timber.w("Message cannot be updated due to some error.");
-            return;
-        }
-
-        new ChatController(context).setNonContactAttributesInDB(peerHandle);
-        adapter.notifyItemChanged(holder.getAdapterPosition());
     }
 }

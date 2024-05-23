@@ -9,7 +9,6 @@ import static mega.privacy.android.app.utils.Constants.EMAIL;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isOnline;
@@ -37,11 +36,10 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
-import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
-import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ContactUtil;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
@@ -280,16 +278,12 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         int id = v.getId();
         if (id == R.id.option_info) {
             if (!isOnline(requireContext())) {
-                ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                 return;
             }
 
             long contactHandle = MEGACHAT_INVALID_HANDLE;
             String contactEmail = null;
-            if (requireActivity() instanceof ChatActivity) {
-                contactEmail = message.getMessage().getUserEmail(0);
-                contactHandle = message.getMessage().getUserHandle(0);
-            } else if (position != -1) {
+            if (position != -1) {
                 contactEmail = message.getMessage().getUserEmail(position);
                 contactHandle = message.getMessage().getUserHandle(position);
             } else {
@@ -306,50 +300,18 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
         } else if (id == R.id.option_invite) {
             if (!isOnline(requireContext())) {
-                ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                 return;
             }
 
             ContactController cC = new ContactController(requireActivity());
-            ArrayList<String> contactEmails;
-
-            if (requireActivity() instanceof ChatActivity) {
-                if (numUsers == 1) {
-                    cC.inviteContact(message.getMessage().getUserEmail(0));
-                } else {
-                    Timber.d("Num users to invite: %s", numUsers);
-                    contactEmails = new ArrayList<>();
-
-                    for (int j = 0; j < numUsers; j++) {
-                        String userMail = message.getMessage().getUserEmail(j);
-                        contactEmails.add(userMail);
-                    }
-                    cC.inviteMultipleContacts(contactEmails);
-                }
-            } else if (email != null) {
+            if (email != null) {
                 cC.inviteContact(email);
             }
         } else if (id == R.id.option_start_conversation) {
-            if (requireActivity() instanceof ChatActivity) {
-                if (numUsers == 1) {
-                    ((ChatActivity) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
-                    dismissAllowingStateLoss();
-                } else {
-                    Timber.d("Num users to invite: %s", numUsers);
-                    ArrayList<Long> contactHandles = new ArrayList<>();
-
-                    for (int j = 0; j < numUsers; j++) {
-                        long userHandle = message.getMessage().getUserHandle(j);
-                        contactHandles.add(userHandle);
-                    }
-                    ((ChatActivity) requireActivity()).startGroupConversation(contactHandles);
-                }
-            } else {
-                Timber.d("Instance of ContactAttachmentActivity");
-                Timber.d("position: %s", position);
-                long userHandle = message.getMessage().getUserHandle(position);
-                ((ContactAttachmentActivity) requireActivity()).startConversation(userHandle);
-            }
+            Timber.d("Instance of ContactAttachmentActivity");
+            Timber.d("position: %s", position);
+            long userHandle = message.getMessage().getUserHandle(position);
+            ((ContactAttachmentActivity) requireActivity()).startConversation(userHandle);
         }
 
         setStateBottomSheetBehaviorHidden();

@@ -1498,53 +1498,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         viewModel.uploadFilesToChatIfFeatureFlagIsTrue(chatIds, files, nodeIds,
             toDoAfter = {
                 openManagerAndFinish()
-            },
-            toDoIfFalse = {
-                val intent = Intent(this, ChatUploadService::class.java)
-
-                if (notEmptyAttachedNodes) {
-                    // There are exist files and files for upload
-                    intent.putExtra(
-                        ChatUploadService.EXTRA_ATTACH_FILES, nodeHandles.toLongArray()
-                    )
-                }
-                intent.putExtra(ChatUploadService.EXTRA_ATTACH_CHAT_IDS, chatIds.toLongArray())
-
-                val idPendMsgs = LongArray(uploadInfos.size * chatListItems.size)
-                val filesToUploadFingerPrint = HashMap<String, String>()
-                var pos = 0
-
-                for (info in infoToShare ?: return@uploadFilesToChatIfFeatureFlagIsTrue) {
-                    val fingerprint = megaApi.getFingerprint(info.fileAbsolutePath)
-
-                    if (fingerprint == null) {
-                        Timber.w("Error, fingerprint == NULL is not possible to access file for some reason")
-                        continue
-                    }
-
-                    filesToUploadFingerPrint[fingerprint] = info.fileAbsolutePath
-
-                    for (item in chatListItems) {
-                        val pendingMsg = ChatUtil.createAttachmentPendingMessage(
-                            item.chatId,
-                            info.fileAbsolutePath, info.getTitle(), true
-                        )
-
-                        idPendMsgs[pos] = pendingMsg.id
-                        pos++
-                    }
-                }
-                intent.apply {
-                    putExtra(ChatUploadService.EXTRA_NAME_EDITED, viewModel.fileNames.value)
-                    putExtra(
-                        ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS,
-                        filesToUploadFingerPrint
-                    )
-                    putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs)
-                    putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true)
-                    putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode?.serialize())
-                }
-                startService(intent)
             }
         )
     }

@@ -7,7 +7,6 @@ import android.util.AttributeSet;
 
 import androidx.appcompat.widget.AppCompatTextView;
 
-import mega.privacy.android.app.main.megachat.ChatActivity;
 import timber.log.Timber;
 
 public class MarqueeTextView extends AppCompatTextView {
@@ -40,14 +39,7 @@ public class MarqueeTextView extends AppCompatTextView {
 
         formatString();
 
-        if (context instanceof ChatActivity) {
-            final TextPaint textPaint1 = textPaint;
-            if(mHandler != null) {
-                mHandler.postDelayed(() -> scroll(textPaint1, getMeasuredWidth()), 1000);
-            }
-        } else {
-            scroll(textPaint, getMaxWidth());
-        }
+        scroll(textPaint, getMaxWidth());
     }
 
     private void scroll(TextPaint textPaint, int width) {

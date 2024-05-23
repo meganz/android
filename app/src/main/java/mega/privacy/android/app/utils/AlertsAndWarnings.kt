@@ -17,7 +17,6 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.domain.entity.AccountType
 import timber.log.Timber
@@ -86,10 +85,6 @@ object AlertsAndWarnings {
             .setCancelable(false)
             .setPositiveButton(context.getString(R.string.button_resume_individual_transfer)) { dialog, _ ->
                 onResumePausedTransfers()
-
-                if (context is ChatActivity) {
-                    context.updatePausedUploadingMessages()
-                }
 
                 dialog.dismiss()
             }

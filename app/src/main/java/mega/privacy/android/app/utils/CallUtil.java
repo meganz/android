@@ -73,23 +73,22 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
-import mega.privacy.android.app.presentation.openlink.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.main.AddContactActivity;
-import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.main.InviteContactActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
-import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
+import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
+import mega.privacy.android.app.presentation.openlink.OpenLinkActivity;
 import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -902,9 +901,6 @@ public class CallUtil {
                 case DialogInterface.BUTTON_POSITIVE:
                     Timber.d("Open camera and lost the camera in the call");
                     disableLocalCamera();
-                    if (activity instanceof ChatActivity && action.equals(ACTION_TAKE_PICTURE)) {
-                        ((ChatActivity) activity).controlCamera();
-                    }
                     if (activity instanceof ManagerActivity) {
                         switch (action) {
                             case ACTION_OPEN_QR:

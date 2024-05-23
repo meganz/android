@@ -3,12 +3,10 @@ package mega.privacy.android.app.nav
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
@@ -52,32 +50,17 @@ internal class MegaNavigatorImpl @Inject constructor(
         isOverQuota: Int?,
         flags: Int,
     ) {
-        applicationScope.launch {
-            val intent = if (getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {
-                getChatActivityIntent(
-                    context = context,
-                    action = action,
-                    link = link,
-                    text = text,
-                    chatId = chatId,
-                    messageId = messageId,
-                    isOverQuota = isOverQuota,
-                    flags = flags
-                )
-            } else {
-                getLegacyChatIntent(
-                    context = context,
-                    action = action,
-                    link = link,
-                    text = text,
-                    chatId = chatId,
-                    messageId = messageId,
-                    isOverQuota = isOverQuota,
-                    flags = flags
-                )
-            }
-            context.startActivity(intent)
-        }
+        val intent = getChatActivityIntent(
+            context = context,
+            action = action,
+            link = link,
+            text = text,
+            chatId = chatId,
+            messageId = messageId,
+            isOverQuota = isOverQuota,
+            flags = flags
+        )
+        context.startActivity(intent)
     }
 
     override fun openUpgradeAccount(context: Context) {
@@ -110,28 +93,6 @@ internal class MegaNavigatorImpl @Inject constructor(
             intent.putExtra(EXTRA_LINK, it)
         }
         return intent
-    }
-
-    private fun getLegacyChatIntent(
-        context: Context,
-        action: String?,
-        link: String?,
-        text: String?,
-        chatId: Long?,
-        messageId: Long?,
-        isOverQuota: Int?,
-        flags: Int,
-    ) = Intent(context, ChatActivity::class.java).apply {
-        this.action = action
-        putExtra(EXTRA_ACTION, action)
-        link?.let {
-            this.data = Uri.parse(it)
-        }
-        text?.let { putExtra(Constants.SHOW_SNACKBAR, text) }
-        chatId?.let { putExtra(Constants.CHAT_ID, chatId) }
-        messageId?.let { putExtra("ID_MSG", messageId) }
-        isOverQuota?.let { putExtra("IS_OVERQUOTA", isOverQuota) }
-        if (flags > 0) setFlags(flags)
     }
 
     override fun openManageChatHistoryActivity(

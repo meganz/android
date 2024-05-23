@@ -3,15 +3,9 @@ package test.mega.privacy.android.app.main
 import android.content.Intent
 import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerViewModel
 import mega.privacy.android.app.utils.Constants
@@ -31,14 +25,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -117,48 +108,13 @@ class FileExplorerViewModelTest {
     }
 
     @Test
-    fun `test that toDoIfFalse is invoked if feature flag is false`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) doReturn false
-        val toDoIfFalse = mock<() -> Unit>()
-
-        underTest.uploadFilesToChatIfFeatureFlagIsTrue(
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            toDoIfFalse = toDoIfFalse
-        ) {}
-
-        verify(toDoIfFalse).invoke()
-    }
-
-    @Test
-    fun `test that toDoIfFalse is invoked if feature flag is true`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) doReturn true
-        val toDoIfFalse = mock<() -> Unit>()
-
-        underTest.uploadFilesToChatIfFeatureFlagIsTrue(
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            toDoIfFalse = toDoIfFalse
-        ) {}
-
-        verifyNoInteractions(toDoIfFalse)
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that toDoAfter is invoked regardless of feature flag value`(
-        featureFlagValue: Boolean,
-    ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) doReturn featureFlagValue
+    fun `test that toDoAfter is invoked`() = runTest {
         val toDoAfter = mock<() -> Unit>()
 
         underTest.uploadFilesToChatIfFeatureFlagIsTrue(
             emptyList(),
             emptyList(),
             emptyList(),
-            {},
             toDoAfter = toDoAfter
         )
 
@@ -167,7 +123,6 @@ class FileExplorerViewModelTest {
 
     @Test
     fun `test that files are attached`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) doReturn true
         val filePaths = listOf("path1", "path2")
 
         val flow = mock<Flow<MultiTransferEvent>>()
@@ -182,7 +137,7 @@ class FileExplorerViewModelTest {
             chatIds = chatIds,
             filePaths = filePaths,
             emptyList(),
-            {}, {}
+            {},
         )
 
         verify(flow).collect(any())
@@ -190,7 +145,6 @@ class FileExplorerViewModelTest {
 
     @Test
     fun `test that nodes are attached`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) doReturn true
 
         val nodeId1 = NodeId(1L)
         val nodeId2 = NodeId(2L)
@@ -204,7 +158,7 @@ class FileExplorerViewModelTest {
             chatIds = chatIds,
             emptyList(),
             nodeIds = nodeIds,
-            {}, {}
+            {},
         )
 
         chatIds.forEach {

@@ -5,9 +5,10 @@ import static mega.privacy.android.app.utils.Constants.MULTIPLE_LEAVE_SHARE;
 import static mega.privacy.android.app.utils.Constants.MULTIPLE_SEND_RUBBISH;
 import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
+
 import android.content.Context;
+
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -173,9 +174,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     break;
             }
 
-            if (context instanceof ChatActivity) {
-                ((ChatActivity) context).removeProgressDialog();
-            } else if (context instanceof NodeAttachmentHistoryActivity) {
+            if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).removeProgressDialog();
             }
 

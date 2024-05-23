@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.RelativeLayout
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.drawable.ScalingUtils
@@ -16,8 +15,6 @@ import com.facebook.imagepipeline.common.RotationOptions
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
-import mega.privacy.android.app.components.RoundedImageView
-import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter
 import mega.privacy.android.icon.pack.R
 import timber.log.Timber
 
@@ -85,65 +82,6 @@ object FrescoUtils {
      */
     fun loadGif(gifImgDisplay: SimpleDraweeView, uri: Uri?) {
         loadGif(gifImgDisplay, null, false, null, uri)
-    }
-
-    /**
-     * Load GIF/WEBP in a chat message.
-     * SimpleDraweeView handles with cache and resource release.
-     *
-     * @param gifImgDisplay The SimpleDraweeView to display the GIF/WEBP.
-     * @param pb            Progress bar showing when loading.
-     * @param preview       View where the file preview is shown.
-     * @param fileView      View where the file inso is shown.
-     * @param uri           The uri of GIF/WEBP. May be from url or local path.
-     */
-    @JvmStatic
-    fun loadGifMessage(
-        gifImgDisplay: SimpleDraweeView?,
-        pb: ProgressBar?,
-        preview: RoundedImageView?,
-        fileView: RelativeLayout?,
-        uri: Uri?,
-    ) {
-        if (gifImgDisplay == null) {
-            Timber.w("Unable to load GIF, view is null.")
-            return
-        }
-        if (gifImgDisplay.visibility != View.VISIBLE) {
-            gifImgDisplay.visibility = View.VISIBLE
-        }
-        if (pb != null) {
-            pb.visibility = View.VISIBLE
-        }
-        val controller: DraweeController = Fresco.newDraweeControllerBuilder()
-            .setImageRequest(ImageRequest.fromUri(uri))
-            .setAutoPlayAnimations(true)
-            .setControllerListener(object : BaseControllerListener<ImageInfo?>() {
-                override fun onFinalImageSet(
-                    id: String,
-                    imageInfo: ImageInfo?,
-                    animatable: Animatable?,
-                ) {
-                    MegaChatAdapter.updateViewDimensions(
-                        gifImgDisplay,
-                        imageInfo!!.width,
-                        imageInfo.height
-                    )
-                    hideProgressBar(pb)
-                    if (fileView != null && fileView.visibility != View.GONE) {
-                        fileView.visibility = View.GONE
-                    }
-                    if (preview != null) {
-                        preview.visibility = View.GONE
-                    }
-                }
-
-                override fun onFailure(id: String, throwable: Throwable) {
-                    Timber.w(throwable, "Load gif failed, error")
-                }
-            })
-            .build()
-        gifImgDisplay.controller = controller
     }
 
     private fun hideProgressBar(pb: ProgressBar?) {

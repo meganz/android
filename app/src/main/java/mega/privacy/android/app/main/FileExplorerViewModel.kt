@@ -382,18 +382,13 @@ class FileExplorerViewModel @Inject constructor(
         chatIds: List<Long>,
         filePaths: List<String>,
         nodeIds: List<NodeId>,
-        toDoIfFalse: () -> Unit,
         toDoAfter: () -> Unit,
     ) {
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {
-                chatIds.forEach {
-                    attachNodes(it, nodeIds)
-                }
-                attachFiles(chatIds, filePaths)
-            } else {
-                toDoIfFalse()
+            chatIds.forEach {
+                attachNodes(it, nodeIds)
             }
+            attachFiles(chatIds, filePaths)
             toDoAfter()
         }
     }

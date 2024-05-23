@@ -339,10 +339,6 @@
             android:name=".main.InviteContactActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".main.megachat.ChatActivity"
-            android:launchMode="singleTask"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
-        <activity
             android:name=".presentation.meeting.chat.ChatHostActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustResize" />

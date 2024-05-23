@@ -1,14 +1,11 @@
 package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.buildChatTempFile;
-import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
-import static mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL;
 import static mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME;
 import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
-import static mega.privacy.android.app.utils.Constants.INVALID_REACTION;
 import static mega.privacy.android.app.utils.Constants.MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_1_HOUR;
@@ -25,9 +22,6 @@ import static mega.privacy.android.app.utils.Constants.SECONDS_IN_HOUR;
 import static mega.privacy.android.app.utils.Constants.SECONDS_IN_MONTH_30;
 import static mega.privacy.android.app.utils.Constants.SECONDS_IN_WEEK;
 import static mega.privacy.android.app.utils.Constants.SECONDS_IN_YEAR;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
-import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.ContactUtil.isContact;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.FileUtil.shareFile;
@@ -36,34 +30,25 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder;
 import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
 import static mega.privacy.android.app.utils.TimeUtils.isUntilThisMorning;
-import static mega.privacy.android.app.utils.Util.dp2px;
-import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -83,30 +68,18 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
-import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
-import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
-import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.main.controllers.ChatController;
-import mega.privacy.android.app.main.listeners.ManageReactionListener;
-import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.main.megachat.RemovedMessage;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
-import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
-import mega.privacy.android.domain.entity.VideoQuality;
-import mega.privacy.android.domain.entity.chat.PendingMessage;
-import mega.privacy.android.domain.entity.chat.PendingMessageState;
 import mega.privacy.android.domain.entity.settings.ChatSettings;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaApiAndroid;
@@ -117,16 +90,11 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaPushNotificationSettings;
-import nz.mega.sdk.MegaStringList;
 import timber.log.Timber;
 
 public class ChatUtil {
-    private static final int MIN_WIDTH = 44;
-    private static final float TEXT_SIZE = 14f;
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
     public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
     public static final int STREAM_MUSIC_DEFAULT = AudioManager.STREAM_MUSIC;
@@ -203,69 +171,6 @@ public class ChatUtil {
         return getMaxAllowed(text) != text.length() || getRealLength(text) == MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
     }
 
-    public static void showShareChatLinkDialog(final Context context, MegaChatRoom chat, final String chatLink) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        LayoutInflater inflater = null;
-
-        if (context instanceof GroupChatInfoActivity) {
-            inflater = ((GroupChatInfoActivity) context).getLayoutInflater();
-        } else if (context instanceof ChatActivity) {
-            inflater = ((ChatActivity) context).getLayoutInflater();
-        }
-
-        View v = inflater.inflate(R.layout.chat_link_share_dialog, null);
-        builder.setView(v);
-        final AlertDialog shareLinkDialog = builder.create();
-
-        EmojiTextView nameGroup = v.findViewById(R.id.group_name_text);
-        nameGroup.setText(getTitleChat(chat));
-        TextView chatLinkText = v.findViewById(R.id.chat_link_text);
-        chatLinkText.setText(chatLink);
-
-        Button copyButton = v.findViewById(R.id.copy_button);
-        copyButton.setOnClickListener(v12 -> {
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText(COPIED_TEXT_LABEL, chatLink);
-            clipboard.setPrimaryClip(clip);
-            if (context instanceof ChatActivity) {
-                ((ChatActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), MEGACHAT_INVALID_HANDLE);
-
-            }
-            dismissShareChatLinkDialog(context, shareLinkDialog);
-        });
-
-        Button shareButton = v.findViewById(R.id.share_button);
-        shareButton.setOnClickListener(v13 -> {
-            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-            sharingIntent.setType(TYPE_TEXT_PLAIN);
-            sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink);
-            context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.context_share)));
-            dismissShareChatLinkDialog(context, shareLinkDialog);
-        });
-
-        Button dismissButton = v.findViewById(R.id.dismiss_button);
-        dismissButton.setOnClickListener(v15 -> dismissShareChatLinkDialog(context, shareLinkDialog));
-
-        shareLinkDialog.setCancelable(false);
-        shareLinkDialog.setCanceledOnTouchOutside(false);
-
-        try {
-            shareLinkDialog.show();
-        } catch (Exception e) {
-            Timber.w(e, "Exception showing share link dialog.");
-        }
-    }
-
-    private static void dismissShareChatLinkDialog(Context context, AlertDialog shareLinkDialog) {
-        try {
-            shareLinkDialog.dismiss();
-            if (context instanceof ChatActivity) {
-                ((ChatActivity) context).setShareLinkDialogDismissed(true);
-            }
-        } catch (Exception e) {
-        }
-    }
-
     public static void showConfirmationRemoveChatLink(final Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.action_delete_link)
@@ -285,41 +190,6 @@ public class ChatUtil {
             return megaChatApi.getMessage(chatId, messageId);
         }
 
-    }
-
-    /**
-     * Locks the device window in landscape mode.
-     */
-    public static void lockOrientationLandscape(Activity activity) {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    }
-
-    /**
-     * Locks the device window in reverse landscape mode.
-     */
-    public static void lockOrientationReverseLandscape(Activity activity) {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-    }
-
-    /**
-     * Locks the device window in portrait mode.
-     */
-    public static void lockOrientationPortrait(Activity activity) {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    }
-
-    /**
-     * Locks the device window in reverse portrait mode.
-     */
-    public static void lockOrientationReversePortrait(Activity activity) {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
-    }
-
-    /**
-     * Allows user to freely use portrait or landscape mode.
-     */
-    public static void unlockOrientation(Activity activity) {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     public static String converterShortCodes(String text) {
@@ -441,136 +311,6 @@ public class ChatUtil {
         fileBitmap.recycle();
 
         return outFile;
-    }
-
-    /**
-     * Method for obtaining the reaction with the largest width.
-     *
-     * @param receivedChatId    The chat ID.
-     * @param receivedMessageId The msg ID.
-     * @param listReactions     The reactions list.
-     * @return The size.
-     */
-    public static int getMaxWidthItem(long receivedChatId, long receivedMessageId, ArrayList<String> listReactions, DisplayMetrics outMetrics) {
-        if (listReactions == null || listReactions.isEmpty()) {
-            return 0;
-        }
-
-        int initSize = dp2px(MIN_WIDTH, outMetrics);
-        for (String reaction : listReactions) {
-            int numUsers = MegaApplication.getInstance().getMegaChatApi().getMessageReactionCount(receivedChatId, receivedMessageId, reaction);
-            if (numUsers > 0) {
-                String text = numUsers + "";
-                Paint paint = new Paint();
-                paint.setTypeface(Typeface.DEFAULT);
-                paint.setTextSize(TEXT_SIZE);
-                int newWidth = (int) paint.measureText(text);
-                int sizeText = isScreenInPortrait(MegaApplication.getInstance().getBaseContext()) ? newWidth + 1 : newWidth + 4;
-                int possibleNewSize = dp2px(MIN_WIDTH, outMetrics) + dp2px(sizeText, outMetrics);
-                if (possibleNewSize > initSize) {
-                    initSize = possibleNewSize;
-                }
-            }
-        }
-        return initSize;
-    }
-
-    /**
-     * Method that transforms an emoji into the right format to add a reaction.
-     *
-     * @param context        Context of Activity.
-     * @param chatId         The chat ID.
-     * @param messageId      The msg ID.
-     * @param emoji          The chosen emoji.
-     * @param isFromKeyboard If it's from the keyboard.
-     */
-    public static void addReactionInMsg(Context context, long chatId, long messageId, Emoji emoji, boolean isFromKeyboard) {
-        if (!(context instanceof ChatActivity)) {
-            Timber.w("Incorrect context");
-            return;
-        }
-
-        EmojiEditText editText = new EmojiEditText(context);
-        editText.input(emoji);
-        if (editText.getText() == null) {
-            Timber.e("Text null");
-            return;
-        }
-
-        String reaction = editText.getText().toString();
-        addReactionInMsg(context, chatId, messageId, reaction, isFromKeyboard);
-    }
-
-    /**
-     * Method for adding a reaction in a msg.
-     *
-     * @param context        Context of Activity.
-     * @param chatId         The chat ID.
-     * @param messageId      The msg ID.
-     * @param reaction       The String with the reaction.
-     * @param isFromKeyboard If it's from the keyboard.
-     */
-    public static void addReactionInMsg(Context context, long chatId, long messageId, String reaction, boolean isFromKeyboard) {
-        if (!(context instanceof ChatActivity)) {
-            Timber.w("Incorrect context");
-            return;
-        }
-
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (isMyOwnReaction(chatId, messageId, reaction) && !isFromKeyboard) {
-            Timber.d("Removing reaction...");
-            megaChatApi.delReaction(chatId, messageId, reaction, new ManageReactionListener(context));
-        } else {
-            Timber.d("Adding reaction...");
-            megaChatApi.addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
-        }
-    }
-
-    public static boolean shouldReactionBeClicked(MegaChatRoom chatRoom) {
-        return !chatRoom.isPreview() &&
-                (chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD ||
-                        chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR);
-    }
-
-    /**
-     * Method of obtaining the reaction list
-     *
-     * @param listReactions   The string list.
-     * @param invalidReaction The invalid reaction
-     * @return The reaction list.
-     */
-    public static ArrayList<String> getReactionsList(MegaStringList listReactions, boolean invalidReaction) {
-        ArrayList<String> list = new ArrayList<>();
-        for (int i = 0; i < listReactions.size(); i++) {
-            list.add(i, listReactions.get(i));
-        }
-
-        if (invalidReaction) {
-            list.add(INVALID_REACTION);
-        }
-
-        return list;
-    }
-
-    /**
-     * Method for know if I have a concrete reaction to a particular message
-     *
-     * @param chatId   The chat ID.
-     * @param msgId    The message ID.
-     * @param reaction The reaction.
-     * @return True, if I have reacted. False otherwise.
-     */
-    public static boolean isMyOwnReaction(long chatId, long msgId, String reaction) {
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, msgId, reaction);
-
-        for (int i = 0; i < handleList.size(); i++) {
-            if (handleList.get(i) == megaChatApi.getMyUserHandle()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -808,26 +548,6 @@ public class ChatUtil {
             contactStateText.setText(lastGreen);
             contactStateText.isMarqueeIsNecessary(context);
         }
-    }
-
-    /**
-     * Gets the name of an attached contact.
-     *
-     * @param message chat message
-     * @return The contact's name by this order if available: nickname, name or email
-     */
-    public static String getNameContactAttachment(MegaChatMessage message) {
-        String email = message.getUserEmail(0);
-        String name = getMegaUserNameDB(MegaApplication.getInstance().getMegaApi().getContact(email));
-        if (isTextEmpty(name)) {
-            name = message.getUserName(0);
-        }
-
-        if (isTextEmpty(name)) {
-            name = email;
-        }
-
-        return name;
     }
 
     /**
@@ -1166,18 +886,6 @@ public class ChatUtil {
     }
 
     /**
-     * Method to know if a message is of the geolocation type.
-     *
-     * @param msg The MegaChatMessage.
-     * @return True if it is. False, if not
-     */
-    public static boolean isGeolocation(MegaChatMessage msg) {
-        return (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META) &&
-                (msg.getContainsMeta() != null &&
-                        msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION);
-    }
-
-    /**
      * Method for obtaining the contact status bitmap.
      *
      * @param userStatus The contact status.
@@ -1235,42 +943,6 @@ public class ChatUtil {
         }
 
         return invalidMetaMessage;
-    }
-
-    /**
-     * Method to know if a message is an image.
-     *
-     * @param message The android msg.
-     * @return True, if it's image. False, if not.
-     */
-    public static boolean isMsgImage(AndroidMegaChatMessage message) {
-        if (message != null && message.getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
-            MegaNodeList list = message.getMessage().getMegaNodeList();
-            if (list.size() == 1) {
-                return MimeTypeList.typeForName(list.get(0).getName()).isImage();
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Dialog to confirm if you want to delete the history of a chat.
-     *
-     * @param chat The MegaChatRoom.
-     * @deprecated Use ClearChatConfirmationDialog Compose view instead.
-     */
-    public static void showConfirmationClearChat(Activity context, MegaChatRoom chat) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        String message = chat.isMeeting() ?
-                context.getString(R.string.meetings_clear_history_confirmation_dialog_message) :
-                context.getString(R.string.confirmation_clear_chat_history);
-
-        builder.setTitle(chat.isMeeting() ? R.string.meetings_clear_history_confirmation_dialog_title : R.string.title_properties_chat_clear)
-                .setMessage(message)
-                .setPositiveButton(R.string.general_clear, (dialog, which) -> new ChatController(context).clearHistory(chat))
-                .setNegativeButton(R.string.general_cancel, null)
-                .show();
     }
 
     /**
@@ -1349,95 +1021,6 @@ public class ChatUtil {
         }
     }
 
-    public static void showConfirmationLeaveChat(Context context, long chatId, ChatManagementCallback chatManagementCallback) {
-        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        builder.setTitle(chatRoom != null && chatRoom.isMeeting() ? context.getString(R.string.meetings_leave_meeting_confirmation_dialog_title) : context.getString(R.string.title_confirmation_leave_group_chat))
-                .setMessage(context.getString(R.string.confirmation_leave_group_chat))
-                .setPositiveButton(context.getString(R.string.general_leave), (dialog, which)
-                        -> chatManagementCallback.confirmLeaveChat(chatId))
-                .setNegativeButton(context.getString(R.string.general_cancel), null)
-                .show();
-    }
-
-    /**
-     * Method to compare if the current message is the same message that needs to be updated.     *
-     *
-     * @param messageToUpdate The message to be updated.
-     * @param currentMessage  The current message.
-     * @return True, if it is the same. False, if not.
-     */
-    public static boolean isItSameMsg(MegaChatMessage messageToUpdate, MegaChatMessage currentMessage) {
-        if (messageToUpdate.getMsgId() != MEGACHAT_INVALID_HANDLE) {
-            return messageToUpdate.getMsgId() == currentMessage.getMsgId();
-        } else {
-            return messageToUpdate.getTempId() == currentMessage.getTempId();
-        }
-    }
-
-    /**
-     * Method to know whether to show mute or unmute options.
-     *
-     * @param context  The Activity context.
-     * @param chatRoom The chat room.
-     * @return True, if it should be shown. False, if not.
-     */
-    public static boolean shouldMuteOrUnmuteOptionsBeShown(Context context, MegaChatRoom chatRoom) {
-        return chatRoom != null && !chatRoom.isPreview() && isStatusConnected(context, chatRoom.getChatId()) &&
-                ((chatRoom.isGroup() && chatRoom.isActive()) ||
-                        (!chatRoom.isGroup() && chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR));
-    }
-
-    /**
-     * Creates a pending message representing an attachment message.
-     *
-     * @param idChat       Identifier of the chat where the message has to be sent.
-     * @param filePath     Path of the file which will be attached to the chat.
-     * @param fileName     Name of the file which will be attached to the chat.
-     * @param fromExplorer True if the file comes from File Explorer, false otherwise.
-     * @return The pending message after add it to the DB.
-     */
-    public static PendingMessage createAttachmentPendingMessage(long idChat, String filePath, String fileName, boolean fromExplorer) {
-        long idPendingMessage;
-        LegacyDatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-
-        PendingMessage pendingMsg = new PendingMessage();
-        pendingMsg.setChatId(idChat);
-        pendingMsg.setUploadTimestamp(System.currentTimeMillis() / 1000);
-        pendingMsg.setFilePath(filePath);
-        pendingMsg.setName(fileName);
-        pendingMsg.setFingerprint(MegaApplication.getInstance().getMegaApi().getFingerprint(filePath));
-
-        if (MimeTypeList.typeForName(fileName).isMp4Video() && dbH.getChatVideoQuality() != VideoQuality.ORIGINAL.getValue()) {
-            idPendingMessage = dbH.addPendingMessage(pendingMsg, PendingMessageState.COMPRESSING.getValue());
-            pendingMsg.setState(PendingMessageState.COMPRESSING.getValue());
-        } else if (fromExplorer) {
-            idPendingMessage = dbH.addPendingMessageFromFileExplorer(pendingMsg);
-        } else {
-            idPendingMessage = dbH.addPendingMessage(pendingMsg);
-        }
-
-        pendingMsg.setId(idPendingMessage);
-
-        return pendingMsg;
-    }
-
-    /**
-     * Method to share a message from the chat.
-     *
-     * @param context    Context of Activity.
-     * @param androidMsg The msg to be shared
-     * @param chatId     The ID of a chat room.
-     */
-    public static void shareMsgFromChat(Context context, AndroidMegaChatMessage androidMsg, long chatId) {
-        MegaChatMessage msg = androidMsg.getMessage();
-        MegaNode node = getNodeFromMessage(msg);
-        if (node == null)
-            return;
-
-        shareNodeFromChat(context, node, chatId, msg.getMsgId());
-    }
-
     /**
      * Method to share a node from the chat.
      *
@@ -1465,101 +1048,6 @@ public class ChatUtil {
             Timber.d("Node is not exported, so export Node");
             MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND), msgId, chatId));
         }
-    }
-
-    /**
-     * Method that controls which nodes of messages should be shared directly and which need to be shared via a public link.
-     *
-     * @param context          The Activity context.
-     * @param messagesSelected The ArrayList of selected messages.
-     * @param chatId           The chat ID.
-     */
-    public static void shareNodesFromChat(Context context, ArrayList<AndroidMegaChatMessage> messagesSelected, long chatId) {
-        ArrayList<MegaNode> listNodes = new ArrayList<>();
-        for (AndroidMegaChatMessage androidMessage : messagesSelected) {
-            MegaNode node = getNodeFromMessage(androidMessage.getMessage());
-            if (node == null) continue;
-
-            listNodes.add(node);
-        }
-
-        if (!MegaNodeUtil.shouldContinueWithoutError(context, listNodes)) {
-            return;
-        }
-
-        if (MegaNodeUtil.areAllNodesDownloaded(context, listNodes)) {
-            return;
-        }
-
-        StringBuilder links = MegaNodeUtil.getExportNodesLink(listNodes);
-        if (areAllNodesExported(listNodes)) {
-            Timber.d("All nodes are exported, so share the public links");
-            startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND),
-                    links.toString(),
-                    null);
-            return;
-        }
-
-        ArrayList<MegaNode> arrayNodesNotExported = getNotExportedNodes(listNodes);
-        if (!arrayNodesNotExported.isEmpty()) {
-            ExportListener exportListener = new ExportListener(context, arrayNodesNotExported.size(), links,
-                    new Intent(android.content.Intent.ACTION_SEND), messagesSelected, chatId);
-
-            for (MegaNode nodeNotExported : arrayNodesNotExported) {
-                Timber.d("Node is not exported, so export Node");
-                MegaApplication.getInstance().getMegaApi().exportNode(nodeNotExported, exportListener);
-            }
-        }
-    }
-
-    /**
-     * Method to get the node from a message.
-     *
-     * @param message The MegaChatMessage.
-     * @return The MegaNode obtained.
-     */
-    private static MegaNode getNodeFromMessage(MegaChatMessage message) {
-        if (message == null) {
-            return null;
-        }
-
-        MegaNodeList nodeList = message.getMegaNodeList();
-        if (nodeList == null || nodeList.size() == 0) {
-            return null;
-        }
-
-        return nodeList.get(0);
-    }
-
-    /**
-     * Method to find out if all nodes are exported nodes.
-     *
-     * @param listNodes list of nodes to check.
-     * @return True, if all are exported nodes. False, otherwise.
-     */
-    private static boolean areAllNodesExported(ArrayList<MegaNode> listNodes) {
-        for (MegaNode node : listNodes) {
-            if (!node.isExported()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Method to get the nodes that are not exported.
-     *
-     * @param listNodes The list of nodes to be checked.
-     * @return The list of nodes that are not exported.
-     */
-    private static ArrayList<MegaNode> getNotExportedNodes(ArrayList<MegaNode> listNodes) {
-        ArrayList<MegaNode> arrayNodesNotExported = new ArrayList<>();
-        for (MegaNode node : listNodes) {
-            if (!node.isExported()) {
-                arrayNodesNotExported.add(node);
-            }
-        }
-        return arrayNodesNotExported;
     }
 
     /**
@@ -1617,71 +1105,6 @@ public class ChatUtil {
                 .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
                 .putExtra(MESSAGE_ID, msgId)
                 .putExtra(CHAT_ID, chatId));
-    }
-
-    /**
-     * Delete a specific SharePreferences.
-     *
-     * @param preferences The SharedPreferences.
-     */
-    private static void removeSharedPreference(SharedPreferences preferences) {
-        if (preferences != null) {
-            preferences.edit().clear().apply();
-        }
-    }
-
-    /**
-     * Method for finding out if the selected message is deleted or
-     * has STATUS_SERVER_REJECTED, STATUS_SENDING_MANUAL or STATUS_SENDING status
-     *
-     * @param removedMessages List of deleted messages
-     * @param message         The message selected.
-     * @return True if it's removed, rejected or in sending or manual sending status . False, otherwise.
-     */
-    public static boolean isMsgRemovedOrHasRejectedOrManualSendingStatus(ArrayList<RemovedMessage> removedMessages, MegaChatMessage message) {
-        int status = message.getStatus();
-        if (status == MegaChatMessage.STATUS_SERVER_REJECTED ||
-                status == MegaChatMessage.STATUS_SENDING_MANUAL ||
-                status == MegaChatMessage.STATUS_SENDING) {
-            return true;
-        }
-
-        if (removedMessages == null || removedMessages.isEmpty()) {
-            return false;
-        }
-
-        for (RemovedMessage removeMsg : removedMessages) {
-            if ((message.getMsgId() != MEGACHAT_INVALID_HANDLE && message.getMsgId() == removeMsg.getMsgId()) ||
-                    (message.getTempId() != MEGACHAT_INVALID_HANDLE && message.getTempId() == removeMsg.getMsgTempId())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Method to know if the forward icon of a own message should be displayed.
-     *
-     * @param removedMessages  List of deleted messages
-     * @param message          The message to be checked
-     * @param isMultipleSelect True, if multi-select mode is activated. False, otherwise.
-     * @param cC               ChatController
-     * @return True, if it must be visible. False, if it must be hidden
-     */
-    public static boolean checkForwardVisibilityInOwnMsg(ArrayList<RemovedMessage> removedMessages, MegaChatMessage message, boolean isMultipleSelect, ChatController cC) {
-        return !isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) && !cC.isInAnonymousMode() && !isMultipleSelect;
-    }
-
-    /**
-     * Method to know if the forward icon a contact message should be displayed
-     *
-     * @param isMultipleSelect True, if multi-select mode is activated. False, otherwise
-     * @param cC               ChatController
-     * @return True, if it must be visible. False, if it must be hidden
-     */
-    public static boolean checkForwardVisibilityInContactMsg(boolean isMultipleSelect, ChatController cC) {
-        return !cC.isInAnonymousMode() && !isMultipleSelect;
     }
 
     /**

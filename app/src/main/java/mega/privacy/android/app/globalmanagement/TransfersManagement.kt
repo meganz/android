@@ -26,7 +26,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -348,20 +347,7 @@ class TransfersManagement @Inject constructor(
                             .setAction(Constants.ACTION_RESTART_SERVICE)
                         val isUploadsWorker = getFeatureFlagValueUseCase(AppFeatures.UploadWorker)
 
-                        if (!getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {
-                            val chatUploadServiceIntent =
-                                Intent(context, ChatUploadService::class.java)
-                                    .setAction(Constants.ACTION_RESTART_SERVICE)
-
-                            if (isUploadsWorker) {
-                                tryToStartForegroundService(chatUploadServiceIntent)
-                            } else {
-                                tryToStartForegroundService(
-                                    uploadServiceIntent,
-                                    chatUploadServiceIntent
-                                )
-                            }
-                        } else if (!isUploadsWorker) {
+                        if (!isUploadsWorker) {
                             tryToStartForegroundService(uploadServiceIntent)
                         }
                     }

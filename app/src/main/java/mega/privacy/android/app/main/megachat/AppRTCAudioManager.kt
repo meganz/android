@@ -110,9 +110,6 @@ class AppRTCAudioManager private constructor(
         startBluetooth()
         audioManager = apprtcContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         start(isSpeakerOn)
-        if (apprtcContext is ChatActivity) {
-            registerProximitySensor()
-        }
         Timber.d("Default audio device is %s", defaultAudioDevice)
         AppRTCUtils.logDeviceInfo(TAG)
     }
@@ -175,8 +172,7 @@ class AppRTCAudioManager private constructor(
                 proximitySensor?.turnOffScreen()
                 Timber.d("Screen off")
                 if (apprtcContext is MegaApplication && isSpeakerOn &&
-                    (bluetoothManager?.state != AppRTCBluetoothManager.State.SCO_CONNECTED) ||
-                    apprtcContext is ChatActivity
+                    (bluetoothManager?.state != AppRTCBluetoothManager.State.SCO_CONNECTED)
                 ) {
                     Timber.d("Disabling the speakerphone:")
                     selectAudioDevice(AudioDevice.EARPIECE, true)
@@ -187,8 +183,7 @@ class AppRTCAudioManager private constructor(
             proximitySensor?.turnOnScreen()
             Timber.d("Screen on")
             if (apprtcContext is MegaApplication && isSpeakerOn &&
-                (bluetoothManager?.state != AppRTCBluetoothManager.State.SCO_CONNECTED) ||
-                apprtcContext is ChatActivity
+                (bluetoothManager?.state != AppRTCBluetoothManager.State.SCO_CONNECTED)
             ) {
                 Timber.d("Enabling the speakerphone: ")
                 selectAudioDevice(AudioDevice.SPEAKER_PHONE, true)

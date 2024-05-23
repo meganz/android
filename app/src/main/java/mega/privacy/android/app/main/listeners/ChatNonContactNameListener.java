@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
-import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatAdapter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
@@ -54,31 +53,6 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         }
     }
 
-    public ChatNonContactNameListener(Context context, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter, long userHandle, boolean isPreview, int pos) {
-        this.context = context;
-        this.holder = holder;
-        this.adapter = adapter;
-        this.isUserHandle = true;
-        this.userHandle = userHandle;
-        this.isPreview = isPreview;
-        this.pos = pos;
-
-        dbH = DbHandlerModuleKt.getDbHandler();
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
-    }
-
-    public ChatNonContactNameListener(Context context) {
-        this.context = context;
-        dbH = DbHandlerModuleKt.getDbHandler();
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
-    }
-
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -96,17 +70,6 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         if (e.getErrorCode() == MegaError.API_OK) {
             if (adapter == null) {
                 return;
-            }
-
-            if (adapter instanceof MegaChatAdapter && holder == null) {
-                Timber.w("holder is NULL");
-                holder = ((MegaChatAdapter) adapter).queryIfHolderNull(pos);
-                if (holder == null) {
-                    Timber.w("holder is NULL");
-                    return;
-                }
-            } else {
-                Timber.w("Other adapter holder is NULL");
             }
 
             if (request.getType() == MegaChatRequest.TYPE_GET_FIRSTNAME) {
@@ -142,9 +105,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
     private void updateAdapter() {
         if (receivedFirstName || receivedLastName || receivedEmail) {
             Timber.d("updateAdapter");
-            if (adapter instanceof MegaChatAdapter) {
-                adapter.notifyItemChanged(holder.getAdapterPosition());
-            } else if (adapter instanceof MegaListChatAdapter) {
+            if (adapter instanceof MegaListChatAdapter) {
                 ((MegaListChatAdapter) adapter).updateNonContactName(holder.getAdapterPosition(), this.userHandle);
             }
 

@@ -53,7 +53,6 @@ import mega.privacy.android.app.presentation.extensions.uploadFolderManually
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException.ChildDoesNotExistsException
 import mega.privacy.android.app.usecase.exception.MegaNodeException.ParentDoesNotExistException
@@ -118,9 +117,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
 
     @Inject
     lateinit var uploadUseCase: UploadUseCase
-
-    @Inject
-    lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
 
     @Inject
     lateinit var copyRequestMessageMapper: CopyRequestMessageMapper

@@ -10,7 +10,6 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.di.DatabaseEntryPoint
 import mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.utils.Constants
@@ -225,15 +224,6 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                 (this as? FileExplorerActivity)?.let {
                     it.setMyChatFilesFolder(myChatFolderNode)
                     it.checkIfFilesExistsInMEGA()
-                }
-
-                (this as? ChatActivity)?.let {
-                    it.setMyChatFilesFolder(myChatFolderNode)
-                    if (it.isForwardingFromNC) {
-                        it.handleStoredData()
-                    } else {
-                        it.proceedWithAction()
-                    }
                 }
 
                 (this as? NodeAttachmentHistoryActivity)?.let {

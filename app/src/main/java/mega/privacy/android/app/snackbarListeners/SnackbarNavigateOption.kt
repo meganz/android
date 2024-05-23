@@ -5,11 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.view.View
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
-import mega.privacy.android.app.contacts.ContactsActivity.Companion.getSentRequestsIntent
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.controllers.ContactController
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants
 
@@ -42,18 +39,6 @@ class SnackbarNavigateOption @JvmOverloads constructor(
                 context.moveToSettingsSectionStorage()
             }
             return
-        }
-        if (context is ChatActivity) {
-            when (type) {
-                Constants.INVITE_CONTACT_TYPE -> {
-                    ContactController(context).inviteContact(userEmail)
-                    return
-                }
-                Constants.SENT_REQUESTS_TYPE -> {
-                    context.startActivity(getSentRequestsIntent(context))
-                    return
-                }
-            }
         }
         val intent = Intent(context, ManagerActivity::class.java)
         if (isSentAsMessageSnackbar) {

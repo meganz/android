@@ -7,9 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.domain.entity.pushes.PushMessage
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,9 +27,6 @@ class ScheduledMeetingPushMessageNotificationTest {
 
     private lateinit var context: Context
     private val notificationManagerCompat: NotificationManagerCompat = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock {
-        onBlocking { invoke(AppFeatures.NewChatActivity) }.thenReturn(false)
-    }
 
     @get:Rule
     val analyticsRule = AnalyticsTestRule()
@@ -41,7 +36,6 @@ class ScheduledMeetingPushMessageNotificationTest {
         context = ApplicationProvider.getApplicationContext()
         underTest = ScheduledMeetingPushMessageNotification(
             notificationManagerCompat,
-            getFeatureFlagValueUseCase
         )
     }
 

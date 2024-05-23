@@ -174,12 +174,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     PromoNotifications("Enable promotional notifications", true),
 
     /**
-     * To switch into new chat activity
-     * Enabled version 11.10
-     */
-    NewChatActivity("Enable new chat activity", true),
-
-    /**
      * Call unlimited for pro users
      */
     CallUnlimitedProPlan("Call to stay unlimited when host with pro plan leaves", false),

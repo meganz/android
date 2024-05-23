@@ -3,7 +3,6 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.utils.Constants
 import nz.mega.sdk.MegaApiJava
@@ -87,22 +86,6 @@ class CreateFolderListener @JvmOverloads constructor(
                             context.showSnackbar(context.getString(R.string.error_creating_folder,
                                 request.name))
                         }
-                    }
-                }
-
-                is ChatActivity -> {
-                    if (e.errorCode == MegaError.API_OK) {
-                        api.setMyChatFilesFolder(handle, SetAttrUserListener(context))
-                        context.setMyChatFilesFolder(node)
-                        if (context.isForwardingFromNC) {
-                            context.handleStoredData()
-                        } else {
-                            context.proceedWithAction()
-                        }
-                    } else {
-                        context.showSnackbar(Constants.SNACKBAR_TYPE,
-                            context.getString(R.string.general_text_error),
-                            -1)
                     }
                 }
 
