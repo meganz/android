@@ -12,7 +12,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
@@ -140,31 +139,6 @@ class GetContactRequestsUseCase @Inject constructor(
             }
         }, BackpressureStrategy.LATEST)
 
-    /**
-     * Get updated number of incoming contact requests
-     *
-     * @return  Flowable with the number of requests
-     */
-    fun getIncomingRequestsSize(): Flowable<Int> =
-        Flowable.create({ emitter ->
-            getRequestsSize().blockingSubscribeBy(onSuccess = { requestsSize ->
-                emitter.onNext(requestsSize.first)
-            })
-
-            val globalSubscription = getGlobalChangesUseCase()
-                .filter { change -> change is Result.OnContactRequestsUpdate }
-                .subscribeBy(
-                    onNext = {
-                        if (emitter.isCancelled) return@subscribeBy
-                        emitter.onNext(megaApi.incomingContactRequests.size)
-                    },
-                    onError = Timber::e
-                )
-
-            emitter.setCancellable {
-                globalSubscription.dispose()
-            }
-        }, BackpressureStrategy.LATEST)
 
     /**
      * Get current number of incoming/outgoing contact requests

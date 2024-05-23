@@ -18,6 +18,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -27,7 +29,6 @@ import mega.privacy.android.app.contacts.list.data.ContactActionItem
 import mega.privacy.android.app.contacts.list.data.ContactActionItem.Type
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.contacts.list.data.ContactListState
-import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestsUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
@@ -52,22 +54,25 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
- * ViewModel that handles all related logic to Contacts for the current user.
+ * ViewModel that handles all related logic to Contact List for the current user.
  *
- * @property getContactsUseCase         Use case to retrieve current contacts
- * @property getContactRequestsUseCase  Use case to retrieve contact requests
- * @property get1On1ChatIdUseCase   Use case to get current chat room for existing user
- * @property removedContactByEmailUseCase       Use case to remove existing contact
- * @property passcodeManagement         [PasscodeManagement]
- * @property startChatCall              [StartChatCall]
- * @property chatApiGateway             [MegaChatApiGateway]
- * @property setChatVideoInDeviceUseCase [SetChatVideoInDeviceUseCase]
- * @property chatManagement             [ChatManagement]
+ * @param getContactsUseCase            Use case to get contacts
+ * @param get1On1ChatIdUseCase          Use case to get 1on1 chat id
+ * @param removedContactByEmailUseCase  Use case to remove contact by email
+ * @param startChatCall                 Use case to start chat call
+ * @param passcodeManagement            PasscodeManagement object
+ * @param chatApiGateway                MegaChatApiGateway object
+ * @param setChatVideoInDeviceUseCase   Use case to set chat video in device
+ * @param chatManagement                ChatManagement object
+ * @param createShareKeyUseCase         Use case to create share key
+ * @param getNodeByIdUseCase            Use case to get node by id
+ * @param monitorSFUServerUpgradeUseCase Use case to monitor SFU server upgrade
+ * @param monitorContactRequestsUseCase Use case to monitor contact requests
+ * @param context                       Application context
  */
 @HiltViewModel
 class ContactListViewModel @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
-    private val getContactRequestsUseCase: GetContactRequestsUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val removedContactByEmailUseCase: RemoveContactByEmailUseCase,
     private val startChatCall: StartChatCall,
@@ -78,6 +83,7 @@ class ContactListViewModel @Inject constructor(
     private val createShareKeyUseCase: CreateShareKeyUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
+    private val monitorContactRequestsUseCase: MonitorContactRequestsUseCase,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -89,7 +95,6 @@ class ContactListViewModel @Inject constructor(
 
     private var queryString: String? = null
     private val contacts: MutableLiveData<List<ContactItem.Data>> = MutableLiveData()
-    private val contactActions: MutableLiveData<List<ContactActionItem>> = MutableLiveData()
     private val _state = MutableStateFlow(ContactListState())
 
     private var monitorSFUServerUpgradeJob: Job? = null
@@ -110,23 +115,32 @@ class ContactListViewModel @Inject constructor(
     }
 
     private fun retrieveContactActions() {
-        getContactRequestsUseCase.getIncomingRequestsSize()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { incomingRequests ->
-                    contactActions.value = listOf(
-                        ContactActionItem(
-                            Type.REQUESTS,
-                            context.getString(R.string.section_requests),
-                            incomingRequests
-                        ),
-                        ContactActionItem(Type.GROUPS, context.getString(R.string.section_groups))
-                    )
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
+        viewModelScope.launch {
+            runCatching {
+                monitorContactRequestsUseCase()
+                    .map { it.incomingContactRequests.size }
+                    .catch { Timber.e(it) }
+                    .collectLatest {
+                        _state.update { state ->
+                            state.copy(
+                                contactActionItems = listOf(
+                                    ContactActionItem(
+                                        Type.REQUESTS,
+                                        context.getString(R.string.section_requests),
+                                        it
+                                    ),
+                                    ContactActionItem(
+                                        Type.GROUPS,
+                                        context.getString(R.string.section_groups)
+                                    )
+                                )
+                            )
+                        }
+                    }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     private fun retrieveContacts(avatarFolder: File) {
@@ -145,8 +159,6 @@ class ContactListViewModel @Inject constructor(
             .addTo(composite)
     }
 
-    fun getContactActions(): LiveData<List<ContactActionItem>> =
-        contactActions
 
     fun getRecentlyAddedContacts(): LiveData<List<ContactItem>> =
         contacts.map { items ->

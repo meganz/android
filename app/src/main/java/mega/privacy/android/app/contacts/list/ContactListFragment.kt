@@ -109,6 +109,8 @@ class ContactListFragment : Fragment() {
                 contactSheet?.dismiss()
 
                 viewModel.onChatOpened()
+
+                actionsAdapter.submitList(state.contactActionItems)
             }
         }
     }
@@ -174,9 +176,7 @@ class ContactListFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.getContactActions().observe(viewLifecycleOwner) { items ->
-            actionsAdapter.submitList(items)
-        }
+
 
         viewModel.getRecentlyAddedContacts().observe(viewLifecycleOwner) { items ->
             recentlyAddedAdapter.submitList(items)
