@@ -495,10 +495,6 @@
             android:launchMode="singleTop" />
 
         <service
-            android:name=".main.megachat.ChatUploadService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync" />
-        <service
             android:name=".meeting.CallService"
             android:exported="false"
             android:foregroundServiceType="phoneCall" />
