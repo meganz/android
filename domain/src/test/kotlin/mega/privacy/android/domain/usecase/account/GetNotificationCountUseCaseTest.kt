@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.contactrequest.GetIncomingContactRequestsUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.GetFeatureNotificationCountUseCase

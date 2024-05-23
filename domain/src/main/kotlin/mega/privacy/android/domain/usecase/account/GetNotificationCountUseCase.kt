@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.contactrequest.GetIncomingContactRequestsUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.GetFeatureNotificationCountUseCase

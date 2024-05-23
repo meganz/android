@@ -24,8 +24,8 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactDataUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.AddNewContactsUseCase
@@ -47,7 +47,7 @@ import javax.inject.Inject
  * @property applyContactUpdates                            [ApplyContactUpdates]
  * @property monitorChatPresenceLastGreenUpdatesUseCase     [MonitorChatPresenceLastGreenUpdatesUseCase]
  * @property monitorChatOnlineStatusUseCase                 [MonitorChatOnlineStatusUseCase]
- * @property monitorContactRequestUpdates                   [MonitorContactRequestUpdates]
+ * @property monitorContactRequestUpdatesUseCase                   [MonitorContactRequestUpdatesUseCase]
  * @property addNewContactsUseCase                          [AddNewContactsUseCase]
  * @property requestUserLastGreenUseCase                    [RequestUserLastGreenUseCase]
  * @property state                    Current view state as [StartConversationState]
@@ -62,7 +62,7 @@ class StartConversationViewModel @Inject constructor(
     private val applyContactUpdates: ApplyContactUpdates,
     private val monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase,
     private val monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase,
-    private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
+    private val monitorContactRequestUpdatesUseCase: MonitorContactRequestUpdatesUseCase,
     private val addNewContactsUseCase: AddNewContactsUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -234,7 +234,7 @@ class StartConversationViewModel @Inject constructor(
 
     private fun observeNewContacts() {
         viewModelScope.launch {
-            monitorContactRequestUpdates().collectLatest { newContacts ->
+            monitorContactRequestUpdatesUseCase().collectLatest { newContacts ->
                 val contactList = addNewContactsUseCase(_state.value.contactItemList, newContacts)
                 _state.update { it.copy(contactItemList = contactList.sortList()) }
             }

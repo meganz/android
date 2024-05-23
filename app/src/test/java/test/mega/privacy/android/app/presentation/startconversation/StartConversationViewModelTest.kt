@@ -21,8 +21,8 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactDataUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.AddNewContactsUseCase
@@ -92,7 +92,7 @@ class StartConversationViewModelTest {
     private val monitorChatPresenceLastGreenUpdatesUseCase =
         mock<MonitorChatPresenceLastGreenUpdatesUseCase>()
     private val monitorChatOnlineStatusUseCase = mock<MonitorChatOnlineStatusUseCase>()
-    private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
+    private val monitorContactRequestUpdatesUseCase = mock<MonitorContactRequestUpdatesUseCase>()
     private val addNewContactsUseCase = mock<AddNewContactsUseCase>()
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
@@ -115,7 +115,7 @@ class StartConversationViewModelTest {
         wheneverBlocking { monitorContactUpdates() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorChatPresenceLastGreenUpdatesUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorChatOnlineStatusUseCase() }.thenReturn(emptyFlow())
-        wheneverBlocking { monitorContactRequestUpdates() }.thenReturn(emptyFlow())
+        wheneverBlocking { monitorContactRequestUpdatesUseCase() }.thenReturn(emptyFlow())
         initTestClass()
     }
 
@@ -129,7 +129,7 @@ class StartConversationViewModelTest {
             applyContactUpdates = applyContactUpdates,
             monitorChatPresenceLastGreenUpdatesUseCase = monitorChatPresenceLastGreenUpdatesUseCase,
             monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,
-            monitorContactRequestUpdates = monitorContactRequestUpdates,
+            monitorContactRequestUpdatesUseCase = monitorContactRequestUpdatesUseCase,
             addNewContactsUseCase = addNewContactsUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,

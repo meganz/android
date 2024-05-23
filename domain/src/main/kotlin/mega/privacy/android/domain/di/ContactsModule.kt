@@ -8,7 +8,6 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactCredentials
-import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
@@ -40,9 +39,6 @@ internal abstract class ContactsModule {
     abstract fun bindResetContactDatabase(implementation: DefaultReloadContactDatabase): ReloadContactDatabase
 
     companion object {
-        @Provides
-        fun provideMonitorContactRequestUpdates(contactsRepository: ContactsRepository): MonitorContactRequestUpdates =
-            MonitorContactRequestUpdates(contactsRepository::monitorContactRequestUpdates)
 
         @Provides
         fun provideMonitorContactUpdates(contactsRepository: ContactsRepository): MonitorContactUpdates =

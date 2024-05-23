@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.contact
 
 import mega.privacy.android.domain.entity.contacts.ContactRequest
-import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
+import mega.privacy.android.domain.usecase.account.contactrequest.GetIncomingContactRequestsUseCase
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

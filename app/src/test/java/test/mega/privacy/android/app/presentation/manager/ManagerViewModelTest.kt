@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -69,12 +70,13 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
-import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RenameRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.contactrequest.GetIncomingContactRequestsUseCase
+import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestUpdatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -160,7 +162,9 @@ class ManagerViewModelTest {
         mock<GetNumUnreadUserAlertsUseCase> { onBlocking { invoke() }.thenReturn(0) }
     private val getNumUnreadPromoNotificationsUseCase =
         mock<GetNumUnreadPromoNotificationsUseCase>()
-    private lateinit var monitorContactRequestUpdates: MutableStateFlow<List<ContactRequest>>
+    private val monitorContactRequestUpdatesUseCase = mock<MonitorContactRequestUpdatesUseCase> {
+        on { invoke() }.thenReturn(emptyFlow())
+    }
 
     private val initialIsFirsLoginValue = true
     private val sendStatisticsMediaDiscoveryUseCase = mock<SendStatisticsMediaDiscoveryUseCase>()
@@ -328,7 +332,7 @@ class ManagerViewModelTest {
             },
             monitorContactUpdates = { monitorContactUpdates },
             monitorUserAlertUpdates = { monitorUserAlertUpdates },
-            monitorContactRequestUpdates = { monitorContactRequestUpdates },
+            monitorContactRequestUpdatesUseCase = monitorContactRequestUpdatesUseCase,
             getNumUnreadUserAlertsUseCase = getNumUnreadUserAlertsUseCase,
             getNumUnreadPromoNotificationsUseCase = getNumUnreadPromoNotificationsUseCase,
             sendStatisticsMediaDiscoveryUseCase = sendStatisticsMediaDiscoveryUseCase,
@@ -449,6 +453,7 @@ class ManagerViewModelTest {
             setUsersCallLimitRemindersUseCase,
             broadcastHomeBadgeCountUseCase,
             monitorUpgradeDialogClosedUseCase,
+            monitorContactRequestUpdatesUseCase,
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
@@ -461,7 +466,7 @@ class ManagerViewModelTest {
         wheneverBlocking { getNumUnreadUserAlertsUseCase() }.thenReturn(0)
         wheneverBlocking { getNumUnreadPromoNotificationsUseCase() }.thenReturn(0)
         wheneverBlocking { getIncomingContactRequestUseCase() }.thenReturn(emptyList())
-        monitorContactRequestUpdates = MutableStateFlow(emptyList())
+        whenever(monitorContactRequestUpdatesUseCase()).thenReturn(emptyFlow())
         monitorNodeUpdatesFakeFlow = MutableSharedFlow()
         monitorSyncsUseCaseFakeFlow = MutableSharedFlow()
         monitorMyAccountUpdateFakeFlow = MutableSharedFlow()
@@ -765,9 +770,9 @@ class ManagerViewModelTest {
                 )
             )
             whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
-            monitorContactRequestUpdates.emit(
-                contactRequests
-            )
+            whenever(monitorContactRequestUpdatesUseCase()).thenReturn(flowOf(contactRequests))
+
+            initViewModel()
             testScheduler.advanceUntilIdle()
             underTest.incomingContactRequests.test {
                 assertThat(awaitItem()).isEqualTo(contactRequests)
@@ -836,7 +841,8 @@ class ManagerViewModelTest {
             whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
             whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
             whenever(getNumUnreadPromoNotificationsUseCase()).thenReturn(1)
-            monitorContactRequestUpdates.emit(contactRequests)
+            whenever(monitorContactRequestUpdatesUseCase()).thenReturn(flowOf(contactRequests))
+            initViewModel()
             advanceUntilIdle()
             verify(saveContactByEmailUseCase).invoke("sourceEmail@mega.co.nz")
         }
@@ -860,7 +866,8 @@ class ManagerViewModelTest {
             whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
             whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
             whenever(getNumUnreadPromoNotificationsUseCase()).thenReturn(1)
-            monitorContactRequestUpdates.emit(contactRequests)
+            whenever(monitorContactRequestUpdatesUseCase()).thenReturn(flowOf(contactRequests))
+            initViewModel()
             advanceUntilIdle()
             verify(saveContactByEmailUseCase).invoke("targetEmail@mega.co.nz")
         }
@@ -872,7 +879,6 @@ class ManagerViewModelTest {
             val expectedUserAlertsCount = 3
             val expectedTotalCount = expectedPromoNotificationsCount + expectedUserAlertsCount
             advanceUntilIdle()
-            assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(0)
             val contactRequests = listOf(
                 ContactRequest(
                     handle = 1L,
@@ -891,7 +897,8 @@ class ManagerViewModelTest {
             whenever(getNumUnreadPromoNotificationsUseCase()).thenReturn(
                 expectedPromoNotificationsCount
             )
-            monitorContactRequestUpdates.emit(contactRequests)
+            whenever(monitorContactRequestUpdatesUseCase()).thenReturn(flowOf(contactRequests))
+            initViewModel()
             advanceUntilIdle()
             verify(broadcastHomeBadgeCountUseCase).invoke(expectedTotalCount + contactRequests.size)
             assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(
@@ -905,8 +912,12 @@ class ManagerViewModelTest {
             val expectedPromoNotificationsCount = 1
             val expectedUserAlertsCount = 3
             val expectedTotalCount = expectedPromoNotificationsCount + expectedUserAlertsCount
+            val requests = MutableStateFlow<List<ContactRequest>>(emptyList())
+            whenever(monitorContactRequestUpdatesUseCase()).thenReturn(requests.filterNot { it.isEmpty() })
+            initViewModel()
             advanceUntilIdle()
             assertThat(underTest.numUnreadUserAlerts.value.second).isEqualTo(0)
+
             val contactRequests = listOf(
                 ContactRequest(
                     handle = 1L,
@@ -926,7 +937,7 @@ class ManagerViewModelTest {
                 expectedPromoNotificationsCount
             )
 
-            monitorContactRequestUpdates.emit(contactRequests)
+            requests.emit(contactRequests)
             advanceUntilIdle()
             verify(broadcastHomeBadgeCountUseCase).invoke(expectedTotalCount + contactRequests.size)
             assertThat(underTest.numUnreadUserAlerts.value.second).isEqualTo(expectedTotalCount)

@@ -53,13 +53,11 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
-import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
-import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -67,6 +65,8 @@ import mega.privacy.android.domain.usecase.account.RenameRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.contactrequest.GetIncomingContactRequestsUseCase
+import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestUpdatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
@@ -181,7 +181,7 @@ class ManagerViewModel @Inject constructor(
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     monitorContactUpdates: MonitorContactUpdates,
     private val monitorUserAlertUpdates: MonitorUserAlertUpdates,
-    monitorContactRequestUpdates: MonitorContactRequestUpdates,
+    monitorContactRequestUpdatesUseCase: MonitorContactRequestUpdatesUseCase,
     private val getNumUnreadUserAlertsUseCase: GetNumUnreadUserAlertsUseCase,
     private val getNumUnreadPromoNotificationsUseCase: GetNumUnreadPromoNotificationsUseCase,
     private val sendStatisticsMediaDiscoveryUseCase: SendStatisticsMediaDiscoveryUseCase,
@@ -444,7 +444,7 @@ class ManagerViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            monitorContactRequestUpdates()
+            monitorContactRequestUpdatesUseCase()
                 .collect {
                     Timber.d("Contact Request Updates")
                     updateIncomingContactRequests()
