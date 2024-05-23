@@ -44,3 +44,15 @@ data class UpdatePendingMessageTransferTagRequest(
     val transferTag: Int,
     val state: PendingMessageState,
 ) : UpdatePendingMessageRequest
+
+/**
+ * Entity to update the state of a pending message
+ * @property pendingMessageId
+ * @property state
+ * @property filePath
+ */
+data class UpdatePendingMessageStateAndPathRequest(
+    override val pendingMessageId: Long,
+    val state: PendingMessageState,
+    val filePath: String
+) : UpdatePendingMessageRequest

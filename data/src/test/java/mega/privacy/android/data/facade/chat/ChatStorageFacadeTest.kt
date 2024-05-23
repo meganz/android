@@ -9,6 +9,7 @@ import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndNodeHandleRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndPathRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
 import org.junit.jupiter.api.BeforeAll
@@ -54,6 +55,10 @@ class ChatStorageFacadeTest {
             is UpdatePendingMessageTransferTagRequest -> {
                 verify(pendingMessageDao).update(update)
             }
+
+            is UpdatePendingMessageStateAndPathRequest -> {
+                verify(pendingMessageDao).update(update)
+            }
         }
     }
 
@@ -89,5 +94,6 @@ class ChatStorageFacadeTest {
         mock<UpdatePendingMessageStateRequest>(),
         mock<UpdatePendingMessageStateAndNodeHandleRequest>(),
         mock<UpdatePendingMessageTransferTagRequest>(),
+        mock<UpdatePendingMessageStateAndPathRequest>(),
     )
 }
