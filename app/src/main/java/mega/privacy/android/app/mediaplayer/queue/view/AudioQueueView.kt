@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -22,6 +23,13 @@ internal fun AudioQueueView(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(uiState.indexOfCurrentPlayingItem) {
+        if (uiState.indexOfCurrentPlayingItem > -1) {
+            lazyListState.animateScrollToItem(uiState.indexOfCurrentPlayingItem)
+        }
+    }
+
     Column(modifier = Modifier.padding(top = 56.dp)) {
         MediaQueueView(
             modifier = Modifier
@@ -40,5 +48,4 @@ internal fun AudioQueueView(
         )
         SimpleAudioPlayerView(setupAudioPlayer = setupAudioPlayer)
     }
-
 }
