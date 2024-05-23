@@ -118,6 +118,18 @@ internal class ChooseAccountViewModel @Inject constructor(
                 it.copy(isPaymentMethodAvailable = isBillingAvailable)
             }
         }
+        viewModelScope.launch {
+            runCatching {
+                val showNoAds = getFeatureFlagValueUseCase(ABTestFeatures.ads)
+                _state.update { state ->
+                    state.copy(
+                        showAdsFeature = showNoAds
+                    )
+                }
+            }.onFailure {
+                Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
+            }
+        }
         refreshPricing()
     }
 

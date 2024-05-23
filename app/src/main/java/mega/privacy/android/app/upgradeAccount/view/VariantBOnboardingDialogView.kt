@@ -65,6 +65,7 @@ fun VariantBOnboardingDialogView(
     onChoosingPlanType: (chosenPlan: AccountType) -> Unit,
     onPlayStoreLinkClicked: (String) -> Unit,
     onProIIIVisible: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
 
@@ -85,6 +86,7 @@ fun VariantBOnboardingDialogView(
                 onChoosingPlanType = onChoosingPlanType,
                 onPlayStoreLinkClicked = onPlayStoreLinkClicked,
                 onProIIIVisible = onProIIIVisible,
+                modifier = modifier,
             )
         }
     )
@@ -99,6 +101,7 @@ internal fun VariantBOnboardingDialogColumn(
     onChoosingPlanType: (chosenPlan: AccountType) -> Unit,
     onPlayStoreLinkClicked: (String) -> Unit,
     onProIIIVisible: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var isMonthly by rememberSaveable { mutableStateOf(false) }
     val cheapestSubscriptionAvailable = uiState.cheapestSubscriptionAvailable
@@ -114,14 +117,14 @@ internal fun VariantBOnboardingDialogColumn(
     var isProIIIPlanCardViewed by rememberSaveable { mutableStateOf(false) }
     val density = LocalDensity.current
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .verticalScroll(state = scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .width(390.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -160,29 +163,23 @@ internal fun VariantBOnboardingDialogColumn(
                     testTag = BACKUP_DESCRIPTION_ROW,
                     isLoading = isLoading,
                 )
-                //MEGA VPN
+                //Extra features
                 FeatureRow(
-                    drawableID = painterResource(id = R.drawable.ic_vpn_onboarding_dialog),
-                    title = stringResource(id = sharedR.string.dialog_onboarding_feature_title_vpn),
-                    description = stringResource(id = sharedR.string.dialog_onboarding_feature_description_vpn),
-                    testTag = VPN_DESCRIPTION_ROW,
-                    isLoading = isLoading,
-                )
-                //Chat and meetings
-                FeatureRow(
-                    drawableID = painterResource(id = R.drawable.ic_chat_onboarding_dialog),
-                    title = stringResource(id = sharedR.string.dialog_onboarding_feature_title_chat),
-                    description = stringResource(id = sharedR.string.dialog_onboarding_feature_description_chat),
-                    testTag = CHAT_DESCRIPTION_ROW,
+                    drawableID = painterResource(id = R.drawable.ic_mega_onboarding_dialog),
+                    title = stringResource(id = sharedR.string.dialog_onboarding_feature_title_additional_features),
+                    description = stringResource(
+                        id = if (uiState.showAdsFeature) sharedR.string.dialog_onboarding_feature_description_additional_features_with_ads else sharedR.string.dialog_onboarding_feature_description_additional_features_without_ads
+                    ),
+                    testTag = ADDITIONAL_FEATURES_DESCRIPTION_ROW,
                     isLoading = isLoading,
                 )
             }
         }
         Row(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = modifier.padding(top = 16.dp),
         ) {
             Column(
-                modifier = Modifier.width(390.dp)
+                modifier = modifier.width(390.dp)
             ) {
                 ChoosePlanTitleText(testTag = ONBOARDING_SCREEN_VARIANT_B)
                 MonthlyYearlyTabs(

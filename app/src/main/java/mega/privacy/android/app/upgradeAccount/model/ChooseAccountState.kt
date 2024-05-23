@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.Product
  * @property chosenPlan account type chosen by user (when user taps on one of the plans)
  * @property isPaymentMethodAvailable boolean to determine if Payments are available through Google Play Store
  * @property isMonthlySelected boolean to determine if monthly plan was selected
+ * @property showAdsFeature boolean to determine if Ad-free feature should be shown or hidden (part of the In-App Advertisement experiment)
  * @constructor Create default Upgrade Account state
  */
 data class ChooseAccountState(
@@ -25,4 +26,5 @@ data class ChooseAccountState(
     val chosenPlan: AccountType = AccountType.FREE,
     val isPaymentMethodAvailable: Boolean = true,
     val isMonthlySelected: Boolean = false,
+    val showAdsFeature: Boolean = false,
 )

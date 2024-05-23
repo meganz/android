@@ -8,7 +8,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -87,6 +91,7 @@ class ChooseAccountFragment : Fragment() {
     }
 
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @SuppressLint("ProduceStateDoesNotAssignValue")
     @Composable
     fun ChooseAccountBody() {
@@ -103,6 +108,9 @@ class ChooseAccountFragment : Fragment() {
                             OnboardingUpsellingDialogVariantAViewProPlansButtonEvent
                         )
                         chooseAccountActivity.onPlanClicked(AccountType.PRO_I)
+                    },
+                    modifier = Modifier.semantics {
+                        testTagsAsResourceId = true
                     },
                 )
             } else if (uiState.enableVariantBUI) {
@@ -129,13 +137,19 @@ class ChooseAccountFragment : Fragment() {
                         Analytics.tracker.trackEvent(
                             OnboardingUpsellingDialogVariantBProPlanIIIDisplayedEvent
                         )
-                    }
+                    },
+                    modifier = Modifier.semantics {
+                        testTagsAsResourceId = true
+                    },
                 )
             } else {
                 ChooseAccountView(
                     state = uiState,
                     onBackPressed = chooseAccountActivity::onFreeClick,
-                    onPlanClicked = chooseAccountActivity::onPlanClicked
+                    onPlanClicked = chooseAccountActivity::onPlanClicked,
+                    modifier = Modifier.semantics {
+                        testTagsAsResourceId = true
+                    },
                 )
             }
         }

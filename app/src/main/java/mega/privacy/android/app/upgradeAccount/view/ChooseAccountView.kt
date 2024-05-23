@@ -70,6 +70,7 @@ fun ChooseAccountView(
     state: ChooseAccountState,
     onBackPressed: () -> Unit = {},
     onPlanClicked: (AccountType) -> Unit = {},
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         topBar = {
@@ -82,7 +83,7 @@ fun ChooseAccountView(
     ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.Start,
-            modifier = Modifier
+            modifier = modifier
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState(), enabled = true)
                 .fillMaxWidth(),

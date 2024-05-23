@@ -175,6 +175,21 @@ class ChooseAccountViewModelTest {
         }
 
     @Test
+    fun `test that initial state has a feature flag for Ads feature set properly if it's enabled`() =
+        runTest {
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getCheapestSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+            initViewModel()
+
+            underTest.state.map { it.showAdsFeature }.test {
+                assertThat(awaitItem()).isEqualTo(true)
+            }
+        }
+
+    @Test
     fun `test that isPaymentMethodAvailable returns true when isBillingAvailableUseCase returns true and getPaymentMethodUseCase contains PAYMENT_METHOD_GOOGLE_WALLET`() =
         runTest {
             whenever(getPricing(any())).thenReturn(Pricing(emptyList()))

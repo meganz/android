@@ -14,8 +14,8 @@ import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.app.upgradeAccount.view.ADDITIONAL_FEATURES_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.BACKUP_DESCRIPTION_ROW
-import mega.privacy.android.app.upgradeAccount.view.CHAT_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.FILE_SHARING_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.IMAGE_TAG
 import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_TEXT
@@ -23,7 +23,6 @@ import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_TITLE
 import mega.privacy.android.app.upgradeAccount.view.SKIP_BUTTON
 import mega.privacy.android.app.upgradeAccount.view.STORAGE_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.VIEW_PRO_PLAN_BUTTON
-import mega.privacy.android.app.upgradeAccount.view.VPN_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.VariantAOnboardingDialogView
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
@@ -98,22 +97,22 @@ class VariantAOnboardingDialogViewTest {
     }
 
     @Test
-    fun `test that vpn row is displayed`() {
-        setContent()
-        composeRule.onNodeWithTag(VPN_DESCRIPTION_ROW).assertIsDisplayed()
-        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_vpn))
+    fun `test that additional features row is displayed with Ad-free if Ads feature is enabled`() {
+        setContentWithAdsEnabled()
+        composeRule.onNodeWithTag(ADDITIONAL_FEATURES_DESCRIPTION_ROW).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_backup_rewind))
             .assertIsDisplayed()
-        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_vpn))
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_additional_features_with_ads))
             .assertIsDisplayed()
     }
 
     @Test
-    fun `test that chats row is displayed`() {
+    fun `test that additional features row is displayed without Ad-free if Ads feature is disabled`() {
         setContent()
-        composeRule.onNodeWithTag(CHAT_DESCRIPTION_ROW).assertIsDisplayed()
-        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_chat))
+        composeRule.onNodeWithTag(ADDITIONAL_FEATURES_DESCRIPTION_ROW).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_additional_features))
             .assertIsDisplayed()
-        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_chat))
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_additional_features_without_ads))
             .assertIsDisplayed()
     }
 
@@ -140,9 +139,23 @@ class VariantAOnboardingDialogViewTest {
         )
     }
 
+    private fun setContentWithAdsEnabled() = composeRule.setContent {
+        VariantAOnboardingDialogView(
+            state = getChooseAccountStateWithAdsEnabled(),
+            onSkipPressed = {},
+            onViewPlansPressed = {}
+        )
+    }
+
     private fun getChooseAccountState(): ChooseAccountState =
         ChooseAccountState(
             cheapestSubscriptionAvailable = subscriptionProLite,
+        )
+
+    private fun getChooseAccountStateWithAdsEnabled(): ChooseAccountState =
+        ChooseAccountState(
+            cheapestSubscriptionAvailable = subscriptionProLite,
+            showAdsFeature = true,
         )
 
     companion object {

@@ -123,7 +123,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Do not show again</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Are you sure that you want to cancel the current login process?</string>
+    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
     <!-- Login button -->
     <string name="login_text">Log&#160;in</string>
     <!-- email label -->
@@ -1027,7 +1027,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]Log out[/A] to switch MEGA accounts</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">Are you sure that you want to log out of the current account?</string>
+    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">This message has been deleted by %1$s</string>
     <!-- Text shown when the chat history was cleared by someone -->

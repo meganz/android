@@ -40,6 +40,7 @@ fun VariantAOnboardingDialogView(
     state: ChooseAccountState,
     onSkipPressed: () -> Unit,
     onViewPlansPressed: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     val cheapestSubscriptionAvailable = state.cheapestSubscriptionAvailable
@@ -49,13 +50,13 @@ fun VariantAOnboardingDialogView(
     val minimalStorageSizeString = formattedStorage?.size ?: ""
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .verticalScroll(state = scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .width(390.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -63,7 +64,7 @@ fun VariantAOnboardingDialogView(
             Image(
                 painter = painterResource(id = R.drawable.image_upselling_onboarding_dialog),
                 contentDescription = "",
-                modifier = Modifier
+                modifier = modifier
                     .testTag(IMAGE_TAG)
                     .size(140.dp)
             )
@@ -102,20 +103,14 @@ fun VariantAOnboardingDialogView(
                 testTag = BACKUP_DESCRIPTION_ROW,
                 isLoading = isLoading,
             )
-            //MEGA VPN
+            //Extra features
             FeatureRow(
-                drawableID = painterResource(id = R.drawable.ic_vpn_onboarding_dialog),
-                title = stringResource(id = sharedR.string.dialog_onboarding_feature_title_vpn),
-                description = stringResource(id = sharedR.string.dialog_onboarding_feature_description_vpn),
-                testTag = VPN_DESCRIPTION_ROW,
-                isLoading = isLoading,
-            )
-            //Chat and meetings
-            FeatureRow(
-                drawableID = painterResource(id = R.drawable.ic_chat_onboarding_dialog),
-                title = stringResource(id = sharedR.string.dialog_onboarding_feature_title_chat),
-                description = stringResource(id = sharedR.string.dialog_onboarding_feature_description_chat),
-                testTag = CHAT_DESCRIPTION_ROW,
+                drawableID = painterResource(id = R.drawable.ic_mega_onboarding_dialog),
+                title = stringResource(id = sharedR.string.dialog_onboarding_feature_title_additional_features),
+                description = stringResource(
+                    id = if (state.showAdsFeature) sharedR.string.dialog_onboarding_feature_description_additional_features_with_ads else sharedR.string.dialog_onboarding_feature_description_additional_features_without_ads
+                ),
+                testTag = ADDITIONAL_FEATURES_DESCRIPTION_ROW,
                 isLoading = isLoading,
             )
             Spacer(modifier = Modifier.height(18.dp))
@@ -159,7 +154,7 @@ internal const val STORAGE_DESCRIPTION_ROW = "onboarding_screen:storage_descript
 internal const val FILE_SHARING_DESCRIPTION_ROW =
     "onboarding_screen:file_sharing_description_row"
 internal const val BACKUP_DESCRIPTION_ROW = "onboarding_screen:backup_description_row"
-internal const val VPN_DESCRIPTION_ROW = "onboarding_screen:vpn_description_row"
-internal const val CHAT_DESCRIPTION_ROW = "onboarding_screen:chat_description_row"
+internal const val ADDITIONAL_FEATURES_DESCRIPTION_ROW =
+    "onboarding_screen:additional_features_description_row"
 internal const val SKIP_BUTTON = "onboarding_screen_variant_a:skip_button"
 internal const val VIEW_PRO_PLAN_BUTTON = "onboarding_screen_variant_a:view_pro_plan_button"

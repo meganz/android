@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">Never lose data again</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Back up and sync your data for complete confidence. Plus, use Rewind to restore folders to any date up to 180 days.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -316,4 +316,10 @@
     <string name="file_info_information_snackbar_description_added">Description added</string>
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">Description updated</string>
+    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_title_additional_features">Plus access to these great benefits:</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Android Sync \n&#8226;&#160;Ad-free</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Android Sync</string>
 </resources>

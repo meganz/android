@@ -15,8 +15,8 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
+import mega.privacy.android.app.upgradeAccount.view.ADDITIONAL_FEATURES_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.BACKUP_DESCRIPTION_ROW
-import mega.privacy.android.app.upgradeAccount.view.CHAT_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.FILE_SHARING_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG
 import mega.privacy.android.app.upgradeAccount.view.ONBOARDING_SCREEN_VARIANT_B
@@ -26,7 +26,6 @@ import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_TITLE
 import mega.privacy.android.app.upgradeAccount.view.STORAGE_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.SUBSCRIPTION_DETAILS_DESCRIPTION_TAG
 import mega.privacy.android.app.upgradeAccount.view.SUBSCRIPTION_DETAILS_TITLE_TAG
-import mega.privacy.android.app.upgradeAccount.view.VPN_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.VariantBOnboardingDialogView
 import mega.privacy.android.app.upgradeAccount.view.components.MONTHLY_CHECK_ICON_TAG
 import mega.privacy.android.app.upgradeAccount.view.components.MONTHLY_TAB_TAG
@@ -103,22 +102,22 @@ class VariantBOnboardingDialogViewTest {
     }
 
     @Test
-    fun `test that vpn row is displayed`() {
-        setContent()
-        composeRule.onNodeWithTag(VPN_DESCRIPTION_ROW).assertIsDisplayed()
-        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_vpn))
+    fun `test that additional features row is displayed with Ad-free if Ads feature is enabled`() {
+        setContentWithAdsEnabled()
+        composeRule.onNodeWithTag(ADDITIONAL_FEATURES_DESCRIPTION_ROW).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_backup_rewind))
             .assertIsDisplayed()
-        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_vpn))
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_additional_features_with_ads))
             .assertIsDisplayed()
     }
 
     @Test
-    fun `test that chats row is displayed`() {
+    fun `test that additional features row is displayed without Ad-free if Ads feature is disabled`() {
         setContent()
-        composeRule.onNodeWithTag(CHAT_DESCRIPTION_ROW).assertIsDisplayed()
-        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_chat))
+        composeRule.onNodeWithTag(ADDITIONAL_FEATURES_DESCRIPTION_ROW).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_additional_features))
             .assertIsDisplayed()
-        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_chat))
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_additional_features_without_ads))
             .assertIsDisplayed()
     }
 
@@ -202,9 +201,28 @@ class VariantBOnboardingDialogViewTest {
         )
     }
 
+    private fun setContentWithAdsEnabled() = composeRule.setContent {
+        VariantBOnboardingDialogView(
+            state = getChooseAccountStateWithAdsEnabled(),
+            onBackPressed = {},
+            onContinueClicked = {},
+            onChoosingMonthlyYearlyPlan = {},
+            onChoosingPlanType = {},
+            onPlayStoreLinkClicked = {},
+            onProIIIVisible = {},
+        )
+    }
+
     private fun getChooseAccountState(): ChooseAccountState =
         ChooseAccountState(
             cheapestSubscriptionAvailable = subscriptionProLite,
             localisedSubscriptionsList = expectedLocalisedSubscriptionsList
+        )
+
+    private fun getChooseAccountStateWithAdsEnabled(): ChooseAccountState =
+        ChooseAccountState(
+            cheapestSubscriptionAvailable = subscriptionProLite,
+            localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
+            showAdsFeature = true,
         )
 }
