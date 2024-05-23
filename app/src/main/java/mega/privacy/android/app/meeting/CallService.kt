@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -17,14 +18,15 @@ import android.graphics.RectF
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOVE_CALL_NOTIFICATION
@@ -38,11 +40,10 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.icon.pack.R as iconPackR
-import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.usecase.meeting.HangChatCallByChatIdUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -60,6 +61,7 @@ import javax.inject.Inject
  * @property megaApi                        [MegaApiAndroid]
  * @property megaChatApi                    [MegaChatApiAndroid]
  * @property app                            [MegaApplication]
+ * @property monitorChatCallUpdatesUseCase  [MonitorChatCallUpdatesUseCase]
 
  */
 @AndroidEntryPoint
@@ -78,6 +80,9 @@ class CallService : LifecycleService() {
     @Inject
     lateinit var hangChatCallByChatIdUseCase: HangChatCallByChatIdUseCase
 
+    @Inject
+    lateinit var monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase
+
     var app: MegaApplication? = null
 
     private var currentChatId: Long = MEGACHAT_INVALID_HANDLE
@@ -90,19 +95,6 @@ class CallService : LifecycleService() {
      * If is in meeting fragment.
      */
     private var isInMeeting = true
-
-    private val callStatusObserver = Observer { call: MegaChatCall ->
-        Timber.d("Call status is ${CallUtil.callStatusToString(call.status)}. Chat id id $currentChatId")
-
-        when (call.status) {
-            MegaChatCall.CALL_STATUS_USER_NO_PRESENT, MegaChatCall.CALL_STATUS_IN_PROGRESS -> updateNotificationContent()
-            MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> removeNotification(
-                call.chatid
-            )
-        }
-    }
-
-    private val callOnHoldObserver = Observer { _: MegaChatCall? -> checkAnotherActiveCall() }
 
     private val titleMeetingChangeObserver = Observer { chat: MegaChatRoom ->
         if (currentChatId == chat.chatId && chat.isGroup) {
@@ -138,10 +130,28 @@ class CallService : LifecycleService() {
         mBuilderCompat = NotificationCompat.Builder(this, notificationChannelId)
         mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observeForever(callStatusObserver)
-        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
-            .observeForever(callOnHoldObserver)
+        lifecycleScope.launch {
+            monitorChatCallUpdatesUseCase().collect { call ->
+                val changes = call.changes.orEmpty()
+                if (changes.contains(ChatCallChanges.Status)) {
+                    Timber.d("Call status is ${call.status}. Chat id id $currentChatId")
+
+                    when (call.status) {
+                        ChatCallStatus.UserNoPresent,
+                        ChatCallStatus.InProgress,
+                        -> updateNotificationContent()
+
+                        ChatCallStatus.TerminatingUserParticipation,
+                        ChatCallStatus.Destroyed,
+                        -> removeNotification(call.chatId)
+
+                        else -> Unit
+                    }
+                } else if (changes.contains(ChatCallChanges.OnHold)) {
+                    checkAnotherActiveCall()
+                }
+            }
+        }
         LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom::class.java)
             .observeForever(titleMeetingChangeObserver)
         LiveEventBus.get(EVENT_REMOVE_CALL_NOTIFICATION, Long::class.java)
@@ -534,10 +544,6 @@ class CallService : LifecycleService() {
      * Service ends
      */
     override fun onDestroy() {
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .removeObserver(callStatusObserver)
-        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
-            .removeObserver(callOnHoldObserver)
         LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom::class.java)
             .removeObserver(titleMeetingChangeObserver)
         LiveEventBus.get(EVENT_REMOVE_CALL_NOTIFICATION, Long::class.java)
