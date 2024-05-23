@@ -60,7 +60,10 @@ class ReportIssueViaEmailViewModel @Inject constructor(
                 return@launch
             }
             runCatching {
-                createSupportTicketEmailUseCase(uiState.value.description)
+                createSupportTicketEmailUseCase(
+                    emailBody = uiState.value.description,
+                    includeLogs = uiState.value.includeLogs
+                )
             }.onSuccess { emailTicket ->
                 _uiState.update {
                     it.copy(
@@ -80,6 +83,19 @@ class ReportIssueViaEmailViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 sendEmailEvent = consumed()
+            )
+        }
+    }
+
+    /**
+     * Set include logs enabled
+     *
+     * @param enabled
+     */
+    fun setIncludeLogs(enabled: Boolean) {
+        _uiState.update {
+            it.copy(
+                includeLogs = enabled
             )
         }
     }

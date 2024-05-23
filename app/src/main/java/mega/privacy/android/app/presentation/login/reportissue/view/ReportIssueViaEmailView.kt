@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.SendMenuActio
 import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueBackHandler
 import mega.privacy.android.app.presentation.settings.reportissue.view.DescriptionTextField
 import mega.privacy.android.app.presentation.settings.reportissue.view.ErrorBanner
+import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -36,6 +37,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  *
  * @param uiState
  * @param onDescriptionChanged
+ * @param onIncludeLogsChanged
  * @param onBackPress
  * @param onDiscard
  * @param onSubmit
@@ -44,6 +46,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 fun ReportIssueViaEmailView(
     uiState: ReportIssueViaEmailUiState,
     onDescriptionChanged: (String) -> Unit,
+    onIncludeLogsChanged: (Boolean) -> Unit,
     onBackPress: () -> Unit,
     onDiscard: () -> Unit,
     onSubmit: () -> Unit,
@@ -72,6 +75,7 @@ fun ReportIssueViaEmailView(
                 modifier = Modifier.padding(paddingValues),
                 uiState = uiState,
                 onDescriptionChanged = onDescriptionChanged,
+                onIncludeLogsChanged = onIncludeLogsChanged
             )
         },
     )
@@ -96,6 +100,7 @@ fun ReportIssueViaEmailBody(
     modifier: Modifier,
     uiState: ReportIssueViaEmailUiState,
     onDescriptionChanged: (String) -> Unit,
+    onIncludeLogsChanged: (Boolean) -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
@@ -126,12 +131,23 @@ fun ReportIssueViaEmailBody(
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = 150.dp)
         )
+
+        LabelledSwitch(
+            label = stringResource(id = R.string.settings_help_report_issue_attach_logs_label),
+            checked = uiState.includeLogs,
+            onCheckChanged = onIncludeLogsChanged,
+            modifier = Modifier
+                .testTag(INCLUDE_LOGS_SWITCH_TEST_TAG)
+                .padding(vertical = 16.dp)
+                .fillMaxWidth(),
+        )
     }
 }
 
 internal const val ERROR_TEST_TAG = "report_issue_via_email:error"
 internal const val NOTE_TEST_TAG = "report_issue_via_email:note"
 internal const val DESCRIPTION_FIELD_TEST_TAG = "report_issue_via_email:description_field"
+internal const val INCLUDE_LOGS_SWITCH_TEST_TAG = "report_issue_via_email:include_logs_switch"
 
 
 @CombinedThemePreviews
@@ -144,6 +160,7 @@ private fun ConfirmEmailScreenPreview() {
             onBackPress = {},
             onDiscard = {},
             onSubmit = {},
+            onIncludeLogsChanged = {}
         )
     }
 }
@@ -160,6 +177,7 @@ private fun ConfirmEmailScreenWithErrorPreview() {
             onBackPress = {},
             onDiscard = {},
             onSubmit = {},
+            onIncludeLogsChanged = {}
         )
     }
 }

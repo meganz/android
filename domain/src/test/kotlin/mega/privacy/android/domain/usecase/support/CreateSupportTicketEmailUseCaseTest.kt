@@ -2,18 +2,18 @@ package mega.privacy.android.domain.usecase.support
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.AppInfo
 import mega.privacy.android.domain.entity.SupportTicket
-import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.usecase.CreateSupportTicketUseCase
 import mega.privacy.android.domain.usecase.FormatSupportTicketUseCase
 import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.logging.GetZippedLogsUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -24,7 +24,12 @@ class CreateSupportTicketEmailUseCaseTest {
     private val getZippedLogsUseCase = mock<GetZippedLogsUseCase>()
     private val createSupportTicketUseCase = mock<CreateSupportTicketUseCase>()
     private val formatSupportTicketUseCase = mock<FormatSupportTicketUseCase>()
-    private val environmentRepository = mock<EnvironmentRepository>()
+
+    private val emailBody = "Test email body"
+    private val email = "test@mega.nz"
+    private val logs = File("testLogs.zip")
+    private val ticket = mock<SupportTicket>()
+    private val formattedTicket = "Formatted test ticket"
 
     @BeforeEach
     fun setUp() {
@@ -33,33 +38,31 @@ class CreateSupportTicketEmailUseCaseTest {
             getZippedLogsUseCase = getZippedLogsUseCase,
             createSupportTicketUseCase = createSupportTicketUseCase,
             formatSupportTicketUseCase = formatSupportTicketUseCase,
-            environmentRepository = environmentRepository,
         )
     }
 
     @Test
     fun `test that ticket is created correctly`() = runTest {
-        val emailBody = "Test email body"
-        val email = "test@mega.nz"
-        val logs = File("testLogs.zip")
-        val ticket = mock<SupportTicket>()
-        val formattedTicket = "Formatted test ticket"
-        val appVersion = "6.0.0"
-        val versionCode = 1
-
         whenever(getSupportEmailUseCase()).thenReturn(email)
         whenever(getZippedLogsUseCase()).thenReturn(logs)
         whenever(createSupportTicketUseCase(any(), any(), eq(null))).thenReturn(ticket)
         whenever(formatSupportTicketUseCase(ticket)).thenReturn(formattedTicket)
-        whenever(environmentRepository.getAppInfo()).thenReturn(AppInfo(appVersion, ""))
-        whenever(environmentRepository.getInstalledVersionCode()).thenReturn(versionCode)
 
-        val result = underTest(emailBody)
+        val result = underTest(emailBody, true)
 
         assertThat(result.email).isEqualTo(email)
         assertThat(result.ticket).isEqualTo(formattedTicket)
         assertThat(result.logs).isEqualTo(logs)
-        assertThat(result.subject).contains(appVersion)
-        assertThat(result.subject).contains(versionCode.toString())
+        verify(getZippedLogsUseCase).invoke()
+    }
+
+    @Test
+    fun `test that log is not fetched when includeLogs is set to false`() = runTest {
+        whenever(getSupportEmailUseCase()).thenReturn(email)
+        whenever(createSupportTicketUseCase(any(), eq(null), eq(null))).thenReturn(ticket)
+        whenever(formatSupportTicketUseCase(ticket)).thenReturn(formattedTicket)
+
+        underTest(emailBody, false)
+        verifyNoInteractions(getZippedLogsUseCase)
     }
 }

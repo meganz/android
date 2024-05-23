@@ -53,16 +53,17 @@ class ReportIssueViaEmailViewModelTest {
     @Test
     fun `test that use case is not invoked when canSubmit is false`() = runTest {
         underTest.submit()
-        verify(createSupportTicketEmailUseCase, never()).invoke(any())
+        verify(createSupportTicketEmailUseCase, never()).invoke(any(), any())
     }
 
     @Test
     fun `test that use case is invoked when canSubmit is true`() = runTest {
         val ticket = mock<SupportEmailTicket>()
-        whenever(createSupportTicketEmailUseCase.invoke(any())).thenReturn(ticket)
+        val emailBody = "New description"
+        whenever(createSupportTicketEmailUseCase.invoke(emailBody, false)).thenReturn(ticket)
 
         underTest.setDescription("New description")
         underTest.submit()
-        verify(createSupportTicketEmailUseCase).invoke("New description")
+        verify(createSupportTicketEmailUseCase).invoke(emailBody, false)
     }
 }

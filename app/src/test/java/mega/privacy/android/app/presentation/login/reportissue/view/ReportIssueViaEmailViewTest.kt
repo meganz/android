@@ -24,6 +24,7 @@ class ReportIssueViaEmailViewTest {
             ReportIssueViaEmailView(
                 uiState = ReportIssueViaEmailUiState(),
                 onDescriptionChanged = {},
+                onIncludeLogsChanged = {},
                 onBackPress = {},
                 onDiscard = {},
                 onSubmit = {}
@@ -32,6 +33,7 @@ class ReportIssueViaEmailViewTest {
 
         composeTestRule.onNodeWithTag(NOTE_TEST_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(DESCRIPTION_FIELD_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(INCLUDE_LOGS_SWITCH_TEST_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(ERROR_TEST_TAG).assertIsNotDisplayed()
     }
 
@@ -43,6 +45,7 @@ class ReportIssueViaEmailViewTest {
                     error = R.string.settings_help_report_issue_description_label
                 ),
                 onDescriptionChanged = {},
+                onIncludeLogsChanged = {},
                 onBackPress = {},
                 onDiscard = {},
                 onSubmit = {}

@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.support.SupportEmailTicket
  * Report issue state
  *
  * @property description content of the description text field
+ * @property includeLogs whether to include logs
  * @property canSubmit validation result
  * @property error error message
  * @property sendEmailEvent event to send email
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.support.SupportEmailTicket
  */
 data class ReportIssueViaEmailUiState(
     val description: String = "",
+    val includeLogs: Boolean = false,
     val canSubmit: Boolean = false,
     val error: Int? = null,
     val sendEmailEvent: StateEventWithContent<SupportEmailTicket> = consumed(),

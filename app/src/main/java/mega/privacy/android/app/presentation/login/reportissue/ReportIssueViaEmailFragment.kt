@@ -52,6 +52,7 @@ class ReportIssueViaEmailFragment : Fragment() {
                 ReportIssueViaEmailView(
                     uiState = uiState,
                     onDescriptionChanged = viewModel::setDescription,
+                    onIncludeLogsChanged = viewModel::setIncludeLogs,
                     onBackPress = {
                         requireActivity().onBackPressedDispatcher.onBackPressed()
                     },
