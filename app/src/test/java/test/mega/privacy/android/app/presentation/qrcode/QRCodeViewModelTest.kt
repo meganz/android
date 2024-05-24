@@ -1,7 +1,9 @@
 package test.mega.privacy.android.app.presentation.qrcode
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -9,12 +11,12 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
@@ -22,7 +24,10 @@ import mega.privacy.android.app.presentation.qrcode.QRCodeViewModel
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.model.ScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.usecase.CopyToClipBoard
@@ -34,6 +39,7 @@ import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
@@ -81,6 +87,8 @@ class QRCodeViewModelTest {
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
     private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val uploadUseCase = mock<UploadUseCase>()
 
     private val initialContactLink = "https://contact_link1"
 
@@ -107,7 +115,9 @@ class QRCodeViewModelTest {
             scanMediaFileUseCase = scanMediaFileUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
-            checkNameCollisionUseCase = checkNameCollisionUseCase
+            checkNameCollisionUseCase = checkNameCollisionUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            uploadUseCase = uploadUseCase,
         )
     }
 
@@ -350,5 +360,35 @@ class QRCodeViewModelTest {
             )
         ).thenReturn(PhotoAvatarContent(path = "photo_path", size = 1L, showBorder = true))
         underTest.createQRCode(true)
+    }
+
+    @Test
+    fun `test that uploadUseCase is not invoked if UploadWorker is enabled`() = runTest {
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+
+        underTest.uploadFile(mock(), mock(), 123L)
+
+        verifyNoInteractions(uploadUseCase)
+    }
+
+    @Test
+    fun `test that state is updated correctly if UploadWorker is enabled`() = runTest {
+        val context = mock<Context>()
+        val file = mock<File>()
+        val parentHandle = 123L
+        val expected = triggered(
+            TransferTriggerEvent.StartUpload.Files(
+                listOf(file.toUri()),
+                NodeId(parentHandle)
+            )
+        )
+
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+
+        underTest.uiState.map { it.uploadEvent }.test {
+            awaitItem()
+            underTest.uploadFile(context, file, parentHandle)
+            assertThat(awaitItem()).isEqualTo(expected)
+        }
     }
 }

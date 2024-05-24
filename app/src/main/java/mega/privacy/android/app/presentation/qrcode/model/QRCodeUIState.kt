@@ -6,6 +6,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import java.io.File
@@ -23,6 +24,7 @@ import java.io.File
  * @property uploadFile     Upload file to the given parent handle
  * @property finishActivityOnScanComplete Finish the activity and set result
  * @property scanCancel     Handle scanning cancel event
+ * @property uploadEvent    Event to start a transfer
  */
 data class QRCodeUIState(
     val myQRCodeState: MyCodeUIState = MyCodeUIState.Idle,
@@ -35,4 +37,5 @@ data class QRCodeUIState(
     val uploadFile: StateEventWithContent<Pair<File, Long>> = consumed(),
     val finishActivityOnScanComplete: Boolean = false,
     val scanCancel: StateEvent = consumed,
+    val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
 )

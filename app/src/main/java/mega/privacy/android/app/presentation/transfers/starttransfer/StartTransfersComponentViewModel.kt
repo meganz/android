@@ -28,6 +28,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -52,6 +53,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownload
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -83,6 +85,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val shouldAskForResumeTransfersUseCase: ShouldAskForResumeTransfersUseCase,
     private val setAskedResumeTransfersUseCase: SetAskedResumeTransfersUseCase,
     private val pauseAllTransfersUseCase: PauseAllTransfersUseCase,
+    private val startUploadWithWorkerUseCase: StartUploadsWithWorkerUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var currentInProgressJob: Job? = null
@@ -97,6 +100,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     init {
         checkRating()
         monitorDownloadFinish()
+        monitorUploadFinish()
     }
 
     /**
@@ -128,6 +132,17 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         isVoiceClip = transferTriggerEvent.isVoiceClip
                     )
                 }
+
+                is TransferTriggerEvent.StartUpload -> {
+                    if (checkAndHandleDeviceIsNotConnected()) {
+                        return@launch
+                    }
+                    startUploads(
+                        uris = transferTriggerEvent.uris,
+                        destinationId = transferTriggerEvent.destinationId,
+                        transferTriggerEvent = transferTriggerEvent,
+                    )
+                }
             }
         }
     }
@@ -152,7 +167,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             Timber.e("Node in $transferTriggerEvent must exist")
             _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
         } else {
-            lastTriggerEvent = transferTriggerEvent
+            lastDownloadTriggerEvent = transferTriggerEvent
             when (transferTriggerEvent) {
                 is TransferTriggerEvent.StartDownloadForOffline -> {
                     startDownloadForOffline(transferTriggerEvent)
@@ -316,7 +331,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     //show start message as soon as an event with all transfers updated is received
                     if (!startMessageShown && singleTransferEvent?.allTransfersUpdated == true) {
                         startMessageShown = true
-                        updateWithFinishProcessing(
+                        updateWithDownloadFinishProcessing(
                             singleTransferEvent,
                             transferTriggerEvent,
                             nodes.size,
@@ -336,7 +351,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             terminalEvent == MultiTransferEvent.InsufficientSpace ->
                 _uiState.updateEventAndClearProgress(StartTransferEvent.Message.NotSufficientSpace)
 
-            !startMessageShown -> updateWithFinishProcessing(
+            !startMessageShown -> updateWithDownloadFinishProcessing(
                 terminalEvent as? MultiTransferEvent.SingleTransferEvent,
                 transferTriggerEvent,
                 nodes.size,
@@ -345,14 +360,14 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
-    private fun updateWithFinishProcessing(
+    private fun updateWithDownloadFinishProcessing(
         event: MultiTransferEvent.SingleTransferEvent?,
         transferTriggerEvent: TransferTriggerEvent,
         totalNodes: Int,
         error: Throwable? = null,
     ) {
         _uiState.updateEventAndClearProgress(
-            StartTransferEvent.FinishProcessing(
+            StartTransferEvent.FinishDownloadProcessing(
                 exception = error,
                 totalNodes = totalNodes,
                 totalFiles = event?.startedFiles ?: 0,
@@ -515,7 +530,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 .catch { Timber.e(it) }
                 .collect { totalNodes ->
                     if (active) {
-                        when (lastTriggerEvent) {
+                        when (lastDownloadTriggerEvent) {
                             is TransferTriggerEvent.StartDownloadForOffline -> {
                                 StartTransferEvent.Message.FinishOffline
                             }
@@ -530,7 +545,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         }?.let { finishEvent ->
                             _uiState.updateEventAndClearProgress(finishEvent)
                         }
-                        lastTriggerEvent = null
+                        lastDownloadTriggerEvent = null
                     }
                 }
         }
@@ -585,10 +600,90 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
+    private suspend fun startUploads(
+        uris: List<Uri>,
+        destinationId: NodeId,
+        transferTriggerEvent: TransferTriggerEvent.StartUpload,
+    ) {
+        runCatching { clearActiveTransfersIfFinishedUseCase(TransferType.GENERAL_UPLOAD) }
+            .onFailure { Timber.e(it) }
+
+        if (uris.isEmpty()) {
+            Timber.e("Uri in $uris must exist")
+            _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
+            return
+        }
+
+        lastUpload = transferTriggerEvent
+        monitorUploadFinish()
+        _uiState.update {
+            it.copy(jobInProgressState = StartTransferJobInProgress.ScanningTransfers)
+        }
+        var startMessageShown = false
+        startUploadWithWorkerUseCase(
+            uris.map { it.toString() }.associateWith { null },
+            destinationId
+        ).catch {
+            Timber.e(it)
+        }.onCompletion {
+            if (it is CancellationException) {
+                _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
+            }
+        }.collect { event ->
+            when (event) {
+                is MultiTransferEvent.TransferNotStarted<*> -> {
+                    Timber.e(event.exception, "Error starting upload")
+                    StartTransferEvent.Message.TransferCancelled
+                }
+
+                MultiTransferEvent.InsufficientSpace -> StartTransferEvent.Message.NotSufficientSpace
+                is MultiTransferEvent.SingleTransferEvent -> {
+                    //show start message as soon as an event with all transfers updated is received
+                    if (!startMessageShown && event.allTransfersUpdated) {
+                        startMessageShown = true
+                        StartTransferEvent.FinishUploadProcessing(totalFiles = event.startedFiles)
+                    } else {
+                        null
+                    }
+                }
+            }?.let {
+                _uiState.updateEventAndClearProgress(it)
+            }
+        }
+    }
+
+    private var monitorUploadFinishJob: Job? = null
+
+    /**
+     * Monitor finish to send the corresponding event (will display a "Upload Finished" snackbar or similar)
+     */
+    private fun monitorUploadFinish() {
+        monitorUploadFinishJob?.cancel()
+        monitorUploadFinishJob = viewModelScope.launch {
+            monitorActiveTransferFinishedUseCase(TransferType.GENERAL_UPLOAD)
+                .catch { Timber.e(it) }
+                .collect { totalFiles ->
+                    if (active) {
+                        lastUpload?.let {
+                            _uiState.updateEventAndClearProgress(
+                                StartTransferEvent.MessagePlural.FinishUploading(totalFiles)
+                            )
+                        }
+                        lastUpload = null
+                    }
+                }
+        }
+    }
+
     companion object {
         /**
          * The last trigger event that started the download, we need to keep it to know what to do when the download finishes even in other screens
          */
-        private var lastTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent? = null
+        private var lastDownloadTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent? = null
+
+        /**
+         * The last trigger event that started the upload, we need to keep it to know what to do when the upload finishes even in other screens
+         */
+        private var lastUpload: TransferTriggerEvent.StartUpload? = null
     }
 }

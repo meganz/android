@@ -10,7 +10,7 @@ import mega.privacy.android.app.R
 sealed interface StartTransferEvent {
 
     /**
-     * Transfers scanning has finished
+     * Download transfers scanning has finished
      * @param exception [Throwable] in case of not correctly finished
      * @param totalNodes
      * @param totalFiles total files on this nodes
@@ -18,7 +18,7 @@ sealed interface StartTransferEvent {
      * @param triggerEvent the event that triggered the start of the transfers
      * @property filesToDownload
      */
-    data class FinishProcessing(
+    data class FinishDownloadProcessing(
         val exception: Throwable?,
         val totalNodes: Int,
         val totalFiles: Int,
@@ -27,6 +27,15 @@ sealed interface StartTransferEvent {
     ) : StartTransferEvent {
         val filesToDownload = totalFiles - totalAlreadyDownloaded
     }
+
+    /**
+     * Upload transfers canning has finished.
+     *
+     * @param totalFiles total files to upload
+     */
+    data class FinishUploadProcessing(
+        val totalFiles: Int,
+    ) : StartTransferEvent
 
     /**
      * we can't do work because there's no Internet connection
@@ -111,5 +120,12 @@ sealed interface StartTransferEvent {
          */
         data class FinishDownloading(val totalNodes: Int) :
             MessagePlural(R.plurals.download_complete, totalNodes)
+
+        /**
+         * Upload has finished
+         * @param totalFiles
+         */
+        data class FinishUploading(val totalFiles: Int) :
+            MessagePlural(R.plurals.upload_finish, totalFiles)
     }
 }

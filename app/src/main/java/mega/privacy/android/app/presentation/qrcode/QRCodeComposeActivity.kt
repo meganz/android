@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.qrcode
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -13,23 +12,16 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
-import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import timber.log.Timber
-import java.io.File
+import mega.privacy.android.shared.theme.MegaAppTheme
 import javax.inject.Inject
 
 /**
@@ -53,12 +45,6 @@ class QRCodeComposeActivity : PasscodeActivity() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
-
-    /**
-     * Upload use case
-     */
-    @Inject
-    lateinit var uploadUseCase: UploadUseCase
 
     private val selectStorageDestinationLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
@@ -102,10 +88,17 @@ class QRCodeComposeActivity : PasscodeActivity() {
                     onCloudDriveClicked = viewModel::saveToCloudDrive,
                     onFileSystemClicked = ::saveToFileSystem,
                     onShowCollision = ::showCollision,
-                    onUploadFile = { uploadFile(qrFile = it.first, parentHandle = it.second) },
+                    onUploadFile = {
+                        viewModel.uploadFile(
+                            context = this@QRCodeComposeActivity,
+                            qrFile = it.first,
+                            parentHandle = it.second
+                        )
+                    },
                     onShowCollisionConsumed = viewModel::resetShowCollision,
                     onUploadFileConsumed = viewModel::resetUploadFile,
                     onScanCancelConsumed = viewModel::resetScanCancel,
+                    onUploadEventConsumed = viewModel::onUploadEventConsumed,
                     qrCodeMapper = qrCodeMapper,
                 )
             }
@@ -131,17 +124,6 @@ class QRCodeComposeActivity : PasscodeActivity() {
             action = FileStorageActivity.Mode.PICK_FOLDER.action
         }
         selectStorageDestinationLauncher.launch(intent)
-    }
-
-    @SuppressLint("CheckResult")
-    private fun uploadFile(qrFile: File, parentHandle: Long) {
-        PermissionUtils.checkNotificationsPermission(this)
-        uploadUseCase.upload(this, qrFile, parentHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                viewModel.setResultMessage(R.string.save_qr_cloud_drive, arrayOf(qrFile.name))
-            }) { t: Throwable? -> Timber.e(t) }
     }
 
     private fun showCollision(collision: NameCollision) {

@@ -79,7 +79,12 @@ import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.view.QRCode
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
+import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
+import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
@@ -88,10 +93,6 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
-import mega.privacy.android.domain.entity.contacts.InviteContactRequest
-import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
-import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
-import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import java.io.File
@@ -128,6 +129,7 @@ internal fun QRCodeView(
     onUploadFile: (Pair<File, Long>) -> Unit,
     onUploadFileConsumed: () -> Unit,
     onScanCancelConsumed: () -> Unit,
+    onUploadEventConsumed: () -> Unit,
     qrCodeMapper: QRCodeMapper,
 ) {
     val view: View = LocalView.current
@@ -194,6 +196,12 @@ internal fun QRCodeView(
         if (viewState.finishActivityOnScanComplete)
             finishActivity(context.findActivity())
     }
+
+    StartTransferComponent(
+        event = viewState.uploadEvent,
+        onConsumeEvent = onUploadEventConsumed,
+        snackBarHostState = snackBarHostState,
+    )
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -698,6 +706,7 @@ private fun PreviewQRCodeView() {
             onUploadFile = { },
             onUploadFileConsumed = { },
             onScanCancelConsumed = { },
+            onUploadEventConsumed = { },
         ) { _, _, _, _, _ ->
             Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
         }

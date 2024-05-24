@@ -1,13 +1,18 @@
 package test.mega.privacy.android.app.presentation.qrcode
 
 import android.graphics.Bitmap
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.qrcode.CREATE_TAG
@@ -19,10 +24,14 @@ import mega.privacy.android.app.presentation.qrcode.SNACKBAR_TAG
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -32,33 +41,47 @@ class QRCodeViewTest {
     val composeTestRule = createComposeRule()
 
     private val qrCodeMapper: QRCodeMapper = mock()
+    private val startTransfersComponentViewModel = mock<StartTransfersComponentViewModel> {
+        on { uiState } doReturn MutableStateFlow(StartTransferViewState())
+    }
+    private val viewModelStore = mock<ViewModelStore> {
+        on { get(argThat<String> { contains(StartTransfersComponentViewModel::class.java.canonicalName.orEmpty()) }) } doReturn startTransfersComponentViewModel
+    }
+    private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
+        on { viewModelStore } doReturn viewModelStore
+    }
 
     private fun setComposeContent(viewState: QRCodeUIState = QRCodeUIState()) {
         composeTestRule.setContent {
-            QRCodeView(
-                viewState = viewState,
-                onCreateQRCode = { },
-                onBackPressed = { },
-                onDeleteQRCode = { },
-                onResetQRCode = { },
-                onScanQrCodeClicked = { },
-                onCopyLinkClicked = { },
-                onViewContactClicked = { },
-                onInviteContactClicked = { _, _ -> },
-                onResultMessageConsumed = { },
-                onScannedContactLinkResultConsumed = { },
-                onInviteContactResultConsumed = { },
-                onInviteResultDialogDismiss = { },
-                onInviteContactDialogDismiss = { },
-                onCloudDriveClicked = { },
-                onFileSystemClicked = { },
-                onShowCollision = { },
-                onShowCollisionConsumed = { },
-                onUploadFile = { },
-                onUploadFileConsumed = { },
-                onScanCancelConsumed = { },
-                qrCodeMapper = qrCodeMapper
-            )
+            CompositionLocalProvider(
+                LocalViewModelStoreOwner provides viewModelStoreOwner
+            ) {
+                QRCodeView(
+                    viewState = viewState,
+                    onCreateQRCode = { },
+                    onBackPressed = { },
+                    onDeleteQRCode = { },
+                    onResetQRCode = { },
+                    onScanQrCodeClicked = { },
+                    onCopyLinkClicked = { },
+                    onViewContactClicked = { },
+                    onInviteContactClicked = { _, _ -> },
+                    onResultMessageConsumed = { },
+                    onScannedContactLinkResultConsumed = { },
+                    onInviteContactResultConsumed = { },
+                    onInviteResultDialogDismiss = { },
+                    onInviteContactDialogDismiss = { },
+                    onCloudDriveClicked = { },
+                    onFileSystemClicked = { },
+                    onShowCollision = { },
+                    onShowCollisionConsumed = { },
+                    onUploadFile = { },
+                    onUploadFileConsumed = { },
+                    onScanCancelConsumed = { },
+                    onUploadEventConsumed = {},
+                    qrCodeMapper = qrCodeMapper
+                )
+            }
         }
     }
 

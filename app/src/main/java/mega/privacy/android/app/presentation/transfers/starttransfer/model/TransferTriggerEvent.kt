@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
 import android.net.Uri
 import androidx.core.net.toUri
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.TransferType
 import java.io.File
@@ -114,4 +115,26 @@ sealed interface TransferTriggerEvent {
         override val isHighPriority: Boolean = true
     }
 
+    /**
+     * Event to start uploading a list of files
+     *
+     * @property uris list of files to be uploaded.
+     * @property destinationId the id of the folder where the files will be uploaded.
+     */
+    sealed interface StartUpload : TransferTriggerEvent {
+        override val type: TransferType
+            get() = TransferType.GENERAL_UPLOAD
+
+        val uris: List<Uri>
+
+        val destinationId: NodeId
+
+        /**
+         * Upload files
+         */
+        data class Files(
+            override val uris: List<Uri>,
+            override val destinationId: NodeId,
+        ) : StartUpload
+    }
 }
