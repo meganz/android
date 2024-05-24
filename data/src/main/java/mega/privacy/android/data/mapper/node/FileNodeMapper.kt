@@ -6,6 +6,7 @@ import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.ExportedData
@@ -22,15 +23,16 @@ import javax.inject.Inject
  * @property cacheGateway
  * @property megaApiGateway
  * @property fileTypeInfoMapper
- * @property megaLocalRoomGateway
- * @property fileGateway
+ * @property offlineAvailabilityMapper
+ * @property stringListMapper
  * @constructor Create empty File node mapper
  */
 internal class FileNodeMapper @Inject constructor(
     private val cacheGateway: CacheGateway,
     private val megaApiGateway: MegaApiGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
-    private val offlineAvailabilityMapper: OfflineAvailabilityMapper
+    private val offlineAvailabilityMapper: OfflineAvailabilityMapper,
+    private val stringListMapper: StringListMapper,
 ) {
     /**
      * Invoke
@@ -83,7 +85,9 @@ internal class FileNodeMapper @Inject constructor(
         hasPreview = megaNode.hasPreview(),
         serializedData = if (requireSerializedData) megaNode.serialize() else null,
         isAvailableOffline = offline?.let { offlineAvailabilityMapper(megaNode, it) } ?: false,
-        versionCount = (megaApiGateway.getNumVersions(megaNode) - 1).coerceAtLeast(0)
+        versionCount = (megaApiGateway.getNumVersions(megaNode) - 1).coerceAtLeast(0),
+        description = megaNode.description,
+        tags = megaNode.tags?.let { stringListMapper(it) }
     )
 
     private fun getThumbnailCacheFilePath(megaNode: MegaNode, thumbnailFolder: File?): String? =

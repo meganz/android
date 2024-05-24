@@ -54,5 +54,7 @@ internal class ImageNodeFileMapper @Inject constructor(
         override val serializedData = "localFile"
         override val isAvailableOffline: Boolean = false
         override val versionCount: Int = -1
+        override val description: String? = null
+        override val tags: List<String>? = null
     }
 }

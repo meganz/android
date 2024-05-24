@@ -1,15 +1,14 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
-import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.Offline
@@ -27,7 +26,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NodeMapperTest {
     private lateinit var underTest: NodeMapper
     val offline = mock<Offline>()
@@ -61,6 +59,7 @@ class NodeMapperTest {
 
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper = mock()
+    private val stringListMapper: StringListMapper = mock()
 
     @BeforeEach
     internal fun setUp() {
@@ -70,11 +69,13 @@ class NodeMapperTest {
                 megaApiGateway = megaApiGateway,
                 fileTypeInfoMapper = { PdfFileTypeInfo },
                 offlineAvailabilityMapper = offlineAvailabilityMapper,
+                stringListMapper = stringListMapper,
             ),
             folderNodeMapper = FolderNodeMapper(
                 megaApiGateway = megaApiGateway,
                 megaApiFolderGateway = megaApiFolderGateway,
                 fetChildrenMapper = mock { on { invoke(any(), any()) }.thenReturn { emptyList() } },
+                stringListMapper = stringListMapper,
             )
         )
     }
@@ -95,7 +96,9 @@ class NodeMapperTest {
     @Test
     fun `test that folders are mapped if isFile is false`() = runTest {
         val megaNode = getMockNode(isFile = false)
-        whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(false)
+        whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(
+            false
+        )
         val actual =
             underTest(
                 megaNode = megaNode,
@@ -163,7 +166,9 @@ class NodeMapperTest {
             exported: Boolean,
         ) = runTest {
             val megaNode = megaNode(exported)
-            whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(false)
+            whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(
+                false
+            )
             val actual = mappedNode(megaNode)
             if (exported) {
                 assertThat(actual.exportedData).isNotNull()
@@ -175,7 +180,9 @@ class NodeMapperTest {
         @Test
         fun `test that exported public link is correct`() = runTest {
             val megaNode = megaNode(true)
-            whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(false)
+            whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(
+                false
+            )
             val actual = mappedNode(megaNode)
             assertThat(actual.exportedData?.publicLink).isEqualTo(expectedPublicLink)
         }
@@ -183,7 +190,9 @@ class NodeMapperTest {
         @Test
         fun `test that exported public link creation time is correct`() = runTest {
             val megaNode = megaNode(true)
-            whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(false)
+            whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(
+                false
+            )
             val actual = mappedNode(megaNode)
             assertThat(actual.exportedData?.publicLinkCreationTime).isEqualTo(
                 expectedPublicLinkCreationTime

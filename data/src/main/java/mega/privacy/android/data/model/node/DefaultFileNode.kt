@@ -32,5 +32,7 @@ internal data class DefaultFileNode(
     override val hasPreview: Boolean,
     override val serializedData: String?,
     override val isAvailableOffline: Boolean,
-    override val versionCount: Int
+    override val versionCount: Int,
+    override val description: String? = null,
+    override val tags: List<String>?
 ) : FileNode

@@ -21,6 +21,7 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineInformationMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.node.FetchChildrenMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
@@ -116,11 +117,13 @@ class NodeRepositoryImplTest {
     private val megaNodeMapper = mock<MegaNodeMapper>()
     private val cancelTokenProvider = mock<CancelTokenProvider>()
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
+    private val stringListMapper = mock<StringListMapper>()
     private val fileNodeMapper = FileNodeMapper(
         cacheGateway = cacheGateway,
         megaApiGateway = megaApiGateway,
         fileTypeInfoMapper = fileTypeInfoMapper,
         offlineAvailabilityMapper = offlineAvailabilityMapper,
+        stringListMapper = stringListMapper,
     )
 
     private val nodeMapper: NodeMapper = NodeMapper(
@@ -129,6 +132,7 @@ class NodeRepositoryImplTest {
             megaApiGateway = megaApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
             fetChildrenMapper = fetChildrenMapper,
+            stringListMapper = stringListMapper,
         )
     )
 

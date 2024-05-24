@@ -47,6 +47,8 @@ internal class SampleRecentActionDataProvider :
             override val originalFingerprint = "abc"
             override val hasThumbnail = false
             override val hasPreview = false
+            override val description: String = "Sample node description"
+            override val tags: List<String> = listOf("tag1", "tag2")
         }
     )
 

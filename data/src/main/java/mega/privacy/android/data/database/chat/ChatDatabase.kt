@@ -25,7 +25,7 @@ import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
  */
 const val CHAT_DATABASE_NAME = "chat_database"
 
-private const val DATABASE_VERSION = 3
+private const val DATABASE_VERSION = 4
 
 /**
  * In memory chat database
@@ -46,6 +46,7 @@ private const val DATABASE_VERSION = 3
     autoMigrations = [
         AutoMigration(1, 2),
         AutoMigration(2, 3, spec = AutoMigrationSpecChat2to3::class),
+        AutoMigration(3, 4),
     ],
 )
 abstract class ChatDatabase : RoomDatabase() {
@@ -71,6 +72,14 @@ abstract class ChatDatabase : RoomDatabase() {
     abstract fun pendingMessageDao(): PendingMessageDao
 
     companion object {
+
+        /**
+         * Init
+         *
+         * @param context
+         * @param factory
+         * @return Chat database
+         */
         fun init(
             context: Context,
             factory: SupportSQLiteOpenHelper.Factory,

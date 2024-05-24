@@ -53,6 +53,8 @@ class ChatNodeEntityListMapper @Inject constructor() {
                     originalFingerprint = it.originalFingerprint,
                     hasThumbnail = it.hasThumbnail,
                     hasPreview = it.hasPreview,
+                    description = it.description,
+                    tags = it.tags,
                 )
             } else {
                 Timber.e("Only files are supported in chats")

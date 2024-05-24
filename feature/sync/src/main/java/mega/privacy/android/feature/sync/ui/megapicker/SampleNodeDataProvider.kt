@@ -38,6 +38,8 @@ internal class SampleNodeDataProvider {
             override val serializedData = null
             override val isAvailableOffline = false
             override val versionCount: Int = 0
+            override val description: String = "Sample node description"
+            override val tags: List<String> = listOf("tag1", "tag2")
         }
 
         private val nodeUIItem2 = object : TypedFolderNode {
@@ -66,6 +68,8 @@ internal class SampleNodeDataProvider {
             override val serializedData = null
             override val isAvailableOffline = false
             override val versionCount: Int = 0
+            override val description: String = "Sample node description"
+            override val tags: List<String> = listOf("tag1", "tag2")
         }
 
         private val nodeUIItem3 = object : TypedFolderNode {
@@ -94,6 +98,8 @@ internal class SampleNodeDataProvider {
             override val serializedData = null
             override val isAvailableOffline = false
             override val versionCount: Int = 0
+            override val description: String = "Sample node description"
+            override val tags: List<String> = listOf("tag1", "tag2")
         }
 
         private val nodeUIItem4 = object : TypedFileNode {
@@ -127,6 +133,8 @@ internal class SampleNodeDataProvider {
             override val serializedData = null
             override val isAvailableOffline = false
             override val versionCount: Int = 0
+            override val description: String = "Sample node description"
+            override val tags: List<String> = listOf("tag1", "tag2")
         }
 
         val values: List<TypedNodeUiModel> =

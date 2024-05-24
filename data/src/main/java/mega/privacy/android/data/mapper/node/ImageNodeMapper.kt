@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper.node
 
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -19,6 +20,7 @@ internal class ImageNodeMapper @Inject constructor(
     private val previewFromServerMapper: PreviewFromServerMapper,
     private val fullImageFromServerMapper: FullImageFromServerMapper,
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper,
+    private val stringListMapper: StringListMapper,
     private val megaApiGateway: MegaApiGateway,
 ) {
     suspend operator fun invoke(
@@ -69,6 +71,8 @@ internal class ImageNodeMapper @Inject constructor(
             override val serializedData = if (requireSerializedData) megaNode.serialize() else null
             override val isAvailableOffline: Boolean = isAvailableOffline
             override val versionCount: Int = version
+            override val description: String? = megaNode.description
+            override val tags: List<String>? = megaNode.tags?.let { stringListMapper(it) }
         }
     }
 }

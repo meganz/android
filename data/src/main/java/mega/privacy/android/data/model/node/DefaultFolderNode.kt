@@ -30,5 +30,7 @@ internal data class DefaultFolderNode(
     override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode>,
     override val serializedData: String?,
     override val isAvailableOffline: Boolean,
-    override val versionCount: Int
+    override val versionCount: Int,
+    override val description: String?,
+    override val tags: List<String>?,
 ) : FolderNode

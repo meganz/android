@@ -96,6 +96,16 @@ interface Node {
     val versionCount: Int
 
     /**
+     * Description of the node
+     */
+    val description: String?
+
+    /**
+     * Tags associated with the node
+     */
+    val tags: List<String>?
+
+    /**
      * Has version
      */
     val hasVersion: Boolean

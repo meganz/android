@@ -5,10 +5,12 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import mega.privacy.android.data.database.converter.ChatNodeEntityConverters
+import mega.privacy.android.data.database.converter.StringListConverter
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FileNode
@@ -34,7 +36,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property versionCount Version count.
  */
 @Entity(tableName = "chat_node")
-@TypeConverters(ChatNodeEntityConverters::class)
+@TypeConverters(ChatNodeEntityConverters::class, StringListConverter::class)
 @Serializable
 data class ChatNodeEntity(
     @PrimaryKey override val id: NodeId,
@@ -66,6 +68,8 @@ data class ChatNodeEntity(
     override val originalFingerprint: String?,
     override val hasThumbnail: Boolean,
     override val hasPreview: Boolean,
+    override val description: String?,
+    override val tags: List<String>?,
 ) : FileNode {
     constructor(
         id: NodeId,
@@ -95,6 +99,8 @@ data class ChatNodeEntity(
         originalFingerprint: String?,
         hasThumbnail: Boolean,
         hasPreview: Boolean,
+        description: String?,
+        tags: List<String>?,
     ) : this(
         id = id,
         messageId = null,
@@ -124,6 +130,8 @@ data class ChatNodeEntity(
         originalFingerprint = originalFingerprint,
         hasThumbnail = hasThumbnail,
         hasPreview = hasPreview,
+        description = description,
+        tags = tags
     )
 }
 

@@ -40,6 +40,8 @@ internal class SampleFolderNodeDataProvider :
             override val serializedData = null
             override val isAvailableOffline: Boolean = false
             override val versionCount: Int = 0
+            override val description: String = "Sample node description"
+            override val tags: List<String> = listOf("tag1", "tag2")
         })
 
     private val nodeUIItem2 = NodeUIItem<TypedFolderNode>(
@@ -71,6 +73,8 @@ internal class SampleFolderNodeDataProvider :
             override val serializedData = null
             override val isAvailableOffline: Boolean = false
             override val versionCount: Int = 0
+            override val description: String = "Sample node description"
+            override val tags: List<String> = listOf("tag1", "tag2")
         })
 
     private val nodeUIItem3 = NodeUIItem<TypedFolderNode>(
@@ -102,6 +106,8 @@ internal class SampleFolderNodeDataProvider :
             override val serializedData = null
             override val isAvailableOffline: Boolean = false
             override val versionCount: Int = 0
+            override val description: String = "Sample node description"
+            override val tags: List<String> = listOf("tag1", "tag2")
         })
 
     override val values: Sequence<List<NodeUIItem<TypedFolderNode>>> = sequenceOf(
