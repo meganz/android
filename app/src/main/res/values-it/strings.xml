@@ -125,7 +125,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Non mostrare più</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Sei sicuro di voler annullare il processo di login corrente?</string>
+    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
     <!-- Login button -->
     <string name="login_text">Entra</string>
     <!-- email label -->
@@ -584,16 +584,6 @@
     <string name="verify_account_error_invalid_code">Codice errato. Per favore, ritenta o chiedi che ti venga mandato nuovamente.</string>
     <!-- verify phone number successfully -->
     <string name="verify_account_successfully">Il tuo numero di telefono è stato verificato</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string-array name="settings_storage_download_location_array">
-        <item>Spazio di archiviazione interno</item>
-        <item>Spazio di archiviazione esterno</item>
-    </string-array>
-    <!-- choose the way the new user’s email is inserted, import from phone option -->
-    <string-array name="add_contact_array">
-        <item>Scrivi l’email dell’utente</item>
-        <item>Importa dal dispositivo</item>
-    </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">Attiva i Caricamenti da fotocamera</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
@@ -604,19 +594,8 @@
     <string name="settings_secondary_upload_off">Disattiva i caricamenti secondari dei media</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Scegli cartella</string>
-    <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
-    <string-array name="settings_camera_upload_how_to_entries">
-        <item>Wi-Fi o connessione dati</item>
-        <item>Solo Wi-Fi</item>
-    </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
     <string name="settings_camera_upload_what_to_upload">Carica file</string>
-    <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string-array name="settings_camera_upload_file_upload_entries">
-        <item>Solo foto</item>
-        <item>Solo video</item>
-        <item>Foto e video</item>
-    </string-array>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">Includi i tag della posizione</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -802,7 +781,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Fai crescere il tuo cloud.[A]Ottieni un aumento del tuo spazio di archiviazione e della tua banda di trasferimento con un account Pro.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Indirizzo email già in uso. Inserisci un\’altra email.</string>
+    <string name="mail_already_used">Indirizzo email già in uso. Inserisci un altro indirizzo email.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">Hai già richiesto un link di conferma per quell’indirizzo e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -1064,7 +1043,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]Effettua il logout[/A] per cambiare account MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">Sei sicuro di voler effettuare il logout dall’account corrente?</string>
+    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Questo messaggio è stato eliminato da %1$s</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -1714,8 +1693,6 @@
     <string name="settings_chat_upload_quality">Qualità dei video</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Qualità dei video</string>
-    <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">I Caricamenti da fotocamera hanno bisogno dell’accesso alle tue foto e agli altri media sul tuo dispositivo. Per favore, vai nella pagina delle Impostazioni e garantisci questo permesso.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Bassa</item>
@@ -3212,7 +3189,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">Cambia nome</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">Aggiungi foto</string>
+    <string name="add_photo_action">Cambia l\’immagine del profilo</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Aggiungi numero di telefono</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -3281,8 +3258,6 @@
     <string name="general_camera_enable">La tua fotocamera è accesa.</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">La tua fotocamera è spenta.</string>
-    <!-- Label for hold meeting -->
-    <string name="meeting_hold">In attesa</string>
     <!-- General label for speaker -->
     <string name="general_speaker">Altoparlante</string>
     <!-- General label for headphone-->
@@ -5433,8 +5408,6 @@
     <string name="meetings_muted_by_a_participant_snackbar_message">%s ti ha mutato</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Dettagli dell\’abbonamento</string>
-    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Gli abbonamenti vengono rinnovati automaticamente per periodi di abbonamento successivi della stessa durata e allo stesso prezzo del periodo iniziale scelto. Puoi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro entro 24 ore prima della scadenza del prossimo pagamento dell\’abbonamento tramite Abbonamenti nel [A]Google Play[/A].</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permetti l\’accesso alla tua Galleria</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
@@ -5448,9 +5421,9 @@
     <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_cancel_button">Chiudi</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Scegli host per abbandonare la chiamata</string>
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Scegli host prima di abbandonare la chiamata</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">Sei l\’unico host nella chiamata. Scegli un altro host del gruppo prima di abbandonare, in modo che un altro utente possa avere i permessi da host. Rimarrai host del gruppo.</string>
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">Sei l\’unico host nella chiamata. Scegli un altro host del gruppo prima di abbandonare, in modo che un altro utente possa avere i permessi da host. Rimarrai come host all\’interno del gruppo.</string>
     <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Scegli e abbandona</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
@@ -5460,7 +5433,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
+    <string name="photos_camera_uploads_low_battery">Caricamento sospeso perché la batteria è minore del %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">I Caricamenti da fotocamera hanno smesso di funzionare. Prova a riattivare i Caricamenti da fotocamera per risolvere il problema. Se il problema persiste, contatta il supporto.</string>
     <!-- Camera uploads pending info in Photos screen. -->
@@ -5496,11 +5469,11 @@
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Il tuo piano gratuito prevede un limite di 60 minuti per i meeting. Gli utenti Pro hanno chiamate illimitate e fino a 1000 partecipanti.[/A] [B]Effettua l\’upgrade adesso.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Ti verrà addebitato %1$s immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 1&#160;mese al costo di %2$s al mese. Il rinnovo verrà addebitato sul tuo account Google&#160;Play entro 24&#160;ore dalla fine di ogni periodo di fatturazione. Per annullare l\’abbonamento, devi disattivare il rinnovo automatico dell\’abbonamento MEGA&#160;Pro almeno 24&#160;ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Ti verrà addebitato %1$s immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 1 mese al costo di %2$s al mese. Il rinnovo verrà addebitato sul tuo account Google&#160;Play entro 24 ore dalla fine di ogni periodo di fatturazione. Per annullare l\’abbonamento, devi disattivare il rinnovo automatico dell\’abbonamento MEGA&#160;Pro almeno 24 ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Ti verrà addebitato %1$s immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 12&#160;mesi al costo di %2$s all\’anno. Il rinnovo verrà addebitato sul tuo account Google&#160;Play entro 24&#160;ore dalla fine di ogni periodo di fatturazione. Per annullare l\’abbonamento, devi disattivare il rinnovo automatico dell\’abbonamento MEGA&#160;Pro almeno 24&#160;ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Ti verrà addebitato %1$s immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 12 mesi al costo di %2$s all\’anno. Il rinnovo verrà addebitato sul tuo account Google&#160;Play entro 24 ore dalla fine di ogni periodo di fatturazione. Per annullare l\’abbonamento, devi disattivare il rinnovo automatico dell\’abbonamento MEGA&#160;Pro almeno 24 ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">L\’addebito avverrà immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 1&#160;mese. Il tuo account Google&#160;Play riceverà un addebito per il rinnovo entro le 24&#160;ore precedenti la fine del periodo di fatturazione. Per annullare il tuo abbonamento, devi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro almeno 24&#160;ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di Servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">L\’addebito avverrà immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 1 mese. Il tuo account Google&#160;Play riceverà un addebito per il rinnovo entro le 24 ore precedenti la fine del periodo di fatturazione. Per annullare il tuo abbonamento, devi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro almeno 24 ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di Servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
     <string name="account_upgrade_account_subscription_details_body_yearly_without_price">L\’addebito avverrà immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 12&#160;mesi. Il tuo account Google&#160;Play riceverà un addebito per il rinnovo entro le 24&#160;ore precedenti la fine del periodo di fatturazione. Per annullare il tuo abbonamento, devi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro almeno 24&#160;ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di Servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
@@ -5590,7 +5563,7 @@
     <!-- Search drop down chips filter type file type documents -->
     <string name="search_dropdown_chip_filter_type_file_type_documents">Documenti</string>
     <!-- Search drop down chips filter type date added -->
-    <string name="search_dropdown_chip_filter_type_date_added">Data aggiunta</string>
+    <string name="search_dropdown_chip_filter_type_date_added">Data di aggiunta</string>
     <!-- Search drop down chips filter type last modified -->
     <string name="search_dropdown_chip_filter_type_last_modified">Ultima modifica</string>
     <!-- Search drop down chips filter type date modified today -->
@@ -5604,7 +5577,7 @@
     <!-- Search drop down chips filter type date modified last year -->
     <string name="search_dropdown_chip_filter_type_date_last_year">Ultimo anno</string>
     <!-- Search drop down chips filter type date modified older -->
-    <string name="search_dropdown_chip_filter_type_date_older">Vecchio</string>
+    <string name="search_dropdown_chip_filter_type_date_older">Più vecchio</string>
     <!-- String below login button next to button for reporting a login issue -->
     <string name="general_login_label_trouble_logging_in">Problemi con il login?</string>
     <!-- Button text for reporting an issue on the login screen -->
@@ -5626,19 +5599,19 @@
     <!-- Title of call button to show more options in call screen -->
     <string name="meetings_more_call_option_button">Altro</string>
     <!-- Title of raise hand button in call screen -->
-    <string name="meetings_raise_hand_option_button">Raise hand</string>
+    <string name="meetings_raise_hand_option_button">Alza la mano</string>
     <!-- Title of lower hand button in call screen -->
-    <string name="meetings_lower_hand_option_button">Lower hand</string>
+    <string name="meetings_lower_hand_option_button">Abbassa la mano</string>
     <!-- Title of put call on hold button in call screen -->
-    <string name="meetings_put_call_on_hold_option_button">Put call on hold</string>
+    <string name="meetings_put_call_on_hold_option_button">Metti la chiamata in attesa</string>
     <!-- Title of swap calls button in call screen -->
-    <string name="meetings_swap_calls_option_button">Swap calls</string>
+    <string name="meetings_swap_calls_option_button">Scambia le telefonate</string>
     <!-- Title of resume call button in call screen -->
     <string name="meetings_resume_call_option_button">Riprendi chiamata</string>
     <!-- Text of pop up informing about the Raise hand feature -->
-    <string name="meetings_new_feature_raise_hand_layout">New feature: Raise hand</string>
+    <string name="meetings_new_feature_raise_hand_layout">Nuova opzione: Alza la mano</string>
     <!-- The snackbar message of your hand is raised -->
-    <string name="meeting_your_hand_is_raised_message">You raised your hand</string>
+    <string name="meeting_your_hand_is_raised_message">Hai alzato la tua mano</string>
     <!-- The snackbar message of you and others raised your hands -->
     <plurals name="meeting_you_and_others_raised_your_hands_message">
         <item quantity="one">You and %1$d other raised your hands</item>

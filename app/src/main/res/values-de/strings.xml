@@ -123,7 +123,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Nicht nochmal anzeigen</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Wollen Sie den Loginvorgang abbrechen?</string>
+    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
     <!-- Login button -->
     <string name="login_text">Anmelden</string>
     <!-- email label -->
@@ -576,16 +576,6 @@
     <string name="verify_account_error_invalid_code">Falscher Code. Bitte geben Sie ihn erneut ein oder fordern Sie einen neuen an.</string>
     <!-- verify phone number successfully -->
     <string name="verify_account_successfully">Ihre Telefonnummer wurde bestätigt</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string-array name="settings_storage_download_location_array">
-        <item>Interner Speicher</item>
-        <item>Externer Speicher</item>
-    </string-array>
-    <!-- choose the way the new user’s email is inserted, import from phone option -->
-    <string-array name="add_contact_array">
-        <item>E-Mail des Benutzers eingeben</item>
-        <item>Vom Gerät importieren</item>
-    </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">Kamera-Uploads aktivieren</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
@@ -596,19 +586,8 @@
     <string name="settings_secondary_upload_off">Zweitmedienuploads deaktivieren</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Ordner auswählen</string>
-    <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
-    <string-array name="settings_camera_upload_how_to_entries">
-        <item>WLAN oder Mobildaten</item>
-        <item>Nur via WLAN</item>
-    </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
     <string name="settings_camera_upload_what_to_upload">Dateiupload</string>
-    <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string-array name="settings_camera_upload_file_upload_entries">
-        <item>Nur Fotos</item>
-        <item>Nur Videos</item>
-        <item>Fotos und Videos</item>
-    </string-array>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">Ortsinformationen</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -1048,7 +1027,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]Ausloggen[/A], um zu einem anderen MEGA-Account zu wechseln</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">Sind Sie sicher, dass Sie sich ausloggen möchten?</string>
+    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Diese Nachricht wurde von %1$s gelöscht</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -1677,8 +1656,6 @@
     <string name="settings_chat_upload_quality">Chat-Videokompression</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Videoqualität</string>
-    <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Kamera-Uploads benötigt Zugriff auf Ihre Fotos und Mediendateien. Bitte gewähren Sie der App dieses Zugriffsrecht in den Einstellungen.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Niedrig</item>
@@ -2449,7 +2426,7 @@
         <item quantity="other">%d Versionen nicht gelöscht</item>
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
-    <string name="no_contacts_invite">Sie haben noch keine MEGA-Kontakte. Bitte laden Sie Freunde, Bekannte oder Kollegen über über den Bereich Kontakte ein.</string>
+    <string name="no_contacts_invite">Sie haben noch keine MEGA-Kontakte. Bitte laden Sie Freunde, Bekannte oder Kollegen über den Bereich Kontakte ein.</string>
     <!-- Title of first tour screen -->
     <string name="title_tour_one">Sie sind der alleinige Inhaber Ihrer Schlüssel</string>
     <!-- Content of first tour screen -->
@@ -3124,7 +3101,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">Namen ändern</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">Foto hinzufügen</string>
+    <string name="add_photo_action">Profilbild ändern</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Telefonnummer hinzufügen</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -3190,8 +3167,6 @@
     <string name="general_camera_enable">Ihre Kamera ist eingeschaltet.</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">Ihre Kamera ist ausgeschaltet.</string>
-    <!-- Label for hold meeting -->
-    <string name="meeting_hold">Halten</string>
     <!-- General label for speaker -->
     <string name="general_speaker">Lautsprecher</string>
     <!-- General label for headphone-->
@@ -5201,8 +5176,6 @@
     <string name="meetings_muted_by_a_participant_snackbar_message">Sie wurden von %s stummgeschaltet</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Abonnementdetails</string>
-    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Abonnements werden automatisch für den ursprünglich gewählten Abonnementzeitraum und zum gleichen Preis verlängert. Sie können die automatische Verlängerung Ihres MEGA-Pro-Abonnements bis spätestens 24 Stunden vor Fälligkeit Ihrer nächsten Abonnementzahlung in [A]Google Play[/A] unter Abonnements deaktivieren.</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Gewähren Sie Zugriff auf Ihre Galerie</string>
     <!-- Button text to grant permission in the chat bottom sheet -->

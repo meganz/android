@@ -121,7 +121,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">請別再顯示</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">您確定要取消目前的登入嗎？</string>
+    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
     <!-- Login button -->
     <string name="login_text">登入</string>
     <!-- email label -->
@@ -568,16 +568,6 @@
     <string name="verify_account_error_invalid_code">驗證碼錯誤。請重試或重新傳送。</string>
     <!-- verify phone number successfully -->
     <string name="verify_account_successfully">您的手機號碼已通過驗證</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string-array name="settings_storage_download_location_array">
-        <item>內部儲存</item>
-        <item>外部儲存</item>
-    </string-array>
-    <!-- choose the way the new user’s email is inserted, import from phone option -->
-    <string-array name="add_contact_array">
-        <item>填入使用者email</item>
-        <item>從裝置匯入</item>
-    </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">啟用相機上傳</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
@@ -588,19 +578,8 @@
     <string name="settings_secondary_upload_off">停用次要體上傳功能</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">選擇資料夾</string>
-    <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
-    <string-array name="settings_camera_upload_how_to_entries">
-        <item>Wi-Fi或行動網路</item>
-        <item>只在WiFi連線</item>
-    </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
     <string name="settings_camera_upload_what_to_upload">檔案上傳</string>
-    <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string-array name="settings_camera_upload_file_upload_entries">
-        <item>只有照片</item>
-        <item>只有影片</item>
-        <item>照片和影片</item>
-    </string-array>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">包含位置標籤</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -1032,7 +1011,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]登出[/A]以切換MEGA帳戶</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">您確定要登出目前帳戶嗎？</string>
+    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">此訊息已被%1$s刪除</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -1640,8 +1619,6 @@
     <string name="settings_chat_upload_quality">影片品質</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">影片品質</string>
-    <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">相機上傳需存取您裝置裡的相片與其他媒體內容，請到設定頁面並且允許其權限。</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>低</item>
@@ -3036,7 +3013,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">更改名稱</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">新增大頭照</string>
+    <string name="add_photo_action">更改個人資料相片</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">新增電話號碼</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -3099,8 +3076,6 @@
     <string name="general_camera_enable">您的相機己開啟。</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">您的相機己關閉。</string>
-    <!-- Label for hold meeting -->
-    <string name="meeting_hold">保留</string>
     <!-- General label for speaker -->
     <string name="general_speaker">喇叭</string>
     <!-- General label for headphone-->
@@ -4969,8 +4944,6 @@
     <string name="meetings_muted_by_a_participant_snackbar_message">%s已將您設為靜音</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">訂閱詳情</string>
-    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">訂閱會自動續訂，續訂的訂閱期間與初始選擇的周期相同，價格也相同。您可以在下次訂閱付款到期前24小時內，透過[A]Google Play[/A]中的訂閱關閉MEGA&#160;Pro訂閱的自動續訂功能。</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">允許存取您的相簿</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
@@ -5169,6 +5142,6 @@
     <string name="meeting_your_hand_is_raised_message">您舉起手</string>
     <!-- The snackbar message of you and others raised your hands -->
     <plurals name="meeting_you_and_others_raised_your_hands_message">
-        <item quantity="other">您和其他%1$d個人舉起了手</item>
+        <item quantity="other">您和其他%1$d個人舉起手</item>
     </plurals>
 </resources>

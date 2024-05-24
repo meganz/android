@@ -21,7 +21,7 @@
     <!-- Document scanner high quality option -->
     <string name="scan_quality_high">Haute</string>
     <!-- Document scanner medium quality option -->
-    <string name="scan_quality_medium">Moyenne</string>
+    <string name="scan_quality_medium">Moyen</string>
     <!-- Document scanner low quality option -->
     <string name="scan_quality_low">Basse</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
@@ -31,7 +31,7 @@
     <!-- Title text shown on document scanner dialog to discard scan all scans -->
     <string name="scan_dialog_discard_all_title">Abandonner toutes les numérisations ?</string>
     <!-- Body text shown on document scanner dialog to discard all scans -->
-    <string name="scan_dialog_discard_all_body">Le présent document sera perdue</string>
+    <string name="scan_dialog_discard_all_body">Le présent document sera perdu</string>
     <!-- Action text shown on document scanner dialog to discard scans -->
     <string name="scan_dialog_discard_action">Abandonner</string>
     <!-- Body text shown on document scanner dialog to delete current scan -->

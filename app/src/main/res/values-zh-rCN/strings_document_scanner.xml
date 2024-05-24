@@ -11,7 +11,7 @@
     <!-- Action text to retake current scan picture (Document scanner) -->
     <string name="scan_action_retake">重新扫描</string>
     <!-- Document scanner file name -->
-    <string name="scan_file_name">文件名称</string>
+    <string name="scan_file_name">文件名</string>
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_file_type">文件类型</string>
     <!-- Input field description in the document save screen (Document scanner) -->

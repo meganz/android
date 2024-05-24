@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">Nigdy więcej nie utrać danych</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Utwórz kopię zapasową i synchronizuj dane, aby uzyskać pełną pewność. Ponadto użyj Przewiń do tyłu, aby przywróć katalog do dowolnej daty do 180 dni.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Przewiń do tyłu, aby przywrócić katalog z powrotem do dowolnej daty do 180 dni, aby Twoje dane były odporne na wypadki i manipulacje.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -312,4 +312,30 @@
     <string name="general_low_tier_plan_basic_label">Basic</string>
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">Essential</string>
+    <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Przesyłanie zostanie wstrzymane, dopóki nie zaczniesz ładować urządzenie. Przesyłanie nadal pozostanie wstrzymane, jeśli bateria jest poniżej 20%.</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_list_empty_state_title">Brak ustawień synchronizacji</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_list_empty_state_message">Synchronizuj katalog lokalny na urządzeniu z katalogiem w MEGA.</string>
+    <!-- Label for the button or menu option to add a new sync -->
+    <string name="device_center_sync_add_new_syn_button_option">Dodaj nową synchronizację</string>
+    <!-- Text for the Sync solved issues chip -->
+    <string name="device_center_sync_solved_issues_chip_text">Rozwiązane problemy</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">You can’t sync folders that are currently synced folders.</string>
+    <!-- Label for the file info information screen description field -->
+    <string name="file_info_information_description_label">Opis</string>
+    <!-- Placeholder for the file info information screen description field -->
+    <string name="file_info_information_description_placeholder">Dodaj opis</string>
+    <!-- Description added snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_added">Opis dodany</string>
+    <!-- Description updated snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_updated">Opis zaktualizowany</string>
+    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_title_additional_features">Plus dostęp do tych wspaniałych korzyści:</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226; &#160; MEGA &#160; VPN \n&#8226; &#160; Nieograniczone połączenia i spotkania \n&#8226; &#160; Automatyczna synchronizacja katalogów na urządzeniu mobilnym \n&#8226; &#160; Brak reklam</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226; &#160; MEGA &#160; VPN \n&#8226; &#160; Nieograniczone połączenia i spotkania \n&#8226; &#160; Automatyczna synchronizacja katalogów na urządzeniu mobilnym</string>
 </resources>

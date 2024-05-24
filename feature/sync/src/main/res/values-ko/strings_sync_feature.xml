@@ -6,8 +6,6 @@
     <string name="sync_button_label">동기화</string>
     <!-- Sync text of sync-->
     <string name="sync">동기화</string>
-    <!-- Sync spannable section to show sync count with notification count-->
-    <string name="section_sync_with_notification">동기화 [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">당신의 로컬 폴더를 동기화하기 위해 MEGA가 장치 저장소에 접근이 필요합니다. 접근을 승인하려면 여기를 탭하세요</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
@@ -34,10 +32,6 @@
     <string name="sync_menu_clear_issues">해결된 문제 지우기</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">양방향 동기화</string>
-    <!-- Sync conflict message -->
-    <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
-    <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">동기화의 한쪽에서 같은 이름을 다신 여러 항목이 있지만 동기화의 다른 쪽에서 같은 하나의 항목이 될 것입니다</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">모든 항목 이름 변경</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -64,20 +58,14 @@
     <string name="sync_dialog_battery_optimization_negative_button">허용하지 않음</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">허용</string>
-    <!-- Sync dialog battery optimization message -->
-    <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">해결된 문제 없음</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">문제 없음</string>
-    <!-- Sync option to choose folder pair -->
-    <string name="sync_folders_choose_folder_pair">동기화 이름을 만드세요</string>
     <!-- Sync option to choose device folder -->
     <string name="sync_folder_choose_device_folder_title">장치 폴더</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">MEGA 폴더</string>
-    <!-- Sync option for sync method -->
-    <string name="sync_folders_method">동기화 유형</string>
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">일시정지 중</string>
     <!-- Sync state syncing -->
@@ -184,6 +172,4 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">로컬에서 이동 또는 이름 변경을 감지하였지만, MEGA에 반영할 수 없었습니다.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">파일이 이동되거나 삭제되었는지 확인하기 위해 스캔이 완료되기를 기다리는 중입니다.</string>
-    <!-- Sync subtitle for sync screen to choose folders-->
-    <string name="sync_choose_folders">폴더 선택</string>
 </resources>

@@ -125,7 +125,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Nu afișa din nou</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Sigur vrei să anulezi procesul actual de autentificare?</string>
+    <string name="confirm_cancel_login">Sigur vreți să anulați procesul actual de autentificare?</string>
     <!-- Login button -->
     <string name="login_text">Autentifică-te</string>
     <!-- email label -->
@@ -431,7 +431,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Trimite</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Îți mulțumim pentru feedback. Sigur vrei să anulezi abonamentul MEGA?</string>
+    <string name="confirmation_cancel_subscriptions">Vă mulțumim pentru feedback. Sigur vreți să vă anulați abonamentul MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Abonamentul dvs. nu a fost anulat. Oferiți un motiv pentru anulare</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
@@ -499,7 +499,7 @@
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Numai Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
-    <string name="cam_sync_data">Wi-Fi sau plan de date</string>
+    <string name="cam_sync_data">Wi-Fi sau date mobile</string>
     <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Încărcări cameră în curs</string>
     <!-- confirmation question for cancelling the camera uploads -->
@@ -584,16 +584,6 @@
     <string name="verify_account_error_invalid_code">Cod greșit. Vă rugăm să încercați din nou sau să retrimiteți.</string>
     <!-- verify phone number successfully -->
     <string name="verify_account_successfully">Numărul dvs. de telefon a fost confirmat</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string-array name="settings_storage_download_location_array">
-        <item>Stocare internă</item>
-        <item>Stocare externă</item>
-    </string-array>
-    <!-- choose the way the new user’s email is inserted, import from phone option -->
-    <string-array name="add_contact_array">
-        <item>Scrie e-mailul utilizatorului</item>
-        <item>Importă de pe dispozitiv</item>
-    </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">Activează Încărcări cameră</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
@@ -604,19 +594,8 @@
     <string name="settings_secondary_upload_off">Dezactivează încărcări media secundare</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Alege un folder</string>
-    <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
-    <string-array name="settings_camera_upload_how_to_entries">
-        <item>Wi-Fi sau plan de date</item>
-        <item>Numai Wi-Fi</item>
-    </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
     <string name="settings_camera_upload_what_to_upload">Încărcarea de fișiere</string>
-    <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string-array name="settings_camera_upload_file_upload_entries">
-        <item>Numai fotografii</item>
-        <item>Numai videoclipuri</item>
-        <item>Fotografii și videoclipuri</item>
-    </string-array>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">Include etichetele locațiilor</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -1064,7 +1043,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]Deconectează-te[/A] pentru a comuta între conturile MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">Sigur vrei să te deconectezi din contul actual?</string>
+    <string name="confirm_logout_from_sms_verification">Sigur vreți să deconectați de la contul curent?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Acest mesaj a fost șters de %1$s</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -1714,8 +1693,6 @@
     <string name="settings_chat_upload_quality">Calitate video</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Calitate video</string>
-    <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Încărcări camere trebuie să acceseze fotografiile și alte suporturi media de pe dispozitiv. Accesați pagina de setări și acordați permisiunea.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Scăzută</item>
@@ -2114,7 +2091,7 @@
     <!-- Label shown the total space and the used space in an account -->
     <string name="used_space">[A]%1$s [/A][B]din %2$s folosiți[/B]</string>
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
-    <string name="staging_api_url_text">Sunteți sigur că doriți să treceți la un server de testare? Contul dvs. poate suferi probleme ireversibile.</string>
+    <string name="staging_api_url_text">Sigur vreți să treceți la un server de testare? Contul dvs. poate suferi probleme ireversibile.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="title_confirmation_open_camera_on_chat">Deschizi camera?</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
@@ -2916,7 +2893,7 @@
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Șterge automat mesajele mai vechi de:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Sigur vrei să ștergi istoricul complet al mesajelor din această conversație?</string>
+    <string name="confirmation_clear_chat_history">Sigur vreți să ștergeți istoricul complet al mesajelor din această conversație?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 an</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
@@ -3212,7 +3189,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">Modifică numele</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">Adaugă o fotografie</string>
+    <string name="add_photo_action">Schimbați imaginea profilului</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Adaugă un număr de telefon</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -3281,8 +3258,6 @@
     <string name="general_camera_enable">Camera este pornită.</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">Camera este oprită.</string>
-    <!-- Label for hold meeting -->
-    <string name="meeting_hold">Pune în așteptare</string>
     <!-- General label for speaker -->
     <string name="general_speaker">Difuzor</string>
     <!-- General label for headphone-->
@@ -3444,7 +3419,7 @@
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Permite folosirea datelor mobile pentru a încărca imagini de înaltă rezoluție la previzualizare. Dacă opțiunea este dezactivată, imaginea originală va fi încărcată numai când faci zoom in.</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_root_folder">Ștergi folderul de backupuri. Acest lucru va elimina toate backupurile pe care le-ai setat. Sigur vrei să faci acest lucru?</string>
+    <string name="backup_remove_root_folder">Ștergeți folderul de backupuri. Aceasta va elimina toate backup-urile pe care le-ați setat. Sigur vreți să faceți asta?</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Mută „%1s” în Coșul de gunoi</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -4972,7 +4947,7 @@
     <!-- Album import saving -->
     <string name="album_import_saving">Se salvează&#8230;</string>
     <!-- Album import success message -->
-    <string name="album_import_success_message">„%1$s” salvat în Unitatea cloud</string>
+    <string name="album_import_success_message">„%1$s” a fost salvat în Unitatea cloud</string>
     <!-- Album import error message -->
     <string name="album_import_error_message">„%1$s” nu poate fi salvat pe Unitatea cloud. Încercați din nou mai târziu și dacă problema continuă, contactați persoana care a partajat linkul cu dvs.</string>
     <!-- Text of the option weekdays in Custom Recurrence screen -->
@@ -5433,8 +5408,6 @@
     <string name="meetings_muted_by_a_participant_snackbar_message">Microfonul dvs. a fost dezactivat de %s</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Detaliile abonamentului</string>
-    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Abonamentele sunt reînnoite automat pentru perioade succesive de abonament cu aceeași durată și la același preț ca perioada inițială aleasă. Puteți dezactiva reînnoirea automată a abonamentului MEGA&#160;Pro cu cel mult 24 de ore înainte de scadența următoarei plăți a abonamentului prin Abonamente în [A]Google Play[/A].</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permiteți accesul la Galeria dvs.</string>
     <!-- Button text to grant permission in the chat bottom sheet -->

@@ -121,7 +121,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">不再显示</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">您确定要取消当前登录吗？</string>
+    <string name="confirm_cancel_login">您确定要取消当前的登入吗？</string>
     <!-- Login button -->
     <string name="login_text">登&#160;入</string>
     <!-- email label -->
@@ -568,16 +568,6 @@
     <string name="verify_account_error_invalid_code">验证码错误。请再试一次或重新发送。</string>
     <!-- verify phone number successfully -->
     <string name="verify_account_successfully">您的电话号码已经通过验证</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string-array name="settings_storage_download_location_array">
-        <item>内部存储</item>
-        <item>外部存储</item>
-    </string-array>
-    <!-- choose the way the new user’s email is inserted, import from phone option -->
-    <string-array name="add_contact_array">
-        <item>请填写用户的电子邮件地址</item>
-        <item>从设备导入</item>
-    </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">启用相机上传</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
@@ -588,19 +578,8 @@
     <string name="settings_secondary_upload_off">关闭辅助媒体上传</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">选择文件夹</string>
-    <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
-    <string-array name="settings_camera_upload_how_to_entries">
-        <item>Wi-Fi或移动数据</item>
-        <item>仅限Wi-Fi</item>
-    </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
     <string name="settings_camera_upload_what_to_upload">上传文件</string>
-    <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string-array name="settings_camera_upload_file_upload_entries">
-        <item>仅照片</item>
-        <item>仅视频</item>
-        <item>照片和视频</item>
-    </string-array>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">包含位置标签</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -1075,7 +1054,7 @@
     <string name="no_conversation_history">无聊天记录</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="other">%1$s[A]正在输入...[/A]</item>
+        <item quantity="other">%1$s[A]正在输入&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]和其他人正在输入&#8230;[/A]</string>
@@ -1640,8 +1619,6 @@
     <string name="settings_chat_upload_quality">视频质量</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">视频画质</string>
-    <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">相机上传需要访问您设备上的照片和其他媒体内容。请转到设置页面开启权限。</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>较低</item>
@@ -3036,7 +3013,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">更改名字</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">添加照片</string>
+    <string name="add_photo_action">更改个人资料图片</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">添加手机号</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -3099,8 +3076,6 @@
     <string name="general_camera_enable">您的摄像头已开启。</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">您的摄像头已关闭。</string>
-    <!-- Label for hold meeting -->
-    <string name="meeting_hold">通话保持</string>
     <!-- General label for speaker -->
     <string name="general_speaker">扬声器</string>
     <!-- General label for headphone-->
@@ -4256,7 +4231,7 @@
     <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
     <string name="media_player_video_enable_subtitle_dialog_option_off">关闭</string>
     <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
-    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">添加字幕...</string>
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">添加字幕&#8230;</string>
     <!-- Slideshow settings page title -->
     <string name="slideshow_settings_page_title">幻灯片选项</string>
     <!-- Slideshow speed preference -->
@@ -4442,9 +4417,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">无法打开文件</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_folder_description">根据我们的[A]删除指导政策[/A]，此文件夹已被删除。如果您认为我们犯了一个错误，您可以对这次删除提出异议。</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_file_description">根据我们的[A]删除指导政策[/A]，此文件已被删除。如果您认为我们犯了一个错误，您可以对这次删除提出异议。</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">仅限Pro会员</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -4969,8 +4944,6 @@
     <string name="meetings_muted_by_a_participant_snackbar_message">您已被%s静音</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">订阅详情</string>
-    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">订阅将自动续订，续订周期与初始选择的周期相同，并且以相同的价格进行续订。您可以在下一次订阅付款到期前24小时以内，通过[A]Google Play[/A]订阅界面关闭MEGA&#160;Pro订阅的自动续订功能。</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">允许访问您的图库</string>
     <!-- Button text to grant permission in the chat bottom sheet -->

@@ -6,8 +6,6 @@
     <string name="sync_button_label">同步</string>
     <!-- Sync text of sync-->
     <string name="sync">同步</string>
-    <!-- Sync spannable section to show sync count with notification count-->
-    <string name="section_sync_with_notification">同步[A]（%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">MEGA需要访问您设备的存储空间，以便同步您的本地文件夹。点按此处以允许访问。</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
@@ -34,10 +32,6 @@
     <string name="sync_menu_clear_issues">清除已解决的问题</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">双向同步</string>
-    <!-- Sync conflict message -->
-    <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
-    <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">同步的一侧具有多个相同名称的项目，这些项目在同步的另一侧都将成为相同的单一项目</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">重命名所有项目</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -64,20 +58,14 @@
     <string name="sync_dialog_battery_optimization_negative_button">不允许</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">允许</string>
-    <!-- Sync dialog battery optimization message -->
-    <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">没有已解决的问题</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">没问题</string>
-    <!-- Sync option to choose folder pair -->
-    <string name="sync_folders_choose_folder_pair">为同步命名</string>
     <!-- Sync option to choose device folder -->
     <string name="sync_folder_choose_device_folder_title">设备文件夹</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">MEGA文件夹</string>
-    <!-- Sync option for sync method -->
-    <string name="sync_folders_method">同步类型</string>
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">已暂停</string>
     <!-- Sync state syncing -->
@@ -184,6 +172,4 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">在本地检测到移动或重命名操作，但无法在MEGA中复制。</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">等待扫描完成以确定文件是否已移动或删除。</string>
-    <!-- Sync subtitle for sync screen to choose folders-->
-    <string name="sync_choose_folders">选择文件夹</string>
 </resources>

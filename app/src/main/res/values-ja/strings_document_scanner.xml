@@ -19,11 +19,11 @@
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_destination">保存先</string>
     <!-- Document scanner high quality option -->
-    <string name="scan_quality_high">高</string>
+    <string name="scan_quality_high">高い</string>
     <!-- Document scanner medium quality option -->
-    <string name="scan_quality_medium">中</string>
+    <string name="scan_quality_medium">普通</string>
     <!-- Document scanner low quality option -->
-    <string name="scan_quality_low">低</string>
+    <string name="scan_quality_low">低い</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
     <string name="scan_dialog_discard_title">スキャンを破棄しますか？</string>
     <!-- Body text shown on document scanner dialog to discard scan -->

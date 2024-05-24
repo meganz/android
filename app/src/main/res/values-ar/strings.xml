@@ -131,7 +131,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">لا تظهر مرة أخرى</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">هل أنت متأكد من أنك تريد إلغاء عملية تسجيل الدخول الحالية؟</string>
+    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
     <!-- Login button -->
     <string name="login_text">تسجيل الدخول</string>
     <!-- email label -->
@@ -608,16 +608,6 @@
     <string name="verify_account_error_invalid_code">رمز خاطئ. يرجى المحاولة مرة أخرى أو إعادة الإرسال.</string>
     <!-- verify phone number successfully -->
     <string name="verify_account_successfully">تم التحقق من رقم هاتفك</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string-array name="settings_storage_download_location_array">
-        <item>ذاكرة داخلية</item>
-        <item>ذاكرة خارجية</item>
-    </string-array>
-    <!-- choose the way the new user’s email is inserted, import from phone option -->
-    <string-array name="add_contact_array">
-        <item>اكتب بريد المستخدم الالكتروني</item>
-        <item>استيراد من جهاز</item>
-    </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">تفعيل ترفيعات الكاميرا</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
@@ -628,19 +618,8 @@
     <string name="settings_secondary_upload_off">تعطيل ترفيعات الوسائط المتعددة</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">اختر مجلد</string>
-    <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
-    <string-array name="settings_camera_upload_how_to_entries">
-        <item>شبكة الواي فاي Wi-Fi أو بيانات الموبايل</item>
-        <item>شبكة الواي فاي Wi-Fi فقط</item>
-    </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
     <string name="settings_camera_upload_what_to_upload">رفع ملف</string>
-    <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string-array name="settings_camera_upload_file_upload_entries">
-        <item>الصور فقط</item>
-        <item>ملفات فيديو فقط</item>
-        <item>الصور و ملفات الفيديو</item>
-    </string-array>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">تشمل علامات الموقع</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -863,7 +842,7 @@
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="hint_confirm_password_protection_dialog">تأكيد كلمة المرور</string>
     <!-- Status text at the beginning of getting a link -->
-    <string name="link_request_status">قيد المعالجة...</string>
+    <string name="link_request_status">قيد المعالجة&#8230;</string>
     <!-- Option of the sliding panel to edit the link of a node -->
     <string name="edit_link_option">إدارة الرابط</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
@@ -1112,7 +1091,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A] تسجيل خروج[/A] للتبديل بين حسابات ميغا MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">هل أنت متأكد أنك تريد تسجيل الخروج من الحساب الحالي؟</string>
+    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">تم حذف هذه الرسالة من قبل %1$s</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -1170,12 +1149,12 @@
     <string name="no_conversation_history">لا توجد سجل للمحادثات</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="zero">%1$s [A] يقوم بالكتابة...[/A]</item>
-        <item quantity="one">%1$s [A] يقوم بالكتابة...[/A]</item>
-        <item quantity="two">%1$s [A] يقوما بالكتابة...[/A]</item>
-        <item quantity="few">%1$s [A] يقومون بالكتابة...[/A]</item>
-        <item quantity="many">%1$s [A] يقومون بالكتابة...[/A]</item>
-        <item quantity="other">%1$s [A] يقومون بالكتابة...[/A]</item>
+        <item quantity="zero">%1$s [A] يقوم بالكتابة&#8230;[/A]</item>
+        <item quantity="one">%1$s [A] يقوم بالكتابة&#8230;[/A]</item>
+        <item quantity="two">%1$s [A] يقوما بالكتابة&#8230;[/A]</item>
+        <item quantity="few">%1$s [A] يقومون بالكتابة&#8230;[/A]</item>
+        <item quantity="many">%1$s [A] يقومون بالكتابة&#8230;[/A]</item>
+        <item quantity="other">%1$s [A] يقومون بالكتابة&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]وأكثر يكتبون&#8230;[/A]</string>
@@ -1825,8 +1804,6 @@
     <string name="settings_chat_upload_quality">جودة الفيديو</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">جودة الفيديو</string>
-    <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">تحتاج ترفيعات الكاميرا صلاحية الوصول إلى الصور والوسائط الأخرى الموجودة على جهازك. يرجى الذهاب إلى صفحة الإعدادات ومنح الإذن.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>منخفضة</item>
@@ -3476,7 +3453,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">تغيير الإسم</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">إضافة صورة</string>
+    <string name="add_photo_action">تغيير صورة الملف الشخصي</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">إضافة رقم هاتف</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -3554,8 +3531,6 @@
     <string name="general_camera_enable">تم تشغيل الكاميرا خاصتك.</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">تم إيقاف تشغيل الكاميرا خاصتك.</string>
-    <!-- Label for hold meeting -->
-    <string name="meeting_hold">تعليق</string>
     <!-- General label for speaker -->
     <string name="general_speaker">مكبر الصوت</string>
     <!-- General label for headphone-->
@@ -5201,7 +5176,7 @@
     <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
     <string name="media_player_video_enable_subtitle_dialog_option_off">ايقاف</string>
     <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
-    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">أضف ترجمات...</string>
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">أضف ترجمات&#8230;</string>
     <!-- Slideshow settings page title -->
     <string name="slideshow_settings_page_title">خيارات عرض الشرائح</string>
     <!-- Slideshow speed preference -->
@@ -5609,7 +5584,7 @@
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">حفظ في السواقة السحابية</string>
     <!-- Album import saving -->
-    <string name="album_import_saving">جاري الحفظ...</string>
+    <string name="album_import_saving">جاري الحفظ&#8230;</string>
     <!-- Album import success message -->
     <string name="album_import_success_message">تم حفظ ”%1$s“ في السواقة السحابية.</string>
     <!-- Album import error message -->
@@ -6026,11 +6001,11 @@
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
+    <string name="dialog_onboarding_feature_title_storage">مرونة تخزين فائقة</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
     <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
+    <string name="dialog_onboarding_button_view_pro_plan">قم بالترقية إلى برو Pro اليوم</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s يقوم بالتقديم</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -6129,8 +6104,6 @@
     <string name="meetings_muted_by_a_participant_snackbar_message">لقد تم كتم صوتك من قِبل %s</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">تفاصيل الاشتراك</string>
-    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">يتم تجديد الاشتراكات تلقائيًا لفترات اشتراك متتالية من نفس المدة وبنفس سعر الفترة الأولية المختارة. يمكنك إيقاف التجديد التلقائي لاشتراك ميغا برو MEGA&#160;Pro الخاص بك في موعد لا يتجاوز 24 ساعة قبل استحقاق دفعة الاشتراك التالية عبر الاشتراكات في [A]غوغل بلاي Google Play[/A].</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your Gallery</string>
     <!-- Button text to grant permission in the chat bottom sheet -->

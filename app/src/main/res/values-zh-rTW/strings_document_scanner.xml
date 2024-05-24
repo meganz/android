@@ -41,7 +41,7 @@
     <!-- Error text for incorrect name -->
     <string name="scan_incorrect_name">無效的名稱</string>
     <!-- Error text for invalid characters -->
-    <string name="scan_invalid_characters">無效字元</string>
+    <string name="scan_invalid_characters">無效的字元</string>
     <!-- Snackbar text for incorrect name -->
     <string name="scan_snackbar_incorrect_name">在繼續操作前，請更正您的檔案名稱</string>
     <!-- Dialog message showing file progress -->

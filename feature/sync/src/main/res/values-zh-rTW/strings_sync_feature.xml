@@ -6,8 +6,6 @@
     <string name="sync_button_label">同步</string>
     <!-- Sync text of sync-->
     <string name="sync">同步</string>
-    <!-- Sync spannable section to show sync count with notification count-->
-    <string name="section_sync_with_notification">同步[A]（%1$d）[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">MEGA需要存取您裝置的儲存空間，以便同步您的本地資料夾。點選此處以允許存取。</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
@@ -34,10 +32,6 @@
     <string name="sync_menu_clear_issues">清除已解決的問題</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">雙向同步</string>
-    <!-- Sync conflict message -->
-    <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
-    <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">同步的一側有多個具有相同名稱的項目，這些項目在同步的另一側都將成為相同的單一項目</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">重新命名所有項目</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -64,20 +58,14 @@
     <string name="sync_dialog_battery_optimization_negative_button">不允許</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">允許</string>
-    <!-- Sync dialog battery optimization message -->
-    <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">沒有已解決的問題</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">沒有問題</string>
-    <!-- Sync option to choose folder pair -->
-    <string name="sync_folders_choose_folder_pair">為同步命名</string>
     <!-- Sync option to choose device folder -->
     <string name="sync_folder_choose_device_folder_title">裝置資料夾</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">MEGA資料夾</string>
-    <!-- Sync option for sync method -->
-    <string name="sync_folders_method">同步類型</string>
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">暫停</string>
     <!-- Sync state syncing -->
@@ -117,7 +105,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">無法移動或重新命名</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">刪除或移動操作正在等待掃描</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">還無法刪除</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -157,7 +145,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">選擇</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">An item has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">一個項目存在需要您的決定才能解決的問題</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">正在等待其它程序完成</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -184,6 +172,4 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">在本地偵測到移動或重新命名操作，但無法在MEGA中複製。</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">等待掃描完成以確定檔案是否已移動或刪除。</string>
-    <!-- Sync subtitle for sync screen to choose folders-->
-    <string name="sync_choose_folders">選擇資料夾</string>
 </resources>

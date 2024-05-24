@@ -17,7 +17,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">最新版</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
-    <string name="device_center_list_view_item_status_initialising">初期化中\u2026</string>
+    <string name="device_center_list_view_item_status_initialising">初期化中&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently scanning -->
     <string name="device_center_list_view_item_status_scanning">スキャン中&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
@@ -180,7 +180,7 @@
     </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="device_center_info_num_folders_and_files">
-        <item quantity="other">%1$d個のフォルダ&#160;・&#160;</item>
+        <item quantity="other">%1$d個のフォルダ&#160;·&#160;</item>
     </plurals>
     <!-- Header of the Info view field for the date and time a folder was added -->
     <string name="device_center_info_added">追加済み</string>

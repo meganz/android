@@ -9,7 +9,7 @@
     <!-- Action of a button to save something -->
     <string name="scan_action_save">Salva</string>
     <!-- Action text to retake current scan picture (Document scanner) -->
-    <string name="scan_action_retake">Rifai</string>
+    <string name="scan_action_retake">Riprova</string>
     <!-- Document scanner file name -->
     <string name="scan_file_name">Nome del file</string>
     <!-- Input field description in the document save screen (Document scanner) -->

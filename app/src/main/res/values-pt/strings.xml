@@ -584,16 +584,6 @@
     <string name="verify_account_error_invalid_code">Código incorreto, tente novamente.</string>
     <!-- verify phone number successfully -->
     <string name="verify_account_successfully">O seu número de telefone foi verificado</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string-array name="settings_storage_download_location_array">
-        <item>Armazenamento interno</item>
-        <item>Armazenamento externo</item>
-    </string-array>
-    <!-- choose the way the new user’s email is inserted, import from phone option -->
-    <string-array name="add_contact_array">
-        <item>Digite o email do usuário</item>
-        <item>Importar do dispositivo</item>
-    </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">Ativar Uploads da câmera</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
@@ -604,19 +594,8 @@
     <string name="settings_secondary_upload_off">Desativar upload secundário de mídia</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Escolher pasta</string>
-    <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
-    <string-array name="settings_camera_upload_how_to_entries">
-        <item>Wi-Fi ou dados móveis</item>
-        <item>Somente Wi-Fi</item>
-    </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
     <string name="settings_camera_upload_what_to_upload">Upload de arquivo</string>
-    <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string-array name="settings_camera_upload_file_upload_entries">
-        <item>Somente fotos</item>
-        <item>Somente vídeos</item>
-        <item>Fotos e vídeos</item>
-    </string-array>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">Incluir etiquetas de localização</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -1714,8 +1693,6 @@
     <string name="settings_chat_upload_quality">Qualidade dos vídeos</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Qualidade dos vídeos</string>
-    <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">A função Uploads da câmera precisa acessar as suas fotos e outras arquivos multimídia no seu dispositivo. Por favor, acesse as configurações do seu dispositivo e conceda permissão.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Baixa</item>
@@ -3212,7 +3189,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">Alterar nome</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">Adicionar foto</string>
+    <string name="add_photo_action">Alterar a imagem de perfil</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Adicionar número de telefone</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -3281,8 +3258,6 @@
     <string name="general_camera_enable">A sua câmera está ativada.</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">A sua câmera está desativada.</string>
-    <!-- Label for hold meeting -->
-    <string name="meeting_hold">Em espera</string>
     <!-- General label for speaker -->
     <string name="general_speaker">Som</string>
     <!-- General label for headphone-->
@@ -5433,8 +5408,6 @@
     <string name="meetings_muted_by_a_participant_snackbar_message">Você foi silenciado por %s</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Informações da assinatura</string>
-    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">As assinaturas serão renovadas automaticamente por períodos sucessivos com a mesma duração e pelo mesmo preço do período inicial. Você pode desativar a renovação automática da sua assinatura Pro&#160;do&#160;MEGA até 24 horas antes do vencimento do próximo pagamento nas Assinaturas da [A]Google Play[/A].</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permitir o acesso à sua Galeria</string>
     <!-- Button text to grant permission in the chat bottom sheet -->

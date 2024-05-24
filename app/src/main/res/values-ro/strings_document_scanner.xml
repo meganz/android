@@ -11,7 +11,7 @@
     <!-- Action text to retake current scan picture (Document scanner) -->
     <string name="scan_action_retake">Refă</string>
     <!-- Document scanner file name -->
-    <string name="scan_file_name">File name</string>
+    <string name="scan_file_name">Numele fișierului</string>
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_file_type">Tipul fișierului</string>
     <!-- Input field description in the document save screen (Document scanner) -->
@@ -19,7 +19,7 @@
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_destination">Destinație</string>
     <!-- Document scanner high quality option -->
-    <string name="scan_quality_high">Superioară</string>
+    <string name="scan_quality_high">Ridicată</string>
     <!-- Document scanner medium quality option -->
     <string name="scan_quality_medium">Medie</string>
     <!-- Document scanner low quality option -->
