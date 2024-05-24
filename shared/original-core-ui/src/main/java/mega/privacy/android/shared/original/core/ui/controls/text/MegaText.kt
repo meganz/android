@@ -9,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -37,13 +38,15 @@ fun MegaText(
     overflow: LongTextBehaviour = LongTextBehaviour.Clip(),
     minLines: Int = 1,
     style: TextStyle = LocalTextStyle.current,
+    textAlign: TextAlign? = null,
 ) = when (overflow) {
     LongTextBehaviour.MiddleEllipsis -> MiddleEllipsisText(
         text = text,
         color = textColor,
         modifier = modifier,
         maxLines = overflow.maxLines,
-        style = style
+        style = style,
+        textAlign = textAlign
     )
 
     LongTextBehaviour.Marquee -> MarqueeText(
@@ -51,6 +54,7 @@ fun MegaText(
         modifier = Modifier.basicMarquee(),
         color = MegaTheme.textColor(textColor = textColor),
         style = style,
+        textAlign = textAlign
     )
 
     else -> Text(
@@ -61,6 +65,7 @@ fun MegaText(
         maxLines = overflow.maxLines,
         minLines = minLines,
         style = style,
+        textAlign = textAlign
     )
 }
 

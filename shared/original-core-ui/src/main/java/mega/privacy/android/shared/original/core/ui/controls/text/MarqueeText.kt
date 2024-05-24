@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
@@ -50,12 +51,14 @@ internal fun MarqueeText(
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
     style: TextStyle = LocalTextStyle.current,
+    textAlign: TextAlign? = null,
 ) = Text(
     text = text,
     modifier = modifier.basicMarquee(),
     color = color,
     maxLines = 1,
     style = style,
+    textAlign = textAlign
 )
 
 @CombinedThemePreviews
