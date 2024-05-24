@@ -12,8 +12,8 @@ class DefaultGetNodeListByIds @Inject constructor(
 ) : GetNodeListByIds {
 
     override suspend fun invoke(ids: List<Long>): List<MegaNode> = withContext(ioDispatcher) {
-        ids.map {
-            getNodeByHandle(it)!!
+        ids.mapNotNull {
+            getNodeByHandle(it)
         }
     }
 }
