@@ -110,8 +110,8 @@ class ContactListViewModel @Inject constructor(
             CacheFolderManager.getCacheFolderAsync(CacheFolderManager.AVATAR_FOLDER)?.let {
                 retrieveContacts(it)
             }
-            retrieveContactActions()
         }
+        retrieveContactActions()
     }
 
     private fun retrieveContactActions() {

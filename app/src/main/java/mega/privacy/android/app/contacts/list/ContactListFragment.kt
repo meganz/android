@@ -110,8 +110,8 @@ class ContactListFragment : Fragment() {
 
                 viewModel.onChatOpened()
 
-                actionsAdapter.submitList(state.contactActionItems)
             }
+            actionsAdapter.submitList(state.contactActionItems)
         }
     }
 
