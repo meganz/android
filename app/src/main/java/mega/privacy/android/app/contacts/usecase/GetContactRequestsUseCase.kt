@@ -11,7 +11,6 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
@@ -138,18 +137,6 @@ class GetContactRequestsUseCase @Inject constructor(
                 globalSubscription.dispose()
             }
         }, BackpressureStrategy.LATEST)
-
-
-    /**
-     * Get current number of incoming/outgoing contact requests
-     *
-     * @return  Single Pair<Int,Int> object with the number of contact requests,
-     *          being the first item the number of incoming and the second one the outgoing.
-     */
-    fun getRequestsSize(): Single<Pair<Int, Int>> =
-        Single.fromCallable {
-            Pair(megaApi.incomingContactRequests.size, megaApi.outgoingContactRequests.size)
-        }
 
     /**
      * Build ContactRequestItem from MegaContactRequest object

@@ -3,6 +3,7 @@ package mega.privacy.android.app.contacts.requests
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,6 +12,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs.INCOMING
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs.OUTGOING
@@ -19,6 +21,7 @@ import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.ManageContactRequestUseCase
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.contacts.ContactRequestAction
+import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestsUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -32,6 +35,7 @@ import javax.inject.Inject
 class ContactRequestsViewModel @Inject constructor(
     private val getContactRequestsUseCase: GetContactRequestsUseCase,
     private val manageContactRequestUseCase: ManageContactRequestUseCase,
+    private val monitorContactRequestsUseCase: MonitorContactRequestsUseCase,
 ) : ViewModel() {
 
     private val composite = CompositeDisposable()
@@ -47,7 +51,9 @@ class ContactRequestsViewModel @Inject constructor(
                 onNext = { items ->
                     contactRequests.value = items
                 },
-                onError = Timber::e
+                onError = {
+                    Timber.e(it)
+                }
             )
             .addTo(composite)
     }
@@ -98,32 +104,20 @@ class ContactRequestsViewModel @Inject constructor(
      * @param isOutgoing    Whether the current view is for outgoing requests or not.
      * @return              LiveData with ViewPager's desired position.
      */
-    fun getDefaultPagerPosition(isOutgoing: Boolean): LiveData<Int> {
-        val result = MutableLiveData<Int>()
-        getContactRequestsUseCase.getRequestsSize()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { requestsSize ->
-                    result.value = if (isOutgoing) {
-                        when {
-                            requestsSize.second > 0 -> OUTGOING.ordinal
-                            requestsSize.first > 0 -> INCOMING.ordinal
-                            else -> OUTGOING.ordinal
-                        }
-                    } else {
-                        when {
-                            requestsSize.first > 0 -> INCOMING.ordinal
-                            requestsSize.second > 0 -> OUTGOING.ordinal
-                            else -> INCOMING.ordinal
-                        }
-                    }
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
-        return result
-    }
+    fun getDefaultPagerPosition(isOutgoing: Boolean): LiveData<Int> =
+        monitorContactRequestsUseCase()
+            .map {
+                val hasIncoming = it.incomingContactRequests.isNotEmpty()
+                val hasOutGoing = it.outgoingContactRequests.isNotEmpty()
+                when {
+                    isOutgoing && hasOutGoing -> OUTGOING.ordinal
+                    !isOutgoing && hasIncoming -> INCOMING.ordinal
+                    isOutgoing && hasIncoming -> INCOMING.ordinal
+                    !isOutgoing && hasOutGoing -> OUTGOING.ordinal
+                    isOutgoing -> OUTGOING.ordinal
+                    else -> INCOMING.ordinal
+                }
+            }.asLiveData(context = viewModelScope.coroutineContext)
 
     override fun onCleared() {
         super.onCleared()
