@@ -108,8 +108,8 @@ interface PendingMessageDao {
      * @param state
      * @return flow of pending messages of the specific state
      */
-    @Query("SELECT * FROM pending_messages WHERE state = :state")
-    fun fetchPendingMessagesByState(state: PendingMessageState): Flow<List<PendingMessageEntity>>
+    @Query("SELECT * FROM pending_messages WHERE state in (:states)")
+    fun fetchPendingMessagesByState(states: List<PendingMessageState>): Flow<List<PendingMessageEntity>>
 
     /**
      * Delete

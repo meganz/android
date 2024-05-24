@@ -105,10 +105,10 @@ interface ChatStorageGateway {
     /**
      * Fetch pending messages of a specific state
      *
-     * @param state
+     * @param states
      * @return flow of pending messages of the specific state
      */
-    fun fetchPendingMessages(state: PendingMessageState): Flow<List<PendingMessageEntity>>
+    fun fetchPendingMessages(vararg states: PendingMessageState): Flow<List<PendingMessageEntity>>
 
     /**
      * Fetch pending messages by id

@@ -238,10 +238,10 @@ interface ChatMessageRepository {
     /**
      * Monitor pending messages of a specific state
      *
-     * @param state
+     * @param states
      * @return flow of pending messages for specific state
      */
-    fun monitorPendingMessagesByState(state: PendingMessageState): Flow<List<PendingMessage>>
+    fun monitorPendingMessagesByState(vararg states: PendingMessageState): Flow<List<PendingMessage>>
 
     /**
      * Forward a message with attach contact

@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.test.Test
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MonitorPendingMessagesByStateUseCaseTest {
@@ -38,4 +39,16 @@ class MonitorPendingMessagesByStateUseCaseTest {
 
         assertThat(actual).isEqualTo(expected)
     }
+
+    @Test
+    fun `test that invoke calls repository method with correct parameters when there are multiple states`() =
+        runTest {
+            val states = arrayOf(PendingMessageState.PREPARING, PendingMessageState.READY_TO_UPLOAD)
+            val expected = mock<Flow<List<PendingMessage>>>()
+            whenever(chatMessageRepository.monitorPendingMessagesByState(states = states)).thenReturn(expected)
+
+            val actual = underTest(states =states)
+
+            assertThat(actual).isEqualTo(expected)
+        }
 }

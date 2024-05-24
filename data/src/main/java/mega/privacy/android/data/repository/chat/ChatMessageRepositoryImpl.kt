@@ -174,8 +174,8 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             .map { list -> list.map { pendingMessageMapper(it) } }
             .flowOn(ioDispatcher)
 
-    override fun monitorPendingMessagesByState(state: PendingMessageState) =
-        chatStorageGateway.fetchPendingMessages(state)
+    override fun monitorPendingMessagesByState(vararg states: PendingMessageState) =
+        chatStorageGateway.fetchPendingMessages(states = states)
             .map { list -> list.map { pendingMessageMapper(it) } }
             .flowOn(ioDispatcher)
 

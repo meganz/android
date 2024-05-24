@@ -574,6 +574,30 @@ class ChatMessageRepositoryImplTest {
     }
 
     @Test
+    fun `test that monitorPendingMessagesByState returns mapped entities from gateway when there are multiple states`() =
+        runTest {
+            val states = arrayOf(PendingMessageState.PREPARING, PendingMessageState.READY_TO_UPLOAD)
+            val idsRange = (0..10)
+            val expected = idsRange.map { mock<PendingMessage>() }
+            val entities = idsRange.map { mock<PendingMessageEntity>() }
+            idsRange.forEach { index ->
+                whenever(pendingMessageMapper(entities[index])).thenReturn(expected[index])
+            }
+
+            whenever(chatStorageGateway.fetchPendingMessages(states = states)).thenReturn(
+                flowOf(
+                    entities
+                )
+            )
+
+            underTest.monitorPendingMessagesByState(states = states).test {
+                val actual = awaitItem()
+                assertThat(actual).isEqualTo(expected)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that clearPendingMessagesCompressionProgress clears the flow`() =
         runTest {
             underTest.clearPendingMessagesCompressionProgress() // to be sure we start with an empty flow

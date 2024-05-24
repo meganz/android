@@ -21,6 +21,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.test.Test
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChatStorageFacadeTest {
@@ -83,9 +84,23 @@ class ChatStorageFacadeTest {
             val pendingMessageDao = mock<PendingMessageDao>()
             whenever(database.pendingMessageDao()) doReturn pendingMessageDao
             val expected = mock<Flow<List<PendingMessageEntity>>>()
-            whenever(pendingMessageDao.fetchPendingMessagesByState(state)) doReturn expected
+            whenever(pendingMessageDao.fetchPendingMessagesByState(listOf(state))) doReturn expected
 
             val actual = underTest.fetchPendingMessages(state)
+
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that fetch pending messages by state returns result from pending message dao when there are multiple states`() =
+        runTest {
+            val states = arrayOf(PendingMessageState.PREPARING, PendingMessageState.READY_TO_UPLOAD)
+            val pendingMessageDao = mock<PendingMessageDao>()
+            whenever(database.pendingMessageDao()) doReturn pendingMessageDao
+            val expected = mock<Flow<List<PendingMessageEntity>>>()
+            whenever(pendingMessageDao.fetchPendingMessagesByState(states.toList())) doReturn expected
+
+            val actual = underTest.fetchPendingMessages(states = states)
 
             assertThat(actual).isEqualTo(expected)
         }

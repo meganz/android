@@ -13,6 +13,6 @@ class MonitorPendingMessagesByStateUseCase @Inject constructor(
     /**
      * Invoke
      */
-    operator fun invoke(state: PendingMessageState) =
-        chatMessageRepository.monitorPendingMessagesByState(state)
+    operator fun invoke(vararg states: PendingMessageState) =
+        chatMessageRepository.monitorPendingMessagesByState(states = states)
 }
