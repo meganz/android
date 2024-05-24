@@ -1950,16 +1950,6 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     /**
-     * Adds a pending message from File Explorer.
-     *
-     * @param message Pending message to add.
-     * @return The identifier of the pending message.
-     */
-    override fun addPendingMessageFromFileExplorer(message: PendingMessage): Long {
-        return addPendingMessage(message, PendingMessageState.PREPARING_FROM_EXPLORER.value)
-    }
-
-    /**
      * Adds a pending message.
      *
      * @param message Pending message to add.

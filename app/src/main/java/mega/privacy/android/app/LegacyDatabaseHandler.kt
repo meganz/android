@@ -25,15 +25,6 @@ interface LegacyDatabaseHandler : DatabaseHandler {
     fun findbyPathAndName(path: String?, name: String?): MegaOffline?
     fun deleteOfflineFile(mOff: MegaOffline): Int
 
-
-    /**
-     * Adds a pending message from File Explorer.
-     *
-     * @param message Pending message to add.
-     * @return The identifier of the pending message.
-     */
-    fun addPendingMessageFromFileExplorer(message: PendingMessage): Long
-
     /**
      * Adds a pending message.
      *

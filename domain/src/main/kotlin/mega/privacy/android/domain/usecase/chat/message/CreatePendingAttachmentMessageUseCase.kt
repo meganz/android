@@ -41,7 +41,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 fileType = fileSystemRepository.getFileTypeInfo(file),
                 transferTag = transferTag.takeIf { it != UNKNOWN_TRANSFER_TAG },
                 state = PendingMessageState.entries.firstOrNull { it.value == state }
-                    ?: PendingMessageState.UPLOADING,
+                    ?: PendingMessageState.PREPARING,
                 nodeId = nodeHandle.takeIf { it != -1L }?.let { NodeId(it) },
                 fileName = name ?: file.name,
             )
@@ -60,7 +60,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 fileType = fileSystemRepository.getFileTypeInfo(file),
                 transferTag = transferTag.takeIf { it != UNKNOWN_TRANSFER_TAG },
                 state = PendingMessageState.entries.firstOrNull { it.value == state }
-                    ?: PendingMessageState.UPLOADING,
+                    ?: PendingMessageState.PREPARING,
                 nodeId = nodeHandle.takeIf { it != -1L }?.let { NodeId(it) },
                 fileSize = fileSystemRepository.getTotalSize(file),
                 fileName = name ?: file.name,
