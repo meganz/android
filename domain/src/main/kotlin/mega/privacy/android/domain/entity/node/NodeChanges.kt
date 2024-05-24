@@ -20,4 +20,5 @@ enum class NodeChanges {
     Name,
     Favourite,
     Sensitive,
+    Description,
 }

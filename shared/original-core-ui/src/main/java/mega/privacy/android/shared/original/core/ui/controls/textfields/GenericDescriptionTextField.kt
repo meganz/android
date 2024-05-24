@@ -60,9 +60,11 @@ fun GenericDescriptionTextField(
     charLimit: Int,
     onValueChange: (String) -> Unit,
     initiallyFocused: Boolean = true,
+    isEnabled: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
     imeAction: ImeAction = ImeAction.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    showUnderline: Boolean = false,
     @StringRes placeholderId: Int? = null,
     @StringRes charLimitErrorId: Int? = null,
     @StringRes titleId: Int? = null,
@@ -91,8 +93,8 @@ fun GenericDescriptionTextField(
             errorCursorColor = MegaTheme.colors.text.error,
             errorIndicatorColor = MegaTheme.colors.support.error,
             focusedLabelColor = MegaTheme.colors.text.primary,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = if (showUnderline) MegaTheme.colors.text.accent else Color.Transparent,
+            unfocusedIndicatorColor = if (showUnderline) MegaTheme.colors.text.secondary else Color.Transparent,
             unfocusedLabelColor = MegaTheme.colors.text.onColorDisabled,
             errorLabelColor = MegaTheme.colors.text.error,
         )
@@ -130,6 +132,7 @@ fun GenericDescriptionTextField(
             (BasicTextField(
                 value = value,
                 maxLines = maxLines,
+                enabled = isEnabled,
                 modifier = modifier
                     .defaultMinSize(
                         minWidth = TextFieldDefaults.MinWidth,

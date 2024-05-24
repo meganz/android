@@ -29,10 +29,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.contacts.ContactPermission
-import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -196,25 +194,21 @@ internal fun FileInfoContent(
             }
 
             //description
-            if (viewState.nodeDescriptionEnabled) {
+            if (nodeDescriptionEnabled) {
                 FileInfoDescriptionField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                    descriptionText = viewState.descriptionText,
+                    descriptionText = descriptionText,
                     labelId = sharedR.string.file_info_information_description_label,
-                    placeholderId = sharedR.string.file_info_information_description_placeholder,
-                    descriptionLimit = Constants.MAX_DESCRIPTION_SIZE,
-                    isEditable = accessPermission == AccessPermission.READWRITE ||
-                            accessPermission == AccessPermission.FULL ||
-                            accessPermission == AccessPermission.OWNER,
+                    placeholderId = sharedR.string.file_info_information_description_placeholder.takeIf { isDescriptionEnabled() },
+                    isEditable = isDescriptionEnabled(),
                     onConfirmDescription = onSetDescriptionClick,
                 )
             }
 
             //link
             if (showLink && publicLink != null) {
-                FileInfoContentDivider(paddingBottom = 8.dp)
                 ShareLinkView(
                     link = publicLink,
                     date = publicLinkCreationTime ?: 0,

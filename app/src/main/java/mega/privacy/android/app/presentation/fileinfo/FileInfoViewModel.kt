@@ -38,6 +38,7 @@ import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges.Description
 import mega.privacy.android.domain.entity.node.NodeChanges.Inshare
 import mega.privacy.android.domain.entity.node.NodeChanges.Name
 import mega.privacy.android.domain.entity.node.NodeChanges.Outshare
@@ -194,17 +195,19 @@ class FileInfoViewModel @Inject constructor(
      */
     fun setNodeDescription(description: String) {
         viewModelScope.launch {
-            runCatching {
-                setNodeDescriptionUseCase(nodeHandle = nodeId, description = description)
-            }.onSuccess {
-                _uiState.update {
-                    it.copy(
-                        oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionAdded),
-                        descriptionText = description
-                    )
+            description.takeIf { it.isNotEmpty() }?.let {
+                runCatching {
+                    setNodeDescriptionUseCase(nodeHandle = nodeId, description = description)
+                }.onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionAdded),
+                            descriptionText = description
+                        )
+                    }
+                }.onFailure {
+                    Timber.e("Set Node Description Failed $it")
                 }
-            }.onFailure {
-                Timber.e("Set Node Description Failed $it")
             }
         }
     }
@@ -671,6 +674,7 @@ class FileInfoViewModel @Inject constructor(
                             }
 
                         Timestamp -> updateTimeStamp()
+                        Description -> updateDescription()
                         Outshare -> {
                             updateOutShares()
                             updateIcon()
@@ -880,6 +884,15 @@ class FileInfoViewModel @Inject constructor(
     }
 
     private fun updateTitle() {
+        updateState {
+            getNodeByIdUseCase(typedNode.id)?.let { updateTypedNode ->
+                typedNode = updateTypedNode
+            }
+            it.copyWithTypedNode(typedNode = typedNode)
+        }
+    }
+
+    private fun updateDescription() {
         updateState {
             getNodeByIdUseCase(typedNode.id)?.let { updateTypedNode ->
                 typedNode = updateTypedNode

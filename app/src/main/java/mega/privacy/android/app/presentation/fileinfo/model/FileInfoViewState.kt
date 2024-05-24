@@ -113,8 +113,17 @@ internal data class FileInfoViewState(
         showLink = !typedNode.isTakenDown && typedNode.exportedData != null,
         creationTime = typedNode.creationTime,
         modificationTime = (typedNode as? TypedFileNode)?.modificationTime,
+        descriptionText = typedNode.description.orEmpty(),
         hasPreview = (typedNode as? TypedFileNode)?.hasPreview == true
     )
+
+
+    /**
+     * Check Conditions to enable description field
+     */
+    fun isDescriptionEnabled() = !isNodeInRubbish &&
+            (accessPermission == AccessPermission.FULL ||
+                    accessPermission == AccessPermission.OWNER)
 
     /**
      * Creates a copy of this view state with the info that can be extracted directly from folderTreeInfo

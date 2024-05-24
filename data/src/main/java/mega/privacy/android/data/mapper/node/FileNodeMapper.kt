@@ -44,7 +44,7 @@ internal class FileNodeMapper @Inject constructor(
     suspend operator fun invoke(
         megaNode: MegaNode,
         requireSerializedData: Boolean,
-        offline: Offline?
+        offline: Offline?,
     ): FileNode = DefaultFileNode(
         id = NodeId(megaNode.handle),
         name = megaNode.name,
