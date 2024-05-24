@@ -20,11 +20,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication.Companion.isLoggingOut
 import mega.privacy.android.app.R
 import mega.privacy.android.app.TourImageAdapter
 import mega.privacy.android.app.constants.IntentConstants
@@ -34,6 +34,7 @@ import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFra
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.onboarding.view.TourViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import nz.mega.sdk.MegaApiJava
@@ -57,6 +58,8 @@ class TourFragment : Fragment() {
     private val notSelectedCircle by lazy {
         ContextCompat.getDrawable(requireContext(), R.drawable.not_selection_circle_page_adapter)
     }
+
+    private val viewModel: TourViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -118,9 +121,11 @@ class TourFragment : Fragment() {
             if (requestBluetoothPermission()) {
                 joinMeetingAsGuestLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
             } else {
-                isLoggingOut = false
-                PasteMeetingLinkGuestDialogFragment().show(childFragmentManager,
-                    PasteMeetingLinkGuestDialogFragment.TAG)
+                viewModel.clearLogoutProgressFlag()
+                PasteMeetingLinkGuestDialogFragment().show(
+                    childFragmentManager,
+                    PasteMeetingLinkGuestDialogFragment.TAG
+                )
             }
         }
 
@@ -175,7 +180,8 @@ class TourFragment : Fragment() {
         val dialogBinding = DialogRecoveryKeyBinding.inflate(layoutInflater)
 
         val dialog = MaterialAlertDialogBuilder(
-            requireContext())
+            requireContext()
+        )
             .setView(dialogBinding.root)
             .setTitle(R.string.title_dialog_insert_MK)
             .setMessage(R.string.text_dialog_insert_MK)
@@ -231,7 +237,8 @@ class TourFragment : Fragment() {
             .setTitle(R.string.park_account_dialog_title)
             .setMessage(R.string.park_account_text_last_step)
             .setNegativeButton(android.R.string.cancel, null)
-            .setPositiveButton(R.string.park_account_button
+            .setPositiveButton(
+                R.string.park_account_button
             ) { _: DialogInterface?, _: Int ->
                 startChangePasswordActivity(Uri.parse(parkAccountUrl), null)
             }
@@ -280,14 +287,18 @@ class TourFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { result: Boolean ->
                 if (result) {
                     Timber.d("onActivityResult: PERMISSION GRANTED")
-                    isLoggingOut = false
-                    PasteMeetingLinkGuestDialogFragment().show(childFragmentManager,
-                        PasteMeetingLinkGuestDialogFragment.TAG)
+                    viewModel.clearLogoutProgressFlag()
+                    PasteMeetingLinkGuestDialogFragment().show(
+                        childFragmentManager,
+                        PasteMeetingLinkGuestDialogFragment.TAG
+                    )
                 } else {
                     Timber.d("onActivityResult: PERMISSION DENIED")
-                    (requireActivity() as BaseActivity).showSnackbar(Constants.PERMISSIONS_TYPE,
+                    (requireActivity() as BaseActivity).showSnackbar(
+                        Constants.PERMISSIONS_TYPE,
                         getString(R.string.meeting_bluetooth_connect_required_permissions_warning),
-                        MegaApiJava.INVALID_HANDLE)
+                        MegaApiJava.INVALID_HANDLE
+                    )
                 }
             }
     }
