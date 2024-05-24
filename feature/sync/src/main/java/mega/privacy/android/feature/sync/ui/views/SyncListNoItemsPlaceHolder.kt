@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,8 +17,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.feature.sync.R
+import mega.privacy.android.icon.pack.R as iconPackR
+import androidx.compose.foundation.layout.size
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 
 @Composable
 internal fun SyncListNoItemsPlaceHolder(
@@ -36,13 +37,14 @@ internal fun SyncListNoItemsPlaceHolder(
             painterResource(placeholderIcon),
             contentDescription = null,
             modifier = Modifier
+                .size(128.dp)
                 .testTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS)
         )
-        Text(
+        MegaText(
             text = placeholderText,
-            modifier = Modifier
-                .padding(top = 8.dp),
-            style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorSecondary),
+            textColor = TextColor.Secondary,
+            modifier = Modifier.padding(top = 8.dp),
+            style = MaterialTheme.typography.subtitle2,
         )
     }
 }
@@ -52,8 +54,8 @@ internal fun SyncListNoItemsPlaceHolder(
 private fun SyncListNoItemsPlaceholderPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SyncListNoItemsPlaceHolder(
-            "No Stalled Issues",
-            R.drawable.ic_no_stalled_issues
+            placeholderText = "No issues",
+            placeholderIcon = iconPackR.drawable.ic_check_circle_color,
         )
     }
 }

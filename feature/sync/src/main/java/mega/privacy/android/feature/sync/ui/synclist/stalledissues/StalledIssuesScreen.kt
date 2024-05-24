@@ -13,6 +13,15 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.views.StalledIssueCard
 import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
+import mega.privacy.android.icon.pack.R as iconPackR
+import androidx.compose.foundation.isSystemInDarkTheme
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.sync.domain.entity.StallIssueType
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
+import mega.privacy.android.feature.sync.ui.model.StalledIssueDetailedInfo
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun StalledIssuesScreen(
@@ -36,7 +45,7 @@ private fun StalledIssuesScreenContent(
             item {
                 SyncListNoItemsPlaceHolder(
                     placeholderText = stringResource(id = R.string.sync_stalled_issues_empty_message),
-                    placeholderIcon = R.drawable.ic_no_stalled_issues,
+                    placeholderIcon = iconPackR.drawable.ic_alert_triangle_color,
                     modifier = Modifier
                         .fillParentMaxHeight(0.8f)
                         .fillParentMaxWidth()
@@ -57,5 +66,78 @@ private fun StalledIssuesScreenContent(
                 Divider(Modifier.padding(start = 72.dp))
             }
         }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+internal fun StalledIssuesScreenEmptyStatePreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        StalledIssuesScreen(
+            stalledIssues = emptyList(),
+            issueDetailsClicked = {},
+            moreClicked = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+internal fun StalledIssuesScreenPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        val detailedInfo = StalledIssueDetailedInfo(
+            title = "Conflict title",
+            explanation = "Conflict explanation",
+        )
+        val stalledIssueResolutionAction = StalledIssueResolutionAction(
+            actionName = "Action name",
+            resolutionActionType = StalledIssueResolutionActionType.UNKNOWN,
+        )
+        StalledIssuesScreen(
+            stalledIssues = listOf(
+                StalledIssueUiItem(
+                    nodeIds = listOf(NodeId(1L)),
+                    localPaths = listOf("Folder name"),
+                    issueType = StallIssueType.FileIssue,
+                    conflictName = "Conflict name",
+                    nodeNames = listOf("Node names"),
+                    icon = iconPackR.drawable.ic_folder_medium_solid,
+                    detailedInfo = detailedInfo,
+                    actions = listOf(stalledIssueResolutionAction)
+                ),
+                StalledIssueUiItem(
+                    nodeIds = listOf(NodeId(2L)),
+                    localPaths = listOf("Folder name"),
+                    issueType = StallIssueType.UploadIssue,
+                    conflictName = "Conflict name",
+                    nodeNames = listOf("Node names"),
+                    icon = iconPackR.drawable.ic_text_medium_solid,
+                    detailedInfo = detailedInfo,
+                    actions = listOf(stalledIssueResolutionAction)
+                ),
+                StalledIssueUiItem(
+                    nodeIds = listOf(NodeId(3L)),
+                    localPaths = listOf("Folder name"),
+                    issueType = StallIssueType.UploadIssue,
+                    conflictName = "Conflict name",
+                    nodeNames = listOf("Node names"),
+                    icon = iconPackR.drawable.ic_word_medium_solid,
+                    detailedInfo = detailedInfo,
+                    actions = listOf(stalledIssueResolutionAction)
+                ),
+                StalledIssueUiItem(
+                    nodeIds = listOf(NodeId(4L)),
+                    localPaths = listOf("Folder name"),
+                    issueType = StallIssueType.UploadIssue,
+                    conflictName = "Conflict name",
+                    nodeNames = listOf("Node names"),
+                    icon = iconPackR.drawable.ic_generic_medium_solid,
+                    detailedInfo = detailedInfo,
+                    actions = listOf(stalledIssueResolutionAction)
+                ),
+            ),
+            issueDetailsClicked = {},
+            moreClicked = {},
+        )
     }
 }

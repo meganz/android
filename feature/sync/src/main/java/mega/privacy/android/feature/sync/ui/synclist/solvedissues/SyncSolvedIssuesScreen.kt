@@ -17,10 +17,10 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
 import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWithBody
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
@@ -30,8 +30,8 @@ internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
             if (solvedIssues.isEmpty()) {
                 item {
                     SyncListNoItemsPlaceHolder(
-                        placeholderText = stringResource(id = R.string.sync_solved_issues_empty_message),
-                        placeholderIcon = R.drawable.ic_no_solved_issues,
+                        placeholderText = stringResource(id = sharedResR.string.device_center_sync_solved_issues_empty_state_text),
+                        placeholderIcon = IconPackR.drawable.ic_check_circle_color,
                         modifier = Modifier
                             .fillParentMaxHeight(0.8f)
                             .fillParentMaxWidth()
@@ -55,6 +55,14 @@ internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
                 }
             }
         })
+}
+
+@CombinedThemePreviews
+@Composable
+internal fun SyncSolvedIssuesScreenEmptyStatePreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        SyncSolvedIssuesScreen(solvedIssues = emptyList())
+    }
 }
 
 @CombinedThemePreviews

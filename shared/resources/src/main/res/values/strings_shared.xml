@@ -316,6 +316,8 @@
     <string name="file_info_information_snackbar_description_added">Description added</string>
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">Description updated</string>
+    <!-- Text for the Sync solved issues list empty state -->
+    <string name="device_center_sync_solved_issues_empty_state_text">No solved issues</string>
     <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
     <string name="dialog_onboarding_feature_title_additional_features">Plus access to these great benefits:</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
