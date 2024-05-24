@@ -6,8 +6,6 @@
     <string name="sync_button_label">Sincronizar</string>
     <!-- Sync text of sync-->
     <string name="sync">Sincronizar</string>
-    <!-- Sync spannable section to show sync count with notification count-->
-    <string name="section_sync_with_notification">Sincronizações [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">O MEGA precisa acessar o armazenamento do seu dispositivo para sincronizar a sua pasta local. Toque aqui para permitir o acesso</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
@@ -42,10 +40,6 @@
     <string name="sync_menu_clear_issues">Deletar os problemas solucionados</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Sincronização bidirecional</string>
-    <!-- Sync conflict message -->
-    <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
-    <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">Há vários itens com o mesmo nome em um lado da sincronização que se tornariam todos o mesmo item no outro lado da sincronização.</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Renomear todos os itens</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -72,24 +66,18 @@
     <string name="sync_dialog_battery_optimization_negative_button">Não permitir</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">Permitir</string>
-    <!-- Sync dialog battery optimization message -->
-    <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">Não há problemas solucionados</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">Não há problemas</string>
-    <!-- Sync option to choose folder pair -->
-    <string name="sync_folders_choose_folder_pair">Nomeie a sincronização</string>
     <!-- Sync option to choose device folder -->
     <string name="sync_folder_choose_device_folder_title">Pasta no dispositivo</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">Pasta no MEGA</string>
-    <!-- Sync option for sync method -->
-    <string name="sync_folders_method">Tipo de sincronização</string>
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">Pausado</string>
     <!-- Sync state syncing -->
-    <string name="sync_list_sync_state_syncing">Sincronizando...</string>
+    <string name="sync_list_sync_state_syncing">Sincronizando&#8230;</string>
     <!-- Sync state failed -->
     <string name="sync_folders_sync_state_failed">Interrompida</string>
     <!-- Sync state synced -->
@@ -192,6 +180,4 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">Foi detectada no dispositivo local uma ação para mover ou renomear, mas não foi possível replicá-la no MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Esperando terminar de escanear para comprovar se o arquivo foi movido ou deletado.</string>
-    <!-- Sync subtitle for sync screen to choose folders-->
-    <string name="sync_choose_folders">Escolher pastas</string>
 </resources>

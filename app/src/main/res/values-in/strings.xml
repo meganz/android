@@ -121,7 +121,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Jangan tampilkan lagi</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Anda yakin ingin membatalkan proses masuk saat ini?</string>
+    <string name="confirm_cancel_login">Apakah anda yakin ingin membatalkan proses login saat ini?</string>
     <!-- Login button -->
     <string name="login_text">Masuk</string>
     <!-- email label -->
@@ -568,16 +568,6 @@
     <string name="verify_account_error_invalid_code">Salah kode. Silakan coba lagi atau kirim ulang.</string>
     <!-- verify phone number successfully -->
     <string name="verify_account_successfully">Nomor telepon anda telah diverifikasi</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string-array name="settings_storage_download_location_array">
-        <item>Penyimpanan internal</item>
-        <item>Penyimpanan luar</item>
-    </string-array>
-    <!-- choose the way the new user’s email is inserted, import from phone option -->
-    <string-array name="add_contact_array">
-        <item>Tulis email pengguna</item>
-        <item>Impor dari perangkat</item>
-    </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">Aktifkan Unggahan camera</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
@@ -588,19 +578,8 @@
     <string name="settings_secondary_upload_off">Nonaktifkan unggahan media sekunder</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Pilih folder</string>
-    <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
-    <string-array name="settings_camera_upload_how_to_entries">
-        <item>Wi-Fi atau data plan</item>
-        <item>Hanya Wi-Fi</item>
-    </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
     <string name="settings_camera_upload_what_to_upload">Unggah file</string>
-    <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string-array name="settings_camera_upload_file_upload_entries">
-        <item>Hanya foto</item>
-        <item>Hanya video</item>
-        <item>Foto dan video</item>
-    </string-array>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">Sertakan tag lokasi</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -1640,8 +1619,6 @@
     <string name="settings_chat_upload_quality">Kualitas video</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Kualitas video</string>
-    <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Unggah Kamera perlu mengakses foto dan media lain di perangkat anda. Silakan buka halaman pengaturan dan berikan izin.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Rendah</item>
@@ -3036,7 +3013,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">Ganti nama</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">Tambahkan foto</string>
+    <string name="add_photo_action">Ubah gambar profil</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Tambahkan nomor telepon</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -3099,8 +3076,6 @@
     <string name="general_camera_enable">Kamera anda nyala.</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">Kamera anda mati.</string>
-    <!-- Label for hold meeting -->
-    <string name="meeting_hold">Tahan</string>
     <!-- General label for speaker -->
     <string name="general_speaker">Suara</string>
     <!-- General label for headphone-->
@@ -4969,8 +4944,6 @@
     <string name="meetings_muted_by_a_participant_snackbar_message">Anda telah dibisukan oleh %s</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Detail langganan</string>
-    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Langganan diperpanjang secara otomatis untuk periode berlangganan berturut-turut dengan durasi yang sama dan dengan harga yang sama dengan periode awal yang dipilih. Anda dapat mematikan perpanjangan otomatis langganan MEGA &#160; Pro anda selambat-lambatnya 24 jam sebelum pembayaran langganan berikutnya jatuh tempo melalui Langganan di [A]Google Play[/A].</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Izinkan akses ke Galeri anda</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
@@ -5154,22 +5127,21 @@
     <!-- Title of call button to show more options in call screen -->
     <string name="meetings_more_call_option_button">Selebihnya</string>
     <!-- Title of raise hand button in call screen -->
-    <string name="meetings_raise_hand_option_button">Raise hand</string>
+    <string name="meetings_raise_hand_option_button">Angkat tangan</string>
     <!-- Title of lower hand button in call screen -->
-    <string name="meetings_lower_hand_option_button">Lower hand</string>
+    <string name="meetings_lower_hand_option_button">Turunkan tangan</string>
     <!-- Title of put call on hold button in call screen -->
-    <string name="meetings_put_call_on_hold_option_button">Put call on hold</string>
+    <string name="meetings_put_call_on_hold_option_button">Tahan panggilan</string>
     <!-- Title of swap calls button in call screen -->
-    <string name="meetings_swap_calls_option_button">Swap calls</string>
+    <string name="meetings_swap_calls_option_button">Tukar panggilan</string>
     <!-- Title of resume call button in call screen -->
     <string name="meetings_resume_call_option_button">Lanjutkan panggilan</string>
     <!-- Text of pop up informing about the Raise hand feature -->
-    <string name="meetings_new_feature_raise_hand_layout">New feature: Raise hand</string>
+    <string name="meetings_new_feature_raise_hand_layout">Fitur baru: Angkat tangan</string>
     <!-- The snackbar message of your hand is raised -->
-    <string name="meeting_your_hand_is_raised_message">You raised your hand</string>
+    <string name="meeting_your_hand_is_raised_message">Anda mengangkat tangan</string>
     <!-- The snackbar message of you and others raised your hands -->
     <plurals name="meeting_you_and_others_raised_your_hands_message">
-        <item quantity="one">You and %1$d other raised your hands</item>
-        <item quantity="other">You and %1$d others raised your hands</item>
+        <item quantity="other">Anda dan %1$d orang lain mengangkat tangan</item>
     </plurals>
 </resources>

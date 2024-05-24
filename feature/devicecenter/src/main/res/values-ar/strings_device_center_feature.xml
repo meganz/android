@@ -17,7 +17,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">لا يوجد تحديثات</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
-    <string name="device_center_list_view_item_status_initialising">جاري التهيئة....</string>
+    <string name="device_center_list_view_item_status_initialising">جاري التهيئة&#8230;.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently scanning -->
     <string name="device_center_list_view_item_status_scanning">جاري الفحص&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->

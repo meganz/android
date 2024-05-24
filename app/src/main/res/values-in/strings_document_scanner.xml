@@ -11,7 +11,7 @@
     <!-- Action text to retake current scan picture (Document scanner) -->
     <string name="scan_action_retake">Ambil kembali</string>
     <!-- Document scanner file name -->
-    <string name="scan_file_name">Nama file</string>
+    <string name="scan_file_name">Nama File</string>
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_file_type">Jenis file</string>
     <!-- Input field description in the document save screen (Document scanner) -->
@@ -21,7 +21,7 @@
     <!-- Document scanner high quality option -->
     <string name="scan_quality_high">Tinggi</string>
     <!-- Document scanner medium quality option -->
-    <string name="scan_quality_medium">Menengah</string>
+    <string name="scan_quality_medium">Sedang</string>
     <!-- Document scanner low quality option -->
     <string name="scan_quality_low">Rendah</string>
     <!-- Title text shown on document scanner dialog to discard scan -->

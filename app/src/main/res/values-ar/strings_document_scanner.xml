@@ -7,7 +7,7 @@
     <!-- Label of the button to add a new page to the current document scan -->
     <string name="scan_action_add">اضافة</string>
     <!-- Action of a button to save something -->
-    <string name="scan_action_save">حفظ</string>
+    <string name="scan_action_save">احفظ</string>
     <!-- Action text to retake current scan picture (Document scanner) -->
     <string name="scan_action_retake">إعادة إلتقاط</string>
     <!-- Document scanner file name -->
@@ -21,7 +21,7 @@
     <!-- Document scanner high quality option -->
     <string name="scan_quality_high">عالية</string>
     <!-- Document scanner medium quality option -->
-    <string name="scan_quality_medium">متوسطة</string>
+    <string name="scan_quality_medium">متوسط</string>
     <!-- Document scanner low quality option -->
     <string name="scan_quality_low">منخفضة</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
@@ -41,7 +41,7 @@
     <!-- Error text for incorrect name -->
     <string name="scan_incorrect_name">الاسم غير صالح</string>
     <!-- Error text for invalid characters -->
-    <string name="scan_invalid_characters">عناصر غير صالحة</string>
+    <string name="scan_invalid_characters">محارف غير صالحة</string>
     <!-- Snackbar text for incorrect name -->
     <string name="scan_snackbar_incorrect_name">قم بتصحيح اسم الملف الخاص بك قبل المتابعة</string>
     <!-- Dialog message showing file progress -->

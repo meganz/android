@@ -57,7 +57,7 @@
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Показать в Облачном диске</string>
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
+    <string name="device_center_list_view_item_sub_state_no_sync_error">Ошибка: отсутствует синхронизация</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA не может синхронизировать эту папку или сделать резервную копию, потому что файловая система на вашем устройстве не поддерживается</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -115,7 +115,7 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Не удалось прочитать расположение синхронизации. Убедитесь, что расположение папки доступно и предоставлены права доступа к нему.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="device_center_list_view_item_sub_state_unable_to_open_database">Unable to open state cache database</string>
+    <string name="device_center_list_view_item_sub_state_unable_to_open_database">Не удалось открыть базу данных кэша состояний</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Недостаточно места для скачивания.</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
@@ -123,7 +123,7 @@
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Неизвестная ошибка.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
+    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Что-то пошло не так.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Папку невозможно синхронизировать или создать её резервную копию, так как папка MEGA находится в Корзине</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->

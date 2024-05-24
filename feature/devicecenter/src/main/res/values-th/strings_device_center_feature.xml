@@ -17,7 +17,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">ล่าสุดแล้ว</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
-    <string name="device_center_list_view_item_status_initialising">กำลังเริ่มต้น...</string>
+    <string name="device_center_list_view_item_status_initialising">กำลังเริ่มต้น&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently scanning -->
     <string name="device_center_list_view_item_status_scanning">กำลังสแกน&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
@@ -27,7 +27,7 @@
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
     <string name="device_center_list_view_item_status_no_camera_uploads">ไม่มีข้อมูลอัปโหลดจากกล้อง</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
-    <string name="device_center_list_view_item_status_disabled">ปิดใช้งาน</string>
+    <string name="device_center_list_view_item_status_disabled">ปิดใช้งานแล้ว</string>
     <!-- The name of the Device or Folder Status which signifies that it is offline -->
     <string name="device_center_list_view_item_status_offline">ออฟไลน์</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
@@ -89,7 +89,7 @@
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="device_center_list_view_item_sub_state_unknown_temporary_error">มีปัญหาในการซิงค์หรือสำรองข้อมูลในโฟลเดอร์นี้ ลองใหม่อีกครั้งในภายหลัง หากยังประสบปัญหาอยู่ ติดต่อฝ่ายสนับสนุน</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
-    <string name="device_center_list_view_item_sub_state_too_many_action_packets">บัญชีของคุณถูกโหลดซ้ำ การเปลี่ยนแปลงที่หายไปจะไม่มีผลกับการสำรองข้อมูลหรือการซิงค์ของคุณ</string>
+    <string name="device_center_list_view_item_sub_state_too_many_action_packets">โหลดข้อมูลในบัญชีใหม่แล้ว แต่การอัปเดตสำรองข้อมูลหรือการซิงค์ที่พลาดไปยังไม่ได้ถูกนำไปใช้</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="device_center_list_view_item_sub_state_logged_out">การซิงค์หรือสำรองข้อมูลหยุดลง เนื่องจากคุณออกจากระบบแอปเดสก์ท็อปแล้ว เข้าสู่ระบบแอปเดสก์ท็อปอีกครั้งเพื่อดำเนินการซิงค์หรือสำรองข้อมูลต่อ</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->

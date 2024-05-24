@@ -319,7 +319,7 @@
     <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
     <string name="dialog_onboarding_feature_title_additional_features">Plus access to these great benefits:</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Android Sync \n&#8226;&#160;Ad-free</string>
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Android Sync</string>
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
 </resources>

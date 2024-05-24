@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">再也不会丢失数据</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">让您完全放心的备份和同步您的数据。另外，使用还原功能将可将文件夹恢复到任何日期，最长可达180天。</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -288,4 +288,30 @@
     <string name="general_low_tier_plan_basic_label">Basic</string>
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">Essential</string>
+    <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">上传将暂停，直到您开始为设备充电。如果您的电池电量低于20%，上传仍将保持暂停状态。</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_list_empty_state_title">未设置同步</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_list_empty_state_message">将设备上的本地文件夹与MEGA上的文件夹同步。</string>
+    <!-- Label for the button or menu option to add a new sync -->
+    <string name="device_center_sync_add_new_syn_button_option">添加新同步</string>
+    <!-- Text for the Sync solved issues chip -->
+    <string name="device_center_sync_solved_issues_chip_text">已解决的问题</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">You can’t sync folders that are currently synced folders.</string>
+    <!-- Label for the file info information screen description field -->
+    <string name="file_info_information_description_label">描述</string>
+    <!-- Placeholder for the file info information screen description field -->
+    <string name="file_info_information_description_placeholder">添加说明</string>
+    <!-- Description added snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_added">已添加描述</string>
+    <!-- Description updated snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_updated">描述已更新</string>
+    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_title_additional_features">此外还可获得以下丰厚受益：</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
 </resources>

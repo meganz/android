@@ -5,7 +5,7 @@
     <!-- Screen title for saving current scan (Document scanner) -->
     <string name="scan_title_save_scan">Scan opslaan</string>
     <!-- Label of the button to add a new page to the current document scan -->
-    <string name="scan_action_add">Toevoegen</string>
+    <string name="scan_action_add">Voeg toe</string>
     <!-- Action of a button to save something -->
     <string name="scan_action_save">Opslaan</string>
     <!-- Action text to retake current scan picture (Document scanner) -->
@@ -21,7 +21,7 @@
     <!-- Document scanner high quality option -->
     <string name="scan_quality_high">Hoog</string>
     <!-- Document scanner medium quality option -->
-    <string name="scan_quality_medium">Medium</string>
+    <string name="scan_quality_medium">Gemiddeld</string>
     <!-- Document scanner low quality option -->
     <string name="scan_quality_low">Laag</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
@@ -45,7 +45,7 @@
     <!-- Snackbar text for incorrect name -->
     <string name="scan_snackbar_incorrect_name">Corrigeer uw bestandsnaam voordat u verder gaat</string>
     <!-- Dialog message showing file progress -->
-    <string name="scan_dialog_progress">%1$sVoorbereiden. Wacht alstublieft&#8230;</string>
+    <string name="scan_dialog_progress">%1$s voorbereiden. Wacht alstublieft&#8230;</string>
     <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
-    <string name="scan_snackbar_invalid_characters">De volgende karakters zijn niet toegestaan: %1$s</string>
+    <string name="scan_snackbar_invalid_characters">De volgende tekens zijn niet toegestaan: %1$s</string>
 </resources>

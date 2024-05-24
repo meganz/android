@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- Label to show that an SDK operation has been complete successfully. -->
     <string name="api_ok">Brak błędów</string>
     <!-- Label to show that an Internal error occurs during a SDK operation. -->
@@ -34,8 +34,6 @@
     <string name="api_ekey">Błąd opisu</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Zły numer sesji</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">Brak dostępu, ponieważ narusza to nasze warunki korzystania z usługi</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Zablokowane</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->

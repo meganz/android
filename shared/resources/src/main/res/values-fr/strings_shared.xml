@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">Ne plus jamais perdre de données</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Ayez l’esprit tranquille en sauvegardant et synchronisant vos données. De plus, le Retour en arrière vous permet de rétablir n’importe quelle version antérieure de vos dossiers, jusqu’à 180&#160;jours.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Retournez en arrière pour restaurer les dossiers à une date antérieure jusqu’à 180&#160;jours. Ainsi, vos données sont protégées contre les accidents et les manipulations, inviolables.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">RPV&#160;MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -297,11 +297,37 @@
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_title">Le compte est désactivé</string>
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
-    <string name="account_pro_flexi_account_deactivated_dialog_body">Your Pro&#160;Flexi account has been deactivated due to payment failure or you’ve cancelled your subscription. You won’t be able to access the data stored in your account. \nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_pro_flexi_account_deactivated_dialog_body">Votre compte Pro&#160;Flexi a été désactivé pour défaut de paiement. Vous ne pourrez plus accéder aux données stockées dans votre compte.\nPour effectuer un paiement et réactiver votre abonnement, connectez-vous à MEGA dans un navigateur.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_starter_label">Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_basic_label">Basic</string>
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">Essential</string>
+    <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Les téléversements seront mis en pause jusqu’à ce votre appareil soit en charge. Les téléversements resteront en pause si le niveau de votre batterie est inférieur à 20&#160;%.</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_list_empty_state_title">Aucune synchronisation n’est configurée</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_list_empty_state_message">Synchronisez un dossier local sur votre appareil avec un dossier sur MEGA.</string>
+    <!-- Label for the button or menu option to add a new sync -->
+    <string name="device_center_sync_add_new_syn_button_option">Ajouter une nouvelle synchronisation</string>
+    <!-- Text for the Sync solved issues chip -->
+    <string name="device_center_sync_solved_issues_chip_text">Problèmes résolus</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">You can’t sync folders that are currently synced folders.</string>
+    <!-- Label for the file info information screen description field -->
+    <string name="file_info_information_description_label">Description</string>
+    <!-- Placeholder for the file info information screen description field -->
+    <string name="file_info_information_description_placeholder">Ajoutez une description</string>
+    <!-- Description added snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_added">Une description a été ajoutée</string>
+    <!-- Description updated snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_updated">La description a été mise à jour</string>
+    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_title_additional_features">Et l’accès à ces avantages intéressants&#160;:</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;RPV&#160;MEGA&#160;VPN\n&#8226;&#160;Réunions et appels illimités\n&#8226;&#160;Synchronisation automatiquement des dossiers de votre appareil mobile\n&#8226;&#160;Sans publicités</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;RPV&#160;MEGA&#160;VPN\n&#8226;&#160;Réunions et appels illimités\n&#8226;&#160;Synchronisation automatiquement des dossiers de votre appareil mobile</string>
 </resources>

@@ -33,7 +33,7 @@
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="general_sync_unknown_temporary_error">同步或備份此資料夾時出現問題。稍後再試。如果問題仍然存在，請聯繫客服。</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
-    <string name="general_sync_too_many_action_packets">帳戶已重新載入。您備份或同步的任何遺失的更新尚未套用。</string>
+    <string name="general_sync_too_many_action_packets">帳戶已重新載入。您的備份或同步的任何遺失的更新尚未套用。</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="general_sync_logged_out">由於您似乎已登出桌面應用程式，因此同步或備份已停止。使用桌面應用程式重新登入，然後恢復同步或備份。</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">再也不會遺失資料</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">讓您完全放心的備份和同步您的資料。此外，使用回溯功能可將資料夾恢復到任何日期，最長可達180天。</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -255,7 +255,7 @@
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
     <string name="transfers_dialog_save_download_location_always_ask_option">總是詢問下載位置</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
-    <string name="general_giga_byte_standalone">&#160;GB</string>
+    <string name="general_giga_byte_standalone">GB</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
@@ -281,11 +281,37 @@
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_title">帳戶已停用</string>
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
-    <string name="account_pro_flexi_account_deactivated_dialog_body">Your Pro&#160;Flexi account has been deactivated due to payment failure or you’ve cancelled your subscription. You won’t be able to access the data stored in your account. \nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_pro_flexi_account_deactivated_dialog_body">由於付款失敗或您已取消訂閱，您的Pro&#160;Flexi帳戶已被停用。您將無法存取儲存在您帳戶中的資料。\n若要進行付款並重新啟用您的訂閱，請透過網頁瀏覽器登入MEGA操作。</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_starter_label">Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_basic_label">Basic</string>
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">Essential</string>
+    <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">上傳將暫停，直到您開始為裝置充電。如果您的電池電量低於20%，上傳仍將保持暫停狀態。</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_list_empty_state_title">未設定同步</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_list_empty_state_message">將裝置上的本地資料夾與MEGA上的資料夾同步。</string>
+    <!-- Label for the button or menu option to add a new sync -->
+    <string name="device_center_sync_add_new_syn_button_option">加入新的同步</string>
+    <!-- Text for the Sync solved issues chip -->
+    <string name="device_center_sync_solved_issues_chip_text">已解決的問題</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">You can’t sync folders that are currently synced folders.</string>
+    <!-- Label for the file info information screen description field -->
+    <string name="file_info_information_description_label">說明</string>
+    <!-- Placeholder for the file info information screen description field -->
+    <string name="file_info_information_description_placeholder">加入說明</string>
+    <!-- Description added snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_added">已新增說明</string>
+    <!-- Description updated snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_updated">已更新說明</string>
+    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_title_additional_features">此外還可獲得這些超棒的好處：</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
 </resources>

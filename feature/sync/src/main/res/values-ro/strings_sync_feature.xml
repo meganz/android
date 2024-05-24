@@ -6,8 +6,6 @@
     <string name="sync_button_label">Sincronizează</string>
     <!-- Sync text of sync-->
     <string name="sync">Sincronizează</string>
-    <!-- Sync spannable section to show sync count with notification count-->
-    <string name="section_sync_with_notification">Sincronizări [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">MEGA trebuie să acceseze spațiul de stocare al dispozitivului dvs. pentru a sincroniza folderul local. Atingeți aici pentru a permite accesul.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
@@ -42,10 +40,6 @@
     <string name="sync_menu_clear_issues">Ștergeți problemele rezolvate</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Sincronizarea bidirecțională</string>
-    <!-- Sync conflict message -->
-    <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
-    <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">Există mai multe elemente cu același nume pe o parte a sincronizării dvs. care ar deveni toate același element unic pe cealaltă parte a sincronizării</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Redenumiți toate elementele</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -72,20 +66,14 @@
     <string name="sync_dialog_battery_optimization_negative_button">Nu permiteți</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">Permite</string>
-    <!-- Sync dialog battery optimization message -->
-    <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">Nicio problemă rezolvată</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">Nicio problemă</string>
-    <!-- Sync option to choose folder pair -->
-    <string name="sync_folders_choose_folder_pair">Denumiți sincronizarea</string>
     <!-- Sync option to choose device folder -->
     <string name="sync_folder_choose_device_folder_title">Folderul dispozitivului</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">Folder MEGA</string>
-    <!-- Sync option for sync method -->
-    <string name="sync_folders_method">Tipul de sincronizare</string>
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">Pus pe pauză</string>
     <!-- Sync state syncing -->
@@ -107,7 +95,7 @@
     <!-- Sync Remove -->
     <string name="sync_card_remove_sync">Elimină</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
-    <string name="sync_dialog_message_wifi_or_mobile_data">Wi-Fi sau plan de date</string>
+    <string name="sync_dialog_message_wifi_or_mobile_data">Wi-Fi sau date mobile</string>
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Numai Wi-Fi</string>
     <!-- Sync empty state message -->
@@ -192,6 +180,4 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">O mutare sau redenumire a fost detectată local, dar nu a putut fi replicată în MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Așteptarea finalizării scanării pentru a determina dacă fișierul a fost mutat sau șters.</string>
-    <!-- Sync subtitle for sync screen to choose folders-->
-    <string name="sync_choose_folders">Alegeți foldere</string>
 </resources>

@@ -21,7 +21,7 @@
     <!-- Document scanner high quality option -->
     <string name="scan_quality_high">Wysoka</string>
     <!-- Document scanner medium quality option -->
-    <string name="scan_quality_medium">Średnia</string>
+    <string name="scan_quality_medium">Średnie</string>
     <!-- Document scanner low quality option -->
     <string name="scan_quality_low">Niska</string>
     <!-- Title text shown on document scanner dialog to discard scan -->

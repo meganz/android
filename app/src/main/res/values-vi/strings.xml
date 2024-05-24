@@ -121,7 +121,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Đừng hiện lại nữa</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Có chắc muốn hủy bỏ quá trình đăng nhập hiện tại không?</string>
+    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
     <!-- Login button -->
     <string name="login_text">Đăng&#160;nhập</string>
     <!-- email label -->
@@ -568,16 +568,6 @@
     <string name="verify_account_error_invalid_code">Mã không đúng. Xin thử lại hoặc lấy cái mới.</string>
     <!-- verify phone number successfully -->
     <string name="verify_account_successfully">Số điện&#160;thoại của bạn đã được xác&#160;thực</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string-array name="settings_storage_download_location_array">
-        <item>Bộ nhớ nội bộ</item>
-        <item>Bộ nhớ ngoài</item>
-    </string-array>
-    <!-- choose the way the new user’s email is inserted, import from phone option -->
-    <string-array name="add_contact_array">
-        <item>Bằng địa chỉ email của người muốn mời</item>
-        <item>Chuyển từ danh bạ của điện thoại</item>
-    </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">Bật Đăng Tải Camêra</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
@@ -588,19 +578,8 @@
     <string name="settings_secondary_upload_off">Tắt đăng tải thư&#160;mục phương&#160;tiện số bổ&#160;sung</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Chọn thư mục</string>
-    <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
-    <string-array name="settings_camera_upload_how_to_entries">
-        <item>Dùng Wi-Fi hay mạng di động</item>
-        <item>Chỉ khi dùng Wi-Fi</item>
-    </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
     <string name="settings_camera_upload_what_to_upload">Tải lên tệp tin</string>
-    <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string-array name="settings_camera_upload_file_upload_entries">
-        <item>Chỉ chọn ảnh</item>
-        <item>Chỉ video</item>
-        <item>Ảnh và video</item>
-    </string-array>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">Bao&#160;gồm vị&#160;trí địa&#160;lý</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -1032,7 +1011,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]Đăng xuất[/A] để đổi sang tài khoản MEGA khác</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">Bạn co chắc muốn đăng xuất khỏi tài khoản hiện tại?</string>
+    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Tin nhắn này đã bị xóa bởi %1$s</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -1640,8 +1619,6 @@
     <string name="settings_chat_upload_quality">Chất lượng video</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Chất Lượng Video</string>
-    <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Đăng Tải Camêra cần quyền truy cập vào hình ảnh và các nội dung phương tiện số trên thiết bị. Xin đi vào phần cài đặt và cấp quyền truy cập cho MEGA.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Thấp</item>
@@ -3036,7 +3013,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">Đổi tên</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">Thêm ảnh</string>
+    <string name="add_photo_action">Đổi ảnh đại&#160;diện</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Thêm số điện thoại</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -3099,8 +3076,6 @@
     <string name="general_camera_enable">Camêra hiện đang được bật.</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">Camêra hiện đang bị tắt.</string>
-    <!-- Label for hold meeting -->
-    <string name="meeting_hold">Tạm dừng</string>
     <!-- General label for speaker -->
     <string name="general_speaker">Loa ngoài</string>
     <!-- General label for headphone-->
@@ -4969,8 +4944,6 @@
     <string name="meetings_muted_by_a_participant_snackbar_message">Bạn đã bị tắt tiếng bởi %s</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Chi&#160;tiết gói đăng&#160;ký</string>
-    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Các gói đăng&#160;ký được tự&#160;động gia&#160;hạn cho khoảng thời&#160;gian đăng&#160;ký kế tiếp có cùng thời&#160;lượng và ở cùng mức giá như khoảng thời&#160;gian ban&#160;đầu đã chọn. Bạn có thể tắt tự&#160;động gia&#160;hạn gói đăng&#160;ký MEGA&#160;Pro của mình không&#160;được ít hơn 24 giờ trước khi đến kỳ&#160;hạn thanh&#160;toán cho gói đăng&#160;ký tiếp&#160;theo thông qua trang Gói thuê&#160;bao trong  [A]Google Play[/A].</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Cho phép truy&#160;cập vào Thư&#160;viện Hình&#160;ảnh của bạn</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
@@ -4996,7 +4969,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Tải lên bị tạm dừng do không có kết&#160;nối internet</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
+    <string name="photos_camera_uploads_low_battery">Tải lên bị tạm dừng vì pin ở dưới %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Đăng tải camêra đã dừng hoạt&#160;động. Hãy thử bật lại đăng tải camêra để giải&#160;quyết. Nếu vấn&#160;đề tiếp diễn, vui lòng liên&#160;hệ với bộ&#160;phận hỗ&#160;trợ.</string>
     <!-- Camera uploads pending info in Photos screen. -->

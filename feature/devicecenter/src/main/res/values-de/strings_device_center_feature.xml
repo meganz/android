@@ -17,11 +17,11 @@
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">Vollständig synchronisiert</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
-    <string name="device_center_list_view_item_status_initialising">Initialisierung....</string>
+    <string name="device_center_list_view_item_status_initialising">Initialisierung&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently scanning -->
-    <string name="device_center_list_view_item_status_scanning">Scan läuft&#8230;</string>
+    <string name="device_center_list_view_item_status_scanning">Wird gescannt&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
-    <string name="device_center_list_view_item_status_updating">Aktualisierung erfolgt&#8230;</string>
+    <string name="device_center_list_view_item_status_updating">Wird aktualisiert&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
     <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% wird aktualisiert&#8230;</string>
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->

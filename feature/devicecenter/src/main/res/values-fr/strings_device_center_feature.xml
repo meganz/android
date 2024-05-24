@@ -23,7 +23,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
     <string name="device_center_list_view_item_status_updating">Mise à jour&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
-    <string name="device_center_list_view_item_status_updating_with_progress">%1$d&#160;%% Mise à jour&#8230;</string>
+    <string name="device_center_list_view_item_status_updating_with_progress">%1$d&#160;%% mise à jour&#8230;</string>
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
     <string name="device_center_list_view_item_status_no_camera_uploads">Aucun téléversement de l’appareil photo</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
@@ -35,7 +35,7 @@
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been stopped -->
     <string name="device_center_list_view_item_status_backup_stopped">La sauvegarde est arrêtée</string>
     <!-- The name of the Device or Folder Status which signifies that it has exceeded the maximum allowed Transfer quota -->
-    <string name="device_center_list_view_item_status_out_of_quota">Quota épuisé</string>
+    <string name="device_center_list_view_item_status_out_of_quota">Le quota est épuisé</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
     <string name="device_center_list_view_item_status_error">Erreur</string>
     <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
@@ -57,7 +57,7 @@
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Afficher dans le Disque nuagique</string>
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
+    <string name="device_center_list_view_item_sub_state_no_sync_error">Aucune erreur de synchronisation</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA ne peut ni synchroniser ni sauvegarder ce dossier, car le système de fichiers de votre appareil n’est pas pris en charge</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -93,7 +93,7 @@
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="device_center_list_view_item_sub_state_logged_out">La synchronisation ou la sauvegarde a été arrêtée, car il semble que vous vous êtes déconnecté de l’appli pour ordinateur. Reconnectez-vous dans l’appli pour ordinateur et reprenez la synchronisation ou la sauvegarde.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="device_center_list_view_item_sub_state_missing_parent_node">N/A</string>
+    <string name="device_center_list_view_item_sub_state_missing_parent_node">n.d.</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">Impossible de trouver le fichier sur le lecteur externe.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
@@ -115,7 +115,7 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Impossible de lire l’emplacement de la synchronisation. Vérifiez que l’emplacement est accessible et que les droits ont été accordés pour l’emplacement du dossier.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="device_center_list_view_item_sub_state_unable_to_open_database">Unable to open state cache database</string>
+    <string name="device_center_list_view_item_sub_state_unable_to_open_database">Impossible d’ouvrir la base de données d’état du cache</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Il n’y a pas suffisamment d’espace pour télécharger.</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
@@ -123,7 +123,7 @@
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Erreur inconnue</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
+    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Un problème est survenu</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Le dossier ne peut ni être synchronisé ni sauvegardé, car le dossier MEGA est dans la Corbeille</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->

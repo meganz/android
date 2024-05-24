@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">Non perdere mai più dati</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Effettua il backup e la sincronizzazione dei dati per la massima sicurezza. Inoltre, utilizza il Riavvolgimento per ripristinare le cartelle a qualsiasi data fino a 180 giorni.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -267,7 +267,7 @@
     <!-- Option to don't use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_only_this_time_option">Solo questa volta</string>
     <!-- Option to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_always_here_option">Always download here</string>
+    <string name="transfers_dialog_save_download_location_always_here_option">Scarica sempre qui</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
     <string name="transfers_dialog_save_download_location_always_ask_option">Chiedi sempre la posizione del download</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
@@ -275,11 +275,11 @@
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">Starting from %1$s&#160;%2$s, find the perfect fit for your storage needs.</string>
+    <string name="dialog_onboarding_feature_storage_description">A partire da %1$s&#160;%2$s, trova la soluzione perfetta per le tue esigenze di archiviazione.</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">Spazio di archiviazione insufficiente</string>
     <!-- Body text of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_body">The size of this folder will take your MEGA account over its storage limit. To be able to sync it, you will need to either free up some space or upgrade your MEGA account.</string>
+    <string name="sync_error_dialog_insufficient_storage_body">Le dimensioni di questa cartella porteranno il tuo account MEGA a superare il limite di spazio di archiviazione. Per poterla sincronizzare, dovrai liberare dello spazio o effettuare l\’upgrade del tuo account MEGA.</string>
     <!-- Confirm button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_confirm_button">Vedi i piani</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
@@ -287,21 +287,47 @@
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
     <string name="account_confirm_email_misspelled_email_description">Se hai scritto male il tuo indirizzo e-mail, correggilo e poi tocca su [A]Reinvia[/A].</string>
     <!-- Title of the insufficient storage error banner -->
-    <string name="sync_error_storage_over_quota_banner_title">Syncing paused, your MEGA plan has run out of storage</string>
+    <string name="sync_error_storage_over_quota_banner_title">Sincronizzazione in pausa, hai terminato lo spazio di archiviazione disponibile per il tuo piano MEGA</string>
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">Effettua l’upgrade</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Upload paused, phone is not charging</string>
+    <string name="camera_uploads_phone_not_charging_message">Caricamento in pausa, il dispositivo non è in carica</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
-    <string name="device_center_list_view_item_status_nothing_setup">No syncs set up</string>
+    <string name="device_center_list_view_item_status_nothing_setup">Nessuna sincronizzazione configurata</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_title">Account disattivato</string>
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
-    <string name="account_pro_flexi_account_deactivated_dialog_body">Your Pro&#160;Flexi account has been deactivated due to payment failure or you’ve cancelled your subscription. You won’t be able to access the data stored in your account. \nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_pro_flexi_account_deactivated_dialog_body">Il tuo account Pro&#160;Flexi è stato disattivato a causa di un mancato pagamento oppure perché hai disattivato il tuo abbonamento. Non potrai accedere ai dati archiviati nel tuo account.\nPer effettuare un pagamento e riattivare l\’abbonamento, accedi a MEGA tramite un browser.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_starter_label">Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_basic_label">Basic</string>
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">Essential</string>
+    <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">I caricamenti verranno sospesi fino a quando non inizierai a caricare il dispositivo. I caricamenti rimarranno comunque in pausa se la batteria è inferiore al 20%.</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_list_empty_state_title">Nessuna sincronizzazione configurata</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_list_empty_state_message">Sincronizza una cartella locale sul tuo dispositivo con una cartella su MEGA.</string>
+    <!-- Label for the button or menu option to add a new sync -->
+    <string name="device_center_sync_add_new_syn_button_option">Aggiungi una nuova sincronizzazione</string>
+    <!-- Text for the Sync solved issues chip -->
+    <string name="device_center_sync_solved_issues_chip_text">Problemi risolti</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">You can’t sync folders that are currently synced folders.</string>
+    <!-- Label for the file info information screen description field -->
+    <string name="file_info_information_description_label">Descrizione</string>
+    <!-- Placeholder for the file info information screen description field -->
+    <string name="file_info_information_description_placeholder">Aggiungi descrizione</string>
+    <!-- Description added snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_added">Description added</string>
+    <!-- Description updated snack bar for the file info information screen-->
+    <string name="file_info_information_snackbar_description_updated">Description updated</string>
+    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_title_additional_features">Plus access to these great benefits:</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
+    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
 </resources>

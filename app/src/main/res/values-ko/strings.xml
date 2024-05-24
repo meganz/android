@@ -43,7 +43,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">불러오는 중</string>
     <!-- state while importing the file -->
-    <string name="general_importing">추가 중...</string>
+    <string name="general_importing">추가 중&#8230;</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">전달중</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
@@ -121,7 +121,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">다시 보여주지 마세요</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">현재 로그인 과정을 취소 하시겠습니까?</string>
+    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
     <!-- Login button -->
     <string name="login_text">로그인</string>
     <!-- email label -->
@@ -568,16 +568,6 @@
     <string name="verify_account_error_invalid_code">잘못된 코드. 다시 시도하거나 재발송하세요.</string>
     <!-- verify phone number successfully -->
     <string name="verify_account_successfully">당신의 휴대 전화 번호는 인증되었습니다.</string>
-    <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
-    <string-array name="settings_storage_download_location_array">
-        <item>내부 저장소</item>
-        <item>외부 저장소</item>
-    </string-array>
-    <!-- choose the way the new user’s email is inserted, import from phone option -->
-    <string-array name="add_contact_array">
-        <item>Write the user’s email</item>
-        <item>장치에서 들여오기</item>
-    </string-array>
     <!-- settings option -->
     <string name="settings_camera_upload_on">카메라 업로드 활성화</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
@@ -588,19 +578,8 @@
     <string name="settings_secondary_upload_off">보조 미디어 업로드 비활성화</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">폴더 선택</string>
-    <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
-    <string-array name="settings_camera_upload_how_to_entries">
-        <item>와이파이 또는 모바일 데이터</item>
-        <item>와이파이 전용</item>
-    </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
     <string name="settings_camera_upload_what_to_upload">파일 올리기</string>
-    <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string-array name="settings_camera_upload_file_upload_entries">
-        <item>사진만</item>
-        <item>동영상만</item>
-        <item>사진과 동영상</item>
-    </string-array>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">위치 태그 포함</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -1032,7 +1011,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">MEGA 계정을 전환하려면 [A]로그아웃[/A]하세요</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">현재 계정에서 로그아웃 하시겠습니까?</string>
+    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">이 메시지는 %1$s님에 의해 삭제되었습니다</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -1640,8 +1619,6 @@
     <string name="settings_chat_upload_quality">동영상 품질</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">동영상 품질</string>
-    <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">카메라 업로드는 당신의 기기의 사진과 다른 미디어에 대한 접근을 필요로 합니다. 설정 페이지에 가서 권한을 부여해주세요.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>낮음</item>
@@ -3036,7 +3013,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">이름 변경</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">사진 추가</string>
+    <string name="add_photo_action">Change profile image</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">전화번호 추가</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -3099,8 +3076,6 @@
     <string name="general_camera_enable">카메라 켜짐.</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">카메라 꺼짐.</string>
-    <!-- Label for hold meeting -->
-    <string name="meeting_hold">보류</string>
     <!-- General label for speaker -->
     <string name="general_speaker">스피커</string>
     <!-- General label for headphone-->
@@ -3396,7 +3371,7 @@
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
     <string name="warning_scanning_transfers">애플리케이션을 닫지 마세요.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
-    <string name="scanning_transfers">스캔 중...</string>
+    <string name="scanning_transfers">스캔 중&#8230;</string>
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">전송 취소</string>
     <!-- Warning informing what will happen if proceed on cancelling transfers. -->
@@ -4256,7 +4231,7 @@
     <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
     <string name="media_player_video_enable_subtitle_dialog_option_off">끔</string>
     <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
-    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">자막 추가...</string>
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">자막 추가&#8230;</string>
     <!-- Slideshow settings page title -->
     <string name="slideshow_settings_page_title">슬라이드쇼 옵션</string>
     <!-- Slideshow speed preference -->
@@ -4544,7 +4519,7 @@
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">클라우드 드라이브에 저장</string>
     <!-- Album import saving -->
-    <string name="album_import_saving">저장 중...</string>
+    <string name="album_import_saving">저장 중&#8230;</string>
     <!-- Album import success message -->
     <string name="album_import_success_message">“%1$s”을/를 클라우드 드라이브에 저장했습니다</string>
     <!-- Album import error message -->
@@ -4969,8 +4944,6 @@
     <string name="meetings_muted_by_a_participant_snackbar_message">%s 님에 의해 음소거 되었습니다</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">구독 세부정보</string>
-    <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">구독은 처음 선택한 기간과 같은 기간 그리고 같은 가격으로 연속적으로 자동 갱신 됩니다. MEGA&#160;Pro 구독 자동 갱신을 [A]Google Play[/A]의 구독을 통해 다음 구독의 결제 24시간 전에 취소할 수 있습니다.</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">갤러리에 접근 허용</string>
     <!-- Button text to grant permission in the chat bottom sheet -->

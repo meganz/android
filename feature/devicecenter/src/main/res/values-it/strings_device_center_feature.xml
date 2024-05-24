@@ -27,7 +27,7 @@
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
     <string name="device_center_list_view_item_status_no_camera_uploads">Nessun caricamento da fotocamera</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
-    <string name="device_center_list_view_item_status_disabled">Disattivato</string>
+    <string name="device_center_list_view_item_status_disabled">Disattivata</string>
     <!-- The name of the Device or Folder Status which signifies that it is offline -->
     <string name="device_center_list_view_item_status_offline">Offline</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
@@ -35,7 +35,7 @@
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been stopped -->
     <string name="device_center_list_view_item_status_backup_stopped">Backup fermato</string>
     <!-- The name of the Device or Folder Status which signifies that it has exceeded the maximum allowed Transfer quota -->
-    <string name="device_center_list_view_item_status_out_of_quota">Oltre il limite</string>
+    <string name="device_center_list_view_item_status_out_of_quota">Banda di trasferimento esaurita</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
     <string name="device_center_list_view_item_status_error">Errore</string>
     <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
@@ -57,7 +57,7 @@
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Mostra nel Cloud drive</string>
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
+    <string name="device_center_list_view_item_sub_state_no_sync_error">Nessun errore di sincronizzazione</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA non può sincronizzare o effettuare il backup di questa cartella perché il filesystem sul tuo dispositivo non è supportato</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -123,7 +123,7 @@
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Errore sconosciuto.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
+    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Qualcosa è andato storto.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">La cartella non può essere sincronizzata o effettuare il backup in quanto la cartella corrispettiva su MEGA è nel Cestino</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->

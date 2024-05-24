@@ -27,7 +27,7 @@
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
     <string name="device_center_list_view_item_status_no_camera_uploads">Không có đăng tải camêra</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
-    <string name="device_center_list_view_item_status_disabled">Đã vô hiệu</string>
+    <string name="device_center_list_view_item_status_disabled">Tắt</string>
     <!-- The name of the Device or Folder Status which signifies that it is offline -->
     <string name="device_center_list_view_item_status_offline">Ngoại tuyến</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
@@ -57,7 +57,7 @@
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Hiện vị trí trong Ổ&#160;Mây</string>
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
+    <string name="device_center_list_view_item_sub_state_no_sync_error">Không có lỗi đồng&#160;bộ</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA không&#160;thể đồng&#160;bộ hoặc sao&#160;lưu thư&#160;mục này bởi vì hệ&#160;thống tệp trên thiết&#160;bị của bạn không&#160;được hỗ&#160;trợ</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -93,7 +93,7 @@
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
     <string name="device_center_list_view_item_sub_state_logged_out">Đồng&#160;bộ hóa hoặc sao&#160;lưu đã bị dừng do có vẻ như bạn đã đăng&#160;xuất khỏi app cho máy&#160;tính. Đăng&#160;nhập vào lại app cho máy&#160;tính để tiếp&#160;tục đồng&#160;bộ hóa hoặc sao&#160;lưu.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
-    <string name="device_center_list_view_item_sub_state_missing_parent_node">N/A</string>
+    <string name="device_center_list_view_item_sub_state_missing_parent_node">Không thấy</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">Không tìm thấy vị&#160;trí của thư&#160;mục trong ổ&#160;đĩa ngoài.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
@@ -115,7 +115,7 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Không thể đọc được vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="device_center_list_view_item_sub_state_unable_to_open_database">Unable to open state cache database</string>
+    <string name="device_center_list_view_item_sub_state_unable_to_open_database">Không thể mở cơ&#160;sở dữ&#160;liệu bộ đệm trạng&#160;thái</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Không đủ dung&#160;lượng cho việc tải&#160;xuống.</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
@@ -123,7 +123,7 @@
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Lỗi không xác&#160;định được.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
+    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Đã có vấn&#160;đề xảy ra.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Thư&#160;mục không thể đồng&#160;bộ hoặc sao&#160;lưu được bởi vì thư&#160;mục tương&#160;ứng trên MEGA đang nằm trong Thùng&#160;Rác</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->

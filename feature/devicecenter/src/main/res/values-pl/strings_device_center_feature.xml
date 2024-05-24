@@ -17,13 +17,13 @@
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">Aktualne</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
-    <string name="device_center_list_view_item_status_initialising">Uruchamianie...</string>
+    <string name="device_center_list_view_item_status_initialising">Uruchamianie&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently scanning -->
     <string name="device_center_list_view_item_status_scanning">Skanowanie&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
     <string name="device_center_list_view_item_status_updating">Aktualizowanie&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
-    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% Aktualizowanie...</string>
+    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% aktualizowanie&#8230;</string>
     <!-- The name of the Device Status which signifies that Camera Uploads is disabled for the User's Current Device -->
     <string name="device_center_list_view_item_status_no_camera_uploads">Brak przesłanych plików z kamery</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
@@ -57,7 +57,7 @@
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Pokaż na Dysku w chmurze</string>
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
+    <string name="device_center_list_view_item_sub_state_no_sync_error">Brak błędu synchronizacji</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA nie może zsynchronizować ani wykonać kopii zapasowej tego katalogu, ponieważ system plików na urządzeniu nie jest obsługiwany</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -109,13 +109,13 @@
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="device_center_list_view_item_sub_state_invalid_scan_interval">Nieprawidłowy interwał skanowania. Sprawdź ustawienia interwału skanowania i spróbuj ponownie.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">Nie można nawiązać komunikacji z lokalizacją katalogu. Sprawdź, czy lokalizacja jest dostępna i czy przyznano uprawnienia do lokalizacji katalogu....</string>
+    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">Nie można nawiązać komunikacji z lokalizacją katalogu. Sprawdź, czy lokalizacja jest dostępna i czy przyznano uprawnienia do lokalizacji katalogu&#8230;.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
     <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Nie można dodać obserwacji systemu plików. Upewnij się, że jest wystarczająco dużo wolnego miejsca i pamięci oraz że masz uprawnienia do lokalizacji katalogu.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Nie można odczytać lokalizacji synchronizacji. Sprawdź, czy lokalizacja jest dostępna i czy przyznano uprawnienia do lokalizacji katalogu.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
-    <string name="device_center_list_view_item_sub_state_unable_to_open_database">Unable to open state cache database</string>
+    <string name="device_center_list_view_item_sub_state_unable_to_open_database">Nie można otworzyć bazy danych pamięci podręcznej</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Niewystarczająca ilość miejsca do pobrania.</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
@@ -123,7 +123,7 @@
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Nieznany błąd.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
+    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Coś poszło nie tak.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Nie można synchronizować ani utworzyć kopii zapasowej katalogu, ponieważ katalog MEGA znajduje się w koszu</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->

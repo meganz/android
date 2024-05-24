@@ -6,8 +6,6 @@
     <string name="sync_button_label">同期</string>
     <!-- Sync text of sync-->
     <string name="sync">同期</string>
-    <!-- Sync spannable section to show sync count with notification count-->
-    <string name="section_sync_with_notification">同期 [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">ローカルフォルダを同期するには、MEGAはお使いのデバイスのストレージにアクセスする必要があります。こちらをタップしてアクセスを許可してください。</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
@@ -34,10 +32,6 @@
     <string name="sync_menu_clear_issues">解決済みの問題をクリア</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">双方向同期</string>
-    <!-- Sync conflict message -->
-    <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
-    <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">同期の一方の側に同じ名前の複数の項目がありますが、同期のもう一方の側ではすべて同じ1つの項目になります。</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">すべての項目の名前を変更する</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -64,20 +58,14 @@
     <string name="sync_dialog_battery_optimization_negative_button">許可しない</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">許可</string>
-    <!-- Sync dialog battery optimization message -->
-    <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">解決済みの問題はありません</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">問題はありません</string>
-    <!-- Sync option to choose folder pair -->
-    <string name="sync_folders_choose_folder_pair">同期に名前を付ける</string>
     <!-- Sync option to choose device folder -->
     <string name="sync_folder_choose_device_folder_title">デバイスフォルダ</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">MEGAフォルダ</string>
-    <!-- Sync option for sync method -->
-    <string name="sync_folders_method">同期タイプ</string>
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">一時停止中</string>
     <!-- Sync state syncing -->
@@ -184,6 +172,4 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">移動または名前変更アクションがローカルで検出されましたが、MEGAで複製できませんでした。</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">ファイルが移動または削除されたかどうかを判断するために、スキャンが完了するのを待っています。</string>
-    <!-- Sync subtitle for sync screen to choose folders-->
-    <string name="sync_choose_folders">フォルダを選択</string>
 </resources>

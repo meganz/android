@@ -6,8 +6,6 @@
     <string name="sync_button_label">مزامنة</string>
     <!-- Sync text of sync-->
     <string name="sync">مزامنة</string>
-    <!-- Sync spannable section to show sync count with notification count-->
-    <string name="section_sync_with_notification">مزامنة [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">MEGA needs to access your device storage in order to sync your local folder. Tap here to allow access.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
@@ -54,10 +52,6 @@
     <string name="sync_menu_clear_issues">مسح المشكلات التي تم حلها</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">المزامنة ثنائية الاتجاه</string>
-    <!-- Sync conflict message -->
-    <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
-    <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">هناك العديد من العناصر التي تحمل الاسم نفسه على جانب واحد من المزامنة الخاصة بك والتي ستصبح جميعها نفس العنصر الفردي على الجانب الآخر من المزامنة الخاصة بك</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">إعادة تسمية جميع العناصر</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -84,20 +78,14 @@
     <string name="sync_dialog_battery_optimization_negative_button">لا تسمح</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">سماح</string>
-    <!-- Sync dialog battery optimization message -->
-    <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">لا توجد مشكلات تم حلها</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">لا توجد مشاكل</string>
-    <!-- Sync option to choose folder pair -->
-    <string name="sync_folders_choose_folder_pair">قم بتسمية المزامنة</string>
     <!-- Sync option to choose device folder -->
     <string name="sync_folder_choose_device_folder_title">مجلد الأجهزة</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">مجلد ميغا MEGA</string>
-    <!-- Sync option for sync method -->
-    <string name="sync_folders_method">نوع المزامنة</string>
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">متوقف مؤقتاً</string>
     <!-- Sync state syncing -->
@@ -204,6 +192,4 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename action was detected locally, but couldn’t be replicated in MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">في انتظار انتهاء الفحص لتحديد ما إذا كان الملف قد تم نقله أو حذفه.</string>
-    <!-- Sync subtitle for sync screen to choose folders-->
-    <string name="sync_choose_folders">اختر المجلدات</string>
 </resources>

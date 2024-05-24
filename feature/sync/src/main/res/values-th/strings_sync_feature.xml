@@ -6,8 +6,6 @@
     <string name="sync_button_label">ซิงค์</string>
     <!-- Sync text of sync-->
     <string name="sync">ซิงค์</string>
-    <!-- Sync spannable section to show sync count with notification count-->
-    <string name="section_sync_with_notification">ซิงค์ [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">MEGA ต้องการเข้าถึงพื้นที่เก็บข้อมูลในอุปกรณ์เพื่อซิงค์โฟลเดอร์ในเครื่องของคุณ แตะที่นี่เพื่ออนุญาตให้เข้าถึง</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
@@ -34,10 +32,6 @@
     <string name="sync_menu_clear_issues">ล้างรายการที่แก้ไขปัญหาเสร็จแล้ว</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">ซิงค์แบบสองทาง</string>
-    <!-- Sync conflict message -->
-    <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
-    <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">พบหลายรายการที่มีชื่อซ้ำกันหลายชื่อ แต่จะมีการรวมชื่อที่ซ้ำกันให้เป็นชื่อเดียว</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">เปลี่ยนชื่อรายการทั้งหมด</string>
     <!-- Sync to resolve conflict Merge folders -->
@@ -64,20 +58,14 @@
     <string name="sync_dialog_battery_optimization_negative_button">ไม่อนุญาต</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">อนุญาต</string>
-    <!-- Sync dialog battery optimization message -->
-    <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
     <string name="sync_solved_issues_empty_message">ปัญหาทั้งหมดได้รับการแก้ไขแล้ว</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">ยังไม่พบปัญหาใด ๆ</string>
-    <!-- Sync option to choose folder pair -->
-    <string name="sync_folders_choose_folder_pair">ชื่อการซิงค์</string>
     <!-- Sync option to choose device folder -->
     <string name="sync_folder_choose_device_folder_title">โฟลเดอร์อุปกรณ์</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">โฟลเดอร์ MEGA</string>
-    <!-- Sync option for sync method -->
-    <string name="sync_folders_method">ประเภทการซิงค์</string>
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">พักแล้ว</string>
     <!-- Sync state syncing -->
@@ -184,6 +172,4 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">ตรวจพบการย้ายหรือเปลี่ยนชื่อไฟล์ในอุปกรณ์ แต่ไม่สามารถอัปเดตรายการใน MEGA ให้ตรงกันได้</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">กำลังรอการสแกนเพื่อดูว่าไฟล์ถูกย้ายหรือลบไปหรือไม่</string>
-    <!-- Sync subtitle for sync screen to choose folders-->
-    <string name="sync_choose_folders">เลือกโฟลเดอร์</string>
 </resources>
