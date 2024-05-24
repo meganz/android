@@ -16,6 +16,7 @@ import mega.privacy.android.app.mediaplayer.queue.model.VideoQueueUiState
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -93,4 +94,113 @@ class VideoQueueViewModel @Inject constructor(
     internal suspend fun isParticipatingInChatCall() = isParticipatingInChatCallUseCase()
 
     internal fun seekTo(index: Int) = mediaPlayerGateway.playerSeekTo(index)
+
+    internal fun updateActionMode(actionMode: Boolean) =
+        _uiState.update { it.copy(isActionMode = actionMode) }
+
+    internal fun searchWidgetStateUpdate() {
+        val searchState = when (_uiState.value.searchState) {
+            SearchWidgetState.EXPANDED -> SearchWidgetState.COLLAPSED
+
+            SearchWidgetState.COLLAPSED -> SearchWidgetState.EXPANDED
+        }
+        _uiState.update { it.copy(searchState = searchState) }
+    }
+
+    internal fun closeSearch() {
+        searchQuery = ""
+        _uiState.update {
+            it.copy(
+                query = null,
+                searchState = SearchWidgetState.COLLAPSED
+            )
+        }
+        searchItemByQueryString()
+    }
+
+    internal fun searchQuery(queryString: String) {
+        searchQuery = queryString
+        _uiState.update {
+            it.copy(
+                query = queryString
+            )
+        }
+        searchItemByQueryString()
+    }
+
+    private fun searchItemByQueryString() {
+        val items = originalData.filter { item ->
+            item.nodeName.contains(searchQuery, true)
+        }
+        _uiState.update {
+            it.copy(
+                items = items
+            )
+        }
+    }
+
+    internal fun updateItemInSelectionState(index: Int, item: MediaQueueItemUiEntity) {
+        val isSelected = !item.isSelected
+        val selectedHandles = _uiState.value.selectedItemHandles.updateSelectedHandles(
+            id = item.id.longValue,
+            isSelected = isSelected
+        )
+        val updateItems =
+            _uiState.value.items.updateItemSelectedState(index, isSelected).updateOriginalData()
+        _uiState.update {
+            it.copy(
+                items = updateItems,
+                selectedItemHandles = selectedHandles
+            )
+        }
+    }
+
+    private fun List<Long>.updateSelectedHandles(
+        id: Long,
+        isSelected: Boolean,
+    ) = toMutableList().also { handles ->
+        if (isSelected) {
+            handles.add(id)
+        } else {
+            handles.remove(id)
+        }
+    }
+
+    private fun List<MediaQueueItemUiEntity>.updateItemSelectedState(
+        index: Int,
+        isSelected: Boolean,
+    ) =
+        if (index in indices) {
+            toMutableList().also { list ->
+                list[index] = list[index].copy(isSelected = isSelected)
+            }
+        } else this
+
+    internal fun clearAllSelected() {
+        val updateItems = clearSelected().updateOriginalData().filterItemBySearchQuery()
+        _uiState.update {
+            it.copy(
+                items = updateItems,
+                selectedItemHandles = emptyList()
+            )
+        }
+    }
+
+    private fun clearSelected() = _uiState.value.items.map {
+        it.copy(isSelected = false)
+    }
+
+    internal fun removeSelectedItems() {
+        val updatedItems = _uiState.value.items.filterNot { item ->
+            _uiState.value.selectedItemHandles.any { it == item.id.longValue }
+        }.updateOriginalData()
+        val playingIndex = updatedItems.indexOfFirst { it.type == MediaQueueItemType.Playing }
+        _uiState.update {
+            it.copy(
+                items = updatedItems,
+                selectedItemHandles = emptyList(),
+                indexOfCurrentPlayingItem = playingIndex
+            )
+        }
+    }
 }

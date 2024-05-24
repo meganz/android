@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.queue.view
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,7 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel
+import mega.privacy.android.app.mediaplayer.queue.model.VideoPlayerMenuAction
 import mega.privacy.android.app.mediaplayer.queue.video.VideoQueueViewModel
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 
 @Composable
 internal fun VideoQueueView(
@@ -25,14 +29,18 @@ internal fun VideoQueueView(
     onDragFinished: () -> Unit,
     onMove: (Int, Int) -> Unit,
     onToolbarColorUpdated: (Boolean) -> Unit,
+    onClickedFinished: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val playlistTitle = videoPlayerViewModel.playlistTitleState.collectAsStateWithLifecycle().value
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     LaunchedEffect(uiState.indexOfCurrentPlayingItem) {
-        lazyListState.scrollToItem(uiState.indexOfCurrentPlayingItem)
+        if (uiState.indexOfCurrentPlayingItem != -1) {
+            lazyListState.animateScrollToItem(uiState.indexOfCurrentPlayingItem)
+        }
     }
 
     val isInFirstItem by remember {
@@ -45,31 +53,96 @@ internal fun VideoQueueView(
         onToolbarColorUpdated(isInFirstItem)
     }
 
-    Column(modifier = Modifier.padding(top = 80.dp)) {
-        MediaQueueView(
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f),
-            indexOfDisabledItem = uiState.indexOfCurrentPlayingItem,
-            items = uiState.items,
-            currentPlayingPosition = uiState.currentPlayingPosition,
-            isAudio = false,
-            isPaused = true,
-            isSearchMode = uiState.isSearchMode,
-            lazyListState = lazyListState,
-            onClick = { _, item ->
-                coroutineScope.launch {
-                    if (!viewModel.isParticipatingInChatCall()) {
-                        videoPlayerViewModel.getIndexFromPlaylistItems(item.id.longValue)
-                            ?.let { index ->
-                                viewModel.seekTo(index)
-                                onBackPressedDispatcher?.onBackPressed()
+    val isBackHandlerEnabled =
+        uiState.isActionMode || uiState.searchState == SearchWidgetState.EXPANDED
+
+    BackHandler(isBackHandlerEnabled) {
+        when {
+            uiState.isActionMode -> {
+                viewModel.updateActionMode(false)
+                viewModel.clearAllSelected()
+            }
+
+            uiState.searchState == SearchWidgetState.EXPANDED ->
+                viewModel.closeSearch()
+        }
+    }
+
+    MegaScaffold(
+        modifier = Modifier.padding(top = 24.dp),
+        topBar = {
+            VideoQueueTopBar(
+                title = playlistTitle ?: "",
+                isActionMode = uiState.isActionMode,
+                selectedSize = uiState.selectedItemHandles.size,
+                searchState = uiState.searchState,
+                query = uiState.query,
+                onMenuActionClick = { action ->
+                    action?.let {
+                        when (it) {
+                            is VideoPlayerMenuAction.VideoQueueSelectAction -> {
+                                viewModel.updateActionMode(true)
                             }
+
+                            is VideoPlayerMenuAction.VideoQueueRemoveAction -> {
+                                viewModel.removeSelectedItems()
+                                videoPlayerViewModel.removeAllSelectedItems()
+                                viewModel.updateActionMode(false)
+                            }
+                        }
+                    }
+                },
+                onSearchTextChange = viewModel::searchQuery,
+                onCloseClicked = viewModel::closeSearch,
+                onSearchClicked = viewModel::searchWidgetStateUpdate,
+                onBackPressed = {
+                    when {
+                        uiState.isActionMode -> {
+                            viewModel.updateActionMode(false)
+                            viewModel.clearAllSelected()
+                        }
+
+                        uiState.searchState == SearchWidgetState.EXPANDED ->
+                            viewModel.closeSearch()
+
+                        else ->
+                            onBackPressedDispatcher?.onBackPressed()
                     }
                 }
-            },
-            onDragFinished = onDragFinished,
-            onMove = onMove
-        )
+            )
+        }
+    ) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            MediaQueueView(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
+                indexOfDisabledItem = uiState.indexOfCurrentPlayingItem,
+                items = uiState.items,
+                currentPlayingPosition = uiState.currentPlayingPosition,
+                isAudio = false,
+                isPaused = true,
+                isSearchMode = uiState.searchState == SearchWidgetState.EXPANDED,
+                lazyListState = lazyListState,
+                onClick = { index, item ->
+                    coroutineScope.launch {
+                        if (uiState.isActionMode) {
+                            viewModel.updateItemInSelectionState(index, item)
+                            videoPlayerViewModel.itemSelected(item.id.longValue)
+                            return@launch
+                        }
+                        if (!viewModel.isParticipatingInChatCall()) {
+                            videoPlayerViewModel.getIndexFromPlaylistItems(item.id.longValue)
+                                ?.let { index ->
+                                    viewModel.seekTo(index)
+                                    onClickedFinished()
+                                }
+                        }
+                    }
+                },
+                onDragFinished = onDragFinished,
+                onMove = onMove
+            )
+        }
     }
 }

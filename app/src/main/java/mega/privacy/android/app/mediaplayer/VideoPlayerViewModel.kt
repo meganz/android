@@ -248,8 +248,8 @@ class VideoPlayerViewModel @Inject constructor(
         MutableStateFlow(MediaPlaySources(emptyList(), INVALID_VALUE, null))
     internal val playerSourcesState: StateFlow<MediaPlaySources> = _playerSourcesState
 
-    private val _mediaItemToRemoveState = MutableStateFlow<Int?>(null)
-    internal val mediaItemToRemoveState: StateFlow<Int?> = _mediaItemToRemoveState
+    private val _mediaItemToRemoveState = MutableStateFlow<Pair<Int, Long>>(Pair(-1, -1))
+    internal val mediaItemToRemoveState: StateFlow<Pair<Int, Long>> = _mediaItemToRemoveState
 
     private val _playlistItemsState =
         MutableStateFlow<Pair<List<PlaylistItem>, Int>>(Pair(emptyList(), 0))
@@ -1525,7 +1525,7 @@ class VideoPlayerViewModel @Inject constructor(
             }.takeIf { index ->
                 index in playlistItems.indices
             }?.let { index ->
-                _mediaItemToRemoveState.update { index }
+                _mediaItemToRemoveState.update { Pair(index, handle) }
                 newItems.removeIf { (nodeHandle) ->
                     nodeHandle == handle
                 }
@@ -1544,6 +1544,7 @@ class VideoPlayerViewModel @Inject constructor(
      */
     internal fun removeAllSelectedItems() {
         if (itemsSelectedMap.isNotEmpty()) {
+            initPlayerSourceChanged()
             itemsSelectedMap.forEach {
                 removeSingleItem(it.value.nodeHandle).let { newItems ->
                     _playlistItemsState.update { flow ->
@@ -1551,6 +1552,7 @@ class VideoPlayerViewModel @Inject constructor(
                     }
                 }
             }
+            updatePlaySource()
             itemsSelectedMap.clear()
             _itemsSelectedCountState.update { itemsSelectedMap.size }
             _actionModeState.update { false }

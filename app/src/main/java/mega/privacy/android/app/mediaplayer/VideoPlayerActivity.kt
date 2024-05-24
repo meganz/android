@@ -743,9 +743,9 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 }
             }
 
-            collectFlow(mediaItemToRemoveState) { index ->
-                index?.let {
-                    mediaPlayerGateway.mediaItemRemoved(it)?.let { handle ->
+            collectFlow(mediaItemToRemoveState) { (index, _) ->
+                if (index != -1) {
+                    mediaPlayerGateway.mediaItemRemoved(index)?.let { handle ->
                         val nodeName = getPlaylistItem(handle)?.nodeName ?: ""
                         videoViewModel.updateMetadataState(Metadata(null, null, null, nodeName))
                     }
@@ -1367,6 +1367,10 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     override fun showToolbar(animate: Boolean) {
         toolbarDisplayedAnimation(animate, TRANSLATION_Y_ZERO)
         showSystemUI()
+    }
+
+    internal fun hideToolbar() {
+        toolbarDisplayedAnimation(false, -binding.toolbar.measuredHeight.toFloat())
     }
 
     private fun toolbarDisplayedAnimation(animate: Boolean, translationY: Float) {
