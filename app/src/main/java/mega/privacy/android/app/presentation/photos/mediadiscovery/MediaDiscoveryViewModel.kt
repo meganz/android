@@ -441,12 +441,13 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     suspend fun getSelectedNodes() = getNodesByIds(_state.value.selectedPhotoIds.toList())
 
-    private suspend fun getNodesByIds(ids: List<Long>) =
+    private suspend fun getNodesByIds(ids: List<Long>) = runCatching {
         if (fromFolderLink == true) {
             getPublicNodeListByIds(ids)
         } else {
             getNodeListByIds(ids)
         }
+    }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
 
 
     fun setCurrentSort(sort: Sort) {

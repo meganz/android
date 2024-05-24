@@ -555,8 +555,10 @@ class TimelineViewModel @Inject constructor(
      *
      * @return a list of Nodes
      */
-    suspend fun getSelectedNodes(): List<MegaNode> =
+    suspend fun getSelectedNodes(): List<MegaNode> = runCatching {
         getNodeListByIds(selectedPhotosIds.toList())
+    }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
+
 
     /**
      * Establishes the initial Camera Uploads preferences

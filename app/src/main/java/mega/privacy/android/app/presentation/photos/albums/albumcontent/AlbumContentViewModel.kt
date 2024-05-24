@@ -457,8 +457,10 @@ internal class AlbumContentViewModel @Inject constructor(
     }
 
     suspend fun getSelectedNodes(): List<MegaNode> {
-        val selectedPhotoIds = _state.value.selectedPhotos.map { it.id }
-        return getNodeListByIds(selectedPhotoIds)
+        return runCatching {
+            val selectedPhotoIds = _state.value.selectedPhotos.map { it.id }
+            getNodeListByIds(selectedPhotoIds)
+        }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
     }
 
     fun updateAlbumName(title: String, albumNames: List<String>) = viewModelScope.launch {
