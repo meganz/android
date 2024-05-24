@@ -28,8 +28,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
+import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.CallOnHoldType
@@ -40,7 +42,8 @@ import mega.privacy.android.domain.entity.meeting.CallOnHoldType
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun MoreCallOptionsBottomSheetView(
-    viewModel: InMeetingViewModel = hiltViewModel(),
+    inMeetingViewModel: InMeetingViewModel = hiltViewModel(),
+    meetingViewModel: MeetingActivityViewModel = hiltViewModel(),
     scrimColor: Color = black.copy(alpha = 0.32f),
     sheetGesturesEnabled: Boolean = true,
     content: (@Composable () -> Unit)? = null,
@@ -50,13 +53,14 @@ internal fun MoreCallOptionsBottomSheetView(
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Expanded,
             confirmValueChange = {
                 if (it == ModalBottomSheetValue.Hidden) {
-                    viewModel.moreCallOptionsBottomPanelDismiss()
+                    inMeetingViewModel.moreCallOptionsBottomPanelDismiss()
                 }
                 true
             })
     val roundedCornerRadius = 12.dp
 
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val uiState by inMeetingViewModel.state.collectAsStateWithLifecycle()
+    val meetingState by meetingViewModel.state.collectAsStateWithLifecycle()
 
     if (uiState.showCallOptionsBottomSheet) {
         ModalBottomSheetLayout(
@@ -75,8 +79,10 @@ internal fun MoreCallOptionsBottomSheetView(
                     modalSheetState = modalSheetState,
                     coroutineScope = coroutineScope,
                     uiState = uiState,
-                    onPutCallOnHold = { viewModel.onClickOnHold() },
-                    onRaiseHand = { viewModel.onClickRaiseHand() },
+                    meetingState = meetingState,
+                    onPutCallOnHold = inMeetingViewModel::onClickOnHold,
+                    onRaiseHand = inMeetingViewModel::raiseHandToSpeak,
+                    onLowerHand = inMeetingViewModel::lowerHandToStopSpeak
                 )
             }
         ) {
@@ -91,8 +97,10 @@ private fun BottomSheetContent(
     modalSheetState: ModalBottomSheetState,
     coroutineScope: CoroutineScope,
     uiState: InMeetingUiState,
+    meetingState: MeetingState,
     onPutCallOnHold: () -> Unit = {},
     onRaiseHand: () -> Unit = {},
+    onLowerHand: () -> Unit = {},
 ) = with(uiState) {
     Column(
         modifier = Modifier
@@ -111,12 +119,18 @@ private fun BottomSheetContent(
                     BottomSheetMenuItemView(
                         modifier = Modifier.testTag(CALL_OPTIONS_BOTTOM_SHEET_RAISE_HAND_BUTTON),
                         res = R.drawable.raise_hand_icon,
-                        text = if (isMyHandRaisedToSpeak) R.string.meetings_lower_hand_option_button else R.string.meetings_raise_hand_option_button,
+                        text = when {
+                            meetingState.isMyHandRaisedToSpeak -> R.string.meetings_lower_hand_option_button
+                            else -> R.string.meetings_raise_hand_option_button
+                        },
                         description = "Raise or lower hand",
                         tintRed = false,
                         onClick = {
                             coroutineScope.launch { modalSheetState.hide() }
-                            onRaiseHand()
+                            when {
+                                meetingState.isMyHandRaisedToSpeak -> onLowerHand()
+                                else -> onRaiseHand()
+                            }
                         }
                     )
                 }
@@ -165,8 +179,10 @@ private fun MoreCallOptionsBottomSheetViewWithoutCallOnHoldPreview() {
                 isOnHold = false
             )
         ),
+        meetingState = MeetingState(),
         onPutCallOnHold = { },
         onRaiseHand = { },
+        onLowerHand = {}
     )
 }
 
@@ -191,8 +207,10 @@ private fun MoreCallOptionsBottomSheetViewWithCallOnHoldPreview() {
                 isOnHold = true
             )
         ),
+        meetingState = MeetingState(),
         onPutCallOnHold = { },
         onRaiseHand = { },
+        onLowerHand = {}
     )
 }
 
@@ -221,8 +239,10 @@ private fun MoreCallOptionsBottomSheetViewWithSwapCallsPreview() {
                 isOnHold = true
             )
         ),
+        meetingState = MeetingState(),
         onPutCallOnHold = { },
         onRaiseHand = { },
+        onLowerHand = {}
     )
 }
 
@@ -241,7 +261,6 @@ private fun MoreCallOptionsBottomSheetViewWithRaiseHandPreview() {
         uiState = InMeetingUiState(
             showCallOptionsBottomSheet = true,
             isRaiseToSpeakFeatureFlagEnabled = true,
-            myUserHandle = null,
             anotherCall = ChatCall(
                 chatId = 123L,
                 callId = 456L,
@@ -252,8 +271,10 @@ private fun MoreCallOptionsBottomSheetViewWithRaiseHandPreview() {
                 isOnHold = true
             )
         ),
+        meetingState = MeetingState(),
         onPutCallOnHold = { },
         onRaiseHand = { },
+        onLowerHand = {}
     )
 }
 
@@ -272,10 +293,11 @@ private fun MoreCallOptionsBottomSheetViewWithLowerHandPreview() {
         uiState = InMeetingUiState(
             showCallOptionsBottomSheet = true,
             isRaiseToSpeakFeatureFlagEnabled = true,
-            myUserHandle = 123L,
         ),
+        meetingState = MeetingState(),
         onPutCallOnHold = { },
         onRaiseHand = { },
+        onLowerHand = {}
     )
 }
 

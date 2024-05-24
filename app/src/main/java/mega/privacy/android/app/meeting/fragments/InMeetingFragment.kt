@@ -1160,38 +1160,49 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.setChatId(state.chatId)
             callRecordingViewModel.setChatId(state.chatId)
 
-            if (state.shouldPinToSpeakerView) {
-                state.chatParticipantSelected?.let {
-                    inMeetingViewModel.onItemClick(it)
-                    sharedModel.onPinToSpeakerView(false)
-                }
-            }
-            if (state.isParticipantSharingScreen != isParticipantSharingScreen) {
-                isParticipantSharingScreen = state.isParticipantSharingScreen
-                speakerViewMenuItem?.apply {
-                    isEnabled = !isParticipantSharingScreen
-                    iconTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            if (isParticipantSharingScreen) R.color.white_alpha_038 else R.color.white
-                        )
-                    )
+            when {
+                state.shouldParticipantInCallListBeShown -> {
+                    sharedModel.showParticipantsList(shouldBeShown = false)
+                    sharedModel.onHandRaisedSnackbarMsgConsumed()
+                    if (bottomFloatingPanelViewHolder?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                        bottomFloatingPanelViewHolder?.expand()
+                    }
                 }
 
-                gridViewMenuItem?.apply {
-                    isEnabled = !isParticipantSharingScreen
-                    iconTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            if (isParticipantSharingScreen) R.color.white_alpha_038 else R.color.white
-                        )
-                    )
+                state.shouldPinToSpeakerView -> {
+                    state.chatParticipantSelected?.let {
+                        inMeetingViewModel.onItemClick(it)
+                        sharedModel.onPinToSpeakerView(false)
+                    }
                 }
 
-                if (!inMeetingViewModel.isOneToOneCall()) {
-                    when (isParticipantSharingScreen) {
-                        true -> changeToSpeakerView()
-                        false -> changeToGridView()
+                state.isParticipantSharingScreen != isParticipantSharingScreen -> {
+                    isParticipantSharingScreen = state.isParticipantSharingScreen
+                    speakerViewMenuItem?.apply {
+                        isEnabled = !isParticipantSharingScreen
+                        iconTintList = ColorStateList.valueOf(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                if (isParticipantSharingScreen) R.color.white_alpha_038 else R.color.white
+                            )
+                        )
+                    }
+
+                    gridViewMenuItem?.apply {
+                        isEnabled = !isParticipantSharingScreen
+                        iconTintList = ColorStateList.valueOf(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                if (isParticipantSharingScreen) R.color.white_alpha_038 else R.color.white
+                            )
+                        )
+                    }
+
+                    if (!inMeetingViewModel.isOneToOneCall()) {
+                        when (isParticipantSharingScreen) {
+                            true -> changeToSpeakerView()
+                            false -> changeToGridView()
+                        }
                     }
                 }
             }

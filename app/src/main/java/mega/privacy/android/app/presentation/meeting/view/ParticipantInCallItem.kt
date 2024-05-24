@@ -76,7 +76,7 @@ fun ParticipantInCallItem(
     onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
     onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
-    onRingParticipantClicked: (ChatParticipant) -> Unit = {},
+    onRingParticipantClicked: (Long) -> Unit = {},
 ) {
     Column {
         Row(
@@ -249,7 +249,7 @@ fun ParticipantInCallItem(
                             if (participant.callStatus != MeetingParticipantNotInCallStatus.Calling && !isRingingAll && myPermission > ChatRoomPermission.ReadOnly) {
                                 TextMegaButton(
                                     text = stringResource(R.string.meetings_bottom_panel_not_in_call_participants_call_button),
-                                    onClick = { onRingParticipantClicked(participant) })
+                                    onClick = { onRingParticipantClicked(participant.handle) })
                             }
                         }
 

@@ -159,7 +159,7 @@
         android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
         android:layout_marginEnd="20dp"
         android:background="@null"
-        android:src="@drawable/ic_phone_02"
+        android:src="@drawable/hang_call_icon"
         app:tint="@null"
         android:tint="@null"
         app:backgroundTint="@color/color_primary_400"

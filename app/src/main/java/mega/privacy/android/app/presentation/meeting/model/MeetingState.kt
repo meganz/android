@@ -10,10 +10,8 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
-import mega.privacy.android.domain.entity.meeting.CallOnHoldType
 import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
-import mega.privacy.android.icon.pack.R
 
 /**
  * Data class defining the state of [MeetingActivityViewModel]
@@ -65,6 +63,12 @@ import mega.privacy.android.icon.pack.R
  * @property callEndedDueToFreePlanLimits               State event to show the force free plan limit participants dialog.
  * @property action                                     Meeting action type
  * @property currentCall                                [ChatCall]
+ * @property myUserHandle                               My user handle
+ * @property userIdsWithChangesInRaisedHand             User identifiers with changes in the raised hand
+ * @property shouldParticipantInCallListBeShown         True, it must be shown. False, must be hidden
+ * @property handRaisedSnackbarMsg                      Message to show in Snackbar.
+ * @property isRaiseToSpeakFeatureFlagEnabled           True, if Raise to speak feature flag enabled. False, otherwise.
+ *
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -112,6 +116,11 @@ data class MeetingState(
     val callEndedDueToFreePlanLimits: Boolean = false,
     val action: String? = null,
     val currentCall: ChatCall? = null,
+    val myUserHandle: Long? = null,
+    val userIdsWithChangesInRaisedHand: List<Long> = emptyList(),
+    val shouldParticipantInCallListBeShown: Boolean = false,
+    val handRaisedSnackbarMsg: StateEventWithContent<String> = consumed(),
+    val isRaiseToSpeakFeatureFlagEnabled: Boolean = false,
 ) {
 
     /**
@@ -132,6 +141,40 @@ data class MeetingState(
             }
 
         return true
+    }
+
+    /**
+     * Monitor if is my hand raised to speak
+     */
+    val isMyHandRaisedToSpeak
+        get():Boolean = myUserHandle?.let {
+            currentCall?.usersRaiseHands?.get(
+                it
+            )
+        } ?: false
+
+    /**
+     * Get number of users with hand raised
+     */
+    val numUsersWithHandRaised
+        get():Int = currentCall?.raisedHandsList?.size ?: 0
+
+    /**
+     * Number of other participants with raised hand
+     */
+    fun getNumOfOtherParticipantsWithHandRaised() = numUsersWithHandRaised - 1
+
+    /**
+     * User ID with hand raised
+     */
+    fun getParticipantNameWithRaisedHand(): String? {
+        currentCall?.raisedHandsList?.first()?.let { peerId ->
+            usersInCall.filter { it.peerId == peerId }.first()?.let {
+                return it.name
+            }
+
+        }
+        return null
     }
 
     /**

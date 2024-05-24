@@ -49,7 +49,6 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChange
@@ -85,7 +84,6 @@ import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
-import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ChatLogoutUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
@@ -183,19 +181,18 @@ class InMeetingViewModel @Inject constructor(
     private val joinPublicChatUseCase: JoinPublicChatUseCase,
     private val chatLogoutUseCase: ChatLogoutUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
-    private val raiseHandToSpeakUseCase: RaiseHandToSpeakUseCase,
-    private val lowerHandToStopSpeakUseCase: LowerHandToStopSpeakUseCase,
     private val holdChatCallUseCase: HoldChatCallUseCase,
     private val monitorParticipatingInAnotherCallUseCase: MonitorParticipatingInAnotherCallUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
-    private val getPluralStringFromStringResMapper: GetPluralStringFromStringResMapper,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
+    private val raiseHandToSpeakUseCase: RaiseHandToSpeakUseCase,
+    private val lowerHandToStopSpeakUseCase: LowerHandToStopSpeakUseCase,
     @ApplicationContext private val context: Context,
 ) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
 
     private val composite = CompositeDisposable()
+
     /**
      * private UI state
      */
@@ -226,7 +223,6 @@ class InMeetingViewModel @Inject constructor(
      * @param participant [Participant]
      */
     fun onItemClick(participant: Participant) {
-        onSnackbarMessageConsumed()
         _pinItemEvent.value = Event(participant)
         getSession(participant.clientId)?.let {
             if (it.hasScreenShare() && _state.value.callUIStatus == CallUIStatusType.SpeakerView) {
@@ -451,7 +447,6 @@ class InMeetingViewModel @Inject constructor(
                             _state.update { it.copy(previousState = status) }
                         }
                         handleFreeCallEndWarning()
-                        getMyUserHandle()
                         isEphemeralAccount()
                     }
                 }
@@ -503,7 +498,6 @@ class InMeetingViewModel @Inject constructor(
                                 call.status?.let { status ->
                                     if (status == ChatCallStatus.InProgress) {
                                         Timber.d("Call in progress, get my user information")
-                                        getMyUserHandle()
                                         isEphemeralAccount()
                                     }
                                     checkSubtitleToolbar()
@@ -521,30 +515,6 @@ class InMeetingViewModel @Inject constructor(
 
                             contains(ChatCallChanges.CallRaiseHand) -> {
                                 updateParticipantsWithRaisedHand()
-
-                                if (state.value.showRaisedHandSnackbar && call.flag) {
-                                    _state.update { state ->
-                                        state.copy(
-                                            showRaisedHandSnackbar = false
-                                        )
-                                    }
-                                    if (state.value.isMyHandRaisedToSpeak) {
-                                        triggerSnackbarMessage(
-                                            when (state.value.numUsersWithHandRaised) {
-                                                1 -> getStringFromStringResMapper(
-                                                    R.string.meeting_your_hand_is_raised_message
-                                                )
-
-                                                else -> getPluralStringFromStringResMapper(
-                                                    stringId = R.plurals.meeting_you_and_others_raised_your_hands_message,
-                                                    quantity = state.value.getNumOfOtherParticipantsWithHandRaised(),
-                                                    state.value.getNumOfOtherParticipantsWithHandRaised()
-                                                )
-                                            }
-
-                                        )
-                                    }
-                                }
                             }
                         }
                     }
@@ -3054,7 +3024,6 @@ class InMeetingViewModel @Inject constructor(
         runCatching {
             endCallUseCase(chatId)
         }.onSuccess {
-            lowerHandToStopSpeak()
             broadcastCallEndedUseCase(chatId)
         }.onFailure {
             Timber.e(it.stackTraceToString())
@@ -3087,7 +3056,6 @@ class InMeetingViewModel @Inject constructor(
         runCatching {
             hangChatCallUseCase(callId)
         }.onSuccess {
-            lowerHandToStopSpeak()
             broadcastCallEndedUseCase(state.value.currentChatId)
         }.onFailure {
             Timber.e(it.stackTraceToString())
@@ -3212,8 +3180,37 @@ class InMeetingViewModel @Inject constructor(
      * More call options clicked
      */
     fun onClickMoreCallOptions() {
-        onSnackbarMessageConsumed()
         _state.update { it.copy(showCallOptionsBottomSheet = true) }
+    }
+
+    /**
+     * Raised hand to speak
+     */
+    fun raiseHandToSpeak() {
+        viewModelScope.launch {
+            runCatching {
+                raiseHandToSpeakUseCase(_state.value.currentChatId)
+            }.onSuccess {
+                moreCallOptionsBottomPanelDismiss()
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
+
+    /**
+     * Lower hand to stop speak
+     */
+    fun lowerHandToStopSpeak() {
+        viewModelScope.launch {
+            runCatching {
+                lowerHandToStopSpeakUseCase(_state.value.currentChatId)
+            }.onSuccess {
+                moreCallOptionsBottomPanelDismiss()
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
     }
 
     /**
@@ -3271,65 +3268,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Raised/Lower hand button clicked
-     */
-    fun onClickRaiseHand() {
-        when (state.value.isMyHandRaisedToSpeak) {
-            true -> lowerHandToStopSpeak()
-            false -> raiseHandToSpeak()
-        }
-    }
-
-    /**
-     * Raised hand to speak
-     */
-    private fun raiseHandToSpeak() {
-        viewModelScope.launch {
-            runCatching {
-                _state.update { state ->
-                    state.copy(
-                        showRaisedHandSnackbar = true
-                    )
-                }
-                raiseHandToSpeakUseCase(_state.value.currentChatId)
-            }.onSuccess {
-                moreCallOptionsBottomPanelDismiss()
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }
-        }
-    }
-
-    /**
-     * Lower hand to stop speak
-     */
-    fun lowerHandToStopSpeak() {
-        viewModelScope.launch {
-            runCatching {
-                lowerHandToStopSpeakUseCase(_state.value.currentChatId)
-            }.onSuccess {
-                moreCallOptionsBottomPanelDismiss()
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }
-        }
-    }
-
-    /**
-     * load my user handle and save to ui state
-     */
-    private fun getMyUserHandle() {
-        if (state.value.myUserHandle != null) return
-
-        viewModelScope.launch {
-            runCatching {
-                val myUserHandle = getMyUserHandleUseCase()
-                _state.update { state -> state.copy(myUserHandle = myUserHandle) }
-            }.onFailure { Timber.e(it) }
-        }
-    }
-
-    /**
      * Is ephemeral account plus plus
      */
     private fun isEphemeralAccount() {
@@ -3340,25 +3278,6 @@ class InMeetingViewModel @Inject constructor(
                 val isEphemeralAccount = isEphemeralPlusPlusUseCase()
                 _state.update { state -> state.copy(isEphemeralAccount = isEphemeralAccount) }
             }.onFailure { Timber.e(it) }
-        }
-    }
-
-    /**
-     * Trigger event to show Snackbar message
-     *
-     * @param message     Content for snack bar
-     */
-    private fun triggerSnackbarMessage(message: String) {
-        onSnackbarMessageConsumed()
-        _state.update { it.copy(snackbarMessage = triggered(message)) }
-    }
-
-    /**
-     * Reset and notify that snackbarMessage is consumed
-     */
-    fun onSnackbarMessageConsumed() {
-        _state.update {
-            it.copy(snackbarMessage = consumed())
         }
     }
 

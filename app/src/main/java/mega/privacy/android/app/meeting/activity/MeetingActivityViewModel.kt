@@ -54,6 +54,7 @@ import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantMapper
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
@@ -97,6 +98,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
@@ -213,6 +215,8 @@ class MeetingActivityViewModel @Inject constructor(
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getPluralStringFromStringResMapper: GetPluralStringFromStringResMapper,
+    private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
 ) : ViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
@@ -345,6 +349,20 @@ class MeetingActivityViewModel @Inject constructor(
     ).post(isVisible)
 
     init {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.RaiseToSpeak).let { flag ->
+                    _state.update { state ->
+                        state.copy(
+                            isRaiseToSpeakFeatureFlagEnabled = flag,
+                        )
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+
         startMonitoringChatCallUpdates()
         startMonitorChatSessionUpdates()
         getMyFullName()
@@ -491,6 +509,20 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
+     * load my user handle and save to ui state
+     */
+    private fun getMyUserHandle() {
+        if (state.value.myUserHandle != null) return
+
+        viewModelScope.launch {
+            runCatching {
+                val myUserHandle = getMyUserHandleUseCase()
+                _state.update { state -> state.copy(myUserHandle = myUserHandle) }
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
      * Get chat room
      */
     private fun getChatRoom() = viewModelScope.launch {
@@ -540,6 +572,7 @@ class MeetingActivityViewModel @Inject constructor(
                             currentCall = it
                         )
                     }
+                    getMyUserHandle()
 
                     when (call.status) {
                         ChatCallStatus.UserNoPresent -> {
@@ -746,6 +779,75 @@ class MeetingActivityViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Trigger event to show Snackbar message
+     *
+     * @param message     Content for snack bar
+     */
+    private fun triggerHandRaisedSnackbarMsg(message: String) {
+        onSnackbarMessageConsumed()
+        _state.update { it.copy(handRaisedSnackbarMsg = triggered(message)) }
+    }
+
+    /**
+     * Reset and notify that snackbarMessage is consumed
+     */
+    fun onHandRaisedSnackbarMsgConsumed() {
+        _state.update {
+            it.copy(handRaisedSnackbarMsg = consumed())
+        }
+    }
+
+    /**
+     * Control the snackbar to be displayed when someone raises their hand.
+     */
+    private fun checkShowHandRaisedSnackbar() {
+        when (state.value.numUsersWithHandRaised) {
+            0 -> Timber.d("No users with hand raised")
+            1 -> when {
+                state.value.isMyHandRaisedToSpeak -> triggerHandRaisedSnackbarMsg(
+                    getStringFromStringResMapper(
+                        R.string.meeting_your_hand_is_raised_message
+                    )
+                )
+
+                else -> state.value.getParticipantNameWithRaisedHand()
+                    ?.let { name ->
+                        triggerHandRaisedSnackbarMsg(
+                            getStringFromStringResMapper(
+                                R.string.meetings_one_participant_raised_their_hand_message,
+                                name
+                            )
+                        )
+                    }
+            }
+
+            else -> {
+                when {
+                    state.value.isMyHandRaisedToSpeak -> triggerHandRaisedSnackbarMsg(
+                        getPluralStringFromStringResMapper(
+                            stringId = R.plurals.meeting_you_and_others_raised_your_hands_message,
+                            quantity = state.value.getNumOfOtherParticipantsWithHandRaised(),
+                            state.value.getNumOfOtherParticipantsWithHandRaised()
+                        )
+                    )
+
+                    else -> state.value.getParticipantNameWithRaisedHand()
+                        ?.let { name ->
+                            triggerHandRaisedSnackbarMsg(
+                                getPluralStringFromStringResMapper(
+                                    stringId = R.plurals.meetings_other_participants_raised_their_hands_message,
+                                    quantity = state.value.getNumOfOtherParticipantsWithHandRaised(),
+                                    name,
+                                    state.value.getNumOfOtherParticipantsWithHandRaised()
+                                )
+                            )
+                        }
+                }
+            }
+        }
+    }
+
 
     /**
      * Check ephemeral account and waiting room
@@ -802,71 +904,77 @@ class MeetingActivityViewModel @Inject constructor(
 
                     checkIfPresenting(call)
                     call.changes?.apply {
-                        if (contains(ChatCallChanges.Status)) {
-                            Timber.d("Chat call status: ${call.status}")
-                            when (call.status) {
-                                ChatCallStatus.InProgress -> {
-                                    checkEphemeralAccountAndWaitingRoom(call)
-                                }
-
-                                ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification -> {
-                                    Timber.d("Chat call termCode: ${call.termCode}")
-                                    if (call.termCode == ChatCallTermCodeType.CallUsersLimit || call.termCode == ChatCallTermCodeType.TooManyParticipants
-                                        && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
-                                    ) {
-                                        _state.update { state ->
-                                            state.copy(
-                                                callEndedDueToFreePlanLimits = true
-                                            )
-                                        }
+                        when {
+                            contains(ChatCallChanges.Status) -> {
+                                Timber.d("Chat call status: ${call.status}")
+                                when (call.status) {
+                                    ChatCallStatus.InProgress -> {
+                                        checkEphemeralAccountAndWaitingRoom(call)
                                     }
-                                }
 
-                                else -> {}
-                            }
-                        }
-
-                        if (contains(ChatCallChanges.LocalAVFlags)) {
-                            val isEnable = call.hasLocalAudio
-                            _micLiveData.value = isEnable
-                            Timber.d("open Mic: $isEnable")
-                            tips.value = when (isEnable) {
-                                true -> context.getString(
-                                    R.string.general_mic_unmute
-                                )
-
-                                false -> context.getString(
-                                    R.string.general_mic_mute
-                                )
-                            }
-
-                            call.auxHandle?.let { auxClientId ->
-                                if (auxClientId != 0L) {
-                                    state.value.usersInCall.find { it.clientId == auxClientId }
-                                        ?.let {
-                                            showSnackBar(
-                                                context.getString(
-                                                    R.string.meetings_muted_by_a_participant_snackbar_message,
-                                                    it.name
+                                    ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification -> {
+                                        Timber.d("Chat call termCode: ${call.termCode}")
+                                        if (call.termCode == ChatCallTermCodeType.CallUsersLimit || call.termCode == ChatCallTermCodeType.TooManyParticipants
+                                            && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
+                                        ) {
+                                            _state.update { state ->
+                                                state.copy(
+                                                    callEndedDueToFreePlanLimits = true
                                                 )
-                                            )
+                                            }
                                         }
+                                    }
+
+                                    else -> {}
                                 }
                             }
-                        }
 
-                        if (contains(ChatCallChanges.WaitingRoomUsersEntered) || contains(
-                                ChatCallChanges.WaitingRoomUsersLeave
-                            )
-                        ) {
-                            call.waitingRoom?.apply {
-                                peers?.let { ids ->
-                                    _state.update {
-                                        it.copy(
-                                            usersInWaitingRoomIDs = ids
-                                        )
+                            contains(ChatCallChanges.CallRaiseHand) -> {
+                                if (call.flag) {
+                                    checkShowHandRaisedSnackbar()
+                                }
+                            }
+
+                            contains(ChatCallChanges.LocalAVFlags) -> {
+                                val isEnable = call.hasLocalAudio
+                                _micLiveData.value = isEnable
+                                Timber.d("open Mic: $isEnable")
+                                tips.value = when (isEnable) {
+                                    true -> context.getString(
+                                        R.string.general_mic_unmute
+                                    )
+
+                                    false -> context.getString(
+                                        R.string.general_mic_mute
+                                    )
+                                }
+
+                                call.auxHandle?.let { auxClientId ->
+                                    if (auxClientId != 0L) {
+                                        state.value.usersInCall.find { it.clientId == auxClientId }
+                                            ?.let {
+                                                showSnackBar(
+                                                    context.getString(
+                                                        R.string.meetings_muted_by_a_participant_snackbar_message,
+                                                        it.name
+                                                    )
+                                                )
+                                            }
                                     }
-                                    checkParticipantLists()
+                                }
+                            }
+
+                            contains(ChatCallChanges.WaitingRoomUsersEntered) ||
+                                    contains(ChatCallChanges.WaitingRoomUsersLeave) -> {
+                                call.waitingRoom?.apply {
+                                    peers?.let { ids ->
+                                        _state.update {
+                                            it.copy(
+                                                usersInWaitingRoomIDs = ids
+                                            )
+                                        }
+                                        checkParticipantLists()
+                                    }
                                 }
                             }
                         }
@@ -917,6 +1025,14 @@ class MeetingActivityViewModel @Inject constructor(
             Timber.d("Error on logout $it")
         }
     }
+
+    /**
+     * Show participants list
+     *
+     * @param shouldBeShown True, should be shown. False, should be hidden.
+     */
+    fun showParticipantsList(shouldBeShown: Boolean) =
+        _state.update { state -> state.copy(shouldParticipantInCallListBeShown = shouldBeShown) }
 
     /**
      * Check concurrent calls to see if the call should be switched or ended

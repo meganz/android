@@ -15,8 +15,10 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -44,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
@@ -86,11 +89,8 @@ fun ParticipantsFullListView(
             meetingViewModel.onConsumeShouldInCallListBeShownEvent()
             meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
         },
-        onDenyParticipantClicked = { participant ->
-            waitingRoomManagementViewModel.denyUsersClick(
-                participant
-            )
-        },
+        onDenyParticipantClicked =
+        waitingRoomManagementViewModel::denyUsersClick,
         onAdmitParticipantClicked = { participant ->
             waitingRoomManagementViewModel.admitUsersClick(
                 participant
@@ -108,16 +108,14 @@ fun ParticipantsFullListView(
         onShareMeetingLink = {
             meetingViewModel.queryMeetingLink(shouldShareMeetingLink = true)
         },
-        onParticipantMoreOptionsClicked = { chatParticipant ->
-            meetingViewModel.onParticipantMoreOptionsClick(chatParticipant)
-        },
-        onConsumeSelectParticipantEvent = { meetingViewModel.onConsumeSelectParticipantEvent() },
+        onParticipantMoreOptionsClicked = meetingViewModel::onParticipantMoreOptionsClick,
+        onConsumeSelectParticipantEvent = meetingViewModel::onConsumeSelectParticipantEvent,
         onBottomPanelHiddenClicked = {
             meetingViewModel.onParticipantMoreOptionsClick(
                 null
             )
         },
-        onAddContactClicked = { meetingViewModel.onAddContactClick() },
+        onAddContactClicked = meetingViewModel::onAddContactClick,
         onEditProfileClicked = onEditProfileClicked,
         onContactInfoClicked = onContactInfoClicked,
         onMakeHostClicked = {
@@ -130,31 +128,26 @@ fun ParticipantsFullListView(
                 ChatRoomPermission.Standard
             )
         },
-        onRemoveParticipant = {
-            meetingViewModel.removeParticipantFromChat()
-        },
+        onRemoveParticipant = meetingViewModel::removeParticipantFromChat,
         onRemoveParticipantClicked = {
             meetingViewModel.showOrHideRemoveParticipantDialog(true)
         },
         onDismissRemoveParticipantDialog = {
             meetingViewModel.showOrHideRemoveParticipantDialog(false)
         },
-        onSendMessageClicked = { meetingViewModel.sendMessageToChat() },
+        onSendMessageClicked = meetingViewModel::sendMessageToChat,
         onDisplayInMainViewClicked = {
             meetingViewModel.onPinToSpeakerView(true)
             meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
             meetingViewModel.onConsumeShouldInCallListBeShownEvent()
             meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
         },
-        onRingParticipantClicked = { chatParticipant ->
-            meetingViewModel.ringParticipant(chatParticipant.handle)
-        },
-        onRingAllParticipantsClicked = {
-            meetingViewModel.ringAllAbsentsParticipants()
-        },
+        onRingParticipantClicked = meetingViewModel::ringParticipant,
+        onRingAllParticipantsClicked = meetingViewModel::ringAllAbsentsParticipants,
         onMuteParticipantClick = meetingViewModel::muteParticipant,
         onMuteAllParticipantsClick = meetingViewModel::muteAllParticipants,
-        onResetStateSnackbarMessage = meetingViewModel::onSnackbarMessageConsumed
+        onResetStateSnackbarMessage = meetingViewModel::onSnackbarMessageConsumed,
+        onHandRaisedSnackbarMsgConsumed = meetingViewModel::onHandRaisedSnackbarMsgConsumed,
     )
 }
 
@@ -188,10 +181,12 @@ private fun ParticipantsFullListView(
     onRemoveParticipant: () -> Unit,
     onDismissRemoveParticipantDialog: () -> Unit,
     onMuteAllParticipantsClick: () -> Unit,
-    onRingParticipantClicked: (ChatParticipant) -> Unit = {},
+    onRingParticipantClicked: (Long) -> Unit = {},
     onRingAllParticipantsClicked: () -> Unit = {},
     onResetStateSnackbarMessage: () -> Unit = {},
+    onHandRaisedSnackbarMsgConsumed: () -> Unit = {},
 ) {
+
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val scaffoldState = rememberScaffoldState()
@@ -387,7 +382,31 @@ private fun ParticipantsFullListView(
                 EventEffect(
                     event = snackbarMsg, onConsumed = onResetStateSnackbarMessage
                 ) {
-                    scaffoldState.snackbarHostState.showSnackbar(it)
+                    if (!uiState.snackbarMsg.equals(consumed)) {
+                        coroutineScope.launch {
+                            scaffoldState.snackbarHostState.showSnackbar(it)
+                        }
+                    }
+                }
+
+                EventEffect(
+                    event = uiState.handRaisedSnackbarMsg,
+                    onConsumed = {}
+                ) {
+
+                    if (!uiState.handRaisedSnackbarMsg.equals(consumed)) {
+
+                        coroutineScope.launch {
+                            val result = scaffoldState.snackbarHostState.showSnackbar(
+                                message = it,
+                                duration = SnackbarDuration.Short
+                            )
+
+                            if (result == SnackbarResult.Dismissed) {
+                                onHandRaisedSnackbarMsgConsumed()
+                            }
+                        }
+                    }
                 }
             }
 
@@ -411,7 +430,6 @@ private fun ParticipantsFullListView(
             )
         }
     }
-
 }
 
 /**

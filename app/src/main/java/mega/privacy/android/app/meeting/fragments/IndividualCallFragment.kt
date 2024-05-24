@@ -27,6 +27,7 @@ import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
+import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getCurrentOrientation
@@ -259,7 +260,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     }
 
     private fun collectFlows() {
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
+        viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->
             raisedHandIcon?.isVisible =
                 state.isRaiseToSpeakFeatureFlagEnabled && state.isMyHandRaisedToSpeak
 

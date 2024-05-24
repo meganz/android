@@ -10,6 +10,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityRepository
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantMapper
 import mega.privacy.android.app.usecase.call.GetCallUseCase
@@ -31,6 +32,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
@@ -106,8 +108,10 @@ class MeetingActivityViewModelTest {
     private val mutePeersUseCase: MutePeersUseCase = mock()
     private val muteAllPeersUseCase: MuteAllPeersUseCase = mock()
     private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
+    private val getPluralStringFromStringResMapper: GetPluralStringFromStringResMapper = mock()
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val getMyUserHandleUseCase: GetMyUserHandleUseCase = mock()
     private val savedStateHandle: SavedStateHandle = mock()
 
     private val context: Context = mock()
@@ -162,8 +166,10 @@ class MeetingActivityViewModelTest {
             mutePeersUseCase,
             muteAllPeersUseCase,
             getStringFromStringResMapper,
+            getPluralStringFromStringResMapper,
             getCurrentSubscriptionPlanUseCase,
             getFeatureFlagValueUseCase,
+            getMyUserHandleUseCase,
             savedStateHandle
         )
     }
@@ -211,8 +217,10 @@ class MeetingActivityViewModelTest {
             mutePeersUseCase = mutePeersUseCase,
             muteAllPeersUseCase = muteAllPeersUseCase,
             getStringFromStringResMapper = getStringFromStringResMapper,
+            getPluralStringFromStringResMapper = getPluralStringFromStringResMapper,
             getCurrentSubscriptionPlanUseCase = getCurrentSubscriptionPlanUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getMyUserHandleUseCase = getMyUserHandleUseCase,
             savedStateHandle = savedStateHandle
         )
     }

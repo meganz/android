@@ -31,7 +31,6 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property updateNumParticipants                  Update the num of participants
  * @property isOneToOneCall                         True, if it's one to one call. False, if it's a group call or a meeting.
  * @property showMeetingInfoFragment                True to show meeting info fragment or False otherwise
- * @property snackbarMessage                        Message to show in Snackbar.
  * @property snackbarInSpeakerViewMessage           Message to show in Snackbar in speaker view.
  * @property addScreensSharedParticipantsList       List of [Participant] to add the screen shared in the carousel
  * @property removeScreensSharedParticipantsList    List of [Participant] to remove the screen shared in the carousel
@@ -46,12 +45,11 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property isRaiseToSpeakFeatureFlagEnabled       True, if Raise to speak feature flag enabled. False, otherwise.
  * @property anotherCall                            Another call in progress or on hold.
  * @property showCallOptionsBottomSheet             True, if should be shown the call options bottom panel. False, otherwise
- * @property myUserHandle                           My user handle
  * @property isEphemeralAccount                     True, if it's ephemeral account. False, if not.
- * @property showRaisedHandSnackbar                 Show raised hand snackbar
  * @property showOnlyMeEndCallTime                  Show only me end call remaining time
  * @property participantsChanges                    Message to show when a participant changes
  * @property userIdsWithChangesInRaisedHand         User identifiers with changes in the raised hand
+ * @property shouldParticipantInCallListBeShown         True, it must be shown. False, must be hidden
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -72,7 +70,6 @@ data class InMeetingUiState(
     val updateNumParticipants: Int = 1,
     val isOneToOneCall: Boolean = true,
     val showMeetingInfoFragment: Boolean = false,
-    val snackbarMessage: StateEventWithContent<String> = consumed(),
     val snackbarInSpeakerViewMessage: StateEventWithContent<String> = consumed(),
     val addScreensSharedParticipantsList: List<Participant>? = null,
     val removeScreensSharedParticipantsList: List<Participant>? = null,
@@ -87,8 +84,6 @@ data class InMeetingUiState(
     val isRaiseToSpeakFeatureFlagEnabled: Boolean = false,
     val anotherCall: ChatCall? = null,
     val showCallOptionsBottomSheet: Boolean = false,
-    val myUserHandle: Long? = null,
-    val showRaisedHandSnackbar: Boolean = false,
     val isEphemeralAccount: Boolean? = null,
     val showOnlyMeEndCallTime: Long? = null,
     val participantsChanges: ParticipantsChange? = null,
@@ -99,33 +94,6 @@ data class InMeetingUiState(
      */
     val isCallOnHold
         get():Boolean = call?.isOnHold == true
-
-    /**
-     * Monitor if is my hand raised to speak
-     */
-    val isMyHandRaisedToSpeak
-        get():Boolean = myUserHandle?.let {
-            call?.usersRaiseHands?.get(
-                it
-            )
-        } ?: false
-
-    /**
-     * Check if the participant's hand is raised
-     */
-    fun isParticipantHandRaisedToSpeak(peerId: Long) = call?.usersRaiseHands?.get(peerId) ?: false
-
-    /**
-     * Get number of users with hand raised
-     */
-    val numUsersWithHandRaised
-        get():Int = call?.raisedHandsList?.size ?: 0
-
-    /**
-     * Number of other participants with raised hand
-     */
-    fun getNumOfOtherParticipantsWithHandRaised() =
-        if (isMyHandRaisedToSpeak) numUsersWithHandRaised - 1 else numUsersWithHandRaised
 
     /**
      * Get the button to be displayed depending on the type of call on hold you have

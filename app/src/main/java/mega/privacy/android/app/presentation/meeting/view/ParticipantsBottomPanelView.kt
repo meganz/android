@@ -18,12 +18,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,6 +47,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.consumed
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
@@ -60,6 +69,7 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.legacy.core.ui.controls.chips.CallTextButtonChip
+import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButtonEvent
 
@@ -94,7 +104,7 @@ fun ParticipantsBottomPanelView(
                 ParticipantsSection.NotInCallSection
             )
         },
-        onAdmitAllClick = { waitingRoomManagementViewModel.admitUsersClick() },
+        onAdmitAllClick = waitingRoomManagementViewModel::admitUsersClick,
         onSeeAllClick = {
             viewModel.onSnackbarMessageConsumed()
             viewModel.onSeeAllClick()
@@ -108,29 +118,15 @@ fun ParticipantsBottomPanelView(
                 shouldShareMeetingLink = true
             )
         },
-        onAllowAddParticipantsClick = {
-            viewModel.allowAddParticipantsClick()
-        },
-        onAdmitParticipantClicked = {
-            waitingRoomManagementViewModel.admitUsersClick(
-                it
-            )
-        },
+        onAllowAddParticipantsClick = viewModel::allowAddParticipantsClick,
+        onAdmitParticipantClicked = waitingRoomManagementViewModel::admitUsersClick,
         onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked,
-        onDenyParticipantClicked = {
-            waitingRoomManagementViewModel.denyUsersClick(
-                it
-            )
-        },
-        onRingParticipantClicked = { chatParticipant ->
-            viewModel.ringParticipant(chatParticipant.handle)
-        },
-        onMuteAllParticipantsClick = {
-            viewModel.muteAllParticipants()
-        },
-        onRingAllParticipantsClicked = {
-            viewModel.ringAllAbsentsParticipants()
-        })
+        onDenyParticipantClicked = waitingRoomManagementViewModel::denyUsersClick,
+        onRingParticipantClicked = viewModel::ringParticipant,
+        onMuteAllParticipantsClick = viewModel::muteAllParticipants,
+        onRingAllParticipantsClicked = viewModel::ringAllAbsentsParticipants,
+        onHandRaisedSnackbarMsgConsumed = viewModel::onHandRaisedSnackbarMsgConsumed,
+    )
 }
 
 /**
@@ -151,9 +147,10 @@ fun BottomPanelView(
     onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
     onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
-    onRingParticipantClicked: (ChatParticipant) -> Unit = {},
+    onRingParticipantClicked: (Long) -> Unit = {},
     onRingAllParticipantsClicked: () -> Unit = {},
     onMuteAllParticipantsClick: () -> Unit = {},
+    onHandRaisedSnackbarMsgConsumed: () -> Unit = {},
 ) {
 
     val listState = rememberLazyListState()
@@ -161,6 +158,27 @@ fun BottomPanelView(
     var isAdmitAllButtonEnabled by rememberSaveable { mutableStateOf(true) }
     var isCallUserLimitWarningShown by rememberSaveable { mutableStateOf(false) }
     var isAllowNonHostAddParticipantEnabled by rememberSaveable { mutableStateOf(true) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    EventEffect(
+        event = uiState.handRaisedSnackbarMsg,
+        onConsumed = {}
+    ) {
+        if (!uiState.handRaisedSnackbarMsg.equals(consumed)) {
+            coroutineScope.launch {
+                val result = snackbarHostState.showSnackbar(
+                    message = it,
+                    duration = SnackbarDuration.Short
+                )
+
+                if (result == SnackbarResult.Dismissed) {
+                    onHandRaisedSnackbarMsgConsumed()
+                }
+            }
+        }
+    }
 
     with(uiState) {
         isCallUserLimitWarningShown =
@@ -504,6 +522,14 @@ fun BottomPanelView(
                     }
                 }
             }
+
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+            ) { data ->
+                MegaSnackbar(snackbarData = data)
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
