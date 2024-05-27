@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,14 +52,21 @@ fun LegacyMegaTooltip(
     showOnTop: Boolean,
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
+    key: Any? = null,
+    setDismissWhenTouchOutside: Boolean = false,
     titleText: String? = null,
     content: @Composable () -> Unit,
 ) {
     var window: BalloonWindow? by remember { mutableStateOf(null) }
+    LaunchedEffect(key1 = key) {
+        window?.awaitAlignTop()
+        window?.updateAlignTop()
+    }
+
     val bgColor = MaterialTheme.colors.dark_blue_tooltip_white
     val builder = rememberBalloonBuilder {
         setIsVisibleOverlay(false)
-        setDismissWhenTouchOutside(false)
+        setDismissWhenTouchOutside(setDismissWhenTouchOutside)
         setDismissWhenOverlayClicked(false)
         setDismissWhenLifecycleOnPause(false)
         setWidth(BalloonSizeSpec.WRAP)

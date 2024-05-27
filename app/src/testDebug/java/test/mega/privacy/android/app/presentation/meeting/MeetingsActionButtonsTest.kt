@@ -89,6 +89,7 @@ class MeetingsActionButtonsTest {
                 backgroundTintAlpha = 1.0F,
                 isRaiseHandToolTipShown = false,
                 onRaiseToRandTooltipDismissed = {},
+                tooltipKey = 0,
                 currentAudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE,
             )
         }

@@ -16,10 +16,10 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -53,7 +53,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 import mega.privacy.android.shared.theme.MegaAppTheme
-import timber.log.Timber
+import kotlin.random.Random
 
 
 /**
@@ -100,6 +100,13 @@ internal class MeetingsActionButtonsView : AbstractComposeView {
 
     var backgroundTintAlpha by mutableFloatStateOf(0.0F)
 
+    private var tooltipKey by mutableIntStateOf(Random.nextInt())
+
+    fun setNewTooltipKey() {
+        // set a new key for updating the position of the tooltip
+        tooltipKey = Random.nextInt()
+    }
+
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
@@ -129,7 +136,8 @@ internal class MeetingsActionButtonsView : AbstractComposeView {
                 backgroundTintAlpha = backgroundTintAlpha,
                 isRaiseHandToolTipShown = isRaiseHandToolTipShown,
                 onRaiseToRandTooltipDismissed = onRaiseToRandTooltipDismissed,
-                currentAudioDevice = currentAudioDevice
+                currentAudioDevice = currentAudioDevice,
+                tooltipKey = tooltipKey
             )
         }
     }
@@ -155,6 +163,7 @@ fun MeetingsActionButtons(
     buttonsEnabled: Boolean,
     backgroundTintAlpha: Float,
     isRaiseHandToolTipShown: Boolean,
+    tooltipKey: Int,
     currentAudioDevice: AppRTCAudioManager.AudioDevice,
     modifier: Modifier = Modifier,
 ) {
@@ -166,10 +175,6 @@ fun MeetingsActionButtons(
             val colorEnd = Color(ContextCompat.getColor(context, R.color.grey_060_white_054))
             lerp(colorStart, colorEnd, backgroundTintAlpha)
         }
-    }
-
-    LaunchedEffect(key1 = backgroundTint) {
-        Timber.d("Background tint: $backgroundTint")
     }
 
     val isEnabled by rememberSaveable(buttonsEnabled) {
@@ -323,7 +328,6 @@ fun MeetingsActionButtons(
                     )
                 }
 
-                // More button
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -346,10 +350,12 @@ fun MeetingsActionButtons(
                         )
                     } else {
                         LegacyMegaTooltip(
+                            key = tooltipKey,
                             modifier = Modifier.testTag(TOOLTIP),
                             descriptionText = stringResource(id = SharedR.string.meetings_raised_hand_tooltip_title),
                             actionText = stringResource(R.string.button_permission_info),
-                            showOnTop = false,
+                            showOnTop = true,
+                            setDismissWhenTouchOutside = true,
                             content = {
                                 OnOffFab(
                                     modifier = Modifier.testTag(MORE_BUTTON),
@@ -441,6 +447,7 @@ private fun MeetingBottomFloatingPanelPreview() {
             isRaiseHandToolTipShown = false,
             onRaiseToRandTooltipDismissed = {},
             currentAudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE,
+            tooltipKey = 0
         )
     }
 }

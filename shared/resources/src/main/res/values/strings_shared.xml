@@ -361,5 +361,5 @@
         <item>&#64;string/cloud_drive_tour_fifth_subtitle</item>
     </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
-    <string name="meetings_raised_hand_tooltip_title">New feature: Raise hand</string>
+    <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
 </resources>

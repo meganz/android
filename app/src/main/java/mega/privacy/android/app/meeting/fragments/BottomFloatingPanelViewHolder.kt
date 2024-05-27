@@ -527,6 +527,7 @@ class BottomFloatingPanelViewHolder(
         } else FrameLayout.LayoutParams.MATCH_PARENT
 
         floatingPanelView.root.layoutParams = params
+        meetingActionButtons.setNewTooltipKey()
     }
 
     /**
