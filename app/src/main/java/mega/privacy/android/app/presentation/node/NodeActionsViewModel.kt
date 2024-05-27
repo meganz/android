@@ -9,6 +9,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -38,10 +39,10 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -90,10 +91,10 @@ class NodeActionsViewModel @Inject constructor(
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -411,7 +412,6 @@ class NodeActionsViewModel @Inject constructor(
         _state.update { state -> state.copy(infoToShowEvent = consumed()) }
     }
 
-
     /**
      * Handle file node clicked
      *
@@ -464,27 +464,32 @@ class NodeActionsViewModel @Inject constructor(
     }
 
     fun handleHiddenNodesOnboardingResult(isOnboarded: Boolean) {
-        if (isOnboarded) {
-            viewModelScope.launch {
-                val selectedNodes = _state.value.selectedNodes
+        viewModelScope.launch {
+            runCatching {
+                if (isOnboarded) {
+                    val selectedNodes = _state.value.selectedNodes
 
-                selectedNodes.forEach {
-                    updateNodeSensitiveUseCase(
-                        nodeId = it.id,
-                        isSensitive = true,
-                    )
-                }
-                _state.update { state ->
-                    state.copy(
-                        infoToShowEvent = triggered(
-                            InfoToShow.QuantityString(
-                                stringId = R.plurals.hidden_nodes_result_message,
-                                count = selectedNodes.size,
+                    selectedNodes.forEach {
+                        updateNodeSensitiveUseCase(
+                            nodeId = it.id,
+                            isSensitive = true,
+                        )
+                    }
+                    _state.update { state ->
+                        state.copy(
+                            infoToShowEvent = triggered(
+                                InfoToShow.QuantityString(
+                                    stringId = R.plurals.hidden_nodes_result_message,
+                                    count = selectedNodes.size,
+                                )
                             )
                         )
-                    )
+                    }
                 }
-            }
+            }.onFailure { Timber.e(it) }
         }
     }
+
+    suspend fun isOnboarding() =
+        monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
 }

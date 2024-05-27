@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.node
 
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.contract.HiddenNodeOnboardingActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
@@ -137,7 +139,12 @@ class NodeActionHandler(
             is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview()
             is DownloadMenuAction -> nodeActionsViewModel.downloadNode()
             is AvailableOfflineMenuAction -> nodeActionsViewModel.downloadNodeForOffline()
-            is HideMenuAction -> hiddenNodesOnboardingLauncher?.launch(longArrayOf(node.id.longValue))
+            is HideMenuAction -> {
+                (activity as? AppCompatActivity)?.lifecycleScope?.launch {
+                    hiddenNodesOnboardingLauncher?.launch(nodeActionsViewModel.isOnboarding())
+                }
+            }
+
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }
     }
@@ -188,8 +195,9 @@ class NodeActionHandler(
             }
 
             is HideDropdownMenuAction -> {
-                val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
-                hiddenNodesOnboardingLauncher?.launch(nodeHandleArray)
+                (activity as? AppCompatActivity)?.lifecycleScope?.launch {
+                    hiddenNodesOnboardingLauncher?.launch(nodeActionsViewModel.isOnboarding())
+                }
             }
 
             else -> throw NotImplementedError("Action $action does not have a handler.")

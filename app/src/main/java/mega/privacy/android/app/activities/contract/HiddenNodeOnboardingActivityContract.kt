@@ -10,11 +10,11 @@ import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActiv
  * Hidden node onboarding activity contract
  */
 class HiddenNodeOnboardingActivityContract :
-    ActivityResultContract<LongArray, Boolean>() {
-    override fun createIntent(context: Context, input: LongArray): Intent {
+    ActivityResultContract<Boolean, Boolean>() {
+    override fun createIntent(context: Context, input: Boolean): Intent {
         return HiddenNodesOnboardingActivity.createScreen(
             context = context,
-            isOnboarding = true,
+            isOnboarding = input,
         )
     }
 
