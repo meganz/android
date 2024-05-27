@@ -61,7 +61,6 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaHandleList
 import org.webrtc.ContextUtils
 import timber.log.Timber
 import javax.inject.Inject
@@ -418,38 +417,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
      */
     fun showOneCallNotification(incomingCall: MegaChatCall) =
         callChangesObserver.showOneCallNotification(incomingCall)
-
-    /**
-     * Check one call
-     *
-     * @param incomingCallChatId
-     */
-    fun checkOneCall(incomingCallChatId: Long) =
-        callChangesObserver.checkOneCall(incomingCallChatId)
-
-    /**
-     * Check several call
-     *
-     * @param listAllCalls
-     * @param callStatus
-     * @param isRinging
-     * @param incomingCallChatId
-     */
-    fun checkSeveralCall(
-        listAllCalls: MegaHandleList?,
-        callStatus: Int,
-        isRinging: Boolean,
-        incomingCallChatId: Long,
-    ) {
-        listAllCalls?.let {
-            callChangesObserver.checkSeveralCall(
-                it,
-                callStatus,
-                isRinging,
-                incomingCallChatId
-            )
-        }
-    }
 
     /**
      * Create or update audio manager
