@@ -1,17 +1,17 @@
 package mega.privacy.android.app.presentation.login.onboarding.model
 
-import androidx.compose.runtime.Immutable
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 
 /**
- * A model represents the onboarding ui items
+ * A model represents the onboarding ui item
  *
- * @property drawableImageResources The list of images for the onboarding
- * @property titles The list of titles
- * @property subtitles The list of subtitles
+ * @property imageDrawableId The drawable resource ID for the image.
+ * @property titleStringId The string resource ID for the title.
+ * @property subtitleStringId The string resource ID for the subtitle.
  */
-@Immutable
 data class OnboardingUiItem(
-    val drawableImageResources: List<Int>,
-    val titles: List<String>,
-    val subtitles: List<String>,
+    @DrawableRes val imageDrawableId: Int,
+    @StringRes val titleStringId: Int,
+    @StringRes val subtitleStringId: Int,
 )

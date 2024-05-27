@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.login.onboarding.view
 
 import mega.privacy.android.shared.resources.R as SharedR
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -157,7 +156,7 @@ internal fun TourScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 40.dp),
-                    item = getOnboardingUiItem(context)
+                    item = getOnboardingUiItem()
                 )
 
                 Row(
@@ -231,39 +230,55 @@ internal fun TourScreen(
     }
 }
 
-private fun getOnboardingUiItem(context: Context) = OnboardingUiItem(
-    drawableImageResources = listOf(
-        R.drawable.tour1,
-        R.drawable.tour2,
-        R.drawable.tour3,
-        R.drawable.tour4,
-        R.drawable.tour5
+private fun getOnboardingUiItem() = listOf(
+    OnboardingUiItem(
+        imageDrawableId = R.drawable.tour1,
+        titleStringId = SharedR.string.cloud_drive_tour_first_title,
+        subtitleStringId = SharedR.string.cloud_drive_tour_first_subtitle
     ),
-    titles = context.resources.getStringArray(SharedR.array.cloud_drive_tour_titles).toList(),
-    subtitles = context.resources.getStringArray(SharedR.array.cloud_drive_tour_subtitles).toList()
+    OnboardingUiItem(
+        imageDrawableId = R.drawable.tour2,
+        titleStringId = SharedR.string.cloud_drive_tour_second_title,
+        subtitleStringId = SharedR.string.cloud_drive_tour_second_subtitle
+    ),
+    OnboardingUiItem(
+        imageDrawableId = R.drawable.tour3,
+        titleStringId = SharedR.string.cloud_drive_tour_third_title,
+        subtitleStringId = SharedR.string.cloud_drive_tour_third_subtitle
+    ),
+    OnboardingUiItem(
+        imageDrawableId = R.drawable.tour4,
+        titleStringId = SharedR.string.cloud_drive_tour_fourth_title,
+        subtitleStringId = SharedR.string.cloud_drive_tour_fourth_subtitle
+    ),
+    OnboardingUiItem(
+        imageDrawableId = R.drawable.tour5,
+        titleStringId = SharedR.string.cloud_drive_tour_fifth_title,
+        subtitleStringId = SharedR.string.cloud_drive_tour_fifth_subtitle
+    )
 )
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HorizontalTourPager(
-    item: OnboardingUiItem,
+    item: List<OnboardingUiItem>,
     modifier: Modifier = Modifier,
 ) {
     InfiniteHorizontalPagerWithIndicator(
         modifier = modifier,
-        pageCount = item.drawableImageResources.size,
+        pageCount = item.size,
         isOverScrollModeEnable = false,
         // We need to know the tallest height among the onboarding items.
         // Since the initial page is the middle item,
         // we only need to render the half left and right sides.
-        beyondBoundsPageCount = item.drawableImageResources.size / 2,
+        beyondBoundsPageCount = item.size / 2,
         verticalAlignment = Alignment.Top
     ) { page ->
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val painter = painterResource(id = item.drawableImageResources[page])
+            val painter = painterResource(id = item[page].imageDrawableId)
             val imageRatio = painter.intrinsicSize.width / painter.intrinsicSize.height
             Image(
                 modifier = Modifier
@@ -271,19 +286,19 @@ private fun HorizontalTourPager(
                     .aspectRatio(imageRatio),
                 painter = painter,
                 contentScale = ContentScale.Fit,
-                contentDescription = item.titles[page]
+                contentDescription = stringResource(id = item[page].titleStringId)
             )
 
             MegaText(
                 modifier = Modifier.padding(top = 20.dp),
-                text = item.titles[page],
+                text = stringResource(id = item[page].titleStringId),
                 textColor = TextColor.Primary,
                 style = MaterialTheme.typography.h6
             )
 
             MegaText(
                 modifier = Modifier.padding(top = 8.dp, start = 24.dp, end = 24.dp),
-                text = item.subtitles[page],
+                text = stringResource(id = item[page].subtitleStringId),
                 textAlign = TextAlign.Center,
                 textColor = TextColor.Secondary,
                 style = MaterialTheme.typography.subtitle2
