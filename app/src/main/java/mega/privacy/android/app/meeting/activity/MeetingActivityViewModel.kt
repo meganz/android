@@ -20,6 +20,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -65,6 +66,7 @@ import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -256,6 +258,8 @@ class MeetingActivityViewModel @Inject constructor(
     val avatarLiveData: LiveData<Bitmap> = _avatarLiveData
 
     var tips: MutableLiveData<String> = MutableLiveData<String>()
+
+    private var monitorChatCallUpdatesJob: Job? = null
 
     // OnOffFab
     private val _micLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
@@ -587,6 +591,9 @@ class MeetingActivityViewModel @Inject constructor(
 
                         else -> {
                             checkIfPresenting(it)
+                            if (state.value.isRaiseToSpeakFeatureFlagEnabled) {
+                                initialiseUserToShowInHandRaisedSnackbar(call)
+                            }
                             if (checkEphemeralAccount) {
                                 checkEphemeralAccountAndWaitingRoom(it)
                             }
@@ -785,6 +792,7 @@ class MeetingActivityViewModel @Inject constructor(
      * @param message     Content for snack bar
      */
     private fun triggerHandRaisedSnackbarMsg(message: String) {
+        clearUserToShowInHandRaisedSnackbar()
         onSnackbarMessageConsumed()
         _state.update { it.copy(handRaisedSnackbarMsg = triggered(message)) }
     }
@@ -802,52 +810,49 @@ class MeetingActivityViewModel @Inject constructor(
      * Control the snackbar to be displayed when someone raises their hand.
      */
     private fun checkShowHandRaisedSnackbar() {
-        when (state.value.numUsersWithHandRaised) {
+        when (val numberOfParticipants = state.value.userToShowInHandRaisedSnackbarNumber()) {
             0 -> Timber.d("No users with hand raised")
             1 -> when {
-                state.value.isMyHandRaisedToSpeak -> triggerHandRaisedSnackbarMsg(
+                state.value.isMyHandRaisedToShowSnackbar -> triggerHandRaisedSnackbarMsg(
                     getStringFromStringResMapper(
                         R.string.meeting_your_hand_is_raised_message
                     )
                 )
 
+                else -> {
+                    val name = state.value.getParticipantNameWithRaisedHand()
+                    triggerHandRaisedSnackbarMsg(
+                        getStringFromStringResMapper(
+                            R.string.meetings_one_participant_raised_their_hand_message,
+                            name
+                        )
+                    )
+                }
+            }
+
+            else -> when {
+                state.value.isMyHandRaisedToShowSnackbar -> triggerHandRaisedSnackbarMsg(
+                    getPluralStringFromStringResMapper(
+                        stringId = R.plurals.meeting_you_and_others_raised_your_hands_message,
+                        quantity = numberOfParticipants - 1,
+                        numberOfParticipants - 1
+                    )
+                )
+
                 else -> state.value.getParticipantNameWithRaisedHand()
-                    ?.let { name ->
+                    .let { name ->
                         triggerHandRaisedSnackbarMsg(
-                            getStringFromStringResMapper(
-                                R.string.meetings_one_participant_raised_their_hand_message,
-                                name
+                            getPluralStringFromStringResMapper(
+                                stringId = R.plurals.meetings_other_participants_raised_their_hands_message,
+                                quantity = numberOfParticipants - 1,
+                                name,
+                                numberOfParticipants - 1
                             )
                         )
                     }
             }
-
-            else -> {
-                when {
-                    state.value.isMyHandRaisedToSpeak -> triggerHandRaisedSnackbarMsg(
-                        getPluralStringFromStringResMapper(
-                            stringId = R.plurals.meeting_you_and_others_raised_your_hands_message,
-                            quantity = state.value.getNumOfOtherParticipantsWithHandRaised(),
-                            state.value.getNumOfOtherParticipantsWithHandRaised()
-                        )
-                    )
-
-                    else -> state.value.getParticipantNameWithRaisedHand()
-                        ?.let { name ->
-                            triggerHandRaisedSnackbarMsg(
-                                getPluralStringFromStringResMapper(
-                                    stringId = R.plurals.meetings_other_participants_raised_their_hands_message,
-                                    quantity = state.value.getNumOfOtherParticipantsWithHandRaised(),
-                                    name,
-                                    state.value.getNumOfOtherParticipantsWithHandRaised()
-                                )
-                            )
-                        }
-                }
-            }
         }
     }
-
 
     /**
      * Check ephemeral account and waiting room
@@ -891,8 +896,9 @@ class MeetingActivityViewModel @Inject constructor(
     /**
      * Get chat call updates
      */
-    private fun startMonitoringChatCallUpdates() =
-        viewModelScope.launch {
+    private fun startMonitoringChatCallUpdates() {
+        monitorChatCallUpdatesJob?.cancel()
+        monitorChatCallUpdatesJob = viewModelScope.launch {
             monitorChatCallUpdatesUseCase()
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
@@ -930,8 +936,32 @@ class MeetingActivityViewModel @Inject constructor(
                             }
 
                             contains(ChatCallChanges.CallRaiseHand) -> {
-                                if (call.flag) {
-                                    checkShowHandRaisedSnackbar()
+                                if (state.value.isRaiseToSpeakFeatureFlagEnabled) {
+                                    when (call.flag) {
+                                        true -> {
+                                            val listToUpdate =
+                                                state.value.userToShowInHandRaisedSnackbar +
+                                                        (call.raisedHandsList?.filterNot {
+                                                            state.value.userToShowInHandRaisedSnackbar.containsKey(
+                                                                it
+                                                            )
+                                                        }
+                                                            ?.associateWith { true } ?: emptyMap())
+
+                                            updateUserToShowInHandRaisedSnackbar(listToUpdate)
+                                            monitorGroupHandRaisedSnackbar()
+                                        }
+
+                                        false -> {
+                                            val listToUpdate =
+                                                state.value.userToShowInHandRaisedSnackbar.filter { entry ->
+                                                    call.raisedHandsList?.contains(entry.key)
+                                                        ?: false
+                                                }.toMap()
+
+                                            updateUserToShowInHandRaisedSnackbar(listToUpdate)
+                                        }
+                                    }
                                 }
                             }
 
@@ -981,6 +1011,29 @@ class MeetingActivityViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    /**
+     * Monitor group snackbar notifications when several users raise their hands at the same time
+     */
+    private fun monitorGroupHandRaisedSnackbar() {
+        if (!state.value.isWaitingForGroupHandRaisedSnackbars) {
+            _state.update { state ->
+                state.copy(
+                    isWaitingForGroupHandRaisedSnackbars = true
+                )
+            }
+
+            runDelay(DEFAULT_GROUP_SNACKBARS_TIMEOUT_MILLISECONDS) {
+                _state.update { state ->
+                    state.copy(
+                        isWaitingForGroupHandRaisedSnackbars = false
+                    )
+                }
+                checkShowHandRaisedSnackbar()
+            }
+        }
+    }
 
     /**
      * Get chat session updates
@@ -1107,6 +1160,7 @@ class MeetingActivityViewModel @Inject constructor(
                     chatId = chatId
                 )
             }
+
             getChatAndCall()
         }
     }
@@ -1769,7 +1823,6 @@ class MeetingActivityViewModel @Inject constructor(
                     Timber.e(exception)
                 }
                 .collectLatest { list ->
-                    Timber.d("Updated list of participants: list ${list.size}")
                     _state.update { state ->
                         state.copy(
                             chatParticipantList = list
@@ -1813,9 +1866,7 @@ class MeetingActivityViewModel @Inject constructor(
 
             state.value.usersInCall.find { it.peerId == chatParticipant.handle }
                 ?.let { participant ->
-
                     participantAdded = true
-
                     chatParticipantsInCall.add(chatParticipantMapper(participant, chatParticipant))
                 }
 
@@ -1892,6 +1943,41 @@ class MeetingActivityViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Initialise user to show in hand raised snackbar
+     *
+     * @param call  [ChatCall]
+     */
+    private fun initialiseUserToShowInHandRaisedSnackbar(call: ChatCall) {
+        val listToUpdate = buildMap {
+            call.raisedHandsList?.forEach { peerId ->
+                this[peerId] = false
+            }
+        }
+
+        updateUserToShowInHandRaisedSnackbar(listToUpdate)
+    }
+
+    /**
+     * Clear user ids with changes in raised hand list
+     */
+    private fun clearUserToShowInHandRaisedSnackbar() {
+        val listToUpdate = mutableMapOf<Long, Boolean>()
+        state.value.userToShowInHandRaisedSnackbar.forEach {
+            listToUpdate[it.key] = false
+        }
+
+        updateUserToShowInHandRaisedSnackbar(listToUpdate)
+    }
+
+    /**
+     * Update user ids with changes in raised hand list
+     *
+     * @param list  map with new values
+     */
+    private fun updateUserToShowInHandRaisedSnackbar(list: Map<Long, Boolean>) =
+        _state.update { state -> state.copy(userToShowInHandRaisedSnackbar = list) }
 
 
     /**
@@ -2191,5 +2277,7 @@ class MeetingActivityViewModel @Inject constructor(
         private const val INVALID_CHAT_HANDLE = -1L
         private const val INVALID_POSITION = -1
         private const val DEFAULT_RING_TIMEOUT_SECONDS = 40L
+        private const val DEFAULT_GROUP_SNACKBARS_TIMEOUT_MILLISECONDS = 500L
+
     }
 }

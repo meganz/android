@@ -29,6 +29,7 @@ class ChatParticipantMapper @Inject constructor() {
             isContact = participant.isContact,
             isSpeaker = participant.isSpeaker,
             isGuest = participant.isGuest,
+            isRaisedHand = participant.isRaisedHand
         ),
     )
 }
