@@ -810,6 +810,12 @@ class MeetingActivityViewModel @Inject constructor(
      * Control the snackbar to be displayed when someone raises their hand.
      */
     private fun checkShowHandRaisedSnackbar() {
+        _state.update {
+            it.copy(
+                showLowerHandButtonInSnackbar = state.value.isMyHandRaisedToShowSnackbar
+            )
+        }
+
         when (val numberOfParticipants = state.value.userToShowInHandRaisedSnackbarNumber()) {
             0 -> Timber.d("No users with hand raised")
             1 -> when {

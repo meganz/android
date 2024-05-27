@@ -51,7 +51,7 @@ fun SnackbarInMeetingView(
             coroutineScope.launch {
                 val result = snackbarHostState.showSnackbar(
                     message = it,
-                    actionLabel = if (uiState.isMyHandRaisedToSpeak)
+                    actionLabel = if (uiState.showLowerHandButtonInSnackbar)
                         context.getString(R.string.meetings_lower_hand_option_button)
                     else
                         context.getString(R.string.contact_view),

@@ -68,6 +68,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property handRaisedSnackbarMsg                      Message to show in Snackbar.
  * @property isRaiseToSpeakFeatureFlagEnabled           True, if Raise to speak feature flag enabled. False, otherwise.
  * @property isWaitingForGroupHandRaisedSnackbars       Waiting for group hand raised snackbars.
+ * @property showLowerHandButtonInSnackbar              True, show lower hand button. False, show view button.
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -120,7 +121,8 @@ data class MeetingState(
     val handRaisedSnackbarMsg: StateEventWithContent<String> = consumed(),
     val isRaiseToSpeakFeatureFlagEnabled: Boolean = false,
     val userToShowInHandRaisedSnackbar: Map<Long, Boolean> = emptyMap(),
-    val isWaitingForGroupHandRaisedSnackbars: Boolean = false
+    val isWaitingForGroupHandRaisedSnackbars: Boolean = false,
+    val showLowerHandButtonInSnackbar: Boolean = false
 ) {
 
     /**

@@ -544,11 +544,15 @@ class InMeetingViewModel @Inject constructor(
         state.value.call?.let { call ->
             participants.value = participants.value?.map { participant ->
                 call.usersRaiseHands.filter { it.key == participant.peerId }.forEach {
-                    if (participant.isRaisedHand != it.value) {
-                        listWithChanges.add(participant.peerId)
-                        return@map participant.copy(
-                            isRaisedHand = it.value
-                        )
+                    when {
+                        participant.isRaisedHand != it.value -> {
+                            listWithChanges.add(participant.peerId)
+                            return@map participant.copy(
+                                isRaisedHand = it.value
+                            )
+                        }
+
+                        else -> return@map participant
                     }
                 }
 
