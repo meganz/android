@@ -35,7 +35,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     NewAudioQueue(
         "Enable new audio queue",
-        false,
+        true,
     ),
 
     /**
