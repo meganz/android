@@ -100,8 +100,10 @@ import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StopHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.StopLowResolutionVideoUseCase
+import mega.privacy.android.domain.usecase.meeting.raisehandtospeak.IsRaiseToHandSuggestionShownUseCase
 import mega.privacy.android.domain.usecase.meeting.raisehandtospeak.LowerHandToStopSpeakUseCase
 import mega.privacy.android.domain.usecase.meeting.raisehandtospeak.RaiseHandToSpeakUseCase
+import mega.privacy.android.domain.usecase.meeting.raisehandtospeak.SetRaiseToHandSuggestionShownUseCase
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_CONNECTING
@@ -146,6 +148,16 @@ import javax.inject.Inject
  * @property joinMeetingAsGuestUseCase          [JoinMeetingAsGuestUseCase]
  * @property chatLogoutUseCase                  [ChatLogoutUseCase]
  * @property getFeatureFlagValueUseCase         [GetFeatureFlagValueUseCase]
+ * @property getMyUserHandleUseCase             [GetMyUserHandleUseCase]
+ * @property raiseHandToSpeakUseCase            [RaiseHandToSpeakUseCase]
+ * @property lowerHandToStopSpeakUseCase        [LowerHandToStopSpeakUseCase]
+ * @property holdChatCallUseCase                [HoldChatCallUseCase]
+ * @property monitorParticipatingInAnotherCallUseCase [MonitorParticipatingInAnotherCallUseCase]
+ * @property getStringFromStringResMapper        [GetStringFromStringResMapper]
+ * @property getPluralStringFromStringResMapper  [GetPluralStringFromStringResMapper]
+ * @property isEphemeralPlusPlusUseCase         [IsEphemeralPlusPlusUseCase]
+ * @property isRaiseToHandSuggestionShownUseCase [IsRaiseToHandSuggestionShownUseCase]
+ * @property setRaiseToHandSuggestionShown      [SetRaiseToHandSuggestionShown]
  * @property state                              Current view state as [InMeetingUiState]
  * @property context                            Application context
  */
@@ -187,6 +199,8 @@ class InMeetingViewModel @Inject constructor(
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     private val raiseHandToSpeakUseCase: RaiseHandToSpeakUseCase,
     private val lowerHandToStopSpeakUseCase: LowerHandToStopSpeakUseCase,
+    private val isRaiseToHandSuggestionShownUseCase: IsRaiseToHandSuggestionShownUseCase,
+    private val setRaiseToHandSuggestionShownUseCase: SetRaiseToHandSuggestionShownUseCase,
     @ApplicationContext private val context: Context,
 ) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
@@ -3345,7 +3359,6 @@ class InMeetingViewModel @Inject constructor(
                 }
             }
         }
-
     }
 
     /**
@@ -3354,6 +3367,48 @@ class InMeetingViewModel @Inject constructor(
     fun hideParticipantChangesMessage() {
         _state.update {
             it.copy(participantsChanges = null)
+        }
+    }
+
+    /**
+     * Set raised hand suggestion shown
+     */
+    fun setRaisedHandSuggestionShown() {
+        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not()) return
+        viewModelScope.launch {
+            runCatching {
+                setRaiseToHandSuggestionShownUseCase()
+                hideRaiseToHandPopup()
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Hide raise to hand popup
+     */
+    fun hideRaiseToHandPopup() {
+        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not()) return
+        _state.update {
+            it.copy(
+                isRaiseToHandSuggestionShown = true
+            )
+        }
+    }
+
+    /**
+     * Check if raise to hand feature tooltip is shown
+     */
+    fun checkRaiseToHandFeatureTooltipIsShown() {
+        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not()) return
+        viewModelScope.launch {
+            runCatching {
+                val value = isRaiseToHandSuggestionShownUseCase()
+                _state.update { it.copy(isRaiseToHandSuggestionShown = value) }
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 }

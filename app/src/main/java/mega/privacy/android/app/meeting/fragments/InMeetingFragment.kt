@@ -126,7 +126,6 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.meeting.AnotherCallType
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
@@ -134,6 +133,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -1153,6 +1153,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             if (state.showMeetingEndWarningDialog) {
                 collapsePanel()
             }
+            bottomFloatingPanelViewHolder?.setRaiseHandToolTipShown(state.isRaiseToHandSuggestionShown)
         }
 
         viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->

@@ -4,7 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -46,12 +46,12 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
  */
 @Composable
 fun LegacyMegaTooltip(
-    modifier: Modifier = Modifier,
-    titleText: String,
     descriptionText: String,
     actionText: String,
     showOnTop: Boolean,
     onDismissed: () -> Unit,
+    modifier: Modifier = Modifier,
+    titleText: String? = null,
     content: @Composable () -> Unit,
 ) {
     var window: BalloonWindow? by remember { mutableStateOf(null) }
@@ -71,26 +71,35 @@ fun LegacyMegaTooltip(
         setArrowOrientationRules(ArrowOrientationRules.ALIGN_ANCHOR)
         setArrowPositionRules(ArrowPositionRules.ALIGN_ANCHOR)
         setBalloonAnimation(BalloonAnimation.FADE)
-        passTouchEventToAnchor = true
         setBackgroundColor(bgColor)
     }
 
     Balloon(
         modifier = modifier,
         builder = builder,
+        onBalloonWindowInitialized = { window = it },
+        onComposedAnchor = {
+            if (showOnTop) {
+                window?.showAlignTop()
+            } else {
+                window?.showAtCenter()
+            }
+        },
         balloonContent = {
             Column(
                 modifier = if (LocalLayoutDirection.current == LayoutDirection.Rtl) {
                     Modifier.fillMaxWidth()
                 } else {
-                    Modifier.width(216.dp)
+                    Modifier.wrapContentWidth()
                 }
             ) {
-                Text(
-                    text = titleText,
-                    color = MaterialTheme.colors.white_black,
-                    style = MaterialTheme.typography.body2medium,
-                )
+                if (titleText != null) {
+                    Text(
+                        text = titleText,
+                        color = MaterialTheme.colors.white_black,
+                        style = MaterialTheme.typography.body2medium,
+                    )
+                }
                 MegaSpannedText(
                     value = descriptionText,
                     baseStyle = MaterialTheme.typography.caption.copy(
@@ -115,13 +124,7 @@ fun LegacyMegaTooltip(
                 )
             }
         }
-    ) { balloonWindow ->
-        window = balloonWindow
+    ) {
         content()
-        if (showOnTop) {
-            balloonWindow.showAlignTop()
-        } else {
-            balloonWindow.showAtCenter()
-        }
     }
 }

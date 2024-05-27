@@ -50,6 +50,7 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property participantsChanges                    Message to show when a participant changes
  * @property userIdsWithChangesInRaisedHand         User identifiers with changes in the raised hand
  * @property shouldParticipantInCallListBeShown         True, it must be shown. False, must be hidden
+ * @property isRaiseToHandSuggestionShown           True, if the Raise to Hand suggestion has been shown. False, otherwise.
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -88,6 +89,7 @@ data class InMeetingUiState(
     val showOnlyMeEndCallTime: Long? = null,
     val participantsChanges: ParticipantsChange? = null,
     val userIdsWithChangesInRaisedHand: List<Long> = emptyList(),
+    val isRaiseToHandSuggestionShown: Boolean = true,
 ) {
     /**
      * Is call on hold

@@ -33,154 +33,14 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:backgroundTint="@color/grey_700" />
 
-    <mega.privacy.android.app.components.OnOffFab
-        android:id="@+id/fab_mic"
-        style="@style/BottomSheetIcon"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="40dp"
-        app:disable_icon="@drawable/ic_mic"
-        app:is_on="true"
-        app:apply_tint="false"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:off_icon="@drawable/ic_mic_stop"
-        app:on_icon="@drawable/ic_mic"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/mic_warning"
-        android:layout_width="wrap_content"
+    <mega.privacy.android.app.meeting.fragments.MeetingsActionButtonsView
+        android:id="@+id/meeting_action_buttons"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:elevation="3dp"
-        android:src="@drawable/ic_permission_warning"
-        app:layout_constraintRight_toRightOf="@id/fab_mic"
-        app:layout_constraintTop_toTopOf="@id/fab_mic"
-        tools:ignore="ContentDescription" />
-
-    <TextView
-        android:id="@+id/fab_mic_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:text="@string/general_mic"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
-        app:layout_constraintEnd_toEndOf="@id/fab_mic"
-        app:layout_constraintStart_toStartOf="@id/fab_mic"
-        app:layout_constraintTop_toBottomOf="@id/fab_mic" />
-
-    <mega.privacy.android.app.components.OnOffFab
-        android:id="@+id/fab_cam"
-        style="@style/BottomSheetIcon"
-        app:disable_icon="@drawable/ic_video_on"
-        app:apply_tint="false"
-        app:is_on="true"
-        app:layout_constraintEnd_toStartOf="@id/fab_speaker"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@id/fab_mic"
-        app:layout_constraintTop_toTopOf="@id/fab_mic"
-        app:off_icon="@drawable/ic_video_off"
-        app:on_icon="@drawable/ic_video_on"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/cam_warning"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:elevation="3dp"
-        android:src="@drawable/ic_permission_warning"
-        app:layout_constraintRight_toRightOf="@id/fab_cam"
-        app:layout_constraintTop_toTopOf="@id/fab_cam"
-        tools:ignore="ContentDescription" />
-
-    <TextView
-        android:id="@+id/fab_cam_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:text="@string/general_camera"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
-        app:layout_constraintEnd_toEndOf="@id/fab_cam"
-        app:layout_constraintStart_toStartOf="@id/fab_cam"
-        app:layout_constraintTop_toBottomOf="@id/fab_cam" />
-
-    <mega.privacy.android.app.components.OnOffFab
-        android:id="@+id/fab_speaker"
-        style="@style/BottomSheetIcon"
-        app:disable_icon="@drawable/ic_volume_max"
-        app:apply_tint="false"
-        app:is_on="true"
-        app:layout_constraintEnd_toStartOf="@id/fab_hold"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@id/fab_cam"
-        app:layout_constraintTop_toTopOf="@id/fab_mic"
-        app:off_icon="@drawable/ic_volume_off"
-        app:on_icon="@drawable/ic_volume_max"
-        tools:ignore="ContentDescription" />
-
-    <TextView
-        android:id="@+id/fab_speaker_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:text="@string/general_speaker"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
-        app:layout_constraintEnd_toEndOf="@id/fab_speaker"
-        app:layout_constraintStart_toStartOf="@id/fab_speaker"
-        app:layout_constraintTop_toBottomOf="@id/fab_speaker" />
-
-    <mega.privacy.android.app.components.OnOffFab
-        android:id="@+id/fab_hold"
-        style="@style/BottomSheetIcon"
-        app:disable_icon="@drawable/more_call_options_icon"
-        app:apply_tint="false"
-        app:is_on="true"
-        app:layout_constraintEnd_toStartOf="@id/fab_end"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@id/fab_speaker"
-        app:layout_constraintTop_toTopOf="@id/fab_mic"
-        app:off_icon="@drawable/more_call_options_icon"
-        app:on_icon="@drawable/more_call_options_icon"
-        tools:ignore="ContentDescription" />
-
-    <TextView
-        android:id="@+id/fab_hold_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:text="@string/meetings_more_call_option_button"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
-        app:layout_constraintEnd_toEndOf="@id/fab_hold"
-        app:layout_constraintStart_toStartOf="@id/fab_hold"
-        app:layout_constraintTop_toBottomOf="@id/fab_hold" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_end"
-        android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:layout_marginEnd="20dp"
-        android:background="@null"
-        android:src="@drawable/hang_call_icon"
-        app:tint="@null"
-        android:tint="@null"
-        app:backgroundTint="@color/color_primary_400"
-        app:borderWidth="0dp"
-        app:elevation="0dp"
-        app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
+        android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/fab_mic"
-        app:pressedTranslationZ="12dp"
-        tools:ignore="ContentDescription" />
-
-    <TextView
-        android:id="@+id/fab_end_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:text="@string/meeting_end"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
-        app:layout_constraintEnd_toEndOf="@id/fab_end"
-        app:layout_constraintStart_toStartOf="@id/fab_end"
-        app:layout_constraintTop_toBottomOf="@id/fab_end" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/participants_compose_view"
@@ -188,5 +48,5 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fab_end_label"/>
+        app:layout_constraintTop_toBottomOf="@id/meeting_action_buttons" />
 </androidx.constraintlayout.widget.ConstraintLayout>
