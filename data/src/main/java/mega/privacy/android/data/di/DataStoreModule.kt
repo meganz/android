@@ -8,7 +8,6 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKey
 import dagger.Module
 import dagger.Provides
@@ -128,12 +127,6 @@ internal object DataStoreModule {
         migration: CredentialsPreferencesMigration,
         masterKey: MasterKey,
     ): DataStore<Preferences> {
-        val encryptedFile = EncryptedFile.Builder(
-            context,
-            context.preferencesDataStoreFile(credentialDataStoreName),
-            masterKey,
-            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-        ).build()
         return PreferenceDataStoreFactory.createEncrypted(
             corruptionHandler = ReplaceFileCorruptionHandler(
                 produceNewData = { emptyPreferences() }
@@ -142,7 +135,9 @@ internal object DataStoreModule {
                 migration
             ),
             scope = CoroutineScope(ioDispatcher),
-            produceFile = { encryptedFile }
+            masterKey = masterKey,
+            context = context,
+            fileName = credentialDataStoreName
         )
     }
 }
