@@ -7,11 +7,12 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
+import kotlinx.coroutines.launch
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.Progress
@@ -30,8 +31,9 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
+import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
-import mega.privacy.android.domain.usecase.chat.message.pendingmessages.CompressAndUploadAllPendingMessagesUseCase
+import mega.privacy.android.domain.usecase.chat.message.pendingmessages.CompressPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
@@ -39,6 +41,7 @@ import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTot
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.ClearPendingMessagesCompressionProgressUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.StartUploadingAllPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 
@@ -64,9 +67,11 @@ class ChatUploadsWorker @AssistedInject constructor(
     private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     private val checkFinishedChatUploadsUseCase: CheckFinishedChatUploadsUseCase,
-    private val compressAndUploadAllPendingMessagesUseCase: CompressAndUploadAllPendingMessagesUseCase,
+    private val compressPendingMessagesUseCase: CompressPendingMessagesUseCase,
     private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     private val clearPendingMessagesCompressionProgressUseCase: ClearPendingMessagesCompressionProgressUseCase,
+    private val startUploadingAllPendingMessagesUseCase: StartUploadingAllPendingMessagesUseCase,
+    private val monitorPendingMessagesByStateUseCase: MonitorPendingMessagesByStateUseCase,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
@@ -90,35 +95,55 @@ class ChatUploadsWorker @AssistedInject constructor(
 ) {
     override val updateNotificationId = NOTIFICATION_CHAT_UPLOAD
 
-    private val chatCompressionProgress =
-        MutableStateFlow<ChatCompressionState>(ChatCompressionProgress(0, 0, Progress(0f)))
+    private var chatCompressionProgress: ChatCompressionState =
+        ChatCompressionProgress(0, 0, Progress(0f))
 
     override fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ) = chatUploadNotificationMapper(
         activeTransferTotals,
-        (chatCompressionProgress.value as? ChatCompressionProgress),
+        (chatCompressionProgress as? ChatCompressionProgress),
         paused
     )
 
-    override fun monitorOngoingActiveTransfers(): Flow<MonitorOngoingActiveTransfersResult> =
+    override fun monitorProgress(): Flow<MonitorOngoingActiveTransfersResult> =
         combine(
             monitorOngoingActiveTransfersUseCase(type),
-            compressAndUploadAllPendingMessagesUseCase()
-        ) { monitorOngoingActiveTransfersResult, chatCompressionProgress ->
-            monitorOngoingActiveTransfersResult to chatCompressionProgress
-        }.transformWhile { (ongoingActiveTransfersResult, progress) ->
+            monitorPendingMessagesByStateUseCase(
+                PendingMessageState.PREPARING,
+                PendingMessageState.COMPRESSING,
+                PendingMessageState.READY_TO_UPLOAD,
+                PendingMessageState.UPLOADING,
+                PendingMessageState.ATTACHING,
+            ),
+        ) { monitorOngoingActiveTransfersResult, pendingMessages ->
+            monitorOngoingActiveTransfersResult to pendingMessages.size
+        }.transformWhile { (ongoingActiveTransfersResult, pendingMessagesCount) ->
             emit(ongoingActiveTransfersResult)
-            chatCompressionProgress.value = progress
-            //keep monitoring if and only if there are compressions or transfers in progress
-            return@transformWhile progress != ChatCompressionFinished || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota && !ongoingActiveTransfersResult.storageOverQuota)
+            Timber.d("Chat upload progress emitted: $pendingMessagesCount ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
+            //keep monitoring if and only if there are work to do or transfers in progress
+            return@transformWhile pendingMessagesCount > 0 || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota && !ongoingActiveTransfersResult.storageOverQuota)
         }.onCompletion {
             clearPendingMessagesCompressionProgressUseCase()
         }
 
+    override suspend fun doWorkInternal(scope: CoroutineScope) {
+        scope.launch {
+            super.doWorkInternal(this)
+        }
+        scope.launch {
+            compressPendingMessagesUseCase().collect {
+                chatCompressionProgress = it
+            }
+        }
+        scope.launch {
+            startUploadingAllPendingMessagesUseCase().collect {}
+        }
+    }
+
     override fun hasCompleted(activeTransferTotals: ActiveTransferTotals): Boolean {
-        return activeTransferTotals.hasCompleted() && chatCompressionProgress.value is ChatCompressionFinished
+        return activeTransferTotals.hasCompleted() && chatCompressionProgress is ChatCompressionFinished
     }
 
     override suspend fun onStart() {

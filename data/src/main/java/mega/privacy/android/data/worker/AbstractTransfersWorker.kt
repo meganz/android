@@ -101,7 +101,7 @@ abstract class AbstractTransfersWorker(
     /**
      * @return a flow with updates of MonitorOngoingActiveTransfersResult to track the progress of the ongoing work. It will be sampled to avoid too much updates.
      */
-    abstract fun monitorOngoingActiveTransfers(): Flow<MonitorOngoingActiveTransfersResult>
+    abstract fun monitorProgress(): Flow<MonitorOngoingActiveTransfersResult>
 
     /**
      * @return true if the work is completed, false otherwise
@@ -114,10 +114,12 @@ abstract class AbstractTransfersWorker(
     override suspend fun doWork() = withContext(ioDispatcher) {
         Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Started")
         crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Started")
-        val monitorJob = monitorTransferEvents(this)
+        val doWorkJob = this.launch(ioDispatcher) {
+            doWorkInternal(this)
+        }
         correctActiveTransfersUseCase(type) //to be sure we haven't missed any event before monitoring them
         onStart()
-        val lastMonitorOngoingActiveTransfersResult = monitorOngoingActiveTransfers()
+        val lastMonitorOngoingActiveTransfersResult = monitorProgress()
             .catch { Timber.e("${this@AbstractTransfersWorker::class.java.simpleName}error: $it") }
             .onFirst {
                 if (!hasCompleted(it.activeTransferTotals)) {
@@ -140,7 +142,7 @@ abstract class AbstractTransfersWorker(
                 Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}${if (paused) "(paused) " else ""} Notification update (${transferTotals.transferProgress.intValue}):${transferTotals.hasOngoingTransfers()}")
             }.lastOrNull()
 
-        stopService(monitorJob)
+        stopWork(doWorkJob)
         lastMonitorOngoingActiveTransfersResult?.let { (lastActiveTransferTotals, _, transferOverQuota, storageOverQuota) ->
             if (hasCompleted(lastActiveTransferTotals)) {
                 Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished Successful: $lastActiveTransferTotals")
@@ -203,25 +205,24 @@ abstract class AbstractTransfersWorker(
     /**
      * Monitors transfer events and update the related active transfers
      */
-    private fun monitorTransferEvents(scope: CoroutineScope) =
-        scope.launch(ioDispatcher) {
-            monitorTransferEventsUseCase()
-                .filter { it.transfer.transferType == type }
-                .collect { transferEvent ->
-                    onTransferEventReceived(transferEvent)
-                    withContext(NonCancellable) {
-                        //handling events can update Active transfers and ends the monitorOngoingActiveTransfers flow that triggers the cancelling of this job, so we need to launch it in a non cancellable context
-                        launch {
-                            handleTransferEventUseCase(transferEvent)
-                        }
+    internal open suspend fun doWorkInternal(scope: CoroutineScope) {
+        monitorTransferEventsUseCase()
+            .filter { it.transfer.transferType == type }
+            .collect { transferEvent ->
+                onTransferEventReceived(transferEvent)
+                withContext(NonCancellable) {
+                    //handling events can update Active transfers and ends the monitorOngoingActiveTransfers flow that triggers the cancelling of this job, so we need to launch it in a non cancellable context
+                    launch {
+                        handleTransferEventUseCase(transferEvent)
                     }
                 }
-        }
+            }
+    }
 
-    private suspend fun stopService(monitorJob: Job) {
+    private suspend fun stopWork(performWorkJob: Job) {
         notificationManager.cancel(updateNotificationId)
         clearActiveTransfersIfFinishedUseCase(type)
-        monitorJob.cancel()
+        performWorkJob.cancel()
     }
 
     /**
@@ -250,7 +251,10 @@ abstract class AbstractTransfersWorker(
         )
 
     @SuppressLint("MissingPermission")
-    private suspend fun showFinalNotification(notification: Notification?, notificationId: Int?) {
+    private suspend fun showFinalNotification(
+        notification: Notification?,
+        notificationId: Int?,
+    ) {
         if (notification != null && notificationId != null && areNotificationsEnabledUseCase()) {
             notificationManager.notify(
                 notificationId,

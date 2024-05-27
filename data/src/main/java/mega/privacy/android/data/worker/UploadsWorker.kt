@@ -69,7 +69,7 @@ class UploadsWorker @AssistedInject constructor(
     override val finalNotificationId = NOTIFICATION_UPLOAD_FINAL
     override val updateNotificationId = UPLOAD_NOTIFICATION_ID
 
-    override fun monitorOngoingActiveTransfers(): Flow<MonitorOngoingActiveTransfersResult> =
+    override fun monitorProgress(): Flow<MonitorOngoingActiveTransfersResult> =
         monitorOngoingActiveTransfersUntilFinishedUseCase(type)
 
     override fun createUpdateNotification(
