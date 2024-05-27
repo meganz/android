@@ -17,6 +17,10 @@ import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -90,6 +94,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -1479,6 +1484,20 @@ object MegaNodeUtil {
     }
 
     /**
+     * Use for companion object injection
+     */
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface MegaNavigatorEntryPoint {
+        /**
+         * Get [MegaNavigator]
+         *
+         * @return [MegaNavigator] instance
+         */
+        fun megaNavigator(): MegaNavigator
+    }
+
+    /**
      * Launch [ZipBrowserActivity] to preview a zip file.
      *
      * @param context Android context.
@@ -1495,18 +1514,15 @@ object MegaNodeUtil {
         snackbarShower: SnackbarShower,
         nodeHandle: Long,
     ) {
-        if (ZipBrowserActivity.zipFileFormatCheck(context, zipFilePath)) {
-            activityLauncher.launchActivity(Intent(context, ZipBrowserActivity::class.java).apply {
-                putExtra(
-                    ZipBrowserActivity.EXTRA_PATH_ZIP, zipFilePath
-                )
-                putExtra(
-                    ZipBrowserActivity.EXTRA_HANDLE_ZIP, nodeHandle
-                )
-            })
-        } else {
-            snackbarShower.showSnackbar(context.getString(R.string.message_zip_format_error))
-        }
+        EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
+            .megaNavigator()
+            .openZipBrowserActivity(
+                context = context,
+                zipFilePath = zipFilePath,
+                nodeHandle = nodeHandle
+            ) {
+                snackbarShower.showSnackbar(context.getString(R.string.message_zip_format_error))
+            }
     }
 
     /**

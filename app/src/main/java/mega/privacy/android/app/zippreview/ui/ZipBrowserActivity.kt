@@ -40,6 +40,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
+import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -56,7 +57,7 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialo
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.getScreenHeight
 import mega.privacy.android.app.zippreview.domain.FileType
-import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
+import mega.privacy.android.app.zippreview.viewmodel.LegacyZipBrowserViewModel
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.monitoring.CrashReporter
@@ -92,7 +93,7 @@ class ZipBrowserActivity : PasscodeActivity() {
 
     private lateinit var unZipWaitingDialog: AlertDialog
 
-    private val zipBrowserViewModel by viewModels<ZipBrowserViewModel>()
+    private val zipBrowserViewModel by viewModels<LegacyZipBrowserViewModel>()
 
     private val onBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -476,16 +477,6 @@ class ZipBrowserActivity : PasscodeActivity() {
         }
 
         /**
-         * Intent key for zip path
-         */
-        const val EXTRA_PATH_ZIP = "PATH_ZIP"
-
-        /**
-         * Intent key for nodeHandle of zip file
-         */
-        const val EXTRA_HANDLE_ZIP = "HANDLE_ZIP"
-
-        /**
          * Type audio
          */
         const val TYPE_AUDIO = "audio/*"
@@ -494,22 +485,6 @@ class ZipBrowserActivity : PasscodeActivity() {
          * Ratio of recycler view
          */
         const val RATIO_RECYCLER_VIEW = 85.0f / 548
-
-        /**
-         * Start ZipBrowserActivity and check the zip file if is error format
-         * @param context Context
-         * @param zipFilePath zip file full path
-         */
-        fun start(context: Context, zipFilePath: String) {
-            if (zipFileFormatCheck(context, zipFilePath)) {
-                context.startActivity(
-                    Intent(context, ZipBrowserActivity::class.java).apply {
-                        putExtra(EXTRA_PATH_ZIP, zipFilePath)
-                    })
-            } else {
-                Util.showSnackbar(context, context.getString(R.string.message_zip_format_error))
-            }
-        }
 
         /**
          * check the zip file if is error format
@@ -534,6 +509,7 @@ class ZipBrowserActivity : PasscodeActivity() {
                 file.entries().toList()
                 file
             } catch (exception: Exception) {
+                Timber.e(exception)
                 // Throws IllegalArgumentException (thrown when malformed) / ZipException (thrown when unsupported format)
                 // Fallback if zip cannot be read with UTF-8 Charset, then switch to CP-437 (Default for Most Windows Zip Software)
                 // i.e: 7-Zip, PeaZip, Winrar, Winzip
@@ -542,6 +518,7 @@ class ZipBrowserActivity : PasscodeActivity() {
                     fallback.entries().toList()
                     fallback
                 } catch (e: Exception) {
+                    Timber.e(exception)
                     zipFile?.close()
                     return false
                 }

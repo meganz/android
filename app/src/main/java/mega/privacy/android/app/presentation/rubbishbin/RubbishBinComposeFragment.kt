@@ -16,6 +16,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -45,13 +46,13 @@ import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
@@ -108,6 +109,7 @@ class RubbishBinComposeFragment : Fragment() {
                     SnackbarHostState()
                 }
                 val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
+                val coroutineScope = rememberCoroutineScope()
 
                 var clickedFile: TypedFileNode? by remember {
                     mutableStateOf(null)
@@ -184,7 +186,8 @@ class RubbishBinComposeFragment : Fragment() {
                         onActionHandled = {
                             clickedFile = null
                         },
-                        nodeActionsViewModel = nodeActionsViewModel
+                        nodeActionsViewModel = nodeActionsViewModel,
+                        coroutineScope = coroutineScope
                     )
                 }
             }

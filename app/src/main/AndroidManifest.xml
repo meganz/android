@@ -333,6 +333,10 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/zip_browser_activity" />
         <activity
+            android:name=".presentation.zipbrowser.ZipBrowserComposeActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/zip_browser_activity" />
+        <activity
             android:name=".main.AddContactActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity

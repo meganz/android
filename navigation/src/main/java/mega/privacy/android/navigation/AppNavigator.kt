@@ -87,4 +87,19 @@ interface AppNavigator {
      * @param deviceName    The device name
      */
     fun openSyncs(activity: Activity, deviceName: String? = null)
+
+    /**
+     * Open zip browser
+     *
+     * @param context Context
+     * @param zipFilePath zip file path
+     * @param nodeHandle the node handle of zip file
+     * @param onError Callback called when zip file format check is not passed
+     */
+    fun openZipBrowserActivity(
+        context: Context,
+        zipFilePath: String,
+        nodeHandle: Long? = null,
+        onError: () -> Unit,
+    )
 }

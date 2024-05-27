@@ -271,7 +271,8 @@ class OutgoingSharesComposeFragment : Fragment() {
                         onActionHandled = {
                             clickedFile = null
                         },
-                        nodeActionsViewModel = nodeActionsViewModel
+                        nodeActionsViewModel = nodeActionsViewModel,
+                        coroutineScope = coroutineScope
                     )
                 }
                 ToolbarTitleUpdateEffect(uiState.updateToolbarTitleEvent) {

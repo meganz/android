@@ -150,7 +150,8 @@ class RecentActionsComposeFragment : Fragment() {
                             clickedFile = null
                             parentFolderSharesType = null
                         },
-                        nodeActionsViewModel = nodeActionsViewModel
+                        nodeActionsViewModel = nodeActionsViewModel,
+                        coroutineScope = coroutineScope
                     )
                 }
             }

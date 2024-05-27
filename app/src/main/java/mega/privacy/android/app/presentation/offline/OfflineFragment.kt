@@ -88,15 +88,16 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.autoCleared
 import mega.privacy.android.app.utils.callManager
-import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -126,6 +127,9 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
@@ -776,7 +780,12 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
         when {
             mime.isZip -> {
                 Timber.d("MimeTypeList ZIP")
-                ZipBrowserActivity.start(requireActivity(), file.path)
+                megaNavigator.openZipBrowserActivity(requireContext(), file.path) {
+                    Util.showSnackbar(
+                        requireContext(),
+                        getString(R.string.message_zip_format_error)
+                    )
+                }
             }
 
             mime.isImage -> viewLifecycleOwner.lifecycleScope.launch {

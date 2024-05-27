@@ -12,8 +12,12 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivityV2
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
+import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
+import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
+import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -112,6 +116,32 @@ internal class MegaNavigatorImpl @Inject constructor(
                 email?.let { putExtra(Constants.EMAIL, it) }
             }
             context.startActivity(intent)
+        }
+    }
+
+    override fun openZipBrowserActivity(
+        context: Context,
+        zipFilePath: String,
+        nodeHandle: Long?,
+        onError: () -> Unit,
+    ) {
+        applicationScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.NewZipBrowser)) {
+                if (ZipBrowserComposeActivity.zipFileFormatCheck(context, zipFilePath)) {
+                    ZipBrowserComposeActivity::class.java
+                } else null
+            } else {
+                if (ZipBrowserActivity.zipFileFormatCheck(context, zipFilePath)) {
+                    ZipBrowserActivity::class.java
+                } else null
+            }?.let { activity ->
+                context.startActivity(Intent(context, activity).apply {
+                    putExtra(EXTRA_PATH_ZIP, zipFilePath)
+                    putExtra(EXTRA_HANDLE_ZIP, nodeHandle)
+                })
+            } ?: run {
+                onError()
+            }
         }
     }
 }

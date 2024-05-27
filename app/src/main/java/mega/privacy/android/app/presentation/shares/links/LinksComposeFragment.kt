@@ -225,7 +225,8 @@ class LinksComposeFragment : Fragment() {
                         onActionHandled = {
                             currentFileNode = null
                         },
-                        nodeActionsViewModel = nodeActionsViewModel
+                        nodeActionsViewModel = nodeActionsViewModel,
+                        coroutineScope = coroutineScope
                     )
                 } ?: run {
                     linksActionListener?.updateSharesPageToolbarTitleAndFAB(

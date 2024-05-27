@@ -30,7 +30,7 @@ import javax.inject.Inject
  * @param zipFileRepository ZipFileRepo
  */
 @HiltViewModel
-class ZipBrowserViewModel @Inject constructor(
+class LegacyZipBrowserViewModel @Inject constructor(
     private val zipFileRepository: ZipFileRepository,
     private val crashReporter: CrashReporter,
 ) : ViewModel() {

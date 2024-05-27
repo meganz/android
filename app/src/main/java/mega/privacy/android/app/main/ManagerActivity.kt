@@ -289,7 +289,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -2451,7 +2450,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Constants.ACTION_EXPLORE_ZIP -> {
                     Timber.d("Open zip browser")
                     intent.extras?.getString(Constants.EXTRA_PATH_ZIP)?.let {
-                        ZipBrowserActivity.start(this, it)
+                        navigator.openZipBrowserActivity(this, it) {
+                            showSnackbar(
+                                Constants.SNACKBAR_TYPE,
+                                getString(R.string.message_zip_format_error),
+                                MEGACHAT_INVALID_HANDLE
+                            )
+                        }
                     }
                 }
 

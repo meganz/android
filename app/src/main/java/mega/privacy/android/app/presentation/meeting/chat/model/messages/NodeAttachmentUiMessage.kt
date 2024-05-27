@@ -11,6 +11,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
@@ -27,7 +29,7 @@ import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -98,7 +100,8 @@ data class NodeAttachmentUiMessage(
                             message,
                             context,
                             snackbarHostState,
-                            chatViewModel
+                            chatViewModel,
+                            coroutineScope
                         )
 
                         is FileNodeContent.Pdf -> openPdfActivity(
@@ -243,11 +246,18 @@ data class NodeAttachmentUiMessage(
         context: Context,
         snackbarHostState: SnackbarHostState?,
         chatViewModel: ChatViewModel,
+        coroutineScope: CoroutineScope,
     ) {
         val fileNode = message.fileNode
         if (localFile != null) {
             if (fileNode.type is ZipFileTypeInfo) {
-                openZipFile(context, localFile, fileNode, snackbarHostState)
+                openZipFile(
+                    context = context,
+                    localFile = localFile,
+                    fileNode = fileNode,
+                    snackbarHostState = snackbarHostState,
+                    coroutineScope = coroutineScope
+                )
             } else {
                 val intent = Intent(Intent.ACTION_VIEW).apply {
                     viewModel.applyNodeContentUri(
@@ -269,26 +279,25 @@ data class NodeAttachmentUiMessage(
         }
     }
 
-    private suspend fun openZipFile(
+    private fun openZipFile(
         context: Context,
         localFile: File,
         fileNode: ChatFile,
         snackbarHostState: SnackbarHostState?,
+        coroutineScope: CoroutineScope,
     ) {
         Timber.d("The file is zip, open in-app.")
-        if (ZipBrowserActivity.zipFileFormatCheck(context, localFile.absolutePath)) {
-            context.startActivity(
-                Intent(context, ZipBrowserActivity::class.java).apply {
-                    putExtra(
-                        ZipBrowserActivity.EXTRA_PATH_ZIP, localFile.absolutePath
-                    )
-                    putExtra(
-                        ZipBrowserActivity.EXTRA_HANDLE_ZIP, fileNode.id.longValue
-                    )
-                }
-            )
-        } else {
-            snackbarHostState?.showSnackbar(context.getString(R.string.message_zip_format_error))
+        EntryPointAccessors.fromApplication(
+            context,
+            MegaNodeUtil.MegaNavigatorEntryPoint::class.java
+        ).megaNavigator().openZipBrowserActivity(
+            context = context,
+            zipFilePath = localFile.absolutePath,
+            nodeHandle = fileNode.id.longValue
+        ) {
+            coroutineScope.launch {
+                snackbarHostState?.showSnackbar(context.getString(R.string.message_zip_format_error))
+            }
         }
     }
 

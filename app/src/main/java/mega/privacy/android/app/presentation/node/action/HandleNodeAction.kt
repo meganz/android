@@ -8,6 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
@@ -23,7 +26,7 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -49,6 +52,7 @@ fun HandleNodeAction(
     snackBarHostState: SnackbarHostState,
     onActionHandled: () -> Unit,
     nodeSourceType: Int? = null,
+    coroutineScope: CoroutineScope,
     nodeActionsViewModel: NodeActionsViewModel = hiltViewModel(),
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
 ) {
@@ -106,7 +110,8 @@ fun HandleNodeAction(
                                 context = context,
                                 localFile = it,
                                 fileNode = typedFileNode,
-                                snackBarHostState = snackBarHostState
+                                snackBarHostState = snackBarHostState,
+                                coroutineScope = coroutineScope
                             )
                         } else {
                             handleOtherFiles(
@@ -321,24 +326,25 @@ private suspend fun Intent.openShareIntent(
     )
 }
 
-private suspend fun openZipFile(
+private fun openZipFile(
     context: Context,
     localFile: File,
     fileNode: TypedFileNode,
     snackBarHostState: SnackbarHostState?,
+    coroutineScope: CoroutineScope,
 ) {
     Timber.d("The file is zip, open in-app.")
-    if (ZipBrowserActivity.zipFileFormatCheck(context, localFile.absolutePath)) {
-        context.startActivity(Intent(context, ZipBrowserActivity::class.java).apply {
-            putExtra(
-                ZipBrowserActivity.EXTRA_PATH_ZIP, localFile.absolutePath
-            )
-            putExtra(
-                ZipBrowserActivity.EXTRA_HANDLE_ZIP, fileNode.id.longValue
-            )
-        })
-    } else {
-        snackBarHostState?.showSnackbar(context.getString(R.string.message_zip_format_error))
+    EntryPointAccessors.fromApplication(
+        context,
+        MegaNodeUtil.MegaNavigatorEntryPoint::class.java
+    ).megaNavigator().openZipBrowserActivity(
+        context = context,
+        zipFilePath = localFile.absolutePath,
+        nodeHandle = fileNode.id.longValue,
+    ) {
+        coroutineScope.launch {
+            snackBarHostState?.showSnackbar(context.getString(R.string.message_zip_format_error))
+        }
     }
 }
 
