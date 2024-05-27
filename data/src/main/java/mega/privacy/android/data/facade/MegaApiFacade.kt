@@ -1520,4 +1520,25 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.setNodeDescription(node, description, listener)
     }
+
+    override fun addNodeTag(node: MegaNode, tag: String, listener: MegaRequestListenerInterface) {
+        megaApi.addNodeTag(node, tag, listener)
+    }
+
+    override fun removeNodeTag(
+        node: MegaNode,
+        tag: String,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.removeNodeTag(node, tag, listener)
+    }
+
+    override fun updateNodeTag(
+        node: MegaNode,
+        newTag: String,
+        oldTag: String,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.updateNodeTag(node, newTag, oldTag, listener)
+    }
 }

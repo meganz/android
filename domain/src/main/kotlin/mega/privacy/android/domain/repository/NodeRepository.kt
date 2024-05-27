@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
@@ -25,13 +24,6 @@ import mega.privacy.android.domain.entity.user.UserId
  *
  */
 interface NodeRepository {
-    /**
-     * Get a list of all outgoing shares
-     *
-     * @param order sort order, if null the default order is applied
-     * @return List of MegaNode of all active and pending outbound shared by current user
-     */
-    suspend fun getOutgoingSharesNode(order: SortOrder): List<ShareData>
 
     /**
      * Get a list of all outgoing shares for a given node
@@ -54,13 +46,6 @@ interface NodeRepository {
      * @return List of [ShareData]
      */
     suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData>
-
-    /**
-     * Provides Verified incoming shares from SDK
-     *
-     * @return List of [ShareData]
-     */
-    suspend fun getVerifiedIncomingShares(order: SortOrder): List<ShareData>
 
     /**
      * Provides all outgoing shares from SDK with proper sorting and filtering
@@ -151,13 +136,6 @@ interface NodeRepository {
      * @return
      */
     suspend fun getNodeChildren(nodeId: NodeId, order: SortOrder? = null): List<UnTypedNode>
-
-    /**
-     * Get the number of versions of the node, including the current version
-     * @param handle the handle of the node
-     * @return the number of versions of the node or 0 if the file is not found
-     */
-    suspend fun getNumVersions(handle: Long): Int
 
     /**
      * Get the history versions of the node
@@ -269,18 +247,6 @@ interface NodeRepository {
     suspend fun setShareAccess(nodeId: NodeId, accessPermission: AccessPermission, email: String)
 
     /**
-     * Load offline nodes
-     *
-     * @param path         Node path
-     * @param searchQuery  search query for database
-     * @return List of [OfflineNodeInformation]
-     */
-    suspend fun loadOfflineNodes(
-        path: String,
-        searchQuery: String?,
-    ): List<OfflineNodeInformation>
-
-    /**
      * Gets invalid handle
      */
     suspend fun getInvalidHandle(): Long
@@ -318,16 +284,6 @@ interface NodeRepository {
      * @return [UnTypedNode] returns list of nodes or empty
      */
     suspend fun getInShares(email: String): List<UnTypedNode>
-
-
-    /**
-     * Get FileTypeInfo given NodeId
-     *
-     * @param nodeId
-     * @return FileTypeInfo if found else null
-     */
-    suspend fun getFileTypeInfo(nodeId: NodeId): FileTypeInfo?
-
 
     /**
      * Get default node handle for a folder
@@ -523,13 +479,6 @@ interface NodeRepository {
         messageId: Long,
     ): List<FileNode>
 
-    /**
-     * Get nodes by handles
-     *
-     * @param handles handle list
-     * @return List<[UnTypedNode]>
-     */
-    suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode>
 
     /**
      * Get rubbish node
@@ -639,12 +588,6 @@ interface NodeRepository {
         nodeId: NodeId,
         level: AccessPermission,
     ): Boolean
-
-    /**
-     * Remove Offline node
-     * @param nodeId [NodeId]
-     */
-    suspend fun removeOfflineNode(nodeId: String)
 
     /**
      * Get offline Node from parent id
@@ -791,4 +734,29 @@ interface NodeRepository {
      * @return list of offline nodes information
      */
     suspend fun getOfflineByQuery(query: String): List<OfflineNodeInformation>?
+
+    /**
+     * Update node tag
+     *
+     * @param nodeHandle [String]
+     * @param oldTag [String]
+     * @param newTag [String]
+     */
+    suspend fun updateNodeTag(nodeHandle: NodeId, oldTag: String, newTag: String)
+
+    /**
+     * Add node tag
+     *
+     * @param nodeHandle [String]
+     * @param tag [String]
+     */
+    suspend fun addNodeTag(nodeHandle: NodeId, tag: String)
+
+    /**
+     * Remove node tag
+     *
+     * @param nodeHandle [String]
+     * @param tag [String]
+     */
+    suspend fun removeNodeTag(nodeHandle: NodeId, tag: String)
 }

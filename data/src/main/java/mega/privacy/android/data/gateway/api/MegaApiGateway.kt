@@ -3458,4 +3458,87 @@ interface MegaApiGateway {
         description: String?,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Add new tag stored as node attribute
+     *
+     * The associated request type with this request is MegaRequest::TYPE_TAG_NODE
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the node that received the tag
+     * - MegaRequest::getParamType - Returns operation type (0 - Add tag, 1 - Remove tag, 2 - Update tag)
+     * - MegaRequest::getText - Returns tag
+     *
+     * ',' is an invalid character to be used in a tag. If it is contained in the tag,
+     * onRequestFinish will be called with the error code MegaError::API_EARGS.
+     *
+     * If the length of all tags is higher than 3000 onRequestFinish will be called with
+     * the error code MegaError::API_EARGS
+     *
+     * If tag already exists, onRequestFinish will be called with the error code MegaError::API_EEXISTS
+     *
+     * If number of tags exceed the maximum number of tags (10),
+     * onRequestFinish will be called with the error code MegaError::API_ETOOMANY
+     *
+     * If the MEGA account is a business account and its status is expired, onRequestFinish will
+     * be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param node Node that will receive the information.
+     * @param tag New tag
+     * @param listener MegaRequestListener to track this request
+     */
+    fun addNodeTag(node: MegaNode, tag: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Remove a tag stored as a node attribute
+     *
+     * The associated request type with this request is MegaRequest::TYPE_TAG_NODE
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the node that received the tag
+     * - MegaRequest::getParamType - Returns operation type (0 - Add tag, 1 - Temove tag, 2 - Update tag)
+     * - MegaRequest::getText - Returns tag
+     *
+     * If tag doesn't exist, onRequestFinish will be called with the error code MegaError::API_ENOENT
+     *
+     * If the MEGA account is a business account and its status is expired, onRequestFinish will
+     * be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param node Node that will receive the information.
+     * @param tag Tag to be removed
+     * @param listener MegaRequestListener to track this request
+     */
+    fun removeNodeTag(node: MegaNode, tag: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * @brief Update a tag stored as a node attribute
+     *
+     * The associated request type with this request is MegaRequest::TYPE_TAG_NODE
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the node that received the tag
+     * - MegaRequest::getParamType - Returns operation type (0 - Add tag, 1 - Temove tag, 2 - Update tag)
+     * - MegaRequest::getText - Returns new tag
+     * - MegaRequest::getName - Returns old tag
+     *
+     * ',' is an invalid character to be used in a tag. If it is contained in the tag,
+     * onRequestFinish will be called with the error code MegaError::API_EARGS.
+     *
+     * If the length of all tags is higher than 3000 characters onRequestFinish will be called with
+     * the error code MegaError::API_EARGS
+     *
+     * If newTag already exists, onRequestFinish will be called with the error code MegaError::API_EEXISTS
+     * If oldTag doesn't exist, onRequestFinish will be called with the error code MegaError::API_ENOENT
+     *
+     * If the MEGA account is a business account and its status is expired, onRequestFinish will
+     * be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param node Node that will receive the information.
+     * @param newTag New tag value
+     * @param oldTag Old tag value
+     * @param listener MegaRequestListener to track this request
+     */
+    fun updateNodeTag(
+        node: MegaNode,
+        newTag: String,
+        oldTag: String,
+        listener: MegaRequestListenerInterface,
+    )
 }

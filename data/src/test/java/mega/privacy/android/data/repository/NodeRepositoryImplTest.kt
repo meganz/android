@@ -2,9 +2,12 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -62,6 +65,7 @@ import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaShare.ACCESS_READ
 import nz.mega.sdk.MegaUser
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -137,11 +141,12 @@ class NodeRepositoryImplTest {
     )
 
     val offline: Offline = mock()
-
+    private val tag = "tag"
     private val nodeLabelIntMapper = NodeLabelIntMapper()
 
     @BeforeAll
     fun setup() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = NodeRepositoryImpl(
             context = context,
             megaApiGateway = megaApiGateway,
@@ -170,6 +175,11 @@ class NodeRepositoryImplTest {
             cancelTokenProvider = cancelTokenProvider,
             megaSearchFilterMapper = megaSearchFilterMapper,
         )
+    }
+
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @BeforeEach
@@ -436,37 +446,6 @@ class NodeRepositoryImplTest {
 
             val expected = listOf(share2)
             val actual = underTest.getUnverifiedOutgoingShares(any())
-
-            assertThat(actual).isEqualTo(expected)
-        }
-
-    @Test
-    fun `test that getVerifiedIncomingShares calls api gateway getVerifiedIncomingShares with mapped sort order`() =
-        runTest {
-            val sortOrder = SortOrder.ORDER_NONE
-            whenever(sortOrderIntMapper(any())).thenReturn(0)
-            whenever(megaApiGateway.getVerifiedIncomingShares(any())).thenReturn(listOf(mock()))
-
-            underTest.getVerifiedIncomingShares(sortOrder)
-
-            verify(megaApiGateway).getVerifiedIncomingShares(sortOrderIntMapper(sortOrder))
-        }
-
-    @Test
-    fun `test that getVerifiedIncomingShares returns mapped result from api gateway`() =
-        runTest {
-            whenever(sortOrderIntMapper(any())).thenReturn(0)
-            val megaShare1 = mock<MegaShare>()
-            val megaShare2 = mock<MegaShare>()
-            val megaShares = listOf(megaShare1, megaShare2)
-            whenever(megaApiGateway.getVerifiedIncomingShares(any())).thenReturn(megaShares)
-            val share1 = mock<ShareData>()
-            val share2 = mock<ShareData>()
-            whenever(shareDataMapper(megaShare1)).thenReturn(share1)
-            whenever(shareDataMapper(megaShare2)).thenReturn(share2)
-
-            val expected = listOf(share1, share2)
-            val actual = underTest.getVerifiedIncomingShares(any())
 
             assertThat(actual).isEqualTo(expected)
         }
@@ -1248,6 +1227,117 @@ class NodeRepositoryImplTest {
         val actual = underTest.isEmptyFolder(typedNode)
         assertThat(actual).isTrue()
     }
+
+    @Test
+    fun `test when addNodeTag is called then api gateway addNodeTag is called`() =
+        runTest {
+            val megaNode = mock<MegaNode>()
+            whenever(folderNode.id).thenReturn(nodeId)
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+            whenever(megaApiGateway.addNodeTag(eq(megaNode), eq(tag), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = mock {
+                        on { errorCode }.thenReturn(
+                            MegaError.API_OK
+                        )
+                    },
+                )
+            }
+
+            underTest.addNodeTag(nodeHandle = folderNode.id, tag = tag)
+            verify(megaApiGateway).addNodeTag(eq(megaNode), eq(tag), any())
+        }
+
+    @Test
+    fun `test when removeNodeTag is called then api gateway removeNodeTag is called`() =
+        runTest {
+            val megaNode = mock<MegaNode>()
+            whenever(folderNode.id).thenReturn(nodeId)
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+            whenever(megaApiGateway.removeNodeTag(eq(megaNode), eq(tag), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = mock {
+                        on { errorCode }.thenReturn(
+                            MegaError.API_OK
+                        )
+                    },
+                )
+            }
+
+            underTest.removeNodeTag(nodeHandle = folderNode.id, tag = tag)
+            verify(megaApiGateway).removeNodeTag(eq(megaNode), eq(tag), any())
+        }
+
+    @Test
+    fun `test that when updateNodeTag is called then api gateway updateNodeTag is called`() =
+        runTest {
+            val megaNode = mock<MegaNode>()
+            whenever(folderNode.id).thenReturn(nodeId)
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+            val oldTag = "oldTag"
+            val newTag = "newTag"
+            whenever(
+                megaApiGateway.updateNodeTag(
+                    eq(megaNode),
+                    eq(oldTag),
+                    eq(newTag),
+                    any()
+                )
+            ).thenAnswer {
+                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = mock {
+                        on { errorCode }.thenReturn(
+                            MegaError.API_OK
+                        )
+                    },
+                )
+            }
+
+            underTest.updateNodeTag(
+                nodeHandle = folderNode.id,
+                oldTag = oldTag,
+                newTag = newTag
+            )
+            verify(megaApiGateway).updateNodeTag(eq(megaNode), eq(oldTag), eq(newTag), any())
+        }
+
+    @Test
+    fun `test that when setNodeDescription is called then api gateway setNodeDescription is called`() =
+        runTest {
+            val megaNode = mock<MegaNode>()
+            val description = "description"
+            whenever(folderNode.id).thenReturn(nodeId)
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+            whenever(
+                megaApiGateway.setNodeDescription(
+                    eq(megaNode),
+                    eq(description),
+                    any()
+                )
+            ).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = mock {
+                        on { errorCode }.thenReturn(
+                            MegaError.API_OK
+                        )
+                    },
+                )
+            }
+
+            underTest.setNodeDescription(
+                nodeHandle = folderNode.id,
+                description = description
+            )
+            verify(megaApiGateway).setNodeDescription(eq(megaNode), eq(description), any())
+        }
 
     private fun provideNodeId() = Stream.of(
         Arguments.of(null),
