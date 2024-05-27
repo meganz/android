@@ -19,7 +19,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     NewVideoQueue(
         "Enable new video queue",
-        false,
+        true,
     ),
 
     /**
