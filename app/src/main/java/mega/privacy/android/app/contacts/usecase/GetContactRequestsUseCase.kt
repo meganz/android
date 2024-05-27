@@ -104,7 +104,7 @@ class GetContactRequestsUseCase @Inject constructor(
                                         if (requestItems.any { it.handle == request.handle }) return@forEach
 
                                         val newRequestItem = request.toContactRequestItem().apply {
-                                            val userImageFile = AvatarUtil.getUserAvatarFile(context, email)?.absolutePath
+                                            val userImageFile = AvatarUtil.getUserAvatarFile(email)?.absolutePath
                                             megaApi.getUserAvatar(email, userImageFile, userAttrsListener)
                                             megaApi.getUserAttribute(email, USER_ATTR_FIRSTNAME, userAttrsListener)
                                         }
@@ -128,7 +128,7 @@ class GetContactRequestsUseCase @Inject constructor(
 
             requestItems.forEach { request ->
                 if (request.avatarUri == null) {
-                    val userImageFile = AvatarUtil.getUserAvatarFile(context, request.email)?.absolutePath
+                    val userImageFile = AvatarUtil.getUserAvatarFile(request.email)?.absolutePath
                     megaApi.getUserAvatar(request.email, userImageFile, userAttrsListener)
                 }
             }
@@ -149,7 +149,7 @@ class GetContactRequestsUseCase @Inject constructor(
         val userEmail = if (isOutgoing) targetEmail else sourceEmail
         val userImageColor = megaApi.getUserAvatarColor(handle.toString())?.toColorInt() ?: -1
         val placeholder = getImagePlaceholder(userEmail, userImageColor)
-        val userImageFile = AvatarUtil.getUserAvatarFile(context, userEmail)
+        val userImageFile = AvatarUtil.getUserAvatarFile(userEmail)
         if (userImageFile?.exists() == true) {
             userImageUri = userImageFile.toUri()
         }

@@ -532,7 +532,7 @@ public class AvatarUtil {
     }
 
     @Nullable
-    public static File getUserAvatarFile(Context context, String userEmail) {
+    public static File getUserAvatarFile(String userEmail) {
         return CacheFolderManager.buildAvatarFile(userEmail + ".jpg");
     }
 }
