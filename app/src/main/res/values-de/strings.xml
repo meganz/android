@@ -123,7 +123,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Nicht nochmal anzeigen</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
+    <string name="confirm_cancel_login">Möchten Sie den aktuellen Loginvorgang wirklich abbrechen?</string>
     <!-- Login button -->
     <string name="login_text">Anmelden</string>
     <!-- email label -->
@@ -1027,7 +1027,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]Ausloggen[/A], um zu einem anderen MEGA-Account zu wechseln</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
+    <string name="confirm_logout_from_sms_verification">Möchten Sie sich wirklich aus dem aktuellen Account ausloggen?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Diese Nachricht wurde von %1$s gelöscht</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -5201,7 +5201,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Upload-Pause wegen fehlender Internetverbindung</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
+    <string name="photos_camera_uploads_low_battery">Upload pausiert, da Akkuladestand unter %1$d&#160;%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Kamera-Uploads funktionieren nicht mehr. Um das Problem zu lösen, versuchen Sie, die Kamera-Uploads wieder zu aktivieren. Wenn das Problem weiterhin besteht, wenden Sie sich an den Support.</string>
     <!-- Camera uploads pending info in Photos screen. -->
@@ -5363,22 +5363,29 @@
     <!-- Title of call button to show more options in call screen -->
     <string name="meetings_more_call_option_button">Mehr</string>
     <!-- Title of raise hand button in call screen -->
-    <string name="meetings_raise_hand_option_button">Raise hand</string>
+    <string name="meetings_raise_hand_option_button">Hand heben</string>
     <!-- Title of lower hand button in call screen -->
-    <string name="meetings_lower_hand_option_button">Lower hand</string>
+    <string name="meetings_lower_hand_option_button">Hand senken</string>
     <!-- Title of put call on hold button in call screen -->
-    <string name="meetings_put_call_on_hold_option_button">Put call on hold</string>
+    <string name="meetings_put_call_on_hold_option_button">Anruf halten</string>
     <!-- Title of swap calls button in call screen -->
-    <string name="meetings_swap_calls_option_button">Swap calls</string>
+    <string name="meetings_swap_calls_option_button">Anruf wechseln</string>
     <!-- Title of resume call button in call screen -->
     <string name="meetings_resume_call_option_button">Gespräch fortsetzen</string>
     <!-- Text of pop up informing about the Raise hand feature -->
-    <string name="meetings_new_feature_raise_hand_layout">New feature: Raise hand</string>
+    <string name="meetings_new_feature_raise_hand_layout">Neue Funktion: Hand heben</string>
     <!-- The snackbar message of your hand is raised -->
-    <string name="meeting_your_hand_is_raised_message">You raised your hand</string>
+    <string name="meeting_your_hand_is_raised_message">Sie haben die Hand gehoben</string>
     <!-- The snackbar message of you and others raised your hands -->
     <plurals name="meeting_you_and_others_raised_your_hands_message">
-        <item quantity="one">You and %1$d other raised your hands</item>
-        <item quantity="other">You and %1$d others raised your hands</item>
+        <item quantity="one">Sie und %1$d weitere Person haben die Hand gehoben</item>
+        <item quantity="other">Sie und %1$d weitere Personen haben die Hand gehoben</item>
+    </plurals>
+    <!-- The snackbar message of another participant raised their hand -->
+    <string name="meetings_one_participant_raised_their_hand_message">%1$s hat die Hand gehoben</string>
+    <!-- The snackbar message two or more participants raised their hands -->
+    <plurals name="meetings_other_participants_raised_their_hands_message">
+        <item quantity="one">%1$s und %2$d weitere Person haben die Hand gehoben</item>
+        <item quantity="other">%1$s und %2$d weitere Personen haben die Hand gehoben</item>
     </plurals>
 </resources>

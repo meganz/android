@@ -5618,4 +5618,11 @@
         <item quantity="many">Tú y %1$d personas habéis levantado la mano</item>
         <item quantity="other">Tú y %1$d personas habéis levantado la mano</item>
     </plurals>
+    <!-- The snackbar message of another participant raised their hand -->
+    <string name="meetings_one_participant_raised_their_hand_message">%1$s raised their hand</string>
+    <!-- The snackbar message two or more participants raised their hands -->
+    <plurals name="meetings_other_participants_raised_their_hands_message">
+        <item quantity="one">%1$s and %2$d other raised their hands</item>
+        <item quantity="other">%1$s and %2$d others raised their hands</item>
+    </plurals>
 </resources>

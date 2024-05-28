@@ -3013,7 +3013,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">이름 변경</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">Change profile image</string>
+    <string name="add_photo_action">프로필 이미지 변경</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">전화번호 추가</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -5144,5 +5144,11 @@
     <plurals name="meeting_you_and_others_raised_your_hands_message">
         <item quantity="one">You and %1$d other raised your hands</item>
         <item quantity="other">You and %1$d others raised your hands</item>
+    </plurals>
+    <!-- The snackbar message of another participant raised their hand -->
+    <string name="meetings_one_participant_raised_their_hand_message">%1$s 님이 손을 들었습니다</string>
+    <!-- The snackbar message two or more participants raised their hands -->
+    <plurals name="meetings_other_participants_raised_their_hands_message">
+        <item quantity="other">%1$s 님 외 %2$d명이 손을 들었습니다</item>
     </plurals>
 </resources>

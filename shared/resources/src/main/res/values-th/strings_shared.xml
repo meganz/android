@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">ไม่มีพลาดทุกข้อมูลสำคัญของคุณ</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">ย้อนกลับโฟลเดอร์ไปยังวันที่ใดก็ได้ในช่วง 180 วันที่ผ่านมา ช่วยให้ข้อมูลของคุณปลอดภัยจากเหตุไม่คาดคิดและการแก้ไขโดยไม่ได้รับอนุญาต</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -279,9 +279,9 @@
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
     <string name="device_center_list_view_item_status_nothing_setup">ยังไม่ได้ตั้งค่าการซิงค์</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
-    <string name="account_pro_flexi_account_deactivated_dialog_title">บัญชีถูกปิดใช้งาน</string>
+    <string name="account_pro_flexi_account_deactivated_dialog_title">บัญชีถูกปิดใช้งานแล้ว</string>
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
-    <string name="account_pro_flexi_account_deactivated_dialog_body">Your Pro&#160;Flexi account has been deactivated due to payment failure or you’ve cancelled your subscription. You won’t be able to access the data stored in your account. \nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_pro_flexi_account_deactivated_dialog_body">บัญชี Pro&#160;Flexi ของคุณถูกปิดใช้งาน เนื่องจากการชำระเงินไม่สำเร็จหรือคุณได้ยกเลิกการสมัครใช้งานของคุณเอง คุณจะไม่สามารถเข้าถึงข้อมูลของคุณได้\nกรุณาเข้าสู่ระบบ MEGA ผ่านเบราว์เซอร์เพื่อดำเนินการชำระเงินและเปิดใช้การสมัครใช้งานของคุณอีกครั้ง</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_starter_label">Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
@@ -289,13 +289,13 @@
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Uploads will be paused until you start charging your device. Uploads will still remain paused if your battery is below 20%.</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">การอัปโหลดจะหยุดชั่วคราวจนกว่าคุณจะเริ่มชาร์จอุปกรณ์ การอัปโหลดจะถูกหยุดไว้ชั่วคราวต่อไปแม้ว่าแบตเตอรี่ของคุณจะต่ำกว่า 20% ก็ตาม</string>
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">ยังไม่ได้ตั้งค่าการซิงค์</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sync a local folder on your device with a folder on MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">ซิงค์โฟลเดอร์บนอุปกรณ์ของคุณกับโฟลเดอร์บน MEGA</string>
     <!-- Label for the button or menu option to add a new sync -->
-    <string name="device_center_sync_add_new_syn_button_option">Add new sync</string>
+    <string name="device_center_sync_add_new_syn_button_option">เพิ่มการซิงค์ใหม่</string>
     <!-- Text for the Sync solved issues chip -->
     <string name="device_center_sync_solved_issues_chip_text">แก้ไขปัญหาแล้ว</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
@@ -309,9 +309,49 @@
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">อัปเดตคำอธิบายแล้ว</string>
     <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">Plus access to these great benefits:</string>
+    <string name="dialog_onboarding_feature_title_additional_features">นอกจากนี้ยังมีสิทธิพิเศษอื่น ๆ เพิ่มเติม เช่น:</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;โทรและประชุมได้ไม่จำกัด\n&#8226;&#160;ซิงค์โฟลเดอร์บนอุปกรณ์มือถือของคุณโดยอัตโนมัติ \n&#8226;&#160;ไม่มีโฆษณา</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;โทรและประชุมได้ไม่จำกัด\n&#8226;&#160;ซิงค์โฟลเดอร์บนอุปกรณ์มือถือของคุณโดยอัตโนมัติ</string>
+    <!-- Text for the Sync solved issues list empty state -->
+    <string name="device_center_sync_solved_issues_empty_state_text">ปัญหาทั้งหมดได้รับการแก้ไขแล้ว</string>
+    <!-- Title of first tour screen -->
+    <string name="cloud_drive_tour_first_title">คุณคือผู้ถือกุญแจ</string>
+    <!-- Title of second tour screen -->
+    <string name="cloud_drive_tour_second_title">เข้ารหัสแชท</string>
+    <!-- Title of third tour screen -->
+    <string name="cloud_drive_tour_third_title">สร้างเครือข่ายของคุณ</string>
+    <!-- Title of fourth tour screen -->
+    <string name="cloud_drive_tour_fourth_title">รูปภาพของคุณในคลาวด์</string>
+    <!-- Title of fifth tour screen -->
+    <string name="cloud_drive_tour_fifth_title">MEGA meeting</string>
+    <!-- First subtitle of the tour screen -->
+    <string name="cloud_drive_tour_first_subtitle">ความปลอดภัยคือเหตุผลหลักที่เราดำเนินการอยู่ ไฟล์ของคุณจะมีความปลอดภัยมากยิ่งขึ้น เพราะใช้เครื่องมือเข้ารหัสที่ป้องกันไฟล์ของคุณ ซึ่งมีเพียงคุณเท่านั้นที่สามารถเข้าถึงไฟล์ได้</string>
+    <!-- Second subtitle of the tour screen -->
+    <string name="cloud_drive_tour_second_subtitle">แชทที่มีการเข้ารหัสอย่างเต็มที่ไม่ว่าจะเป็นการโทรด้วยเสียงและสนทนาทางวิดีโอ การส่งข้อความแบบกลุ่มและบูรณาการไฟล์ร่วมกันกับคลาวด์ไดรฟ์ของคุณ</string>
+    <!-- Third subtitle of the tour screen -->
+    <string name="cloud_drive_tour_third_subtitle">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA.</string>
+    <!-- Fourth subtitle of the tour screen -->
+    <string name="cloud_drive_tour_fourth_subtitle">การอัปโหลดจากกล้อง เป็นฟีเจอร์สำคัญสำหรับโทรศัพท์มือถือทุกเครื่องและเราได้ให้ความสำคัญกับคุณ สร้างบัญชีของคุณเลย</string>
+    <!-- Fifth subtitle of the tour screen -->
+    <string name="cloud_drive_tour_fifth_subtitle">Zero-knowledge encrypted video meeting.</string>
+    <!-- Titles of the tour screen to onboard users with the MEGA application -->
+    <string-array name="cloud_drive_tour_titles">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array>
+    <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
+    <string-array name="cloud_drive_tour_subtitles">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array>
+    <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
+    <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
 </resources>

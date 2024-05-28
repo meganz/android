@@ -330,4 +330,44 @@
     <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226; &#160; Chamadas e reuniões irrestritas \n&#8226; &#160; Sincronização automática das pastas no seu dispositivo móvel \n&#8226; &#160; Sem anúncios</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226; &#160; Chamadas e reuniões irrestritas \n&#8226; &#160; Sincronização automática das pastas no seu dispositivo móvel</string>
+    <!-- Text for the Sync solved issues list empty state -->
+    <string name="device_center_sync_solved_issues_empty_state_text">Não há problemas solucionados</string>
+    <!-- Title of first tour screen -->
+    <string name="cloud_drive_tour_first_title">Você tem a chave</string>
+    <!-- Title of second tour screen -->
+    <string name="cloud_drive_tour_second_title">Chat criptografado</string>
+    <!-- Title of third tour screen -->
+    <string name="cloud_drive_tour_third_title">Crie a sua rede</string>
+    <!-- Title of fourth tour screen -->
+    <string name="cloud_drive_tour_fourth_title">As suas fotos na nuvem</string>
+    <!-- Title of fifth tour screen -->
+    <string name="cloud_drive_tour_fifth_title">Reunião MEGA</string>
+    <!-- First subtitle of the tour screen -->
+    <string name="cloud_drive_tour_first_subtitle">A segurança é a razão da nossa existência. Os seus arquivos estão protegidos por uma máquina de criptografia bem engrenada, na qual somente você pode acessá-los.</string>
+    <!-- Second subtitle of the tour screen -->
+    <string name="cloud_drive_tour_second_subtitle">Chat totalmente criptografado com chamadas de voz e vídeo, mensagens de grupo e compartilhamento de dados integrado com a sua Nuvem de arquivos.</string>
+    <!-- Third subtitle of the tour screen -->
+    <string name="cloud_drive_tour_third_subtitle">Adicione contatos, crie uma rede, colabore e faça chamadas de voz e vídeo sem sair do MEGA.</string>
+    <!-- Fourth subtitle of the tour screen -->
+    <string name="cloud_drive_tour_fourth_subtitle">Sabemos que os Uploads da câmera são um recurso essencial para qualquer dispositivo móvel. Crie a sua conta agora.</string>
+    <!-- Fifth subtitle of the tour screen -->
+    <string name="cloud_drive_tour_fifth_subtitle">Videoconferência criptografada de conhecimento zero.</string>
+    <!-- Titles of the tour screen to onboard users with the MEGA application -->
+    <string-array name="cloud_drive_tour_titles">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array>
+    <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
+    <string-array name="cloud_drive_tour_subtitles">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array>
+    <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
+    <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
 </resources>

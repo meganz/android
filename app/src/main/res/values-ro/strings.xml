@@ -2501,9 +2501,9 @@
     <!-- Title of third tour screen -->
     <string name="title_tour_three">Creează-ți rețeaua</string>
     <!-- Content of third tour screen -->
-    <string name="content_tour_three">Adaugă contacte, creează o rețea, colaborează și efectuează apeluri vocale și video fără să părăsești MEGA</string>
+    <string name="content_tour_three">Adăugați contacte, creați o rețea, colaborați și efectuați apeluri vocale și video fără a părăsi MEGA.</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Fotografiile tale în cloud</string>
+    <string name="title_tour_four">Fotografiile dvs. în cloud</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Încărcările camerelor sunt o caracteristică esențială pentru orice dispozitiv mobil și vă asigurăm. Creează-ți contul acum.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -5617,5 +5617,13 @@
         <item quantity="one">Dvs. și încă %1$d&#160;persoană ați ridicat mâna</item>
         <item quantity="few">Dvs. și alte %1$d&#160;persoane ați ridicat mâna</item>
         <item quantity="other">Dvs. și alte %1$d de persoane ați ridicat mâna</item>
+    </plurals>
+    <!-- The snackbar message of another participant raised their hand -->
+    <string name="meetings_one_participant_raised_their_hand_message">%1$s a ridicat mâna</string>
+    <!-- The snackbar message two or more participants raised their hands -->
+    <plurals name="meetings_other_participants_raised_their_hands_message">
+        <item quantity="one">%1$s și încă %2$d persoană au ridicat mâna</item>
+        <item quantity="few">%1$s și alte %2$d persoane au ridicat mâna</item>
+        <item quantity="other">%1$s și alte %2$d de persoane au ridicat mâna</item>
     </plurals>
 </resources>
