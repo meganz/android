@@ -5144,4 +5144,10 @@
     <plurals name="meeting_you_and_others_raised_your_hands_message">
         <item quantity="other">あなたとその他%1$d人が挙手しました</item>
     </plurals>
+    <!-- The snackbar message of another participant raised their hand -->
+    <string name="meetings_one_participant_raised_their_hand_message">%1$s人が挙手しました</string>
+    <!-- The snackbar message two or more participants raised their hands -->
+    <plurals name="meetings_other_participants_raised_their_hands_message">
+        <item quantity="other">%1$sさんとその他%2$d人が挙手しました</item>
+    </plurals>
 </resources>

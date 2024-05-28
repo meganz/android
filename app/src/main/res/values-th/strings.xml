@@ -121,7 +121,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">ไม่ต้องแสดงในครั้งต่อไป</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
+    <string name="confirm_cancel_login">คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการเข้าสู่ระบบปัจจุบัน</string>
     <!-- Login button -->
     <string name="login_text">เข้าสู่ระบบ</string>
     <!-- email label -->
@@ -1011,7 +1011,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]ออกจากระบบ[/A]เพื่อใช้ MEGA กับบัญชีอื่น</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
+    <string name="confirm_logout_from_sms_verification">คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบบัญชีปัจจุบัน</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">ข้อความนี้ถูกลบโดย %1$s</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -5143,5 +5143,11 @@
     <!-- The snackbar message of you and others raised your hands -->
     <plurals name="meeting_you_and_others_raised_your_hands_message">
         <item quantity="other">คุณและคนอื่น ๆ อีก %1$d คนได้ยกมือ</item>
+    </plurals>
+    <!-- The snackbar message of another participant raised their hand -->
+    <string name="meetings_one_participant_raised_their_hand_message">%1$s ได้ยกมือ</string>
+    <!-- The snackbar message two or more participants raised their hands -->
+    <plurals name="meetings_other_participants_raised_their_hands_message">
+        <item quantity="other">%1$s และคนอื่น ๆ อีก %2$d คนได้ยกมือ</item>
     </plurals>
 </resources>
