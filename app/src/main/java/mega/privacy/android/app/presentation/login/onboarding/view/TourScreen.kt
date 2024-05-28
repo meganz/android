@@ -60,8 +60,8 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaBut
 import mega.privacy.android.shared.original.core.ui.controls.pager.InfiniteHorizontalPagerWithIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -164,11 +164,13 @@ internal fun TourScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     TextMegaButton(
+                        modifier = Modifier.testTag(BUTTON_LOGIN_TAG),
                         textId = R.string.login_text,
                         onClick = onLoginClick
                     )
 
                     RaisedDefaultMegaButton(
+                        modifier = Modifier.testTag(BUTTON_CREATE_ACCOUNT_TAG),
                         textId = R.string.create_account,
                         onClick = onCreateAccountClick
                     )
@@ -326,3 +328,5 @@ private fun TourScreenPreview() {
 
 internal const val JOIN_A_MEETING_AS_GUEST_TAG = "tour_screen:button_join_a_meeting_as_guest"
 internal const val PASTE_MEETING_LINK_DIALOG_TAG = "tour_screen:dialog_join_a_meeting_as_guest"
+internal const val BUTTON_LOGIN_TAG = "tour_screen:button_login"
+internal const val BUTTON_CREATE_ACCOUNT_TAG = "tour_screen:button_create_account"
