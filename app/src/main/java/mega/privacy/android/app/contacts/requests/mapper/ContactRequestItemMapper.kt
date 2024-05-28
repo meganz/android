@@ -39,10 +39,9 @@ internal class ContactRequestItemMapper(
         val email = (if (isOutgoing) targetEmail else sourceEmail) ?: return null
         val userImageColor = avatarRepository.getAvatarColor(handle)
         val placeholder = getImagePlaceholder(email, userImageColor)
-        val userImageFile = avatarRepository.getAvatarFile(email)
-        val userImageUri = if (userImageFile.exists()) {
-            userImageFile.toUri()
-        } else null
+        val userImageUri = runCatching {
+            avatarRepository.getAvatarFile(email)
+        }.getOrNull()?.takeIf { it.exists() }?.toUri()
 
         ContactRequestItem(
             handle = handle,

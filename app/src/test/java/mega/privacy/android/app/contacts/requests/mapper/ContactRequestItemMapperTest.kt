@@ -128,4 +128,32 @@ class ContactRequestItemMapperTest {
         assertThat(actual?.createdTime).isEqualTo(formatCreationTime(creationTime))
         assertThat(actual?.isOutgoing).isEqualTo(isOutgoing)
     }
+
+    @Test
+    internal fun `test that no file uri is added if repository throws an exception`() = runTest {
+        avatarRepository.stub {
+            onBlocking {
+                getAvatarFile(
+                    any<String>(),
+                    any()
+                )
+            }.thenAnswer { throw RuntimeException() }
+        }
+
+        val input = ContactRequest(
+            handle = 1,
+            sourceEmail = "sourceEmail",
+            sourceMessage = "sourceMessage",
+            targetEmail = "targetEmail",
+            creationTime = 1,
+            modificationTime = 1,
+            status = ContactRequestStatus.Unresolved,
+            isOutgoing = true,
+            isAutoAccepted = false,
+        )
+
+        val actual = underTest(request = input)
+
+        assertThat(actual?.avatarUri).isNull()
+    }
 }
