@@ -12,7 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.slideshow.view.SlideshowSettingsView
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -35,7 +35,7 @@ class SlideshowSettingsFragment : Fragment() {
                 val mode by getThemeMode().collectAsStateWithLifecycle(
                     initialValue = ThemeMode.System
                 )
-                MegaAppTheme(isDark = mode.isDarkMode()) {
+                OriginalTempTheme(isDark = mode.isDarkMode()) {
                     SlideshowSettingsView(
                         slideshowSettingViewModel = slideshowSettingViewModel,
                     )

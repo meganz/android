@@ -38,8 +38,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * TextField Generic Title
@@ -82,21 +82,21 @@ fun GenericTitleTextField(
         }
 
         val textFieldColors = TextFieldDefaults.textFieldColors(
-            textColor = MegaTheme.colors.text.primary,
-            backgroundColor = MegaTheme.colors.background.pageBackground,
-            cursorColor = MegaTheme.colors.border.strongSelected,
-            errorCursorColor = MegaTheme.colors.support.error,
-            errorIndicatorColor = MegaTheme.colors.support.error,
-            focusedLabelColor = MegaTheme.colors.text.primary,
+            textColor = MegaOriginalTheme.colors.text.primary,
+            backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
+            cursorColor = MegaOriginalTheme.colors.border.strongSelected,
+            errorCursorColor = MegaOriginalTheme.colors.support.error,
+            errorIndicatorColor = MegaOriginalTheme.colors.support.error,
+            focusedLabelColor = MegaOriginalTheme.colors.text.primary,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            unfocusedLabelColor = MegaTheme.colors.text.onColorDisabled,
-            errorLabelColor = MegaTheme.colors.text.error,
+            unfocusedLabelColor = MegaOriginalTheme.colors.text.onColorDisabled,
+            errorLabelColor = MegaOriginalTheme.colors.text.error,
         )
 
         val customTextSelectionColors = TextSelectionColors(
-            handleColor = MegaTheme.colors.border.strongSelected,
-            backgroundColor = MegaTheme.colors.border.strongSelected
+            handleColor = MegaOriginalTheme.colors.border.strongSelected,
+            backgroundColor = MegaOriginalTheme.colors.border.strongSelected
         )
 
         val keyboardOption = KeyboardOptions(
@@ -131,7 +131,7 @@ fun GenericTitleTextField(
                     ),
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.h6.copy(
-                    color = MegaTheme.colors.text.primary,
+                    color = MegaOriginalTheme.colors.text.primary,
                     textAlign = TextAlign.Start
                 ),
                 cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
@@ -150,7 +150,7 @@ fun GenericTitleTextField(
                                 Text(
                                     text = stringResource(id = id),
                                     style = MaterialTheme.typography.h6.copy(
-                                        color = MegaTheme.colors.text.onColorDisabled,
+                                        color = MegaOriginalTheme.colors.text.onColorDisabled,
                                         textAlign = TextAlign.Start
                                     ),
                                 )
@@ -190,7 +190,7 @@ fun GenericTitleTextField(
 @CombinedThemePreviews
 @Composable
 private fun PreviewGenericTitleTextField() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GenericTitleTextField(
             value = "title",
             isEmptyValueError = false,

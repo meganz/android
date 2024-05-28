@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Test tag for the Media Permissions Rationale Dialog
@@ -46,7 +46,7 @@ internal fun MediaPermissionsRationaleDialog(
 @CombinedThemePreviews
 @Composable
 private fun MediaPermissionsRationaleDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MediaPermissionsRationaleDialog(
             onMediaAccessGranted = {},
             onMediaAccessDenied = {},

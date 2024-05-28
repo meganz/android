@@ -28,7 +28,7 @@ import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActi
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHANGE_PASSWORD_2FA
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaError
@@ -106,7 +106,7 @@ class ChangePasswordActivity : PasscodeActivity() {
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        MegaAppTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
             LaunchedEffect(Unit) {
                 viewModel.determineIfScreenIsResetPasswordMode()
             }

@@ -11,7 +11,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * A [Composable] that displays the Camera Uploads (Primary Folder) Folder Name from Cloud Drive.
@@ -48,7 +48,7 @@ internal fun CameraUploadsFolderNodeTile(
 @CombinedThemePreviews
 @Composable
 private fun CameraUploadsFolderNodeTilePreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CameraUploadsFolderNodeTile(
             primaryFolderName = "Camera Uploads",
             onItemClicked = {},

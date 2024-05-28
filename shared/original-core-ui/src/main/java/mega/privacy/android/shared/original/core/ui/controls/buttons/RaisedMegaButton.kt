@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Raised default text button
@@ -89,11 +89,11 @@ private fun RaisedDefaultMegaButton(
     onClick = onClick,
     enabled = enabled,
     shape = MaterialTheme.shapes.medium,
-    colors = MegaTheme.colors.raisedButtonColors,
+    colors = MegaOriginalTheme.colors.raisedButtonColors,
     border = if (enabled) {
         null
     } else {
-        BorderStroke(1.dp, MegaTheme.colors.border.disabled)
+        BorderStroke(1.dp, MegaOriginalTheme.colors.border.disabled)
     },
     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
     elevation = ButtonDefaults.elevation(8.dp),
@@ -115,7 +115,7 @@ private fun RaisedErrorMegaButton(
     onClick = onClick,
     enabled = enabled,
     shape = MaterialTheme.shapes.medium,
-    colors = MegaTheme.colors.raisedErrorButtonColors,
+    colors = MegaOriginalTheme.colors.raisedErrorButtonColors,
     border = null,
     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
     elevation = ButtonDefaults.elevation(8.dp),
@@ -126,7 +126,7 @@ private fun RaisedErrorMegaButton(
 @CombinedTextAndThemePreviews
 @Composable
 private fun PreviewRaisedDefaultMegaButton() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -150,7 +150,7 @@ private fun PreviewRaisedDefaultMegaButton() {
 @CombinedTextAndThemePreviews
 @Composable
 private fun RaisedErrorMegaButtonPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -174,7 +174,7 @@ private fun RaisedErrorMegaButtonPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RaisedProgressMegaButtonPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         RaisedProgressMegaButton()
     }
 }

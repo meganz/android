@@ -9,7 +9,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * A [Composable] Dialog that displays a list of Options on how Camera Uploads content should be
@@ -43,7 +43,7 @@ internal fun HowToUploadDialog(
 @CombinedThemePreviews
 @Composable
 private fun HowToUploadDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         HowToUploadDialog(
             currentUploadConnectionType = UploadConnectionType.WIFI,
             onOptionSelected = {},

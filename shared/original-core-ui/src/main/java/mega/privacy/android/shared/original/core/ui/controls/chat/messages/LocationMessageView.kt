@@ -26,8 +26,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Compose view for location message.
@@ -50,12 +50,12 @@ fun LocationMessageView(
         modifier = modifier
             .size(width = 256.dp, height = 200.dp)
             .background(
-                color = MegaTheme.colors.background.pageBackground,
+                color = MegaOriginalTheme.colors.background.pageBackground,
                 shape = RoundedCornerShape(12.dp)
             )
             .border(
                 width = 1.dp,
-                color = if (isMe) MegaTheme.colors.border.strongSelected else MegaTheme.colors.background.surface2,
+                color = if (isMe) MegaOriginalTheme.colors.border.strongSelected else MegaOriginalTheme.colors.background.surface2,
                 shape = RoundedCornerShape(12.dp)
             )
     ) {
@@ -66,8 +66,8 @@ fun LocationMessageView(
                     .height(120.dp)
                     .clip(shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                     .background(
-                        color = if (isMe) MegaTheme.colors.border.strong
-                        else MegaTheme.colors.background.surface2
+                        color = if (isMe) MegaOriginalTheme.colors.border.strong
+                        else MegaOriginalTheme.colors.background.surface2
                     ),
                 bitmap = it,
                 contentScale = ContentScale.Crop,
@@ -79,14 +79,14 @@ fun LocationMessageView(
             text = title,
             style = MaterialTheme.typography.subtitle1,
             fontWeight = FontWeight.Normal,
-            color = MegaTheme.colors.text.primary
+            color = MegaOriginalTheme.colors.text.primary
         )
         Text(
             modifier = Modifier.padding(start = 12.dp),
             text = geolocation,
             style = MaterialTheme.typography.subtitle2,
             fontWeight = FontWeight.Normal,
-            color = MegaTheme.colors.text.primary
+            color = MegaOriginalTheme.colors.text.primary
         )
     }
 }
@@ -96,7 +96,7 @@ fun LocationMessageView(
 private fun LocationMessagePreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         LocationMessageView(
             isMe = isMe,
             title = buildAnnotatedString { append("Pinned location") },

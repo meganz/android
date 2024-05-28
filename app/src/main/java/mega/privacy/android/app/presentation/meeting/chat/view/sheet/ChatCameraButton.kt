@@ -43,7 +43,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.ChatGalleryItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 
 internal const val TEST_TAG_CHAT_CAMERA_BUTTON = "chat_camera_button"
@@ -155,7 +155,7 @@ fun ChatCameraButton(
 @CombinedThemePreviews
 @Composable
 private fun ChatCameraButtonPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatCameraButton(
             modifier = Modifier.size(88.dp),
             hideSheet = {},

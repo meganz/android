@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 
 /**
@@ -35,11 +35,11 @@ fun GiphyMessagePlaceHolder(width: Int, height: Int, content: @Composable () -> 
             .size(width = width.dp, height = height.dp)
             .border(
                 width = 1.dp,
-                color = MegaTheme.colors.border.subtle,
+                color = MegaOriginalTheme.colors.border.subtle,
                 shape = RoundedCornerShape(12.dp)
             )
             .clip(RoundedCornerShape(12.dp))
-            .background(color = MegaTheme.colors.background.surface2),
+            .background(color = MegaOriginalTheme.colors.background.surface2),
         contentAlignment = Alignment.Center,
     ) {
         content()
@@ -49,7 +49,7 @@ fun GiphyMessagePlaceHolder(width: Int, height: Int, content: @Composable () -> 
 @CombinedThemePreviews
 @Composable
 private fun GiphyMessageLoadingPlaceHolderPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GiphyMessagePlaceHolder(width = 256, height = 200) {
             MegaCircularProgressIndicator(modifier = Modifier.size(48.dp))
         }
@@ -59,7 +59,7 @@ private fun GiphyMessageLoadingPlaceHolderPreview() {
 @CombinedThemePreviews
 @Composable
 private fun GiphyMessageStaticPlaceHolderPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GiphyMessagePlaceHolder(width = 256, height = 200) {
             Image(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_check_circle),

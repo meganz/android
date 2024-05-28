@@ -58,8 +58,8 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * ScaffoldWithCollapsibleHeader
@@ -92,18 +92,18 @@ fun ScaffoldWithCollapsibleHeader(
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
-            .background(MegaTheme.colors.background.pageBackground)
+            .background(MegaOriginalTheme.colors.background.pageBackground)
     ) {
         // calculate the dimensions and colors that are derived from scrollState
         val density = LocalDensity.current.density
         val hasHeaderBelowSystemBar = headerIncludingSystemBar != null
-        val needsInverseTitleColors = hasHeaderBelowSystemBar && MegaTheme.colors.isLight
-        val iconTintColorBase = MegaTheme.colors.icon.primary
+        val needsInverseTitleColors = hasHeaderBelowSystemBar && MegaOriginalTheme.colors.isLight
+        val iconTintColorBase = MegaOriginalTheme.colors.icon.primary
         val iconTintColorExpanded =
-            if (needsInverseTitleColors) MegaTheme.colors.icon.inverse else iconTintColorBase
-        val titleColorBase = MegaTheme.colors.text.primary
+            if (needsInverseTitleColors) MegaOriginalTheme.colors.icon.inverse else iconTintColorBase
+        val titleColorBase = MegaOriginalTheme.colors.text.primary
         val titleColorExpanded =
-            if (needsInverseTitleColors) MegaTheme.colors.text.inverse else titleColorBase
+            if (needsInverseTitleColors) MegaOriginalTheme.colors.text.inverse else titleColorBase
         val targetAppBarElevation = LocalMegaAppBarElevation.current
 
         val headerHeight by remember {
@@ -182,7 +182,7 @@ fun ScaffoldWithCollapsibleHeader(
         //set the status bar color to match toolbar color
         if (!LocalView.current.isInEditMode) {
             val statusColor =
-                MegaTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha)
+                MegaOriginalTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha)
                     .surfaceColorAtElevation(absoluteElevation = appBarElevation)
                     .copy(alpha = topBarBackgroundAlpha)
             val systemUiController = rememberSystemUiController()
@@ -363,7 +363,7 @@ private fun Color.surfaceColorAtElevation(
 private fun ScaffoldWithCollapsibleHeaderPreview(
     @PreviewParameter(BooleanProvider::class) hasHeaderBelowAppbar: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         val title = "Title very long that can take up to 3 lines when the header is expanded"
         val appBarType = if (hasHeaderBelowAppbar) AppBarType.NONE else AppBarType.BACK_NAVIGATION
         ScaffoldWithCollapsibleHeader(
@@ -384,7 +384,7 @@ private fun ScaffoldWithCollapsibleHeaderPreview(
                     Box(modifier = Modifier.fillMaxSize()) {
                         Text(
                             text = "Header above app bar",
-                            color = MegaTheme.colors.text.primary,
+                            color = MegaOriginalTheme.colors.text.primary,
                             modifier = Modifier
                                 .align(Alignment.BottomStart)
                                 .padding(start = 16.dp)
@@ -401,7 +401,7 @@ private fun ScaffoldWithCollapsibleHeaderPreview(
 @CombinedThemePreviews
 @Composable
 private fun ScaffoldWithCollapsibleHeaderWithSubtitlePreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         val title = "Collapsable With Subtitle"
         val subtitle = "Subtitle"
         val appBarType = AppBarType.BACK_NAVIGATION
@@ -410,7 +410,7 @@ private fun ScaffoldWithCollapsibleHeaderWithSubtitlePreview() {
                 modifier = Modifier
                     .size(24.dp)
                     .padding(6.dp)
-                    .background(MegaTheme.colors.components.selectionControl, shape = CircleShape)
+                    .background(MegaOriginalTheme.colors.components.selectionControl, shape = CircleShape)
             )
         }
         ScaffoldWithCollapsibleHeader(
@@ -447,17 +447,17 @@ private fun Content() = Column(
         .fillMaxSize()
         .padding(16.dp)
 ) {
-    Text("Content", color = MegaTheme.colors.text.primary)
-    Text("Content", color = MegaTheme.colors.text.primary)
-    Text("Content", color = MegaTheme.colors.text.primary)
-    Text("Content", color = MegaTheme.colors.text.primary)
+    Text("Content", color = MegaOriginalTheme.colors.text.primary)
+    Text("Content", color = MegaOriginalTheme.colors.text.primary)
+    Text("Content", color = MegaOriginalTheme.colors.text.primary)
+    Text("Content", color = MegaOriginalTheme.colors.text.primary)
 }
 
 @Composable
 private fun Header() = Box(
     modifier = Modifier
         .fillMaxSize()
-        .background(MegaTheme.colors.background.blur)
+        .background(MegaOriginalTheme.colors.background.blur)
 )
 
 private fun getSampleToolbarActions(): List<MenuAction> = listOf(

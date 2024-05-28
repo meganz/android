@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import mega.privacy.android.shared.original.core.ui.controls.skeleton.ListItemLoadingSkeleton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Test Tag for the Device Center Loading Screen
@@ -37,7 +37,7 @@ internal fun DeviceCenterLoadingScreen() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewDeviceCenterLoadingScreen() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterLoadingScreen()
     }
 }

@@ -57,9 +57,9 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackB
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -240,7 +240,7 @@ fun VoiceClipRecorderView(
                             .fillMaxHeight()
                             .width(40.dp)
                             .clip(RoundedCornerShape(25.dp))
-                            .background(color = MegaTheme.colors.background.surface1),
+                            .background(color = MegaOriginalTheme.colors.background.surface1),
                         contentAlignment = Alignment.TopCenter,
                     ) {
                         Icon(
@@ -248,7 +248,7 @@ fun VoiceClipRecorderView(
                                 .padding(top = 12.dp)
                                 .size(18.dp),
                             imageVector = ImageVector.vectorResource(R.drawable.ic_icon_lock_medium_regular_solid),
-                            tint = MegaTheme.colors.icon.secondary,
+                            tint = MegaOriginalTheme.colors.icon.secondary,
                             contentDescription = null
                         )
                         Icon(
@@ -256,7 +256,7 @@ fun VoiceClipRecorderView(
                                 .padding(top = 34.dp)
                                 .size(18.dp),
                             imageVector = ImageVector.vectorResource(R.drawable.ic_icon_chevron_up_medium_regular_outline),
-                            tint = MegaTheme.colors.icon.disabled,
+                            tint = MegaOriginalTheme.colors.icon.disabled,
                             contentDescription = null
                         )
                     }
@@ -272,7 +272,7 @@ fun VoiceClipRecorderView(
                         .fillMaxWidth()
                         .height(42.dp)
                         .clip(RoundedCornerShape(25.dp))
-                        .background(color = MegaTheme.colors.background.surface1),
+                        .background(color = MegaOriginalTheme.colors.background.surface1),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     TimerWithIndicator(
@@ -394,7 +394,7 @@ private fun TimerWithIndicator(seconds: Int, modifier: Modifier = Modifier) {
 @CombinedThemePreviews
 @Composable
 private fun TimerWithIndicatorPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         TimerWithIndicator(seconds = 100)
     }
 }
@@ -409,7 +409,7 @@ private fun CancelButton(
             .padding(start = 8.dp)
             .clickable { onCancel() },
         text = stringResource(id = R.string.general_cancel),
-        color = MegaTheme.colors.components.interactive,
+        color = MegaOriginalTheme.colors.components.interactive,
         style = MaterialTheme.typography.subtitle2,
         fontWeight = FontWeight.Medium,
     )
@@ -421,7 +421,7 @@ private fun RecordingWave(modifier: Modifier = Modifier) {
         modifier = modifier,
         imageVector = ImageVector.vectorResource(R.drawable.ic_icon_audio_wave),
         contentDescription = null,
-        tint = MegaTheme.colors.icon.primary
+        tint = MegaOriginalTheme.colors.icon.primary
     )
 }
 
@@ -431,7 +431,7 @@ private fun RecordIndicator(modifier: Modifier = Modifier) {
         modifier = modifier
             .clip(CircleShape)
             .size(12.dp)
-            .background(color = MegaTheme.colors.components.interactive),
+            .background(color = MegaOriginalTheme.colors.components.interactive),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -449,14 +449,14 @@ private fun RecordScroller(modifier: Modifier = Modifier) {
         modifier = modifier
             .size(REC_SCROLLER_SIZE_IN_DP.dp)
             .clip(CircleShape)
-            .background(color = MegaTheme.colors.components.interactive),
+            .background(color = MegaOriginalTheme.colors.components.interactive),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             modifier = Modifier.size(24.dp),
             imageVector = ImageVector.vectorResource(R.drawable.ic_icon_mic_medium_regular_solid),
             contentDescription = null,
-            tint = MegaTheme.colors.icon.onColor,
+            tint = MegaOriginalTheme.colors.icon.onColor,
         )
     }
 }
@@ -470,7 +470,7 @@ private fun SlideToCancel(modifier: Modifier = Modifier) {
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.ic_icon_chevron_left_medium_regular_outline),
             contentDescription = null,
-            tint = MegaTheme.colors.icon.onColorDisabled
+            tint = MegaOriginalTheme.colors.icon.onColorDisabled
         )
         MegaText(
             text = stringResource(id = R.string.slide_to_cancel),
@@ -493,7 +493,7 @@ private const val SLIDE_TO_CANCEL_THRESHOLD_IN_PX = 400
 @CombinedThemePreviews
 @Composable
 private fun SlideToCancelPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SlideToCancel()
     }
 }
@@ -501,7 +501,7 @@ private fun SlideToCancelPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RecordIndicatorPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         RecordIndicator()
     }
 }
@@ -509,7 +509,7 @@ private fun RecordIndicatorPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VoiceClipRecorderViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VoiceClipRecorderView()
     }
 }
@@ -517,7 +517,7 @@ private fun VoiceClipRecorderViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RecordScrollerPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         RecordScroller()
     }
 }

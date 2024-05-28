@@ -8,7 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 
 /**
@@ -107,7 +107,7 @@ private fun getTitle(isMeeting: Boolean) =
 @CombinedThemePreviews
 @Composable
 private fun MutePushNotificationDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MutePushNotificationDialog(ChatPushNotificationMuteOption.entries)
     }
 }

@@ -26,10 +26,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Generic two line list item
@@ -74,7 +74,7 @@ fun GenericTwoLineListItem(
                 modifier = Modifier,
                 text = title,
                 style = MaterialTheme.typography.subtitle1,
-                color = MegaTheme.textColor(textColor = titleTextColor),
+                color = MegaOriginalTheme.textColor(textColor = titleTextColor),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -85,7 +85,7 @@ fun GenericTwoLineListItem(
                     modifier = Modifier,
                     text = subtitle,
                     style = MaterialTheme.typography.subtitle2,
-                    color = MegaTheme.textColor(textColor = subtitleTextColor),
+                    color = MegaOriginalTheme.textColor(textColor = subtitleTextColor),
                     maxLines = if (showEntireSubtitle) {
                         Int.MAX_VALUE
                     } else {
@@ -163,7 +163,7 @@ internal fun GenericTwoLineListItem(
 @Composable
 private fun RowScope.TrailingIcons(trailingIcons: @Composable (RowScope.() -> Unit)?) {
     CompositionLocalProvider(
-        LocalContentColor provides MegaTheme.colors.icon.secondary,
+        LocalContentColor provides MegaOriginalTheme.colors.icon.secondary,
         LocalContentAlpha provides 1f,
     ) {
         trailingIcons?.invoke(this)
@@ -183,14 +183,14 @@ private fun TitleRow(
     ) {
         Box(modifier = Modifier.weight(1f, fill = fillTitleText)) {
             CompositionLocalProvider(
-                LocalContentColor provides MegaTheme.colors.text.primary,
+                LocalContentColor provides MegaOriginalTheme.colors.text.primary,
                 LocalTextStyle provides MaterialTheme.typography.subtitle1,
             ) {
                 title()
             }
         }
         CompositionLocalProvider(
-            LocalContentColor provides MegaTheme.colors.icon.secondary,
+            LocalContentColor provides MegaOriginalTheme.colors.icon.secondary,
             LocalContentAlpha provides 1f,
         ) {
             titleIcons?.invoke(this)
@@ -213,21 +213,21 @@ private fun SubTitleRow(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             CompositionLocalProvider(
-                LocalContentColor provides MegaTheme.colors.icon.secondary,
+                LocalContentColor provides MegaOriginalTheme.colors.icon.secondary,
                 LocalContentAlpha provides 1f,
             ) {
                 subTitlePrefixIcons?.invoke(this)
             }
             Box(modifier = Modifier.weight(1f, fill = fillSubTitleText)) {
                 CompositionLocalProvider(
-                    LocalContentColor provides MegaTheme.colors.text.secondary,
+                    LocalContentColor provides MegaOriginalTheme.colors.text.secondary,
                     LocalTextStyle provides MaterialTheme.typography.subtitle2
                 ) {
                     subtitle()
                 }
             }
             CompositionLocalProvider(
-                LocalContentColor provides MegaTheme.colors.icon.secondary,
+                LocalContentColor provides MegaOriginalTheme.colors.icon.secondary,
                 LocalContentAlpha provides 1f,
             ) {
                 subTitleSuffixIcons?.invoke(this)
@@ -239,7 +239,7 @@ private fun SubTitleRow(
 @CombinedThemePreviews
 @Composable
 private fun GenericTwoLineListItemPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GenericTwoLineListItem(
             title = "Generic Two Line List Item Title",
             subtitle = "Generic Two Line List Item Subtitle",
@@ -258,7 +258,7 @@ private fun GenericTwoLineListItemPreview() {
 private fun GenericTwoLineListItemWithLongContentPreview(
     @PreviewParameter(BooleanProvider::class) showEntireSubtitle: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GenericTwoLineListItem(
             title = "Very Long Generic Two Line List Item Title to Simulate Ellipsis",
             subtitle = "Very Long Generic Two Line List Item Subtitle to Simulate Ellipsis",
@@ -276,7 +276,7 @@ private fun GenericTwoLineListItemWithLongContentPreview(
 @CombinedThemePreviews
 @Composable
 private fun GenericTwoLineListItemWithOnlyTitlePreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GenericTwoLineListItem(title = "Generic Two Line List Item Title")
     }
 }

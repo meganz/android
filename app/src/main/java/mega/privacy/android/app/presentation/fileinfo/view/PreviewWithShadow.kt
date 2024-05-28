@@ -16,7 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_026
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_050
@@ -73,7 +73,7 @@ internal fun PreviewWithShadow(
 @CombinedThemePreviews
 @Composable
 private fun PreviewWithShadowPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.height(120.dp)) {
             PreviewWithShadow(previewUri = "a")
         }

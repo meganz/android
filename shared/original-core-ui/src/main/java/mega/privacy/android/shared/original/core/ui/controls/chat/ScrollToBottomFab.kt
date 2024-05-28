@@ -23,11 +23,11 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.FloatingAct
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 
 internal const val SCROLL_TO_BOTTOM_FAB_TEST_TAG = "scroll_to_bottom_fab:fab"
@@ -54,26 +54,26 @@ fun ScrollToBottomFab(
                 .testTag(SCROLL_TO_BOTTOM_FAB_TEST_TAG),
             onClick = onClick,
             style = FloatingActionButtonStyle.SmallWithoutElevation,
-            backgroundColor = MegaTheme.colors.icon.primary
+            backgroundColor = MegaOriginalTheme.colors.icon.primary
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .border(1.dp, MegaTheme.colors.border.subtle, CircleShape)
+                    .border(1.dp, MegaOriginalTheme.colors.border.subtle, CircleShape)
             ) {
                 Icon(
                     modifier = modifier.align(Alignment.Center),
                     painter = painterResource(id = R.drawable.ic_arrow_down),
                     contentDescription = "Icon Arrow Down",
-                    tint = MegaTheme.colors.icon.inverse
+                    tint = MegaOriginalTheme.colors.icon.inverse
                 )
             }
         }
         if (unreadCount > 0) {
             MegaText(
                 modifier = Modifier
-                    .background(MegaTheme.colors.icon.primary, RoundedCornerShape(20.dp))
-                    .border(1.dp, MegaTheme.colors.border.subtle, RoundedCornerShape(20.dp))
+                    .background(MegaOriginalTheme.colors.icon.primary, RoundedCornerShape(20.dp))
+                    .border(1.dp, MegaOriginalTheme.colors.border.subtle, RoundedCornerShape(20.dp))
                     .padding(horizontal = 6.dp, vertical = 3.dp),
                 text = unreadCount.formatUnreadCount(), textColor = TextColor.Inverse,
                 style = MaterialTheme.typography.body4
@@ -89,7 +89,7 @@ private fun Int.formatUnreadCount(): String = if (this > 99) "+99" else "$this"
 private fun ScrollToBottomFabPreview(
     @PreviewParameter(UnreadCountProvider::class) unreadCount: Int,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ScrollToBottomFab(onClick = {}, unreadCount = unreadCount)
     }
 }

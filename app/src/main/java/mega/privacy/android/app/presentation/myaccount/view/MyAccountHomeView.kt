@@ -134,7 +134,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPr
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.white
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import org.jetbrains.anko.displayMetrics
 import java.io.File
 
@@ -980,7 +980,7 @@ private fun shouldShowPaymentInfo(uiState: MyAccountHomeUIState): Boolean {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "MyAccountHomePreviewDark")
 @Composable
 internal fun MyAccountHomePreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MyAccountHomeView(
             uiState = MyAccountHomeUIState(
                 name = "QWERTY UIOP",

@@ -21,7 +21,7 @@ import mega.privacy.android.feature.sync.navigation.syncNavGraph
 import mega.privacy.android.feature.sync.navigation.syncRoute
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
 
 /**
@@ -80,7 +80,7 @@ class SyncFragment : Fragment() {
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
                 state.showOnboarding?.let { showOnboarding ->
-                    MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                    OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                         NavHost(
                             navController = animatedNavController,
                             startDestination = syncRoute,

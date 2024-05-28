@@ -6,7 +6,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getDayAndMonth
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import java.time.Instant
@@ -45,7 +45,7 @@ fun CancelScheduledMeetingOccurrenceDialog(
 @Preview
 @Composable
 fun PreviewCancelScheduledMeetingOccurrenceDialog() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CancelScheduledMeetingOccurrenceDialog(
             occurrence = ChatScheduledMeetingOccurr(
                 schedId = Random.nextLong(),

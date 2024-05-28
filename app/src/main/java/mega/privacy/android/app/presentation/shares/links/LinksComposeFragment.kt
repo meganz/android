@@ -72,7 +72,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -136,7 +136,7 @@ class LinksComposeFragment : Fragment() {
                     mutableStateOf(null)
                 }
 
-                MegaAppTheme(isDark = isDarkMode) {
+                OriginalTempTheme(isDark = isDarkMode) {
                     LinksView(
                         uiState = uiState,
                         emptyState = getEmptyFolderDrawable(uiState.isLinksEmpty),

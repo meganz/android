@@ -37,7 +37,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ScheduledMeetingCancelMenuItemEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuItemEvent
 import javax.inject.Inject
@@ -82,7 +82,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val item: ChatRoomItem? by viewModel.getChatRoom(chatId)
                 .collectAsStateWithLifecycle(null, viewLifecycleOwner, Lifecycle.State.STARTED)
-            MegaAppTheme(isDark = mode.isDarkMode()) {
+            OriginalTempTheme(isDark = mode.isDarkMode()) {
                 ChatRoomItemBottomSheetView(
                     item = item,
                     onStartMeetingClick = ::onStartMeetingClick,

@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.sp
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 
@@ -65,22 +65,22 @@ fun ReactionChip(
                 }
                 .border(
                     width = 1.dp,
-                    color = if (reaction.hasMe) MegaTheme.colors.border.strongSelected else MegaTheme.colors.border.disabled,
+                    color = if (reaction.hasMe) MegaOriginalTheme.colors.border.strongSelected else MegaOriginalTheme.colors.border.disabled,
                     shape = RoundedCornerShape(12.dp)
                 )
-                .background(color = MegaTheme.colors.background.surface2)
+                .background(color = MegaOriginalTheme.colors.background.surface2)
                 .padding(bottom = 2.dp)
                 .testTag(TEST_TAG_CHAT_MESSAGE_REACTION_CHIP),
         ) {
             Text(
                 modifier = Modifier.padding(end = 2.dp),
                 text = reaction.reaction,
-                color = MegaTheme.colors.border.strongSelected,
+                color = MegaOriginalTheme.colors.border.strongSelected,
                 fontSize = 14.sp,
             )
             Text(
                 text = "${reaction.userList.size}",
-                color = if (reaction.hasMe) MegaTheme.colors.border.strongSelected else MegaTheme.colors.text.secondary,
+                color = if (reaction.hasMe) MegaOriginalTheme.colors.border.strongSelected else MegaOriginalTheme.colors.text.secondary,
                 style = MaterialTheme.typography.subtitle2,
             )
         }
@@ -94,7 +94,7 @@ fun ReactionChip(
 private fun ReactionChipWithRtlCountPreview(
     @PreviewParameter(BooleanProvider::class) hasMe: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ReactionChip(
             reaction = UIReaction(
                 reaction = "\uD83C\uDF77",
@@ -116,7 +116,7 @@ private fun ReactionChipWithRtlCountPreview(
 private fun ReactionChipWithCountPreview(
     @PreviewParameter(BooleanProvider::class) hasMe: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ReactionChip(
             reaction = UIReaction(
                 reaction = "\uD83C\uDF77",

@@ -15,7 +15,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaChatApiJava
 import javax.inject.Inject
 
@@ -49,7 +49,7 @@ class ComposeContactInfoActivity : BaseActivity() {
             val statusBarHeight = Util.getStatusBarHeight() / density
 
 
-            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 // A surface container using the 'background' color from the theme
                 ContactInfoView(
                     uiState = uiState,

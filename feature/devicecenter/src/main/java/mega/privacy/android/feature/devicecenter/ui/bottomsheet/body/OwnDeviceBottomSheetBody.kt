@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.CameraUploadsBottomSheetTile
@@ -64,7 +64,7 @@ internal fun OwnDeviceBottomSheetBody(
 private fun PreviewOwnDeviceBottomSheet(
     @PreviewParameter(BooleanProvider::class) isCameraUploadsEnabled: Boolean,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         OwnDeviceBottomSheetBody(
             isCameraUploadsEnabled = isCameraUploadsEnabled,
             hasSyncedFolders = true,

@@ -16,7 +16,7 @@ import mega.privacy.android.shared.original.core.ui.controls.preview.PreviewAler
 import mega.privacy.android.shared.original.core.ui.controls.preview.PreviewStringParameters
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
 
 /**
  * Confirmation dialog with a title, a message body and 2 buttons.
@@ -200,7 +200,7 @@ private fun DialogEndButton(
 @CombinedThemePreviews
 @Composable
 private fun ConfirmationDialogPreview() {
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         ConfirmationDialog(
             title = "Dialog title",
             text = "This is the message body of the dialog. And this is another line in the test.",
@@ -215,7 +215,7 @@ private fun ConfirmationDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ConfirmationDialogOnlyTitlePreview() {
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         ConfirmationDialog(
             title = "Dialog title",
             cancelButtonText = "Cancel",
@@ -232,7 +232,7 @@ private fun ConfirmationDialogRtlPreview(
     @PreviewParameter(PreviewStringsParametersProviderWithTitle::class) texts: PreviewStringParameters,
 ) {
     texts.title?.let {
-        AndroidTheme {
+        OriginalTempThemeForPreviews {
             ConfirmationDialog(
                 title = texts.title.getText(),
                 text = texts.text.getText(),
@@ -248,7 +248,7 @@ private fun ConfirmationDialogRtlPreview(
 @CombinedThemePreviews
 @Composable
 private fun ConfirmationDialog3ButtonsPreview() {
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         ConfirmationDialog(
             title = "Dialog title",
             text = "This is the message body of the dialog. And this is another line in the test.",

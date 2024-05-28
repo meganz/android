@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view.OfflineFileInfoScreen
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
 
 /**
@@ -43,7 +43,7 @@ class OfflineFileInfoComposeFragment : Fragment() {
                 val isDarkMode = themeMode.isDarkMode()
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-                MegaAppTheme(isDark = isDarkMode) {
+                OriginalTempTheme(isDark = isDarkMode) {
                     OfflineFileInfoScreen(
                         uiState = uiState,
                         onRemoveFromOffline = {

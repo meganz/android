@@ -13,9 +13,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Chat error bubble.
@@ -28,7 +28,7 @@ fun ChatErrorBubble(
     Box(
         modifier = modifier
             .border(
-                BorderStroke(1.dp, SolidColor(MegaTheme.colors.text.error)),
+                BorderStroke(1.dp, SolidColor(MegaOriginalTheme.colors.text.error)),
                 RoundedCornerShape(12.dp)
             ),
     ) {
@@ -44,7 +44,7 @@ fun ChatErrorBubble(
 @CombinedThemePreviews
 @Composable
 private fun ChatErrorBubblePreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatErrorBubble(errorText = "Invalid message format")
     }
 }

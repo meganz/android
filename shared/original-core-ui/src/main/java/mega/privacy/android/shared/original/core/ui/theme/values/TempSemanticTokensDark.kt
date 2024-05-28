@@ -2,22 +2,22 @@
 // Generated automatically by KotlinTokensGenerator.
 // Do not modify this file manually.
 //
-package mega.privacy.android.shared.original.core.ui.theme.tokens.new
+package mega.privacy.android.shared.original.core.ui.theme.values
 
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Background
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Border
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Button
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Components
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Focus
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Icon
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Indicator
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Link
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Notifications
-import mega.privacy.android.shared.original.core.ui.theme.tokens.SemanticTokens
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Support
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Text
+import mega.android.core.ui.tokens.theme.tokens.Background
+import mega.android.core.ui.tokens.theme.tokens.Border
+import mega.android.core.ui.tokens.theme.tokens.Button
+import mega.android.core.ui.tokens.theme.tokens.Components
+import mega.android.core.ui.tokens.theme.tokens.Focus
+import mega.android.core.ui.tokens.theme.tokens.Icon
+import mega.android.core.ui.tokens.theme.tokens.Indicator
+import mega.android.core.ui.tokens.theme.tokens.Link
+import mega.android.core.ui.tokens.theme.tokens.Notifications
+import mega.android.core.ui.tokens.theme.tokens.SemanticTokens
+import mega.android.core.ui.tokens.theme.tokens.Support
+import mega.android.core.ui.tokens.theme.tokens.Text
 
-internal object AndroidNewSemanticTokensDark : SemanticTokens {
+internal object TempSemanticTokensDark : SemanticTokens {
     override val background: Background = Background(
             pageBackground = Colors.Neutral.n900,
             inverse = Colors.Neutral.n050,

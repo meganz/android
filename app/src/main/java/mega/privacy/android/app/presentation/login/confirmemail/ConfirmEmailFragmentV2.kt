@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.login.confirmemail.view.ConfirmEmai
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
 
 /**
@@ -59,7 +59,7 @@ class ConfirmEmailFragmentV2 : Fragment() {
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 ConfirmEmailRoute(
                     modifier = Modifier.fillMaxSize(),
                     email = emailTemp.orEmpty(),

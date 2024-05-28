@@ -19,8 +19,8 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedTex
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Composable for when Recent Actions is empty
@@ -83,7 +83,7 @@ internal const val RECENT_EMPTY_TEXT_TEST_TAG = "recent_actions_empty_view:text"
 @CombinedThemePreviews
 @Composable
 private fun RecentActionsEmptyViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         RecentActionsEmptyView()
     }
 }

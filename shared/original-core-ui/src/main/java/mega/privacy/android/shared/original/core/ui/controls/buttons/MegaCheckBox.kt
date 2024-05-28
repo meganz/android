@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 /**
@@ -45,11 +45,11 @@ fun MegaCheckbox(
     rounded: Boolean = true,
 ) {
     val imageVector = ImageVector.vectorResource(R.drawable.check)
-    val tint = if (checked) MegaTheme.colors.icon.inverse else Color.Transparent
+    val tint = if (checked) MegaOriginalTheme.colors.icon.inverse else Color.Transparent
     val background =
-        if (checked) MegaTheme.colors.components.selectionControl else Color.Transparent
+        if (checked) MegaOriginalTheme.colors.components.selectionControl else Color.Transparent
     val borderColor =
-        if (enabled) MegaTheme.colors.icon.secondary else MegaTheme.colors.border.disabled
+        if (enabled) MegaOriginalTheme.colors.icon.secondary else MegaOriginalTheme.colors.border.disabled
     val shape = if (rounded) CircleShape else RoundedCornerShape(2.dp)
 
     IconButton(
@@ -102,7 +102,7 @@ private fun PreviewMegaCheckboxSquare(
 
 @Composable
 private fun Preview(checked: Boolean, rounded: Boolean) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         var interactiveChecked by remember { mutableStateOf(checked) }
         MegaCheckbox(
             modifier = Modifier,

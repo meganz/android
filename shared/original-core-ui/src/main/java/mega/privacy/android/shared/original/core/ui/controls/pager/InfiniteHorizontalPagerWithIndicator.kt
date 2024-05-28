@@ -16,11 +16,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.controls.pager.indicator.HorizontalPagerIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * A [HorizontalPager] that supports infinite scrolling with indicator.
@@ -82,7 +82,7 @@ fun InfiniteHorizontalPagerWithIndicator(
 @CombinedTextAndThemePreviews
 @Composable
 private fun InfiniteHorizontalPagerWithIndicatorPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Column(modifier = Modifier.fillMaxSize()) {
             InfiniteHorizontalPagerWithIndicator(
                 modifier = Modifier.fillMaxWidth(),

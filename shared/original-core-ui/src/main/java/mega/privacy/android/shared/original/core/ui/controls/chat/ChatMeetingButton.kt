@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Chat meeting button
@@ -34,10 +34,10 @@ fun ChatMeetingButton(
     enabled = enabled,
     shape = CircleShape,
     colors = ButtonDefaults.buttonColors(
-        backgroundColor = MegaTheme.colors.background.inverse,
-        contentColor = MegaTheme.colors.text.inverse,
-        disabledBackgroundColor = MegaTheme.colors.button.disabled,
-        disabledContentColor = MegaTheme.colors.text.disabled,
+        backgroundColor = MegaOriginalTheme.colors.background.inverse,
+        contentColor = MegaOriginalTheme.colors.text.inverse,
+        disabledBackgroundColor = MegaOriginalTheme.colors.button.disabled,
+        disabledContentColor = MegaOriginalTheme.colors.text.disabled,
     ),
     contentPadding = PaddingValues(16.dp),
     elevation = ButtonDefaults.elevation(8.dp),
@@ -51,7 +51,7 @@ fun ChatMeetingButton(
 @CombinedThemePreviews
 @Composable
 private fun ChatMeetingButtonPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatMeetingButton(
             text = "Start meeting",
             onClick = {},

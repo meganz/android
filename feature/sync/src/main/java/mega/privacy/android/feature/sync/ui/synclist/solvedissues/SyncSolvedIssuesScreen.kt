@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
@@ -60,7 +60,7 @@ internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
 @CombinedThemePreviews
 @Composable
 internal fun SyncSolvedIssuesScreenEmptyStatePreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncSolvedIssuesScreen(solvedIssues = emptyList())
     }
 }
@@ -68,7 +68,7 @@ internal fun SyncSolvedIssuesScreenEmptyStatePreview() {
 @CombinedThemePreviews
 @Composable
 internal fun SyncSolvedIssuesScreenPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncSolvedIssuesScreen(
             listOf(
                 SolvedIssueUiItem(

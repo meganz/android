@@ -16,15 +16,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.hilt.navigation.compose.hiltViewModel
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
-import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.management.AlterParticipantsMessage
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
+import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Alter participants message view
@@ -140,7 +140,7 @@ internal fun AlterParticipantsMessageView(
 private fun AlterParticipantsMessageViewSameHandlePreview(
     @PreviewParameter(ChatRoomPermissionProvider::class) permission: ChatRoomPermission,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         AlterParticipantsMessageView(
             message = AlterParticipantsMessage(
                 chatId = 1L,
@@ -167,7 +167,7 @@ private fun AlterParticipantsMessageViewSameHandlePreview(
 private fun AlterParticipantsMessageViewDifferentHandlePreview(
     @PreviewParameter(ChatRoomPermissionProvider::class) permission: ChatRoomPermission,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         AlterParticipantsMessageView(
             message = AlterParticipantsMessage(
                 chatId = 1L,

@@ -40,7 +40,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ChatConversationAddParticipantsMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ChatConversationArchiveMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ChatConversationCallMenuToolbarEvent
@@ -359,7 +359,7 @@ private fun getCustomSubtitle(uiState: ChatUiState): String = with(uiState) {
 @CombinedThemePreviews
 @Composable
 private fun ChatAppBarPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatAppBar(
             uiState = ChatUiState(
                 chat = ChatRoom(

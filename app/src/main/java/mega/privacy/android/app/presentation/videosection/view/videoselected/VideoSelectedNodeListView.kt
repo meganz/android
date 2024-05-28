@@ -31,7 +31,7 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun <T : TypedNode> VideoSelectedNodeListView(
@@ -112,7 +112,7 @@ internal fun <T : TypedNode> VideoSelectedNodeListView(
 private fun VideoSelectedNodeListViewFoldersPreview(
     @PreviewParameter(SampleFolderNodeDataProvider::class) items: List<NodeUIItem<TypedFolderNode>>,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoSelectedNodeListView(
             modifier = Modifier,
             nodeUIItemList = items,

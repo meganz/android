@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Error text in text field.
@@ -29,7 +29,7 @@ fun ErrorTextTextField(
             .fillMaxWidth()
             .padding(top = 4.dp),
         text = errorText,
-        style = MaterialTheme.typography.caption.copy(color = MegaTheme.colors.text.error),
+        style = MaterialTheme.typography.caption.copy(color = MegaOriginalTheme.colors.text.error),
         textAlign = TextAlign.Start
     )
 }
@@ -37,7 +37,7 @@ fun ErrorTextTextField(
 @CombinedThemePreviews
 @Composable
 private fun PreviewErrorTextTextField() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ErrorTextTextField(errorText = "Error text")
     }
 }

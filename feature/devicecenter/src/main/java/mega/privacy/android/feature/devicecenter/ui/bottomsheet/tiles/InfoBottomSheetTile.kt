@@ -11,7 +11,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionLis
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Test Tag for the Info Bottom Sheet Tile
@@ -45,7 +45,7 @@ internal fun InfoBottomSheetTile(
 @CombinedThemePreviews
 @Composable
 private fun PreviewInfoBottomSheetTile() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         InfoBottomSheetTile(onActionClicked = {})
     }
 }

@@ -37,7 +37,6 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":data"))
     implementation(project(":shared:original-core-ui"))
-    implementation(project(":shared:theme"))
     implementation(project(":shared:sync"))
     implementation(project(":shared:resources"))
     implementation(project(":legacy-core-ui"))

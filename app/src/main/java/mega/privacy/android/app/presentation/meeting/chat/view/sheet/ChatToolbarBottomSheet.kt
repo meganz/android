@@ -44,7 +44,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AttachItem
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationGIFMenuItemEvent
@@ -299,7 +299,7 @@ private fun openDocumentScanner(
 @CombinedThemePreviews
 @Composable
 private fun ChatToolbarBottomSheetPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatToolbarBottomSheet(
             onAttachContacts = {},
             uiState = ChatUiState(),

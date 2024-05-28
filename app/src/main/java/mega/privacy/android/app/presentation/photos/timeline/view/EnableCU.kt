@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.grey_200
@@ -304,7 +304,7 @@ fun EnableCameraUploadsButton(
 @Preview
 @Composable
 fun PreviewEnableCU() {
-    MegaAppTheme(isSystemInDarkTheme()) {
+    OriginalTempTheme(isSystemInDarkTheme()) {
         Scaffold { paddingValues ->
             Column(modifier = Modifier
                 .padding(paddingValues)) { }

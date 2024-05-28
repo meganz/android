@@ -14,7 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Show there are participants waiting in the waiting room dialog.
@@ -161,7 +161,7 @@ fun UsersInWaitingRoomDialog(
 @Preview
 @Composable
 fun PreviewUsersInWaitingRoomDialog() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         UsersInWaitingRoomDialog(
             WaitingRoomManagementState(
                 scheduledMeetingTitle = "Title",
@@ -181,7 +181,7 @@ fun PreviewUsersInWaitingRoomDialog() {
 @Preview
 @Composable
 fun PreviewDenyUserInWaitingRoomDialog() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         UsersInWaitingRoomDialog(
             WaitingRoomManagementState(
                 scheduledMeetingTitle = "Title",

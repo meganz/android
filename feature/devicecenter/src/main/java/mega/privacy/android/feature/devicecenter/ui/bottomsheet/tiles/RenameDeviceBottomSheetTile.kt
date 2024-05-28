@@ -10,7 +10,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionLis
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Test Tag for the Rename Device Bottom Sheet Tile
@@ -42,7 +42,7 @@ internal fun RenameDeviceBottomSheetTile(
 @CombinedThemePreviews
 @Composable
 private fun PreviewRenameDeviceBottomSheetTile() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         RenameDeviceBottomSheetTile(onActionClicked = {})
     }
 }

@@ -8,7 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Share folder access dialog to show access dialog to share folder
@@ -58,7 +58,7 @@ private fun ShareFolderAccessDialogBody(
     onItemSelected: (AccessPermission) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ConfirmationDialogWithRadioButtons(
             radioOptions = radioButtonOptions,
             titleText = stringResource(id = R.string.dialog_select_permissions),

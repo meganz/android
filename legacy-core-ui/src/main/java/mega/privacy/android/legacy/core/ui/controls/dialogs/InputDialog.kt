@@ -32,7 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
@@ -163,7 +163,7 @@ internal const val INPUT_DIALOG_CONFIRM_TAG = "input_dialog:button_confirm"
 @CombinedThemeRtlPreviews
 @Composable
 private fun InputDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Box(
             modifier = Modifier.padding(horizontal = 240.dp, vertical = 120.dp),
             content = {
@@ -183,7 +183,7 @@ private fun InputDialogPreview() {
 @CombinedThemeRtlPreviews
 @Composable
 private fun InputDialogWithMessagePreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Box(
             modifier = Modifier.padding(horizontal = 240.dp, vertical = 120.dp),
             content = {
@@ -204,7 +204,7 @@ private fun InputDialogWithMessagePreview() {
 @CombinedThemeRtlPreviews
 @Composable
 private fun InputDialogPreviewWithError() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Box(
             modifier = Modifier.padding(horizontal = 240.dp, vertical = 120.dp),
             content = {
@@ -226,7 +226,7 @@ private fun InputDialogPreviewWithError() {
 @CombinedThemeRtlPreviews
 @Composable
 private fun InputDialogPreviewWithLargeButtonText() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Box(
             modifier = Modifier.padding(horizontal = 240.dp, vertical = 120.dp),
             content = {

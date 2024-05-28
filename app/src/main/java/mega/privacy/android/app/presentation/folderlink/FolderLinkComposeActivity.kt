@@ -69,7 +69,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -215,7 +215,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
 
 
         val snackBarHostState = remember { SnackbarHostState() }
-        MegaAppTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
             FolderLinkView(
                 state = uiState,
                 snackBarHostState = snackBarHostState,

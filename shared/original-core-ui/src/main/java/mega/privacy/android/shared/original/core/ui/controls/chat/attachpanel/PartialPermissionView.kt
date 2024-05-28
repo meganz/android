@@ -11,8 +11,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Partial permission view
@@ -33,7 +33,7 @@ fun PartialPermissionView(
                 .clickable(onClick = onRequestPermission),
             painter = painterResource(id = R.drawable.ic_image_plus),
             contentDescription = "Image plus",
-            tint = MegaTheme.colors.icon.accent
+            tint = MegaOriginalTheme.colors.icon.accent
         )
     }
 }
@@ -41,7 +41,7 @@ fun PartialPermissionView(
 @CombinedThemePreviews
 @Composable
 private fun PartialPermissionViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         PartialPermissionView(
             modifier = Modifier.size(88.dp)
         )

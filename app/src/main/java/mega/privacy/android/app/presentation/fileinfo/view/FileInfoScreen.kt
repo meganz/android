@@ -38,7 +38,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAp
 import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.time.Instant
 import kotlin.time.Duration.Companion.days
 
@@ -155,7 +155,7 @@ private fun FileInfoScreenPreview(
     @PreviewParameter(FileInfoViewStatePreviewsProvider::class) viewState: FileInfoViewState,
 ) {
     var state by mutableStateOf(viewState) //not remembered to allow multiple states in device, don't do that in real code, just in previews
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FileInfoScreen(
             modifier = Modifier.background(color = MaterialTheme.colors.background),
             viewState = state,

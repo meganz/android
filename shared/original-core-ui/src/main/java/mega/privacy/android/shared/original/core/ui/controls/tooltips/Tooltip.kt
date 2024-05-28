@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.delay
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 
 
@@ -140,7 +140,7 @@ private fun PopupContent(
         // Add space for elevation shadow
         modifier = Modifier.padding(TOOLTIP_ELEVATION.dp),
     ) {
-        TooltipContent(expandedStates, MegaTheme.colors.icon.primary, content)
+        TooltipContent(expandedStates, MegaOriginalTheme.colors.icon.primary, content)
     }
 }
 
@@ -148,7 +148,7 @@ private fun PopupContent(
 private fun TooltipText(text: String) =
     Text(
         text = text,
-        color = MegaTheme.colors.text.inverse,
+        color = MegaOriginalTheme.colors.text.inverse,
         style = MaterialTheme.typography.body2medium,
     )
 
@@ -178,7 +178,7 @@ private fun TooltipContent(
 
     Card(
         backgroundColor = backgroundColor,
-        contentColor = MegaTheme.colors.text.inverse,
+        contentColor = MegaOriginalTheme.colors.text.inverse,
         modifier = Modifier.alpha(alpha),
         elevation = TOOLTIP_ELEVATION.dp,
     ) {

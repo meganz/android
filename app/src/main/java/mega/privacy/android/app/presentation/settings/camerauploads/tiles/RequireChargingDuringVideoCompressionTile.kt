@@ -14,7 +14,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLin
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * A [Composable] that displays a [MegaSwitch] to require or not require the User to charge his/her
@@ -73,7 +73,7 @@ internal fun RequireChargingDuringVideoCompressionTile(
 private fun RequireChargingDuringVideoCompressionTilePreview(
     @PreviewParameter(BooleanProvider::class) isChecked: Boolean,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         RequireChargingDuringVideoCompressionTile(
             maximumNonChargingVideoCompressionSize = 500,
             isChecked = isChecked,

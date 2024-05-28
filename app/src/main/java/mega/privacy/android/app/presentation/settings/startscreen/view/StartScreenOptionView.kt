@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
@@ -124,7 +124,7 @@ fun StartScreenOptionView(
 @Composable
 fun StartScreenOptionViewPreview() {
     var selected by remember { (mutableStateOf(true)) }
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.background(MaterialTheme.colors.surface)) {
             StartScreenOptionView(
                 iconPackR.drawable.ic_mega_medium_regular_outline,

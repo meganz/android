@@ -51,6 +51,10 @@ allprojects {
         }
         maven {
             url =
+                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/core-ui")
+        }
+        maven {
+            url =
                 uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/dev-tools")
         }
         maven {

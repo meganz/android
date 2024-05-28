@@ -48,10 +48,10 @@ import mega.privacy.android.shared.original.core.ui.controls.images.GridThumbnai
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.color_button_brand
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.icon.pack.R
 
 /**
@@ -99,11 +99,11 @@ fun NodeGridViewItem(
                 .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
                 .border(
                     width = 1.dp,
-                    color = if (isSelected) MegaTheme.colors.border.subtleSelected
-                    else MegaTheme.colors.border.subtle,
+                    color = if (isSelected) MegaOriginalTheme.colors.border.subtleSelected
+                    else MegaOriginalTheme.colors.border.subtle,
                     shape = RoundedCornerShape(5.dp),
                 )
-                .background(MegaTheme.colors.background.pageBackground)
+                .background(MegaOriginalTheme.colors.background.pageBackground)
                 .combinedClickable(
                     onClick = { onClick() },
                     onLongClick = { onLongClick() },
@@ -129,7 +129,7 @@ fun NodeGridViewItem(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(MegaTheme.colors.background.blur)
+                                .background(MegaOriginalTheme.colors.background.blur)
                         ) {
                             Icon(
                                 modifier = Modifier
@@ -138,7 +138,7 @@ fun NodeGridViewItem(
                                     .testTag(VIDEO_PLAY_ICON_TEST_TAG),
                                 painter = painterResource(id = IconPackR.drawable.ic_play_circle_medium_regular_solid),
                                 contentDescription = "Play Icon",
-                                tint = MegaTheme.colors.icon.onColor,
+                                tint = MegaOriginalTheme.colors.icon.onColor,
                             )
                         }
                     }
@@ -235,7 +235,7 @@ private fun Footer(
             IconButton(onClick = onMenuClick) {
                 Icon(
                     painter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
-                    tint = MegaTheme.colors.icon.secondary,
+                    tint = MegaOriginalTheme.colors.icon.secondary,
                     contentDescription = "More",
                     modifier = Modifier
                         .size(24.dp)
@@ -258,7 +258,7 @@ private fun Footer(
 private fun NodeGridViewItemPreview(
     @PreviewParameter(NodeGridViewItemDataProvider::class) data: NodeGridViewItemData,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(4.dp),

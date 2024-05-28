@@ -14,7 +14,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.verification.view.SMSVerificationView
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
@@ -104,7 +104,7 @@ class SMSVerificationActivity : PasscodeActivity() {
         val themeMode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        MegaAppTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
             SMSVerificationView(
                 state = uiState,
                 onRegionSelection = {

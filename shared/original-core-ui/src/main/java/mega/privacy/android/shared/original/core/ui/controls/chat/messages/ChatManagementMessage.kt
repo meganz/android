@@ -18,8 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Test Tag Management Message Icon
@@ -51,7 +51,7 @@ fun ChatManagementMessage(
                 .testTag(TEST_TAG_MANAGEMENT_MESSAGE_ICON),
             painter = painterResource(id = iconResId),
             contentDescription = "Call Icon Status",
-            tint = MegaTheme.colors.icon.primary
+            tint = MegaOriginalTheme.colors.icon.primary
         )
 
         Text(
@@ -59,7 +59,7 @@ fun ChatManagementMessage(
             text = text,
             style = MaterialTheme.typography.subtitle2,
             fontWeight = FontWeight.Medium,
-            color = MegaTheme.colors.text.primary
+            color = MegaOriginalTheme.colors.text.primary
         )
     }
 }
@@ -67,7 +67,7 @@ fun ChatManagementMessage(
 @CombinedThemePreviews
 @Composable
 private fun ChatManagementMessagePreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatManagementMessage(
             iconResId = R.drawable.ic_favorite,
             text = "This is a management message"

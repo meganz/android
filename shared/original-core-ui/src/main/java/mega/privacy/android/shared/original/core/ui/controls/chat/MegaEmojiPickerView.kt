@@ -22,7 +22,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.isVisible
 import androidx.emoji2.emojipicker.EmojiPickerView
 import androidx.emoji2.emojipicker.EmojiViewItem
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Emoji picker view.
@@ -48,7 +48,7 @@ fun MegaEmojiPickerView(
         modifier = Modifier
             .fillMaxWidth()
             .height(if (keyboardHeight > 0.dp) keyboardHeight else defaultHeight)
-            .background(MegaTheme.colors.background.pageBackground)
+            .background(MegaOriginalTheme.colors.background.pageBackground)
             .testTag(TEST_TAG_EMOJI_PICKER_VIEW),
         factory = { context ->
             EmojiPickerView(context).apply {

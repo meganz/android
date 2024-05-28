@@ -15,9 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Camera timer
@@ -33,7 +33,7 @@ fun CameraTimer(
     Row(
         modifier = modifier
             .background(
-                color = MegaTheme.colors.background.surface1.copy(alpha = 0.9f),
+                color = MegaOriginalTheme.colors.background.surface1.copy(alpha = 0.9f),
                 shape = CircleShape
             )
             .padding(horizontal = 12.dp, vertical = 6.dp),
@@ -43,7 +43,7 @@ fun CameraTimer(
         Box(
             modifier = Modifier
                 .size(8.dp)
-                .background(color = MegaTheme.colors.components.interactive, shape = CircleShape)
+                .background(color = MegaOriginalTheme.colors.components.interactive, shape = CircleShape)
         )
         MegaText(
             text = formattedTime,
@@ -56,7 +56,7 @@ fun CameraTimer(
 @CombinedThemePreviews
 @Composable
 private fun CameraTimerPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CameraTimer(formattedTime = "00:00:00")
     }
 }

@@ -11,7 +11,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * A [Composable] that displays the Media Uploads (Secondary Folder) Local Folder Path. Clicking the
@@ -48,7 +48,7 @@ internal fun MediaUploadsLocalFolderTile(
 @CombinedThemePreviews
 @Composable
 private fun MediaUploadsLocalFolderTilePreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MediaUploadsLocalFolderTile(
             secondaryFolderPath = "secondary/folder/path",
             onItemClicked = {},

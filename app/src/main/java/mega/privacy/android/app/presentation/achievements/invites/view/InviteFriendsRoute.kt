@@ -45,7 +45,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.dark_blue_500_dark_blue_200
@@ -286,7 +286,7 @@ internal fun InviteConfirmationDialog(
 @Composable
 @CombinedThemePreviews
 internal fun InviteFriendsViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         InviteFriendsView(
             modifier = Modifier,
             uiState = InviteFriendsUIState(
@@ -299,7 +299,7 @@ internal fun InviteFriendsViewPreview() {
 @Composable
 @CombinedThemePreviews
 internal fun InviteConfirmationDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         InviteConfirmationDialog(
             isDialogVisible = true,
             description = R.string.invite_sent_text_multi,

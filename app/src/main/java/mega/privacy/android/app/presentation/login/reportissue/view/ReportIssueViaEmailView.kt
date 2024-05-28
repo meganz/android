@@ -29,8 +29,8 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Report issue via email view
@@ -153,7 +153,7 @@ internal const val INCLUDE_LOGS_SWITCH_TEST_TAG = "report_issue_via_email:includ
 @CombinedThemePreviews
 @Composable
 private fun ConfirmEmailScreenPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ReportIssueViaEmailView(
             uiState = ReportIssueViaEmailUiState(),
             onDescriptionChanged = {},
@@ -168,7 +168,7 @@ private fun ConfirmEmailScreenPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ConfirmEmailScreenWithErrorPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ReportIssueViaEmailView(
             uiState = ReportIssueViaEmailUiState(
                 error = R.string.settings_help_report_issue_description_label

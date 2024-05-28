@@ -40,9 +40,9 @@ import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehavi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * View to show the information of reactions.
@@ -85,7 +85,7 @@ fun ReactionsInfoView(
                         .tabIndicatorOffset(tabPositions[pagerState.currentPage])
                         .height(2.dp)
                         .padding(horizontal = 13.dp)
-                        .background(color = MegaTheme.colors.components.selectionControl)
+                        .background(color = MegaOriginalTheme.colors.components.selectionControl)
                 )
             },
             divider = {},
@@ -196,7 +196,7 @@ fun ReactionsInfoView(
 private fun ReactionsInfoViewPreview(
     @PreviewParameter(BooleanProvider::class) hasMe: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
 
         val reactionList = listOf(
             SLIGHT_SMILE_REACTION,

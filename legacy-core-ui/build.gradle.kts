@@ -33,7 +33,6 @@ dependencies {
 
     implementation(project(":icon-pack"))
     implementation(project(":shared:original-core-ui"))
-    implementation(project(":shared:theme"))
     testImplementation(project(":core-ui-test"))
 
     implementation(platform(androidx.compose.bom))

@@ -48,10 +48,10 @@ import mega.privacy.android.shared.original.core.ui.theme.red_400
 import mega.privacy.android.shared.original.core.ui.theme.red_900
 import mega.privacy.android.shared.original.core.ui.theme.teal_200
 import mega.privacy.android.shared.original.core.ui.theme.teal_300
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -248,7 +248,7 @@ internal fun CreateVideoPlaylistDialog(
 @CombinedThemePreviews
 @Composable
 private fun CreateVideoPlaylistDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
             positiveButtonText = stringResource(id = R.string.general_create),
@@ -266,7 +266,7 @@ private fun CreateVideoPlaylistDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateVideoPlaylistDialogWithErrorPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
             positiveButtonText = stringResource(id = R.string.general_create),
@@ -284,7 +284,7 @@ private fun CreateVideoPlaylistDialogWithErrorPreview() {
 @CombinedThemePreviews
 @Composable
 private fun CreateVideoPlaylistDialogWithSameNamePreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
             positiveButtonText = stringResource(id = R.string.general_create),

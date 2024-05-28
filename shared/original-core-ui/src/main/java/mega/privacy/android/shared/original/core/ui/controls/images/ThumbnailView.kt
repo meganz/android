@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.icon.pack.R
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.io.File
 
 /**
@@ -106,7 +106,7 @@ fun ThumbnailView(
 @Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun ThumbnailViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ThumbnailView(
             contentDescription = "image",
             imageFile = null as File?,

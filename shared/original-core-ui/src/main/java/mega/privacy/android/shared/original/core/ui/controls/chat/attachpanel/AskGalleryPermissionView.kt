@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Ask gallery permission view
@@ -47,7 +47,7 @@ fun AskGalleryPermissionView(
                     .size(24.dp),
                 painter = painterResource(id = R.drawable.ic_image_no_permission),
                 contentDescription = "Icon Photo",
-                tint = MegaTheme.colors.icon.disabled
+                tint = MegaOriginalTheme.colors.icon.disabled
             )
 
             Column(
@@ -73,7 +73,7 @@ fun AskGalleryPermissionView(
 @CombinedThemePreviews
 @Composable
 private fun AskGalleryPermissionViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         AskGalleryPermissionView(
             modifier = Modifier
                 .height(88.dp)

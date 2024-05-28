@@ -38,7 +38,7 @@ import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent
 import javax.inject.Inject
 
@@ -61,7 +61,7 @@ internal class ChatFragment : Fragment() {
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             SessionContainer(shouldCheckChatSession = true) {
-                MegaAppTheme(isDark = mode.isDarkMode()) {
+                OriginalTempTheme(isDark = mode.isDarkMode()) {
                     PasscodeContainer(
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {

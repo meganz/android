@@ -18,10 +18,10 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 @Composable
 fun ChatObserverIndicator(
@@ -31,7 +31,7 @@ fun ChatObserverIndicator(
     modifier = modifier
         .testTag(TEST_TAG_OBSERVER_INDICATOR)
         .padding(8.dp),
-    contentColor = MegaTheme.colors.background.surface3,
+    contentColor = MegaOriginalTheme.colors.background.surface3,
     shape = CircleShape,
     elevation = 3.dp
 ) {
@@ -45,7 +45,7 @@ fun ChatObserverIndicator(
                 .testTag(TEST_TAG_OBSERVER_ICON),
             imageVector = ImageVector.vectorResource(R.drawable.ic_eye_medium_regular),
             contentDescription = numObservers,
-            tint = MegaTheme.colors.text.primary
+            tint = MegaOriginalTheme.colors.text.primary
         )
         Spacer(modifier = Modifier.padding(horizontal = 6.dp))
         MegaText(
@@ -61,7 +61,7 @@ fun ChatObserverIndicator(
 @CombinedThemePreviews
 @Composable
 private fun ChatObserverIndicatorPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatObserverIndicator(numObservers = "2")
     }
 }

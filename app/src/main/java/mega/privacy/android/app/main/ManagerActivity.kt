@@ -326,7 +326,7 @@ import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.CloudDriveSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
 import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
@@ -1066,7 +1066,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             setContent {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
-                MegaAppTheme(isDark = isDark) {
+                OriginalTempTheme(isDark = isDark) {
                     UsersInWaitingRoomDialog()
                     DenyEntryToCallDialog()
                 }
@@ -1079,7 +1079,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             setContent {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
-                MegaAppTheme(isDark = isDark) {
+                OriginalTempTheme(isDark = isDark) {
                     CallRecordingConsentDialog()
                 }
             }
@@ -1104,7 +1104,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     upgradeToProPlanBottomSheetState.currentValue != ModalBottomSheetValue.Hidden
                 }
 
-                MegaAppTheme(isDark = isDark) {
+                OriginalTempTheme(isDark = isDark) {
 
                     var showUpgradeDialog by rememberSaveable() {
                         mutableStateOf(false)
@@ -8268,7 +8268,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
                 val uiState by adsViewModel.uiState.collectAsStateWithLifecycle()
-                MegaAppTheme(isDark = isDark) {
+                OriginalTempTheme(isDark = isDark) {
                     AdsBannerView(uiState = uiState,
                         onAdsWebpageLoaded = ::onAdsWebpageLoaded,
                         onAdClicked = { uri ->

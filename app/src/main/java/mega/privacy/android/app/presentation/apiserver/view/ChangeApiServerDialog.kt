@@ -12,7 +12,7 @@ import mega.privacy.android.app.presentation.apiserver.ApiServerViewModel
 import mega.privacy.android.app.presentation.apiserver.extensions.getTextId
 import mega.privacy.android.app.presentation.apiserver.model.ApiServerUIState
 import mega.privacy.android.app.presentation.apiserver.view.navigation.openLoginActivity
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.apiserver.ApiServer
@@ -66,7 +66,7 @@ internal fun ChangeApiServerDialog(
 @CombinedThemePreviews
 @Composable
 private fun ChangeApiServerDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChangeApiServerDialog(onDismissRequest = {})
     }
 }

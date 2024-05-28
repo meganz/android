@@ -39,7 +39,6 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":core:formatter"))
     implementation(project(":shared:original-core-ui"))
-    implementation(project(":shared:theme"))
     implementation(project(":shared:sync"))
     implementation(project(":shared:resources"))
     implementation(project(":legacy-core-ui"))

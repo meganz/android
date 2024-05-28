@@ -28,8 +28,8 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.ChatStatusIcon
 import mega.privacy.android.shared.original.core.ui.controls.chat.UiChatStatus
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 /**
@@ -55,7 +55,7 @@ fun ContactAttachmentMessageView(
 ) {
     ChatBubble(isMe = isMe, modifier = modifier) {
         CompositionLocalProvider(
-            LocalContentColor provides if (isMe) MegaTheme.colors.text.inverse else MegaTheme.colors.text.primary,
+            LocalContentColor provides if (isMe) MegaOriginalTheme.colors.text.inverse else MegaOriginalTheme.colors.text.primary,
         ) {
             ContactMessageContentView(
                 avatar = avatar,
@@ -103,7 +103,7 @@ fun ContactMessageContentView(
                 Box(
                     modifier = Modifier.border(
                         width = 1.dp,
-                        color = MegaTheme.colors.background.pageBackground,
+                        color = MegaOriginalTheme.colors.background.pageBackground,
                         shape = CircleShape
                     )
                 ) {
@@ -126,9 +126,9 @@ fun ContactMessageContentView(
                         .align(Alignment.TopEnd)
                         .testTag(TEST_TAG_CONTACT_MESSAGE_CONTENT_VIEW_VERIFIED)
                         .size(22.dp)
-                        .border(1.dp, MegaTheme.colors.background.pageBackground, CircleShape)
+                        .border(1.dp, MegaOriginalTheme.colors.background.pageBackground, CircleShape)
                         .background(
-                            color = MegaTheme.colors.indicator.blue,
+                            color = MegaOriginalTheme.colors.indicator.blue,
                             shape = CircleShape
                         )
                 ) {
@@ -137,7 +137,7 @@ fun ContactMessageContentView(
                             .size(16.dp)
                             .align(Alignment.Center),
                         painter = painterResource(id = R.drawable.check),
-                        tint = MegaTheme.colors.icon.inverse,
+                        tint = MegaOriginalTheme.colors.icon.inverse,
                         contentDescription = "Checked"
                     )
                 }
@@ -164,7 +164,7 @@ fun ContactMessageContentView(
 private fun ContactAttachmentMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ContactAttachmentMessageView(
             isMe = isMe,
             userName = "User Name",
@@ -174,7 +174,7 @@ private fun ContactAttachmentMessageViewPreview(
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            color = MegaTheme.colors.background.inverse,
+                            color = MegaOriginalTheme.colors.background.inverse,
                             shape = CircleShape
                         ),
                 )
@@ -189,7 +189,7 @@ private fun ContactAttachmentMessageViewPreview(
 private fun VerifiedContactAttachmentMessageViewPreview(
     @PreviewParameter(BooleanProvider::class) isMe: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ContactAttachmentMessageView(
             isMe = isMe,
             userName = "User Name",
@@ -199,7 +199,7 @@ private fun VerifiedContactAttachmentMessageViewPreview(
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            color = MegaTheme.colors.background.inverse,
+                            color = MegaOriginalTheme.colors.background.inverse,
                             shape = CircleShape
                         ),
                 )

@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 /**
@@ -111,7 +111,7 @@ fun ChatInputTextToolbar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = MegaTheme.colors.background.pageBackground)
+            .background(color = MegaOriginalTheme.colors.background.pageBackground)
             .padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
         if (showExpandButton || isInputExpanded) {
@@ -125,7 +125,7 @@ fun ChatInputTextToolbar(
                     },
                 painter = painterResource(id = if (isInputExpanded) R.drawable.ic_collapse_text_input else R.drawable.ic_expand_text_input),
                 contentDescription = "Attachment icon",
-                tint = MegaTheme.colors.icon.secondary,
+                tint = MegaOriginalTheme.colors.icon.secondary,
             )
         }
         VoiceClipRecorderView(
@@ -143,7 +143,7 @@ fun ChatInputTextToolbar(
                         .clickable(onClick = onAttachmentClick),
                     painter = painterResource(id = R.drawable.ic_plus),
                     contentDescription = "Attachment icon",
-                    tint = MegaTheme.colors.icon.secondary,
+                    tint = MegaOriginalTheme.colors.icon.secondary,
                 )
 
                 Column(
@@ -154,7 +154,7 @@ fun ChatInputTextToolbar(
                         }
                         .conditional(!isInputExpanded) {
                             background(
-                                color = MegaTheme.colors.background.surface2,
+                                color = MegaOriginalTheme.colors.background.surface2,
                                 shape = shape,
                             )
                         },
@@ -213,7 +213,7 @@ fun ChatInputTextToolbar(
                             }),
                         painter = painterResource(id = R.drawable.ic_send),
                         contentDescription = "Send icon",
-                        tint = MegaTheme.colors.icon.accent
+                        tint = MegaOriginalTheme.colors.icon.accent
                     )
                 }
                 AnimatedVisibility(
@@ -226,7 +226,7 @@ fun ChatInputTextToolbar(
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.ic_icon_mic_medium_regular_outline),
                         contentDescription = "mic icon",
-                        tint = MegaTheme.colors.icon.secondary,
+                        tint = MegaOriginalTheme.colors.icon.secondary,
                         modifier = Modifier
                             .weight(1f)
                             .padding(start = 8.dp)
@@ -285,7 +285,7 @@ private fun addPickedEmojiToInput(
 private fun ChatInputTextToolbarPlaceholderPreview(
     @PreviewParameter(BooleanProvider::class) showEmojiPicker: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatInputTextToolbar(
             text = "",
             placeholder = "Very long long long long long long long long long long long long long long long long long long long long long long long long long long long ",
@@ -303,7 +303,7 @@ private fun ChatInputTextToolbarPlaceholderPreview(
 private fun ChatInputTextToolbarLongTextPreview(
     @PreviewParameter(BooleanProvider::class) showEmojiPicker: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatInputTextToolbar(
             text = "abc ".repeat(30),
             placeholder = "",
@@ -321,7 +321,7 @@ private fun ChatInputTextToolbarLongTextPreview(
 private fun ChatInputTextToolbarEditingMessageTextPreview(
     @PreviewParameter(BooleanProvider::class) showEmojiPicker: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatInputTextToolbar(
             text = "Hello world",
             placeholder = "",

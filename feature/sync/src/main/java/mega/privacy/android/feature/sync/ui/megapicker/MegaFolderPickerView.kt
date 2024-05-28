@@ -27,7 +27,7 @@ import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun MegaFolderPickerView(
@@ -105,7 +105,7 @@ internal fun MegaFolderPickerView(
 @Composable
 @CombinedThemePreviews
 private fun PreviewMegaFolderPickerView() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaFolderPickerView(
             nodesList = SampleNodeDataProvider.values,
             sortOrder = "Name",

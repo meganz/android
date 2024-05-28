@@ -17,42 +17,54 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import mega.android.core.ui.tokens.theme.tokens.AndroidNewSemanticTokensDark
+import mega.android.core.ui.tokens.theme.tokens.AndroidNewSemanticTokensLight
+import mega.android.core.ui.tokens.theme.tokens.Background
+import mega.android.core.ui.tokens.theme.tokens.Border
+import mega.android.core.ui.tokens.theme.tokens.Button
+import mega.android.core.ui.tokens.theme.tokens.Components
+import mega.android.core.ui.tokens.theme.tokens.Focus
+import mega.android.core.ui.tokens.theme.tokens.Icon
+import mega.android.core.ui.tokens.theme.tokens.Indicator
+import mega.android.core.ui.tokens.theme.tokens.Link
+import mega.android.core.ui.tokens.theme.tokens.Notifications
+import mega.android.core.ui.tokens.theme.tokens.SemanticTokens
+import mega.android.core.ui.tokens.theme.tokens.Support
+import mega.android.core.ui.tokens.theme.tokens.Text
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.tokens.AndroidTempSemanticTokensDark
-import mega.privacy.android.shared.original.core.ui.theme.tokens.AndroidTempSemanticTokensLight
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Background
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Border
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Button
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Components
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Focus
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Icon
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Indicator
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Link
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Notifications
-import mega.privacy.android.shared.original.core.ui.theme.tokens.SemanticTokens
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Support
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Text
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.tokens.new.AndroidNewSemanticTokensDark
-import mega.privacy.android.shared.original.core.ui.theme.tokens.new.AndroidNewSemanticTokensLight
-
+import mega.privacy.android.shared.original.core.ui.theme.values.TempSemanticTokensDark
+import mega.privacy.android.shared.original.core.ui.theme.values.TempSemanticTokensLight
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
- * Android theme to be used only for internal previews
+ * Android theme to be used by Original components with TEMP (temporary) color tokens.
  *
  * @param isDark
  * @param content
  */
+@Composable
+fun OriginalTempTheme(
+    isDark: Boolean,
+    content: @Composable () -> Unit,
+) = OriginalTheme(
+    isDark = isDark,
+    darkColorTokens = TempSemanticTokensDark,
+    lightColorTokens = TempSemanticTokensLight,
+    content = content,
+)
+
+/**
+ * Android theme with TEMP (temporary) tokens to be used only in Previews.
+ *
+ * @param content
+ */
 @SuppressLint("IsSystemInDarkTheme")
 @Composable
-internal fun AndroidTheme(
-    isDark: Boolean = isSystemInDarkTheme(),
+internal fun OriginalTempThemeForPreviews(
     content: @Composable () -> Unit,
-) = AndroidTheme(
-    isDark = isDark,
-    darkColorTokens = AndroidTempSemanticTokensDark,
-    lightColorTokens = AndroidTempSemanticTokensLight,
-    content = content,
+) = OriginalTempTheme(
+    isSystemInDarkTheme(),
+    content,
 )
 
 /**
@@ -65,15 +77,15 @@ internal fun PreviewWithTempAndNewCoreColorTokens(
     isDark: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) = Column {
-    AndroidTheme(
+    OriginalTheme(
         isDark = isDark,
-        darkColorTokens = AndroidTempSemanticTokensDark,
-        lightColorTokens = AndroidTempSemanticTokensLight,
+        darkColorTokens = TempSemanticTokensDark,
+        lightColorTokens = TempSemanticTokensLight,
         content = {
             PreviewWithTitle(title = "TEMP", content)
         }
     )
-    AndroidTheme(
+    OriginalTheme(
         isDark = isDark,
         darkColorTokens = AndroidNewSemanticTokensDark,
         lightColorTokens = AndroidNewSemanticTokensLight,
@@ -98,7 +110,8 @@ private fun PreviewWithTitle(title: String, content: @Composable () -> Unit) =
     }
 
 /**
- * Android theme
+ * Android theme to be used by Original components with with the specified color tokens.
+ * This method is added to add flexibility, however the version with default tokens is preferred: [OriginalTempTheme].
  *
  * @param isDark
  * @param darkColorTokens [SemanticTokens] for dark mode
@@ -106,7 +119,7 @@ private fun PreviewWithTitle(title: String, content: @Composable () -> Unit) =
  * @param content
  */
 @Composable
-fun AndroidTheme(
+fun OriginalTheme(
     isDark: Boolean,
     darkColorTokens: SemanticTokens,
     lightColorTokens: SemanticTokens,
@@ -152,14 +165,13 @@ fun AndroidTheme(
     }
 }
 
-internal object MegaTheme {
+internal object MegaOriginalTheme {
     val colors: MegaColors
         @Composable
         get() = LocalMegaColors.current
 
     @Composable
-    fun textColor(textColor: TextColor) =
-        LocalMegaColors.current.text.getTextColor(textColor)
+    fun textColor(textColor: TextColor) = textColor.getTextColor(LocalMegaColors.current.text)
 }
 
 private val LocalMegaColors = staticCompositionLocalOf {

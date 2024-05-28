@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaRadioButton
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * List 1 line item, variant "Settings item with RadioButton"
@@ -49,7 +49,7 @@ fun SettingsItemWithRadioButton(
         MegaRadioButton(selected = selected, onClick = onClick)
         Text(
             text = title,
-            color = MegaTheme.colors.text.primary,
+            color = MegaOriginalTheme.colors.text.primary,
             textAlign = TextAlign.Start,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.subtitle1,
@@ -63,7 +63,7 @@ private fun SettingsItemPreview(
     @PreviewParameter(BooleanProvider::class) initialValue: Boolean,
 ) {
     var selected by remember { mutableStateOf(initialValue) }
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SettingsItemWithRadioButton(
             title = "Settings name",
             selected = selected,

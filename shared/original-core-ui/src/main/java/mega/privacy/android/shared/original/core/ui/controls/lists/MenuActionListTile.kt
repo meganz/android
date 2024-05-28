@@ -33,10 +33,10 @@ import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Menu action list tile
@@ -114,9 +114,9 @@ fun MenuActionListTile(
                     painter = icon,
                     contentDescription = null,
                     tint = if (isDestructive) {
-                        MegaTheme.colors.support.error
+                        MegaOriginalTheme.colors.support.error
                     } else {
-                        MegaTheme.colors.icon.secondary
+                        MegaOriginalTheme.colors.icon.secondary
                     },
                 )
             }
@@ -151,7 +151,7 @@ internal const val MENU_ITEM_SWITCH_TAG = "menu_action:button_switch"
 private fun PreviewPreviewMegaMenuAction(
     @PreviewParameter(BooleanProvider::class) isDestructive: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),
@@ -165,7 +165,7 @@ private fun PreviewPreviewMegaMenuAction(
 private fun PreviewMegaMenuActionWithSwitch(
     @PreviewParameter(BooleanProvider::class) hasSwitch: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),
@@ -183,7 +183,7 @@ private fun PreviewMegaMenuActionWithSwitch(
 @CombinedThemePreviews
 @Composable
 private fun PreviewMegaMenuActionWithoutIcon() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
         )
@@ -193,7 +193,7 @@ private fun PreviewMegaMenuActionWithoutIcon() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewMegaMenuActionWithTextButton() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),
@@ -201,7 +201,7 @@ private fun PreviewMegaMenuActionWithTextButton() {
             Text(
                 text = "Button",
                 style = MaterialTheme.typography.button,
-                color = MegaTheme.colors.text.accent,
+                color = MegaOriginalTheme.colors.text.accent,
             )
         }
     }

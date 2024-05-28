@@ -49,7 +49,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -247,7 +247,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
             val uiState by transfersManagementViewModel.state.collectAsStateWithLifecycle(
                 TransferManagementUiState()
             )
-            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 @OptIn(ExperimentalAnimationApi::class)
                 AnimatedVisibility(
                     visible = uiState.widgetVisible,

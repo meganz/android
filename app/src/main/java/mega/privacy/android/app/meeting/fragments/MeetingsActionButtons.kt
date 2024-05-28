@@ -51,8 +51,8 @@ import mega.privacy.android.app.meeting.fragments.fab.OnOffFab
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import kotlin.random.Random
 
 
@@ -117,7 +117,7 @@ internal class MeetingsActionButtonsView : AbstractComposeView {
 
     @Composable
     override fun Content() {
-        MegaAppTheme(
+        OriginalTempTheme(
             isDark = (isSystemInDarkTheme().not() && backgroundTintAlpha < 0.2F) || isSystemInDarkTheme()
         ) {
             MeetingsActionButtons(
@@ -428,7 +428,7 @@ fun MeetingsActionButtons(
 @CombinedThemePreviews
 @Composable
 private fun MeetingBottomFloatingPanelPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MeetingsActionButtons(
             modifier = Modifier.padding(vertical = 8.dp),
             onMicClicked = {},

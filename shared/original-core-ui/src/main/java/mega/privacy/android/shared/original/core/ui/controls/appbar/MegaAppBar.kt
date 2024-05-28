@@ -44,8 +44,8 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.badge
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
@@ -84,9 +84,9 @@ fun MegaAppBar(
     elevation: Dp = LocalMegaAppBarElevation.current,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
-        iconsTintColor = MegaTheme.colors.icon.primary,
-        titleColor = MegaTheme.colors.text.primary,
-        subtitleColor = MegaTheme.colors.text.secondary,
+        iconsTintColor = MegaOriginalTheme.colors.icon.primary,
+        titleColor = MegaOriginalTheme.colors.text.primary,
+        subtitleColor = MegaOriginalTheme.colors.text.secondary,
     )
 ) {
     BaseMegaAppBar(
@@ -142,9 +142,9 @@ fun MegaAppBar(
     elevation: Dp = LocalMegaAppBarElevation.current,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
-        iconsTintColor = MegaTheme.colors.icon.primary,
-        titleColor = MegaTheme.colors.text.primary,
-        subtitleColor = MegaTheme.colors.text.secondary,
+        iconsTintColor = MegaOriginalTheme.colors.icon.primary,
+        titleColor = MegaOriginalTheme.colors.text.primary,
+        subtitleColor = MegaOriginalTheme.colors.text.secondary,
     )
 ) {
     BaseMegaAppBar(
@@ -180,9 +180,9 @@ fun ProvideDefaultMegaAppBarColors(
     content: @Composable () -> Unit,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
-        iconsTintColor = MegaTheme.colors.icon.primary,
-        titleColor = MegaTheme.colors.text.primary,
-        subtitleColor = MegaTheme.colors.text.secondary,
+        iconsTintColor = MegaOriginalTheme.colors.icon.primary,
+        titleColor = MegaOriginalTheme.colors.text.primary,
+        subtitleColor = MegaOriginalTheme.colors.text.secondary,
     ), content
 )
 
@@ -279,7 +279,7 @@ internal fun BaseMegaAppBar(
 ) {
     TopAppBar(
         title = titleAndSubtitle,
-        backgroundColor = MegaTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha),
+        backgroundColor = MegaOriginalTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha),
         modifier = modifier.testTag(TEST_TAG_APP_BAR),
         navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
             Box {
@@ -301,12 +301,12 @@ internal fun BaseMegaAppBar(
                             .size(24.dp)
                             .padding(3.dp)
                             .background(
-                                color = MegaTheme.colors.indicator.pink,
+                                color = MegaOriginalTheme.colors.indicator.pink,
                                 shape = CircleShape
                             )
                             .border(
                                 2.dp,
-                                MegaTheme.colors.background.pageBackground,
+                                MegaOriginalTheme.colors.background.pageBackground,
                                 shape = CircleShape
                             )
                             .testTag(APP_BAR_BADGE)
@@ -315,7 +315,7 @@ internal fun BaseMegaAppBar(
                         Text(
                             text = it.toString(),
                             modifier = Modifier.align(Alignment.Center),
-                            color = MegaTheme.colors.text.inverse,
+                            color = MegaOriginalTheme.colors.text.inverse,
                             style = MaterialTheme.typography.badge,
                             textAlign = TextAlign.Center,
                         )
@@ -351,7 +351,7 @@ internal fun BaseMegaAppBar(
 ) {
     TopAppBar(
         title = titleAndSubtitle,
-        backgroundColor = MegaTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha),
+        backgroundColor = MegaOriginalTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha),
         modifier = modifier.testTag(TEST_TAG_APP_BAR),
         navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
             Box {
@@ -373,12 +373,12 @@ internal fun BaseMegaAppBar(
                             .size(24.dp)
                             .padding(3.dp)
                             .background(
-                                color = MegaTheme.colors.indicator.pink,
+                                color = MegaOriginalTheme.colors.indicator.pink,
                                 shape = CircleShape
                             )
                             .border(
                                 2.dp,
-                                MegaTheme.colors.background.pageBackground,
+                                MegaOriginalTheme.colors.background.pageBackground,
                                 shape = CircleShape
                             )
                             .testTag(APP_BAR_BADGE)
@@ -387,7 +387,7 @@ internal fun BaseMegaAppBar(
                         Text(
                             text = it.toString(),
                             modifier = Modifier.align(Alignment.Center),
-                            color = MegaTheme.colors.text.inverse,
+                            color = MegaOriginalTheme.colors.text.inverse,
                             style = MaterialTheme.typography.badge,
                             textAlign = TextAlign.Center,
                         )
@@ -433,7 +433,7 @@ internal fun MegaAppBarSubTitle(
 ) = Text(
     text = subtitle,
     modifier = modifier.testTag(TEST_TAG_MEGA_APP_BAR_SUBTITLE),
-    color = LocalMegaAppBarColors.current.subtitleColor.takeOrElse { MegaTheme.colors.text.secondary },
+    color = LocalMegaAppBarColors.current.subtitleColor.takeOrElse { MegaOriginalTheme.colors.text.secondary },
     maxLines = maxLines,
     style = MaterialTheme.typography.body4
 )
@@ -445,7 +445,7 @@ internal fun MegaAppBarMarqueeSubTitle(
 ) = MarqueeText(
     text = subtitle,
     modifier = modifier.testTag(TEST_TAG_MEGA_APP_BAR_SUBTITLE),
-    color = LocalMegaAppBarColors.current.subtitleColor.takeOrElse { MegaTheme.colors.text.secondary },
+    color = LocalMegaAppBarColors.current.subtitleColor.takeOrElse { MegaOriginalTheme.colors.text.secondary },
     style = MaterialTheme.typography.body4
 )
 
@@ -465,7 +465,7 @@ internal fun MegaAppBarTitleAndSubtitle(
                 title()
             }
             CompositionLocalProvider(
-                LocalContentColor provides MegaTheme.colors.icon.secondary,
+                LocalContentColor provides MegaOriginalTheme.colors.icon.secondary,
                 LocalContentAlpha provides 1f,
             ) {
                 titleIcons?.let { it() }
@@ -492,7 +492,7 @@ private fun NavigationIcon(
 @CombinedThemePreviews
 @Composable
 private fun MegaAppBarPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaAppBar(
             appBarType = AppBarType.MENU,
             title = "App bar title",
@@ -517,7 +517,7 @@ private fun MegaAppBarPreview() {
 @CombinedThemePreviews
 @Composable
 private fun MegaAppBarPreviewWithoutSubtitle() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaAppBar(
             appBarType = AppBarType.MENU,
             title = "App bar title",
@@ -529,7 +529,7 @@ private fun MegaAppBarPreviewWithoutSubtitle() {
 @CombinedThemePreviews
 @Composable
 private fun MegaAppBarPreviewWithMarqueeSubtitle() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaAppBar(
             appBarType = AppBarType.MENU,
             title = "App bar title",

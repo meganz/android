@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Camera preview bottom bar
@@ -29,7 +29,7 @@ fun CameraPreviewBottomBar(
 ) {
     Box(
         modifier = modifier
-            .background(color = MegaTheme.colors.background.pageBackground)
+            .background(color = MegaOriginalTheme.colors.background.pageBackground)
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
             .height(172.dp),
@@ -48,7 +48,7 @@ fun CameraPreviewBottomBar(
 @CombinedThemePreviews
 @Composable
 private fun VideoPreviewBottomBarPreview() {
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         CameraPreviewBottomBar(onSendVideo = {})
     }
 }

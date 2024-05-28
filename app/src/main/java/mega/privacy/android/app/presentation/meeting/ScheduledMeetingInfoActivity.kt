@@ -60,7 +60,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableMeetingLinkButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableOpenInviteButtonEvent
@@ -493,7 +493,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
 
-        MegaAppTheme(isDark = isDark) {
+        OriginalTempTheme(isDark = isDark) {
             ScheduledMeetingInfoView(
                 state = uiState,
                 managementState = managementState,

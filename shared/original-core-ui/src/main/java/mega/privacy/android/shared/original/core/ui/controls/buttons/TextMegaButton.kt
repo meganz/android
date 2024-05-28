@@ -17,8 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Text button
@@ -65,9 +65,9 @@ internal fun TextMegaButton(
     enabled = enabled,
     colors = ButtonDefaults.buttonColors(
         backgroundColor = Color.Transparent,
-        contentColor = MegaTheme.colors.text.accent,
+        contentColor = MegaOriginalTheme.colors.text.accent,
         disabledBackgroundColor = Color.Transparent,
-        disabledContentColor = MegaTheme.colors.text.disabled,
+        disabledContentColor = MegaOriginalTheme.colors.text.disabled,
     ),
     contentPadding = contentPadding
 ) {
@@ -81,7 +81,7 @@ internal fun TextMegaButton(
 @CombinedThemePreviews
 @Composable
 private fun PreviewTextMegaButton() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)

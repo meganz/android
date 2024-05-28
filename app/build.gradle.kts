@@ -160,7 +160,6 @@ dependencies {
     implementation(project(":core:formatter"))
     implementation(project(":domain"))
     implementation(project(":shared:original-core-ui"))
-    implementation(project(":shared:theme"))
     implementation(project(":legacy-core-ui"))
     implementation(project(":data"))
     implementation(project(":navigation"))

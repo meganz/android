@@ -10,7 +10,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,7 +45,7 @@ class NodeListViewItemTest {
                     accessPermissionIcon = R.drawable.ic_favorite,
                     showOffline = true,
                     showVersion = true,
-                    labelColor = MegaTheme.colors.indicator.pink,
+                    labelColor = MegaOriginalTheme.colors.indicator.pink,
                     showLink = true,
                     showFavourite = true,
                     onMoreClicked = {},

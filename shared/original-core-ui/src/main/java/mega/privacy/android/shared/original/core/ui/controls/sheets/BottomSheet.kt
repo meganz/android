@@ -38,12 +38,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * BottomSheet
@@ -122,7 +121,7 @@ fun BottomSheet(
         val systemUiController = rememberSystemUiController()
         systemUiController.setStatusBarColor(
             statusBarColor.value,
-            MegaTheme.colors.isLight
+            MegaOriginalTheme.colors.isLight
         )
     }
 
@@ -150,7 +149,7 @@ private fun BottomSheetPreview() {
         initialValue = ModalBottomSheetValue.HalfExpanded,
         skipHalfExpanded = false,
     )
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         BottomSheet(
             modalSheetState = modalSheetState,
             sheetHeader = {
@@ -191,7 +190,7 @@ private fun BottomSheetPreview() {
                         Text(
                             text = "Show modal sheet",
                             style = MaterialTheme.typography.body2,
-                            color = MegaTheme.colors.text.primary
+                            color = MegaOriginalTheme.colors.text.primary
                         )
                     }
                 }

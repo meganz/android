@@ -15,8 +15,8 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.TextUnit
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Mega text style
@@ -56,7 +56,7 @@ fun megaTextStyle(
     shadow: Shadow? = null,
     drawStyle: DrawStyle? = null,
 ) = baseStyle.copy(
-    color = MegaTheme.textColor(textColor = color),
+    color = MegaOriginalTheme.textColor(textColor = color),
     fontSize = fontSize,
     fontWeight = fontWeight,
     fontStyle = fontStyle,

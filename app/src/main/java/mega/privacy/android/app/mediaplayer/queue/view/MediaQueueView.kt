@@ -13,7 +13,7 @@ import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
 import mega.privacy.android.shared.original.core.ui.controls.lists.DragDropListView
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -65,7 +65,7 @@ internal fun MediaQueueView(
 @CombinedThemePreviews
 @Composable
 private fun MediaQueueViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueView(
             items = initPreviewData(),
             currentPlayingPosition = "00:00",
@@ -82,7 +82,7 @@ private fun MediaQueueViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun MediaQueueViewWithPausedPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueView(
             items = initPreviewData(),
             currentPlayingPosition = "00:00",

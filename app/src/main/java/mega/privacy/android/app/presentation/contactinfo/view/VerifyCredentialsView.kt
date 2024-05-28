@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.R as IconR
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
@@ -90,7 +90,7 @@ internal fun VerifyCredentialsView(isVerified: Boolean) = Column {
 @CombinedThemePreviews
 @Composable
 private fun PreviewVerifyCredentialsLight() {
-    MegaAppTheme(isDark = false) {
+    OriginalTempTheme(isDark = false) {
         Surface {
             VerifyCredentialsView(isVerified = false)
         }
@@ -100,7 +100,7 @@ private fun PreviewVerifyCredentialsLight() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewVerifyCredentialsDark() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         Surface {
             VerifyCredentialsView(isVerified = true)
         }

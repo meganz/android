@@ -14,8 +14,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 @Composable
 fun ChatStatusIcon(
@@ -25,26 +25,26 @@ fun ChatStatusIcon(
     when (status) {
         UiChatStatus.Online -> ChatStatusIcon(
             modifier = modifier,
-            background = MegaTheme.colors.indicator.green,
-            borderColor = MegaTheme.colors.background.pageBackground
+            background = MegaOriginalTheme.colors.indicator.green,
+            borderColor = MegaOriginalTheme.colors.background.pageBackground
         )
 
         UiChatStatus.Away -> ChatStatusIcon(
             modifier = modifier,
-            background = MegaTheme.colors.indicator.yellow,
-            borderColor = MegaTheme.colors.background.pageBackground
+            background = MegaOriginalTheme.colors.indicator.yellow,
+            borderColor = MegaOriginalTheme.colors.background.pageBackground
         )
 
         UiChatStatus.Busy -> ChatStatusIcon(
             modifier = modifier,
-            background = MegaTheme.colors.indicator.pink,
-            borderColor = MegaTheme.colors.background.pageBackground
+            background = MegaOriginalTheme.colors.indicator.pink,
+            borderColor = MegaOriginalTheme.colors.background.pageBackground
         )
 
         else -> ChatStatusIcon(
             modifier = modifier,
-            background = MegaTheme.colors.icon.secondary,
-            borderColor = MegaTheme.colors.background.pageBackground
+            background = MegaOriginalTheme.colors.icon.secondary,
+            borderColor = MegaOriginalTheme.colors.background.pageBackground
         )
     }
 }
@@ -69,7 +69,7 @@ private fun ChatStatusIcon(
 private fun ChatStatusIconPreview(
     @PreviewParameter(ChatStatusProvider::class) status: UiChatStatus,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatStatusIcon(status)
     }
 }

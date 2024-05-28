@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 internal const val TEST_TAG_CANNOT_OPEN_FILE_DIALOG_TAG = "cannot_open_file_dialog_tag"
 
@@ -34,7 +34,7 @@ internal fun CannotOpenFileDialog(
 @Composable
 @CombinedTextAndThemePreviews
 private fun CannotOpenFileDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CannotOpenFileDialog(onDismiss = { }, onDownload = { })
     }
 }

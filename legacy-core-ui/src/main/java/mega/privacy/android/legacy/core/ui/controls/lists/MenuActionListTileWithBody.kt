@@ -21,8 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
@@ -118,7 +117,7 @@ fun MenuActionListTileWithBody(
 @CombinedThemePreviews
 @Composable
 private fun PreviewTile() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTileWithBody(
             title = "Tile Title",
             body = "Tile Body",
@@ -133,7 +132,7 @@ private fun PreviewTile() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewTileWithoutDivider() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTileWithBody(
             title = "Tile Title",
             body = "Tile Body",
@@ -151,7 +150,7 @@ private fun PreviewTileWithoutDivider() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewTileWithVeryLongBody() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTileWithBody(
             title = "Tile Title",
             body = "This is a really long body text used to check if the container height dynamically expands or not",

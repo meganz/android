@@ -2,9 +2,22 @@
 // Generated automatically by KotlinTokensGenerator.
 // Do not modify this file manually.
 //
-package mega.privacy.android.shared.original.core.ui.theme.tokens
+package mega.privacy.android.shared.original.core.ui.theme.values
 
-internal object AndroidTempSemanticTokensLight : SemanticTokens {
+import mega.android.core.ui.tokens.theme.tokens.Background
+import mega.android.core.ui.tokens.theme.tokens.Border
+import mega.android.core.ui.tokens.theme.tokens.Button
+import mega.android.core.ui.tokens.theme.tokens.Components
+import mega.android.core.ui.tokens.theme.tokens.Focus
+import mega.android.core.ui.tokens.theme.tokens.Icon
+import mega.android.core.ui.tokens.theme.tokens.Indicator
+import mega.android.core.ui.tokens.theme.tokens.Link
+import mega.android.core.ui.tokens.theme.tokens.Notifications
+import mega.android.core.ui.tokens.theme.tokens.SemanticTokens
+import mega.android.core.ui.tokens.theme.tokens.Support
+import mega.android.core.ui.tokens.theme.tokens.Text
+
+internal object TempSemanticTokensLight : SemanticTokens {
     override val background: Background = Background(
             pageBackground = Colors.Base.white,
             inverse = Colors.Neutral.n700,

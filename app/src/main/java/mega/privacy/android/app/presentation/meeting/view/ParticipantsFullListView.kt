@@ -54,7 +54,7 @@ import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewMo
 import mega.privacy.android.app.presentation.meeting.view.sheet.CallParticipantBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
@@ -531,7 +531,7 @@ private fun ParticipantsFullListAppBar(
 @Preview
 @Composable
 fun PreviewUsersListViewWaitingRoom() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantsFullListView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getParticipants(),
@@ -569,7 +569,7 @@ fun PreviewUsersListViewWaitingRoom() {
 @Preview
 @Composable
 fun PreviewUsersListViewInCall() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantsFullListView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getParticipants(),
@@ -607,7 +607,7 @@ fun PreviewUsersListViewInCall() {
 @Preview
 @Composable
 fun PreviewUsersListViewNotInCall() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantsFullListView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getParticipants(),

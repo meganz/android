@@ -24,7 +24,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * The popup for selecting the option in the video player
@@ -94,7 +94,7 @@ private fun PreviewVideoPlayerOptionPopup() {
         VideoOptionItem.VIDEO_OPTION_LOCK,
         VideoOptionItem.VIDEO_OPTION_ZOOM_TO_FILL
     )
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoOptionPopup(
             items = videoOptions,
             isShown = true,

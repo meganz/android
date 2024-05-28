@@ -13,7 +13,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * A [Composable] to enable or disable Secondary Media Uploads. This is also known as Secondary
@@ -60,7 +60,7 @@ internal fun MediaUploadsTile(
 private fun MediaUploadsTilePreview(
     @PreviewParameter(BooleanProvider::class) isMediaUploadsEnabled: Boolean,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MediaUploadsTile(
             isMediaUploadsEnabled = isMediaUploadsEnabled,
             onItemClicked = {},

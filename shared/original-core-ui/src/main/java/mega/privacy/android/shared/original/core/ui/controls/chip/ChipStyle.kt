@@ -8,7 +8,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 
 /**
@@ -151,12 +151,12 @@ object DefaultChipStyle : ChipStyle {
      */
     @Composable
     override fun colors(): ChipColors = DefaultChipColors(
-        selectedBackgroundColor = MegaTheme.colors.components.selectionControl,
-        unselectedBackgroundColor = MegaTheme.colors.button.secondary,
-        disabledBackgroundColor = MegaTheme.colors.button.secondary,
-        selectedContentColor = MegaTheme.colors.text.inverse,
-        unselectedContentColor = MegaTheme.colors.text.secondary,
-        disabledContentColor = MegaTheme.colors.text.secondary,
+        selectedBackgroundColor = MegaOriginalTheme.colors.components.selectionControl,
+        unselectedBackgroundColor = MegaOriginalTheme.colors.button.secondary,
+        disabledBackgroundColor = MegaOriginalTheme.colors.button.secondary,
+        selectedContentColor = MegaOriginalTheme.colors.text.inverse,
+        unselectedContentColor = MegaOriginalTheme.colors.text.secondary,
+        disabledContentColor = MegaOriginalTheme.colors.text.secondary,
         selectedBorderColor = Color.Transparent,
         unselectedBorderColor = Color.Transparent,
         disabledBorderColor = Color.Transparent,

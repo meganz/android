@@ -38,7 +38,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -295,7 +295,7 @@ internal fun VideoPlaylistInfoView(
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistItemViewWithoutVideosPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistItemView(
             icon = R.drawable.ic_playlist_item_empty,
             title = "New Playlist",
@@ -312,7 +312,7 @@ private fun VideoPlaylistItemViewWithoutVideosPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistItemViewWith1VideoPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistItemView(
             icon = R.drawable.ic_playlist_item_empty,
             title = "1 Video Playlist",
@@ -329,7 +329,7 @@ private fun VideoPlaylistItemViewWith1VideoPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistItemViewMultipleVideosPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistItemView(
             icon = R.drawable.ic_playlist_item_empty,
             title = "Multiple Video Playlist",
@@ -346,7 +346,7 @@ private fun VideoPlaylistItemViewMultipleVideosPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ThumbnailListViewWith4ThumbnailsPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistThumbnailView(
             icon = R.drawable.ic_playlist_item_empty,
             modifier = Modifier,
@@ -358,7 +358,7 @@ private fun ThumbnailListViewWith4ThumbnailsPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ThumbnailListViewWith1NullThumbnailPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistThumbnailView(
             icon = R.drawable.ic_playlist_item_empty,
             modifier = Modifier,
@@ -370,7 +370,7 @@ private fun ThumbnailListViewWith1NullThumbnailPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ThumbnailListViewWith1ThumbnailsPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistThumbnailView(
             icon = R.drawable.ic_playlist_item_empty,
             modifier = Modifier,
@@ -382,7 +382,7 @@ private fun ThumbnailListViewWith1ThumbnailsPreview() {
 @CombinedThemePreviews
 @Composable
 private fun ThumbnailListViewWhenThumbnailListIsNullPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistThumbnailView(
             icon = R.drawable.ic_playlist_item_empty,
             modifier = Modifier,

@@ -29,7 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -47,7 +46,7 @@ import mega.privacy.android.app.mediaplayer.trackinfo.Constants.OFFLINE_OPTION_T
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.io.File
 
 /**
@@ -310,7 +309,7 @@ fun AudioNodeInfoView(
 @CombinedThemePreviews
 @Composable
 private fun AudioTrackInfoViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         AudioTrackInfoView(
             uiState = TrackInfoState(
                 durationString = "00:35"
@@ -330,7 +329,7 @@ private fun AudioTrackInfoViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AudioInfoViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         AudioInfoView(
             thumbnail = null,
             titleString = "Vengeance Rhythm",
@@ -344,7 +343,7 @@ private fun AudioInfoViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AudioNodeInfoViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         AudioNodeInfoView(
             onCheckedChange = {},
             isEnabled = false,

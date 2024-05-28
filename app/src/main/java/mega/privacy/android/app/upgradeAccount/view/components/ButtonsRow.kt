@@ -21,7 +21,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMeg
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_900
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Composable UI for Buttons Row to use on Onboarding dialog for Variant A
@@ -66,7 +66,7 @@ fun ButtonsRow(
 @CombinedThemePreviews
 @Composable
 fun ButtonsRowPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ButtonsRow(
             onSkipPressed = {},
             onViewPlansPressed = {},

@@ -16,7 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 
 /**
@@ -81,7 +81,7 @@ fun LoadingHeaderView(modifier: Modifier = Modifier) {
 @CombinedThemePreviews
 @Composable
 private fun NodeLoadingGridViewItemPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         NodeLoadingGridViewItem()
     }
 }
@@ -89,7 +89,7 @@ private fun NodeLoadingGridViewItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun LoadingHeaderViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         LoadingHeaderView()
     }
 }

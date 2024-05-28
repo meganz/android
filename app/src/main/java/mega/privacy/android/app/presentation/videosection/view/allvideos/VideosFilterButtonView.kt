@@ -14,8 +14,8 @@ import mega.privacy.android.shared.original.core.ui.controls.chip.Chip
 import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun VideosFilterButtonView(
@@ -96,7 +96,7 @@ private fun getTextColor(isSelected: Boolean) =
 @CombinedThemePreviews
 @Composable
 private fun VideosFilterButtonViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideosFilterButtonView(
             isLocationFilterSelected = false,
             isDurationFilterSelected = false,
@@ -114,7 +114,7 @@ private fun VideosFilterButtonViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideosFilterButtonViewSelectedPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideosFilterButtonView(
             isLocationFilterSelected = true,
             isDurationFilterSelected = true,

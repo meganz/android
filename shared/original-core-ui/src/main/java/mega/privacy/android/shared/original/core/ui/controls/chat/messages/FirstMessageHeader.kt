@@ -17,8 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 internal const val TEST_TAG_FIRST_MESSAGE_HEADER_TITLE = "first_message_header_title:title"
 internal const val TEST_TAG_FIRST_MESSAGE_HEADER_SUBTITLE = "first_message_header_title:subtitle"
@@ -40,7 +40,7 @@ fun FirstMessageHeaderTitle(
         Text(
             modifier = Modifier.testTag(TEST_TAG_FIRST_MESSAGE_HEADER_TITLE),
             text = title,
-            color = MegaTheme.colors.text.primary,
+            color = MegaOriginalTheme.colors.text.primary,
             style = MaterialTheme.typography.body1,
             fontWeight = FontWeight.Medium,
         )
@@ -48,7 +48,7 @@ fun FirstMessageHeaderTitle(
             Text(
                 modifier = Modifier.testTag(TEST_TAG_FIRST_MESSAGE_HEADER_SUBTITLE),
                 text = it,
-                color = MegaTheme.colors.text.secondary,
+                color = MegaOriginalTheme.colors.text.secondary,
                 style = MaterialTheme.typography.body2,
             )
         }
@@ -73,7 +73,7 @@ fun FirstMessageHeaderSubtitleWithIcon(
         Icon(
             modifier = Modifier.size(16.dp).testTag(TEST_TAG_FIRST_MESSAGE_SUBTITLE_WITH_ICON),
             painter = painterResource(id = iconRes),
-            tint = MegaTheme.colors.icon.primary,
+            tint = MegaOriginalTheme.colors.icon.primary,
             contentDescription = null,
         )
         Text(
@@ -81,7 +81,7 @@ fun FirstMessageHeaderSubtitleWithIcon(
                 TEST_TAG_FIRST_MESSAGE_SUBTITLE_WITH_ICON_TEXT
             ),
             text = subtitle,
-            color = MegaTheme.colors.text.primary,
+            color = MegaOriginalTheme.colors.text.primary,
             style = MaterialTheme.typography.body1,
             fontWeight = FontWeight.Normal,
         )
@@ -97,7 +97,7 @@ fun FirstMessageHeaderParagraph(
     Text(
         modifier = modifier,
         text = paragraph,
-        color = MegaTheme.colors.text.secondary,
+        color = MegaOriginalTheme.colors.text.secondary,
         style = MaterialTheme.typography.subtitle2,
     )
 }
@@ -105,7 +105,7 @@ fun FirstMessageHeaderParagraph(
 @CombinedThemePreviews
 @Composable
 private fun PreviewFirstMessageHeaderTitle() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FirstMessageHeaderTitle(
             modifier = Modifier,
             title = "Bob Club",
@@ -117,7 +117,7 @@ private fun PreviewFirstMessageHeaderTitle() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewFirstMessageHeaderParagraph() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FirstMessageHeaderParagraph(
             modifier = Modifier,
             paragraph = "MEGA protects your communications with our zero-knowledge encryption system providing essential safety assurances:",
@@ -128,7 +128,7 @@ private fun PreviewFirstMessageHeaderParagraph() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewFirstMessageHeaderSubtitleWithIcon() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FirstMessageHeaderSubtitleWithIcon(
             modifier = Modifier,
             subtitle = "Confidentiality",

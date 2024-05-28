@@ -21,9 +21,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import java.text.BreakIterator
 
 /**
@@ -58,7 +58,7 @@ fun MiddleEllipsisText(
     if (text.isEmpty()) {
         Text(
             text = text,
-            color = MegaTheme.textColor(textColor = color),
+            color = MegaOriginalTheme.textColor(textColor = color),
             fontSize = fontSize,
             fontStyle = fontStyle,
             fontWeight = fontWeight,
@@ -90,7 +90,7 @@ fun MiddleEllipsisText(
             subcompose("MiddleEllipsisText_calculate") {
                 Text(
                     text = text + ellipsisChar,
-                    color = MegaTheme.textColor(textColor = color),
+                    color = MegaOriginalTheme.textColor(textColor = color),
                     fontSize = fontSize,
                     fontStyle = fontStyle,
                     fontWeight = fontWeight,
@@ -192,7 +192,7 @@ fun MiddleEllipsisText(
                     }
                     Text(
                         text = combinedText,
-                        color = MegaTheme.textColor(textColor = color),
+                        color = MegaOriginalTheme.textColor(textColor = color),
                         fontSize = fontSize,
                         fontStyle = fontStyle,
                         fontWeight = fontWeight,
@@ -221,7 +221,7 @@ fun MiddleEllipsisText(
 private fun PreviewMiddleEllipsisText(
     @PreviewParameter(MiddleEllipsisTextProvider::class) text: String,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MiddleEllipsisText(
             text = text, color = TextColor.Primary
         )

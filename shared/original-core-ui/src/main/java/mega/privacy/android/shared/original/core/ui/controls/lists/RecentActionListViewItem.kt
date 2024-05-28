@@ -37,10 +37,10 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsis
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 
 /**
@@ -228,7 +228,7 @@ internal const val MENU_TEST_TAG = "recent_action_list_view_item:menu"
 @CombinedThemePreviews
 @Composable
 private fun RecentActionListViewItemPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         RecentActionListViewItem(
             firstLineText = "First line text",
             time = "12:00 PM",
@@ -241,7 +241,7 @@ private fun RecentActionListViewItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun RecentActionListViewItem2Preview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         RecentActionListViewItem(
             firstLineText = "First line text",
             updatedByText = "[A]Updated by[/A] [B]John Doe[/B]",

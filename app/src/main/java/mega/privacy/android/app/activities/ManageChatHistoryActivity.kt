@@ -40,7 +40,7 @@ import mega.privacy.android.app.utils.Constants.SECONDS_IN_YEAR
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
@@ -149,7 +149,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 LaunchedEffect(uiState.statusMessageResId) {
                     uiState.statusMessageResId?.let {
                         showSnackbar(binding.root, getString(it))

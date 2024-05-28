@@ -18,9 +18,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.chat.messages.management.ChatLinkRemovedMessage
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Chat link removed message view.
@@ -80,7 +80,7 @@ internal fun ChatLinkRemovedView(
 @CombinedThemePreviews
 @Composable
 private fun ChatLinkRemovedPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatLinkRemovedView(
             ownerActionFullName = "Name"
         )

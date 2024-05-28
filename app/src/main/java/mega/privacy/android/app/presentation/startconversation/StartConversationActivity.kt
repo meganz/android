@@ -26,7 +26,7 @@ import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.view.StartConversationView
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -110,7 +110,7 @@ class StartConversationActivity : ComponentActivity() {
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsState()
 
-        MegaAppTheme(isDark = themeMode.isDarkMode()) {
+        OriginalTempTheme(isDark = themeMode.isDarkMode()) {
             StartConversationView(
                 state = uiState,
                 onButtonClicked = ::onActionTap,

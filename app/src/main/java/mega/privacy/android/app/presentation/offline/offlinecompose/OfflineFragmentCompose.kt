@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.offline.view.OfflineFeatureScreen
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
@@ -70,7 +70,7 @@ class OfflineFragmentCompose : Fragment(), ActionMode.Callback {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDarkMode = themeMode.isDarkMode()
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-                MegaAppTheme(isDark = isDarkMode) {
+                OriginalTempTheme(isDark = isDarkMode) {
                     OfflineFeatureScreen(
                         uiState = uiState,
                         fileTypeIconMapper = fileTypeIconMapper,

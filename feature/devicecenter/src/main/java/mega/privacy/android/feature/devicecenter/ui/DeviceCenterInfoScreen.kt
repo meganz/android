@@ -33,11 +33,11 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterInfoUiState
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Test tags for the Device Center Info View
@@ -206,7 +206,7 @@ private fun InfoRow(
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterInfoScreenDevicePreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterInfoScreen(
             uiState = DeviceCenterInfoUiState(
                 icon = IconPackR.drawable.ic_pc_medium_solid,
@@ -224,7 +224,7 @@ private fun DeviceCenterInfoScreenDevicePreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterInfoScreenFolderPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterInfoScreen(
             uiState = DeviceCenterInfoUiState(
                 icon = IconPackR.drawable.ic_folder_medium_solid,

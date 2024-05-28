@@ -34,7 +34,7 @@ import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -91,7 +91,7 @@ class ConfirmEmailFragment : Fragment() {
                 val snackBarHostState = remember { SnackbarHostState() }
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-                MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     val successMessage =
                         stringResource(id = R.string.confirm_email_misspelled_email_sent)
                     LaunchedEffect(uiState.shouldShowSuccessMessage) {

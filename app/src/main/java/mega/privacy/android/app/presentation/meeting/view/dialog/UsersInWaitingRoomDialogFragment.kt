@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewMo
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaChatApiJava
 import javax.inject.Inject
 
@@ -53,7 +53,7 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
             setContent {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
-                MegaAppTheme(isDark = isDark) {
+                OriginalTempTheme(isDark = isDark) {
                     UsersInWaitingRoomDialog(
                         onSeeWaitingRoomClick = {
                             val chatId = viewModel.state.value.chatId

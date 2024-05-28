@@ -30,7 +30,7 @@ import mega.privacy.android.app.upgradeAccount.view.ChooseAccountView
 import mega.privacy.android.app.upgradeAccount.view.VariantAOnboardingDialogView
 import mega.privacy.android.app.upgradeAccount.view.VariantBOnboardingDialogView
 import mega.privacy.android.app.utils.billing.PaymentUtils
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
@@ -98,7 +98,7 @@ class ChooseAccountFragment : Fragment() {
         val uiState by chooseAccountViewModel.state.collectAsStateWithLifecycle()
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-        MegaAppTheme(isDark = mode.isDarkMode()) {
+        OriginalTempTheme(isDark = mode.isDarkMode()) {
             if (uiState.enableVariantAUI) {
                 VariantAOnboardingDialogView(
                     state = uiState,

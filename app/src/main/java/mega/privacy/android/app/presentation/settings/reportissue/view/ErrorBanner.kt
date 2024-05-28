@@ -15,7 +15,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 fun ErrorBanner(
@@ -44,7 +44,7 @@ fun ErrorBanner(
 @Preview
 @Composable
 fun PreviewErrorBanner() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ErrorBanner(
             errorMessage = "This is an error message. If you broke it, " +
                     "please fix whatever is wrong, if we broke it,we are very sorry" +

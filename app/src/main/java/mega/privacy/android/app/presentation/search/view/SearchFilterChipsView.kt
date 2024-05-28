@@ -28,7 +28,7 @@ import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.legacy.core.ui.controls.chips.TextButtonWithIconChipForSearch
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Search filter chips view
@@ -81,7 +81,7 @@ private fun PreviewSearchFilterChipsView(
     @PreviewParameter(SearchStatePreviewsProvider::class) viewState: SearchState,
 ) {
     var state by mutableStateOf(viewState)
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SearchFilterChipsView(
             selectedFilter = state.selectedFilter,
             filters = state.filters,

@@ -13,8 +13,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Wrapper for [LinearProgressIndicator] to set default parameters to better represent the project theme
@@ -30,16 +30,16 @@ fun MegaLinearProgressIndicator(
     LinearProgressIndicator(
         modifier = modifier.fillMaxWidth(),
         progress = progress,
-        color = MegaTheme.colors.icon.accent,
+        color = MegaOriginalTheme.colors.icon.accent,
         strokeCap = strokeCap,
-        backgroundColor = MegaTheme.colors.background.surface3
+        backgroundColor = MegaOriginalTheme.colors.background.surface3
     )
 } else {
     LinearProgressIndicator(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colors.secondary,
         strokeCap = strokeCap,
-        backgroundColor = MegaTheme.colors.background.surface3
+        backgroundColor = MegaOriginalTheme.colors.background.surface3
     )
 }
 
@@ -48,7 +48,7 @@ fun MegaLinearProgressIndicator(
 private fun MegaLinearProgressIndicatorPreview(
     @PreviewParameter(BooleanProvider::class) indeterminate: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.padding(16.dp)) {
             MegaLinearProgressIndicator(
                 progress = 0.3f.takeIf { !indeterminate }

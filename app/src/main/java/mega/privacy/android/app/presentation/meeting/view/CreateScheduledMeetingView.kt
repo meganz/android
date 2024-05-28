@@ -67,7 +67,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.dialog.WaitingRoomWarningDialog
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
@@ -78,7 +78,7 @@ import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
@@ -795,7 +795,7 @@ internal const val UPGRADE_ACCOUNT_BUTTON_TAG =
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewDiscardMeetingAlertDialog")
 @Composable
 fun PreviewDiscardMeetingAlertDialog() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DiscardMeetingAlertDialog(state = CreateScheduledMeetingState(
             meetingTitle = "Title meeting",
             rulesSelected = ChatScheduledRules(),
@@ -816,7 +816,7 @@ fun PreviewDiscardMeetingAlertDialog() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewRecurringMeetingDialog")
 @Composable
 fun PreviewRecurringMeetingDialog() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         RecurringMeetingDialog(state = CreateScheduledMeetingState(
             meetingTitle = "Title meeting",
             rulesSelected = ChatScheduledRules(),
@@ -837,7 +837,7 @@ fun PreviewRecurringMeetingDialog() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewCreateScheduledMeetingView")
 @Composable
 private fun PreviewCreateScheduledMeetingView() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CreateScheduledMeetingView(
             state = CreateScheduledMeetingState(
                 meetingTitle = "Title meeting",
@@ -878,7 +878,7 @@ private fun PreviewCreateScheduledMeetingView() {
 )
 @Composable
 private fun CreateScheduledMeetingViewWithFreePlanLimitWarningPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CreateScheduledMeetingView(
             state = CreateScheduledMeetingState(
                 meetingTitle = "Title meeting",

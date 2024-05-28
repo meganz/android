@@ -13,7 +13,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startM
 import mega.privacy.android.shared.original.core.ui.controls.chat.ReturnToCallBanner
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun OngoingCallBanner(
@@ -34,7 +34,7 @@ internal fun OngoingCallBannerContent(
     }
     val context = LocalContext.current
     uiState.currentCall?.takeIf { uiState.isShown }?.let { call ->
-        MegaAppTheme(isDark = uiState.themeMode.isDarkMode()) {
+        OriginalTempTheme(isDark = uiState.themeMode.isDarkMode()) {
             ReturnToCallBanner(
                 text = stringResource(id = R.string.call_in_progress_layout),
                 onBannerClicked = { startMeetingActivity(context, call.chatId) },

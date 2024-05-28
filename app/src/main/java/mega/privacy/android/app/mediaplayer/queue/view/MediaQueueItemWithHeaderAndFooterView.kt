@@ -22,8 +22,8 @@ import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.legacy.core.ui.controls.lists.MediaQueueItemView
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun MediaQueueItemWithHeaderAndFooterView(
@@ -221,7 +221,7 @@ private fun MediaQueueItemDivider(
 @CombinedThemePreviews
 @Composable
 private fun PlayingMediaQueueItemPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemWithHeaderAndFooterView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             name = "Media Name",
@@ -243,7 +243,7 @@ private fun PlayingMediaQueueItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun PausedPlayingMediaQueueItemPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemWithHeaderAndFooterView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             name = "Media Name",
@@ -265,7 +265,7 @@ private fun PausedPlayingMediaQueueItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun FirstMediaQueueItemPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemWithHeaderAndFooterView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             name = "Media Name",
@@ -287,7 +287,7 @@ private fun FirstMediaQueueItemPreview() {
 @CombinedThemePreviews
 @Composable
 private fun NextMediaQueueItemPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemWithHeaderAndFooterView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             name = "Media Name",

@@ -41,8 +41,8 @@ import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehavi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -293,7 +293,7 @@ internal fun VideoSizeAndIconsView(
 @CombinedThemePreviews
 @Composable
 private fun VideoItemViewWithFavouritePreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoItemView(
             icon = iconPackR.drawable.ic_video_medium_solid,
             name = "testing_video_file_name_long_name_testing.mp4",
@@ -313,7 +313,7 @@ private fun VideoItemViewWithFavouritePreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoItemViewWithoutFavouritePreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoItemView(
             icon = iconPackR.drawable.ic_video_medium_solid,
             name = "name.mp4",
@@ -332,7 +332,7 @@ private fun VideoItemViewWithoutFavouritePreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoInfoViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoInfoView(
             name = "testing_video_file_name_long_name_testing_testing_video_file_name_long_name_testing_testing_video_file_name_long_name_testing.mp4",
             fileSize = "1.3MB",

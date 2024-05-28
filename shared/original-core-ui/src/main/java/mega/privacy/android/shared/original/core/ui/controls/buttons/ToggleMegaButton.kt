@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Mega custom implementation of [IconToggleButton]
@@ -118,7 +118,7 @@ fun ToggleMegaButton(
 fun PreviewEnabledToggleMegaButton(
     @PreviewParameter(BooleanProvider::class) isEnabled: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ToggleMegaButton(
             modifier = Modifier,
             checked = isEnabled,

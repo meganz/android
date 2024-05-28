@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * [ConfirmationDialog] for resuming transfers.
@@ -34,7 +34,7 @@ fun ResumeTransfersDialog(
 @CombinedThemePreviews
 @Composable
 private fun ResumeTransfersDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ResumeTransfersDialog(
             onResume = {},
             onDismiss = {},

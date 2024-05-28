@@ -24,9 +24,9 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * File message content for file without preview
@@ -49,7 +49,7 @@ internal fun FileNoPreviewMessageView(
     Row(
         modifier = modifier
             .background(
-                color = if (isMe) MegaTheme.colors.button.primary else MegaTheme.colors.background.surface2,
+                color = if (isMe) MegaOriginalTheme.colors.button.primary else MegaOriginalTheme.colors.background.surface2,
             )
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -97,7 +97,7 @@ private fun FileIcon(
 ) {
     fileTypeResId?.let {
         Icon(
-            tint = if (isMe) MegaTheme.colors.icon.inverse else MegaTheme.colors.icon.primary,
+            tint = if (isMe) MegaOriginalTheme.colors.icon.inverse else MegaOriginalTheme.colors.icon.primary,
             imageVector = ImageVector.vectorResource(fileTypeResId),
             contentDescription = null,
             modifier = modifier.testTag(FILE_MESSAGE_VIEW_FILE_TYPE_ICON_TEST_TAG),
@@ -110,7 +110,7 @@ private fun FileIcon(
 private fun FileNoPreviewMessageViewPreview(
     @PreviewParameter(NoPreviewPreviewProvider::class) params: NoPreviewPreviewParams,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FileContainerMessageView(
             modifier = Modifier.padding(12.dp),
             content = {

@@ -50,6 +50,7 @@ dependencies {
     implementation(lib.coil.compose)
     implementation(lib.balloon)
     implementation(google.accompanist.placeholder)
+    implementation(lib.mega.core.ui.tokens)
 
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)

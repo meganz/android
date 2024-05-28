@@ -36,7 +36,7 @@ import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -89,7 +89,7 @@ class UpgradeAccountFragment : Fragment() {
         val uiState by upgradeAccountViewModel.state.collectAsStateWithLifecycle()
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-        MegaAppTheme(isDark = mode.isDarkMode()) {
+        OriginalTempTheme(isDark = mode.isDarkMode()) {
             UpgradeAccountView(
                 modifier = Modifier.semantics {
                     testTagsAsResourceId = true

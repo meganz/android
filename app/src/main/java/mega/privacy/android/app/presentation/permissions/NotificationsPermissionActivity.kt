@@ -14,7 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.permissions.view.NotificationsPermissionView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -59,7 +59,7 @@ class NotificationsPermissionActivity : ComponentActivity() {
 
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 NotificationsPermissionView()
             }
         }

@@ -11,7 +11,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * MegaScaffold is a wrapper around Scaffold that provides a convenient way to show a snackBar from any view inside this scaffold.
@@ -45,7 +45,7 @@ fun MegaScaffold(
                 }
             },
             floatingActionButton = floatingActionButton,
-            backgroundColor = MegaTheme.colors.background.pageBackground,
+            backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
             content = content
         )
     }

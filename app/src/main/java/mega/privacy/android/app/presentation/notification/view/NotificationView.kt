@@ -30,7 +30,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Notification View in Compose
@@ -164,7 +164,7 @@ private fun NotificationViewPreview() {
         backgroundColor = { "#D3D3D3" },
         separatorMargin = { 0 }
     ) {}
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         NotificationView(
             state = NotificationState(
                 promoNotifications = (listOf(promoNotification)),

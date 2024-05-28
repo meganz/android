@@ -15,8 +15,8 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.TextUnit
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Mega span style
@@ -55,7 +55,7 @@ fun megaSpanStyle(
     platformStyle: PlatformSpanStyle? = null,
     drawStyle: DrawStyle? = null,
 ) = SpanStyle(
-    color = color?.let { MegaTheme.textColor(textColor = color) } ?: Color.Unspecified,
+    color = color?.let { MegaOriginalTheme.textColor(textColor = color) } ?: Color.Unspecified,
     fontSize = fontSize,
     fontWeight = fontWeight,
     fontStyle = fontStyle,
@@ -83,4 +83,4 @@ fun megaSpanStyle(
 fun megaSpanStyle(
     base: SpanStyle,
     color: TextColor,
-) = base.copy(color = MegaTheme.textColor(textColor = color))
+) = base.copy(color = MegaOriginalTheme.textColor(textColor = color))

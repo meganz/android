@@ -10,8 +10,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * MegaDivider
@@ -33,7 +33,7 @@ fun MegaDivider(
     Divider(
         modifier = finalModifier,
         thickness = 1.dp,
-        color = MegaTheme.colors.border.subtle
+        color = MegaOriginalTheme.colors.border.subtle
     )
 }
 
@@ -68,7 +68,7 @@ enum class DividerType {
 private fun PreviewMegaDivider(
     @PreviewParameter(DividerTypeProvider::class) spacing: DividerType,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaDivider(
             dividerType = spacing,
         )

@@ -12,8 +12,8 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Select mode app bar
@@ -35,7 +35,7 @@ fun SelectModeAppBar(
     elevation: Dp = LocalMegaAppBarElevation.current,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides
-            MegaAppBarColors(MegaTheme.colors.icon.accent, MegaTheme.colors.text.accent)
+            MegaAppBarColors(MegaOriginalTheme.colors.icon.accent, MegaOriginalTheme.colors.text.accent)
 ) {
     BaseMegaAppBar(
         appBarType = AppBarType.BACK_NAVIGATION,
@@ -66,7 +66,7 @@ fun SelectModeAppBar(
     elevation: Dp = LocalMegaAppBarElevation.current,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides
-            MegaAppBarColors(MegaTheme.colors.icon.accent, MegaTheme.colors.text.accent)
+            MegaAppBarColors(MegaOriginalTheme.colors.icon.accent, MegaOriginalTheme.colors.text.accent)
 ) {
     BaseMegaAppBar(
         appBarType = AppBarType.BACK_NAVIGATION,
@@ -81,7 +81,7 @@ fun SelectModeAppBar(
 @CombinedThemePreviews
 @Composable
 private fun SelectModeAppBarPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SelectModeAppBar(
             title = "App bar title",
             actions = getSampleToolbarActions()

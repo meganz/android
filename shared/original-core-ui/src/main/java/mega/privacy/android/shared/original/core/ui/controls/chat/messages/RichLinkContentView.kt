@@ -26,8 +26,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Rich link content
@@ -122,9 +122,9 @@ fun RichLinkContentView(
 @CombinedThemePreviews
 @Composable
 private fun RichLinkContentViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CompositionLocalProvider(
-            LocalContentColor provides MegaTheme.colors.text.primary,
+            LocalContentColor provides MegaOriginalTheme.colors.text.primary,
         ) {
             RichLinkContentView(
                 contentTitle = "Title",

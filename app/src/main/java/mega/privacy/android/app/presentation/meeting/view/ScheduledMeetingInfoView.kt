@@ -96,7 +96,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.legacy.core.ui.controls.text.MarqueeText
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -1225,7 +1225,7 @@ internal const val SCHEDULE_MEETING_INFO_PARTICIPANTS_WARNING_TAG =
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewActionButton")
 @Composable
 fun PreviewActionButton() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ActionButton(state = ScheduledMeetingInfoUiState(
             scheduledMeeting = ChatScheduledMeeting(
                 chatId = -1,
@@ -1258,7 +1258,7 @@ fun PreviewActionButton() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkAddParticipantsButton")
 @Composable
 fun PreviewAddParticipantsButton() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         AddParticipantsButton(state = ScheduledMeetingInfoUiState(
             scheduledMeeting = ChatScheduledMeeting(
                 chatId = -1,
@@ -1287,7 +1287,7 @@ fun PreviewAddParticipantsButton() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewScheduledMeetingInfoView")
 @Composable
 fun PreviewScheduledMeetingInfoView() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ScheduledMeetingInfoView(
             state = ScheduledMeetingInfoUiState(
                 scheduledMeeting = ChatScheduledMeeting(

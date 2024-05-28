@@ -10,7 +10,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * A Composable Dialog informing the Business User that his/her Account has been suspended. The
@@ -57,7 +57,7 @@ fun BusinessAccountSuspendedDialog(
 private fun BusinessAccountSuspendedDialogPreview(
     @PreviewParameter(BooleanProvider::class) isBusinessAdministratorAccount: Boolean,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         BusinessAccountSuspendedDialog(
             isBusinessAdministratorAccount = isBusinessAdministratorAccount,
             onAlertAcknowledged = {},

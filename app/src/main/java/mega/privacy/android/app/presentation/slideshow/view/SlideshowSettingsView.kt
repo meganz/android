@@ -37,7 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.slideshow.SlideshowSettingViewModel
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.button
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
@@ -318,7 +318,7 @@ fun PreviewSlideshowSettingsView() {
     var selectedSpeed by remember { mutableStateOf("Normal (4s)") }
     var selectedOrder by remember { mutableStateOf("Shuffle") }
     var repeat by remember { mutableStateOf(false) }
-    MegaAppTheme(isSystemInDarkTheme()) {
+    OriginalTempTheme(isSystemInDarkTheme()) {
         Scaffold {
             SlideshowSettingsView(viewModel())
         }

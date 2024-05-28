@@ -19,8 +19,8 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.status.MegaStatusIndicator
 import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Two line list item with status info
@@ -60,7 +60,7 @@ fun StatusListViewItem(
                 painter = painterResource(id = icon),
                 contentDescription = "Item icon",
                 colorFilter = if (applySecondaryColorIconTint) {
-                    ColorFilter.tint(MegaTheme.colors.icon.secondary)
+                    ColorFilter.tint(MegaOriginalTheme.colors.icon.secondary)
                 } else {
                     null
                 }

@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Test Tag for the Camera Uploads Business Account Dialog
@@ -48,7 +48,7 @@ internal fun CameraUploadsBusinessAccountDialog(
 @CombinedThemePreviews
 @Composable
 private fun CameraUploadsBusinessAccountDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CameraUploadsBusinessAccountDialog(
             onAlertAcknowledged = {},
             onAlertDismissed = {},

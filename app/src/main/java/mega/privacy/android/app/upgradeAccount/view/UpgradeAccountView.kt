@@ -86,12 +86,12 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1me
 import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleNoTitleTopAppBar
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 internal const val UPGRADE_ACCOUNT_SCREEN_TAG = "upgrade_account_screen:"
 internal const val BILLING_WARNING_TAG = "upgrade_account_screen:box_warning_unavailable_payments"
@@ -656,7 +656,7 @@ private fun PricingPageLinkText(
 fun PreviewUpgradeAccountView(
     @PreviewParameter(UpgradeAccountPreviewProvider::class) state: UpgradeAccountState,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         UpgradeAccountView(
             state = state,
             onBackPressed = {},

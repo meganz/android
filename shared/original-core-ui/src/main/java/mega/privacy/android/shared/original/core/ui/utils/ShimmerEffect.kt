@@ -21,7 +21,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Shimmer effect for a view
@@ -50,9 +50,9 @@ fun Modifier.shimmerEffect(
         label = "Shimmering Animation"
     )
     val colors = listOf(
-        MegaTheme.colors.background.surface2,
-        MegaTheme.colors.background.surface1,
-        MegaTheme.colors.background.surface2,
+        MegaOriginalTheme.colors.background.surface2,
+        MegaOriginalTheme.colors.background.surface1,
+        MegaOriginalTheme.colors.background.surface2,
     )
     val gradientWidth = size.width.toFloat()
     drawWithCache {

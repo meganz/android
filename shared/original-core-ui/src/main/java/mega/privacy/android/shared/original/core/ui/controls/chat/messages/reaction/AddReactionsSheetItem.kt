@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Bottom sheet item for adding reactions to a chat message.
@@ -91,7 +91,7 @@ internal fun ReactionItem(
         .clickable { onClick() }
         .size(48.dp)
         .background(
-            color = MegaTheme.colors.background.surface2,
+            color = MegaOriginalTheme.colors.background.surface2,
             shape = CircleShape
         ),
     contentAlignment = Alignment.Center
@@ -107,14 +107,14 @@ internal fun ReactionItem(
         modifier = Modifier.size(24.dp),
         imageVector = ImageVector.vectorResource(R.drawable.ic_icon_add_small_regular_outline),
         contentDescription = "Add more reactions",
-        tint = MegaTheme.colors.icon.secondary,
+        tint = MegaOriginalTheme.colors.icon.secondary,
     )
 }
 
 @CombinedThemePreviews
 @Composable
 private fun AddReactionSheetPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         AddReactionsSheetItem(onReactionClicked = {}, onMoreReactionsClicked = {})
     }
 }

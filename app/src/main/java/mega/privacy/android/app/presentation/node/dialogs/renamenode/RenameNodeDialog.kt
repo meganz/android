@@ -19,7 +19,7 @@ import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnLoadNodeName
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameConfirmed
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameValidationPassed
@@ -88,7 +88,7 @@ private fun RenameNodeDialogBody(
 ) {
     var initialInput by rememberSaveable { mutableStateOf(nodeName) }
 
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         InputDialog(
             modifier = Modifier.testTag(RENAME_NODE_DIALOG_TAG),
             title = stringResource(id = R.string.context_rename),
@@ -114,7 +114,7 @@ private fun RenameNodeDialogBody(
 private fun PreviewRenameDeviceDialogBody(
     @PreviewParameter(RenameNodeDialogBodyPreviewProvider::class) renameDialogState: RenameNodeDialogState,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         RenameNodeDialogBody(
             nodeName = renameDialogState.nodeName ?: "",
             errorMessage = renameDialogState.errorMessage,

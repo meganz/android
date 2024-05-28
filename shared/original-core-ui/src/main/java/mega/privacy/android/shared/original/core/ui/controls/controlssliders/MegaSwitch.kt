@@ -43,8 +43,8 @@ import androidx.core.content.withStyledAttributes
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.PreviewWithTempAndNewCoreColorTokens
 
 
@@ -92,7 +92,7 @@ internal class MegaSwitch : AbstractComposeView, Checkable {
 
     @Composable
     override fun Content() {
-        AndroidTheme(isDark = isSystemInDarkTheme()) {
+        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
             MegaSwitch(checked = checked, onCheckedChange = {
                 checked = it
                 onCheckedChange(it)
@@ -141,33 +141,33 @@ internal fun MegaSwitch(
 
     val trackColor by animateColorAsState(
         targetValue = if (checked && enabled) {
-            MegaTheme.colors.components.selectionControl
+            MegaOriginalTheme.colors.components.selectionControl
         } else if (!checked) {
-            MegaTheme.colors.background.pageBackground
+            MegaOriginalTheme.colors.background.pageBackground
         } else {
-            MegaTheme.colors.border.disabled
+            MegaOriginalTheme.colors.border.disabled
         },
         animationSpec = trackAnimationSpecs,
         label = "track color"
     )
     val borderColor by animateColorAsState(
         targetValue = if (enabled) {
-            MegaTheme.colors.button.outline
+            MegaOriginalTheme.colors.button.outline
         } else {
-            MegaTheme.colors.border.disabled
+            MegaOriginalTheme.colors.border.disabled
         },
         animationSpec = trackAnimationSpecs,
         label = "border color"
     )
     val thumbColor by animateColorAsState(
         targetValue = if (checked) {
-            MegaTheme.colors.background.pageBackground
+            MegaOriginalTheme.colors.background.pageBackground
         } else if (enabled && isPressed) {
-            MegaTheme.colors.button.outlinePressed
+            MegaOriginalTheme.colors.button.outlinePressed
         } else if (enabled) {
-            MegaTheme.colors.button.outline
+            MegaOriginalTheme.colors.button.outline
         } else {
-            MegaTheme.colors.border.disabled
+            MegaOriginalTheme.colors.border.disabled
         },
         animationSpec = thumbAnimationSpecs,
         label = "thumb color"

@@ -31,8 +31,8 @@ import androidx.core.content.withStyledAttributes
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 class WarningBanner : AbstractComposeView {
     var text by mutableStateOf("")
@@ -52,7 +52,7 @@ class WarningBanner : AbstractComposeView {
 
     @Composable
     override fun Content() {
-        AndroidTheme(isDark = isSystemInDarkTheme()) {
+        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
             WarningBanner(textString = text, onCloseClick = onCloseClick)
         }
     }
@@ -87,8 +87,8 @@ fun WarningBanner(
     onCloseClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    val textColour = MegaTheme.colors.text.primary
-    val buttonColor = MegaTheme.colors.icon.primary
+    val textColour = MegaOriginalTheme.colors.text.primary
+    val buttonColor = MegaOriginalTheme.colors.icon.primary
     ProvideTextStyle(
         MaterialTheme.typography.caption.copy(color = textColour)
     ) {
@@ -144,7 +144,7 @@ private fun BannerContent(
 ) {
     Row(
         modifier = modifier
-            .background(MegaTheme.colors.notifications.notificationWarning),
+            .background(MegaOriginalTheme.colors.notifications.notificationWarning),
         verticalAlignment = verticalAlignment
     ) {
         Box(
@@ -181,7 +181,7 @@ private fun BannerContent(
 private fun WarningBannerPreview(
     @PreviewParameter(BooleanProvider::class) showCloseButton: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         WarningBanner(
             textString = "This is a warning banner",
             onCloseClick = if (showCloseButton) {
@@ -196,7 +196,7 @@ private fun WarningBannerPreview(
 private fun WarningBannerLongTextPreview(
     @PreviewParameter(BooleanProvider::class) showCloseButton: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         WarningBanner(
             textString = "This is a warning banner with a very long text to preview multiline behaviour, still more text needed",
             onCloseClick = if (showCloseButton) {

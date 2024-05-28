@@ -5,8 +5,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import mega.android.core.ui.tokens.theme.tokens.SemanticTokens
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
-import mega.privacy.android.shared.original.core.ui.theme.tokens.SemanticTokens
 
 /**
  * Theme colors to be used in all core-ui components.
@@ -40,8 +40,8 @@ internal data class MegaColors(
     val radioColors
         @Composable
         get() = RadioButtonDefaults.colors(
-            selectedColor = MegaTheme.colors.border.strongSelected,
-            unselectedColor = MegaTheme.colors.icon.secondary,
-            disabledColor = MegaTheme.colors.border.disabled,
+            selectedColor = MegaOriginalTheme.colors.border.strongSelected,
+            unselectedColor = MegaOriginalTheme.colors.icon.secondary,
+            disabledColor = MegaOriginalTheme.colors.border.disabled,
         )
 }

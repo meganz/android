@@ -54,7 +54,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -366,7 +366,7 @@ internal fun DeleteItemsDialog(
 @CombinedThemePreviews
 @Composable
 private fun DeleteVideoPlaylistDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DeleteItemsDialog(
             title = "Delete playlist?",
             text = "Do we need additional explanation to delete playlists?",
@@ -380,7 +380,7 @@ private fun DeleteVideoPlaylistDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DeleteVideosDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DeleteItemsDialog(
             title = "Remove from playlist?",
             text = null,
@@ -394,7 +394,7 @@ private fun DeleteVideosDialogPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistsViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistsView(
             items = emptyList(),
             progressBarShowing = false,
@@ -427,7 +427,7 @@ private fun VideoPlaylistsViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistsViewCreateDialogShownPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistsView(
             items = emptyList(),
             progressBarShowing = false,
@@ -460,7 +460,7 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
 @CombinedThemePreviews
 @Composable
 private fun FabButtonPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistFabButton(onCreateVideoPlaylistClick = {})
     }
 }

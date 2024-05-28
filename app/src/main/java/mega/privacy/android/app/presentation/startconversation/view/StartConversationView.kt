@@ -54,7 +54,7 @@ import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.search.view.EmptySearchView
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
@@ -312,7 +312,7 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewActionButton")
 @Composable
 fun PreviewActionButton() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ActionButton(action = StartConversationAction.NewGroup, onButtonClicked = {})
     }
 }
@@ -321,7 +321,7 @@ fun PreviewActionButton() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkInviteContactsButton")
 @Composable
 fun PreviewInviteContactsButton() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         InviteContactsButton(onInviteContactsClicked = {})
     }
 }
@@ -330,7 +330,7 @@ fun PreviewInviteContactsButton() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewHeaderItem")
 @Composable
 fun PreviewHeaderItem() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         HeaderItem(text = "A")
     }
 }
@@ -339,7 +339,7 @@ fun PreviewHeaderItem() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewStartConversationView")
 @Composable
 fun PreviewStartConversationView() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         StartConversationView(
             state = StartConversationState(),
             onButtonClicked = {},
@@ -358,7 +358,7 @@ fun PreviewStartConversationView() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewEmptyContactsView")
 @Composable
 fun PreviewEmptyContactsView() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         EmptyContactsView(onInviteContactsClicked = {})
     }
 }

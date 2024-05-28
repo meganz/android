@@ -9,7 +9,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * A [Composable] Dialog that displays a list of Options on the type of content being uploaded by
@@ -43,7 +43,7 @@ internal fun FileUploadDialog(
 @CombinedThemePreviews
 @Composable
 private fun FileUploadDialogPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FileUploadDialog(
             currentUploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
             onOptionSelected = {},

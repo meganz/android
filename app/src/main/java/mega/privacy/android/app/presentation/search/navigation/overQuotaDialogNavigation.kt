@@ -17,7 +17,7 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 
 internal fun NavGraphBuilder.overQuotaDialogNavigation(
@@ -33,7 +33,7 @@ internal fun NavGraphBuilder.overQuotaDialogNavigation(
         ),
     ) {
         val overQuota = it.arguments?.getBoolean(searchOverQuotaDialogArgumentOverQuota) ?: false
-        MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
             StorageStatusDialogView(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 usePlatformDefaultWidth = false,

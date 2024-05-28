@@ -37,7 +37,7 @@ import mega.privacy.android.app.presentation.contact.view.UriAvatarView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaButtonWithIcon
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
@@ -289,7 +289,7 @@ private fun ParticipantAvatar(
 @Preview
 @Composable
 fun PreviewParticipantInWaitingRoomItem() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.WaitingRoomSection,
             myPermission = ChatRoomPermission.Moderator,
@@ -316,7 +316,7 @@ fun PreviewParticipantInWaitingRoomItem() {
 @Preview
 @Composable
 fun PreviewMeParticipantInCallItem() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.InCallSection,
             myPermission = ChatRoomPermission.Moderator,
@@ -345,7 +345,7 @@ fun PreviewMeParticipantInCallItem() {
 @Preview
 @Composable
 fun PreviewParticipantInCallItem() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.InCallSection,
             myPermission = ChatRoomPermission.Moderator,
@@ -371,7 +371,7 @@ fun PreviewParticipantInCallItem() {
 @Preview
 @Composable
 fun PreviewGuestParticipantInCallItem() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.InCallSection,
             myPermission = ChatRoomPermission.Moderator,
@@ -397,7 +397,7 @@ fun PreviewGuestParticipantInCallItem() {
 @Preview
 @Composable
 fun PreviewParticipantNotInCallItem() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.NotInCallSection,
             myPermission = ChatRoomPermission.Moderator,
@@ -424,7 +424,7 @@ fun PreviewParticipantNotInCallItem() {
 @Preview
 @Composable
 fun PreviewParticipantNotInCallRingingItem() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.NotInCallSection,
             myPermission = ChatRoomPermission.Moderator,
@@ -452,7 +452,7 @@ fun PreviewParticipantNotInCallRingingItem() {
 @Preview
 @Composable
 fun PreviewParticipantNotInCallNoResponseItem() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.NotInCallSection,
             myPermission = ChatRoomPermission.Moderator,
@@ -480,7 +480,7 @@ fun PreviewParticipantNotInCallNoResponseItem() {
 @Preview
 @Composable
 fun PreviewParticipantNotInCallItemNonHost() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.NotInCallSection,
             myPermission = ChatRoomPermission.Standard,
@@ -508,7 +508,7 @@ fun PreviewParticipantNotInCallItemNonHost() {
 @Preview
 @Composable
 fun PreviewGuestParticipantNotInCallItem() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         ParticipantInCallItem(
             section = ParticipantsSection.NotInCallSection,
             myPermission = ChatRoomPermission.Moderator,

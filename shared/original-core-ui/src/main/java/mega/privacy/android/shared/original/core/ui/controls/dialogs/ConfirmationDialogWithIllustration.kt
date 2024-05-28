@@ -27,7 +27,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaBut
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.BaseMegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.preview.PreviewStringParameters
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 /**
@@ -122,7 +122,7 @@ fun ConfirmationDialogWithIllustration(
 private fun ConfirmationDialogWithIllustrationPreview(
     @PreviewParameter(PreviewStringsParametersProviderWithTitle::class) texts: PreviewStringParameters,
 ) {
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         DialogBox {
             ConfirmationDialogWithIllustration(
                 title = texts.title?.getText() ?: "",

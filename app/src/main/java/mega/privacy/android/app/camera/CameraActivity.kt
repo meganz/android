@@ -14,7 +14,7 @@ import mega.privacy.android.app.camera.preview.navigateToVideoPreview
 import mega.privacy.android.app.camera.preview.photoPreviewScreen
 import mega.privacy.android.app.camera.preview.videoPreviewScreen
 import mega.privacy.android.app.presentation.extensions.parcelable
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @AndroidEntryPoint
 internal class CameraActivity : AppCompatActivity() {
@@ -27,7 +27,7 @@ internal class CameraActivity : AppCompatActivity() {
             val args = intent.parcelable<CameraArg>(EXTRA_ARGS) as CameraArg
 
             // force dark theme for camera
-            MegaAppTheme(isDark = true) {
+            OriginalTempTheme(isDark = true) {
                 NavHost(navController = navController, startDestination = CAMERA_CAPTURE_ROUTE) {
                     cameraCaptureScreen(
                         onFinish = ::setResult,

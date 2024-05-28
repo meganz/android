@@ -44,7 +44,7 @@ import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaNode
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -187,7 +187,7 @@ internal fun AddDocumentFabButton(
 @CombinedThemePreviews
 @Composable
 private fun DocumentSectionComposeViewWithoutDocumentsPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DocumentSectionComposeView(
             uiState = DocumentSectionUiState(
                 isLoading = false
@@ -206,7 +206,7 @@ private fun DocumentSectionComposeViewWithoutDocumentsPreview() {
 @CombinedThemePreviews
 @Composable
 private fun DocumentSectionComposeViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DocumentSectionComposeView(
             uiState = DocumentSectionUiState(
                 allDocuments = getPreviewItems(),
@@ -226,7 +226,7 @@ private fun DocumentSectionComposeViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun AddDocumentFabButtonPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         AddDocumentFabButton(
             onAddDocumentClick = {},
         )

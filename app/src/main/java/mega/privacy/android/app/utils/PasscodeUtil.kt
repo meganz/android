@@ -30,7 +30,7 @@ import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeLockStateUseCase
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
@@ -357,7 +357,7 @@ class PasscodeUtil @Inject constructor(
                             initialValue = true
                         )
                         if (locked) {
-                            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                                 PasscodeView(cryptObjectFactory = passcodeCryptObjectFactory)
                             }
                         }

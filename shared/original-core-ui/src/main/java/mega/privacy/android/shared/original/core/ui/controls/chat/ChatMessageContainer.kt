@@ -45,11 +45,11 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.react
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.reactionsList
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 internal const val TEST_TAG_FORWARD_ICON = "chat_message_container:forward_icon"
 
@@ -208,7 +208,7 @@ private fun ForwardIcon(
             .clickable { onForwardClicked() },
         painter = painterResource(id = R.drawable.ic_forward_circle),
         contentDescription = "Icon Forward",
-        tint = MegaTheme.colors.icon.secondary
+        tint = MegaOriginalTheme.colors.icon.secondary
     )
 }
 
@@ -220,7 +220,7 @@ private fun Preview(
     var isSelected by remember {
         mutableStateOf(parameter.checked)
     }
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         LazyColumn() {
             item {
                 ChatMessageContainer(
@@ -241,7 +241,7 @@ private fun Preview(
                             modifier = it,
                             painter = painterResource(id = R.drawable.ic_emoji_smile_medium_regular),
                             contentDescription = "Avatar",
-                            tint = MegaTheme.colors.icon.secondary
+                            tint = MegaOriginalTheme.colors.icon.secondary
                         )
                     },
                     content = parameter.content,

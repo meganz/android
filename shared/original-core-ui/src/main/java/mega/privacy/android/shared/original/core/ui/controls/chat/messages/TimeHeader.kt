@@ -15,8 +15,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 
 
@@ -51,14 +51,14 @@ fun TimeHeader(
                     .testTag(TEST_TAG_TIME_HEADER_USER_NAME),
                 text = it,
                 style = MaterialTheme.typography.caption,
-                color = MegaTheme.colors.text.primary
+                color = MegaOriginalTheme.colors.text.primary
             )
         }
         Text(
             modifier = Modifier.testTag(TEST_TAG_TIME_HEADER_TIME),
             text = timeString,
             style = MaterialTheme.typography.body4,
-            color = MegaTheme.colors.text.secondary
+            color = MegaOriginalTheme.colors.text.secondary
         )
     }
 }
@@ -68,7 +68,7 @@ fun TimeHeader(
 private fun PreviewTimeHeader(
     @PreviewParameter(BooleanProvider::class) isMine: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         TimeHeader(
             timeString = "Friday, Nov 14, 2023",
             displayAsMine = isMine,

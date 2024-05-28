@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Plain button with an outlined border
@@ -53,18 +53,18 @@ fun OutlinedWithoutBackgroundMegaButton(
     @DrawableRes iconId: Int? = null,
 ) {
     val color = if (enabled) {
-        MegaTheme.colors.button.outline
+        MegaOriginalTheme.colors.button.outline
     } else {
-        MegaTheme.colors.border.disabled
+        MegaOriginalTheme.colors.border.disabled
     }
     TextButton(
         modifier = modifier.widthIn(min = 100.dp),
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.Transparent,
-            contentColor = MegaTheme.colors.text.accent,
+            contentColor = MegaOriginalTheme.colors.text.accent,
             disabledBackgroundColor = Color.Transparent,
-            disabledContentColor = MegaTheme.colors.text.disabled,
+            disabledContentColor = MegaOriginalTheme.colors.text.disabled,
         ),
         onClick = onClick,
         shape = if (rounded) RoundedCornerShape(25.dp) else MaterialTheme.shapes.medium,
@@ -93,7 +93,7 @@ fun OutlinedWithoutBackgroundMegaButton(
 private fun OutlinedWithoutBackgroundMegaButtonPreview(
     @PreviewParameter(BooleanProvider::class) withIcon: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -121,7 +121,7 @@ private fun OutlinedWithoutBackgroundMegaButtonPreview(
 private fun OutlinedWithoutBackgroundMegaButtonPreview(
     @PreviewParameter(OutlinedWithoutBackgroundMegaButtonPreviewProvider::class) state: OutlinedWithoutBackgroundMegaButtonState,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)

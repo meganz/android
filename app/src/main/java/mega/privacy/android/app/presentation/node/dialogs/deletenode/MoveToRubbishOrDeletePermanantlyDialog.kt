@@ -10,7 +10,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 
 /**
@@ -62,7 +62,7 @@ private fun MoveToRubbishOrDeleteNodeDialogBody(
     onPositiveButtonClicked: () -> Unit,
     onNegativeButtonClicked: () -> Unit,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaAlertDialog(
             text = message,
             confirmButtonText = positiveText,
@@ -78,7 +78,7 @@ private fun MoveToRubbishOrDeleteNodeDialogBody(
 private fun MoveToRubbishOrDeleteNodeDialogBodyPreview(
     @PreviewParameter(BooleanProvider::class) isNodeInRubbish: Boolean,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MoveToRubbishOrDeleteNodeDialogBody(
             message = stringResource(id = R.string.confirmation_delete_from_mega),
             positiveText = stringResource(id = R.string.rubbish_bin_delete_confirmation_dialog_button_delete),

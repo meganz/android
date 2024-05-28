@@ -29,8 +29,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Loading messages header
@@ -43,7 +43,7 @@ fun LoadingMessagesHeader(
     val density = LocalDensity.current
 
     Box(modifier = modifier
-        .background(MegaTheme.colors.background.pageBackground)
+        .background(MegaOriginalTheme.colors.background.pageBackground)
         .onGloballyPositioned {
             componentHeight = with(density) { it.size.height.toDp() }
         }) {
@@ -53,7 +53,7 @@ fun LoadingMessagesHeader(
             modifier = modifier
                 .fillMaxWidth()
                 .testTag(TEST_TAG_LOADING_MESSAGES),
-            colorFilter = ColorFilter.tint(MegaTheme.colors.background.surface2)
+            colorFilter = ColorFilter.tint(MegaOriginalTheme.colors.background.surface2)
         )
         Spacer(
             modifier = Modifier
@@ -68,11 +68,11 @@ fun LoadingMessagesHeader(
 @Composable
 private fun shimmerBrush(): Brush {
     val shimmerColors = listOf(
-        MegaTheme.colors.background.pageBackground.copy(alpha = 0f),
-        MegaTheme.colors.background.pageBackground.copy(alpha = 0.2f),
-        MegaTheme.colors.background.pageBackground.copy(alpha = 0.6f),
-        MegaTheme.colors.background.pageBackground.copy(alpha = 0.2f),
-        MegaTheme.colors.background.pageBackground.copy(alpha = 0f),
+        MegaOriginalTheme.colors.background.pageBackground.copy(alpha = 0f),
+        MegaOriginalTheme.colors.background.pageBackground.copy(alpha = 0.2f),
+        MegaOriginalTheme.colors.background.pageBackground.copy(alpha = 0.6f),
+        MegaOriginalTheme.colors.background.pageBackground.copy(alpha = 0.2f),
+        MegaOriginalTheme.colors.background.pageBackground.copy(alpha = 0f),
     )
 
     val transition = rememberInfiniteTransition(label = "")
@@ -96,7 +96,7 @@ private fun shimmerBrush(): Brush {
 @CombinedThemePreviews
 @Composable
 private fun LoadingMessagesHeaderPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         LoadingMessagesHeader()
     }
 }

@@ -27,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import kotlin.time.Duration
 
 /**
@@ -46,12 +46,12 @@ fun ReturnToCallBanner(
 ) = Row(
     modifier = modifier
         .fillMaxWidth()
-        .background(MegaTheme.colors.button.primary)
+        .background(MegaOriginalTheme.colors.button.primary)
         .clickable { onBannerClicked() },
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.Center,
 ) {
-    val textStyle = MaterialTheme.typography.body2.copy(color = MegaTheme.colors.text.inverse)
+    val textStyle = MaterialTheme.typography.body2.copy(color = MegaOriginalTheme.colors.text.inverse)
     Text(
         text = text,
         style = textStyle,
@@ -91,7 +91,7 @@ private fun CallChronometer(duration: Duration, textStyle: TextStyle) {
 @CombinedThemePreviews
 @Composable
 private fun ReturnToCallBannerPreview() {
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         ReturnToCallBanner(
             text = "Return to call",
             onBannerClicked = {},

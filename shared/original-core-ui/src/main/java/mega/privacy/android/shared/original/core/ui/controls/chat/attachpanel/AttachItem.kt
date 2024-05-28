@@ -19,8 +19,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 
 /**
@@ -47,7 +47,7 @@ fun AttachItem(
         modifier = Modifier
             .size(48.dp)
             .background(
-                color = MegaTheme.colors.button.secondary,
+                color = MegaOriginalTheme.colors.button.secondary,
                 shape = CircleShape
             )
     ) {
@@ -58,14 +58,14 @@ fun AttachItem(
                 .size(24.dp)
                 .align(Alignment.Center)
                 .testTag(TEST_TAG_ATTACH_ITEM_ICON),
-            tint = MegaTheme.colors.icon.primary
+            tint = MegaOriginalTheme.colors.icon.primary
         )
     }
     Text(
         text = itemName,
         style = MaterialTheme.typography.body4,
         modifier = Modifier.padding(top = 2.dp),
-        color = MegaTheme.colors.text.primary
+        color = MegaOriginalTheme.colors.text.primary
     )
 }
 
@@ -76,7 +76,7 @@ fun AttachItemPlaceHolder(modifier: Modifier = Modifier) =
 @CombinedThemePreviews
 @Composable
 private fun AttachItemPreview() {
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         AttachItem(
             iconId = R.drawable.ic_menu,
             itemName = "Item",

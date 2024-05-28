@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaRadioButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.grey_700
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Creates one row for each element in @@FeatureFlag list
@@ -104,7 +104,7 @@ private fun FeatureFlagRowPreview() {
             if (enabled) "This is the subtitle, it goes away when you toggle this switch" else null
         }
     }
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FeatureFlagRow(
             name = "Test Flag",
             description = description,

@@ -36,7 +36,7 @@ import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 
 /**
@@ -250,7 +250,7 @@ private fun IconButtonWithTooltip(
             Icon(
                 painter = iconPainter,
                 contentDescription = description,
-                tint = if (enabled) LocalMegaAppBarColors.current.iconsTintColor else MegaTheme.colors.icon.disabled,
+                tint = if (enabled) LocalMegaAppBarColors.current.iconsTintColor else MegaOriginalTheme.colors.icon.disabled,
             )
         }
         Tooltip(showTooltip, description)

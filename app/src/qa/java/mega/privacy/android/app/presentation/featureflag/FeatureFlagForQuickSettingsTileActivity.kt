@@ -18,7 +18,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
 
 /**
@@ -47,7 +47,7 @@ class FeatureFlagForQuickSettingsTileActivity : BaseActivity() {
                     val mode by getThemeMode()
                         .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                     val uiState by featureFlagForQuickSettingsTileViewModel.state.collectAsStateWithLifecycle()
-                    MegaAppTheme(isDark = mode.isDarkMode()) {
+                    OriginalTempTheme(isDark = mode.isDarkMode()) {
                         MegaScaffold(
                             topBar = {
                                 MegaAppBar(

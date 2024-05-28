@@ -36,7 +36,7 @@ import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
@@ -184,7 +184,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
         navController = rememberNavController()
 
-        MegaAppTheme(isDark = isDark) {
+        OriginalTempTheme(isDark = isDark) {
             NavHost(
                 navController = navController,
                 startDestination = CREATE_SCHEDULED_MEETING_TAG

@@ -23,7 +23,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINod
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Test tag for the Device Center List View Item
@@ -137,7 +137,7 @@ private fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
 private fun DeviceCenterListViewItemDevicePreview(
     @PreviewParameter(DeviceCenterUINodeDeviceIconProvider::class) icon: DeviceCenterUINodeIcon,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(
                 id = "1234-5678",
@@ -158,7 +158,7 @@ private fun DeviceCenterListViewItemDevicePreview(
 private fun DeviceCenterListViewItemDeviceFolderPreview(
     @PreviewParameter(DeviceCenterUINodeFolderIconProvider::class) icon: DeviceCenterUINodeIcon,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = BackupDeviceFolderUINode(
                 id = "1234-5678",
@@ -179,7 +179,7 @@ private fun DeviceCenterListViewItemDeviceFolderPreview(
 @CombinedThemePreviews
 @Composable
 private fun DeviceCenterListViewItemDeviceWithEmptyTitlePreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(
                 id = "1234-5678",

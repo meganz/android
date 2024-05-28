@@ -18,9 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Card with header to display info
@@ -38,7 +38,7 @@ fun MegaCardWithHeader(
     Column(
         modifier = modifier.border(
             width = 1.dp,
-            color = MegaTheme.colors.border.strong,
+            color = MegaOriginalTheme.colors.border.strong,
             shape = RoundedCornerShape(12.dp),
         )
     ) {
@@ -46,7 +46,7 @@ fun MegaCardWithHeader(
             modifier = modifier
                 .height(28.dp)
                 .background(
-                    color = MegaTheme.colors.background.surface1,
+                    color = MegaOriginalTheme.colors.background.surface1,
                     shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
                 ),
         ) {
@@ -60,7 +60,7 @@ fun MegaCardWithHeader(
 @CombinedThemePreviews
 @Composable
 private fun MegaCardWithHeaderPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaCardWithHeader(
             header = {
                 Row(

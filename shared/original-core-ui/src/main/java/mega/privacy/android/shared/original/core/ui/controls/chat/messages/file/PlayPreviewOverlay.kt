@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.chat.VideoDuration
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Overlay for previews of playable files (usually videos) to better indicate that this file can be played.
@@ -36,7 +36,7 @@ fun PlayPreviewOverlay(
             .align(Alignment.Center)
             .padding(4.dp)
             .size(32.dp),
-        colorFilter = ColorFilter.tint(MegaTheme.colors.icon.onColor),
+        colorFilter = ColorFilter.tint(MegaOriginalTheme.colors.icon.onColor),
         painter = painterResource(id = IconPackR.drawable.ic_play_circle_medium_regular_solid),
         contentDescription = "Play"
     )
@@ -51,7 +51,7 @@ fun PlayPreviewOverlay(
 @Composable
 @CombinedThemePreviews
 private fun PlayPreviewOverlayPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         PlayPreviewOverlay(
             modifier = Modifier
                 .background(Color.Gray)

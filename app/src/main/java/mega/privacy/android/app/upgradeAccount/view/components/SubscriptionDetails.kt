@@ -30,9 +30,9 @@ import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.util.Locale
 
 /**
@@ -185,7 +185,7 @@ internal fun SubscriptionDetails(
 @CombinedThemePreviews
 @Composable
 fun SubscriptionDetailsPreview() {
-    MegaAppTheme(isDark = false) {
+    OriginalTempTheme(isDark = false) {
         SubscriptionDetails(
             onLinkClick = {},
             chosenPlan = AccountType.PRO_LITE,

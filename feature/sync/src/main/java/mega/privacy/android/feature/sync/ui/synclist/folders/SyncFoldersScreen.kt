@@ -37,8 +37,8 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefau
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun SyncFoldersScreen(
@@ -145,7 +145,7 @@ private fun SyncFoldersScreenEmptyState(
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenEmptyStatePreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             syncUiItems = emptyList(),
             cardExpanded = {},
@@ -161,7 +161,7 @@ private fun SyncFoldersScreenEmptyStatePreview() {
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenSyncingPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             listOf(
                 SyncUiItem(
@@ -189,7 +189,7 @@ private fun SyncFoldersScreenSyncingPreview() {
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenSyncingWithStalledIssuesPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             listOf(
                 SyncUiItem(

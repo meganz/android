@@ -22,7 +22,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 
 /**
@@ -70,7 +70,7 @@ internal fun FileVersionsView(
 @CombinedTextAndThemePreviews
 @Composable
 private fun FileVersionsPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FileVersionsView(versions = 5,
             onClick = {})
     }

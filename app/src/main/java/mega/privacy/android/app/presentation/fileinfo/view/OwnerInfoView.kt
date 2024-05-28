@@ -20,7 +20,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.ContactAvatarVerified
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.extensions.iconRes
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
@@ -82,7 +82,7 @@ internal fun OwnerInfoView(
 @CombinedTextAndThemePreviews
 @Composable
 private fun IncomeSharedInfoPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         OwnerInfoView(contactItemForPreviews)
     }
 }

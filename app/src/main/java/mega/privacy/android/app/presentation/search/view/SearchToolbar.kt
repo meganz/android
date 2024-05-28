@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.legacy.core.ui.controls.appbar.CollapsedSearchAppBar
 import mega.privacy.android.legacy.core.ui.controls.appbar.ExpandedSearchAppBar
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Search toolbar used in search activity
@@ -141,7 +141,7 @@ private fun SearchToolbarBody(
 @CombinedThemePreviews
 @Composable
 private fun PreviewSearchToolbarBody() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SearchToolbarBody(
             searchQuery = "searchQuery",
             menuActions = emptyList(),

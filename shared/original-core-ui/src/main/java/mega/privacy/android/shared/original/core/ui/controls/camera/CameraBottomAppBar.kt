@@ -35,8 +35,8 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.chip.Chip
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Camera bottom app bar
@@ -62,7 +62,7 @@ fun CameraBottomAppBar(
         modifier = modifier
             .fillMaxWidth()
             .height(172.dp)
-            .background(color = MegaTheme.colors.background.pageBackground),
+            .background(color = MegaOriginalTheme.colors.background.pageBackground),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Row(
@@ -201,7 +201,7 @@ private fun CaptureIcon(
             .size(56.dp)
             .clip(CircleShape)
             .clickable(onClick = onClick)
-            .border(2.dp, MegaTheme.colors.background.inverse, CircleShape)
+            .border(2.dp, MegaOriginalTheme.colors.background.inverse, CircleShape)
     ) {
         if (isRecording) {
             Box(
@@ -209,7 +209,7 @@ private fun CaptureIcon(
                     .align(Alignment.Center)
                     .size(24.dp)
                     .background(
-                        color = MegaTheme.colors.components.interactive,
+                        color = MegaOriginalTheme.colors.components.interactive,
                         shape = RoundedCornerShape(6.dp),
                     )
             )
@@ -218,7 +218,7 @@ private fun CaptureIcon(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(48.dp)
-                    .background(color = MegaTheme.colors.background.inverse, shape = CircleShape)
+                    .background(color = MegaOriginalTheme.colors.background.inverse, shape = CircleShape)
             ) {
                 if (isCaptureVideo) {
                     Box(
@@ -226,7 +226,7 @@ private fun CaptureIcon(
                             .size(12.dp)
                             .align(Alignment.Center)
                             .background(
-                                color = MegaTheme.colors.components.interactive,
+                                color = MegaOriginalTheme.colors.components.interactive,
                                 shape = CircleShape,
                             )
                     )
@@ -246,14 +246,14 @@ private fun CameraButton(
         modifier = modifier
             .size(48.dp)
             .clip(CircleShape)
-            .background(color = MegaTheme.colors.background.surface2, shape = CircleShape)
+            .background(color = MegaOriginalTheme.colors.background.surface2, shape = CircleShape)
             .clickable(onClick = onClick),
     ) {
         Icon(
             modifier = Modifier.align(Alignment.Center),
             painter = painterResource(id = iconResId),
             contentDescription = "Camera button",
-            tint = MegaTheme.colors.icon.onColor
+            tint = MegaOriginalTheme.colors.icon.onColor
         )
     }
 }
@@ -263,7 +263,7 @@ private fun CameraButton(
 private fun CameraBottomAppBarPreview(
     @PreviewParameter(BooleanProvider::class) isVideoSelected: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CameraBottomAppBar(
             isCaptureVideo = isVideoSelected,
             isRecording = false,
@@ -276,7 +276,7 @@ private fun CameraBottomAppBarPreview(
 private fun RecordingCameraBottomAppBarPreview(
     @PreviewParameter(BooleanProvider::class) isVideoSelected: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CameraBottomAppBar(
             isCaptureVideo = isVideoSelected,
             isRecording = true,

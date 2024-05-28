@@ -34,7 +34,7 @@ import mega.privacy.android.app.presentation.settings.reportissue.view.DiscardRe
 import mega.privacy.android.app.presentation.settings.reportissue.view.ReportIssueView
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
 
 /**
@@ -56,7 +56,7 @@ class ReportIssueFragment : Fragment() {
         setContent {
             val themeMode by getThemeMode()
                 .collectAsState(initial = ThemeMode.System)
-            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 ReportIssueView(viewModel)
             }
         }

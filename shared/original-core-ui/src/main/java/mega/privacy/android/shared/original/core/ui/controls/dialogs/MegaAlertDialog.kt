@@ -21,8 +21,8 @@ import mega.privacy.android.shared.original.core.ui.controls.preview.PreviewAler
 import mega.privacy.android.shared.original.core.ui.controls.preview.PreviewStringParameters
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 
 /**
@@ -224,7 +224,7 @@ fun MegaAlertDialog(
 private fun MegaAlertDialogPreview(
     @PreviewParameter(PreviewAlertDialogParametersProvider::class) texts: PreviewStringParameters,
 ) {
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         DialogBox {
             MegaAlertDialog(
                 text = texts.text.getText(),
@@ -240,7 +240,7 @@ private fun MegaAlertDialogPreview(
 @CombinedThemeRtlPreviews
 @Composable
 private fun MegaAlertDialogPreview() {
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         DialogBox {
             MegaAlertDialog(
                 title = "Delete node?",

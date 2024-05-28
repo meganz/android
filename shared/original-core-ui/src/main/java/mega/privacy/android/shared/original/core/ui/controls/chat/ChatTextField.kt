@@ -39,8 +39,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 internal const val CHAT_TEXT_FIELD_TEXT_TAG = "chat_text_field"
 internal const val CHAT_TEXT_FIELD_EMOJI_ICON = "chat_text_field:emoji_icon"
@@ -75,17 +75,17 @@ fun ChatTextField(
     focusRequester: FocusRequester = remember { FocusRequester() },
 ) = Box(modifier = modifier) {
     val colors = TextFieldDefaults.textFieldColors(
-        textColor = MegaTheme.colors.text.placeholder,
-        backgroundColor = MegaTheme.colors.background.surface1,
-        cursorColor = MegaTheme.colors.border.strongSelected,
-        errorCursorColor = MegaTheme.colors.text.error,
-        errorIndicatorColor = MegaTheme.colors.text.error,
+        textColor = MegaOriginalTheme.colors.text.placeholder,
+        backgroundColor = MegaOriginalTheme.colors.background.surface1,
+        cursorColor = MegaOriginalTheme.colors.border.strongSelected,
+        errorCursorColor = MegaOriginalTheme.colors.text.error,
+        errorIndicatorColor = MegaOriginalTheme.colors.text.error,
         focusedIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
     )
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = MegaTheme.colors.border.strongSelected,
-        backgroundColor = MegaTheme.colors.border.strongSelected
+        handleColor = MegaOriginalTheme.colors.border.strongSelected,
+        backgroundColor = MegaOriginalTheme.colors.border.strongSelected
     )
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
@@ -102,7 +102,7 @@ fun ChatTextField(
                 )
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
-            textStyle = MaterialTheme.typography.body1.copy(color = MegaTheme.colors.text.primary),
+            textStyle = MaterialTheme.typography.body1.copy(color = MegaOriginalTheme.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(false).value),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -153,7 +153,7 @@ fun ChatTextField(
             else R.drawable.ic_emoji_smile_medium_regular
         ),
         contentDescription = "Emoji Icon",
-        tint = MegaTheme.colors.icon.secondary
+        tint = MegaOriginalTheme.colors.icon.secondary
     )
 }
 
@@ -162,7 +162,7 @@ fun ChatTextField(
 private fun ChatTextFieldPreview(
     @PreviewParameter(BooleanProvider::class) isEmojiPickerShown: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatTextField(
             textFieldValue = TextFieldValue("how it looks like when the text is too long"),
             placeholder = "Message",

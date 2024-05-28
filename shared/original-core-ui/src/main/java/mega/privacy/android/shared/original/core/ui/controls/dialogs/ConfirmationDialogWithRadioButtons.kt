@@ -32,9 +32,9 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.Al
 import mega.privacy.android.shared.original.core.ui.controls.lists.SettingsItemWithRadioButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Confirmation dialog with radio button
@@ -171,7 +171,7 @@ private fun ScrollSeparator() = Spacer(
     Modifier
         .height(1.dp)
         .fillMaxWidth()
-        .background(MegaTheme.colors.border.strong)
+        .background(MegaOriginalTheme.colors.border.strong)
 )
 
 
@@ -180,7 +180,7 @@ private fun ScrollSeparator() = Spacer(
 private fun ConfirmationDialogWithRadioButtonsPreview() {
     val options = listOf("Light", "Dark", "Busy", "System default")
     var selected by remember { mutableStateOf(options[0]) }
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         ConfirmationDialogWithRadioButtons(
             titleText = "Dialog title",
             cancelButtonText = "Cancel",
@@ -204,7 +204,7 @@ private fun ConfirmationDialogWithRadioButtonsWithCancelPreview() {
         "System default",
     )
     var selected by remember { mutableStateOf(options[0]) }
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         ConfirmationDialogWithRadioButtons(
             titleText = "Dialog title",
             subTitleText = "Subtitle",
@@ -230,7 +230,7 @@ private fun ConfirmationDialogWithRadioButtonsWithScrollPreview() {
         "Yet another one",
     )
     var selected by remember { mutableStateOf(options[0]) }
-    AndroidTheme {
+    OriginalTempThemeForPreviews {
         ConfirmationDialogWithRadioButtons(
             modifier = Modifier.height(350.dp),
             titleText = "Dialog title",

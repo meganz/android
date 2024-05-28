@@ -62,12 +62,12 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaNode
 
 /**
@@ -495,7 +495,7 @@ internal fun PlayAllButtonView(
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistDetailViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistDetailView(
             playlist = null,
             isInputTitleValid = true,
@@ -526,7 +526,7 @@ private fun VideoPlaylistDetailViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistHeaderViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistHeaderView(
             modifier = Modifier,
             thumbnailList = listOf(null),
@@ -541,7 +541,7 @@ private fun VideoPlaylistHeaderViewPreview() {
 @CombinedThemePreviews
 @Composable
 private fun PlayAllButtonViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         PlayAllButtonView()
     }
 }

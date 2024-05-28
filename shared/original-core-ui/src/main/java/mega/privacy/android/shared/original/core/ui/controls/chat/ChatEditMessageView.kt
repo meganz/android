@@ -23,10 +23,10 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Chat edit message view
@@ -45,7 +45,7 @@ fun ChatEditMessageView(
             modifier = Modifier
                 .fillMaxHeight()
                 .width(2.dp)
-                .background(MegaTheme.colors.components.selectionControl)
+                .background(MegaOriginalTheme.colors.components.selectionControl)
         )
 
         Column(
@@ -73,7 +73,7 @@ fun ChatEditMessageView(
                 .padding(start = 8.dp)
                 .size(16.dp).clickable(onClick = onCloseEditing),
             painter = painterResource(id = R.drawable.ic_universal_close),
-            tint = MegaTheme.colors.icon.secondary,
+            tint = MegaOriginalTheme.colors.icon.secondary,
             contentDescription = "Icon close"
         )
     }
@@ -82,7 +82,7 @@ fun ChatEditMessageView(
 @CombinedThemePreviews
 @Composable
 private fun ChatEditMessageViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatEditMessageView(content = "This is a message")
     }
 }

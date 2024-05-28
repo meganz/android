@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Chip to filter lists based on user interaction
@@ -118,7 +118,7 @@ fun Chip(
 private fun ChipPreview(
     @PreviewParameter(BooleanProvider::class) selected: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Chip(selected = selected, contentDescription = "") {
             Text(
                 text = "Type"
@@ -132,7 +132,7 @@ private fun ChipPreview(
 private fun ChipWithIconPreview(
     @PreviewParameter(BooleanProvider::class) selected: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Chip(selected = selected, contentDescription = "") {
             Text(
                 text = "Type"
@@ -151,7 +151,7 @@ private fun ChipWithIconPreview(
 private fun ChipWithIconPreview2(
     @PreviewParameter(BooleanProvider::class) selected: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Chip(selected = selected, contentDescription = "") {
             Text(
                 text = "Type"

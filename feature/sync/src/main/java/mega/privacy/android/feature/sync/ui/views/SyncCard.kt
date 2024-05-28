@@ -40,12 +40,12 @@ import mega.privacy.android.shared.original.core.ui.controls.status.getStatusTex
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun SyncCard(
@@ -316,7 +316,7 @@ private fun SyncCardFooter(
 @CombinedThemePreviews
 @Composable
 private fun SyncCardExpandedPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
             SyncUiItem(
                 id = 1234L,
@@ -345,7 +345,7 @@ private fun SyncCardExpandedPreview() {
 @CombinedThemePreviews
 @Composable
 private fun SyncCardExpandedWithBannerPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
             SyncUiItem(
                 id = 1234L,
@@ -374,7 +374,7 @@ private fun SyncCardExpandedWithBannerPreview() {
 @CombinedThemePreviews
 @Composable
 private fun SyncCardCollapsedPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
             SyncUiItem(
                 id = 1234L,
@@ -403,7 +403,7 @@ private fun SyncCardCollapsedPreview() {
 @CombinedThemePreviews
 @Composable
 private fun SyncCardCollapsedWithBannerPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
             SyncUiItem(
                 id = 1234L,

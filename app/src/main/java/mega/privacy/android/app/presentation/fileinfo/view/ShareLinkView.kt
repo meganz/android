@@ -21,7 +21,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.time.Instant.now
 
 /**
@@ -71,7 +71,7 @@ internal fun ShareLinkView(
 @CombinedTextAndThemePreviews
 @Composable
 private fun ShareLinkPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ShareLinkView(
             link = "http://mega.nz/folder/longhpajsdfg",
             date = now().epochSecond,

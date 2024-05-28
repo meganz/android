@@ -15,7 +15,7 @@ import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel
 import mega.privacy.android.app.mediaplayer.queue.view.VideoQueueView
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Video queue fragment for displaying the video queue.
@@ -38,7 +38,7 @@ class VideoQueueFragment : Fragment() {
         ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                MegaAppTheme(isDark = true) {
+                OriginalTempTheme(isDark = true) {
                     VideoQueueView(
                         viewModel = videoQueueViewModel,
                         videoPlayerViewModel = videoPlayerViewModel,

@@ -23,7 +23,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.support.SupportEmailTicket
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,7 +48,7 @@ class ReportIssueViaEmailFragment : Fragment() {
                 .collectAsState(initial = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 ReportIssueViaEmailView(
                     uiState = uiState,
                     onDescriptionChanged = viewModel::setDescription,

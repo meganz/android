@@ -48,7 +48,7 @@ import mega.privacy.android.app.presentation.qrcode.mycode.view.QRCode
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.toSeedArray
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
@@ -299,7 +299,7 @@ private fun AlertNoAppAvailableDialog(
     onConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    MegaAppTheme(isDark = isDarkMode) {
+    OriginalTempTheme(isDark = isDarkMode) {
         val firstText = stringResource(id = R.string.intent_not_available_2fa)
         val secondText = stringResource(id = R.string.open_play_store_2fa)
         val text = "$firstText\n\n$secondText"
@@ -322,7 +322,7 @@ private fun AlertHelpDialog(
     onConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    MegaAppTheme(isDark = isDarkMode) {
+    OriginalTempTheme(isDark = isDarkMode) {
         ConfirmationDialog(
             title = stringResource(id = R.string.no_authentication_apps_title),
             text = stringResource(id = R.string.text_2fa_help),

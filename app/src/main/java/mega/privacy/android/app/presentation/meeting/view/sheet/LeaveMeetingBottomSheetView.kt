@@ -30,7 +30,7 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefau
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Leave meeting bottom sheet view
@@ -172,7 +172,7 @@ internal const val BOTTOM_SHEET_END_FOR_ALL_BUTTON =
 @CombinedThemePreviews
 @Composable
 private fun PreviewLeaveMeetingBottomSheetView() {
-    MegaAppTheme(isDark = true) {
+    OriginalTempTheme(isDark = true) {
         LeaveMeetingBottomSheetView(
             state = InMeetingUiState(),
             onAssignAndLeaveClick = {},

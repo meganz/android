@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Date header
@@ -34,7 +34,7 @@ fun DateHeader(
                 .testTag(TEST_TAG_DATE_HEADER_TIME),
             text = dateString,
             style = MaterialTheme.typography.subtitle2,
-            color = MegaTheme.colors.text.secondary
+            color = MegaOriginalTheme.colors.text.secondary
         )
     }
 }
@@ -42,7 +42,7 @@ fun DateHeader(
 @CombinedThemePreviews
 @Composable
 private fun PreviewDateHeader() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DateHeader(dateString = "Friday, Nov 14, 2023")
     }
 }

@@ -66,7 +66,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomState
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.ToggleMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
@@ -454,7 +454,7 @@ private fun GuestNameInputText(
 )
 @Composable
 internal fun PreviewWaitingRoomView() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         WaitingRoomView(
             state = WaitingRoomState(
                 chatId = -1,
@@ -484,7 +484,7 @@ internal fun PreviewWaitingRoomView() {
 )
 @Composable
 internal fun PreviewGuestWaitingRoomView() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         WaitingRoomView(
             state = WaitingRoomState(
                 chatId = -1,

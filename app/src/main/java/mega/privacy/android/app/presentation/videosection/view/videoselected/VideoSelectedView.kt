@@ -51,7 +51,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -238,7 +238,7 @@ private fun <T : TypedNode> rememberNodeListForGrid(
 @CombinedThemePreviews
 @Composable
 private fun VideoSelectedViewWithProgressBarPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoSelectedView(
             uiState = VideoSelectedState(
                 isLoading = true,
@@ -261,7 +261,7 @@ private fun VideoSelectedViewWithProgressBarPreview() {
 @CombinedThemePreviews
 @Composable
 private fun VideoSelectedViewWithEmptyViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoSelectedView(
             uiState = VideoSelectedState(
                 isLoading = false,

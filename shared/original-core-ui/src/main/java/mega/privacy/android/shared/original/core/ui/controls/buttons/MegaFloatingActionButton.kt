@@ -20,8 +20,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * MegaFloatingActionButton
@@ -45,7 +45,7 @@ fun MegaFloatingActionButton(
         modifier = modifier,
         style = style,
         enabled = enabled,
-        backgroundColor = MegaTheme.colors.button.primary,
+        backgroundColor = MegaOriginalTheme.colors.button.primary,
         content = content,
     )
 }
@@ -56,10 +56,10 @@ internal fun MegaFloatingActionButton(
     modifier: Modifier = Modifier,
     style: FloatingActionButtonStyle = FloatingActionButtonStyle.Big,
     enabled: Boolean = true,
-    backgroundColor: Color = MegaTheme.colors.button.primary,
-    iconTintColor: Color = MegaTheme.colors.icon.inverse,
-    backgroundColorDisabled: Color = MegaTheme.colors.button.disabled,
-    iconTintColorDisabled: Color = MegaTheme.colors.text.onColorDisabled,
+    backgroundColor: Color = MegaOriginalTheme.colors.button.primary,
+    iconTintColor: Color = MegaOriginalTheme.colors.icon.inverse,
+    backgroundColorDisabled: Color = MegaOriginalTheme.colors.button.disabled,
+    iconTintColorDisabled: Color = MegaOriginalTheme.colors.text.onColorDisabled,
     content: @Composable () -> Unit,
 ) {
     FloatingActionButton(
@@ -120,7 +120,7 @@ enum class FloatingActionButtonStyle(
 private fun MegaFloatingActionButtonPreview(
     @PreviewParameter(FloatingActionButtonPreviewProvider::class) styleEnabled: Pair<FloatingActionButtonStyle, Boolean>,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaFloatingActionButton(
             modifier = Modifier.padding(16.dp),
             style = styleEnabled.first,

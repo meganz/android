@@ -25,8 +25,8 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBarSu
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBarTitle
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBarTitleAndSubtitle
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 
 /**
@@ -129,15 +129,15 @@ fun CollapsibleHeaderWithTitle(
 @CombinedThemePreviews
 @Composable
 private fun CollapsibleHeaderPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CollapsibleHeaderWithTitle(AppBarType.MENU, "Title", "Subtitle") {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MegaTheme.colors.background.inverse),
+                    .background(MegaOriginalTheme.colors.background.inverse),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "preview", color = MegaTheme.colors.text.accent)
+                Text(text = "preview", color = MegaOriginalTheme.colors.text.accent)
             }
         }
     }

@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import java.text.BreakIterator
 
@@ -233,7 +233,7 @@ fun MiddleEllipsisText(
 private fun PreviewMiddleEllipsisText(
     @PreviewParameter(MiddleEllipsisTextProvider::class) text: String,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MiddleEllipsisText(
             text = text,
             color = Color.Green

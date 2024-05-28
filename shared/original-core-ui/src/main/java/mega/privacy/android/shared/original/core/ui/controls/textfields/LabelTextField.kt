@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.autofill
 
 /**
@@ -145,22 +145,22 @@ fun LabelTextField(
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isError = errorText != null
     val colors = TextFieldDefaults.textFieldColors(
-        textColor = MegaTheme.colors.text.primary,
-        backgroundColor = MegaTheme.colors.background.pageBackground,
-        cursorColor = MegaTheme.colors.border.strongSelected,
-        errorCursorColor = MegaTheme.colors.text.error,
-        errorIndicatorColor = MegaTheme.colors.text.error,
-        focusedIndicatorColor = MegaTheme.colors.border.disabled,
-        unfocusedIndicatorColor = MegaTheme.colors.border.disabled,
-        focusedLabelColor = MegaTheme.colors.text.accent,
-        unfocusedLabelColor = MegaTheme.colors.text.placeholder,
-        errorLabelColor = MegaTheme.colors.text.error,
+        textColor = MegaOriginalTheme.colors.text.primary,
+        backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
+        cursorColor = MegaOriginalTheme.colors.border.strongSelected,
+        errorCursorColor = MegaOriginalTheme.colors.text.error,
+        errorIndicatorColor = MegaOriginalTheme.colors.text.error,
+        focusedIndicatorColor = MegaOriginalTheme.colors.border.disabled,
+        unfocusedIndicatorColor = MegaOriginalTheme.colors.border.disabled,
+        focusedLabelColor = MegaOriginalTheme.colors.text.accent,
+        unfocusedLabelColor = MegaOriginalTheme.colors.text.placeholder,
+        errorLabelColor = MegaOriginalTheme.colors.text.error,
     )
     val focusRequester = remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = MegaTheme.colors.border.strongSelected,
-        backgroundColor = MegaTheme.colors.border.strongSelected
+        handleColor = MegaOriginalTheme.colors.border.strongSelected,
+        backgroundColor = MegaOriginalTheme.colors.border.strongSelected
     )
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
@@ -177,7 +177,7 @@ fun LabelTextField(
                     autofillTypes = if (isEmail) listOf(AutofillType.EmailAddress) else emptyList(),
                     onAutoFilled = { onTextChange(value.copy(text = it)) }
                 ),
-            textStyle = MaterialTheme.typography.subtitle1.copy(color = MegaTheme.colors.text.primary),
+            textStyle = MaterialTheme.typography.subtitle1.copy(color = MegaOriginalTheme.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
                 keyboardType = if (isEmail) KeyboardType.Email else KeyboardType.Text,
@@ -202,31 +202,31 @@ fun LabelTextField(
                         style = when {
                             isError && isFocused -> {
                                 MaterialTheme.typography.caption.copy(
-                                    color = MegaTheme.colors.text.error
+                                    color = MegaOriginalTheme.colors.text.error
                                 )
                             }
 
                             isError && value.text.isEmpty() -> {
                                 MaterialTheme.typography.body1.copy(
-                                    color = MegaTheme.colors.text.error
+                                    color = MegaOriginalTheme.colors.text.error
                                 )
                             }
 
                             isFocused -> {
                                 MaterialTheme.typography.caption.copy(
-                                    color = MegaTheme.colors.text.accent
+                                    color = MegaOriginalTheme.colors.text.accent
                                 )
                             }
 
                             value.text.isNotEmpty() -> {
                                 MaterialTheme.typography.caption.copy(
-                                    color = MegaTheme.colors.text.placeholder
+                                    color = MegaOriginalTheme.colors.text.placeholder
                                 )
                             }
 
                             else -> {
                                 MaterialTheme.typography.body1.copy(
-                                    color = MegaTheme.colors.text.placeholder
+                                    color = MegaOriginalTheme.colors.text.placeholder
                                 )
                             }
                         }
@@ -254,7 +254,7 @@ fun LabelTextField(
 private fun PreviewLabelTextField(
     @PreviewParameter(TextFieldProvider::class) state: TextFieldState,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         var text by remember { mutableStateOf(state.text) }
 
         LabelTextField(

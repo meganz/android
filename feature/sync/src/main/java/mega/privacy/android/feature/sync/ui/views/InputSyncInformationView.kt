@@ -20,17 +20,17 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.shared.original.core.ui.controls.cards.MegaCardWithHeader
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
-import mega.privacy.android.feature.sync.R
 
 @Composable
 internal fun InputSyncInformationView(
@@ -145,7 +145,7 @@ private fun TwoLinesItem(
 @CombinedThemePreviews
 @Composable
 private fun SyncEmptyScreenPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         InputSyncInformationView(
             selectDeviceFolderClicked = {},
             selectMegaFolderClicked = {},

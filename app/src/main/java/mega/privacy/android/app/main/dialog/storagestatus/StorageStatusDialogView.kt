@@ -38,7 +38,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.h6
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 internal const val TITLE_TAG = "storage_status_dialog:text_title"
 internal const val IMAGE_STATUS_TAG = "storage_status_dialog:image_status"
@@ -339,7 +339,7 @@ private fun getDetail(state: StorageStatusDialogState): DialogViewDetail {
 private fun PreviewHorizontalButtonDialog(
     @PreviewParameter(StorageStatusDialogPreviewProvider::class) storageState: StorageStatusDialogState,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         StorageStatusDialogView(
             state = storageState,
             dismissClickListener = {},

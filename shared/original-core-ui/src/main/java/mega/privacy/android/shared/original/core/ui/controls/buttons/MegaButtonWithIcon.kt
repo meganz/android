@@ -16,8 +16,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Button with icon
@@ -46,7 +46,7 @@ fun MegaButtonWithIcon(
                 contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally),
-                colorFilter = ColorFilter.tint(color = if (enabled) iconColor else MegaTheme.colors.icon.disabled)
+                colorFilter = ColorFilter.tint(color = if (enabled) iconColor else MegaOriginalTheme.colors.icon.disabled)
             )
         }
     }
@@ -57,7 +57,7 @@ fun MegaButtonWithIcon(
 private fun MegaButtonWithIconPreview(
     @PreviewParameter(BooleanProvider::class) enabled: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaButtonWithIcon(
             iconColor = Color.Cyan,
             icon = R.drawable.ic_info,

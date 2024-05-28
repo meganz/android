@@ -77,7 +77,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_te
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 internal object Constants {
     /**
@@ -472,7 +472,7 @@ internal fun EmptyFolderLinkView(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSimpleAppBarPreview")
 @Composable
 private fun PreviewFolderLinkTopAppBar() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FolderLinkTopAppBar(
             title = "Folder Name",
             elevation = false,
@@ -487,7 +487,7 @@ private fun PreviewFolderLinkTopAppBar() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSimpleAppBarPreview")
 @Composable
 private fun PreviewEmptyFolderLinkView() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         EmptyFolderLinkView(
             modifier = Modifier
                 .fillMaxWidth()
@@ -503,7 +503,7 @@ private fun PreviewEmptyFolderLinkView() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSimpleAppBarPreview")
 @Composable
 private fun PreviewFolderLinkSelectedTopAppBar() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FolderLinkSelectedTopAppBar(
             title = "Folder Name",
             elevation = false,
@@ -519,7 +519,7 @@ private fun PreviewFolderLinkSelectedTopAppBar() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSimpleAppBarPreview")
 @Composable
 private fun PreviewImportDownloadView() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ImportDownloadView(
             modifier = Modifier
                 .fillMaxWidth()

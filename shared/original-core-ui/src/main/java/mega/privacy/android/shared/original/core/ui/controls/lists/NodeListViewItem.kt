@@ -26,9 +26,9 @@ import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailVie
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Generic two line list item
@@ -157,7 +157,7 @@ fun NodeListViewItem(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_check_circle),
                     contentDescription = "Checked",
-                    tint = MegaTheme.colors.icon.accent,
+                    tint = MegaOriginalTheme.colors.icon.accent,
                     modifier = Modifier
                         .size(16.dp)
                         .testTag(VERSION_ICON_TAG)
@@ -241,7 +241,7 @@ private fun Circle(color: Color, modifier: Modifier = Modifier) {
 @CombinedThemePreviews
 @Composable
 private fun PreviewGenericTwoLineListViewItemSimple() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Simple title",
             subtitle = "Simple sub title",
@@ -253,7 +253,7 @@ private fun PreviewGenericTwoLineListViewItemSimple() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewGenericTwoLineListItemWithLongTitle() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title very big for testing the middle ellipsis",
             subtitle = "Subtitle very big for testing the middle ellipsis",
@@ -263,7 +263,7 @@ private fun PreviewGenericTwoLineListItemWithLongTitle() {
             showVersion = true,
             showFavourite = true,
             showLink = true,
-            labelColor = MegaTheme.colors.indicator.pink,
+            labelColor = MegaOriginalTheme.colors.indicator.pink,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg"
         )
     }
@@ -272,7 +272,7 @@ private fun PreviewGenericTwoLineListItemWithLongTitle() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewGenericTwoLineListItem() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title",
             subtitle = "Subtitle",
@@ -283,7 +283,7 @@ private fun PreviewGenericTwoLineListItem() {
             showVersion = true,
             showFavourite = true,
             showLink = true,
-            labelColor = MegaTheme.colors.indicator.pink,
+            labelColor = MegaOriginalTheme.colors.indicator.pink,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg"
         )
     }
@@ -292,7 +292,7 @@ private fun PreviewGenericTwoLineListItem() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewGenericTwoLineListItemWithoutMoreOption() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title",
             subtitle = "Subtitle",
@@ -303,7 +303,7 @@ private fun PreviewGenericTwoLineListItemWithoutMoreOption() {
             onInfoClicked = { },
             onMoreClicked = { },
             accessPermissionIcon = R.drawable.ic_sync,
-            labelColor = MegaTheme.colors.indicator.pink,
+            labelColor = MegaOriginalTheme.colors.indicator.pink,
             showIsVerified = true,
             isTakenDown = true,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg"

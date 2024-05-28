@@ -42,8 +42,8 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.autofill
 
 /**
@@ -71,22 +71,22 @@ fun PasswordTextField(
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isError = errorText != null
     val colors = TextFieldDefaults.textFieldColors(
-        textColor = MegaTheme.colors.text.primary,
-        backgroundColor = MegaTheme.colors.background.pageBackground,
-        cursorColor = MegaTheme.colors.border.strongSelected,
-        errorCursorColor = MegaTheme.colors.text.error,
-        errorIndicatorColor = MegaTheme.colors.support.error,
-        focusedIndicatorColor = MegaTheme.colors.border.strongSelected,
-        unfocusedIndicatorColor = MegaTheme.colors.border.disabled,
-        focusedLabelColor = MegaTheme.colors.text.accent,
-        unfocusedLabelColor = MegaTheme.colors.text.placeholder,
-        errorLabelColor = MegaTheme.colors.text.error,
+        textColor = MegaOriginalTheme.colors.text.primary,
+        backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
+        cursorColor = MegaOriginalTheme.colors.border.strongSelected,
+        errorCursorColor = MegaOriginalTheme.colors.text.error,
+        errorIndicatorColor = MegaOriginalTheme.colors.support.error,
+        focusedIndicatorColor = MegaOriginalTheme.colors.border.strongSelected,
+        unfocusedIndicatorColor = MegaOriginalTheme.colors.border.disabled,
+        focusedLabelColor = MegaOriginalTheme.colors.text.accent,
+        unfocusedLabelColor = MegaOriginalTheme.colors.text.placeholder,
+        errorLabelColor = MegaOriginalTheme.colors.text.error,
     )
     var isFocused by remember { mutableStateOf(false) }
     var showPassword by remember { mutableStateOf(false) }
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = MegaTheme.colors.border.strongSelected,
-        backgroundColor = MegaTheme.colors.border.strongSelected
+        handleColor = MegaOriginalTheme.colors.border.strongSelected,
+        backgroundColor = MegaOriginalTheme.colors.border.strongSelected
     )
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
@@ -104,7 +104,7 @@ fun PasswordTextField(
                 .autofill(
                     autofillTypes = listOf(AutofillType.Password), onAutoFilled = onTextChange
                 ),
-            textStyle = MaterialTheme.typography.subtitle1.copy(color = MegaTheme.colors.text.primary),
+            textStyle = MaterialTheme.typography.subtitle1.copy(color = MegaOriginalTheme.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -130,11 +130,11 @@ fun PasswordTextField(
                         text = hintString,
                         modifier = Modifier.padding(bottom = if (isFocused) 6.dp else 0.dp),
                         style = when {
-                            isError && isFocused -> MaterialTheme.typography.caption.copy(color = MegaTheme.colors.text.error)
-                            isError && text.isEmpty() -> MaterialTheme.typography.body1.copy(color = MegaTheme.colors.text.error)
-                            isFocused -> MaterialTheme.typography.caption.copy(color = MegaTheme.colors.text.accent)
-                            text.isNotEmpty() -> MaterialTheme.typography.caption.copy(color = MegaTheme.colors.text.placeholder)
-                            else -> MaterialTheme.typography.body1.copy(color = MegaTheme.colors.text.placeholder)
+                            isError && isFocused -> MaterialTheme.typography.caption.copy(color = MegaOriginalTheme.colors.text.error)
+                            isError && text.isEmpty() -> MaterialTheme.typography.body1.copy(color = MegaOriginalTheme.colors.text.error)
+                            isFocused -> MaterialTheme.typography.caption.copy(color = MegaOriginalTheme.colors.text.accent)
+                            text.isNotEmpty() -> MaterialTheme.typography.caption.copy(color = MegaOriginalTheme.colors.text.placeholder)
+                            else -> MaterialTheme.typography.body1.copy(color = MegaOriginalTheme.colors.text.placeholder)
                         }
                     )
                 },
@@ -147,7 +147,7 @@ fun PasswordTextField(
                                 onClick = { showPassword = !showPassword },
                             ),
                             painter = painterResource(id = R.drawable.ic_visibility_outline),
-                            tint = if (showPassword) MegaTheme.colors.icon.accent else MegaTheme.colors.icon.disabled,
+                            tint = if (showPassword) MegaOriginalTheme.colors.icon.accent else MegaOriginalTheme.colors.icon.disabled,
                             contentDescription = "see"
                         )
                     }
@@ -168,7 +168,7 @@ fun PasswordTextField(
 private fun PreviewErrorPasswordTextField(
     @PreviewParameter(TextFieldProvider::class) state: TextFieldState,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         var text by remember { mutableStateOf(state.text) }
 
         PasswordTextField(

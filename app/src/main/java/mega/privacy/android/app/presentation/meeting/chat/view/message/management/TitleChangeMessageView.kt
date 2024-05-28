@@ -18,9 +18,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.chat.messages.management.TitleChangeMessage
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Title change message view
@@ -93,7 +93,7 @@ internal fun TitleChangeMessageView(
 @CombinedThemePreviews
 @Composable
 private fun TitleChangeMessageViewPreview() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         TitleChangeMessageView(
             newTitle = "New title",
             ownerActionFullName = "My name"

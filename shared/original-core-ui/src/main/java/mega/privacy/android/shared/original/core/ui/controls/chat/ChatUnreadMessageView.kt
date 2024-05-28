@@ -11,9 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Chat unread message view
@@ -28,7 +28,7 @@ fun ChatUnreadMessageView(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = MegaTheme.colors.background.surface2)
+            .background(color = MegaOriginalTheme.colors.background.surface2)
             .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -42,7 +42,7 @@ fun ChatUnreadMessageView(
 @CombinedThemePreviews
 @Composable
 private fun ChatUnreadMessageViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         ChatUnreadMessageView("5 unread messages")
     }
 }

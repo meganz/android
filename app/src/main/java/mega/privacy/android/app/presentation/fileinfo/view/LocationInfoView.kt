@@ -21,7 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 
 /**
@@ -60,7 +60,7 @@ internal fun LocationInfoView(
 @Composable
 private fun LocationInfoViewPreview() {
     var counter by remember { mutableStateOf(0) }
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         LocationInfoView(location = "CloudDrive $counter", onClick = {
             counter++
         })
