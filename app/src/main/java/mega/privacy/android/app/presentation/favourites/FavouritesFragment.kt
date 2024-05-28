@@ -375,7 +375,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                                 menuOptionsSource = ImagePreviewMenuSource.FAVOURITE,
                                 anchorImageNodeId = NodeId(handle),
                                 params = mapOf(FavouriteImageNodeFetcher.NODE_ID to handle),
-                                showScreenLabel = false,
                             )
                         )
                     } else {

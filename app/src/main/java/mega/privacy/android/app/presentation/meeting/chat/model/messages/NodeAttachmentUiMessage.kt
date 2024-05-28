@@ -221,7 +221,6 @@ data class NodeAttachmentUiMessage(
             imageSource = ImagePreviewFetcherSource.CHAT,
             menuOptionsSource = ImagePreviewMenuSource.CHAT,
             anchorImageNodeId = nodeId,
-            showScreenLabel = false,
             params = mapOf(
                 ChatImageNodeFetcher.CHAT_ROOM_ID to chatId,
                 ChatImageNodeFetcher.MESSAGE_IDS to messageIds

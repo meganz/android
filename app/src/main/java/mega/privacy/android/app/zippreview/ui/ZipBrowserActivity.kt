@@ -300,7 +300,6 @@ class ZipBrowserActivity : PasscodeActivity() {
                 imageSource = ImagePreviewFetcherSource.ZIP,
                 menuOptionsSource = ImagePreviewMenuSource.ZIP,
                 anchorImageNodeId = NodeId(file.hashCode().toLong()),
-                showScreenLabel = false,
                 params = mapOf(ZipImageNodeFetcher.URI to "${file.toUri()}")
             )
             startActivity(intent)

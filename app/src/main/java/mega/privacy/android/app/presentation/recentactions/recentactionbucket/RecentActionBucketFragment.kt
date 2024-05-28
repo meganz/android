@@ -441,7 +441,6 @@ class RecentActionBucketFragment : Fragment() {
             menuOptionsSource = menuOptionSource,
             anchorImageNodeId = NodeId(node.handle),
             params = mapOf(DefaultImageNodeFetcher.NODE_IDS to nodeIds),
-            showScreenLabel = false,
         )
         putThumbnailLocation(
             intent,

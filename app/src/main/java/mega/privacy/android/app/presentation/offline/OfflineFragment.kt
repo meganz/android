@@ -796,7 +796,6 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
                     menuOptionsSource = ImagePreviewMenuSource.OFFLINE,
                     anchorImageNodeId = NodeId(handle),
                     params = mapOf(OfflineImageNodeFetcher.PATH to node.node.path),
-                    showScreenLabel = false,
                 )
 
                 putThumbnailLocation(

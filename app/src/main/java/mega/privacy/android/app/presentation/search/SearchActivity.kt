@@ -605,7 +605,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             menuOptionsSource = menuOptionsSource,
             anchorImageNodeId = currentFileNode.id,
             params = mapOf(paramKey to currentFileNodeParentId),
-            showScreenLabel = false
         )
         startActivity(intent)
     }

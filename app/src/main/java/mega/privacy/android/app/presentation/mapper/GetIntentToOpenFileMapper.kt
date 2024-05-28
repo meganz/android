@@ -253,7 +253,6 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
                     menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
                     anchorImageNodeId = fileNode.id,
-                    showScreenLabel = false,
                     params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to parentNodeHandle),
                 )
             } else if (viewType == INCOMING_SHARES_ADAPTER || viewType == OUTGOING_SHARES_ADAPTER) {
@@ -264,7 +263,6 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     menuOptionsSource = ImagePreviewMenuSource.SHARED_ITEMS,
                     anchorImageNodeId = fileNode.id,
                     params = mapOf(SharedItemsImageNodeFetcher.PARENT_ID to parentNodeHandle),
-                    showScreenLabel = false,
                 )
             } else if (viewType == LINKS_ADAPTER) {
                 val parentNodeHandle = fileNode.parentId.longValue
@@ -274,7 +272,6 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     menuOptionsSource = ImagePreviewMenuSource.LINKS,
                     anchorImageNodeId = fileNode.id,
                     params = mapOf(SharedItemsImageNodeFetcher.PARENT_ID to parentNodeHandle),
-                    showScreenLabel = false,
                 )
             } else if (viewType == RUBBISH_BIN_ADAPTER) {
                 ImagePreviewActivity.createIntent(
@@ -282,7 +279,6 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     imageSource = ImagePreviewFetcherSource.RUBBISH_BIN,
                     menuOptionsSource = ImagePreviewMenuSource.RUBBISH_BIN,
                     anchorImageNodeId = fileNode.id,
-                    showScreenLabel = false,
                     params = mapOf(RubbishBinImageNodeFetcher.PARENT_ID to fileNode.parentId.longValue),
                 )
             } else {

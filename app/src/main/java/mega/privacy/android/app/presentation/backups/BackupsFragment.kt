@@ -544,7 +544,6 @@ class BackupsFragment : RotatableFragment() {
                     imageSource = ImagePreviewFetcherSource.BACKUPS,
                     menuOptionsSource = ImagePreviewMenuSource.BACKUPS,
                     anchorImageNodeId = NodeId(node.handle),
-                    showScreenLabel = false,
                     params = mapOf(
                         BackupsImageNodeFetcher.PARENT_ID to parentNodeLongValue,
                     ),

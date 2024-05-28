@@ -88,14 +88,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables new Image Preview flag
-     */
-    ImagePreview(
-        "Enables new Image Preview flag",
-        false,
-    ),
-
-    /**
      * Enables prefetch timeline photos as soon initialization screen completed
      */
     PrefetchTimeline(

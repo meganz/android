@@ -278,7 +278,6 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                         imageSource = ImagePreviewFetcherSource.PUBLIC_FILE,
                         menuOptionsSource = ImagePreviewMenuSource.PUBLIC_FILE,
                         params = mapOf(PublicFileImageNodeFetcher.URL to url),
-                        showScreenLabel = false,
                     )
                     viewModel.updateImageIntent(intent)
                 }

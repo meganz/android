@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -104,20 +103,11 @@ class ImagePreviewActivity : BaseActivity() {
         )
     }
     private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
-    private val showScreenLabel: Boolean by lazy {
-        intent.getBooleanExtra("show_screen_label", false)
-    }
-    private val isForeign: Boolean by lazy {
-        intent.getBooleanExtra(IMAGE_PREVIEW_IS_FOREIGN, false)
-    }
 
     private var tempNodeId: NodeId? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (showScreenLabel) {
-            Toast.makeText(this, "New Image Preview", Toast.LENGTH_SHORT).show()
-        }
         Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
         if (savedInstanceState != null) {
             nodeSaver.restoreState(savedInstanceState)
@@ -418,7 +408,6 @@ class ImagePreviewActivity : BaseActivity() {
             anchorImageNodeId: NodeId? = null,
             params: Map<String, Any> = mapOf(),
             isForeign: Boolean = false,
-            showScreenLabel: Boolean = true,
         ): Intent {
             return Intent(context, ImagePreviewActivity::class.java).apply {
                 putExtra(IMAGE_NODE_FETCHER_SOURCE, imageSource)
@@ -426,8 +415,6 @@ class ImagePreviewActivity : BaseActivity() {
                 putExtra(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE, anchorImageNodeId?.longValue)
                 putExtra(FETCHER_PARAMS, bundleOf(*params.toList().toTypedArray()))
                 putExtra(IMAGE_PREVIEW_IS_FOREIGN, isForeign)
-                // For QA & Dev purpose: To remove once new Image Preview migration is done
-                putExtra("show_screen_label", showScreenLabel)
             }
         }
 
@@ -438,7 +425,6 @@ class ImagePreviewActivity : BaseActivity() {
             anchorImageNodeId: Long? = null,
             params: Map<String, Any> = mapOf(),
             isForeign: Boolean = false,
-            showScreenLabel: Boolean = true,
         ): Intent {
             return createIntent(
                 context = context,
@@ -447,7 +433,6 @@ class ImagePreviewActivity : BaseActivity() {
                 anchorImageNodeId = anchorImageNodeId?.let { NodeId(it) },
                 params = params,
                 isForeign = isForeign,
-                showScreenLabel = showScreenLabel,
             )
         }
     }

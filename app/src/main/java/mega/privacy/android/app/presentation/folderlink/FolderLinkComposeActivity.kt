@@ -308,7 +308,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                                 params = mapOf(
                                     FolderLinkImageNodeFetcher.PARENT_ID to parentNodeLongValue,
                                 ),
-                                showScreenLabel = false,
                             )
                             viewModel.updateImageIntent(intent)
                         }

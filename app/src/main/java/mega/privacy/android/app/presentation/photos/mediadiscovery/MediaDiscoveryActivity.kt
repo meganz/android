@@ -255,7 +255,6 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                 params = mapOf(
                     FolderLinkMediaDiscoveryImageNodeFetcher.PARENT_ID to mediaHandle,
                 ),
-                showScreenLabel = false,
             ).run {
                 startActivity(this)
             }

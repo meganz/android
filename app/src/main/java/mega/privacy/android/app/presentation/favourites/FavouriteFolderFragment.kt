@@ -198,7 +198,6 @@ class FavouriteFolderFragment : Fragment() {
                                         handle
                                     )
                                 ),
-                                showScreenLabel = false,
                             )
                         )
                     } else {

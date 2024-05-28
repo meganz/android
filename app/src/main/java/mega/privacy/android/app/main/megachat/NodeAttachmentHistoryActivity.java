@@ -70,7 +70,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -742,7 +741,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 ImagePreviewMenuSource.CHAT,
                 currentNodeHandle,
                 previewParams,
-                false,
                 false
         );
         startActivity(intent);

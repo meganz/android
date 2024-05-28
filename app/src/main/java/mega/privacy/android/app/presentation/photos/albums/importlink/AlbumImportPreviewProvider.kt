@@ -107,7 +107,6 @@ class AlbumImportPreviewProvider @Inject constructor(
                         menuOptionsSource = ImagePreviewMenuSource.MEDIA_DISCOVERY,
                         anchorImageNodeId = NodeId(photo.id),
                         params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to recursive),
-                        showScreenLabel = false,
                     ).run {
                         activity.startActivity(this)
                     }
@@ -125,7 +124,6 @@ class AlbumImportPreviewProvider @Inject constructor(
             imageSource = ImagePreviewFetcherSource.ALBUM_SHARING,
             menuOptionsSource = ImagePreviewMenuSource.ALBUM_SHARING,
             anchorImageNodeId = NodeId(photo.id),
-            showScreenLabel = false,
         )
         activity.startActivity(intent)
     }

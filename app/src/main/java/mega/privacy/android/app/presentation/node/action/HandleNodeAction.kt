@@ -227,7 +227,6 @@ private fun openImageViewerActivity(
         menuOptionsSource = menuOptionsSource,
         anchorImageNodeId = currentFileNode.id,
         params = mapOf(paramKey to currentFileNodeParentId),
-        showScreenLabel = false
     )
 
     context.startActivity(intent)

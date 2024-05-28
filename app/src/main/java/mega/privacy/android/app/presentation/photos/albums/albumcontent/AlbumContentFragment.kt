@@ -214,7 +214,6 @@ class AlbumContentFragment : Fragment() {
                     menuOptionsSource = ImagePreviewMenuSource.ALBUM_CONTENT,
                     anchorImageNodeId = NodeId(anchorPhoto.id),
                     params = params,
-                    showScreenLabel = false,
                 )
                 startActivity(intent)
             }
