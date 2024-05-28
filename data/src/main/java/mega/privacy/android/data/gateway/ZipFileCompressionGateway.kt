@@ -48,7 +48,7 @@ internal class ZipFileCompressionGateway @Inject constructor() : FileCompression
         folder: File,
         zipOutputStream: ZipOutputStream,
     ) {
-        val path = if (parentDirectory == "") {
+        val path = if (parentDirectory.isBlank()) {
             folder.name + File.separator
         } else {
             parentDirectory + File.separator + folder.name + File.separator
@@ -63,9 +63,11 @@ internal class ZipFileCompressionGateway @Inject constructor() : FileCompression
         zipOutputStream: ZipOutputStream,
         data: ByteArray,
     ) {
-        FileInputStream(file).use {
-            BufferedInputStream(it).use { stream ->
-                val path = parentDirectory + File.separator + file.name
+        FileInputStream(file).use { fileInputStream ->
+            BufferedInputStream(fileInputStream).use { stream ->
+                val folderPath =
+                    parentDirectory.takeUnless { it.isBlank() }?.let { it + File.separator } ?: ""
+                val path = folderPath + file.name
                 createZipEntry(path, file, zipOutputStream)
                 while (true) {
                     val readBytes = stream.read(data)
