@@ -4,10 +4,12 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.domain.entity.chat.PendingMessageState
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndNodeHandleRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndPathRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
@@ -44,6 +46,30 @@ interface PendingMessageDao {
      */
     @Update(entity = PendingMessageEntity::class)
     suspend fun update(updatePendingMessageStateRequest: UpdatePendingMessageStateRequest)
+
+    /**
+     * Update multiple pending messages in a single transaction
+     *
+     * @param updatePendingMessageStateRequests
+     */
+    @Transaction
+    suspend fun updateMultiple(updatePendingMessageStateRequests: List<UpdatePendingMessageRequest>) {
+        for (request in updatePendingMessageStateRequests) {
+            when (request) {
+                is UpdatePendingMessageStateRequest ->
+                    update(request)
+
+                is UpdatePendingMessageStateAndNodeHandleRequest ->
+                    update(request)
+
+                is UpdatePendingMessageTransferTagRequest ->
+                    update(request)
+
+                is UpdatePendingMessageStateAndPathRequest ->
+                    update(request)
+            }
+        }
+    }
 
     /**
      * Update the pending message

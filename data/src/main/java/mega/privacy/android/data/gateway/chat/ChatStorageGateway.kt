@@ -85,7 +85,7 @@ interface ChatStorageGateway {
      *
      * @param updatePendingMessageRequest
      */
-    suspend fun updatePendingMessage(updatePendingMessageRequest: UpdatePendingMessageRequest)
+    suspend fun updatePendingMessage(vararg updatePendingMessageRequest: UpdatePendingMessageRequest)
 
     /**
      * Delete pending message by id

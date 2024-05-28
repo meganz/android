@@ -162,10 +162,10 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     })
 
     override suspend fun updatePendingMessage(
-        updatePendingMessageRequest: UpdatePendingMessageRequest,
+        vararg updatePendingMessageRequests: UpdatePendingMessageRequest,
     ) {
         return withContext(ioDispatcher) {
-            chatStorageGateway.updatePendingMessage(updatePendingMessageRequest)
+            chatStorageGateway.updatePendingMessage(updatePendingMessageRequest = updatePendingMessageRequests)
         }
     }
 

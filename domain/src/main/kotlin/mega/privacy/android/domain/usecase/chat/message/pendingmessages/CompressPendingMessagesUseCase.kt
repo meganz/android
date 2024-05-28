@@ -99,15 +99,15 @@ class CompressPendingMessagesUseCase @Inject constructor(
                                                 (it as? ChatUploadCompressionState.Compressed)?.file
                                             }.firstOrNull()
                                         // Once the file is compressed, let's set its state to ready to upload
-                                        pendingMessages.forEach { pendingMessage ->
-                                            updatePendingMessageUseCase(
+                                        updatePendingMessageUseCase(
+                                            updatePendingMessageRequests = pendingMessages.map { pendingMessage ->
                                                 UpdatePendingMessageStateAndPathRequest(
                                                     pendingMessage.id,
                                                     PendingMessageState.READY_TO_UPLOAD,
                                                     (compressed ?: original).path,
                                                 )
-                                            )
-                                        }
+                                            }.toTypedArray()
+                                        )
                                     }
                                 }
                             }

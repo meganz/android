@@ -35,4 +35,18 @@ class UpdatePendingMessageUseCaseTest() {
 
         verify(chatMessageRepository).updatePendingMessage(updatePendingMessageRequest)
     }
+
+    @Test
+    fun `test that the chat message repository is called with correct parameter when there are multiple updates`() =
+        runTest {
+            val updatePendingMessageRequest1 = mock<UpdatePendingMessageStateRequest>()
+            val updatePendingMessageRequest2 = mock<UpdatePendingMessageStateRequest>()
+
+            underTest(updatePendingMessageRequest1, updatePendingMessageRequest2)
+
+            verify(chatMessageRepository).updatePendingMessage(
+                updatePendingMessageRequest1,
+                updatePendingMessageRequest2
+            )
+        }
 }

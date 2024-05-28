@@ -121,19 +121,23 @@ internal class ChatStorageFacade @Inject constructor(
         pendingMessageEntities: List<PendingMessageEntity>,
     ) = database.pendingMessageDao().insert(pendingMessageEntities)
 
-    override suspend fun updatePendingMessage(updatePendingMessageRequest: UpdatePendingMessageRequest) {
-        when (updatePendingMessageRequest) {
-            is UpdatePendingMessageStateRequest ->
-                database.pendingMessageDao().update(updatePendingMessageRequest)
+    override suspend fun updatePendingMessage(vararg updatePendingMessageRequests: UpdatePendingMessageRequest) {
+        updatePendingMessageRequests.singleOrNull()?.let { updatePendingMessageRequest ->
+            when (updatePendingMessageRequest) {
+                is UpdatePendingMessageStateRequest ->
+                    database.pendingMessageDao().update(updatePendingMessageRequest)
 
-            is UpdatePendingMessageStateAndNodeHandleRequest ->
-                database.pendingMessageDao().update(updatePendingMessageRequest)
+                is UpdatePendingMessageStateAndNodeHandleRequest ->
+                    database.pendingMessageDao().update(updatePendingMessageRequest)
 
-            is UpdatePendingMessageTransferTagRequest ->
-                database.pendingMessageDao().update(updatePendingMessageRequest)
+                is UpdatePendingMessageTransferTagRequest ->
+                    database.pendingMessageDao().update(updatePendingMessageRequest)
 
-            is UpdatePendingMessageStateAndPathRequest ->
-                database.pendingMessageDao().update(updatePendingMessageRequest)
+                is UpdatePendingMessageStateAndPathRequest ->
+                    database.pendingMessageDao().update(updatePendingMessageRequest)
+            }
+        } ?: run {
+            database.pendingMessageDao().updateMultiple(updatePendingMessageRequests.toList())
         }
     }
 

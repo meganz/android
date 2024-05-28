@@ -221,10 +221,10 @@ interface ChatMessageRepository {
     /**
      * Update pending message
      *
-     * @param updatePendingMessageRequest
+     * @param updatePendingMessageRequests
      */
     suspend fun updatePendingMessage(
-        updatePendingMessageRequest: UpdatePendingMessageRequest,
+        vararg updatePendingMessageRequests: UpdatePendingMessageRequest,
     )
 
     /**

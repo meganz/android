@@ -5,7 +5,7 @@ import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import javax.inject.Inject
 
 /**
- * Use case to update a pending message
+ * Use case to update one or several pending messages
  */
 class UpdatePendingMessageUseCase @Inject constructor(
     private val chatMessageRepository: ChatMessageRepository,
@@ -14,7 +14,7 @@ class UpdatePendingMessageUseCase @Inject constructor(
     /**
      * Invoke
      */
-    suspend operator fun invoke(updatePendingMessageRequest: UpdatePendingMessageRequest) {
-        chatMessageRepository.updatePendingMessage(updatePendingMessageRequest)
+    suspend operator fun invoke(vararg updatePendingMessageRequests: UpdatePendingMessageRequest) {
+        chatMessageRepository.updatePendingMessage(updatePendingMessageRequests = updatePendingMessageRequests)
     }
 }

@@ -53,14 +53,14 @@ class HandleChatUploadTransferEventUseCase @Inject constructor(
             }
         //mark as error if it's a temporary error (typically an over quota error)
         if (singleTransferEvent?.transferEvent is TransferEvent.TransferTemporaryErrorEvent) {
-            pendingMessageIds.forEach { pendingMessageId ->
-                updatePendingMessageUseCase(
+            updatePendingMessageUseCase(
+                updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
                     UpdatePendingMessageStateRequest(
                         pendingMessageId,
                         PendingMessageState.ERROR_UPLOADING
                     )
-                )
-            }
+                }.toTypedArray()
+            )
         }
     }
 }

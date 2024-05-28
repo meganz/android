@@ -63,6 +63,19 @@ class ChatStorageFacadeTest {
         }
     }
 
+    @Test
+    fun `test that multiple pending message update requests calls the transaction dao update`() =
+        runTest {
+            val updates = pendingMessageUpdatesProvider()
+
+            val pendingMessageDao = mock<PendingMessageDao>()
+            whenever(database.pendingMessageDao()) doReturn pendingMessageDao
+
+            underTest.updatePendingMessage(updatePendingMessageRequests = updates.toTypedArray())
+
+            verify(pendingMessageDao).updateMultiple(updates)
+        }
+
     @ParameterizedTest
     @EnumSource(PendingMessageState::class)
     fun `test that get pending messages by state returns result from pending message dao`(state: PendingMessageState) =

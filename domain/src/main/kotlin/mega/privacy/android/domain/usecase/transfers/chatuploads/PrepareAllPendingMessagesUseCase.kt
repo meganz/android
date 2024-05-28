@@ -51,39 +51,39 @@ class PrepareAllPendingMessagesUseCase @Inject constructor(
                                     )
                                     when {
                                         cacheCopy == null -> {
-                                            pendingMessageIds.forEach { pendingMessageId ->
-                                                updatePendingMessageUseCase(
+                                            updatePendingMessageUseCase(
+                                                updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
                                                     UpdatePendingMessageStateRequest(
                                                         pendingMessageId,
                                                         PendingMessageState.ERROR_UPLOADING,
                                                     )
-                                                )
-                                            }
+                                                }.toTypedArray()
+                                            )
                                         }
 
                                         chatAttachmentNeedsCompressionUseCase(cacheCopy) -> {
-                                            pendingMessageIds.forEach { pendingMessageId ->
-                                                updatePendingMessageUseCase(
+                                            updatePendingMessageUseCase(
+                                                updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
                                                     UpdatePendingMessageStateAndPathRequest(
                                                         pendingMessageId,
                                                         PendingMessageState.COMPRESSING,
                                                         cacheCopy.path,
                                                     )
-                                                )
-                                            }
+                                                }.toTypedArray()
+                                            )
                                         }
 
                                         else -> {
                                             //ready to upload
-                                            pendingMessageIds.forEach { pendingMessageId ->
-                                                updatePendingMessageUseCase(
+                                            updatePendingMessageUseCase(
+                                                updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
                                                     UpdatePendingMessageStateAndPathRequest(
                                                         pendingMessageId,
                                                         PendingMessageState.READY_TO_UPLOAD,
                                                         cacheCopy.path,
                                                     )
-                                                )
-                                            }
+                                                }.toTypedArray()
+                                            )
                                         }
                                     }
                                 }

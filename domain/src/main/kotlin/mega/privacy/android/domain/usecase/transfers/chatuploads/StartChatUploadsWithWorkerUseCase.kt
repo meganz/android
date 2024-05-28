@@ -73,14 +73,14 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
             doTransfers = {
                 if (chatAttachmentNeedsCompressionUseCase(file)) {
                     //if needs compression, skip the upload and update the state to COMPRESSING, it will be compressed and uploaded in the Worker
-                    pendingMessageIds.forEach { pendingMessageId ->
-                        updatePendingMessageUseCase(
+                    updatePendingMessageUseCase(
+                        updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
                             UpdatePendingMessageStateRequest(
                                 pendingMessageId,
                                 PendingMessageState.COMPRESSING
                             )
-                        )
-                    }
+                        }.toTypedArray()
+                    )
                     emptyFlow()
                 } else {
                     uploadFilesUseCase(

@@ -40,23 +40,24 @@ class StartUploadingAllPendingMessagesUseCase @Inject constructor(
                                 mapOf(file to filesAndNames.second),
                                 pendingMessages.map { it.id }
                             )
-                            pendingMessages.forEach { pendingMessage ->
-                                updatePendingMessageUseCase(
+                            updatePendingMessageUseCase(
+                                updatePendingMessageRequests = pendingMessages.map { pendingMessage ->
                                     UpdatePendingMessageStateRequest(
                                         pendingMessage.id,
                                         PendingMessageState.UPLOADING,
                                     )
-                                )
-                            }
+                                }.toTypedArray()
+                            )
                         } ?: run {
-                            pendingMessages.forEach { pendingMessage ->
-                                updatePendingMessageUseCase(
+
+                            updatePendingMessageUseCase(
+                                updatePendingMessageRequests = pendingMessages.map { pendingMessage ->
                                     UpdatePendingMessageStateRequest(
                                         pendingMessage.id,
                                         PendingMessageState.ERROR_UPLOADING,
                                     )
-                                )
-                            }
+                                }.toTypedArray()
+                            )
                         }
                     }
                 pendingMessageList.size

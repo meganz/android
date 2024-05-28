@@ -332,6 +332,21 @@ class ChatMessageRepositoryImplTest {
     }
 
     @Test
+    fun `test that updatePendingMessage invokes gateway update when there are multiple updates`() =
+        runTest {
+            val updatePendingMessageRequest1 = mock<UpdatePendingMessageStateRequest>()
+            val updatePendingMessageRequest2 = mock<UpdatePendingMessageStateRequest>()
+            underTest.updatePendingMessage(
+                updatePendingMessageRequest1,
+                updatePendingMessageRequest2
+            )
+            verify(chatStorageGateway).updatePendingMessage(
+                updatePendingMessageRequest1,
+                updatePendingMessageRequest2
+            )
+        }
+
+    @Test
     fun `test that forward contact invokes api and returns the message`() = runTest {
         val chatMessage = mock<MegaChatMessage>()
         val message = mock<ChatMessage>()
