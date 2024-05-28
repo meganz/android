@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.rxFlowable
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.chat.MonitorCallsReconnectingStatusUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -49,7 +51,7 @@ class GetCallSoundsUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
     private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase,
-    private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
+    private val monitorCallsReconnectingStatusUseCase: MonitorCallsReconnectingStatusUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
@@ -102,7 +104,7 @@ class GetCallSoundsUseCase @Inject constructor(
                 }
             }
 
-            getCallStatusChangesUseCase.getReconnectingStatus()
+            rxFlowable<Boolean> { monitorCallsReconnectingStatusUseCase() }
                 .subscribeBy(
                     onNext = {
                         if (it) {

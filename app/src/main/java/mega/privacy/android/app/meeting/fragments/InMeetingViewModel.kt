@@ -53,7 +53,6 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChange
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChangeType
-import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetNetworkChangesUseCase
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
@@ -80,6 +79,7 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorCallReconnectingStatusUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
@@ -126,7 +126,7 @@ import javax.inject.Inject
  * @property getCallUseCase                     [GetCallUseCase]
  * @property startChatCall                      [StartChatCall]
  * @property getNetworkChangesUseCase           [GetNetworkChangesUseCase]
- * @property getCallStatusChangesUseCase        [GetCallStatusChangesUseCase]
+ * @property monitorCallReconnectingStatusUseCase       [MonitorCallReconnectingStatusUseCase]
  * @property endCallUseCase                     [EndCallUseCase]
  * @property getParticipantsChangesUseCase      [GetParticipantsChangesUseCase]
  * @property rtcAudioManagerGateway             [RTCAudioManagerGateway]
@@ -168,7 +168,7 @@ class InMeetingViewModel @Inject constructor(
     private val getCallUseCase: GetCallUseCase,
     private val startChatCall: StartChatCall,
     private val getNetworkChangesUseCase: GetNetworkChangesUseCase,
-    private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
+    private val monitorCallReconnectingStatusUseCase: MonitorCallReconnectingStatusUseCase,
     private val endCallUseCase: EndCallUseCase,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
@@ -219,7 +219,7 @@ class InMeetingViewModel @Inject constructor(
 
     private var anotherCallInProgressDisposable: Disposable? = null
     private var networkQualityDisposable: Disposable? = null
-    private var reconnectingDisposable: Disposable? = null
+    private var reconnectingJob: Job? = null
 
     private var monitorParticipatingInAnotherCallJob: Job? = null
     private var monitorChatRoomUpdatesJob: Job? = null
@@ -891,17 +891,14 @@ class InMeetingViewModel @Inject constructor(
      * Method that controls whether to display the reconnecting banner
      */
     private fun checkReconnectingChanges() {
-        reconnectingDisposable?.dispose()
-        reconnectingDisposable =
-            getCallStatusChangesUseCase.getReconnectingStatus(_state.value.currentChatId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = {
-                        _showReconnectingBanner.value = it
-                    },
-                    onError = Timber::e
-                ).addTo(composite)
+        reconnectingJob?.cancel()
+        reconnectingJob = viewModelScope.launch {
+            monitorCallReconnectingStatusUseCase(_state.value.currentChatId)
+                .catch { Timber.e(it) }
+                .collectLatest {
+                    _showReconnectingBanner.value = it
+                }
+        }
     }
 
     /**
