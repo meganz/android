@@ -4,8 +4,8 @@ import mega.privacy.android.build.shouldUsePrebuiltSdk
 plugins {
     alias(plugin.plugins.ksp) apply false
     id("org.jetbrains.kotlin.android") version "1.9.22" apply false
-    id("mega.android.release") version "0.21.20240522023511"
-    id("mega.android.cicd") version "0.21.20240522023511"
+    id("mega.android.release") version lib.versions.megagradle.get()
+    id("mega.android.cicd") version lib.versions.megagradle.get()
 }
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.

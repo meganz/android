@@ -27,6 +27,7 @@ sqlcipher = "4.5.4"
 kotlin-serialisation = "1.6.3"
 eclipse-jgit = "6.6.0.202305301015-r"
 json = "20230227"
+megagradle = "0.22.20240528013745"
 
 [libraries]
 anko-commons = { module = "org.jetbrains.anko:anko-commons", version.ref = "anko" }
