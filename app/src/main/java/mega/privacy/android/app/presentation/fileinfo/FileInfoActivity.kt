@@ -19,6 +19,7 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -64,6 +65,8 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.mobile.analytics.event.NodeInfoDescriptionAddedMessageDisplayedEvent
+import mega.privacy.mobile.analytics.event.NodeInfoScreenEvent
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -132,6 +135,7 @@ class FileInfoActivity : BaseActivity() {
         configureActivityResultLaunchers()
         initFileBackupManager()
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        Analytics.tracker.trackEvent(NodeInfoScreenEvent)
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -512,6 +516,9 @@ class FileInfoActivity : BaseActivity() {
 
             is FileInfoOneOffViewEvent.Message -> {
                 snackBarHostState.showSnackbar(getString(event.message))
+                if (event is FileInfoOneOffViewEvent.Message.NodeDescriptionAdded) {
+                    Analytics.tracker.trackEvent(NodeInfoDescriptionAddedMessageDisplayedEvent)
+                }
             }
 
             is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
