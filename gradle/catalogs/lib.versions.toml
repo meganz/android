@@ -28,7 +28,7 @@ kotlin-serialisation = "1.6.3"
 eclipse-jgit = "6.6.0.202305301015-r"
 json = "20230227"
 megagradle = "0.22.20240528013745"
-mega-core-ui = "2.6.20240527115645"
+mega-core-ui = "2.8.20240528052404"
 
 [libraries]
 anko-commons = { module = "org.jetbrains.anko:anko-commons", version.ref = "anko" }
@@ -86,7 +86,7 @@ kotlin-serialisation = { module = "org.jetbrains.kotlinx:kotlinx-serialization-j
 eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "eclipse-jgit"}
 eclipse-jgit-ssh-jsch = { module = "org.eclipse.jgit:org.eclipse.jgit.ssh.jsch", version.ref = "eclipse-jgit"}
 json = { module = "org.json:json", version.ref = "json"}
-mega-core-ui = { module = "mega.android.core:ui", version.ref = "mega-core-ui" }
+mega-core-ui = { group = "mega.android.core", name  = "ui", version.ref = "mega-core-ui" }
 mega-core-ui-tokens = { group = "mega.android.core", name  = "ui-tokens", version.ref = "mega-core-ui"}
 
 [bundles]

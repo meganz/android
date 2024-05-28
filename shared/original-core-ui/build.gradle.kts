@@ -55,7 +55,4 @@ dependencies {
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.compose.junit)
-
-    debugImplementation(lib.kotlinpoet)
-    debugImplementation(google.gson)
 }
