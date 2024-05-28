@@ -169,6 +169,7 @@ fun MeetingsActionButtons(
 ) {
 
     val context = LocalContext.current
+    val textStyle = MaterialTheme.typography.caption.copy(fontSize = 10.sp)
     val backgroundTint by remember(backgroundTintAlpha) {
         derivedStateOf {
             val colorStart = Color(ContextCompat.getColor(context, R.color.grey_032_white_054))
@@ -243,7 +244,7 @@ fun MeetingsActionButtons(
                     MegaText(
                         text = stringResource(id = R.string.general_mic),
                         textColor = TextColor.Primary,
-                        style = MaterialTheme.typography.caption.copy(fontSize = 10.sp)
+                        style = textStyle
                     )
                 }
 
@@ -293,7 +294,7 @@ fun MeetingsActionButtons(
                     MegaText(
                         text = stringResource(id = R.string.general_camera),
                         textColor = TextColor.Primary,
-                        style = MaterialTheme.typography.caption.copy(fontSize = 10.sp)
+                        style = textStyle
                     )
                 }
 
@@ -324,7 +325,7 @@ fun MeetingsActionButtons(
                     MegaText(
                         text = stringResource(id = stringId),
                         textColor = TextColor.Primary,
-                        style = MaterialTheme.typography.caption.copy(fontSize = 10.sp)
+                        style = textStyle
                     )
                 }
 
@@ -333,7 +334,7 @@ fun MeetingsActionButtons(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     val isOn = rememberSaveable(moreEnabled) { mutableStateOf(moreEnabled) }
-                    if (isRaiseHandToolTipShown) {
+                    if (isRaiseHandToolTipShown || backgroundTintAlpha == 1.0F) {
                         OnOffFab(
                             modifier = Modifier.testTag(MORE_BUTTON),
                             isOn = isOn,
@@ -368,7 +369,10 @@ fun MeetingsActionButtons(
                                     offBackgroundTint = backgroundTint,
                                     onIconTint = Color.White,
                                     offIconTint = Color.White,
-                                    onOff = onMoreClicked
+                                    onOff = {
+                                        onMoreClicked?.invoke(it)
+                                        onRaiseToRandTooltipDismissed?.invoke()
+                                    }
                                 )
                             },
                             onDismissed = {
@@ -380,7 +384,7 @@ fun MeetingsActionButtons(
                     MegaText(
                         text = stringResource(id = R.string.meetings_more_call_option_button),
                         textColor = TextColor.Primary,
-                        style = MaterialTheme.typography.caption.copy(fontSize = 10.sp)
+                        style = textStyle
                     )
                 }
 
@@ -416,7 +420,7 @@ fun MeetingsActionButtons(
                     MegaText(
                         text = stringResource(id = R.string.meeting_end),
                         textColor = TextColor.Primary,
-                        style = MaterialTheme.typography.caption.copy(fontSize = 10.sp)
+                        style = textStyle
                     )
                 }
             }

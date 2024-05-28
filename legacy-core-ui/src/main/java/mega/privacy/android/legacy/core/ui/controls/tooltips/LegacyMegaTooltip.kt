@@ -2,7 +2,6 @@ package mega.privacy.android.legacy.core.ui.controls.tooltips
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.MaterialTheme
@@ -14,11 +13,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.skydoves.balloon.ArrowOrientationRules
 import com.skydoves.balloon.ArrowPositionRules
@@ -94,13 +91,7 @@ fun LegacyMegaTooltip(
             }
         },
         balloonContent = {
-            Column(
-                modifier = if (LocalLayoutDirection.current == LayoutDirection.Rtl) {
-                    Modifier.fillMaxWidth()
-                } else {
-                    Modifier.wrapContentWidth()
-                }
-            ) {
+            Column(modifier = Modifier.wrapContentWidth()) {
                 if (titleText != null) {
                     Text(
                         text = titleText,
