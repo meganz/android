@@ -1,11 +1,11 @@
-package mega.privacy.android.shared.original.core.ui.controls.lists
+package mega.privacy.android.legacy.core.ui.controls.lists
 
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.icon.pack.R
@@ -64,13 +64,12 @@ class MediaQueueItemViewTest {
             MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
             MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG,
             MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG,
-            MEDIA_QUEUE_ITEM_NAME_TEST_TAG,
-            MEDIA_QUEUE_ITEM_DURATION_TEST_TAG
         ).forEach { viewTag ->
             viewTag.isDisplayed()
         }
 
-        MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
+        composeTestRule.onNodeWithText(testDuration).assertIsDisplayed()
+        composeTestRule.onNodeWithText(testName).assertIsDisplayed()
 
         listOf(
             MEDIA_QUEUE_ITEM_SELECT_ICON_TEST_TAG,
@@ -84,10 +83,6 @@ class MediaQueueItemViewTest {
     private fun String.isDisplayed() =
         composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsDisplayed()
 
-    private fun String.textEquals(expectedText: String) =
-        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true)
-            .assertTextEquals(expectedText)
-
     private fun String.doesNotExist() =
         composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertDoesNotExist()
 
@@ -99,13 +94,12 @@ class MediaQueueItemViewTest {
             MEDIA_QUEUE_ITEM_VIEW_TEST_TAG,
             MEDIA_QUEUE_ITEM_SELECT_ICON_TEST_TAG,
             MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG,
-            MEDIA_QUEUE_ITEM_NAME_TEST_TAG,
-            MEDIA_QUEUE_ITEM_DURATION_TEST_TAG
         ).forEach { viewTag ->
             viewTag.isDisplayed()
         }
 
-        MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
+        composeTestRule.onNodeWithText(testDuration).assertIsDisplayed()
+        composeTestRule.onNodeWithText(testName).assertIsDisplayed()
 
         listOf(
             MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
@@ -125,13 +119,12 @@ class MediaQueueItemViewTest {
             MEDIA_QUEUE_ITEM_VIEW_TEST_TAG,
             MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
             MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG,
-            MEDIA_QUEUE_ITEM_NAME_TEST_TAG,
-            MEDIA_QUEUE_ITEM_DURATION_TEST_TAG
         ).forEach { viewTag ->
             viewTag.isDisplayed()
         }
 
-        MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
+        composeTestRule.onNodeWithText(testDuration).assertIsDisplayed()
+        composeTestRule.onNodeWithText(testName).assertIsDisplayed()
 
         listOf(
             MEDIA_QUEUE_ITEM_SELECT_ICON_TEST_TAG,
@@ -149,8 +142,6 @@ class MediaQueueItemViewTest {
 
         listOf(
             MEDIA_QUEUE_ITEM_VIEW_TEST_TAG,
-            MEDIA_QUEUE_ITEM_NAME_TEST_TAG,
-            MEDIA_QUEUE_ITEM_DURATION_TEST_TAG,
             MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
             MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG,
         ).forEach { viewTag ->
@@ -158,7 +149,8 @@ class MediaQueueItemViewTest {
         }
 
         val expectedDuration = "$testCurrentPlayingPosition / $testDuration"
-        MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(expectedDuration)
+        composeTestRule.onNodeWithText(expectedDuration).assertIsDisplayed()
+        composeTestRule.onNodeWithText(testName).assertIsDisplayed()
 
         listOf(
             MEDIA_QUEUE_ITEM_PAUSED_BACKGROUND_TEST_TAG,
@@ -176,8 +168,6 @@ class MediaQueueItemViewTest {
 
         listOf(
             MEDIA_QUEUE_ITEM_VIEW_TEST_TAG,
-            MEDIA_QUEUE_ITEM_NAME_TEST_TAG,
-            MEDIA_QUEUE_ITEM_DURATION_TEST_TAG,
             MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
             MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG,
             MEDIA_QUEUE_ITEM_PAUSED_BACKGROUND_TEST_TAG,
@@ -187,7 +177,8 @@ class MediaQueueItemViewTest {
         }
 
         val expectedDuration = "$testCurrentPlayingPosition / $testDuration"
-        MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(expectedDuration)
+        composeTestRule.onNodeWithText(expectedDuration).assertIsDisplayed()
+        composeTestRule.onNodeWithText(testName).assertIsDisplayed()
 
         MEDIA_QUEUE_ITEM_SELECT_ICON_TEST_TAG.doesNotExist()
         MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG.doesNotExist()

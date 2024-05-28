@@ -1,4 +1,4 @@
-package mega.privacy.android.shared.original.core.ui.controls.lists
+package mega.privacy.android.legacy.core.ui.controls.lists
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
@@ -6,7 +6,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,13 +24,9 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.core.R
-import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.AndroidTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaTheme
-import mega.privacy.android.shared.original.core.ui.theme.tokens.Colors
-import mega.privacy.android.shared.original.core.ui.theme.tokens.TextColor
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * The media queue item view
@@ -63,26 +58,12 @@ fun MediaQueueItemView(
     isSelected: Boolean = false,
 ) {
     GenericTwoLineListItem(
-        title = {
-            MegaText(
-                modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_NAME_TEST_TAG),
-                text = name,
-                textColor = TextColor.Primary,
-                overflow = LongTextBehaviour.MiddleEllipsis
-            )
-        },
+        title = name,
         modifier = modifier.testTag(MEDIA_QUEUE_ITEM_VIEW_TEST_TAG),
-        subtitle = {
-            MegaText(
-                modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_DURATION_TEST_TAG),
-                text = if (isItemPlaying) {
-                    "$currentPlayingPosition / $duration"
-                } else {
-                    duration
-                },
-                textColor = TextColor.Secondary,
-                style = MaterialTheme.typography.caption
-            )
+        subtitle = if (isItemPlaying) {
+            "$currentPlayingPosition / $duration"
+        } else {
+            duration
         },
         icon = {
             QueueThumbnailView(
@@ -105,7 +86,7 @@ fun MediaQueueItemView(
                         .testTag(MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG),
                     painter = painterResource(R.drawable.ic_reorder),
                     contentDescription = "Reorder",
-                    colorFilter = ColorFilter.tint(MegaTheme.colors.icon.secondary)
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
                 )
             }
         },
@@ -150,7 +131,7 @@ private fun QueueThumbnailView(
                     modifier = Modifier
                         .size(24.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Colors.Neutral.n800)
+                        .background(Color.DarkGray)
                         .testTag(MEDIA_QUEUE_ITEM_PAUSED_BACKGROUND_TEST_TAG),
                     contentAlignment = Alignment.Center
                 ) {
@@ -170,40 +151,10 @@ private fun QueueThumbnailView(
     }
 }
 
-@Composable
-private fun QueueInfoView(
-    name: String,
-    currentPlayingPosition: String,
-    isItemPlaying: Boolean,
-    duration: String,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-    ) {
-        MegaText(
-            modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_NAME_TEST_TAG),
-            text = name,
-            textColor = TextColor.Primary
-        )
-
-        MegaText(
-            modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_DURATION_TEST_TAG),
-            text = if (isItemPlaying) {
-                "$currentPlayingPosition / $duration"
-            } else {
-                duration
-            },
-            textColor = TextColor.Secondary,
-            style = MaterialTheme.typography.caption
-        )
-    }
-}
-
 @CombinedThemePreviews
 @Composable
 private fun MediaQueueItemInfoViewWithPausedPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             onClick = {},
@@ -221,7 +172,7 @@ private fun MediaQueueItemInfoViewWithPausedPreview() {
 @CombinedThemePreviews
 @Composable
 private fun MediaQueueItemInfoViewWithSelectedPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemView(
             icon = iconPackR.drawable.ic_video_medium_solid,
             onClick = {},
@@ -238,7 +189,7 @@ private fun MediaQueueItemInfoViewWithSelectedPreview() {
 @CombinedThemePreviews
 @Composable
 private fun MediaQueueItemInfoViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         MediaQueueItemView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             onClick = {},
@@ -280,16 +231,6 @@ const val MEDIA_QUEUE_ITEM_PAUSED_BACKGROUND_TEST_TAG = "media_queue_item:box_pa
  * Test tag for the paused image of the media queue item
  */
 const val MEDIA_QUEUE_ITEM_PAUSED_ICON_TEST_TAG = "media_queue_item:image_paused"
-
-/**
- * Test tag for the name of the media queue item
- */
-const val MEDIA_QUEUE_ITEM_NAME_TEST_TAG = "media_queue_item:text_name"
-
-/**
- * Test tag for the duration of the media queue item
- */
-const val MEDIA_QUEUE_ITEM_DURATION_TEST_TAG = "media_queue_item:text_duration"
 
 /**
  * Test tag for the reorder icon of the media queue item
