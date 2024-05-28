@@ -42,7 +42,7 @@ class VideoQueueFragment : Fragment() {
                     VideoQueueView(
                         viewModel = videoQueueViewModel,
                         videoPlayerViewModel = videoPlayerViewModel,
-                        onDragFinished = { videoPlayerViewModel.updatePlaySource() },
+                        onDragFinished = { videoPlayerViewModel.updatePlaySource(false) },
                         onMove = { from, to ->
                             videoQueueViewModel.updateMediaQueueAfterReorder(from, to)
                             videoPlayerViewModel.swapItems(from, to)

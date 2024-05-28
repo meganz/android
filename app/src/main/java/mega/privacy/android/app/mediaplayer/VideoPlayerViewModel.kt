@@ -1217,7 +1217,7 @@ class VideoPlayerViewModel @Inject constructor(
 
         mediaPlayerGateway.buildPlaySources(mediaPlaySources)
 
-        if (_mediaPlaybackState.value) {
+        if (_mediaPlaybackState.value && mediaPlaySources.isRestartPlaying) {
             mediaPlayerGateway.setPlayWhenReady(true)
         }
 
@@ -1777,7 +1777,7 @@ class VideoPlayerViewModel @Inject constructor(
     /**
      * Updated the play source of exoplayer after reordered.
      */
-    internal fun updatePlaySource() {
+    internal fun updatePlaySource(isRestartPlaying: Boolean = true) {
         if (playlistItemsChanged.isNotEmpty() && playSourceChanged.isNotEmpty()) {
             _playlistItemsState.update {
                 it.copy(playlistItemsChanged.toList())
@@ -1785,7 +1785,8 @@ class VideoPlayerViewModel @Inject constructor(
             _playerSourcesState.update {
                 it.copy(
                     mediaItems = playSourceChanged.toList(),
-                    newIndexForCurrentItem = playingPosition
+                    newIndexForCurrentItem = playingPosition,
+                    isRestartPlaying = isRestartPlaying
                 )
             }
             playSourceChanged.clear()
