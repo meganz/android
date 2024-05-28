@@ -194,6 +194,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     private val dragToExit by lazy {
         DragToExitSupport(
             context = this,
+            coroutineScope = lifecycleScope,
             dragActivated = this::onDragActivated
         ) {
             finish()

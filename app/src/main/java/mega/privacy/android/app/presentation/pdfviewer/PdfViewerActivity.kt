@@ -165,7 +165,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     )
 
     // it's only used for enter animation
-    private val dragToExit = DragToExitSupport(this, null, null)
+    private val dragToExit = DragToExitSupport(this, lifecycleScope,null, null)
     private var nC: NodeController? = null
     private var handler: Handler? = null
     private var fromChat = false

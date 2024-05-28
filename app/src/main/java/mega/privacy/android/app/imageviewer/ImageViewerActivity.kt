@@ -576,7 +576,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     private fun setupAttachers(savedInstanceState: Bundle?) {
-        dragToExit = DragToExitSupport(this, { activate ->
+        dragToExit = DragToExitSupport(this, lifecycleScope, { activate ->
             if (activate) {
                 dragStarted = true
                 binding.imagesNavHostFragment.setBackgroundResource(android.R.color.transparent)

@@ -18,14 +18,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.Constants.EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIEWER_FROM
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -34,7 +33,6 @@ import mega.privacy.android.app.utils.Constants.LOCATION_INDEX_HEIGHT
 import mega.privacy.android.app.utils.Constants.LOCATION_INDEX_LEFT
 import mega.privacy.android.app.utils.Constants.LOCATION_INDEX_TOP
 import mega.privacy.android.app.utils.Constants.LOCATION_INDEX_WIDTH
-import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 
@@ -42,15 +40,15 @@ import timber.log.Timber
 /**
  * Class that encapsulate all logic related to drag to exit support, and the enter animation.
  *
- * It uses LiveEventBus to decouple thumbnail display screen, e.g. OfflineFragment, and
- * draggable view display screen, e.g. MediaPlayerActivity.
  *
  * @param context Android context
+ * @param coroutineScope CoroutineScope to launch coroutines
  * @param dragActivated callback for drag event, parameter will be true when drag is activated
  * @param fadeOutFinishCallback callback to fade out and finish activity
  */
 class DragToExitSupport(
     private val context: Context,
+    private val coroutineScope: CoroutineScope,
     private val dragActivated: ((Boolean) -> Unit)?,
     private val fadeOutFinishCallback: (() -> Unit)?,
 ) : DraggableView.DraggableListener, ViewAnimator.Listener, DraggableView.DraggableViewListener {
@@ -240,25 +238,12 @@ class DragToExitSupport(
         // `currentHandle` may be updated before `visibilityEvent` executes, so we need
         // construct `event` beforehand.
         val event = ThumbnailVisibilityEvent(viewerFrom, handle, false, currentHandle)
-        val visibilityEvent = {
-            LiveEventBus.get(
-                EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY, ThumbnailVisibilityEvent::class.java
-            ).post(event)
-        }
-
-        if (currentHandle != INVALID_HANDLE) {
-
-            lifecycleOwner.lifecycleScope.launch {
+        lifecycleOwner.lifecycleScope.launch {
+            if (currentHandle != INVALID_HANDLE) {
                 dragToExitFlow.emit(ScrollEvent(viewerFrom, handle))
             }
-
-            // When we need scroll, post the visibility event on the next UI cycle,
-            // in case the item isn't scrolled up to visible at now.
-            post(visibilityEvent)
-        } else {
-            visibilityEvent()
+            dragToExitThumbnailVisibilityFlow.emit(event)
         }
-
         currentHandle = handle
     }
 
@@ -305,9 +290,15 @@ class DragToExitSupport(
      * Show previous hidden thumbnail
      */
     override fun showPreviousHiddenThumbnail() {
-        LiveEventBus.get(
-            EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY, ThumbnailVisibilityEvent::class.java
-        ).post(ThumbnailVisibilityEvent(viewerFrom, currentHandle, true))
+        coroutineScope.launch {
+            dragToExitThumbnailVisibilityFlow.emit(
+                ThumbnailVisibilityEvent(
+                    viewerFrom,
+                    currentHandle,
+                    true
+                )
+            )
+        }
     }
 
     /**
@@ -360,6 +351,8 @@ class DragToExitSupport(
         private var thumbnailLocationFlow: MutableSharedFlow<ThumbnailLocationEvent> =
             MutableSharedFlow()
         private var dragToExitFlow: MutableSharedFlow<ScrollEvent> =
+            MutableSharedFlow()
+        private var dragToExitThumbnailVisibilityFlow: MutableSharedFlow<ThumbnailVisibilityEvent> =
             MutableSharedFlow()
 
         /**
@@ -421,51 +414,51 @@ class DragToExitSupport(
             rv: RecyclerView?,
             viewerFrom: Int,
         ) {
-            LiveEventBus.get(
-                EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY, ThumbnailVisibilityEvent::class.java
-            ).observe(lifecycleOwner) {
-                Timber.d("EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY $it")
 
-                if (it.viewerFrom != viewerFrom) {
-                    return@observe
-                }
+            lifecycleOwner.lifecycleScope.launch {
+                dragToExitThumbnailVisibilityFlow.flowWithLifecycle(lifecycleOwner.lifecycle)
+                    .onEach {
+                        Timber.d("EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY $it")
+                    }.filter {
+                        it.viewerFrom == viewerFrom
+                    }.collectLatest {
+                        val thumbnailGetter =
+                            rv?.adapter as? DragThumbnailGetter ?: return@collectLatest
 
-                val thumbnailGetter = rv?.adapter as? DragThumbnailGetter ?: return@observe
+                        if (it.previousHiddenHandle != INVALID_HANDLE) {
+                            val previousThumbnail =
+                                getThumbnail(rv, thumbnailGetter, it.previousHiddenHandle)
+                            Timber.d("previous thumbnail $previousThumbnail")
 
-                if (it.previousHiddenHandle != INVALID_HANDLE) {
-                    val thumbnail = getThumbnail(rv, thumbnailGetter, it.previousHiddenHandle)
-                    Timber.d("previous thumbnail $thumbnail")
-
-                    if (thumbnail != null) {
-                        thumbnail.visibility = View.VISIBLE
-                    } else {
-                        // The thumbnail may be null because the item is scrolled off the screen,
-                        // so we rebind it in this case.
-                        val position = thumbnailGetter.getNodePosition(it.previousHiddenHandle)
-                        if (position != INVALID_POSITION) {
-                            (rv.adapter as RecyclerView.Adapter).notifyItemChanged(position)
+                            if (previousThumbnail == null) {
+                                // The thumbnail may be null because the item is scrolled off the screen,
+                                // so we rebind it in this case.
+                                val position =
+                                    thumbnailGetter.getNodePosition(it.previousHiddenHandle)
+                                if (position != INVALID_POSITION) {
+                                    (rv.adapter as RecyclerView.Adapter).notifyItemChanged(position)
+                                }
+                            } else {
+                                previousThumbnail.visibility = View.VISIBLE
+                            }
                         }
-                    }
-                }
+                        val currentThumbnail = getThumbnail(rv, thumbnailGetter, it.handle)
+                        Timber.d("current thumbnail $currentThumbnail")
 
-                val thumbnail = getThumbnail(rv, thumbnailGetter, it.handle)
-                Timber.d("current thumbnail $thumbnail")
+                        currentThumbnail?.let { thumbnail ->
+                            thumbnail.visibility = if (it.visible) View.VISIBLE else View.INVISIBLE
 
-                if (thumbnail != null) {
-                    thumbnail.visibility = if (it.visible) View.VISIBLE else View.INVISIBLE
-
-                    val location = getThumbnailLocation(thumbnail)
-                    if (!it.visible && location != null) {
-                        lifecycleOwner.lifecycleScope.launch {
-                            thumbnailLocationFlow.emit(
-                                ThumbnailLocationEvent(
-                                    viewerFrom = viewerFrom,
-                                    location = location
+                            val location = getThumbnailLocation(thumbnail)
+                            if (!it.visible && location != null) {
+                                thumbnailLocationFlow.emit(
+                                    ThumbnailLocationEvent(
+                                        viewerFrom = viewerFrom,
+                                        location = location
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
-                }
             }
 
             lifecycleOwner.lifecycleScope.launch {
