@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.model.AddContactState
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
@@ -46,13 +46,20 @@ class AddContactViewModel @Inject constructor(
     private var monitorChatCallJob: Job? = null
 
     init {
-        getEnabledFeatures()
+        getApiFeatureFlag()
         getContactFeatureEnabled()
     }
 
-    private fun getEnabledFeatures() {
+    /**
+     * Get call unlimited pro plan api feature flag
+     */
+    private fun getApiFeatureFlag() {
         viewModelScope.launch {
-            getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
+            runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.CallUnlimitedProPlan)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { flag ->
                 _state.update { state ->
                     state.copy(
                         isCallUnlimitedProPlanFeatureFlagEnabled = flag,

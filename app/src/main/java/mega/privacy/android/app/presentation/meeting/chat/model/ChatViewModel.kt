@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.megachat.MapsActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -285,7 +286,7 @@ class ChatViewModel @Inject constructor(
     private var monitorConnectivityJob: Job? = null
 
     init {
-        checkFeatureFlag()
+        getApiFeatureFlag()
         checkUsersCallLimitReminders()
         getMyUserHandle()
         checkGeolocation()
@@ -300,9 +301,16 @@ class ChatViewModel @Inject constructor(
         monitorChatRoomPreference()
     }
 
-    private fun checkFeatureFlag() {
+    /**
+     * Get call unlimited pro plan api feature flag
+     */
+    private fun getApiFeatureFlag() {
         viewModelScope.launch {
-            getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
+            runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.CallUnlimitedProPlan)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { flag ->
                 _state.update { state ->
                     state.copy(
                         isCallUnlimitedProPlanFeatureFlagEnabled = flag,

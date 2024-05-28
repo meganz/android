@@ -41,6 +41,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
 import mega.privacy.android.app.extensions.updateItemAt
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
@@ -376,20 +377,7 @@ class MeetingActivityViewModel @Inject constructor(
         }
 
         getCurrentSubscriptionPlan()
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
-                    _state.update { state ->
-                        state.copy(
-                            isCallUnlimitedProPlanFeatureFlagEnabled = flag,
-                        )
-                    }
-                }
-            }.onFailure {
-                Timber.e(it)
-            }
-
-        }
+        getApiFeatureFlag()
 
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .observeForever(audioOutputStateObserver)
@@ -399,8 +387,6 @@ class MeetingActivityViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .observeForever(meetingCreatedObserver)
-
-
 
         getCallUseCase.getCallEnded()
             .subscribeOn(Schedulers.io())
@@ -430,6 +416,25 @@ class MeetingActivityViewModel @Inject constructor(
                 when (it) {
                     UserChanges.Firstname, UserChanges.Lastname -> getMyFullName()
                     else -> Unit
+                }
+            }
+        }
+    }
+
+    /**
+     * Get call unlimited pro plan api feature flag
+     */
+    private fun getApiFeatureFlag() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.CallUnlimitedProPlan)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isCallUnlimitedProPlanFeatureFlagEnabled = flag,
+                    )
                 }
             }
         }

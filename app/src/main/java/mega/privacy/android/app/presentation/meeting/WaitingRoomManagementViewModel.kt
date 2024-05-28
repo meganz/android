@@ -11,21 +11,19 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
-import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallInProgress
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.KickUsersFromCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -68,15 +66,22 @@ class WaitingRoomManagementViewModel @Inject constructor(
     val state: StateFlow<WaitingRoomManagementState> = _state
 
     init {
-        getEnabledFeatures()
+        getApiFeatureFlag()
         getCall()
         startMonitoringChatCallUpdates()
         startMonitoringScheduledMeetingUpdates()
     }
 
-    private fun getEnabledFeatures() {
+    /**
+     * Get call unlimited pro plan api feature flag
+     */
+    private fun getApiFeatureFlag() {
         viewModelScope.launch {
-            getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
+            runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.CallUnlimitedProPlan)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { flag ->
                 _state.update { state ->
                     state.copy(
                         isCallUnlimitedProPlanFeatureFlagEnabled = flag,

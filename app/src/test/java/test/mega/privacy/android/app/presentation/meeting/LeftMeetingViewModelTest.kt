@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.meeting.LeftMeetingViewModel
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -46,7 +46,7 @@ internal class LeftMeetingViewModelTest {
         whenever(savedStateHandle.get<Boolean>(MeetingActivity.MEETING_FREE_PLAN_USERS_LIMIT)).thenReturn(
             true
         )
-        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan) } doReturn true
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.CallUnlimitedProPlan) } doReturn true
     }
 
     private fun initTestClass() {

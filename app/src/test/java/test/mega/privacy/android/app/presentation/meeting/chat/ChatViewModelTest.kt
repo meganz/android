@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.GifData
@@ -407,7 +408,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorLeavingChatUseCase(any()) } doReturn emptyFlow()
         whenever(monitorChatPendingChangesUseCase(any())) doReturn emptyFlow()
         whenever(monitorLeaveChatUseCase()) doReturn emptyFlow()
-        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan) } doReturn false
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.CallUnlimitedProPlan) } doReturn false
     }
 
     private fun initTestClass(
@@ -2926,7 +2927,7 @@ internal class ChatViewModelTest {
                 on { termCode } doReturn ChatCallTermCodeType.CallUsersLimit
             }
             whenever(monitorCallInChatUseCase(chatId)).thenReturn(flow)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CallUnlimitedProPlan)).thenReturn(true)
             initTestClass()
             flow.emit(call)
             advanceUntilIdle()
@@ -2947,7 +2948,7 @@ internal class ChatViewModelTest {
                 on { isOwnClientCaller } doReturn true
             }
             whenever(monitorCallInChatUseCase(chatId)).thenReturn(flow)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.CallUnlimitedProPlan)).thenReturn(true)
             initTestClass()
             flow.emit(call)
             advanceUntilIdle()

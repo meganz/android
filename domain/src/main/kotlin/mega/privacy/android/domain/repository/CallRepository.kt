@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
+import mega.privacy.android.domain.entity.featureflag.Flag
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
@@ -503,4 +504,12 @@ interface CallRepository {
     suspend fun muteAllPeers(
         chatId: Long,
     ): ChatRequest
+
+    /**
+     * Gets flag
+     *
+     * @param nameFlag  Name flag
+     * @return          [Flag]
+     */
+    suspend fun getFlag(nameFlag: String): Flag?
 }

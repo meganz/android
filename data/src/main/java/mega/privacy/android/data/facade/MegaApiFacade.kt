@@ -25,6 +25,7 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaEvent
+import nz.mega.sdk.MegaFlag
 import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaLoggerInterface
@@ -1541,4 +1542,11 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.updateNodeTag(node, newTag, oldTag, listener)
     }
+
+    override fun getFlag(
+        flagName: String,
+        commit: Boolean,
+        listener: MegaRequestListenerInterface?,
+    ): MegaFlag? =
+        megaApi.getFlag(flagName, commit, listener)
 }

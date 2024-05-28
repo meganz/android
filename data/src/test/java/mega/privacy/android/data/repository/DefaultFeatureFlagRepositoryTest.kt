@@ -43,6 +43,7 @@ class DefaultFeatureFlagRepositoryTest {
     private val fake1 = mock<FeatureFlagValueProvider>()
     private val fake2 = mock<FeatureFlagValueProvider>()
 
+
     private val featureFlagValueProviders = providerMocks.mapKeys {
         FeatureFlagPriorityKey(
             implementingClass = FeatureFlagValueProvider::class,

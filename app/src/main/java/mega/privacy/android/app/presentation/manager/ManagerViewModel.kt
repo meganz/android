@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
@@ -326,6 +327,7 @@ class ManagerViewModel @Inject constructor(
 
     init {
         checkUsersCallLimitReminders()
+        getApiFeatureFlag()
 
         viewModelScope.launch {
             val order = getCloudSortOrder()
@@ -471,14 +473,6 @@ class ManagerViewModel @Inject constructor(
             val androidSyncEnabled =
                 getFeatureFlagValueUseCase(SyncFeatures.AndroidSync)
 
-            _state.update {
-                it.copy(
-                    isCallUnlimitedProPlanFeatureFlagEnabled = getFeatureFlagValueUseCase(
-                        AppFeatures.CallUnlimitedProPlan
-                    )
-                )
-            }
-
             if (androidSyncEnabled) {
                 monitorSyncsUseCase().catch { Timber.e(it) }.collect { syncFolders ->
                     val isServiceEnabled = syncFolders.isNotEmpty()
@@ -524,6 +518,25 @@ class ManagerViewModel @Inject constructor(
                     getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)
                 ) {
                     startCameraUploadUseCase()
+                }
+            }
+        }
+    }
+
+    /**
+     * Get call unlimited pro plan api feature flag
+     */
+    private fun getApiFeatureFlag() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.CallUnlimitedProPlan)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isCallUnlimitedProPlanFeatureFlagEnabled = flag,
+                    )
                 }
             }
         }

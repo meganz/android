@@ -9,6 +9,7 @@ import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoMap
 import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.featuretoggle.remote.ABTestFeatureFlagValueProvider
+import mega.privacy.android.data.featuretoggle.remote.ApiFeatureFlagProvider
 import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
@@ -18,6 +19,18 @@ import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class FeatureFlagModule {
+
+    /**
+     * Provide api feature flag value provider
+     *
+     */
+    @Binds
+    @IntoMap
+    @FeatureFlagPriorityKey(
+        implementingClass = ApiFeatureFlagProvider::class,
+        priority = FeatureFlagValuePriority.RuntimeOverride
+    )
+    abstract fun provideApiFeatureFlagValueProvider(apiFeatureFlagProvider: ApiFeatureFlagProvider): @JvmSuppressWildcards FeatureFlagValueProvider
 
     /**
      * Provide remote feature flag value provider
@@ -30,6 +43,7 @@ internal abstract class FeatureFlagModule {
         priority = FeatureFlagValuePriority.RemoteToggled
     )
     abstract fun provideRemoteFeatureFlagValueProvider(ABTestFeatureFlagValueProvider: ABTestFeatureFlagValueProvider): @JvmSuppressWildcards FeatureFlagValueProvider
+
 
     companion object {
         /**

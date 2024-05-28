@@ -14,10 +14,12 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
+import mega.privacy.android.data.mapper.featureflag.FlagMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
@@ -36,6 +38,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
+import mega.privacy.android.domain.entity.featureflag.Flag
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
@@ -69,6 +72,8 @@ import kotlin.coroutines.resumeWithException
 internal class CallRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val chatCallMapper: ChatCallMapper,
+    private val megaApiGateway: MegaApiGateway,
+    private val flagMapper: FlagMapper,
     private val chatSessionMapper: ChatSessionMapper,
     private val chatRequestMapper: ChatRequestMapper,
     private val chatScheduledMeetingMapper: ChatScheduledMeetingMapper,
@@ -795,4 +800,10 @@ internal class CallRepositoryImpl @Inject constructor(
             continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
+
+    override suspend fun getFlag(nameFlag: String): Flag? =
+        withContext(dispatcher) {
+            megaApiGateway.getFlag(nameFlag, commit = true, listener = null)
+                ?.let(flagMapper::invoke)
+        }
 }

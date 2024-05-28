@@ -18,7 +18,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.groupInfo.model.GroupInfoState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState.Companion.FREE_PLAN_PARTICIPANTS_LIMIT
@@ -119,8 +119,19 @@ class GroupChatInfoViewModel @Inject constructor(
             }
         }
         monitorSFUServerUpgrade()
+        getApiFeatureFlag()
+    }
+
+    /**
+     * Get call unlimited pro plan api feature flag
+     */
+    private fun getApiFeatureFlag() {
         viewModelScope.launch {
-            getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
+            runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.CallUnlimitedProPlan)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { flag ->
                 _state.update { state ->
                     state.copy(
                         isCallUnlimitedProPlanFeatureFlagEnabled = flag,

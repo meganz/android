@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.extensions.getDayAndMonth
 import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
@@ -40,7 +40,6 @@ import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
-import mega.privacy.android.domain.usecase.chat.message.MonitorChatRoomMessagesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingOccurrenceUseCase
@@ -124,20 +123,33 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
 
     init {
         checkWaitingRoomWarning()
+        getApiFeatureFlag()
+
         viewModelScope.launch {
-            getFeatureFlagValue(AppFeatures.CallUnlimitedProPlan).let { flag ->
+            getCurrentSubscriptionPlanUseCase()?.let { currentSubscriptionPlan ->
+                _state.update { it.copy(subscriptionPlan = currentSubscriptionPlan) }
+            }
+        }
+        getAccountDetailUpdates()
+    }
+
+    /**
+     * Get call unlimited pro plan api feature flag
+     */
+    private fun getApiFeatureFlag() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValue(ApiFeatures.CallUnlimitedProPlan)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { flag ->
                 _state.update { state ->
                     state.copy(
                         isCallUnlimitedProPlanFeatureFlagEnabled = flag,
                     )
                 }
             }
-
-            getCurrentSubscriptionPlanUseCase()?.let { currentSubscriptionPlan ->
-                _state.update { it.copy(subscriptionPlan = currentSubscriptionPlan) }
-            }
         }
-        getAccountDetailUpdates()
     }
 
     /**

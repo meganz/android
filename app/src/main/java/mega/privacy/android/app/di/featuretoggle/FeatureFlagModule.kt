@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoMap
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.data.featuretoggle.file.FileFeatureFlagValueProvider
 import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
@@ -56,6 +57,17 @@ abstract class FeatureFlagModule {
         fun provideRemoteFeatures(): Set<@JvmSuppressWildcards Feature> =
             ABTestFeatures.values().toSet()
 
+
+        /**
+         * Provide api features
+         *
+         * @return Api features
+         */
+        @Provides
+        @ElementsIntoSet
+        fun provideApiFeatures(): Set<@JvmSuppressWildcards Feature> =
+            ApiFeatures.values().toSet()
+
         /**
          * Provide feature flag value provider
          *
@@ -81,5 +93,19 @@ abstract class FeatureFlagModule {
         )
         fun provideRemoteFeatureFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             ABTestFeatures.Companion
+
+        /**
+         * Provide api feature flag default value provider
+         *
+         */
+        @Provides
+        @IntoMap
+        @FeatureFlagPriorityKey(
+            implementingClass = ApiFeatures.Companion::class,
+            priority = FeatureFlagValuePriority.RemoteToggled
+        )
+        fun provideApiFeaturesFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            ApiFeatures.Companion
+
     }
 }

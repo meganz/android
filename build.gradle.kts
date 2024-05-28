@@ -85,7 +85,7 @@ extra["targetSdkVersion"] = 34
 extra["buildTools"] = "34.0.0"
 
 // Prebuilt MEGA SDK version
-extra["megaSdkVersion"] = "20240523.185313-dev"
+extra["megaSdkVersion"] = "20240527.163411-dev"
 
 //JDK and Java Version
 extra["jdk"] = "17"
@@ -101,5 +101,3 @@ val shouldSuppressWarnings by extra(
 if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     apply(from = "${project.rootDir}/tools/prebuilt-sdk.gradle")
 }
-
-
