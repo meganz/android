@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.camerauploads
 
+import android.app.Activity.RESULT_OK
 import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -147,30 +148,38 @@ internal fun SettingsCameraUploadsView(
     val cameraUploadsLocalFolderLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) {
-        val primaryFolderLocalPath = it.data?.getStringExtra(FileStorageActivity.EXTRA_PATH)
-        onLocalPrimaryFolderSelected.invoke(primaryFolderLocalPath)
+        if (it.resultCode == RESULT_OK) {
+            val primaryFolderLocalPath = it.data?.getStringExtra(FileStorageActivity.EXTRA_PATH)
+            onLocalPrimaryFolderSelected.invoke(primaryFolderLocalPath)
+        }
     }
     val mediaUploadsLocalFolderLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) {
-        val secondaryFolderLocalPath = it.data?.getStringExtra(FileStorageActivity.EXTRA_PATH)
-        onLocalSecondaryFolderSelected.invoke(secondaryFolderLocalPath)
+        if (it.resultCode == RESULT_OK) {
+            val secondaryFolderLocalPath = it.data?.getStringExtra(FileStorageActivity.EXTRA_PATH)
+            onLocalSecondaryFolderSelected.invoke(secondaryFolderLocalPath)
+        }
     }
     val cameraUploadsFolderNodeLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) {
-        val primaryFolderNodeId = NodeId(
-            it.data?.getLongExtra(FileExplorerActivity.EXTRA_MEGA_SELECTED_FOLDER, -1L) ?: -1L
-        )
-        onPrimaryFolderNodeSelected.invoke(primaryFolderNodeId)
+        if (it.resultCode == RESULT_OK) {
+            val primaryFolderNodeId = NodeId(
+                it.data?.getLongExtra(FileExplorerActivity.EXTRA_MEGA_SELECTED_FOLDER, -1L) ?: -1L
+            )
+            onPrimaryFolderNodeSelected.invoke(primaryFolderNodeId)
+        }
     }
     val mediaUploadsFolderNodeLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) {
-        val secondaryFolderNodeId = NodeId(
-            it.data?.getLongExtra(FileExplorerActivity.EXTRA_MEGA_SELECTED_FOLDER, -1L) ?: -1L
-        )
-        onSecondaryFolderNodeSelected.invoke(secondaryFolderNodeId)
+        if (it.resultCode == RESULT_OK) {
+            val secondaryFolderNodeId = NodeId(
+                it.data?.getLongExtra(FileExplorerActivity.EXTRA_MEGA_SELECTED_FOLDER, -1L) ?: -1L
+            )
+            onSecondaryFolderNodeSelected.invoke(secondaryFolderNodeId)
+        }
     }
 
     DisposableEffect(lifecycleOwner) {
