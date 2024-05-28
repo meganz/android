@@ -12,8 +12,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -396,9 +394,13 @@ class FileExplorerViewModel @Inject constructor(
     private suspend fun attachFiles(chatIds: List<Long>, filePaths: List<String>) {
         val filePathsWithNames =
             filePaths.associateWith { fileNames.value?.get(it.split(File.separator).last()) }
-        sendChatAttachmentsUseCase(filePathsWithNames, chatIds = chatIds.toLongArray())
-            .catch { Timber.e("Error attaching files", it) }
-            .collect()
+        runCatching {
+            sendChatAttachmentsUseCase(
+                filePathsWithNames, chatIds = chatIds.toLongArray()
+            )
+        }.onFailure {
+            Timber.e("Error attaching files", it)
+        }
     }
 
     private suspend fun attachNodes(chatId: Long, nodes: List<NodeId>) {

@@ -618,7 +618,6 @@ class StartTransfersComponentViewModelTest {
 
     private fun stubStartTransfers(flow: Flow<MultiTransferEvent>) {
         stubStartDownload(flow)
-        stubStartChatUpload(flow)
         stubStartUpload(flow)
     }
 
@@ -630,10 +629,6 @@ class StartTransfersComponentViewModelTest {
                 anyOrNull(),
             )
         ).thenReturn(flow)
-    }
-
-    private fun stubStartChatUpload(flow: Flow<MultiTransferEvent>) {
-        whenever(sendChatAttachmentsUseCase(any(), anyOrNull(), any())).thenReturn(flow)
     }
 
     private fun stubStartUpload(flow: Flow<MultiTransferEvent>) {

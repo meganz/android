@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTot
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.ClearPendingMessagesCompressionProgressUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.PrepareAllPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartUploadingAllPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
@@ -72,6 +73,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     private val clearPendingMessagesCompressionProgressUseCase: ClearPendingMessagesCompressionProgressUseCase,
     private val startUploadingAllPendingMessagesUseCase: StartUploadingAllPendingMessagesUseCase,
     private val monitorPendingMessagesByStateUseCase: MonitorPendingMessagesByStateUseCase,
+    private val prepareAllPendingMessagesUseCase: PrepareAllPendingMessagesUseCase,
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
@@ -131,6 +133,9 @@ class ChatUploadsWorker @AssistedInject constructor(
     override suspend fun doWorkInternal(scope: CoroutineScope) {
         scope.launch {
             super.doWorkInternal(this)
+        }
+        scope.launch {
+            prepareAllPendingMessagesUseCase().collect {}
         }
         scope.launch {
             compressPendingMessagesUseCase().collect {

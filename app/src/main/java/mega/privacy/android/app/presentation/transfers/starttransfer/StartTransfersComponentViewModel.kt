@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
@@ -125,12 +126,12 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 }
 
                 is TransferTriggerEvent.StartChatUpload -> {
-                    checkAndHandleTransfersPaused()
                     startChatUploads(
                         chatId = transferTriggerEvent.chatId,
                         uris = transferTriggerEvent.uris,
                         isVoiceClip = transferTriggerEvent.isVoiceClip
                     )
+                    checkAndHandleTransfersPaused()
                 }
 
                 is TransferTriggerEvent.StartUpload -> {
@@ -384,20 +385,21 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     ) {
         runCatching { clearActiveTransfersIfFinishedUseCase(TransferType.CHAT_UPLOAD) }
             .onFailure { Timber.e(it) }
-        sendChatAttachmentsUseCase(
-            uris.map { it.toString() }.associateWith { null }, isVoiceClip, chatId
-        ).catch { Timber.e(it) }.collect {
-            when (it) {
-                is MultiTransferEvent.TransferNotStarted<*> -> {
-                    Timber.e(it.exception, "Error starting chat upload")
+        runCatching {
+            sendChatAttachmentsUseCase(
+                uris.map { it.toString() }.associateWith { null }, isVoiceClip, chatId
+            )
+        }.onSuccess {
+            _uiState.updateEventAndClearProgress(null)
+        }.onFailure {
+            Timber.e(it)
+            _uiState.updateEventAndClearProgress(
+                if (it is NotEnoughStorageException) {
+                    StartTransferEvent.Message.NotSufficientSpace
+                } else {
                     StartTransferEvent.Message.TransferCancelled
                 }
-
-                MultiTransferEvent.InsufficientSpace -> StartTransferEvent.Message.NotSufficientSpace
-                is MultiTransferEvent.SingleTransferEvent -> null
-            }?.let {
-                _uiState.updateEventAndClearProgress(it)
-            }
+            )
         }
     }
 

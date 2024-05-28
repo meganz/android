@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -25,7 +24,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -124,14 +122,9 @@ class FileExplorerViewModelTest {
     @Test
     fun `test that files are attached`() = runTest {
         val filePaths = listOf("path1", "path2")
+        val filesWithNames = filePaths.associateWith { null }
 
         val flow = mock<Flow<MultiTransferEvent>>()
-        whenever(
-            sendChatAttachmentsUseCase(
-                filePaths.associateWith { null },
-                chatIds = chatIds.toLongArray()
-            )
-        ) doReturn flow
 
         underTest.uploadFilesToChatIfFeatureFlagIsTrue(
             chatIds = chatIds,
@@ -140,7 +133,11 @@ class FileExplorerViewModelTest {
             {},
         )
 
-        verify(flow).collect(any())
+        verify(sendChatAttachmentsUseCase).invoke(
+            filesWithNames,
+            false,
+            chatIds = chatIds.toLongArray()
+        )
     }
 
     @Test
