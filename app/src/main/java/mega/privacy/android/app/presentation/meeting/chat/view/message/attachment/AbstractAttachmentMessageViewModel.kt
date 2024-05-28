@@ -45,8 +45,15 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
     }
 
     private fun updateMessage(attachmentMessage: T) {
-        _uiStateFlowMap[attachmentMessage.msgId]?.update {
-            it.copy(isError = attachmentMessage.isSendError())
+        _uiStateFlowMap[attachmentMessage.msgId]?.update { current ->
+            current.copy(
+                isError = attachmentMessage.isSendError(),
+                fileSize = fileSizeStringMapper(attachmentMessage.fileSize),
+                duration = attachmentMessage.duration?.let { durationInSecondsTextMapper(it) }
+                    ?: current.duration,
+                fileTypeResId = fileTypeIconMapper(attachmentMessage.fileType.extension),
+                fileName = attachmentMessage.fileName,
+            )
         }
     }
 

@@ -13,12 +13,14 @@ import java.io.File
 /**
  * Pending attachment message
  * @property file
+ * @property filePath path of the file or content uri string
  * @property transferTag
  * @property state
  * @property nodeId
  */
 sealed interface PendingAttachmentMessage : AttachmentMessage {
     val file: File?
+    val filePath: String
     val transferTag: Int?
     val state: PendingMessageState
     val nodeId: NodeId?
@@ -49,7 +51,7 @@ data class PendingFileAttachmentMessage(
     override val nodeId: NodeId?,
     override val fileName: String,
     override val fileSize: Long,
-    val filePath: String,
+    override val filePath: String,
 ) : PendingAttachmentMessage {
     @Transient
     override val file = File(filePath)
@@ -76,7 +78,7 @@ data class PendingVoiceClipMessage(
     override val state: PendingMessageState,
     override val nodeId: NodeId?,
     override val fileName: String,
-    val filePath: String,
+    override val filePath: String,
 ) : PendingAttachmentMessage {
     @Transient
     override val file = File(filePath)

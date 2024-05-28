@@ -68,13 +68,13 @@ class PendingAttachmentMessageViewModelTest {
     @Test
     fun `test that first ui state adds file path`() {
         setup(emptyFlow())
-        val path = "root/file.jpg"
+        val filePathOrUri = "root/file.jpg"
         val attachmentMessage = stubMessage()
 
-        whenever(attachmentMessage.file) doReturn File(path)
+        whenever(attachmentMessage.filePath) doReturn filePathOrUri
 
         val actual = underTest.createFirstUiState(attachmentMessage)
-        assertThat(actual.previewUri).endsWith(path)
+        assertThat(actual.previewUri).isEqualTo(filePathOrUri)
     }
 
     @ParameterizedTest
@@ -193,13 +193,15 @@ class PendingAttachmentMessageViewModelTest {
     }
 
     private fun stubMessage(isError: Boolean = false) = mock<PendingFileAttachmentMessage> {
-        on { fileName } doReturn "file.jpg"
+        on { fileName } doReturn filePath
         on { fileType } doReturn StaticImageFileTypeInfo("image/jpg", "jpg")
         on { fileSize } doReturn 8435L
         on { msgId } doReturn pendingMsgId
-        on { file } doReturn File("file.jpg")
+        on { filePath } doReturn filePath
+        on { file } doReturn File(filePath)
         on { isSendError() } doReturn isError
     }
 
+    private val filePath = "file.jpg"
     private val pendingMsgId = 879L
 }

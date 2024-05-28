@@ -23,7 +23,7 @@ fun PendingAttachmentMessageView(
         isMe = message.isMine,
         fileTypeResId = uiState.fileTypeResId,
         previewUri = uiState.previewUri?.toUri(),
-        loadProgress = uiState.progress?.floatValue,
+        loadProgress = uiState.progress?.floatValue ?: 0f,
         fileName = uiState.fileName,
         fileSize = uiState.fileSize,
         duration = uiState.duration,

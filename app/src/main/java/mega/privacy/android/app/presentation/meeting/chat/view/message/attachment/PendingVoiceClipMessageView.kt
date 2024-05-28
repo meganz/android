@@ -24,7 +24,7 @@ fun PendingVoiceClipMessageView(
         timestamp = uiState.duration ?: "",
         modifier = modifier,
         exists = true,
-        loadProgress = uiState.progress?.floatValue,
+        loadProgress = uiState.progress?.floatValue ?: 0f,
         interactionEnabled = false,
         showPausedTransfersWarning = uiState.areTransfersPaused,
     )
