@@ -237,6 +237,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     NewConfirmEmailFragment(
         "Enable new confirm email fragment",
         true
+    ),
+
+    /**
+     * Enables new tour fragment compose page
+     */
+    NewTourFragment(
+        "Enable new tour fragment",
+        true
     );
 
     companion object : FeatureFlagValueProvider {

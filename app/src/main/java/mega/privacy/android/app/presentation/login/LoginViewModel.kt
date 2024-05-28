@@ -981,6 +981,9 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    internal suspend fun isNewTourFragmentEnabled() =
+        getFeatureFlagValueUseCase(AppFeatures.NewTourFragment)
+
     companion object {
         /**
          * Intent action for showing the login fetching nodes.

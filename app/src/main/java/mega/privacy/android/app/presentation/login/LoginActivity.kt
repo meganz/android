@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Rect
+import android.net.Uri
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
@@ -16,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -30,7 +32,10 @@ import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragmentV2
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.presentation.login.onboarding.TourFragmentV2
 import mega.privacy.android.app.presentation.login.reportissue.ReportIssueViaEmailFragment
+import mega.privacy.android.app.presentation.meeting.view.dialog.ACTION_JOIN_AS_GUEST
+import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
@@ -221,25 +226,45 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
             Constants.TOUR_FRAGMENT -> {
                 Timber.d("Show TOUR_FRAGMENT")
-                tourFragment =
-                    when {
-                        Constants.ACTION_RESET_PASS == intent?.action -> {
-                            TourFragment.newInstance(intent?.dataString, null)
+                // Need to make this call synchronous, otherwise the TourFragment will be shown
+                // before we successfully fetch the flag
+                runBlocking {
+                    var isNewTourFragmentEnabled = false
+                    runCatching { viewModel.isNewTourFragmentEnabled() }
+                        .onSuccess { isNewTourFragmentEnabled = it }
+                    val tourFragment =
+                        if (isNewTourFragmentEnabled) {
+                            TourFragmentV2().apply {
+                                onLoginClick = {
+                                    showFragment(LoginFragmentType.Login)
+                                }
+                                onCreateAccountClick = {
+                                    showFragment(LoginFragmentType.CreateAccount)
+                                }
+                                onOpenLink = ::startOpenLinkActivity
+                            }
+                        } else {
+                            when {
+                                Constants.ACTION_RESET_PASS == intent?.action -> {
+                                    TourFragment.newInstance(intent?.dataString, null)
+                                }
+
+                                Constants.ACTION_PARK_ACCOUNT == intent?.action -> {
+                                    TourFragment.newInstance(null, intent?.dataString)
+                                }
+
+                                else -> {
+                                    TourFragment.newInstance(null, null)
+                                }
+                            }
                         }
 
-                        Constants.ACTION_PARK_ACCOUNT == intent?.action -> {
-                            TourFragment.newInstance(null, intent?.dataString)
-                        }
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container_login, tourFragment)
+                        .commitNowAllowingStateLoss()
 
-                        else -> {
-                            TourFragment.newInstance(null, null)
-                        }
-                    }
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container_login, tourFragment ?: return)
-                    .commitNowAllowingStateLoss()
-
-                Util.setDrawUnderStatusBar(this, true)
+                    Util.setDrawUnderStatusBar(this@LoginActivity, true)
+                }
             }
 
             Constants.CONFIRM_EMAIL_FRAGMENT -> {
@@ -472,6 +497,13 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         lastNameTemp = lastName
         passwdTemp = password
         viewModel.setIsWaitingForConfirmAccount()
+    }
+
+    private fun startOpenLinkActivity(meetingLink: String) {
+        val intent = Intent(this, OpenLinkActivity::class.java)
+        intent.putExtra(ACTION_JOIN_AS_GUEST, "any")
+        intent.data = Uri.parse(meetingLink)
+        startActivity(intent)
     }
 
     companion object {

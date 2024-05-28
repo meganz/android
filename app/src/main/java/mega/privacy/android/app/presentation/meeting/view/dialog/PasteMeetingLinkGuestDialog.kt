@@ -106,3 +106,5 @@ private fun PasteMeetingLinkGuestDialogWithErrorPreview() {
         )
     }
 }
+
+internal const val ACTION_JOIN_AS_GUEST = "action_join_as_guest"
