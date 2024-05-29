@@ -1,11 +1,14 @@
 package mega.privacy.android.app.main.managerSections
 
+import androidx.core.net.toUri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -43,6 +46,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 import java.math.BigInteger
 
 @ExperimentalCoroutinesApi
@@ -333,6 +337,32 @@ internal class TransfersViewModelTest {
                     .isEqualTo(listOf(expected))
             }
         }
+
+    @Test
+    fun `test that retryTransfer triggers a StartUpload event when it is an upload and UploadWorker is enabled`() =
+        runTest {
+            val path = "path"
+            val file = mock<File>()
+            val parentHandle = 123L
+            val transfer = mock<CompletedTransfer> {
+                on { type } doReturn MegaTransfer.TYPE_UPLOAD
+                on { this.parentHandle } doReturn parentHandle
+                on { originalPath } doReturn path
+            }
+            val expected = triggered(
+                TransferTriggerEvent.StartUpload.Files(
+                    listOf(file.toUri()),
+                    NodeId(parentHandle)
+                )
+            )
+
+            underTest.retryTransfer(transfer)
+
+            underTest.uiState.map { it.startEvent }.test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
+
 
     companion object {
         @JvmField

@@ -27,6 +27,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentTransferPageBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter
@@ -413,15 +414,21 @@ internal class TransferPageFragment : Fragment() {
             }
 
             MegaTransfer.TYPE_UPLOAD -> {
-                PermissionUtils.checkNotificationsPermission(requireActivity())
-                val file = File(transfer.originalPath)
-                uploadUseCase.upload(requireActivity(), file, transfer.parentHandle)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { Timber.d("Transfer retried.") },
-                        { t: Throwable? -> Timber.e(t) })
-                    .addTo(composite)
+                lifecycleScope.launch {
+                    if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                        transfersViewModel.retryTransfer(transfer)
+                    } else {
+                        PermissionUtils.checkNotificationsPermission(requireActivity())
+                        val file = File(transfer.originalPath)
+                        uploadUseCase.upload(requireActivity(), file, transfer.parentHandle)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                { Timber.d("Transfer retried.") },
+                                { t: Throwable? -> Timber.e(t) })
+                            .addTo(composite)
+                    }
+                }
             }
 
             else -> {

@@ -1,6 +1,5 @@
 package test.mega.privacy.android.app.presentation.qrcode
 
-import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
@@ -25,7 +24,6 @@ import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapp
 import mega.privacy.android.app.presentation.qrcode.model.ScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
@@ -39,7 +37,6 @@ import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
@@ -87,8 +84,6 @@ class QRCodeViewModelTest {
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
     private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val uploadUseCase = mock<UploadUseCase>()
 
     private val initialContactLink = "https://contact_link1"
 
@@ -116,8 +111,6 @@ class QRCodeViewModelTest {
             getRootNodeUseCase = getRootNodeUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            uploadUseCase = uploadUseCase,
         )
     }
 
@@ -363,17 +356,7 @@ class QRCodeViewModelTest {
     }
 
     @Test
-    fun `test that uploadUseCase is not invoked if UploadWorker is enabled`() = runTest {
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
-
-        underTest.uploadFile(mock(), mock(), 123L)
-
-        verifyNoInteractions(uploadUseCase)
-    }
-
-    @Test
     fun `test that state is updated correctly if UploadWorker is enabled`() = runTest {
-        val context = mock<Context>()
         val file = mock<File>()
         val parentHandle = 123L
         val expected = triggered(
@@ -383,11 +366,9 @@ class QRCodeViewModelTest {
             )
         )
 
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
-
         underTest.uiState.map { it.uploadEvent }.test {
             awaitItem()
-            underTest.uploadFile(context, file, parentHandle)
+            underTest.uploadFile(file, parentHandle)
             assertThat(awaitItem()).isEqualTo(expected)
         }
     }

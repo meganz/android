@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.managerSections
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -470,7 +471,7 @@ class TransfersViewModel @Inject constructor(
      * trigger retry transfer event
      */
     suspend fun retryTransfer(transfer: CompletedTransfer) {
-        val event = when (transfer.type) {
+        when (transfer.type) {
             MegaTransfer.TYPE_DOWNLOAD -> {
                 getNodeByIdUseCase(NodeId(transfer.handle))?.let { typedNode ->
                     if (transfer.isOffline == true) {
@@ -480,13 +481,23 @@ class TransfersViewModel @Inject constructor(
                     }
                 } ?: run {
                     Timber.e("Node not found for this transfer")
-                    return
                 }
             }
 
+            MegaTransfer.TYPE_UPLOAD -> {
+                val file = File(transfer.originalPath)
+                TransferTriggerEvent.StartUpload.Files(
+                    listOf(file.toUri()),
+                    NodeId(transfer.parentHandle)
+                )
+            }
+
             else -> throw IllegalArgumentException("This transfer type cannot be retried here for now")
+        }.let { event ->
+            if (event is TransferTriggerEvent) {
+                _uiState.update { state -> state.copy(startEvent = triggered(event)) }
+            }
         }
-        _uiState.update { state -> state.copy(startEvent = triggered(event)) }
     }
 
     /**

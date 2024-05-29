@@ -8,8 +8,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +15,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -28,12 +25,10 @@ import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.model.ScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
@@ -46,7 +41,6 @@ import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
@@ -84,8 +78,6 @@ class QRCodeViewModel @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val uploadUseCase: UploadUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(QRCodeUIState())
@@ -393,7 +385,7 @@ class QRCodeViewModel @Inject constructor(
      *
      * @param messageId String ID of the message
      */
-    private fun setResultMessage(messageId: Int, formatArgs: Array<Any> = emptyArray()) =
+    fun setResultMessage(messageId: Int, formatArgs: Array<Any> = emptyArray()) =
         _uiState.update { it.copy(resultMessage = triggered(Pair(messageId, formatArgs))) }
 
     /**
@@ -441,31 +433,16 @@ class QRCodeViewModel @Inject constructor(
     /**
      * Upload file to cloud drive.
      */
-    fun uploadFile(context: Context, qrFile: File, parentHandle: Long) {
-        viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                _uiState.update { state ->
-                    state.copy(
-                        uploadEvent = triggered(
-                            TransferTriggerEvent.StartUpload.Files(
-                                listOf(qrFile.toUri()),
-                                NodeId(parentHandle)
-                            )
-                        )
+    fun uploadFile(qrFile: File, parentHandle: Long) {
+        _uiState.update { state ->
+            state.copy(
+                uploadEvent = triggered(
+                    TransferTriggerEvent.StartUpload.Files(
+                        listOf(qrFile.toUri()),
+                        NodeId(parentHandle)
                     )
-                }
-            } else {
-                PermissionUtils.checkNotificationsPermission(context as QRCodeComposeActivity)
-                uploadUseCase.upload(context, qrFile, parentHandle)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        setResultMessage(
-                            R.string.save_qr_cloud_drive,
-                            arrayOf(qrFile.name)
-                        )
-                    }) { t: Throwable? -> Timber.e(t) }
-            }
+                )
+            )
         }
     }
 
