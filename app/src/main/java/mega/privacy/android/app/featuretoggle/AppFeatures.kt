@@ -186,7 +186,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     NodeWithDescription(
         "Enable node with description",
-        false
+        true
     ),
 
     /**
