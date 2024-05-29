@@ -21,6 +21,8 @@ import mega.privacy.android.data.mapper.chat.messages.PendingMessageMapper
 import mega.privacy.android.data.mapper.chat.paging.TypedMessagePagingSourceMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
+import mega.privacy.android.data.qualifier.OriginalPathForNodeCache
+import mega.privacy.android.data.qualifier.OriginalPathForPendingMessageCache
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
@@ -49,7 +51,8 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     private val pendingMessageEntityMapper: PendingMessageEntityMapper,
     private val pendingMessageMapper: PendingMessageMapper,
     private val typedMessageEntityConverters: TypedMessageEntityConverters,
-    private val originalPathCache: Cache<Map<NodeId, String>>,
+    @OriginalPathForNodeCache private val originalPathCache: Cache<Map<NodeId, String>>,
+    @OriginalPathForPendingMessageCache private val originalPathForPendingMessageCache: Cache<Map<Long, String>>,
     private val typedMessagePagingSourceMapper: TypedMessagePagingSourceMapper,
 ) : ChatMessageRepository {
 
@@ -307,6 +310,19 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             put(nodeId, path)
         }
         originalPathCache.set(updated)
+    }
+
+    override fun getCachedOriginalPathForPendingMessage(pendingMessageId: Long) =
+        originalPathForPendingMessageCache.get()?.get(pendingMessageId)
+
+    override fun cacheOriginalPathForPendingMessage(pendingMessageId: Long, path: String) {
+        val updated = buildMap {
+            originalPathForPendingMessageCache.get()?.let {
+                putAll(it)
+            }
+            put(pendingMessageId, path)
+        }
+        originalPathForPendingMessageCache.set(updated)
     }
 
     override fun getPagedMessages(chatId: Long) =

@@ -505,6 +505,22 @@ interface ChatMessageRepository {
     fun cacheOriginalPathForNode(nodeId: NodeId, path: String)
 
     /**
+     * Gets the original path of this pending message if it has been cached during the creation of the pending message.
+     *
+     * @param pendingMessageId The id of the node.
+     * @return The cached original path or uri, or null if not cached.
+     */
+    fun getCachedOriginalPathForPendingMessage(pendingMessageId: Long): String?
+
+    /**
+     * Caches the original path of the pending message once the pending message is created, before it is copied to cache folder and/or scaled/compressed.
+     *
+     * @param pendingMessageId The id of the pending message.
+     * @param path The original path or uri to be cached.
+     */
+    fun cacheOriginalPathForPendingMessage(pendingMessageId: Long, path: String)
+
+    /**
      * Get paged messages
      *
      * @param chatId
@@ -556,7 +572,10 @@ interface ChatMessageRepository {
      */
     suspend fun clearAllData()
 
-    fun updatePendingMessagesCompressionProgress(progress: Progress, pendingMessages: List<PendingMessage>)
+    fun updatePendingMessagesCompressionProgress(
+        progress: Progress,
+        pendingMessages: List<PendingMessage>,
+    )
 
     fun monitorPendingMessagesCompressionProgress(): Flow<Map<Long, Progress>>
 

@@ -10,6 +10,8 @@ import mega.privacy.android.data.cache.ExpiringCache
 import mega.privacy.android.data.cache.PermanentCache
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.qualifier.FileVersionsOption
+import mega.privacy.android.data.qualifier.OriginalPathForNodeCache
+import mega.privacy.android.data.qualifier.OriginalPathForPendingMessageCache
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
@@ -65,7 +67,13 @@ internal object LocalCacheModule {
     @Singleton
     fun providePsaCache(): Cache<Psa> = PermanentCache()
 
+    @OriginalPathForNodeCache
     @Provides
     @Singleton
     fun provideChatOriginalFileCache(): Cache<Map<NodeId, String>> = PermanentCache()
+
+    @OriginalPathForPendingMessageCache
+    @Provides
+    @Singleton
+    fun provideChatOriginalPathForPendingMessageCache(): Cache<Map<Long, String>> = PermanentCache()
 }

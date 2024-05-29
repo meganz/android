@@ -69,6 +69,7 @@ class ChatMessageRepositoryImplTest {
     private val pendingMessageMapper = mock<PendingMessageMapper>()
     private val typedMessageEntityConverters = mock<TypedMessageEntityConverters>()
     private val originalPathCache = mock<Cache<Map<NodeId, String>>>()
+    private val originalPathForPendingMessageCache = mock<Cache<Map<Long, String>>>()
     private val typedMessagePagingSourceMapper = mock<TypedMessagePagingSourceMapper>()
     private val megaChatErrorSuccess = mock<MegaChatError> {
         on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
@@ -92,6 +93,7 @@ class ChatMessageRepositoryImplTest {
             pendingMessageMapper = pendingMessageMapper,
             typedMessageEntityConverters = typedMessageEntityConverters,
             originalPathCache = originalPathCache,
+            originalPathForPendingMessageCache = originalPathForPendingMessageCache,
             typedMessagePagingSourceMapper = typedMessagePagingSourceMapper,
         )
     }
@@ -510,6 +512,27 @@ class ChatMessageRepositoryImplTest {
         whenever(originalPathCache.get()).thenReturn(previousCache)
         underTest.cacheOriginalPathForNode(newId, newPath)
         verify(originalPathCache).set(eq(previousCache + (newId to newPath)))
+    }
+
+    @Test
+    fun `test that original path for pending message is added to the cache`() {
+        val newId = 2L
+        val newPath = "someInterestingPath/image.jpg"
+        whenever(originalPathForPendingMessageCache.get()).thenReturn(emptyMap())
+        underTest.cacheOriginalPathForPendingMessage(newId, newPath)
+        verify(originalPathForPendingMessageCache).set(eq(mapOf(newId to newPath)))
+    }
+
+    @Test
+    fun `test that original path for pending message is added to the cache when it's not empty`() {
+        val originalId = 1L
+        val originalPath = "originalPath/video.mp4"
+        val previousCache = mapOf(originalId to originalPath)
+        val newId = 2L
+        val newPath = "someInterestingPath/image.jpg"
+        whenever(originalPathForPendingMessageCache.get()).thenReturn(previousCache)
+        underTest.cacheOriginalPathForPendingMessage(newId, newPath)
+        verify(originalPathForPendingMessageCache).set(eq(previousCache + (newId to newPath)))
     }
 
     @Test

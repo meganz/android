@@ -113,6 +113,21 @@ class SendChatAttachmentsUseCaseTest {
             }, eq(listOf(chatId)))
         }
 
+    @Test
+    fun `test that original path is cached`() = runTest {
+        val chatId = 1263L
+        val pendingMsgId = 22353L
+        val expected = "content://content.example"
+        val uris = mapOf<String, String?>(expected to null)
+        commonStub(pendingMsgId)
+
+        underTest(uris, isVoiceClip = false, chatId)
+
+        verify(chatMessageRepository).cacheOriginalPathForPendingMessage(
+            pendingMsgId, expected
+        )
+    }
+
     private suspend fun commonStub(pendingMsgId: Long = 1L) {
         whenever(chatMessageRepository.savePendingMessages(any(), any()))
             .thenReturn(listOf(pendingMsgId))

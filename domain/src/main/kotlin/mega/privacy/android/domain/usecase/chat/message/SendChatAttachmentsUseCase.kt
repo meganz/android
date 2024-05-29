@@ -50,7 +50,9 @@ class SendChatAttachmentsUseCase @Inject constructor(
                     transferTag = -1,
                 ),
                 chatIds.asList()
-            )
+            ).forEach { pendingMessageId ->
+                chatMessageRepository.cacheOriginalPathForPendingMessage(pendingMessageId, uri)
+            }
         }
         startChatUploadsWorkerUseCase()
     }

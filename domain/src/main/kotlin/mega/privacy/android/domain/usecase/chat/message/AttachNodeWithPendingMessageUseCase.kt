@@ -33,7 +33,12 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
 
         chatMessageRepository.getPendingMessage(pendingMessageId)
             ?.let { pendingMessage ->
-                chatMessageRepository.cacheOriginalPathForNode(nodeId, pendingMessage.filePath)
+                val originalPath =
+                    chatMessageRepository.getCachedOriginalPathForPendingMessage(pendingMessage.id)
+                chatMessageRepository.cacheOriginalPathForNode(
+                    nodeId,
+                    originalPath ?: pendingMessage.filePath
+                )
                 updatePendingMessageUseCase(
                     UpdatePendingMessageStateAndNodeHandleRequest(
                         pendingMessageId = pendingMessage.id,

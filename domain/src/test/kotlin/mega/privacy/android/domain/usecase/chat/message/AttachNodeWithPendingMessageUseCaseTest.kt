@@ -140,14 +140,33 @@ class AttachNodeWithPendingMessageUseCaseTest {
         }
 
     @Test
-    fun `test that original path is cached`() = runTest {
+    fun `test that file path is cached when original path from pending message does not exist`() =
+        runTest {
+            val pendingMessage = createPendingMessageMock()
+            val nodeId = NodeId(1L)
+            whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(
+                pendingMessage
+            )
+            whenever(chatMessageRepository.getCachedOriginalPathForPendingMessage(pendingMsgId))
+                .thenReturn(null)
+
+            underTest(pendingMsgId, nodeId)
+            verify(chatMessageRepository)
+                .cacheOriginalPathForNode(nodeId, filePath)
+        }
+
+    @Test
+    fun `test that original path from pending message is cached when exists`() = runTest {
         val pendingMessage = createPendingMessageMock()
         val nodeId = NodeId(1L)
+        val originalUri = "content://example.uri"
         whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(pendingMessage)
+        whenever(chatMessageRepository.getCachedOriginalPathForPendingMessage(pendingMsgId))
+            .thenReturn(originalUri)
 
         underTest(pendingMsgId, nodeId)
         verify(chatMessageRepository)
-            .cacheOriginalPathForNode(nodeId, filePath)
+            .cacheOriginalPathForNode(nodeId, originalUri)
     }
 
     @Test
