@@ -94,7 +94,7 @@ fun GenericDescriptionTextField(
             errorIndicatorColor = MegaOriginalTheme.colors.support.error,
             focusedLabelColor = MegaOriginalTheme.colors.text.primary,
             focusedIndicatorColor = if (showUnderline) MegaOriginalTheme.colors.text.accent else Color.Transparent,
-            unfocusedIndicatorColor = if (showUnderline) MegaOriginalTheme.colors.text.secondary else Color.Transparent,
+            unfocusedIndicatorColor = if (showUnderline) MegaOriginalTheme.colors.border.strong else Color.Transparent,
             unfocusedLabelColor = MegaOriginalTheme.colors.text.onColorDisabled,
             errorLabelColor = MegaOriginalTheme.colors.text.error,
         )
@@ -159,7 +159,7 @@ fun GenericDescriptionTextField(
                     },
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.subtitle2.copy(
-                    color = if (!isFocused && value.isNotEmpty()) MegaOriginalTheme.colors.text.onColorDisabled else MegaOriginalTheme.colors.text.primary,
+                    color = MegaOriginalTheme.colors.text.primary,
                     textAlign = TextAlign.Start
                 ),
                 cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
@@ -187,7 +187,7 @@ fun GenericDescriptionTextField(
                         isError = isError,
                         interactionSource = interactionSource,
                         colors = textFieldColors,
-                        contentPadding = PaddingValues(0.dp)
+                        contentPadding = PaddingValues(2.dp)
                     )
                 }
             ))

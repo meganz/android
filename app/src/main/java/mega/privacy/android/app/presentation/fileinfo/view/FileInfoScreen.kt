@@ -6,6 +6,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
@@ -67,7 +68,7 @@ internal fun FileInfoScreen(
 ) {
     val actionModeSelect = viewState.outShareContactsSelected.isNotEmpty()
     ScaffoldWithCollapsibleHeader(
-        modifier = modifier,
+        modifier = modifier.imePadding(),
         headerIncludingSystemBar = viewState.actualPreviewUriString?.takeIf { viewState.hasPreview }
             ?.let { previewUri ->
                 {

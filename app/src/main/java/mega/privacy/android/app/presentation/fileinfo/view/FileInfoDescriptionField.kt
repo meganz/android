@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -17,12 +19,13 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.resources.R
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionConfirmedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionEnteredEvent
@@ -39,8 +42,8 @@ import mega.privacy.mobile.analytics.event.NodeInfoDescriptionEnteredEvent
  */
 @Composable
 fun FileInfoDescriptionField(
-    modifier: Modifier = Modifier,
     descriptionText: String,
+    modifier: Modifier = Modifier,
     @StringRes labelId: Int? = null,
     @StringRes placeholderId: Int? = null,
     descriptionLimit: Int = DESCRIPTION_LIMIT,
@@ -87,18 +90,37 @@ fun FileInfoDescriptionField(
             showUnderline = true,
             placeholderId = placeholderId,
             onValueChange = {
-                description = it.take(descriptionLimit)
+                val oldLength = description.length
+                val newLength = it.length
+                if (newLength - oldLength > descriptionLimit) {
+                    description = it.take(descriptionLimit)
+                } else if (oldLength < descriptionLimit || newLength < oldLength) {
+                    description = it
+                }
             },
         )
 
-        if (isFocused) {
-            Analytics.tracker.trackEvent(NodeInfoDescriptionEnteredEvent)
+        if (!isEditable) {
             MegaText(
-                modifier = Modifier.align(Alignment.End),
-                text = "${description.length}/$descriptionLimit",
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .align(Alignment.Start),
+                text = stringResource(id = R.string.file_properties_shared_folder_read_only),
                 textColor = TextColor.Primary,
                 style = MaterialTheme.typography.caption,
             )
+        } else {
+            if (isFocused) {
+                Analytics.tracker.trackEvent(NodeInfoDescriptionEnteredEvent)
+                MegaText(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .align(Alignment.End),
+                    text = "${description.length}/$descriptionLimit",
+                    textColor = TextColor.Primary,
+                    style = MaterialTheme.typography.caption,
+                )
+            }
         }
     }
 }
@@ -111,8 +133,8 @@ private fun FileInfoDescriptionFieldPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FileInfoDescriptionField(
             descriptionText = "This is a description",
-            labelId = R.string.file_info_information_description_label,
-            placeholderId = R.string.file_info_information_description_placeholder,
+            labelId = sharedR.string.file_info_information_description_label,
+            placeholderId = sharedR.string.file_info_information_description_placeholder,
         )
     }
 }

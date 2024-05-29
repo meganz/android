@@ -121,7 +121,7 @@ internal data class FileInfoViewState(
     /**
      * Check Conditions to enable description field
      */
-    fun isDescriptionEnabled() = !isNodeInRubbish &&
+    fun isDescriptionEnabled() = !isNodeInRubbish && !isNodeInBackups &&
             (accessPermission == AccessPermission.FULL ||
                     accessPermission == AccessPermission.OWNER)
 

@@ -195,19 +195,17 @@ class FileInfoViewModel @Inject constructor(
      */
     fun setNodeDescription(description: String) {
         viewModelScope.launch {
-            description.takeIf { it.isNotEmpty() }?.let {
-                runCatching {
-                    setNodeDescriptionUseCase(nodeHandle = nodeId, description = description)
-                }.onSuccess {
-                    _uiState.update {
-                        it.copy(
-                            oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionAdded),
-                            descriptionText = description
-                        )
-                    }
-                }.onFailure {
-                    Timber.e("Set Node Description Failed $it")
+            runCatching {
+                setNodeDescriptionUseCase(nodeHandle = nodeId, description = description)
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionAdded),
+                        descriptionText = description
+                    )
                 }
+            }.onFailure {
+                Timber.e("Set Node Description Failed $it")
             }
         }
     }
