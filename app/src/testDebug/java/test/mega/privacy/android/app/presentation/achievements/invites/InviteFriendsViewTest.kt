@@ -19,7 +19,7 @@ import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toUnitString
-import mega.privacy.android.app.main.InviteContactActivity
+import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactActivity
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteConfirmationDialog
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsView
