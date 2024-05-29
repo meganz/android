@@ -41,27 +41,14 @@ internal class DefaultRecentActionsRepository @Inject constructor(
     private suspend fun getMegaRecentAction(): List<MegaRecentActionBucket> =
         withContext(ioDispatcher) {
             val result = suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("getMegaRecentAction") {
-                    it.recentActions
+                val listener = continuation.getRequestListener("getRecentActionsAsync") {
+                    megaApiGateway.copyBucketList(it.recentActions)
                 }
                 megaApiGateway.getRecentActionsAsync(DAYS, MAX_NODES, listener)
                 continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
-            recentActionsMapper(
-                result,
-                ::copyRecentActionBucket
-            )
+            recentActionsMapper(result)
         }
-
-
-    /**
-     * Provide the [MegaRecentActionBucket] required copy.
-     */
-    private suspend fun copyRecentActionBucket(recentActionBucket: MegaRecentActionBucket) =
-        withContext(ioDispatcher) {
-            megaApiGateway.copyBucket(recentActionBucket)
-        }
-
 
     companion object {
         /**

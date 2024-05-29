@@ -16,7 +16,7 @@ import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaPushNotificationSettings
-import nz.mega.sdk.MegaRecentActionBucket
+import nz.mega.sdk.MegaRecentActionBucketList
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaSet
@@ -1098,12 +1098,12 @@ interface MegaApiGateway {
     )
 
     /**
-     * Creates a copy of MegaRecentActionBucket required for its usage in the app.
+     * Creates a copy of MegaRecentActionBucketList required for its usage in the app.
      *
-     * @param bucket The MegaRecentActionBucket received.
-     * @return A copy of MegaRecentActionBucket.
+     * @param bucketList The MegaRecentActionBucketList received.
+     * @return A copy of MegaRecentActionBucketList.
      */
-    fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket
+    fun copyBucketList(bucketList: MegaRecentActionBucketList): MegaRecentActionBucketList
 
     /**
      * Check access error extended

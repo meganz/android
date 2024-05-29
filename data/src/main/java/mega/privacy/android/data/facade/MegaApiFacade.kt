@@ -33,7 +33,8 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaPushNotificationSettingsAndroid
-import nz.mega.sdk.MegaRecentActionBucket
+import nz.mega.sdk.MegaRecentActionBucketList
+import nz.mega.sdk.MegaRecentActionBucketListAndroid
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSearchFilter
@@ -740,8 +741,8 @@ internal class MegaApiFacade @Inject constructor(
         }
     }
 
-    override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =
-        megaApi.copyBucket(bucket)
+    override fun copyBucketList(bucketList: MegaRecentActionBucketList): MegaRecentActionBucketList =
+        MegaRecentActionBucketListAndroid.copy(bucketList)
 
     override fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError =
         megaApi.checkAccessErrorExtended(node, level)

@@ -68,8 +68,8 @@ class DefaultRecentActionsRepositoryTest {
                 error
             )
         }
-        whenever(megaApiGateway.copyBucket(any())).thenReturn(mock())
-        whenever(recentActionsMapper(any(), any())).thenReturn(list)
+        whenever(megaApiGateway.copyBucketList(any())).thenReturn(mock())
+        whenever(recentActionsMapper(any())).thenReturn(list)
         whenever(
             recentActionBucketMapper.invoke(
                 mock(),

@@ -13,15 +13,12 @@ internal class RecentActionsMapper @Inject constructor() {
      * Invoke.
      *
      * @param recentActions [MegaRecentActionBucketList].
-     * @param copyRecentActionBucket Provides the required copy of a [MegaRecentActionBucket].
      * @return List of [MegaRecentActionBucket].
      */
-    suspend operator fun invoke(
+    operator fun invoke(
         recentActions: MegaRecentActionBucketList?,
-        copyRecentActionBucket: suspend (MegaRecentActionBucket) -> MegaRecentActionBucket,
     ) = recentActions?.let { actions ->
         (0 until actions.size())
-            .filter { recentActions.get(it) != null }
-            .map { copyRecentActionBucket(recentActions.get(it)) }
+            .mapNotNull { recentActions.get(it) }
     } ?: emptyList()
 }
