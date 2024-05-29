@@ -33,7 +33,7 @@ import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
-import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
@@ -89,7 +89,7 @@ class MeetingActivityViewModelTest {
     private val chatParticipantMapper: ChatParticipantMapper = mock()
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase = mock()
     private val createChatLink: CreateChatLink = mock()
-    private val inviteContactUseCase: InviteContactUseCase = mock()
+    private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase = mock()
     private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase = mock()
     private val removeFromChaUseCase: RemoveFromChat = mock()
     private val startConversationUseCase: StartConversationUseCase = mock()
@@ -148,7 +148,7 @@ class MeetingActivityViewModelTest {
             chatParticipantMapper,
             isEphemeralPlusPlusUseCase,
             createChatLink,
-            inviteContactUseCase,
+            inviteContactWithHandleUseCase,
             updateChatPermissionsUseCase,
             removeFromChaUseCase,
             startConversationUseCase,
@@ -199,7 +199,7 @@ class MeetingActivityViewModelTest {
             chatParticipantMapper = chatParticipantMapper,
             isEphemeralPlusPlusUseCase = isEphemeralPlusPlusUseCase,
             createChatLink = createChatLink,
-            inviteContactUseCase = inviteContactUseCase,
+            inviteContactWithHandleUseCase = inviteContactWithHandleUseCase,
             updateChatPermissionsUseCase = updateChatPermissionsUseCase,
             removeFromChaUseCase = removeFromChaUseCase,
             startConversationUseCase = startConversationUseCase,

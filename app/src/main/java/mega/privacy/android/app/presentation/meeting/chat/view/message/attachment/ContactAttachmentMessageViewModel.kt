@@ -10,20 +10,20 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteUserAsCon
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteUserAsContactResult
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.InviteMultipleUsersAsContactResult
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
-import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * ViewModel for contact attachment message.
  *
- * @property inviteContactUseCase
+ * @property inviteContactWithHandleUseCase
  * @property inviteUserAsContactResultOptionMapper
  * @property inviteMultipleUsersAsContactResultMapper
  */
 @HiltViewModel
 class ContactAttachmentMessageViewModel @Inject constructor(
-    private val inviteContactUseCase: InviteContactUseCase,
+    private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase,
     private val inviteUserAsContactResultOptionMapper: InviteUserAsContactResultMapper,
     private val inviteMultipleUsersAsContactResultMapper: InviteMultipleUsersAsContactResultMapper,
 ) : ViewModel() {
@@ -38,7 +38,7 @@ class ContactAttachmentMessageViewModel @Inject constructor(
             : InviteMultipleUsersAsContactResult = coroutineScope {
         messages.map { message ->
             async {
-                inviteContactUseCase(message.contactEmail, message.contactHandle, null)
+                inviteContactWithHandleUseCase(message.contactEmail, message.contactHandle, null)
             }
         }.awaitAll().let { inviteMultipleUsersAsContactResultMapper(it) }
     }
@@ -55,7 +55,7 @@ class ContactAttachmentMessageViewModel @Inject constructor(
     ): InviteUserAsContactResult {
         runCatching {
             val email = message.contactEmail
-            val result = inviteContactUseCase(
+            val result = inviteContactWithHandleUseCase(
                 email = email,
                 handle = message.contactHandle,
                 message = null

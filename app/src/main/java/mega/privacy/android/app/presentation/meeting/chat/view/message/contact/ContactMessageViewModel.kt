@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
-import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -22,7 +22,7 @@ class ContactMessageViewModel @Inject constructor(
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
     private val getUserUseCase: GetUserUseCase,
     private val isContactRequestSentUseCase: IsContactRequestSentUseCase,
-    private val inviteContactUseCase: InviteContactUseCase,
+    private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
 ) : ViewModel() {
     /**
@@ -83,7 +83,7 @@ class ContactMessageViewModel @Inject constructor(
      */
     fun inviteUser(email: String, handle: Long, onInvitationSent: () -> Unit) {
         viewModelScope.launch {
-            runCatching { inviteContactUseCase(email, handle, null) }
+            runCatching { inviteContactWithHandleUseCase(email, handle, null) }
                 .onSuccess { onInvitationSent() }
                 .onFailure {
                     Timber.e(it)

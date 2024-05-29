@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
-import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -42,7 +42,7 @@ internal class ContactMessageViewModelTest {
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase = mock()
     private val getUserUseCase = mock<GetUserUseCase>()
     private val isContactRequestSentUseCase = mock<IsContactRequestSentUseCase>()
-    private val inviteContactUseCase = mock<InviteContactUseCase>()
+    private val inviteContactWithHandleUseCase = mock<InviteContactWithHandleUseCase>()
     private val getMyUserHandleUseCase = mock<GetMyUserHandleUseCase>()
 
     private val email = "email"
@@ -61,7 +61,7 @@ internal class ContactMessageViewModelTest {
             getContactFromEmailUseCase,
             getUserUseCase,
             isContactRequestSentUseCase,
-            inviteContactUseCase,
+            inviteContactWithHandleUseCase,
             getMyUserHandleUseCase,
         )
     }
@@ -202,10 +202,10 @@ internal class ContactMessageViewModelTest {
     @Test
     fun `test that invite user invokes correctly`() = runTest {
         val onInvitationSent = mock<() -> Unit>()
-        whenever(inviteContactUseCase.invoke(email, userHandle, null))
+        whenever(inviteContactWithHandleUseCase.invoke(email, userHandle, null))
             .thenReturn(mock())
         underTest.inviteUser(email, userHandle, onInvitationSent)
-        verify(inviteContactUseCase).invoke(email, userHandle, null)
+        verify(inviteContactWithHandleUseCase).invoke(email, userHandle, null)
         verify(onInvitationSent).invoke()
     }
 
@@ -214,7 +214,7 @@ internal class ContactMessageViewModelTest {
             getContactFromEmailUseCase,
             getUserUseCase,
             isContactRequestSentUseCase,
-            inviteContactUseCase,
+            inviteContactWithHandleUseCase,
             getMyUserHandleUseCase,
         )
     }

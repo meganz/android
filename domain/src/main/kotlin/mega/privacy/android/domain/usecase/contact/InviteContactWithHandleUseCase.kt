@@ -4,9 +4,9 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import javax.inject.Inject
 
 /**
- * Use case for inviting new contact
+ * Use case for inviting new contact with handle.
  */
-class InviteContactUseCase @Inject constructor(
+class InviteContactWithHandleUseCase @Inject constructor(
     private val repository: ContactsRepository,
 ) {
 

@@ -102,7 +102,7 @@ import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
-import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
@@ -155,7 +155,7 @@ import javax.inject.Inject
  * @property queryChatLink                                  [QueryChatLink]
  * @property isEphemeralPlusPlusUseCase                     [IsEphemeralPlusPlusUseCase]
  * @property createChatLink                                 [CreateChatLink]
- * @property inviteContactUseCase                           [InviteContactUseCase]
+ * @property inviteContactWithHandleUseCase                           [InviteContactWithHandleUseCase]
  * @property updateChatPermissionsUseCase                   [UpdateChatPermissionsUseCase]
  * @property removeFromChaUseCase                           [RemoveFromChat]
  * @property startConversationUseCase                       [StartConversationUseCase]
@@ -198,7 +198,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val chatParticipantMapper: ChatParticipantMapper,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     private val createChatLink: CreateChatLink,
-    private val inviteContactUseCase: InviteContactUseCase,
+    private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase,
     private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase,
     private val removeFromChaUseCase: RemoveFromChat,
     private val startConversationUseCase: StartConversationUseCase,
@@ -1919,7 +1919,7 @@ class MeetingActivityViewModel @Inject constructor(
         state.value.chatParticipantSelected?.let { participant ->
             viewModelScope.launch {
                 runCatching {
-                    inviteContactUseCase(
+                    inviteContactWithHandleUseCase(
                         participant.email ?: "",
                         participant.handle ?: -1,
                         null

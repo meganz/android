@@ -14,7 +14,7 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class InviteContactUseCaseRequestMapperTest {
+class InviteContactRequestMapperTest {
     private val underTest: InviteContactRequestMapper = InviteContactRequestMapper()
 
     @ParameterizedTest(name = "test {0} is mapped correctly")

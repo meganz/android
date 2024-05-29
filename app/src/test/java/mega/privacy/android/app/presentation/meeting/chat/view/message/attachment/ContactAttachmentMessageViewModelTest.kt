@@ -9,7 +9,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.InviteM
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
-import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,7 +27,7 @@ import org.mockito.kotlin.whenever
 class ContactAttachmentMessageViewModelTest {
     lateinit var underTest: ContactAttachmentMessageViewModel
 
-    private val inviteContactUseCase = mock<InviteContactUseCase>()
+    private val inviteContactWithHandleUseCase = mock<InviteContactWithHandleUseCase>()
     private val inviteUserAsContactResultOptionMapper =
         mock<InviteUserAsContactResultMapper>()
     private val inviteMultipleUsersAsContactResultMapper =
@@ -36,7 +36,7 @@ class ContactAttachmentMessageViewModelTest {
     @BeforeAll
     fun setUp() {
         underTest = ContactAttachmentMessageViewModel(
-            inviteContactUseCase = inviteContactUseCase,
+            inviteContactWithHandleUseCase = inviteContactWithHandleUseCase,
             inviteUserAsContactResultOptionMapper = inviteUserAsContactResultOptionMapper,
             inviteMultipleUsersAsContactResultMapper = inviteMultipleUsersAsContactResultMapper
         )
@@ -45,7 +45,7 @@ class ContactAttachmentMessageViewModelTest {
     @BeforeEach
     fun resetMock() {
         reset(
-            inviteContactUseCase,
+            inviteContactWithHandleUseCase,
             inviteUserAsContactResultOptionMapper,
             inviteMultipleUsersAsContactResultMapper
         )
@@ -60,7 +60,13 @@ class ContactAttachmentMessageViewModelTest {
                 on { this.contactHandle } doReturn contactUserHandle
                 on { this.contactEmail } doReturn contactEmail
             }
-            whenever(inviteContactUseCase(contactEmail, contactUserHandle, null)).thenReturn(
+            whenever(
+                inviteContactWithHandleUseCase(
+                    contactEmail,
+                    contactUserHandle,
+                    null
+                )
+            ).thenReturn(
                 InviteContactRequest.Sent
             )
             whenever(
@@ -89,7 +95,7 @@ class ContactAttachmentMessageViewModelTest {
                 on { this.contactEmail } doReturn "1@b.c"
             }
             val messageSet = setOf(message1, message2)
-            whenever(inviteContactUseCase(any(), any(), any())).thenReturn(
+            whenever(inviteContactWithHandleUseCase(any(), any(), any())).thenReturn(
                 InviteContactRequest.Sent
             )
             whenever(

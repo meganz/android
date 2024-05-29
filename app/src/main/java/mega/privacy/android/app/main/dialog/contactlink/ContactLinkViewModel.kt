@@ -12,13 +12,13 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
-import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 internal class ContactLinkViewModel @Inject constructor(
     private val getContactLinkUseCase: GetContactLinkUseCase,
-    private val inviteContactUseCase: InviteContactUseCase,
+    private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val userHandle = savedStateHandle.get<Long>(ContactLinkDialogFragment.EXTRA_USER_HANDLE)
@@ -37,7 +37,8 @@ internal class ContactLinkViewModel @Inject constructor(
     fun sendContactInvitation(contactLinkHandle: Long, email: String) {
         if (sendInviteJob?.isActive == true) return // prevent multiple invite send
         sendInviteJob = viewModelScope.launch {
-            val result = runCatching { inviteContactUseCase(email, contactLinkHandle, null) }
+            val result =
+                runCatching { inviteContactWithHandleUseCase(email, contactLinkHandle, null) }
             _state.update { it.copy(sentInviteResult = result) }
         }
     }

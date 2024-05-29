@@ -38,7 +38,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
@@ -77,7 +77,7 @@ class QRCodeViewModelTest {
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val getUserFullNameUseCase: GetUserFullNameUseCase = mock()
     private val queryScannedContactLinkUseCase = mock<QueryScannedContactLinkUseCase>()
-    private val inviteContactUseCase = mock<InviteContactUseCase>()
+    private val inviteContactWithHandleUseCase = mock<InviteContactWithHandleUseCase>()
     private val avatarContentMapper = mock<AvatarContentMapper>()
     private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
     private val scannerHandler = mock<ScannerHandler>()
@@ -106,7 +106,7 @@ class QRCodeViewModelTest {
             getUserFullNameUseCase = getUserFullNameUseCase,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             queryScannedContactLinkUseCase = queryScannedContactLinkUseCase,
-            inviteContactUseCase = inviteContactUseCase,
+            inviteContactWithHandleUseCase = inviteContactWithHandleUseCase,
             avatarContentMapper = avatarContentMapper,
             myQRCodeTextErrorMapper = myQRCodeTextErrorMapper,
             scannerHandler = scannerHandler,
@@ -219,7 +219,7 @@ class QRCodeViewModelTest {
     @Test
     fun `test that inviteContactResult is set correctly when send invite is success`() =
         runTest {
-            whenever(inviteContactUseCase(any(), any(), anyOrNull()))
+            whenever(inviteContactWithHandleUseCase(any(), any(), anyOrNull()))
                 .thenReturn(InviteContactRequest.Sent)
             underTest.uiState.test {
                 awaitItem()
@@ -232,7 +232,7 @@ class QRCodeViewModelTest {
     @Test
     fun `test that inviteContactResult is set to InvalidStatus when send invite throws exception`() =
         runTest {
-            whenever(inviteContactUseCase(any(), any(), anyOrNull()))
+            whenever(inviteContactWithHandleUseCase(any(), any(), anyOrNull()))
                 .thenAnswer { throw RuntimeException() }
             underTest.uiState.test {
                 awaitItem()
@@ -309,7 +309,7 @@ class QRCodeViewModelTest {
     @Test
     fun `test that scannedContactEmail is set to null when resetScannedContactEmail is invoked`() =
         runTest {
-            whenever(inviteContactUseCase(any(), any(), anyOrNull()))
+            whenever(inviteContactWithHandleUseCase(any(), any(), anyOrNull()))
                 .thenReturn(InviteContactRequest.Sent)
             underTest.sendInvite(123L, "abc@gmail.com")
             underTest.uiState.test {

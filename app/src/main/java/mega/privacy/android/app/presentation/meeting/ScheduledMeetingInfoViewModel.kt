@@ -48,7 +48,6 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RemoveFromChat
@@ -59,6 +58,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -83,7 +83,7 @@ import javax.inject.Inject
  * @property inviteToChat                                   [InviteToChat]
  * @property leaveChatUseCase                               [LeaveChatUseCase]
  * @property removeFromChat                                 [RemoveFromChat]
- * @property inviteContact                                  [InviteContact]
+ * @property inviteContactWithEmailUseCase                  [InviteContactWithEmailUseCase]
  * @property setOpenInvite                                  [SetOpenInvite]
  * @property updateChatPermissionsUseCase                   [UpdateChatPermissionsUseCase]
  * @property getPublicChatToPrivate                         [SetPublicChatToPrivate]
@@ -115,7 +115,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val inviteToChat: InviteToChat,
     private val leaveChatUseCase: LeaveChatUseCase,
     private val removeFromChat: RemoveFromChat,
-    private val inviteContact: InviteContact,
+    private val inviteContactWithEmailUseCase: InviteContactWithEmailUseCase,
     private val setOpenInvite: SetOpenInvite,
     private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase,
     private val getPublicChatToPrivate: SetPublicChatToPrivate,
@@ -820,7 +820,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             participant.email?.let { email ->
                 viewModelScope.launch {
                     runCatching {
-                        inviteContact(email)
+                        inviteContactWithEmailUseCase(email)
                     }.onFailure { exception ->
                         Timber.e(exception)
                         triggerSnackbarMessage(

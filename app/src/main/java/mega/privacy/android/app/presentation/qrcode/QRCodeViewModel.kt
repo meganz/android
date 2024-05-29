@@ -45,7 +45,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
@@ -74,7 +74,7 @@ class QRCodeViewModel @Inject constructor(
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val queryScannedContactLinkUseCase: QueryScannedContactLinkUseCase,
-    private val inviteContactUseCase: InviteContactUseCase,
+    private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase,
     private val avatarContentMapper: AvatarContentMapper,
     private val myQRCodeTextErrorMapper: MyQRCodeTextErrorMapper,
     private val scannerHandler: ScannerHandler,
@@ -226,7 +226,7 @@ class QRCodeViewModel @Inject constructor(
      */
     fun sendInvite(contactHandle: Long, contactEmail: String) {
         viewModelScope.launch {
-            runCatching { inviteContactUseCase(contactEmail, contactHandle, null) }
+            runCatching { inviteContactWithHandleUseCase(contactEmail, contactHandle, null) }
                 .onSuccess { result ->
                     _uiState.update {
                         it.copy(

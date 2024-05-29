@@ -10,7 +10,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
-import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -24,17 +24,21 @@ import org.mockito.kotlin.whenever
 internal class ContactLinkViewModelTest {
     private lateinit var underTest: ContactLinkViewModel
     private val getContactLinkUseCase: GetContactLinkUseCase = mock()
-    private val inviteContactUseCase: InviteContactUseCase = mock()
+    private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase = mock()
     private val savedStateHandle: SavedStateHandle = mock()
 
     @BeforeEach
     fun resetMocks() {
-        reset(getContactLinkUseCase, inviteContactUseCase, savedStateHandle)
+        reset(getContactLinkUseCase, inviteContactWithHandleUseCase, savedStateHandle)
     }
 
     private fun initTestClass() {
         underTest =
-            ContactLinkViewModel(getContactLinkUseCase, inviteContactUseCase, savedStateHandle)
+            ContactLinkViewModel(
+                getContactLinkUseCase,
+                inviteContactWithHandleUseCase,
+                savedStateHandle
+            )
     }
 
     @Test
@@ -75,7 +79,7 @@ internal class ContactLinkViewModelTest {
             whenever(savedStateHandle.get<Long>(ContactLinkDialogFragment.EXTRA_USER_HANDLE))
                 .thenReturn(1L)
             whenever(
-                inviteContactUseCase(
+                inviteContactWithHandleUseCase(
                     myEmail,
                     handle,
                     null
@@ -100,7 +104,7 @@ internal class ContactLinkViewModelTest {
             whenever(savedStateHandle.get<Long>(ContactLinkDialogFragment.EXTRA_USER_HANDLE))
                 .thenReturn(1L)
             whenever(
-                inviteContactUseCase(
+                inviteContactWithHandleUseCase(
                     myEmail,
                     handle,
                     null
