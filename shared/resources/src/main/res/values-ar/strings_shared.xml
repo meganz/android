@@ -3,7 +3,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">لا يوجد خطأ في المزامنة</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="general_sync_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported</string>
+    <string name="general_sync_unsupported_file_system">لا يمكن لميغا MEGA مزامنة هذا المجلد أو نسخه احتياطيًا لأن نظام الملفات على جهازك غير مدعوم</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="general_sync_invalid_remote_type">لا يمكن مزامنة المجلد الذي اخترته</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -11,45 +11,45 @@
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
     <string name="general_sync_initial_scan_failed">فشل الفحص الأولي. ستحتاج إلى إعادة تمكين المزامنة أو النسخ الاحتياطي من تطبيق الحاسوب المكتبي.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="general_sync_remote_node_not_found">Folder in MEGA can’t be located as it’s been moved or deleted, or you might not have access</string>
+    <string name="general_sync_remote_node_not_found">لا يمكن تحديد موقع المجلد في ميغا MEGA لأنه تم نقله أو حذفه، أو ليس لديك إذن للوصول إليه</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
-    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <string name="general_sync_storage_overquota">غير قادر على مزامنة هذا المجلد أو نسخه احتياطيًا لأن مساحة التخزين ممتلئة</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
-    <string name="general_sync_account_expired">Unable to sync or back up this folder as your plan has expired</string>
+    <string name="general_sync_account_expired">غير قادر على مزامنة هذا المجلد أو نسخه احتياطيًا نظرًا لانتهاء صلاحية باقتك</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="general_sync_foreign_target_overshare">Folder can’t be synced as the user who shared this folder has reached their storage limit</string>
+    <string name="general_sync_foreign_target_overshare">لا يمكن مزامنة المجلد لأن المستخدم الذي شارك هذا المجلد قد وصل إلى الحد المتاح من مساحة التخزين الخاصة به</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="general_sync_remote_path_has_changed">Folder in MEGA can’t be located as it’s been moved or deleted, or you might not have access</string>
+    <string name="general_sync_remote_path_has_changed">لا يمكن تحديد موقع المجلد في ميغا MEGA لأنه تم نقله أو حذفه، أو ليس لديك إذن للوصول إليه</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="general_sync_share_non_full_access">Folder can’t be synced as it’s a shared folder that you don’t have full access to</string>
+    <string name="general_sync_share_non_full_access">لا يمكن مزامنة المجلد لأنه مجلد مشارك ليس لديك حق الوصول الكامل إليه</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="general_sync_put_nodes_error">Files in this folder can’t be synced or backed up. You’ll need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_put_nodes_error">لا يمكن مزامنة الملفات الموجودة في هذا المجلد أو نسخها احتياطيًا. ستحتاج إلى إعادة تمكين المزامنة أو النسخ الاحتياطي من تطبيق الحاسوب المكتبي.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="general_sync_active_sync_below_path">Folder can’t be synced as it already contains synced folders</string>
+    <string name="general_sync_active_sync_below_path">لا يمكن مزامنة المجلد لأنه يحتوي بالفعل على مجلدات متزامنة</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="general_sync_vboxsharedfolder_unsupported">MEGA can’t sync or back up VirtualBox folders</string>
+    <string name="general_sync_vboxsharedfolder_unsupported">لا تستطيع ميغا MEGA مزامنة مجلدات VirtualBox أو نسخها احتياطيًا</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <string name="general_sync_account_blocked">غير قادر على مزامنة هذا المجلد أو نسخه احتياطيًا حيث تم حظر الحساب</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="general_sync_unknown_temporary_error">حدثت مشكلة في مزامنة هذا المجلد أو نسخه احتياطيًا. حاول مرة أخرى في وقت لاحق. إذا استمرت المشكلة، تواصل مع قسم الدعم.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="general_sync_too_many_action_packets">تمت إعادة تحميل الحساب. لم يتم تطبيق أي تحديثات فائتة على النسخ الاحتياطية أو المزامنات الخاصة بك.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="general_sync_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
+    <string name="general_sync_logged_out">تم إيقاف المزامنة أو النسخ الاحتياطي حيث يبدو أنك قمت بتسجيل الخروج من تطبيق الحاسوب المكتبي. قم بتسجيل الدخول مرة أخرى عبر تطبيق الحاسوب المكتبي واستأنف المزامنة أو النسخ الاحتياطي.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="general_sync_missing_parent_node">غير متوفر</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">لا يمكن تحديد موقع المجلد الموجود في السواقة الخارجية.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="general_sync_active_sync_same_path">There’s already a synced folder at the same location</string>
+    <string name="general_sync_active_sync_same_path">يوجد بالفعل مجلد تمت مزامنته في نفس الموقع</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="general_sync_could_not_move_cloud_nodes">Renaming failed</string>
+    <string name="general_sync_could_not_move_cloud_nodes">فشلت عملية إعادة التسمية</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="general_sync_could_not_create_ignore_file">Couldn’t create a .megaignore file for this sync</string>
+    <string name="general_sync_could_not_create_ignore_file">تعذّر إنشاء ملف.megaignore لهذه المزامنة</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="general_sync_config_read_failure">تعذرت قراءة تكوين المزامنة. حاول مرة أخرى لاحقًا أو تحقق من أذونات المجلد.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="general_sync_unknown_drive_path">Sync location is unknown</string>
+    <string name="general_sync_unknown_drive_path">موقع المزامنة غير معروف</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="general_sync_invalid_scan_interval">الفاصل الزمني للفحص غير صالح. تحقق من إعداد الفاصل الزمني للفحص وحاول مرة أخرى.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -61,17 +61,17 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="general_sync_unable_to_open_database">غير قادر على فتح قاعدة بيانات ذاكرة التخزين المؤقت للحالة</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
-    <string name="general_sync_insufficient_disk_space">Insufficient storage space on your device</string>
+    <string name="general_sync_insufficient_disk_space">مساحة تخزين غير كافية على جهازك</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">تعذرت قراءة موقع المزامنة. تحقق من إمكانية الوصول إلى الموقع ومن منح الأذونات لموقع المجلد.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact Support.</string>
+    <string name="general_sync_message_unknown_error">حدث خطأ غير معروف. تواصل مع الدعم.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">حدث خطأ ما.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
+    <string name="general_sync_message_node_in_rubbish_bin">لا يمكن مزامنة المجلد أو نسخه احتياطيًا لأن مجلد ميغا MEGA موجود في سلة المحذوفات</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="general_sync_message_cannot_locate_local_drive_now">Folder in your device can’t be located right now. Try again later.</string>
+    <string name="general_sync_message_cannot_locate_local_drive_now">لا يمكن تحديد موقع المجلد في جهازك الآن. حاول مرة أخرى لاحقًا.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="general_sync_message_cannot_locate_local_drive">لا يمكن تحديد موقع المجلد في جهازك</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
@@ -79,11 +79,11 @@
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue">حدثت مشكلة في مزامنة هذا المجلد أو نسخه احتياطيًا. أوقف المزامنة أو النسخ الاحتياطي وحاول إعداده مرة أخرى في تطبيق الحاسوب المكتبي أو تواصل مع قسم الدعم.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">لا يمكن مزامنة المجلد لأنه موجود بالفعل داخل مجلد تمت مزامنته</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="general_sync_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_local_filesystem_mismatch">لا يمكن مزامنة الملفات الموجودة في هذا المجلد أو نسخها احتياطيًا. ستحتاج إلى إعادة تمكين المزامنة أو النسخ الاحتياطي من تطبيق الحاسوب المكتبي.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
-    <string name="general_message_sync_paused_low_battery_level">Syncing paused, battery level too low. Charge battery to resume syncing.</string>
+    <string name="general_message_sync_paused_low_battery_level">تم إيقاف المزامنة مؤقتًا، ومستوى البطارية منخفض جدًا. اشحن البطارية لاستئناف المزامنة.</string>
     <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_file_sharing">مشاركة ملفات سهلة وآمنة</string>
     <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">لا تفقد البيانات مرة أخرى</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">يمكنك الترجيع لاستعادة المجلدات مرة أخرى إلى أي تاريخ يصل إلى 180 يومًا بحيث تكون بياناتك مقاومة للحوادث والعبث.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -190,13 +190,21 @@
     <string name="video_section_video_selected_top_bar_title">اختر الملفات</string>
     <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
     <plurals name="video_section_playlists_delete_playlists_message">
-        <item quantity="one">Deleted %1$d playlist</item>
-        <item quantity="other">Deleted %1$d playlists</item>
+        <item quantity="zero">تم حذف %1$d قائمة التشغيل</item>
+        <item quantity="one">تم حذف %1$d قائمة التشغيل</item>
+        <item quantity="two">تم حذف %1$d قائمتي تشغيل</item>
+        <item quantity="few">تم حذف %1$d قوائم التشغيل</item>
+        <item quantity="many">تم حذف %1$d قائمة تشغيل</item>
+        <item quantity="other">تم حذف %1$d قائمة تشغيل</item>
     </plurals>
     <!-- Message when adding the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_add_videos_message">
-        <item quantity="one">Added %1$d item to “%2$s”</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
+        <item quantity="zero">تمت إضافة %1$d عنصر إلى ”%2$s“</item>
+        <item quantity="one">تمت إضافة %1$d عنصر إلى ”%2$s“</item>
+        <item quantity="two">تمت إضافة %1$d عنصرين إلى ”%2$s“</item>
+        <item quantity="few">تمت إضافة %1$d عناصر إلى ”%2$s“</item>
+        <item quantity="many">تمت إضافة %1$d عنصراً إلى ”%2$s“</item>
+        <item quantity="other">تمت إضافة %1$d عنصر إلى ”%2$s“</item>
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_remove_videos_message">
@@ -217,15 +225,15 @@
         <item quantity="other">%1$d فيديوهات</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
-    <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
+    <string name="chat_click_link_in_message_intent_not_available">قد لا يكون لديك أي تطبيقات مثبتة يمكنها فتح موقع الويب هذا</string>
     <!-- Message when deleting a singular playlist of the video section playlists tab. %1$s will be replaced the name of deleted playlist -->
     <string name="video_section_playlists_delete_playlists_message_singular">تم حذف ”%1$s“</string>
     <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_name">قم بالترفيع فقط أثناء الشحن</string>
     <!-- Text for the header of the screen to add a new sync folder -->
-    <string name="sync_add_new_sync_folder_header_text">Add synchronised folder:</string>
+    <string name="sync_add_new_sync_folder_header_text">إضافة مجلد متزامن:</string>
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
-    <string name="general_size_giga_byte">%1$s&#160;GB</string>
+    <string name="general_size_giga_byte">%1$s&#160;غيغابايت</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">Free</string>
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
@@ -235,7 +243,7 @@
     <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
     <string name="dialog_onboarding_button_continue">تابع</string>
     <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
+    <string name="dialog_onboarding_app_bar_title">اختر باقة ميغا MEGA الخاصة بك</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">المحتويات</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -253,8 +261,12 @@
     </plurals>
     <!-- String which indicates the number of folders contained into a device/folder -->
     <plurals name="info_num_folders">
-        <item quantity="one">%1$d folder</item>
-        <item quantity="other">%1$d folders</item>
+        <item quantity="zero">%1$d مجلد</item>
+        <item quantity="one">%1$d مجلد</item>
+        <item quantity="two">%1$d مجلدان</item>
+        <item quantity="few">%1$d مجلدات</item>
+        <item quantity="many">%1$d مجلداً</item>
+        <item quantity="other">%1$d مجلد</item>
     </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="info_num_folders_and_files">
@@ -275,41 +287,41 @@
         <item quantity="other">شارك الروابط</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_title">Download to this location\?</string>
+    <string name="transfers_dialog_save_download_location_title">تنزيل إلى هذا الموقع؟</string>
     <!-- Option to don't use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_only_this_time_option">Only this time</string>
+    <string name="transfers_dialog_save_download_location_only_this_time_option">فقط هذه المرة</string>
     <!-- Option to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_always_here_option">Always download here</string>
+    <string name="transfers_dialog_save_download_location_always_here_option">قم بالتنزيل دائمًا هنا</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
-    <string name="transfers_dialog_save_download_location_always_ask_option">Always ask for destination</string>
+    <string name="transfers_dialog_save_download_location_always_ask_option">اسأل دائمًا عن الوجهة</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_giga_byte_standalone">غيغابايت</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">تيرابايت</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">Starting from %1$s&#160;%2$s, find the perfect fit for your storage needs.</string>
+    <string name="dialog_onboarding_feature_storage_description">بدءًا من %1$s&#160;%2$s، ابحث عن الملاءمة المثالية لاحتياجات التخزين الخاصة بك.</string>
     <!-- Title of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_title">Insufficient storage space</string>
+    <string name="sync_error_dialog_insufficient_storage_title">مساحة تخزين غير كافية</string>
     <!-- Body text of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_body">The size of this folder will take your MEGA account over its storage limit. To be able to sync it, you will need to either free up some space or upgrade your MEGA account.</string>
+    <string name="sync_error_dialog_insufficient_storage_body">سيؤدي حجم هذا المجلد إلى تجاوز حساب ميغا MEGA الخاص بك مساحة التخزين المتاحة لك لتتمكن من مزامنته ستحتاج إما إلى تحرير بعض المساحة أو ترقية حساب ميغا MEGA الخاص بك.</string>
     <!-- Confirm button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_confirm_button">انظر إلى الباقات</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">ليس الآن</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
-    <string name="account_confirm_email_misspelled_email_description">If you have misspelt your email address, correct it and tap [A]Resend[/A].</string>
+    <string name="account_confirm_email_misspelled_email_description">إذا أخطأت في كتابة عنوان بريدك الإلكتروني، فقم بتصحيحه وانقر [A]إعادة إرسال[/A].</string>
     <!-- Title of the insufficient storage error banner -->
-    <string name="sync_error_storage_over_quota_banner_title">Syncing paused, your MEGA plan has run out of storage</string>
+    <string name="sync_error_storage_over_quota_banner_title">تم إيقاف المزامنة مؤقتًا ونفدت مساحة التخزين في باقة ميغا MEGA الخاصة بك</string>
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">ترقية</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Upload paused, phone is not charging</string>
+    <string name="camera_uploads_phone_not_charging_message">تم إيقاف الترفيع مؤقتًا، لا يتم شحن الهاتف</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
-    <string name="device_center_list_view_item_status_nothing_setup">No syncs set up</string>
+    <string name="device_center_list_view_item_status_nothing_setup">لم يتم إعداد عمليات المزامنة</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_title">الحساب غير مفعل</string>
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
-    <string name="account_pro_flexi_account_deactivated_dialog_body">Your Pro&#160;Flexi account has been deactivated due to payment failure or you’ve cancelled your subscription. You won’t be able to access the data stored in your account. \nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_pro_flexi_account_deactivated_dialog_body">تم إلغاء تنشيط حساب برو فلاكسي Pro&#160;Flexi الخاص بك بسبب فشل الدفع أو إلغاء اشتراكك. لن تتمكن من الوصول إلى البيانات المخزنة في حسابك. \nلإجراء الدفع وإعادة تفعيل اشتراكك قم بتسجيل الدخول إلى ميغا MEGA من خلال متصفح.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_starter_label">Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
@@ -317,15 +329,15 @@
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Uploads will be paused until you start charging your device. Uploads will still remain paused if your battery is below 20%.</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">سيتم إيقاف الترفيعات مؤقتًا حتى تبدأ في شحن جهازك. ستظل الترفيعات متوقفة مؤقتًا إذا كانت بطاريتك أقل من 20%.</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_title">No syncs set up</string>
+    <string name="device_center_sync_list_empty_state_title">لم يتم إعداد عمليات المزامنة</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sync a local folder on your device with a folder on MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">قم بمزامنة مجلد محلي على جهازك مع مجلد على ميغا MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
-    <string name="device_center_sync_add_new_syn_button_option">Add new sync</string>
+    <string name="device_center_sync_add_new_syn_button_option">إضافة مزامنة جديدة</string>
     <!-- Text for the Sync solved issues chip -->
-    <string name="device_center_sync_solved_issues_chip_text">Solved issues</string>
+    <string name="device_center_sync_solved_issues_chip_text">المشكلات التي تم حلها</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
     <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">You can’t sync folders that are currently synced folders.</string>
     <!-- Label for the file info information screen description field -->
@@ -333,17 +345,17 @@
     <!-- Placeholder for the file info information screen description field -->
     <string name="file_info_information_description_placeholder">إضافة وصف</string>
     <!-- Description added snack bar for the file info information screen-->
-    <string name="file_info_information_snackbar_description_added">Description added</string>
+    <string name="file_info_information_snackbar_description_added">تمت إضافة الوصف</string>
     <!-- Description updated snack bar for the file info information screen-->
-    <string name="file_info_information_snackbar_description_updated">Description updated</string>
+    <string name="file_info_information_snackbar_description_updated">تم تحديث الوصف</string>
     <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">Plus access to these great benefits:</string>
+    <string name="dialog_onboarding_feature_title_additional_features">بالإضافة إلى الوصول إلى هذه المزايا الرائعة:</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226; ميغا في بي إن &#160;MEGA&#160;VPN \n &#8226;&#160;مكالمات واجتماعات غير مقيدة \n&#8226;&#160;قم بمزامنة المجلدات تلقائيًا على جهازك المحمول \n&#8226;&#160;بدون إعلانات</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;ميغا في بي إن &#160;MEGA&#160;VPN \n&#8226;&#160;مكالمات واجتماعات غير مقيدة \n&#8226;&#160;قم بمزامنة المجلدات تلقائيًا على جهازك المحمول</string>
     <!-- Text for the Sync solved issues list empty state -->
-    <string name="device_center_sync_solved_issues_empty_state_text">No solved issues</string>
+    <string name="device_center_sync_solved_issues_empty_state_text">لا توجد مشاكل تم حلها</string>
     <!-- Title of first tour screen -->
     <string name="cloud_drive_tour_first_title">انت تحتفظ بالمفاتيح</string>
     <!-- Title of second tour screen -->
@@ -359,27 +371,31 @@
     <!-- Second subtitle of the tour screen -->
     <string name="cloud_drive_tour_second_subtitle">محادثة مشفرة بالكامل مع مكالمات صوتية ومكالمات فيديو ومراسلات جماعية و مشاركة ملفات بشكل متكامل مع سواقتك السحابية.</string>
     <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA.</string>
+    <string name="cloud_drive_tour_third_subtitle">يمكنك إضافة جهات اتصال وإنشاء شبكة والتعاون وإجراء مكالمات صوتية ومكالمات فيديو دون مغادرة ميغا MEGA مطلقًا.</string>
     <!-- Fourth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fourth_subtitle">ترفيع صور الكاميرا هو ميزة أساسية لأي جهاز محمول و نحن نقدم لك ذلك. أنشأ حسابك الآن.</string>
     <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Zero-knowledge encrypted video meeting.</string>
+    <string name="cloud_drive_tour_fifth_subtitle">اجتماع فيديو مشفر بتشفير المعرفة الصفرية.</string>
     <!-- Titles of the tour screen to onboard users with the MEGA application -->
     <string-array name="cloud_drive_tour_titles">
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
+        <item>@string/cloud_drive_tour_first_title</item>
+        <item>@string/cloud_drive_tour_second_title</item>
+        <item>@string/cloud_drive_tour_third_title</item>
+        <item>@string/cloud_drive_tour_fourth_title</item>
+        <item>@string/cloud_drive_tour_fifth_title</item>
     </string-array>
     <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
     <string-array name="cloud_drive_tour_subtitles">
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
+        <item>@string/cloud_drive_tour_first_subtitle</item>
+        <item>@string/cloud_drive_tour_second_subtitle</item>
+        <item>@string/cloud_drive_tour_third_subtitle</item>
+        <item>@string/cloud_drive_tour_fourth_subtitle</item>
+        <item>@string/cloud_drive_tour_fifth_subtitle</item>
     </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
-    <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
+    <string name="meetings_raised_hand_tooltip_title">[A]ميزة جديدة: رفع اليد[/A]</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_list_empty_state_message_free_account">حافظ على مزامنة معلوماتك وتحديثها من خلال الترقية إلى إحدى باقات برو Pro الخاصة بنا.</string>
+    <!-- "Upgrade now" label for a button, menu entry, etc -->
+    <string name="general_upgrade_now_label">رق حسابك الآن</string>
 </resources>

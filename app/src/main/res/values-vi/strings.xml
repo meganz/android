@@ -121,7 +121,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Đừng hiện lại nữa</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
+    <string name="confirm_cancel_login">Bạn có chắc muốn hủy&#160;bỏ quá&#160;trình đăng&#160;nhập hiện&#160;tại hay không?</string>
     <!-- Login button -->
     <string name="login_text">Đăng&#160;nhập</string>
     <!-- email label -->
@@ -1011,7 +1011,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]Đăng xuất[/A] để đổi sang tài khoản MEGA khác</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
+    <string name="confirm_logout_from_sms_verification">Bạn có chắc muốn đăng&#160;xuất khỏi tài&#160;khoản hiện&#160;tại hay không?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Tin nhắn này đã bị xóa bởi %1$s</string>
     <!-- Text shown when the chat history was cleared by someone -->

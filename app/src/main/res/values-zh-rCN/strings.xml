@@ -827,7 +827,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">正在等待电子邮件确认</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">查看您的电子邮件收件箱并跟随链接确认您的帐户。</string>
+    <string name="confirm_email_explanation">检查您的电子邮件收件箱并跟随链接确认您的帐户。</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d个项目</item>
@@ -3689,7 +3689,7 @@
         <item quantity="other">已添加%1$d个项目到“%2$s”</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
-    <string name="photos_user_album_empty_album">[A]相册[/A]为[B]空[/B]</string>
+    <string name="photos_user_album_empty_album">[B]空[/B][A]相册[/A]</string>
     <!-- Albums sub-section for all system and user albums -->
     <string name="photos_album_subsection_my_albums">我的相册</string>
     <!-- Albums sub-section for all shared albums -->
@@ -3705,7 +3705,7 @@
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">媒体发现视图</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">在媒体发现视图中自动打开只包含图片和视频的文件夹。这让您可以在图库模式下看到媒体，并按日期过滤。</string>
+    <string name="settings_media_discovery_view_context">在媒体发现视图中自动打开只包含图片和视频的文件夹。这让您可以在图库模式下看到媒体内容并按日期筛选。</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
     <string name="cloud_drive_media_discovery_banner_context">由于此文件夹仅包含图像和视频，我们已自动在媒体发现视图中将其打开。您可以通过更身临其境的布局欣赏您的视觉内容。您可以在设置中禁用此功能。</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
@@ -3733,7 +3733,7 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[未解密的文件夹]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">为了访问此共享文件夹，与您分享它的人应该也对您进行验证。</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">为了访问此共享文件夹，与您共享它的人应该也对您进行验证。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">验证%s</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
@@ -3754,7 +3754,7 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">不授予</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="other">已从“%2$s”中移除了%1$d个项目</item>
+        <item quantity="other">已从“%2$s”中移除%1$d个项目</item>
     </plurals>
     <!-- Label to describe one off meetings -->
     <string name="meetings_list_one_off_meeting_label">单次会议</string>
@@ -3783,7 +3783,7 @@
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">访问被拒绝</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_content_media_permissions_denied">您拒绝了MEGA对您设备的存储和媒体文件的访问。如果您想继续分享，请给予MEGA权限。</string>
+    <string name="dialog_content_media_permissions_denied">您已拒绝MEGA访问您设备的存储和媒体文件。如果您想继续共享，请授予MEGA权限。</string>
     <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
     <string name="dialog_positive_button_allow_permission">允许权限</string>
     <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
@@ -3817,7 +3817,7 @@
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s取消了[/A][B]预定于以下时间的事件：[/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_message">这个链接还没有在您目前登录的账户中生成。请登录与此链接相关的账户，以验证您的电子邮件地址。</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_message">此链接尚未在您目前登录的帐户中生成。请登入与此链接相关连的帐户，以验证您的电子邮件地址。</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
     <string name="account_change_email_error_not_logged_with_correct_account_title">无法更新电子邮件地址</string>
     <!-- Select album cover -->
@@ -4145,7 +4145,7 @@
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">账户安全升级</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">我们正在升级您帐户的安全性。您应该只会看到这条消息一次。如果您之前已经看过这条消息，请首先确认这是针对此帐户而非您拥有的其他MEGA帐户。\n\n如果您确定并且这是您第二次在这个帐户看到此消息，请停止使用此帐户。</string>
+    <string name="shared_items_security_upgrade_dialog_content">我们正在升级您帐户的安全性。您应该只会看到这条消息一次。如果您之前已经看到过，请首先确认这是针对此帐户而非您拥有的其它MEGA帐户。\n\n如果您确定并且这是您第二次在这个帐户看到此消息，请停止使用此帐户。</string>
     <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
         <item quantity="other">[文件未解密]</item>
@@ -4469,7 +4469,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite最多可还原90天已删除的数据，Pro&#160;I、II和III则最多可还原180天</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;安排垃圾桶清理工作7天至10年</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;定期清理回收站7天至10年</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">购买Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5148,6 +5148,6 @@
     <string name="meetings_one_participant_raised_their_hand_message">%1$s举起手</string>
     <!-- The snackbar message two or more participants raised their hands -->
     <plurals name="meetings_other_participants_raised_their_hands_message">
-        <item quantity="other">%1$s和其它%2$d个人举起手</item>
+        <item quantity="other">%1$s和其他%2$d个人举起手</item>
     </plurals>
 </resources>

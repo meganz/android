@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">Verlies nooit meer gegevens</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Terugspoelen om mappen tot 180 dagen terug te zetten naar een willekeurige datum, zodat uw gegevens ongevallig en fraudebestendig zijn.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -171,7 +171,7 @@
     <!-- Error message when the playlist name already exists -->
     <string name="video_section_playlists_error_message_playlist_name_exists">Er bestaat al een playlist met deze naam. Voer een andere naam in.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_delete_playlist_dialog_title">Afspeellijst verwijderen\?</string>
+    <string name="video_section_playlists_delete_playlist_dialog_title">Afspeellijst verwijderen?</string>
     <!-- Delete button title of the video section playlists tab delete playlist dialog -->
     <string name="video_section_playlists_delete_playlist_dialog_delete_button">Verwijderen</string>
     <!-- Text that indicates that there’s no playlist to show. -->
@@ -179,7 +179,7 @@
     <!-- Delete option title of the video section playlist bottom sheet -->
     <string name="video_section_playlist_bottom_sheet_option_title_delete">Afspeellijst verwijderen</string>
     <!-- Remove videos dialog title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_title">Uit de afspeellijst verwijderen\?</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">Uit de afspeellijst verwijderen?</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
     <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Verwijderen</string>
     <!-- Play all button title of the video section playlist detail -->
@@ -255,7 +255,7 @@
         <item quantity="other">Links delen</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_title">Naar deze lokatie downloaden\?</string>
+    <string name="transfers_dialog_save_download_location_title">Naar deze lokatie downloaden?</string>
     <!-- Option to don't use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_only_this_time_option">Alleen deze keer</string>
     <!-- Option to use the selected location as default location for next downloads-->
@@ -313,13 +313,57 @@
     <!-- Placeholder for the file info information screen description field -->
     <string name="file_info_information_description_placeholder">Omschrijving toevoegen</string>
     <!-- Description added snack bar for the file info information screen-->
-    <string name="file_info_information_snackbar_description_added">Description added</string>
+    <string name="file_info_information_snackbar_description_added">Beschrijving toegevoegd</string>
     <!-- Description updated snack bar for the file info information screen-->
-    <string name="file_info_information_snackbar_description_updated">Description updated</string>
+    <string name="file_info_information_snackbar_description_updated">Beschrijving bijgewerkt</string>
     <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">Plus access to these great benefits:</string>
+    <string name="dialog_onboarding_feature_title_additional_features">Plus toegang tot deze geweldige voordelen:</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226; &#160; MEGA &#160; VPN \n&#8226; &#160; Onbeperkt bellen en vergaderen \n&#8226; &#160; De mappen op uw mobiele apparaat automatisch synchroniseren \n&#8226; &#160; Geen advertenties</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226; &#160; MEGA &#160; VPN \n&#8226; &#160; Onbeperkt bellen en vergaderen \n&#8226; &#160; De mappen op uw mobiele apparaat automatisch synchroniseren</string>
+    <!-- Text for the Sync solved issues list empty state -->
+    <string name="device_center_sync_solved_issues_empty_state_text">Geen opgeloste problemen</string>
+    <!-- Title of first tour screen -->
+    <string name="cloud_drive_tour_first_title">U heeft de sleutels</string>
+    <!-- Title of second tour screen -->
+    <string name="cloud_drive_tour_second_title">Gecodeerd gesprek</string>
+    <!-- Title of third tour screen -->
+    <string name="cloud_drive_tour_third_title">Creëer uw netwerk</string>
+    <!-- Title of fourth tour screen -->
+    <string name="cloud_drive_tour_fourth_title">Uw foto’s in de cloud</string>
+    <!-- Title of fifth tour screen -->
+    <string name="cloud_drive_tour_fifth_title">MEGA vergadering</string>
+    <!-- First subtitle of the tour screen -->
+    <string name="cloud_drive_tour_first_subtitle">Veiligheid is waarom we bestaan, uw bestanden zijn veilig bij ons achter een goed geolied coderingsapparaat waar alleen u toegang heeft tot uw bestanden.</string>
+    <!-- Second subtitle of the tour screen -->
+    <string name="cloud_drive_tour_second_subtitle">Volledig gecodeerd gesprek met spraak en video oproepen, groepsgesprekken en bestandsdeling integratie met uw Cloud Schijf.</string>
+    <!-- Third subtitle of the tour screen -->
+    <string name="cloud_drive_tour_third_subtitle">Voeg contacten toe, creëer een netwerk, werk samen en voer spraak- en videogesprekken zonder MEGA te verlaten.</string>
+    <!-- Fourth subtitle of the tour screen -->
+    <string name="cloud_drive_tour_fourth_subtitle">Camera uploads zijn een essentiële functie voor elk mobiel apparaat en wij helpen u daarbij. Creëer uw account nu.</string>
+    <!-- Fifth subtitle of the tour screen -->
+    <string name="cloud_drive_tour_fifth_subtitle">Zero-knowledge gecodeerde videovergadering.</string>
+    <!-- Titles of the tour screen to onboard users with the MEGA application -->
+    <string-array name="cloud_drive_tour_titles">
+        <item>@string/cloud_drive_tour_first_title</item>
+        <item>@string/cloud_drive_tour_second_title</item>
+        <item>@string/cloud_drive_tour_third_title</item>
+        <item>@string/cloud_drive_tour_fourth_title</item>
+        <item>@string/cloud_drive_tour_fifth_title</item>
+    </string-array>
+    <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
+    <string-array name="cloud_drive_tour_subtitles">
+        <item>@string/cloud_drive_tour_first_subtitle</item>
+        <item>@string/cloud_drive_tour_second_subtitle</item>
+        <item>@string/cloud_drive_tour_third_subtitle</item>
+        <item>@string/cloud_drive_tour_fourth_subtitle</item>
+        <item>@string/cloud_drive_tour_fifth_subtitle</item>
+    </string-array>
+    <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
+    <string name="meetings_raised_hand_tooltip_title">[A]Nieuw kenmerk: Hand opsteken[/A]</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_list_empty_state_message_free_account">Houd uw informatie gesynchroniseerd en up-to-date door te upgraden naar een van onze Pro-abonnementen.</string>
+    <!-- "Upgrade now" label for a button, menu entry, etc -->
+    <string name="general_upgrade_now_label">Nu upgraden</string>
 </resources>

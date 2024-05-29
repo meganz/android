@@ -325,33 +325,37 @@
     <!-- Title of fourth tour screen -->
     <string name="cloud_drive_tour_fourth_title">รูปภาพของคุณในคลาวด์</string>
     <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">MEGA meeting</string>
+    <string name="cloud_drive_tour_fifth_title">การประชุม MEGA</string>
     <!-- First subtitle of the tour screen -->
     <string name="cloud_drive_tour_first_subtitle">ความปลอดภัยคือเหตุผลหลักที่เราดำเนินการอยู่ ไฟล์ของคุณจะมีความปลอดภัยมากยิ่งขึ้น เพราะใช้เครื่องมือเข้ารหัสที่ป้องกันไฟล์ของคุณ ซึ่งมีเพียงคุณเท่านั้นที่สามารถเข้าถึงไฟล์ได้</string>
     <!-- Second subtitle of the tour screen -->
     <string name="cloud_drive_tour_second_subtitle">แชทที่มีการเข้ารหัสอย่างเต็มที่ไม่ว่าจะเป็นการโทรด้วยเสียงและสนทนาทางวิดีโอ การส่งข้อความแบบกลุ่มและบูรณาการไฟล์ร่วมกันกับคลาวด์ไดรฟ์ของคุณ</string>
     <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA.</string>
+    <string name="cloud_drive_tour_third_subtitle">เพิ่มผู้ติดต่อ สร้างกลุ่ม ทำงานร่วมกัน และโทรทั้งแบบเสียงและวิดีโอได้ง่าย ๆ โดยไม่ต้องออกจาก MEGA เลย</string>
     <!-- Fourth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fourth_subtitle">การอัปโหลดจากกล้อง เป็นฟีเจอร์สำคัญสำหรับโทรศัพท์มือถือทุกเครื่องและเราได้ให้ความสำคัญกับคุณ สร้างบัญชีของคุณเลย</string>
     <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Zero-knowledge encrypted video meeting.</string>
+    <string name="cloud_drive_tour_fifth_subtitle">การประชุมทางวิดีโอด้วยการเข้ารหัสแบบซีโร่-นอว์เลจ</string>
     <!-- Titles of the tour screen to onboard users with the MEGA application -->
     <string-array name="cloud_drive_tour_titles">
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
+        <item>@string/cloud_drive_tour_first_title</item>
+        <item>@string/cloud_drive_tour_second_title</item>
+        <item>@string/cloud_drive_tour_third_title</item>
+        <item>@string/cloud_drive_tour_fourth_title</item>
+        <item>@string/cloud_drive_tour_fifth_title</item>
     </string-array>
     <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
     <string-array name="cloud_drive_tour_subtitles">
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
+        <item>@string/cloud_drive_tour_first_subtitle</item>
+        <item>@string/cloud_drive_tour_second_subtitle</item>
+        <item>@string/cloud_drive_tour_third_subtitle</item>
+        <item>@string/cloud_drive_tour_fourth_subtitle</item>
+        <item>@string/cloud_drive_tour_fifth_subtitle</item>
     </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
-    <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
+    <string name="meetings_raised_hand_tooltip_title">[A]ฟีเจอร์ใหม่: ยกมือขึ้น[/A]</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_list_empty_state_message_free_account">อัปเกรดเป็นแผน Pro ช่วยให้คุณซิงค์ข้อมูลกับอุปกรณ์ต่าง ๆ ของคุณได้อย่างราบรื่นและมั่นใจได้ว่าข้อมูลจะอัปเดตอยู่เสมอ</string>
+    <!-- "Upgrade now" label for a button, menu entry, etc -->
+    <string name="general_upgrade_now_label">อัปเกรดตอนนี้เลย</string>
 </resources>

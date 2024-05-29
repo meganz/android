@@ -125,7 +125,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">No volver a mostrar</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
+    <string name="confirm_cancel_login">¿Confirmas que quieres cancelar el proceso de inicio de sesión?</string>
     <!-- Login button -->
     <string name="login_text">Iniciar&#160;sesión</string>
     <!-- email label -->
@@ -1043,7 +1043,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]Cierra sesión[/A] para usar otra cuenta de MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
+    <string name="confirm_logout_from_sms_verification">¿Confirmas que quieres cerrar sesión y salir de tu cuenta?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">%1$s ha eliminado el mensaje</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -5619,10 +5619,11 @@
         <item quantity="other">Tú y %1$d personas habéis levantado la mano</item>
     </plurals>
     <!-- The snackbar message of another participant raised their hand -->
-    <string name="meetings_one_participant_raised_their_hand_message">%1$s raised their hand</string>
+    <string name="meetings_one_participant_raised_their_hand_message">%1$s ha levantado la mano</string>
     <!-- The snackbar message two or more participants raised their hands -->
     <plurals name="meetings_other_participants_raised_their_hands_message">
-        <item quantity="one">%1$s and %2$d other raised their hands</item>
-        <item quantity="other">%1$s and %2$d others raised their hands</item>
+        <item quantity="one">%1$s y %2$d más han levantado la mano</item>
+        <item quantity="many">%1$s y otros %2$d han levantado la mano</item>
+        <item quantity="other">%1$s y otros %2$d han levantado la mano</item>
     </plurals>
 </resources>

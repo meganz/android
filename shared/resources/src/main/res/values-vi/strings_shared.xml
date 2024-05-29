@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">Không bao&#160;giờ mất dữ&#160;liệu nữa</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Tua lại để khôi&#160;phục lại các thư&#160;mục về bất kỳ ngày nào trong phạm&#160;vi lên đến 180 ngày, vì vậy dữ&#160;liệu của bạn không bị tai&#160;nạn và chống giả&#160;mạo.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -171,7 +171,7 @@
     <!-- Error message when the playlist name already exists -->
     <string name="video_section_playlists_error_message_playlist_name_exists">Đã có một danh&#160;sách phát với tên này rồi. Nhập một tên khác.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_delete_playlist_dialog_title">Xóa danh&#160;sách phát\?</string>
+    <string name="video_section_playlists_delete_playlist_dialog_title">Xóa danh&#160;sách phát?</string>
     <!-- Delete button title of the video section playlists tab delete playlist dialog -->
     <string name="video_section_playlists_delete_playlist_dialog_delete_button">Xóa</string>
     <!-- Text that indicates that there’s no playlist to show. -->
@@ -179,7 +179,7 @@
     <!-- Delete option title of the video section playlist bottom sheet -->
     <string name="video_section_playlist_bottom_sheet_option_title_delete">Xóa danh&#160;sách phát</string>
     <!-- Remove videos dialog title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_title">Loại khỏi danh&#160;sách phát\?</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">Loại khỏi danh&#160;sách phát?</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
     <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Loại bỏ</string>
     <!-- Play all button title of the video section playlist detail -->
@@ -247,7 +247,7 @@
         <item quantity="other">Chia&#160;sẻ đường liên&#160;kết</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_title">Tải xuống vào vị&#160;trí này\?</string>
+    <string name="transfers_dialog_save_download_location_title">Tải xuống vào vị&#160;trí này?</string>
     <!-- Option to don't use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_only_this_time_option">Chỉ lần này</string>
     <!-- Option to use the selected location as default location for next downloads-->
@@ -305,17 +305,17 @@
     <!-- Placeholder for the file info information screen description field -->
     <string name="file_info_information_description_placeholder">Thêm miêu&#160;tả</string>
     <!-- Description added snack bar for the file info information screen-->
-    <string name="file_info_information_snackbar_description_added">Description added</string>
+    <string name="file_info_information_snackbar_description_added">Mô tả đã được thêm</string>
     <!-- Description updated snack bar for the file info information screen-->
-    <string name="file_info_information_snackbar_description_updated">Description updated</string>
+    <string name="file_info_information_snackbar_description_updated">Mô tả được cập nhật</string>
     <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">Plus access to these great benefits:</string>
+    <string name="dialog_onboarding_feature_title_additional_features">Cộng với quyền truy&#160;cập vào những lợi&#160;ích tuyệt&#160;vời sau:</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160; VPN \n&#8226;&#160;Cuộc gọi và họp không bị hạn&#160;chế \n&#8226;&#160;Tự động đồng&#160;bộ các thư&#160;mục trong thiết&#160;bị di&#160;động của bạn \n&#8226;&#160;Không có quảng&#160;cáo</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160; VPN \n&#8226;&#160;Cuộc gọi và họp không bị hạn&#160;chế \n&#8226;&#160;Tự động đồng&#160;bộ các thư&#160;mục trong thiết&#160;bị di&#160;động của bạn</string>
     <!-- Text for the Sync solved issues list empty state -->
-    <string name="device_center_sync_solved_issues_empty_state_text">No solved issues</string>
+    <string name="device_center_sync_solved_issues_empty_state_text">Không có vấn&#160;đề đã giải&#160;quyết nào</string>
     <!-- Title of first tour screen -->
     <string name="cloud_drive_tour_first_title">Chính bạn là người giữ chìa khóa</string>
     <!-- Title of second tour screen -->
@@ -331,27 +331,31 @@
     <!-- Second subtitle of the tour screen -->
     <string name="cloud_drive_tour_second_subtitle">Toàn bộ chát, tin nhắn, thoại hay video đều được mã hóa hoàn toàn và hoạt động với khả năng chia sẻ thông qua Ổ Mây.</string>
     <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA.</string>
+    <string name="cloud_drive_tour_third_subtitle">Thêm tên liên&#160;lạc, tạo kết&#160;nối, cộng&#160;tác với nhau, trao&#160;đổi qua gọi thoại và video mà không cần phải rời khỏi MEGA.</string>
     <!-- Fourth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fourth_subtitle">Đăng Tải Camêra là tính năng thiết yếu cho mọi thiết bị di động, và MEGA có cung cấp cho mọi người dùng. Tạo tài khoản ngay.</string>
     <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Zero-knowledge encrypted video meeting.</string>
+    <string name="cloud_drive_tour_fifth_subtitle">Gọi họp video an&#160;toàn với mã&#160;hóa vô&#160;kiến&#160;thức.</string>
     <!-- Titles of the tour screen to onboard users with the MEGA application -->
     <string-array name="cloud_drive_tour_titles">
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
+        <item>@string/cloud_drive_tour_first_title</item>
+        <item>@string/cloud_drive_tour_second_title</item>
+        <item>@string/cloud_drive_tour_third_title</item>
+        <item>@string/cloud_drive_tour_fourth_title</item>
+        <item>@string/cloud_drive_tour_fifth_title</item>
     </string-array>
     <!-- Subtitles of the tour screen to onboard users with the MEGA application -->
     <string-array name="cloud_drive_tour_subtitles">
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
+        <item>@string/cloud_drive_tour_first_subtitle</item>
+        <item>@string/cloud_drive_tour_second_subtitle</item>
+        <item>@string/cloud_drive_tour_third_subtitle</item>
+        <item>@string/cloud_drive_tour_fourth_subtitle</item>
+        <item>@string/cloud_drive_tour_fifth_subtitle</item>
     </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
-    <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
+    <string name="meetings_raised_hand_tooltip_title">[A]Tính&#160;năng mới: Giơ tay[/A]</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_list_empty_state_message_free_account">Giữ cho thông&#160;tin của bạn được đồng&#160;bộ hóa và cập&#160;nhật bằng cách nâng&#160;cấp lên một trong các gói Pro của chúng&#160;tôi.</string>
+    <!-- "Upgrade now" label for a button, menu entry, etc -->
+    <string name="general_upgrade_now_label">Nâng&#160;cấp ngay</string>
 </resources>

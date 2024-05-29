@@ -7,9 +7,9 @@
     <!-- Sync text of sync-->
     <string name="sync">مزامنة</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">MEGA needs to access your device storage in order to sync your local folder. Tap here to allow access.</string>
+    <string name="sync_storage_permission_banner">تحتاج ميغا MEGA إلى الوصول إلى مساحة تخزين جهازك من أجل مزامنة المجلد المحلي الخاص بك. انقر هنا للسماح بالوصول.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
+    <string name="sync_battery_optimisation_banner">لمزامنة ملفاتك ومجلداتك باستمرار اسمح بتشغيل ميغا MEGA في الخلفية</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="zero">%d ملف</item>
@@ -111,7 +111,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">شبكة الوايرلس فقط</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
+    <string name="sync_empty_state_message">ستحتاج إلى إعداد مجلد محلي على جهازك يتزامن مع المجلد المختار على السواقة السحابية</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">مزامنة المراقبة</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
@@ -125,7 +125,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">لا يمكن النقل أو إعادة التسمية</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">إجراء الحذف أو النقل في انتظار الفحص</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">لا يمكن الحذف بعد</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -165,7 +165,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">تحديد</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">An item has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">يحتوي العنصر على مشكلة تحتاج إلى قرارك لحلها</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">في انتظار اكتمال العمليات الأخرى</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -187,9 +187,9 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">هناك العديد من العناصر التي تحمل الاسم نفسه على جانب واحد من المزامنة الخاصة بك والتي ستصبح جميعها نفس العنصر الفردي على الجانب الآخر من المزامنة الخاصة بك</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">تم اكتشاف إجراء نقل أو إعادة تسمية في ميغا MEGA ولكن لا يمكن نسخه محليًا.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename action was detected locally, but couldn’t be replicated in MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">تم اكتشاف إجراء نقل أو إعادة تسمية محليًا، ولكن تعذر نسخه في ميغا MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">في انتظار انتهاء الفحص لتحديد ما إذا كان الملف قد تم نقله أو حذفه.</string>
 </resources>
