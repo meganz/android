@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.MediaPlayerRepository
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,14 +14,13 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MegaApiFolderHttpServerStartUseCaseTest {
-    private lateinit var underTest: MegaApiFolderHttpServerStartUseCase
+class MegaApiHttpServerStartUseCaseTest {
+    private lateinit var underTest: MegaApiHttpServerStartUseCase
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest =
-            MegaApiFolderHttpServerStartUseCase(mediaPlayerRepository = mediaPlayerRepository)
+        underTest = MegaApiHttpServerStartUseCase(mediaPlayerRepository = mediaPlayerRepository)
     }
 
     @BeforeEach
@@ -32,14 +31,14 @@ class MegaApiFolderHttpServerStartUseCaseTest {
     @Test
     fun `test that the result returns true`() =
         runTest {
-            whenever(mediaPlayerRepository.megaApiFolderHttpServerStart()).thenReturn(true)
+            whenever(mediaPlayerRepository.megaApiHttpServerStart()).thenReturn(true)
             assertThat(underTest()).isTrue()
         }
 
     @Test
     fun `test that the result returns false`() =
         runTest {
-            whenever(mediaPlayerRepository.megaApiFolderHttpServerStart()).thenReturn(false)
+            whenever(mediaPlayerRepository.megaApiHttpServerStart()).thenReturn(false)
             assertThat(underTest()).isFalse()
         }
 
@@ -47,6 +46,6 @@ class MegaApiFolderHttpServerStartUseCaseTest {
     fun `test that the function is invoked as expected`() =
         runTest {
             underTest()
-            verify(mediaPlayerRepository).megaApiFolderHttpServerStart()
+            verify(mediaPlayerRepository).megaApiHttpServerStart()
         }
 }
