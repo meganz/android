@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.R
@@ -35,8 +36,10 @@ import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
@@ -47,8 +50,10 @@ internal fun SyncFoldersScreen(
     pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (folderPairId: Long) -> Unit,
     addFolderClicked: () -> Unit,
+    upgradeAccountClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
+    isFreeAccount: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -61,7 +66,9 @@ internal fun SyncFoldersScreen(
             if (syncUiItems.isEmpty()) {
                 item {
                     SyncFoldersScreenEmptyState(
+                        isFreeAccount = isFreeAccount,
                         addFolderClicked = addFolderClicked,
+                        upgradeNowClicked = upgradeAccountClicked,
                         modifier = Modifier
                             .fillParentMaxHeight(0.8f)
                             .fillParentMaxWidth()
@@ -106,7 +113,9 @@ internal fun SyncFoldersScreen(
 
 @Composable
 private fun SyncFoldersScreenEmptyState(
+    isFreeAccount: Boolean,
     addFolderClicked: () -> Unit,
+    upgradeNowClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -126,25 +135,40 @@ private fun SyncFoldersScreenEmptyState(
             modifier = Modifier.padding(top = 32.dp),
             style = MaterialTheme.typography.h6Medium
         )
+        val messageTypography =
+            if (isFreeAccount) MaterialTheme.typography.subtitle2medium else MaterialTheme.typography.subtitle2
         MegaText(
             text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_message),
-            textColor = TextColor.Secondary,
+            textColor = if (isFreeAccount) TextColor.Primary else TextColor.Secondary,
             modifier = Modifier.padding(top = 16.dp),
-            style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+            style = messageTypography.copy(textAlign = TextAlign.Center),
         )
+        if (isFreeAccount) {
+            MegaText(
+                text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_message_free_account),
+                textColor = TextColor.Secondary,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS),
+                style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+            )
+        }
         RaisedDefaultMegaButton(
-            textId = sharedResR.string.device_center_sync_add_new_syn_button_option,
-            onClick = addFolderClicked,
+            textId = if (isFreeAccount) sharedResR.string.general_upgrade_now_label else sharedResR.string.device_center_sync_add_new_syn_button_option,
+            onClick = if (isFreeAccount) upgradeNowClicked else addFolderClicked,
             modifier = Modifier
-                .padding(top = 162.dp)
-                .defaultMinSize(minWidth = 232.dp),
+                .padding(top = if (isFreeAccount) 108.dp else 162.dp)
+                .defaultMinSize(minWidth = 232.dp)
+                .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON),
         )
     }
 }
 
 @CombinedThemePreviews
 @Composable
-private fun SyncFoldersScreenEmptyStatePreview() {
+private fun SyncFoldersScreenEmptyStatePreview(
+    @PreviewParameter(BooleanProvider::class) isFreeAccount: Boolean,
+) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             syncUiItems = emptyList(),
@@ -152,8 +176,10 @@ private fun SyncFoldersScreenEmptyStatePreview() {
             pauseRunClicked = {},
             removeFolderClicked = {},
             addFolderClicked = {},
+            upgradeAccountClicked = {},
             issuesInfoClicked = {},
             isLowBatteryLevel = false,
+            isFreeAccount = isFreeAccount,
         )
     }
 }
@@ -180,8 +206,10 @@ private fun SyncFoldersScreenSyncingPreview() {
             pauseRunClicked = {},
             removeFolderClicked = {},
             addFolderClicked = {},
+            upgradeAccountClicked = {},
             issuesInfoClicked = {},
             isLowBatteryLevel = false,
+            isFreeAccount = false,
         )
     }
 }
@@ -208,8 +236,15 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview() {
             pauseRunClicked = {},
             removeFolderClicked = {},
             addFolderClicked = {},
+            upgradeAccountClicked = {},
             issuesInfoClicked = {},
             isLowBatteryLevel = false,
+            isFreeAccount = false,
         )
     }
 }
+
+internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS =
+    "sync_list_screen_empty_status_text_for_free_accounts"
+internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON =
+    "sync_list_screen_empty_status_button"

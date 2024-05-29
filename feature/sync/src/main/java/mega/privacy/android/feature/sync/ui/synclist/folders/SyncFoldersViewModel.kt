@@ -9,10 +9,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.feature.sync.data.service.SyncBackgroundService
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -43,6 +46,8 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFolderTreeInfo: GetFolderTreeInfo,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
+    private val getAccountTypeUseCase: GetAccountTypeUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncFoldersState(emptyList()))
@@ -122,6 +127,24 @@ internal class SyncFoldersViewModel @Inject constructor(
             monitorBatteryInfoUseCase().collect { batteryInfo ->
                 _uiState.update { state ->
                     state.copy(isLowBatteryLevel = batteryInfo.level < SyncBackgroundService.LOW_BATTERY_LEVEL && !batteryInfo.isCharging)
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            runCatching {
+                getAccountTypeUseCase()
+            }.onSuccess { accountType ->
+                _uiState.update { it.copy(isFreeAccount = accountType == AccountType.FREE) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+
+        viewModelScope.launch {
+            monitorAccountDetailUseCase().collect { accountDetail ->
+                _uiState.update {
+                    it.copy(isFreeAccount = accountDetail.levelDetail?.accountType == AccountType.FREE)
                 }
             }
         }

@@ -239,6 +239,7 @@ private fun SyncListScreenContent(
         ) {
             SelectedChipScreen(
                 addFolderClicked = addFolderClicked,
+                upgradeAccountClicked = onOpenUpgradeAccountClicked,
                 stalledIssueDetailsClicked = stalledIssuesDetailsClicked,
                 moreClicked = moreClicked,
                 issuesInfoClicked = {
@@ -300,6 +301,7 @@ private fun HeaderChips(
 @Composable
 private fun SelectedChipScreen(
     addFolderClicked: () -> Unit,
+    upgradeAccountClicked: () -> Unit,
     stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
     issuesInfoClicked: () -> Unit,
@@ -313,6 +315,7 @@ private fun SelectedChipScreen(
         SYNC_FOLDERS -> {
             SyncFoldersRoute(
                 addFolderClicked = addFolderClicked,
+                upgradeAccountClicked = upgradeAccountClicked,
                 issuesInfoClicked = issuesInfoClicked,
                 viewModel = syncFoldersViewModel,
                 state = syncFoldersState
