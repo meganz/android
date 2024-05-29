@@ -23,7 +23,7 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import timber.log.Timber
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -34,10 +34,10 @@ import javax.inject.Inject
 @HiltViewModel
 class InviteContactViewModel @Inject constructor(
     @ApplicationContext applicationContext: Context,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getLocalContactsUseCase: GetLocalContactsUseCase,
     private val filterLocalContactsByEmailUseCase: FilterLocalContactsByEmailUseCase,
     private val filterPendingOrAcceptedLocalContactsByEmailUseCase: FilterPendingOrAcceptedLocalContactsByEmailUseCase,
+    private val createContactLinkUseCase: CreateContactLinkUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -70,6 +70,16 @@ class InviteContactViewModel @Inject constructor(
 
     init {
         updateCurrentSearchQuery()
+        createContactLink()
+    }
+
+    private fun createContactLink() {
+        viewModelScope.launch {
+            Timber.d("Creating contact link")
+            runCatching { createContactLinkUseCase(renew = false) }
+                .onSuccess { contactLink -> _uiState.update { it.copy(contactLink = contactLink) } }
+                .onFailure { Timber.e("Failed to generate a contact link", it) }
+        }
     }
 
     /**

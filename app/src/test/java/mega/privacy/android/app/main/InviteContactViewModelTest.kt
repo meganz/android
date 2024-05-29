@@ -14,7 +14,7 @@ import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,7 +24,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.NullAndEmptySource
-import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -36,18 +36,19 @@ class InviteContactViewModelTest {
     private lateinit var underTest: InviteContactViewModel
 
     private val context: Context = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val createContactLinkUseCase: CreateContactLinkUseCase = mock()
     private val getLocalContactsUseCase: GetLocalContactsUseCase = mock()
     private val filterLocalContactsByEmailUseCase: FilterLocalContactsByEmailUseCase = mock()
     private val filterPendingOrAcceptedLocalContactsByEmailUseCase: FilterPendingOrAcceptedLocalContactsByEmailUseCase =
         mock()
     private val defaultQuery = "defaultQuery"
+    private val defaultContactLink = "https://mega.nz/C!wf8jTYRB"
 
     private lateinit var savedStateHandle: SavedStateHandle
 
     @BeforeEach
     fun setup() = runTest {
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+        whenever(createContactLinkUseCase(false)) doReturn defaultContactLink
 
         savedStateHandle = SavedStateHandle(mapOf("CONTACT_SEARCH_QUERY" to defaultQuery))
         initializeViewModel()
@@ -56,11 +57,11 @@ class InviteContactViewModelTest {
     private fun initializeViewModel() {
         underTest = InviteContactViewModel(
             applicationContext = context,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = extension.testDispatcher,
             getLocalContactsUseCase = getLocalContactsUseCase,
             filterLocalContactsByEmailUseCase = filterLocalContactsByEmailUseCase,
             filterPendingOrAcceptedLocalContactsByEmailUseCase = filterPendingOrAcceptedLocalContactsByEmailUseCase,
+            createContactLinkUseCase = createContactLinkUseCase,
             savedStateHandle = savedStateHandle
         )
     }
@@ -337,11 +338,24 @@ class InviteContactViewModelTest {
             }
         }
 
+    @Test
+    fun `test that the contact link state value is updated after successfully creating the contact link`() =
+        runTest {
+            whenever(createContactLinkUseCase(false)) doReturn defaultContactLink
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().contactLink).isEqualTo(defaultContactLink)
+            }
+        }
+
     @AfterEach
     fun tearDown() {
         reset(
             context,
-            getFeatureFlagValueUseCase
+            createContactLinkUseCase,
+            getLocalContactsUseCase,
+            filterLocalContactsByEmailUseCase,
+            filterPendingOrAcceptedLocalContactsByEmailUseCase
         )
     }
 

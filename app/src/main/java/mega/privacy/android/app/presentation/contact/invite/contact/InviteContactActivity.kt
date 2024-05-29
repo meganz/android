@@ -50,7 +50,6 @@ import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.CONTACT_LINK_BASE_URL
 import mega.privacy.android.app.utils.Constants.REQUEST_READ_CONTACTS
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.contacts.ContactsFilter.isEmailInContacts
@@ -59,7 +58,6 @@ import mega.privacy.android.app.utils.contacts.ContactsFilter.isMySelf
 import mega.privacy.android.app.utils.contacts.ContactsFilter.isTheSameContact
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -81,7 +79,6 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
     private var actionBar: ActionBar? = null
     private var invitationContactsAdapter: InvitationContactsAdapter? = null
 
-    private var contactLink: String? = null
     private var listDialog: ContactInfoListDialog? = null
     private var currentSelected: InvitationContactInfo? = null
 
@@ -206,35 +203,6 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
         } else {
             queryIfHasReadContactsPermissions()
         }
-
-        val getContactLinkCallback: MegaRequestListenerInterface =
-            object : MegaRequestListenerInterface {
-                override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-                }
-
-                override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-                }
-
-                override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-                    if (request.type == MegaRequest.TYPE_CONTACT_LINK_CREATE && e.errorCode == MegaError.API_OK) {
-                        contactLink =
-                            CONTACT_LINK_BASE_URL + MegaApiAndroid.handleToBase64(request.nodeHandle)
-                    } else {
-                        Timber.w("Create contact link failed.")
-                        contactLink = ""
-                    }
-                }
-
-                override fun onRequestTemporaryError(
-                    api: MegaApiJava,
-                    request: MegaRequest,
-                    e: MegaError,
-                ) {
-                    Timber.w("Create contact link temp error.")
-                    contactLink = ""
-                }
-            }
-        megaApi.contactLinkCreate(false, getContactLinkCallback)
 
         collectFlows()
     }
@@ -392,7 +360,7 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
                 Timber.i("more button clicked - share invitation through other app")
                 val message = resources.getString(
                     R.string.invite_contacts_to_start_chat_text_message,
-                    contactLink
+                    viewModel.uiState.value.contactLink
                 )
                 val sendIntent = Intent().apply {
                     setAction(Intent.ACTION_SEND)
@@ -886,8 +854,10 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
                 Timber.d("setResultPhoneContacts: $phone")
             }
         }
-        val smsBody =
-            resources.getString(R.string.invite_contacts_to_start_chat_text_message, contactLink)
+        val smsBody = resources.getString(
+            R.string.invite_contacts_to_start_chat_text_message,
+            viewModel.uiState.value.contactLink
+        )
         val smsIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(recipient))
         smsIntent.putExtra("sms_body", smsBody)
         startActivity(smsIntent)
