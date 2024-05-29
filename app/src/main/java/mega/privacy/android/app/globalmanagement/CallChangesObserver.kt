@@ -5,9 +5,11 @@ import android.content.Context
 import android.os.PowerManager
 import android.provider.Settings
 import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants
@@ -25,6 +27,7 @@ import mega.privacy.android.domain.entity.meeting.ChatSessionStatus
 import mega.privacy.android.domain.entity.meeting.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.meeting.EndCallReason
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallHandleListUseCase
@@ -60,6 +63,7 @@ class CallChangesObserver @Inject constructor(
     private val isChatNotifiableUseCase: IsChatNotifiableUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
     private var wakeLock: PowerManager.WakeLock? = null
     private var openCallChatId: Long = -1
@@ -73,16 +77,18 @@ class CallChangesObserver @Inject constructor(
                 .catch { e -> Timber.e(e, "Error listening call updates") }
                 .collect { call ->
                     runCatching {
-                        val changes = call.changes.orEmpty()
-                        when {
-                            changes.contains(ChatCallChanges.Status)
-                            -> onHandleCallStatusChange(call)
+                        withContext(mainImmediateDispatcher) {
+                            val changes = call.changes.orEmpty()
+                            when {
+                                changes.contains(ChatCallChanges.Status)
+                                -> onHandleCallStatusChange(call)
 
-                            changes.contains(ChatCallChanges.RingingStatus)
-                            -> handleCallRinging(call)
+                                changes.contains(ChatCallChanges.RingingStatus)
+                                -> handleCallRinging(call)
 
-                            changes.contains(ChatCallChanges.CallComposition)
-                            -> handleCallComposition(call)
+                                changes.contains(ChatCallChanges.CallComposition)
+                                -> handleCallComposition(call)
+                            }
                         }
                     }.onFailure {
                         Timber.e(it, "Error handling call status change")
@@ -451,7 +457,9 @@ class CallChangesObserver @Inject constructor(
 
         if (!chatRoom.isMeeting || !chatManagement.isOpeningMeetingLink(incomingCallChatId)) {
             Timber.d("It is necessary to check the number of current calls")
-            controlNumberOfCalls(listAllCalls, callStatus, incomingCallChatId)
+            withContext(mainImmediateDispatcher) {
+                controlNumberOfCalls(listAllCalls, callStatus, incomingCallChatId)
+            }
         }
     }
 
