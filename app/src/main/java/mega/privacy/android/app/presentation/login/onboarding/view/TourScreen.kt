@@ -292,14 +292,18 @@ private fun HorizontalTourPager(
             )
 
             MegaText(
-                modifier = Modifier.padding(top = 20.dp),
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .testTag(TEXT_TOUR_TITLE_TAG),
                 text = stringResource(id = item[page].titleStringId),
                 textColor = TextColor.Primary,
                 style = MaterialTheme.typography.h6
             )
 
             MegaText(
-                modifier = Modifier.padding(top = 8.dp, start = 24.dp, end = 24.dp),
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 24.dp, end = 24.dp)
+                    .testTag(TEXT_TOUR_TEXT_TAG),
                 text = stringResource(id = item[page].subtitleStringId),
                 textAlign = TextAlign.Center,
                 textColor = TextColor.Secondary,
@@ -330,3 +334,5 @@ internal const val JOIN_A_MEETING_AS_GUEST_TAG = "tour_screen:button_join_a_meet
 internal const val PASTE_MEETING_LINK_DIALOG_TAG = "tour_screen:dialog_join_a_meeting_as_guest"
 internal const val BUTTON_LOGIN_TAG = "tour_screen:button_login"
 internal const val BUTTON_CREATE_ACCOUNT_TAG = "tour_screen:button_create_account"
+internal const val TEXT_TOUR_TITLE_TAG = "tour_screen:text_tour_title"
+internal const val TEXT_TOUR_TEXT_TAG = "tour_screen:text_tour_text"
