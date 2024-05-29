@@ -5,7 +5,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKey
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
@@ -102,13 +101,11 @@ class CredentialsPreferencesDataStoreTest {
         val masterKey = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
-        return PreferenceDataStoreFactory.createEncrypted(scope = scope) {
-            EncryptedFile.Builder(
-                context,
-                file,
-                masterKey,
-                EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-            ).build()
-        }
+        return PreferenceDataStoreFactory.createEncrypted(
+            scope = scope,
+            context = context,
+            fileName = credentialDataStoreName,
+            masterKey = masterKey
+        )
     }
 }

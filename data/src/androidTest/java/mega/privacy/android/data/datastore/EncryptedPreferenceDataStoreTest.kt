@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
-import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKey
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.CoroutineScope
@@ -54,13 +53,11 @@ internal class EncryptedPreferenceDataStoreTest {
         val masterKey = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
-        return PreferenceDataStoreFactory.createEncrypted(scope = scope) {
-            EncryptedFile.Builder(
-                context,
-                file,
-                masterKey,
-                EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-            ).build()
-        }
+        return PreferenceDataStoreFactory.createEncrypted(
+            scope = scope,
+            context = context,
+            fileName = "test",
+            masterKey = masterKey
+        )
     }
 }
