@@ -31,6 +31,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -46,6 +49,7 @@ import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.createManualInput
 import mega.privacy.android.app.main.InviteContactViewModel
 import mega.privacy.android.app.main.adapters.InvitationContactsAdapter
+import mega.privacy.android.app.main.model.InvitationStatusUiState
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
@@ -58,12 +62,7 @@ import mega.privacy.android.app.utils.contacts.ContactsFilter.isMySelf
 import mega.privacy.android.app.utils.contacts.ContactsFilter.isTheSameContact
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaContactRequest
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 
 /**
@@ -71,7 +70,7 @@ import timber.log.Timber
  */
 @AndroidEntryPoint
 class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
-    MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener {
+    InvitationContactsAdapter.OnItemClickListener {
 
     private val viewModel: InviteContactViewModel by viewModels()
 
@@ -87,7 +86,6 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
     private var contactsEmailsSelected: MutableList<String> = mutableListOf()
     private var contactsPhoneSelected: MutableList<String> = mutableListOf()
 
-    private var fromAchievement = false
     private var isPermissionGranted = false
     private var isGetContactCompleted = false
 
@@ -153,11 +151,8 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
         if (savedInstanceState != null) {
             isGetContactCompleted =
                 savedInstanceState.getBoolean(KEY_IS_GET_CONTACT_COMPLETED, false)
-            fromAchievement = savedInstanceState.getBoolean(KEY_FROM, false)
-        } else {
-            fromAchievement = intent.getBooleanExtra(KEY_FROM, false)
         }
-        Timber.d("Request by Achievement: $fromAchievement")
+
         if (isGetContactCompleted) {
             if (savedInstanceState != null) {
                 phoneContacts =
@@ -326,8 +321,13 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
     }
 
     private fun collectFlows() {
-        collectFlow(viewModel.uiState) { uiState ->
-            if (uiState.onContactsInitialized) {
+        collectFlow(
+            viewModel
+                .uiState
+                .map { it.onContactsInitialized }
+                .distinctUntilChanged()
+        ) { isContactsInitialized ->
+            if (isContactsInitialized) {
                 onGetContactCompleted()
                 viewModel.filterContacts(binding.typeMailEditText.text.toString())
                 viewModel.resetOnContactsInitializedState()
@@ -338,6 +338,63 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
             refreshList()
             visibilityFastScroller()
         }
+
+        collectFlow(
+            viewModel
+                .uiState
+                .map { it.invitationStatus }
+                .filter { it.emails.isNotEmpty() }
+                .distinctUntilChanged()
+        ) {
+            showInvitationsResult(it)
+        }
+    }
+
+    private fun showInvitationsResult(status: InvitationStatusUiState) {
+        val result = Intent()
+        // If the invitation is successful and the total number of invitations is one.
+        if (status.emails.size == 1 && status.totalInvitationSent == 1 && !viewModel.isFromAchievement) {
+            showSnackBar(getString(R.string.context_contact_request_sent, status.emails[0]))
+        } else {
+            val totalFailedInvitations = status.emails.size - status.totalInvitationSent
+            // There are failed invitations.
+            if (totalFailedInvitations > 0 && !viewModel.isFromAchievement) {
+                val requestsSent = resources.getQuantityString(
+                    R.plurals.contact_snackbar_invite_contact_requests_sent,
+                    status.totalInvitationSent,
+                    status.totalInvitationSent
+                )
+                val requestsNotSent = resources.getQuantityString(
+                    R.plurals.contact_snackbar_invite_contact_requests_not_sent,
+                    totalFailedInvitations,
+                    totalFailedInvitations
+                )
+                showSnackBar(requestsSent + requestsNotSent)
+            } else {
+                // All invitations are successfully sent.
+                if (!viewModel.isFromAchievement) {
+                    showSnackBar(
+                        resources.getQuantityString(
+                            R.plurals.number_correctly_invite_contact_request,
+                            status.emails.size,
+                            status.emails.size
+                        )
+                    )
+                } else {
+                    // Sent back the result to the InviteFriendsRoute.
+                    result.putExtra(KEY_SENT_NUMBER, status.totalInvitationSent)
+                }
+            }
+        }
+
+        Util.hideKeyboard(this@InviteContactActivity, 0)
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (contactsPhoneSelected.isNotEmpty()) {
+                invitePhoneContacts(ArrayList(contactsPhoneSelected))
+            }
+            setResult(RESULT_OK, result)
+            finish()
+        }, 2000)
     }
 
     /**
@@ -394,7 +451,6 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
         )
         outState.putBoolean(KEY_IS_PERMISSION_GRANTED, isPermissionGranted)
         outState.putBoolean(KEY_IS_GET_CONTACT_COMPLETED, isGetContactCompleted)
-        outState.putBoolean(KEY_FROM, fromAchievement)
         outState.putParcelable(CURRENT_SELECTED_CONTACT, currentSelected)
         listDialog?.let {
             outState.putIntegerArrayList(CHECKED_INDEX, it.checkedIndex)
@@ -423,16 +479,14 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
 
     private fun setTitleAB() {
         Timber.d("setTitleAB")
-        if (addedContacts.isNotEmpty()) {
-            actionBar?.setSubtitle(
-                resources.getQuantityString(
-                    R.plurals.general_selection_num_contacts,
-                    addedContacts.size,
-                    addedContacts.size
-                )
+        actionBar?.subtitle = if (addedContacts.isNotEmpty()) {
+            resources.getQuantityString(
+                R.plurals.general_selection_num_contacts,
+                addedContacts.size,
+                addedContacts.size
             )
         } else {
-            actionBar?.subtitle = null
+            null
         }
     }
 
@@ -687,6 +741,7 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
     }
 
     private fun onGetContactCompleted() {
+        isGetContactCompleted = true
         binding.inviteContactProgressBar.visibility = View.GONE
         refreshList()
         setRecyclersVisibility()
@@ -835,7 +890,7 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
 
         if (contactsEmailsSelected.isNotEmpty()) {
             //phone contact will be invited once email done
-            inviteEmailContacts(ArrayList(contactsEmailsSelected))
+            viewModel.inviteContactsByEmail(ArrayList(contactsEmailsSelected))
         } else if (contactsPhoneSelected.isNotEmpty()) {
             invitePhoneContacts(ArrayList(contactsPhoneSelected))
             finish()
@@ -861,90 +916,6 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
         val smsIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(recipient))
         smsIntent.putExtra("sms_body", smsBody)
         startActivity(smsIntent)
-    }
-
-    private var numberToSend = 0
-    private var numberSent = 0
-    private var numberNotSent = 0
-
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) = Unit
-
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) = Unit
-
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        if (request.type == MegaRequest.TYPE_INVITE_CONTACT) {
-            Timber.d("MegaRequest.TYPE_INVITE_CONTACT finished: ${request.number}")
-            if (e.errorCode == MegaError.API_OK) {
-                numberSent++
-                Timber.d("OK INVITE CONTACT: ${request.email}")
-            } else {
-                numberNotSent++
-                Timber.d("ERROR: ${e.errorCode}___${e.errorString}")
-            }
-            if (numberSent + numberNotSent == numberToSend) {
-                val result = Intent()
-                if (numberToSend == 1 && numberSent == 1) {
-                    if (!fromAchievement) {
-                        showSnackBar(
-                            getString(
-                                R.string.context_contact_request_sent,
-                                request.email
-                            )
-                        )
-                    } else {
-                        result.putExtra(KEY_SENT_EMAIL, request.email)
-                    }
-                } else {
-                    if (numberNotSent > 0 && !fromAchievement) {
-                        val requestsSent = resources.getQuantityString(
-                            R.plurals.contact_snackbar_invite_contact_requests_sent,
-                            numberSent,
-                            numberSent
-                        )
-                        val requestsNotSent = resources.getQuantityString(
-                            R.plurals.contact_snackbar_invite_contact_requests_not_sent,
-                            numberNotSent,
-                            numberNotSent
-                        )
-                        showSnackBar(requestsSent + requestsNotSent)
-                    } else {
-                        if (!fromAchievement) {
-                            showSnackBar(
-                                resources.getQuantityString(
-                                    R.plurals.number_correctly_invite_contact_request,
-                                    numberToSend,
-                                    numberToSend
-                                )
-                            )
-                        } else {
-                            result.putExtra(KEY_SENT_NUMBER, numberSent)
-                        }
-                    }
-                }
-
-                Util.hideKeyboard(this@InviteContactActivity, 0)
-                Handler(Looper.getMainLooper()).postDelayed({
-                    if (contactsPhoneSelected.isNotEmpty()) {
-                        invitePhoneContacts(ArrayList(contactsPhoneSelected))
-                    }
-                    numberSent = 0
-                    numberToSend = 0
-                    numberNotSent = 0
-                    setResult(RESULT_OK, result)
-                    finish()
-                }, 2000)
-            }
-        }
-    }
-
-    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {}
-
-    private fun inviteEmailContacts(emails: List<String>) {
-        numberToSend = emails.size
-        emails.forEach {
-            Timber.d("setResultEmailContacts: $it")
-            megaApi.inviteContact(it, null, MegaContactRequest.INVITE_ACTION_ADD, this)
-        }
     }
 
     /**
@@ -973,8 +944,7 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
     }
 
     companion object {
-        internal const val KEY_FROM: String = "fromAchievement"
-        internal const val KEY_SENT_NUMBER: String = "sentNumber"
+        internal const val KEY_SENT_NUMBER = "sentNumber"
 
         private const val SCAN_QR_FOR_INVITE_CONTACTS = 1111
         private const val KEY_PHONE_CONTACTS = "KEY_PHONE_CONTACTS"
@@ -988,6 +958,5 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
         private const val USER_INDEX_NONE_EXIST = -1
         private const val MIN_LIST_SIZE_FOR_FAST_SCROLLER = 20
         private const val ADDED_CONTACT_VIEW_MARGIN_LEFT = 10
-        private const val KEY_SENT_EMAIL: String = "sentEmail"
     }
 }

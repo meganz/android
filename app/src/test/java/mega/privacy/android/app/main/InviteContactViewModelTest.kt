@@ -9,11 +9,14 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
 import mega.privacy.android.app.main.InviteContactViewModel.Companion.ID_PHONE_CONTACTS_HEADER
+import mega.privacy.android.app.main.model.InvitationStatusUiState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailsUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -41,6 +44,7 @@ class InviteContactViewModelTest {
     private val filterLocalContactsByEmailUseCase: FilterLocalContactsByEmailUseCase = mock()
     private val filterPendingOrAcceptedLocalContactsByEmailUseCase: FilterPendingOrAcceptedLocalContactsByEmailUseCase =
         mock()
+    private val inviteContactWithEmailsUseCase: InviteContactWithEmailsUseCase = mock()
     private val defaultQuery = "defaultQuery"
     private val defaultContactLink = "https://mega.nz/C!wf8jTYRB"
 
@@ -62,6 +66,7 @@ class InviteContactViewModelTest {
             filterLocalContactsByEmailUseCase = filterLocalContactsByEmailUseCase,
             filterPendingOrAcceptedLocalContactsByEmailUseCase = filterPendingOrAcceptedLocalContactsByEmailUseCase,
             createContactLinkUseCase = createContactLinkUseCase,
+            inviteContactWithEmailsUseCase = inviteContactWithEmailsUseCase,
             savedStateHandle = savedStateHandle
         )
     }
@@ -348,6 +353,27 @@ class InviteContactViewModelTest {
             }
         }
 
+    @Test
+    fun `test that the correct invitation status state is updated after successfully inviting contacts by email`() =
+        runTest {
+            val emails = listOf("email1@email.com", "email2@email.com", "email3@email.com")
+            whenever(inviteContactWithEmailsUseCase(emails)) doReturn listOf(
+                InviteContactRequest.Sent,
+                InviteContactRequest.Resent,
+                InviteContactRequest.Sent
+            )
+
+            underTest.inviteContactsByEmail(emails)
+
+            underTest.uiState.test {
+                val expected = InvitationStatusUiState(
+                    emails = emails,
+                    totalInvitationSent = 2
+                )
+                assertThat(expectMostRecentItem().invitationStatus).isEqualTo(expected)
+            }
+        }
+
     @AfterEach
     fun tearDown() {
         reset(
@@ -355,7 +381,8 @@ class InviteContactViewModelTest {
             createContactLinkUseCase,
             getLocalContactsUseCase,
             filterLocalContactsByEmailUseCase,
-            filterPendingOrAcceptedLocalContactsByEmailUseCase
+            filterPendingOrAcceptedLocalContactsByEmailUseCase,
+            inviteContactWithEmailsUseCase
         )
     }
 

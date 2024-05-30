@@ -43,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toUnitString
+import mega.privacy.android.app.main.InviteContactViewModel.Companion.KEY_FROM
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactActivity
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
@@ -163,7 +164,7 @@ internal fun InviteFriendsView(
                     textId = R.string.invite_contacts,
                     onClick = {
                         val intent = Intent(context, InviteContactActivity::class.java).apply {
-                            putExtra(InviteContactActivity.KEY_FROM, true)
+                            putExtra(KEY_FROM, true)
                         }
                         activityLauncher.launch(intent)
                     }

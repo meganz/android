@@ -5,7 +5,7 @@ import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
 /**
- * Use case for invite contact with email.
+ * Use case for inviting a contact by email.
  *
  * @property chatRepository Chat repository.
  */

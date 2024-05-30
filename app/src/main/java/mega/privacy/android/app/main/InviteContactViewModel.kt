@@ -15,14 +15,17 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
+import mega.privacy.android.app.main.model.InvitationStatusUiState
 import mega.privacy.android.app.main.model.InviteContactFilterUiState
 import mega.privacy.android.app.main.model.InviteContactUiState
 import mega.privacy.android.app.utils.contacts.ContactsFilter
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest.Sent
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailsUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -38,6 +41,7 @@ class InviteContactViewModel @Inject constructor(
     private val filterLocalContactsByEmailUseCase: FilterLocalContactsByEmailUseCase,
     private val filterPendingOrAcceptedLocalContactsByEmailUseCase: FilterPendingOrAcceptedLocalContactsByEmailUseCase,
     private val createContactLinkUseCase: CreateContactLinkUseCase,
+    private val inviteContactWithEmailsUseCase: InviteContactWithEmailsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -65,6 +69,8 @@ class InviteContactViewModel @Inject constructor(
      */
     var allContacts: List<InvitationContactInfo> = emptyList()
         private set
+
+    internal val isFromAchievement = savedStateHandle.get<Boolean>(KEY_FROM) ?: false
 
     private lateinit var currentSearchQuery: String
 
@@ -286,11 +292,31 @@ class InviteContactViewModel @Inject constructor(
         _uiState.update { it.copy(onContactsInitialized = false) }
     }
 
+    internal fun inviteContactsByEmail(emails: List<String>) {
+        viewModelScope.launch {
+            Timber.d("Inviting contacts by emails. Total email: ${emails.size}")
+            runCatching { inviteContactWithEmailsUseCase(emails) }
+                .onSuccess {
+                    _uiState.update { uiState ->
+                        uiState.copy(
+                            invitationStatus = InvitationStatusUiState(
+                                emails = emails,
+                                totalInvitationSent = it.count { it == Sent }
+                            )
+                        )
+                    }
+                }
+                .onFailure { Timber.e("Failed to invite contacts by email.") }
+        }
+    }
+
     companion object {
         /**
          * View's ID for the header
          */
         const val ID_PHONE_CONTACTS_HEADER = -1L
+
+        internal const val KEY_FROM = "fromAchievement"
 
         private const val CONTACT_SEARCH_QUERY = "CONTACT_SEARCH_QUERY"
     }
