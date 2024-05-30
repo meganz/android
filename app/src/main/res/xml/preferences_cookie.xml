@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_cookie_accept"
         android:title="@string/preference_cookies_accept"
         app:allowDividerBelow="true"
@@ -20,7 +20,7 @@
         app:iconSpaceReserved="false"
         app:shouldDisableView="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_cookie_performance_analytics"
         android:summary="@string/preference_cookies_performance_summary"
         android:title="@string/preference_cookies_performance_title"
@@ -29,7 +29,7 @@
         app:iconSpaceReserved="false"
         app:shouldDisableView="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_cookie_advertisement"
         android:summary="@string/settings_cookies_settings_ads_summary"
         android:title="@string/settings_cookies_settings_ads_title"

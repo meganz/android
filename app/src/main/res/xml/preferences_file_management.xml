@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="setting_mobile_data_high_resolution"
         android:summary="@string/settings_mobile_data_resoluton_summary"
         android:title="@string/settings_mobile_data_resoluton_title"
@@ -35,7 +35,7 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_rb_scheduler_switch"
         android:title="@string/settings_rb_scheduler_enable_title"
         app:allowDividerAbove="true"
@@ -49,7 +49,7 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_file_versioning_switch"
         android:title="@string/settings_enable_file_versioning_title"
         android:summary="@string/settings_enable_file_versioning_subtitle"
@@ -72,7 +72,7 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:defaultValue="false"
         android:key="auto_play_switch"
         android:summary="@string/settings_file_management_auto_open_downloaded_file_description"

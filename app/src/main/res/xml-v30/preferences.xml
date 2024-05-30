@@ -81,7 +81,7 @@
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
 
-        <androidx.preference.SwitchPreferenceCompat
+        <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
             android:defaultValue="false"
             android:key="settings_hide_recent_activity"
             android:summary="@string/hide_recent_setting_context"
@@ -90,7 +90,7 @@
             app:allowDividerBelow="true"
             app:iconSpaceReserved="false" />
 
-        <androidx.preference.SwitchPreferenceCompat
+        <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
             android:defaultValue="false"
             android:key="settings_media_discovery_view"
             android:summary="@string/settings_media_discovery_view_context"
@@ -99,7 +99,7 @@
             app:allowDividerBelow="true"
             app:iconSpaceReserved="false" />
 
-        <androidx.preference.SwitchPreferenceCompat
+        <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
             android:defaultValue="false"
             android:key="settings_sub_folder_media_discovery"
             android:summary="@string/settings_media_discovery_sub_folder_context"
@@ -108,7 +108,7 @@
             app:allowDividerBelow="true"
             app:iconSpaceReserved="false" />
 
-        <androidx.preference.SwitchPreferenceCompat
+        <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
             android:defaultValue="true"
             android:key="settings_hidden_items"
             android:summary="@string/hidden_nodes_show_items_description"
@@ -124,7 +124,7 @@
         app:allowDividerAbove="false"
         app:allowDividerBelow="false">
 
-        <androidx.preference.SwitchPreferenceCompat
+        <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
             android:key="settings_audio_background_play_enabled"
             android:summary="@string/settings_background_play_hint"
             android:title="@string/settings_media_audio_files"
@@ -164,7 +164,7 @@
             app:allowDividerBelow="true"
             app:iconSpaceReserved="false" />
 
-        <androidx.preference.SwitchPreferenceCompat
+        <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
             android:key="settings_2fa_activated"
             android:title="@string/settings_2fa"
             android:summary="@string/setting_subtitle_2fa"
@@ -172,7 +172,7 @@
             app:allowDividerBelow="true"
             app:iconSpaceReserved="false" />
 
-        <androidx.preference.SwitchPreferenceCompat
+        <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
             android:key="settings_qrcode_autoaccept"
             android:title="@string/section_qr_code"
             android:summary="@string/setting_subtitle_qrcode_autoccept"

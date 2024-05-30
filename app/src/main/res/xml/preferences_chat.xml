@@ -22,7 +22,7 @@
         app:iconSpaceReserved="false" />
 
     <!--  Auto-away  -->
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_chat_autoaway_switch"
         android:title="@string/settings_autoaway_title"
         app:allowDividerAbove="true"
@@ -46,7 +46,7 @@
         app:iconSpaceReserved="false" />
 
     <!--  Show Last seen ...   -->
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_chat_last_green"
         android:title="@string/option_enable_last_green_chat"
         android:summary="@string/subtitle_option_enable_last_green_chat"
@@ -75,7 +75,7 @@
         app:iconSpaceReserved="false" />
 
     <!--  Rich URL Previews   -->
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_chat_rich_links_enable"
         android:title="@string/option_enable_chat_rich_preview"
         android:defaultValue="false"

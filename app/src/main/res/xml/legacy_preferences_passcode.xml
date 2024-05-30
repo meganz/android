@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:defaultValue="false"
         android:key="settings_passcode_enable"
         android:title="@string/settings_passcode_lock_switch"
@@ -18,7 +18,7 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:defaultValue="false"
         android:key="settings_fingerprint_enable"
         android:title="@string/setting_fingerprint"

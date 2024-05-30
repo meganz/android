@@ -43,19 +43,18 @@ import androidx.core.content.withStyledAttributes
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.PreviewWithTempAndNewCoreColorTokens
 
 
 /**
  * Custom implementation of Switch View following our design
- * WARNING: This component is still not ready, as disabled state colors needs to be defined. Please don't use it until it's ready
  * @property checked
  * @property enabled
  * @property onCheckedChange
  */
-internal class MegaSwitch : AbstractComposeView, Checkable {
+class MegaSwitch : AbstractComposeView, Checkable {
     @get:JvmName("isCheckedKt")
     @set:JvmName("setCheckedKt")
     var checked by mutableStateOf(false)
@@ -63,7 +62,7 @@ internal class MegaSwitch : AbstractComposeView, Checkable {
     @get:JvmName("isEnabledKt")
     @set:JvmName("setEnabledKt")
     var enabled by mutableStateOf(true)
-    var onCheckedChange by mutableStateOf<(Boolean) -> Unit>({ })
+    var onCheckedChange by mutableStateOf<((Boolean) -> Unit)?>(null)
 
     /**
      * overridden getter to be sure it's not used by mistake or from java code
@@ -95,32 +94,37 @@ internal class MegaSwitch : AbstractComposeView, Checkable {
         OriginalTempTheme(isDark = isSystemInDarkTheme()) {
             MegaSwitch(checked = checked, onCheckedChange = {
                 checked = it
-                onCheckedChange(it)
+                onCheckedChange?.invoke(it)
             })
         }
     }
 
     override fun setChecked(checked: Boolean) {
         this.checked = checked
+        onCheckedChange?.invoke(checked)
     }
 
     override fun isChecked() = checked
 
     override fun toggle() {
         checked = !checked
+        onCheckedChange?.invoke(checked)
+    }
+
+    fun setOnCheckedChangeListener(listener: ((Boolean) -> Unit)?) {
+        onCheckedChange = listener
     }
 }
 
 /**
  * Custom implementation of Switch component following our design
- * WARNING: This component is still not ready, as disabled state colors needs to be defined. Please don't use it until it's ready
  * @param checked
  * @param modifier [Modifier]
  * @param enabled
  * @param onCheckedChange
  */
 @Composable
-internal fun MegaSwitch(
+fun MegaSwitch(
     checked: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
