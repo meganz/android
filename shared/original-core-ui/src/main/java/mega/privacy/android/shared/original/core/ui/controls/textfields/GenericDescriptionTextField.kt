@@ -5,7 +5,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
@@ -129,15 +128,11 @@ fun GenericDescriptionTextField(
 
         CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
             @OptIn(ExperimentalMaterialApi::class)
-            (BasicTextField(
+            BasicTextField(
                 value = value,
                 maxLines = maxLines,
                 enabled = isEnabled,
                 modifier = modifier
-                    .defaultMinSize(
-                        minWidth = TextFieldDefaults.MinWidth,
-                        minHeight = 48.dp
-                    )
                     .fillMaxWidth()
                     .focusRequester(focusRequester)
                     .onFocusChanged {
@@ -187,10 +182,10 @@ fun GenericDescriptionTextField(
                         isError = isError,
                         interactionSource = interactionSource,
                         colors = textFieldColors,
-                        contentPadding = PaddingValues(2.dp)
+                        contentPadding = PaddingValues(vertical = 8.dp)
                     )
                 }
-            ))
+            )
         }
 
         charLimitErrorId?.let { id ->

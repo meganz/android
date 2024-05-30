@@ -58,13 +58,13 @@ import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 fun GenericTitleTextField(
     value: String,
     onValueChange: (String) -> Unit,
+    charLimit: Int,
     modifier: Modifier = Modifier,
     @StringRes placeholderId: Int? = null,
     @StringRes charLimitErrorId: Int? = null,
     isEmptyValueError: Boolean = false,
     shouldInitialFocus: Boolean = true,
     @StringRes emptyValueErrorId: Int? = null,
-    charLimit: Int,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     visualTransformation: VisualTransformation = VisualTransformation.None,
 ) {

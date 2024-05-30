@@ -21,6 +21,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
@@ -54,17 +56,20 @@ fun Chip(
     onClick: () -> Unit = {},
     enabled: Boolean = true,
     onClickLabel: String? = null,
+    showTransparentBackground: Boolean = false,
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
     content: @Composable RowScope.() -> Unit,
 ) {
-    val backgroundColor = style.colors().backgroundColor(
-        selected = selected,
-        enabled = enabled
-    ).value
+    val backgroundColor =
+        if (showTransparentBackground) Color.Transparent else style.colors()
+            .backgroundColor(
+                selected = selected,
+                enabled = enabled
+            ).value
 
     val borderStroke = BorderStroke(
         width = 1.dp,
-        color = style
+        color = if (showTransparentBackground) MegaOriginalTheme.colors.border.strong else style
             .colors()
             .borderColor(
                 selected = selected,
@@ -157,7 +162,9 @@ private fun ChipWithIconPreview2(
                 text = "Type"
             )
             Icon(
-                modifier = Modifier.height(18.dp).width(18.dp),
+                modifier = Modifier
+                    .height(18.dp)
+                    .width(18.dp),
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_chevron_down),
                 contentDescription = "See more",
             )
