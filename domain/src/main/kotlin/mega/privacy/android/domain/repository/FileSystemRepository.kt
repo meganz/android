@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ViewerNode
@@ -392,4 +394,12 @@ interface FileSystemRepository {
      * @return true if the file is deleted successfully
      */
     suspend fun deleteFileByUri(uri: String): Boolean
+
+    /**
+     * Get files in document folder
+     *
+     * @param uri file uri of the document folder
+     * @return
+     */
+    suspend fun getFilesInDocumentFolder(uri: UriPath): DocumentFolder
 }

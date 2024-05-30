@@ -26,6 +26,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import nz.mega.sdk.AndroidGfxProcessor
@@ -450,6 +452,15 @@ class FileFacade @Inject constructor(
 
     override suspend fun deleteFileByUri(uri: Uri): Boolean =
         context.contentResolver.delete(uri, null, null) > 0
+
+    override suspend fun getFilesInDocumentFolder(folder: UriPath): DocumentFolder {
+        val uri = Uri.parse(folder.value)
+        val document = DocumentFile.fromTreeUri(context, uri) ?: throw FileNotFoundException()
+        val files = document.listFiles().mapNotNull { file ->
+            UriPath(file.uri.toString())
+        }
+        return DocumentFolder(files)
+    }
 
     private fun File.getCompressFormat(): CompressFormat = when (extension) {
         "jpeg", "jpg" -> CompressFormat.JPEG

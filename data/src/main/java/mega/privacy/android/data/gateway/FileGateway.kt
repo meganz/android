@@ -2,6 +2,8 @@ package mega.privacy.android.data.gateway
 
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
+import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 import java.io.IOException
 
@@ -310,4 +312,12 @@ interface FileGateway {
      * @return
      */
     suspend fun deleteFileByUri(uri: Uri): Boolean
+
+    /**
+     * Get files in document folder
+     *
+     * @param folder
+     * @return list of files in the folder
+     */
+    suspend fun getFilesInDocumentFolder(folder: UriPath): DocumentFolder
 }

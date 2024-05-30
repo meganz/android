@@ -1,6 +1,8 @@
 package mega.privacy.android.app.uploadFolder.usecase
 
 import android.content.Context
+import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import kotlinx.coroutines.rx3.rxSingle
@@ -14,10 +16,12 @@ import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.EmptySearchException
 import mega.privacy.android.domain.exception.FolderNameNullException
+import mega.privacy.android.domain.usecase.file.GetFilesInDocumentFolderUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
@@ -34,6 +38,7 @@ class GetFolderContentUseCase @Inject constructor(
     private val getChildNodeUseCase: GetChildNodeUseCase,
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val uploadUseCase: UploadUseCase,
+    private val getFilesInDocumentFolderUseCase: GetFilesInDocumentFolderUseCase,
 ) {
 
     /**
@@ -45,27 +50,20 @@ class GetFolderContentUseCase @Inject constructor(
     private fun get(
         currentFolder: FolderContent.Data,
         context: Context,
-    ): Single<List<FolderContent.Data>> =
-        Single.create { emitter ->
-            val listFiles = currentFolder.document.listFiles()
-            if (listFiles.isEmpty()) {
-                emitter.onError(EmptyFolderException())
-            } else {
-                val folderContentList = mutableListOf<FolderContent.Data>()
-
-                listFiles.forEach { file ->
-                    folderContentList.add(
-                        FolderContent.Data(
-                            currentFolder,
-                            file,
-                            info = file.getInfo(context = context)
-                        )
-                    )
-                }
-
-                emitter.onSuccess(folderContentList)
+    ): Single<List<FolderContent.Data>> = rxSingle {
+        getFilesInDocumentFolderUseCase(UriPath(currentFolder.document.uri.toString()))
+    }.map {
+        it.files.mapNotNull { fileUri ->
+            val uri = Uri.parse(fileUri.value)
+            DocumentFile.fromTreeUri(context, uri)?.let { document ->
+                FolderContent.Data(
+                    currentFolder,
+                    document,
+                    info = document.getInfo(context = context)
+                )
             }
         }
+    }
 
     /**
      * Gets the content of a FolderContent Data. It should represent a folder.

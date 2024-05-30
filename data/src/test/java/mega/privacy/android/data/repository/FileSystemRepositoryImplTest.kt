@@ -34,6 +34,8 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.FileNotCreatedException
@@ -591,5 +593,17 @@ internal class FileSystemRepositoryImplTest {
             verify(fileGateway).deleteFileByUri(uri)
             assertThat(actual).isEqualTo(expected)
         }
+    }
+
+    @Test
+    fun `test that get file in document folder returns correct value`() = runTest {
+        val folderUri = UriPath("file://test/file/path")
+        val uriPath = UriPath("file://test/file/path/file")
+        whenever(fileGateway.getFilesInDocumentFolder(folderUri)).thenReturn(
+            DocumentFolder(listOf(uriPath))
+        )
+        assertThat(underTest.getFilesInDocumentFolder(folderUri)).isEqualTo(
+            DocumentFolder(listOf(uriPath))
+        )
     }
 }

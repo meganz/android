@@ -420,7 +420,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
             actionMode != null -> onLongClick(itemClicked, position)
             itemClicked.isFolder -> {
                 showProgress(true)
-                if (this::searchMenuItem.isInitialized) {
+                if (this::searchMenuItem.isInitialized && searchMenuItem.isActionViewExpanded) {
                     searchMenuItem.collapseActionView()
                 }
                 viewModel.folderClick(itemClicked)

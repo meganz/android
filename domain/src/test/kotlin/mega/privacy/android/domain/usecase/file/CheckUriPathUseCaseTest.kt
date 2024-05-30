@@ -10,7 +10,7 @@ import org.mockito.Mockito
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CheckFileUriUseCaseTest {
+class CheckUriPathUseCaseTest {
 
     private val fileSystemRepository: FileSystemRepository = Mockito.mock()
 

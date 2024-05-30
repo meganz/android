@@ -30,6 +30,7 @@ class FolderContentListHolder(
 
                 if (!isSelected) {
                     if (item.isFolder) {
+                        setImageURI(null as Uri?)
                         hierarchy.setPlaceholderImage(IconPackR.drawable.ic_folder_medium_solid)
                         hierarchy.setPlaceholderImage(IconPackR.drawable.ic_folder_medium_solid)
                     } else {

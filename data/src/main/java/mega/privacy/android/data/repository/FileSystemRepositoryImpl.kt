@@ -46,7 +46,9 @@ import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.FileVersionsOption
+import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ViewerNode
@@ -596,4 +598,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun deleteFileByUri(uri: String): Boolean = withContext(ioDispatcher) {
         fileGateway.deleteFileByUri(Uri.parse(uri))
     }
+
+    override suspend fun getFilesInDocumentFolder(uri: UriPath): DocumentFolder =
+        withContext(ioDispatcher) {
+            fileGateway.getFilesInDocumentFolder(uri)
+        }
 }
