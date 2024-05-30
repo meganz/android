@@ -49,8 +49,8 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property showOnlyMeEndCallTime                  Show only me end call remaining time
  * @property participantsChanges                    Message to show when a participant changes
  * @property userIdsWithChangesInRaisedHand         User identifiers with changes in the raised hand
- * @property shouldParticipantInCallListBeShown         True, it must be shown. False, must be hidden
  * @property isRaiseToHandSuggestionShown           True, if the Raise to Hand suggestion has been shown. False, otherwise.
+ * @property shouldUpdateLocalAVFlags               True, if should update local av flag. False, if not
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -90,6 +90,7 @@ data class InMeetingUiState(
     val participantsChanges: ParticipantsChange? = null,
     val userIdsWithChangesInRaisedHand: List<Long> = emptyList(),
     val isRaiseToHandSuggestionShown: Boolean = true,
+    val shouldUpdateLocalAVFlags: Boolean = true,
 ) {
     /**
      * Is call on hold

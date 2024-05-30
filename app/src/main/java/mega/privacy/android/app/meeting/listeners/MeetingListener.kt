@@ -11,7 +11,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_OUTGOING_RIN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_SPEAK_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AUDIO_LEVEL_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AVFLAGS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_NETWORK_QUALITY_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
@@ -57,12 +56,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             if (call.status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION || call.status == MegaChatCall.CALL_STATUS_DESTROYED) {
                 stopCountDown()
             }
-        }
-
-        // Local audio/video flags has changed
-        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)) {
-            Timber.d("Changes in local av flags. Audio enable ${call.hasLocalAudio()}, Video enable ${call.hasLocalVideo()}")
-            sendCallEvent(EVENT_LOCAL_AVFLAGS_CHANGE, call)
         }
 
         // Peer has changed its ringing state

@@ -12,7 +12,6 @@ object EventConstants {
     /** Event Keys related to calls*/
     const val EVENT_UPDATE_CALL = "update_call"
     const val EVENT_CALL_STATUS_CHANGE = "call_status_change"
-    const val EVENT_LOCAL_AVFLAGS_CHANGE = "local_avflags_change"
     const val EVENT_RINGING_STATUS_CHANGE = "ringing_status_change"
     const val EVENT_CALL_COMPOSITION_CHANGE = "call_composition_change"
     const val EVENT_CALL_ON_HOLD_CHANGE = "call_on_hold_change"

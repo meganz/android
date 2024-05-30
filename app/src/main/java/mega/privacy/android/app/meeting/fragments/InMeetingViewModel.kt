@@ -531,10 +531,24 @@ class InMeetingViewModel @Inject constructor(
                             contains(ChatCallChanges.CallRaiseHand) -> {
                                 updateParticipantsWithRaisedHand()
                             }
+                            contains(ChatCallChanges.LocalAVFlags) -> {
+                                checkUpdateLocalAVFlags(update = true)
+                            }
                         }
                     }
                 }
         }
+    }
+
+    /**
+     * Check update Local AVFlags
+     *
+     * @param update    True, is updated. False, if not.
+     */
+    fun checkUpdateLocalAVFlags(update: Boolean) = _state.update { state ->
+        state.copy(
+            shouldUpdateLocalAVFlags = update,
+        )
     }
 
     /**

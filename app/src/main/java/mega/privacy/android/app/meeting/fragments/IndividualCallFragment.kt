@@ -11,16 +11,18 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AVFLAGS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
@@ -57,6 +59,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private lateinit var onHoldImageView: ImageView
     private var microOffImageView: ImageView? = null
     private var raisedHandIcon: ImageView? = null
+
+    val individualCallViewModel: InMeetingViewModel by activityViewModels()
+
 
     private lateinit var inMeetingFragment: InMeetingFragment
 
@@ -114,13 +119,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
         }
 
-    private val localAVFlagsObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId) && isAdded) {
-            Timber.d("Check changes in local AVFlags")
-            checkItIsOnlyAudio()
-        }
-    }
-
     private val callOnHoldObserver = Observer<MegaChatCall> {
         if (inMeetingViewModel.isSameCall(it.callId) && isAdded) {
             Timber.d("Check changes in call on hold")
@@ -174,8 +172,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
     }
 
     private fun initLiveEventBus() {
-        LiveEventBus.get(EVENT_LOCAL_AVFLAGS_CHANGE, MegaChatCall::class.java)
-            .observeSticky(this, localAVFlagsObserver)
         LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AVFLAGS_CHANGE)
             .observeSticky(this, remoteAVFlagsObserver)
 
@@ -263,7 +259,14 @@ class IndividualCallFragment : MeetingBaseFragment() {
         viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->
             raisedHandIcon?.isVisible =
                 state.isRaiseToSpeakFeatureFlagEnabled && state.isMyHandRaisedToSpeak
+        }
 
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.shouldUpdateLocalAVFlags }
+            .distinctUntilChanged()) { shouldUpdateLocalAVFlags ->
+            if (shouldUpdateLocalAVFlags) {
+                inMeetingViewModel.checkUpdateLocalAVFlags(update = false)
+                checkItIsOnlyAudio()
+            }
         }
     }
 
