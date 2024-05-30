@@ -155,9 +155,10 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun providePassphraseEncryptedFile(
         @ApplicationContext context: Context,
-        masterKey: MasterKey,
+        masterKey: MasterKey?,
         passphraseFile: File,
     ): EncryptedFile? {
+        masterKey ?: return null
         return runCatching {
             EncryptedFile.Builder(
                 context,
@@ -174,10 +175,14 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideMasterKey(
         @ApplicationContext context: Context,
-    ): MasterKey {
-        return MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
+    ): MasterKey? {
+        return runCatching {
+            MasterKey.Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+        }.onFailure {
+            Timber.e(it, "Failed to create MasterKey")
+        }.getOrNull()
     }
 
     @Provides
