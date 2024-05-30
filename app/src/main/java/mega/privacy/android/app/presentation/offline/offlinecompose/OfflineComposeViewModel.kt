@@ -30,7 +30,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * OfflineComposeViewModel of [OfflineFragmentCompose]
+ * OfflineComposeViewModel of [OfflineComposeFragment]
  */
 @HiltViewModel
 class OfflineComposeViewModel @Inject constructor(

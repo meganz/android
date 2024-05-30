@@ -55,7 +55,7 @@ import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.LegacyOfflineOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -1072,7 +1072,7 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
     private fun showOptionsPanel(node: MegaOffline) {
         Timber.d("showNodeOptionsPanel-Offline")
         if (childFragmentManager.findFragmentByTag("OfflineOptionsBottomSheetDialogFragment") != null) return
-        OfflineOptionsBottomSheetDialogFragment.newInstance(node).show(
+        LegacyOfflineOptionsBottomSheetDialogFragment.newInstance(node).show(
             childFragmentManager, "OfflineOptionsBottomSheetDialogFragment"
         )
     }

@@ -146,7 +146,7 @@
     </fragment>
     <fragment
         android:id="@+id/offlineFragmentCompose"
-        android:name="mega.privacy.android.app.presentation.offline.offlinecompose.OfflineFragmentCompose"
+        android:name="mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment"
         android:label="OfflineFragmentCompose">
         <argument
             android:name="path"

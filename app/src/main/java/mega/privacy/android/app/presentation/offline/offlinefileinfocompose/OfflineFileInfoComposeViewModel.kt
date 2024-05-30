@@ -70,12 +70,14 @@ internal class OfflineFileInfoComposeViewModel @Inject constructor(
 
                     _state.update {
                         it.copy(
+                            isLoading = false,
                             title = offlineNodeInfo.name,
                             isFolder = offlineNodeInfo.isFolder,
                             addedTime = addedTime,
                             totalSize = totalSize,
                             folderInfo = folderInfo,
-                            thumbnail = thumbnail
+                            thumbnail = thumbnail,
+                            handle = nodeId.longValue
                         )
                     }
                 } ?: run {

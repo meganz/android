@@ -206,8 +206,8 @@ import mega.privacy.android.app.presentation.node.NodeSourceTypeMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
 import mega.privacy.android.app.presentation.offline.OfflineFragment
+import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment
 import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeViewModel
-import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineFragmentCompose
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
@@ -590,8 +590,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var permissionsFragment: PermissionsFragment? = null
     private var mStopped = true
     private var bottomItemBeforeOpenFullscreenOffline = Constants.INVALID_VALUE
-    private var fullscreenOfflineFragmentCompose: OfflineFragmentCompose? = null
-    private var pagerOfflineFragmentCompose: OfflineFragmentCompose? = null
+    private var fullscreenOfflineComposeFragment: OfflineComposeFragment? = null
+    private var pagerOfflineComposeFragment: OfflineComposeFragment? = null
     private var fullscreenOfflineFragment: OfflineFragment? = null
     private var pagerOfflineFragment: OfflineFragment? = null
 
@@ -4026,8 +4026,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    fun fullscreenOfflineFragmentComposeOpened(fragment: OfflineFragmentCompose?) {
-        fullscreenOfflineFragmentCompose = fragment
+    fun fullscreenOfflineFragmentComposeOpened(fragment: OfflineComposeFragment?) {
+        fullscreenOfflineComposeFragment = fragment
         showFabButton()
         setBottomNavigationMenuItemChecked(HOME_BNV)
         appBarLayout.visibility = View.VISIBLE
@@ -4035,9 +4035,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         supportInvalidateOptionsMenu()
     }
 
-    fun fullscreenOfflineFragmentComposeClosed(fragment: OfflineFragmentCompose) {
-        if (fragment === fullscreenOfflineFragmentCompose) {
-            fullscreenOfflineFragmentCompose = null
+    fun fullscreenOfflineFragmentComposeClosed(fragment: OfflineComposeFragment) {
+        if (fragment == fullscreenOfflineComposeFragment) {
+            fullscreenOfflineComposeFragment = null
             if (bottomItemBeforeOpenFullscreenOffline != Constants.INVALID_VALUE && !mStopped) {
                 goBackToBottomNavigationItem(bottomItemBeforeOpenFullscreenOffline)
                 bottomItemBeforeOpenFullscreenOffline = Constants.INVALID_VALUE
@@ -4052,12 +4052,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    fun pagerOfflineFragmentComposeOpened(fragment: OfflineFragmentCompose?) {
-        pagerOfflineFragmentCompose = fragment
+    fun pagerOfflineComposeFragmentOpened(fragment: OfflineComposeFragment?) {
+        pagerOfflineComposeFragment = fragment
     }
 
-    fun pagerOfflineFragmentComposeClosed(fragment: OfflineFragmentCompose) {
-        if (fragment === pagerOfflineFragmentCompose) {
+    fun pagerOfflineComposeFragmentClosed(fragment: OfflineComposeFragment) {
+        if (fragment == pagerOfflineComposeFragment) {
             pagerOfflineFragment = null
         }
     }
@@ -4067,7 +4067,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     fun pagerOfflineFragmentClosed(fragment: OfflineFragment) {
-        if (fragment === pagerOfflineFragment) {
+        if (fragment == pagerOfflineFragment) {
             pagerOfflineFragment = null
         }
     }

@@ -24,7 +24,8 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import timber.log.Timber
 
-internal class OfflineOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
+@Deprecated("Use OfflineOptionsBottomSheetDialogFragment")
+internal class LegacyOfflineOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
     View.OnClickListener {
     private val nodeOffline: MegaOffline by lazy(LazyThreadSafetyMode.NONE) {
         requireNotNull(requireArguments().parcelable(EXTRA_OFFLINE))
@@ -146,7 +147,7 @@ internal class OfflineOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFr
     companion object {
         private const val EXTRA_OFFLINE = "offline"
 
-        fun newInstance(offline: MegaOffline) = OfflineOptionsBottomSheetDialogFragment().apply {
+        fun newInstance(offline: MegaOffline) = LegacyOfflineOptionsBottomSheetDialogFragment().apply {
             arguments = bundleOf(EXTRA_OFFLINE to offline)
         }
     }

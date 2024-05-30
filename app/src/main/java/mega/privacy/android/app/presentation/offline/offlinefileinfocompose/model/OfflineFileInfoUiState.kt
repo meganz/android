@@ -16,6 +16,8 @@ import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
  * @property isFolder true if the node is a folder, false if it's a file
  * @property id id of node in database
  * @property parentId id of parent in database
+ * @property isLoading true if the node is still loading, false otherwise
+ * @property errorEvent event to show an error message
  */
 data class OfflineFileInfoUiState(
     val id: Int = 0,
@@ -27,5 +29,6 @@ data class OfflineFileInfoUiState(
     val addedTime: Long? = null,
     val thumbnail: String? = null,
     val isFolder: Boolean = false,
+    val isLoading: Boolean = true,
     val errorEvent: StateEventWithContent<Boolean> = consumed()
 )

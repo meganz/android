@@ -3,7 +3,7 @@ package mega.privacy.android.app.fragments.homepage.main
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import mega.privacy.android.app.presentation.offline.OfflineFragment
-import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineFragmentCompose
+import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment
 import mega.privacy.android.app.presentation.recentactions.RecentActionsComposeFragment
 import mega.privacy.android.app.presentation.recentactions.RecentActionsFragment
 
@@ -19,7 +19,7 @@ class BottomSheetPagerAdapter(
         else
             RecentActionsFragment::class.java,
         OFFLINE_INDEX to if (enableOfflineCompose)
-            OfflineFragmentCompose::class.java
+            OfflineComposeFragment::class.java
         else
             OfflineFragment::class.java
     )
