@@ -125,7 +125,7 @@ internal object DataStoreModule {
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         migration: CredentialsPreferencesMigration,
-        masterKey: MasterKey,
+        masterKey: MasterKey?,
     ): DataStore<Preferences> {
         return PreferenceDataStoreFactory.createEncrypted(
             corruptionHandler = ReplaceFileCorruptionHandler(

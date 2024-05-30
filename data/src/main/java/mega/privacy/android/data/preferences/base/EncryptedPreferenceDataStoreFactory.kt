@@ -41,10 +41,11 @@ fun PreferenceDataStoreFactory.createEncrypted(
     corruptionHandler: ReplaceFileCorruptionHandler<Preferences>? = null,
     migrations: List<DataMigration<Preferences>> = listOf(),
     scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-    masterKey: MasterKey,
+    masterKey: MasterKey?,
     fileName: String,
 ): DataStore<Preferences> {
     return try {
+        masterKey ?: throw IllegalArgumentException("Failed to create MasterKey")
         val encryptedFile = EncryptedFile.Builder(
             context,
             context.preferencesDataStoreFile(fileName),
