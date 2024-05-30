@@ -190,7 +190,7 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
             cameraUploadsSettingsPreferenceGateway.setUploadFileNamesKept(keepFileNames)
         }
 
-    override suspend fun isSecondaryMediaFolderEnabled() = withContext(ioDispatcher) {
+    override suspend fun isMediaUploadsEnabled() = withContext(ioDispatcher) {
         cameraUploadsSettingsPreferenceGateway.isMediaUploadsEnabled()
     }
 

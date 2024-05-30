@@ -199,11 +199,12 @@ interface CameraUploadsRepository {
     suspend fun setUploadFileNamesKept(keepFileNames: Boolean)
 
     /**
-     * Is secondary media folder enabled
+     * Checks whether or not Media Uploads (Secondary Folder Uploads) is enabled
      *
-     * @return true if secondary media folder enabled
+     * @return true if Media Uploads is enabled, and false if otherwise. null may be returned if the
+     * Setting saved in the DataStore is null
      */
-    suspend fun isSecondaryMediaFolderEnabled(): Boolean?
+    suspend fun isMediaUploadsEnabled(): Boolean?
 
     /**
      * Checks whether compressing videos require the device to be charged or not

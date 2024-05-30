@@ -19,7 +19,7 @@ class SendMediaUploadsBackupHeartBeatUseCase @Inject constructor(private val cam
         heartbeatStatus: HeartbeatStatus,
         lastNodeHandle: Long,
     ) {
-        if (cameraUploadsRepository.isSecondaryMediaFolderEnabled() == true) {
+        if (cameraUploadsRepository.isMediaUploadsEnabled() == true) {
             cameraUploadsRepository.getMuBackUpId()?.let { backupId ->
                 cameraUploadsRepository.sendBackupHeartbeat(
                     backupId = backupId,

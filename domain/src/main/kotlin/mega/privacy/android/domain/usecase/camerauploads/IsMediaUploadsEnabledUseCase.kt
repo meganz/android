@@ -18,5 +18,5 @@ class IsMediaUploadsEnabledUseCase @Inject constructor(
      * @return true if Media Uploads is enabled, and false if otherwise. false is also returned
      * if the Setting saved in the DataStore is null
      */
-    suspend operator fun invoke() = cameraUploadsRepository.isSecondaryMediaFolderEnabled() ?: false
+    suspend operator fun invoke() = cameraUploadsRepository.isMediaUploadsEnabled() ?: false
 }

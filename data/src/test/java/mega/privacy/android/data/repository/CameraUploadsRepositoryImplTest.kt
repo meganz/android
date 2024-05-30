@@ -402,14 +402,32 @@ class CameraUploadsRepositoryImplTest {
             verify(cameraUploadsSettingsPreferenceGateway).setMediaUploadsLocalPath(testPath)
         }
 
-        @ParameterizedTest(name = "secondary folder enabled: {0}")
-        @ValueSource(booleans = [true, false])
-        fun `test that the secondary folder is enabled or not`(enabled: Boolean) =
+        @Test
+        fun `test that media uploads is enabled`() = runTest {
+            whenever(cameraUploadsSettingsPreferenceGateway.isMediaUploadsEnabled()).thenReturn(
+                true
+            )
+
+            assertThat(underTest.isMediaUploadsEnabled()).isTrue()
+        }
+
+        @Test
+        fun `test that media uploads is disabled`() = runTest {
+            whenever(cameraUploadsSettingsPreferenceGateway.isMediaUploadsEnabled()).thenReturn(
+                false
+            )
+
+            assertThat(underTest.isMediaUploadsEnabled()).isFalse()
+        }
+
+        @Test
+        fun `test that the media uploads status is null when it cannot be retrieved from the data store`() =
             runTest {
                 whenever(cameraUploadsSettingsPreferenceGateway.isMediaUploadsEnabled()).thenReturn(
-                    enabled
+                    null
                 )
-                assertThat(underTest.isSecondaryMediaFolderEnabled()).isEqualTo(enabled)
+
+                assertThat(underTest.isMediaUploadsEnabled()).isNull()
             }
 
         @Test

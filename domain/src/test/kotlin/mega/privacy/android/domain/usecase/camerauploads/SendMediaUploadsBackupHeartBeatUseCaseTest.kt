@@ -41,7 +41,7 @@ internal class SendMediaUploadsBackupHeartBeatUseCaseTest {
     @Test
     internal fun `test that media uploads backup heart beat is sent when sync is enabled and backup id exists`() =
         runTest {
-            whenever(cameraUploadsRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
+            whenever(cameraUploadsRepository.isMediaUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadsRepository.getMuBackUpId()).thenReturn(69L)
             underTest(HeartbeatStatus.values().random(), 1L)
             verify(cameraUploadsRepository, times(1)).sendBackupHeartbeat(
@@ -53,7 +53,7 @@ internal class SendMediaUploadsBackupHeartBeatUseCaseTest {
     @Test
     internal fun `test that media uploads backup heart beat is not sent when sync is enabled and backup id does not exist`() =
         runTest {
-            whenever(cameraUploadsRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
+            whenever(cameraUploadsRepository.isMediaUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadsRepository.getMuBackUpId()).thenReturn(null)
             underTest(HeartbeatStatus.values().random(), 1L)
             verify(cameraUploadsRepository, times(0)).sendBackupHeartbeat(
@@ -65,7 +65,7 @@ internal class SendMediaUploadsBackupHeartBeatUseCaseTest {
     @Test
     internal fun `test that media uploads backup heart beat is not sent when sync is not enabled`() =
         runTest {
-            whenever(cameraUploadsRepository.isSecondaryMediaFolderEnabled()).thenReturn(false)
+            whenever(cameraUploadsRepository.isMediaUploadsEnabled()).thenReturn(false)
             whenever(cameraUploadsRepository.getMuBackUpId()).thenReturn(69L)
             underTest(HeartbeatStatus.values().random(), 1L)
             verify(cameraUploadsRepository, times(0)).sendBackupHeartbeat(
