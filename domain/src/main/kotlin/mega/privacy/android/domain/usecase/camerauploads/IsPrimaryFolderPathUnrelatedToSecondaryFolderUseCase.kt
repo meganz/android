@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import java.nio.file.Paths
 import javax.inject.Inject
 
