@@ -16,6 +16,7 @@ import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -108,6 +109,7 @@ fun NodeListViewItem(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(8.dp))
+                            .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
                             .testTag(ICON_TAG),
                         data = thumbnailData,
                         defaultImage = icon,

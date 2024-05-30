@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -121,6 +122,7 @@ fun NodeGridViewItem(
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.Center)
+                            .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
                             .testTag(THUMBNAIL_FILE_TEST_TAG),
                         contentDescription = name,
                         contentScale = ContentScale.Crop,
@@ -175,6 +177,7 @@ fun NodeGridViewItem(
                 iconRes = iconRes,
                 name = name,
                 isTakenDown = isTakenDown,
+                isSensitive = isSensitive,
                 onMenuClick = onMenuClick,
                 isSelected = isSelected,
                 onClick = onClick
@@ -189,6 +192,7 @@ private fun Footer(
     iconRes: Int,
     name: String,
     isTakenDown: Boolean,
+    isSensitive: Boolean,
     onMenuClick: (() -> Unit)?,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -205,6 +209,7 @@ private fun Footer(
                 contentDescription = "Folder",
                 modifier = Modifier
                     .padding(start = 8.dp)
+                    .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
                     .size(24.dp)
                     .testTag(FOLDER_VIEW_ICON_TEST_TAG),
             )
