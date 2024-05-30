@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.repository.CameraUploadsRepository
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadBackupIDUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateBackupUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -33,7 +33,7 @@ internal class SetupOrUpdateMediaUploadsBackupUseCaseTest {
     private val setupMediaUploadsBackupUseCase: SetupMediaUploadsBackupUseCase = mock()
     private val updateBackupUseCase: UpdateBackupUseCase = mock()
     private val cameraUploadsRepository: CameraUploadsRepository = mock()
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled = mock()
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase = mock()
 
     @BeforeAll
     fun setUp() {
@@ -42,7 +42,7 @@ internal class SetupOrUpdateMediaUploadsBackupUseCaseTest {
             setupMediaUploadsBackupUseCase,
             updateBackupUseCase,
             cameraUploadsRepository,
-            isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase,
         )
     }
 
@@ -53,14 +53,14 @@ internal class SetupOrUpdateMediaUploadsBackupUseCaseTest {
             setupMediaUploadsBackupUseCase,
             updateBackupUseCase,
             cameraUploadsRepository,
-            isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase,
         )
     }
 
     @Test
     fun `test that nothing happens when media uploads is not enabled`() =
         runTest {
-            whenever(isSecondaryFolderEnabled()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
             underTest(targetNode = 456L, localFolder = "/path/to/local/folder")
             verifyNoInteractions(
                 getMediaUploadBackupIDUseCase,
@@ -76,7 +76,7 @@ internal class SetupOrUpdateMediaUploadsBackupUseCaseTest {
     fun `test that media uploads backup is setup when local back up is not set`(backupId: Long?) =
         runTest {
             val backupName = "Media Uploads"
-            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
             whenever(getMediaUploadBackupIDUseCase()).thenReturn(backupId)
             whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(backupName)
             underTest(targetNode = 456L, localFolder = "/path/to/local/folder")
@@ -90,7 +90,7 @@ internal class SetupOrUpdateMediaUploadsBackupUseCaseTest {
             val backupId = 1234L
             val targetNode = 456L
             val localFolder = "/path/to/local/folder"
-            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
             whenever(getMediaUploadBackupIDUseCase()).thenReturn(backupId)
             whenever(cameraUploadsRepository.getMediaUploadsName()).thenReturn(backupName)
             underTest(targetNode = targetNode, localFolder = localFolder)

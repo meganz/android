@@ -4,7 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import javax.inject.Inject
 
 /**
@@ -14,14 +14,14 @@ import javax.inject.Inject
  * @property getPrimaryFolderPathUseCase
  * @property getSecondaryFolderPathUseCase
  * @property getMediaStoreFileTypesUseCase
- * @property isSecondaryFolderEnabled
+ * @property isMediaUploadsEnabledUseCase
  * @property retrieveMediaFromMediaStoreUseCase
  */
 class ProcessCameraUploadsMediaUseCase @Inject constructor(
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
     private val getMediaStoreFileTypesUseCase: GetMediaStoreFileTypesUseCase,
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
     private val retrieveMediaFromMediaStoreUseCase: RetrieveMediaFromMediaStoreUseCase,
     private val saveCameraUploadsRecordUseCase: SaveCameraUploadsRecordUseCase,
 ) {
@@ -60,7 +60,7 @@ class ProcessCameraUploadsMediaUseCase @Inject constructor(
             } ?: emptyList()
         }
 
-        val isSecondaryFolderEnabled = isSecondaryFolderEnabled()
+        val isSecondaryFolderEnabled = isMediaUploadsEnabledUseCase()
         val secondaryFolderPath = getSecondaryFolderPathUseCase()
 
         val secondaryPhotoMedia =

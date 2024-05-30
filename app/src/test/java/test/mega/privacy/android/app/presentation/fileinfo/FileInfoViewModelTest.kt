@@ -52,7 +52,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
@@ -144,7 +144,7 @@ internal class FileInfoViewModelTest {
     private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
-    private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
+    private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
     private val monitorOfflineFileAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
@@ -202,7 +202,7 @@ internal class FileInfoViewModelTest {
             getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase,
             isCameraUploadsEnabledUseCase,
-            isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase,
             monitorOfflineFileAvailabilityUseCase,
             getContactVerificationWarningUseCase,
             typedFileNode,
@@ -249,7 +249,7 @@ internal class FileInfoViewModelTest {
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
-            isSecondaryFolderEnabled = isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
             fileTypeIconMapper = fileTypeIconMapper
@@ -913,7 +913,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(-1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(nodeId.longValue)
-            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
             underTest.setNode(node.handle, true)
             underTest.initiateRemoveNode(true)
             underTest.uiState.mapNotNull { it.requiredExtraAction }.test {

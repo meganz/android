@@ -77,7 +77,7 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
@@ -137,7 +137,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
     private val isSecondaryFolderSetUseCase: IsSecondaryFolderSetUseCase,
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val isWifiNotSatisfiedUseCase: IsWifiNotSatisfiedUseCase,
     private val setPrimaryFolderLocalPathUseCase: SetPrimaryFolderLocalPathUseCase,
@@ -556,13 +556,13 @@ class CameraUploadsWorker @AssistedInject constructor(
         !isChargingConstraintSatisfied() -> CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
         isStorageQuotaExceeded() -> CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
         else -> {
-            if (isSecondaryFolderEnabled())
+            if (isMediaUploadsEnabledUseCase())
                 isLocalSecondaryFolderValid()
 
             when {
                 !synchronizeUploadNodeHandles() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
                 !checkOrCreatePrimaryUploadNodes() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
-                isSecondaryFolderEnabled() && !checkOrCreateSecondaryUploadNodes() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
+                isMediaUploadsEnabledUseCase() && !checkOrCreateSecondaryUploadNodes() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
                 !initializeBackup() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
                 !createTempCacheFile() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
                 else -> null

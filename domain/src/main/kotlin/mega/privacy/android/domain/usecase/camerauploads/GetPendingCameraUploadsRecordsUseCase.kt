@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.repository.CameraUploadsRepository
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import javax.inject.Inject
 
 /**
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class GetPendingCameraUploadsRecordsUseCase @Inject constructor(
     private val cameraUploadsRepository: CameraUploadsRepository,
     private val getUploadOptionUseCase: GetUploadOptionUseCase,
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
 ) {
 
     /**
@@ -40,7 +40,7 @@ class GetPendingCameraUploadsRecordsUseCase @Inject constructor(
         }
 
         val folderTypes =
-            if (isSecondaryFolderEnabled())
+            if (isMediaUploadsEnabledUseCase())
                 listOf(CameraUploadFolderType.Primary, CameraUploadFolderType.Secondary)
             else listOf(CameraUploadFolderType.Primary)
 

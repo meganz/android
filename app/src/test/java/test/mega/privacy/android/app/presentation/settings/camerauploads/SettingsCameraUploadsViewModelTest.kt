@@ -34,7 +34,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
@@ -134,7 +134,7 @@ internal class SettingsCameraUploadsViewModelTest {
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val isPrimaryFolderNodeValidUseCase = mock<IsPrimaryFolderNodeValidUseCase>()
     private val isPrimaryFolderPathValidUseCase = mock<IsPrimaryFolderPathValidUseCase>()
-    private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
+    private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
     private val isSecondaryFolderNodeValidUseCase = mock<IsSecondaryFolderNodeValidUseCase>()
     private val isSecondaryFolderPathValidUseCase = mock<IsSecondaryFolderPathValidUseCase>()
     private val listenToNewMediaUseCase = mock<ListenToNewMediaUseCase>()
@@ -198,7 +198,7 @@ internal class SettingsCameraUploadsViewModelTest {
             isConnectedToInternetUseCase,
             isPrimaryFolderNodeValidUseCase,
             isPrimaryFolderPathValidUseCase,
-            isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase,
             isSecondaryFolderNodeValidUseCase,
             isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase,
@@ -273,7 +273,7 @@ internal class SettingsCameraUploadsViewModelTest {
         whenever(isChargingRequiredToUploadContentUseCase()).thenReturn(
             requireChargingWhenUploadingContent
         )
-        whenever(isSecondaryFolderEnabled()).thenReturn(isMediaUploadsEnabled)
+        whenever(isMediaUploadsEnabledUseCase()).thenReturn(isMediaUploadsEnabled)
         whenever(monitorCameraUploadsSettingsActionsUseCase()).thenReturn(
             fakeMonitorCameraUploadsSettingsActionsFlow
         )
@@ -304,7 +304,7 @@ internal class SettingsCameraUploadsViewModelTest {
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             isPrimaryFolderNodeValidUseCase = isPrimaryFolderNodeValidUseCase,
             isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
-            isSecondaryFolderEnabled = isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             isSecondaryFolderNodeValidUseCase = isSecondaryFolderNodeValidUseCase,
             isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase = listenToNewMediaUseCase,

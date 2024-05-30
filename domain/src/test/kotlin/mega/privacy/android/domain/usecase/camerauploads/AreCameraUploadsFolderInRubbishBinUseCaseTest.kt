@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -22,7 +22,7 @@ import org.mockito.kotlin.whenever
 internal class AreCameraUploadsFolderInRubbishBinUseCaseTest {
     lateinit var underTest: AreCameraUploadsFoldersInRubbishBinUseCase
 
-    private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
+    private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
     private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
 
     private val primaryHandle = 11111L
@@ -32,7 +32,7 @@ internal class AreCameraUploadsFolderInRubbishBinUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest = AreCameraUploadsFoldersInRubbishBinUseCase(
-            isSecondaryFolderEnabled = isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
         )
     }
@@ -40,7 +40,7 @@ internal class AreCameraUploadsFolderInRubbishBinUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase,
             isNodeInRubbishOrDeletedUseCase,
         )
     }
@@ -58,7 +58,7 @@ internal class AreCameraUploadsFolderInRubbishBinUseCaseTest {
             )
 
             whenever(isNodeInRubbishOrDeletedUseCase(primaryHandle)).thenReturn(true)
-            whenever(isSecondaryFolderEnabled()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
             val actual = underTest(primaryHandle, secondaryHandle, nodeUpdate)
             val expected = true
             assertThat(actual).isEqualTo(expected)
@@ -77,7 +77,7 @@ internal class AreCameraUploadsFolderInRubbishBinUseCaseTest {
             )
 
             whenever(isNodeInRubbishOrDeletedUseCase(secondaryHandle)).thenReturn(false)
-            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
             whenever(isNodeInRubbishOrDeletedUseCase(primaryHandle)).thenReturn(true)
             val actual = underTest(primaryHandle, secondaryHandle, nodeUpdate)
             val expected = true

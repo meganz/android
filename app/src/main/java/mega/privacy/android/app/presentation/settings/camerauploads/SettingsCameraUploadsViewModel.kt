@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
@@ -113,7 +113,7 @@ import javax.inject.Inject
  * @property isConnectedToInternetUseCase Checks if the User is connected to the Internet or not
  * @property isPrimaryFolderNodeValidUseCase Checks if the Camera Uploads Folder Node is valid or not
  * @property isPrimaryFolderPathValidUseCase Checks if the Camera Uploads Primary Folder Path is valid or not
- * @property isSecondaryFolderEnabled Checks if Media Uploads (the Secondary Folder) is enabled or not
+ * @property isMediaUploadsEnabledUseCase Checks if Media Uploads (the Secondary Folder) is enabled or not
  * @property isSecondaryFolderNodeValidUseCase Checks if the Media Uploads Folder Node is valid or not
  * @property isSecondaryFolderPathValidUseCase Checks if the Media Uploads Secondary Folder Path is valid or not
  * @property listenToNewMediaUseCase Listens to new Photos and Videos captured by the Device
@@ -172,7 +172,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val isPrimaryFolderNodeValidUseCase: IsPrimaryFolderNodeValidUseCase,
     private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
     private val isSecondaryFolderNodeValidUseCase: IsSecondaryFolderNodeValidUseCase,
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
@@ -224,7 +224,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 preparePrimaryFolderPathUseCase()
 
                 val isCameraUploadsEnabled = async { isCameraUploadsEnabledUseCase() }
-                val isMediaUploadsEnabled = async { isSecondaryFolderEnabled() }
+                val isMediaUploadsEnabled = async { isMediaUploadsEnabledUseCase() }
                 val maximumNonChargingVideoCompressionSize =
                     async { getVideoCompressionSizeLimitUseCase() }
                 val primaryFolderNode = async { getPrimaryFolderNodeUseCase() }

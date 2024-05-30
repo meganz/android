@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.backup
 
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.repository.CameraUploadsRepository
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaUploadBackupIDUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateBackupUseCase
 import javax.inject.Inject
@@ -15,7 +15,7 @@ class SetupOrUpdateMediaUploadsBackupUseCase @Inject constructor(
     private val setupMediaUploadsBackupUseCase: SetupMediaUploadsBackupUseCase,
     private val updateBackupUseCase: UpdateBackupUseCase,
     private val cameraUploadsRepository: CameraUploadsRepository,
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
 ) {
 
     /**
@@ -24,7 +24,7 @@ class SetupOrUpdateMediaUploadsBackupUseCase @Inject constructor(
      * @param localFolder [String]
      */
     suspend operator fun invoke(targetNode: Long?, localFolder: String?) {
-        if (isSecondaryFolderEnabled()) {
+        if (isMediaUploadsEnabledUseCase()) {
             getMediaUploadBackupIDUseCase()?.takeIf { it != -1L }?.let {
                 updateBackupUseCase(
                     backupId = it,

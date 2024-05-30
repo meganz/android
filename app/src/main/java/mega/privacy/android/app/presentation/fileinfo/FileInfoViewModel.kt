@@ -55,7 +55,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
@@ -130,7 +130,7 @@ class FileInfoViewModel @Inject constructor(
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase,
     private val nodeActionMapper: NodeActionMapper,
     private val clipboardGateway: ClipboardGateway,
@@ -569,7 +569,7 @@ class FileInfoViewModel @Inject constructor(
                             FileInfoExtraAction.ConfirmRemove.SendToRubbishCameraUploads
                         }
 
-                        getSecondarySyncHandleUseCase() == handle && isSecondaryFolderEnabled() -> {
+                        getSecondarySyncHandleUseCase() == handle && isMediaUploadsEnabledUseCase() -> {
                             FileInfoExtraAction.ConfirmRemove.SendToRubbishSecondaryMediaUploads
                         }
 

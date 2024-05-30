@@ -8,7 +8,7 @@ import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDi
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -31,7 +31,7 @@ internal class ConfirmMoveToRubbishBinViewModelTest {
     private lateinit var underTest: ConfirmMoveToRubbishBinViewModel
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase = mock()
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled = mock()
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase = mock()
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock()
     private val savedStateHandle: SavedStateHandle = mock()
@@ -41,7 +41,7 @@ internal class ConfirmMoveToRubbishBinViewModelTest {
         reset(
             isNodeInRubbishBinUseCase,
             isCameraUploadsEnabledUseCase,
-            isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase,
             getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase,
             savedStateHandle,
@@ -52,7 +52,7 @@ internal class ConfirmMoveToRubbishBinViewModelTest {
         underTest = ConfirmMoveToRubbishBinViewModel(
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
-            isSecondaryFolderEnabled = isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             savedStateHandle = savedStateHandle,
@@ -106,7 +106,7 @@ internal class ConfirmMoveToRubbishBinViewModelTest {
         whenever(savedStateHandle.get<LongArray>(ConfirmMoveToRubbishBinDialogFragment.EXTRA_HANDLES)).thenReturn(
             longArrayOf(handle)
         )
-        whenever(isSecondaryFolderEnabled()).thenReturn(isSecondaryFolderEnabled)
+        whenever(isMediaUploadsEnabledUseCase()).thenReturn(isSecondaryFolderEnabled)
         whenever(getSecondarySyncHandleUseCase()).thenReturn(secondaryCuHandle)
         initTestClass()
         underTest.state.test {

@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import javax.inject.Inject
 
@@ -11,7 +11,7 @@ import javax.inject.Inject
  * based on the [NodeUpdate] received
  */
 class AreCameraUploadsFoldersInRubbishBinUseCase @Inject constructor(
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
 ) {
 
@@ -36,7 +36,7 @@ class AreCameraUploadsFoldersInRubbishBinUseCase @Inject constructor(
         val isPrimaryUploadFolderInRubbishBinOrDeleted =
             isNodeInRubbishOrDeletedUseCase(primaryHandle)
         val isSecondaryUploadFolderInRubbishBinOrDeleted =
-            isSecondaryFolderEnabled() && isNodeInRubbishOrDeletedUseCase(secondaryHandle)
+            isMediaUploadsEnabledUseCase() && isNodeInRubbishOrDeletedUseCase(secondaryHandle)
 
         return (isPrimaryUploadFolderInRubbishBinOrDeleted || isSecondaryUploadFolderInRubbishBinOrDeleted)
     }

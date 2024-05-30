@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -25,7 +25,7 @@ import javax.inject.Inject
 internal class ConfirmMoveToRubbishBinViewModel @Inject constructor(
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     savedStateHandle: SavedStateHandle,
@@ -77,7 +77,7 @@ internal class ConfirmMoveToRubbishBinViewModel @Inject constructor(
             .getOrDefault(false)
 
     private suspend fun isCameraUploadsSecondaryFolderEnabled(handle: Long): Boolean =
-        runCatching { isSecondaryFolderEnabled() && getSecondarySyncHandleUseCase() == handle }
+        runCatching { isMediaUploadsEnabledUseCase() && getSecondarySyncHandleUseCase() == handle }
             .getOrDefault(false)
 
     private suspend fun isNodeInRubbishBin(handle: Long): Boolean =

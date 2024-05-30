@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,24 +24,24 @@ internal class IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCaseTest {
     private lateinit var underTest: IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase
 
     private val getSecondaryFolderPathUseCase = mock<GetSecondaryFolderPathUseCase>()
-    private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
+    private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase(
             getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
-            isSecondaryFolderEnabled = isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getSecondaryFolderPathUseCase, isSecondaryFolderEnabled)
+        reset(getSecondaryFolderPathUseCase, isMediaUploadsEnabledUseCase)
     }
 
     @Test
     fun `test that the primary folder is unrelated if secondary uploads are disabled`() = runTest {
-        whenever(isSecondaryFolderEnabled()).thenReturn(false)
+        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
 
         assertThat(underTest("primary/folder/path")).isTrue()
     }
@@ -49,7 +49,7 @@ internal class IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCaseTest {
     @Test
     fun `test that the primary folder is unrelated if the secondary folder path is empty`() =
         runTest {
-            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
             whenever(getSecondaryFolderPathUseCase()).thenReturn("")
 
             assertThat(underTest("primary/folder/path")).isTrue()
@@ -58,7 +58,7 @@ internal class IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCaseTest {
     @Test
     fun `test that the primary folder is unrelated if the secondary folder path only contains whitespaces`() =
         runTest {
-            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
             whenever(getSecondaryFolderPathUseCase()).thenReturn(" ")
 
             assertThat(underTest("primary/folder/path")).isTrue()
@@ -70,7 +70,7 @@ internal class IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCaseTest {
         primaryFolderPath: String,
         secondaryFolderPath: String,
     ) = runTest {
-        whenever(isSecondaryFolderEnabled()).thenReturn(true)
+        whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
         whenever(getSecondaryFolderPathUseCase()).thenReturn(secondaryFolderPath)
 
         assertThat(underTest(primaryFolderPath)).isTrue()
@@ -89,7 +89,7 @@ internal class IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCaseTest {
         primaryFolderPath: String,
         secondaryFolderPath: String,
     ) = runTest {
-        whenever(isSecondaryFolderEnabled()).thenReturn(true)
+        whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
         whenever(getSecondaryFolderPathUseCase()).thenReturn(secondaryFolderPath)
 
         assertThat(underTest(primaryFolderPath)).isFalse()

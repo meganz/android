@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.repository.CameraUploadsRepository
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -27,14 +27,14 @@ class GetPendingCameraUploadsRecordsUseCaseTest {
 
     private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
-    private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
+    private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = GetPendingCameraUploadsRecordsUseCase(
             cameraUploadsRepository = cameraUploadsRepository,
             getUploadOptionUseCase = getUploadOptionUseCase,
-            isSecondaryFolderEnabled = isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
         )
     }
 
@@ -43,7 +43,7 @@ class GetPendingCameraUploadsRecordsUseCaseTest {
         reset(
             cameraUploadsRepository,
             getUploadOptionUseCase,
-            isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase,
         )
     }
 
@@ -54,7 +54,7 @@ class GetPendingCameraUploadsRecordsUseCaseTest {
         isSecondaryFolderEnabled: Boolean,
     ) = runTest {
         whenever(getUploadOptionUseCase()).thenReturn(uploadOption)
-        whenever(isSecondaryFolderEnabled()).thenReturn(isSecondaryFolderEnabled)
+        whenever(isMediaUploadsEnabledUseCase()).thenReturn(isSecondaryFolderEnabled)
 
         val expectedTypes = when (uploadOption) {
             UploadOption.PHOTOS -> listOf(CameraUploadsRecordType.TYPE_PHOTO)

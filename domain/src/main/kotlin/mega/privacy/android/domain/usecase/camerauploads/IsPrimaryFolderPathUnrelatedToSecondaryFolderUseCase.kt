@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import java.nio.file.Paths
 import javax.inject.Inject
 
@@ -14,11 +14,11 @@ import javax.inject.Inject
  *
  * @property getSecondaryFolderPathUseCase Retrieves the folder path of the current Local Secondary
  * Folder
- * @property isSecondaryFolderEnabled true if Secondary Media uploads are enabled for Camera Uploads
+ * @property isMediaUploadsEnabledUseCase true if Secondary Media uploads are enabled for Camera Uploads
  */
 class IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase @Inject constructor(
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
 ) {
     /**
      * Invocation function
@@ -27,7 +27,7 @@ class IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase @Inject constructor(
      *
      * @return true if the Local Primary Folder is unrelated to the current Local Secondary Folder
      */
-    suspend operator fun invoke(newPath: String) = if (isSecondaryFolderEnabled()) {
+    suspend operator fun invoke(newPath: String) = if (isMediaUploadsEnabledUseCase()) {
         val secondaryFolderPath = getSecondaryFolderPathUseCase()
         if (secondaryFolderPath.isNotBlank()) {
             val primaryAbsolutePath = Paths.get(newPath).toAbsolutePath()

@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFolderState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
-import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsMediaUploadsEnabledUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,14 +24,14 @@ internal class UpdateCameraUploadsBackupHeartbeatStatusUseCaseTest {
     lateinit var underTest: UpdateCameraUploadsBackupHeartbeatStatusUseCase
 
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
-    private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
+    private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
     private val reportUploadStatusUseCase = mock<ReportUploadStatusUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = UpdateCameraUploadsBackupHeartbeatStatusUseCase(
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
-            isSecondaryFolderEnabled = isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             reportUploadStatusUseCase = reportUploadStatusUseCase,
         )
     }
@@ -40,7 +40,7 @@ internal class UpdateCameraUploadsBackupHeartbeatStatusUseCaseTest {
     fun resetMocks() {
         reset(
             isCameraUploadsEnabledUseCase,
-            isSecondaryFolderEnabled,
+            isMediaUploadsEnabledUseCase,
             reportUploadStatusUseCase,
         )
     }
@@ -61,7 +61,7 @@ internal class UpdateCameraUploadsBackupHeartbeatStatusUseCaseTest {
     fun `test that if camera uploads is enabled then primary back up state is reported`() =
         runTest {
             whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
-            whenever(isSecondaryFolderEnabled()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
 
             val heartbeatStatus = HeartbeatStatus.UP_TO_DATE
             val cameraUploadsState = CameraUploadsState(
@@ -87,7 +87,7 @@ internal class UpdateCameraUploadsBackupHeartbeatStatusUseCaseTest {
     fun `test that if secondary folder is not enabled then secondary back up state is reported`() =
         runTest {
             whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
-            whenever(isSecondaryFolderEnabled()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
             val heartbeatStatus = HeartbeatStatus.UP_TO_DATE
             val cameraUploadsState = CameraUploadsState(
                 secondaryCameraUploadsState = CameraUploadsFolderState(
@@ -111,7 +111,7 @@ internal class UpdateCameraUploadsBackupHeartbeatStatusUseCaseTest {
     fun `test that if secondary folder is enabled then secondary back up state is reported`() =
         runTest {
             whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
-            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
             val heartbeatStatus = mock<HeartbeatStatus>()
             val cameraUploadsState = CameraUploadsState(
                 secondaryCameraUploadsState = CameraUploadsFolderState(
