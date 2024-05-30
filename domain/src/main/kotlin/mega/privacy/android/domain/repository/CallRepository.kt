@@ -346,14 +346,54 @@ interface CallRepository {
      *
      * @return      True if the device is opened, false otherwise.
      */
-    suspend fun openVideoDevice()
+    suspend fun openVideoDevice(): ChatRequest
 
     /**
      * Release video device
      *
      * @return      True if the device is closed, false otherwise.
      */
-    suspend fun releaseVideoDevice()
+    suspend fun releaseVideoDevice(): ChatRequest
+
+    /**
+     * Enable video
+     *
+     * @param chatId  Chat id
+     * @return                  [ChatRequest]
+     */
+    suspend fun enableVideo(
+        chatId: Long,
+    ): ChatRequest
+
+    /**
+     * Disable video
+     *
+     * @param chatId  Chat id
+     * @return                  [ChatRequest]
+     */
+    suspend fun disableVideo(
+        chatId: Long,
+    ): ChatRequest
+
+    /**
+     * Enable Audio
+     *
+     * @param chatId  Chat id
+     * @return                  [ChatRequest]
+     */
+    suspend fun enableAudio(
+        chatId: Long,
+    ): ChatRequest
+
+    /**
+     * Disable Audio
+     *
+     * @param chatId  Chat id
+     * @return                  [ChatRequest]
+     */
+    suspend fun disableAudio(
+        chatId: Long,
+    ): ChatRequest
 
     /**
      * Push a list of users (for all it's connected clients) into the waiting room.

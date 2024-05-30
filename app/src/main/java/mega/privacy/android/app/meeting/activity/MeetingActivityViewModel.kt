@@ -50,9 +50,7 @@ import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
-import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.getState
@@ -70,6 +68,7 @@ import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
@@ -99,6 +98,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
+import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -109,6 +109,8 @@ import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
+import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
+import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
@@ -122,7 +124,6 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
@@ -220,10 +221,12 @@ class MeetingActivityViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPluralStringFromStringResMapper: GetPluralStringFromStringResMapper,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
+    private val startVideoDeviceUseCase: StartVideoDeviceUseCase,
+    private val enableOrDisableVideoUseCase: EnableOrDisableVideoUseCase,
+    private val enableOrDisableAudioUseCase: EnableOrDisableAudioUseCase,
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
-) : ViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
-    DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
+) : ViewModel() {
 
     private val composite = CompositeDisposable()
 
@@ -1235,21 +1238,17 @@ class MeetingActivityViewModel @Inject constructor(
             _recordAudioPermissionCheck.value = true
             return
         }
-
-        if (isChatCreatedAndIParticipating()) {
-            meetingActivityRepository.switchMic(
-                _state.value.chatId,
-                shouldAudioBeEnabled,
-                DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
-            )
-        } else {
-            //The chat is not yet created or the call is not yet established
-            _micLiveData.value = shouldAudioBeEnabled
-            Timber.d("open Mic: $shouldAudioBeEnabled")
-            tips.value = if (shouldAudioBeEnabled) {
-                context.getString(R.string.general_mic_unmute)
-            } else {
-                context.getString(R.string.general_mic_mute)
+        when {
+            isChatCreatedAndIParticipating() -> enableAudio(enable = shouldAudioBeEnabled)
+            else -> {
+                //The chat is not yet created or the call is not yet established
+                _micLiveData.value = shouldAudioBeEnabled
+                Timber.d("open Mic: $shouldAudioBeEnabled")
+                tips.value = if (shouldAudioBeEnabled) {
+                    context.getString(R.string.general_mic_unmute)
+                } else {
+                    context.getString(R.string.general_mic_mute)
+                }
             }
         }
     }
@@ -1266,20 +1265,76 @@ class MeetingActivityViewModel @Inject constructor(
             return
         }
 
-        if (isChatCreatedAndIParticipating()) {
-            Timber.d("Clicked cam with chat")
-            meetingActivityRepository.switchCamera(
-                _state.value.chatId,
-                shouldVideoBeEnabled,
-                DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
-            )
-        } else {
-            Timber.d("Clicked cam without chat")
-            //The chat is not yet created or the call is not yet established
-            meetingActivityRepository.switchCameraBeforeStartMeeting(
-                shouldVideoBeEnabled,
-                OpenVideoDeviceListener(MegaApplication.getInstance(), this)
-            )
+        viewModelScope.launch {
+            runCatching {
+                setChatVideoInDeviceUseCase()
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess {
+                when {
+                    isChatCreatedAndIParticipating() -> enableVideo(enable = shouldVideoBeEnabled)
+                    else -> enableDeviceCamera(enable = shouldVideoBeEnabled)
+                }
+            }
+        }
+    }
+
+    /**
+     * Enable device camera
+     *
+     * @param enable    true to enable camera, false otherwise
+     */
+    private fun enableDeviceCamera(enable: Boolean) = viewModelScope.launch {
+        runCatching {
+            startVideoDeviceUseCase(enable)
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }.onSuccess { chatRequest ->
+            chatRequest.apply {
+                updateCameraValueAndTips(flag)
+            }
+        }
+    }
+
+    /**
+     * Enable video
+     *
+     * @param enable    true to enable video, false otherwise
+     */
+    private fun enableVideo(enable: Boolean) {
+        state.value.currentCall?.apply {
+            val enableVideo = enable && !hasLocalVideo
+            viewModelScope.launch {
+                runCatching {
+                    enableOrDisableVideoUseCase(chatId, enableVideo)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }.onSuccess { chatRequest ->
+                    chatRequest.apply {
+                        if (paramType == ChatRequestParamType.Video) {
+                            updateCameraValueAndTips(flag)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Enable audio
+     *
+     * @param enable    true to enable audio, false otherwise
+     */
+    private fun enableAudio(enable: Boolean) {
+        state.value.currentCall?.apply {
+            val enableAudio = enable && !hasLocalAudio
+            viewModelScope.launch {
+                runCatching {
+                    enableOrDisableAudioUseCase(chatId, enableAudio)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }
+            }
         }
     }
 
@@ -1288,10 +1343,7 @@ class MeetingActivityViewModel @Inject constructor(
      * or the call is not yet established
      */
     fun releaseVideoDevice() {
-        meetingActivityRepository.switchCameraBeforeStartMeeting(
-            false,
-            OpenVideoDeviceListener(MegaApplication.getInstance())
-        )
+        enableDeviceCamera(enable = false)
     }
 
     /**
@@ -1401,18 +1453,6 @@ class MeetingActivityViewModel @Inject constructor(
             false -> context.getString(
                 R.string.general_camera_disable
             )
-        }
-    }
-
-    override fun onVideoDeviceOpened(isVideoOn: Boolean) {
-        updateCameraValueAndTips(isVideoOn)
-    }
-
-    override fun onDisableAudioVideo(chatId: Long, typeChange: Int, isEnable: Boolean) {
-        when (typeChange) {
-            MegaChatRequest.VIDEO -> {
-                updateCameraValueAndTips(isEnable)
-            }
         }
     }
 

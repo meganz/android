@@ -11,12 +11,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.featureflag.FlagMapper
@@ -44,12 +42,8 @@ import mega.privacy.android.domain.entity.meeting.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CallRepository
-import nz.mega.sdk.MegaChatError
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 /**
  * Default implementation of [CallRepository]
@@ -509,49 +503,103 @@ internal class CallRepositoryImpl @Inject constructor(
     override fun getChatLocalVideoUpdates(chatId: Long): Flow<ChatVideoUpdate> =
         megaChatApiGateway.getChatLocalVideoUpdates(chatId).flowOn(dispatcher)
 
-    override suspend fun openVideoDevice() = withContext(dispatcher) {
+    override suspend fun openVideoDevice(): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val methodName = "openVideoDevice"
-            val listener = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    if (error.errorCode == MegaChatError.ERROR_OK) {
-                        if (request.flag) {
-                            continuation.resume(Unit)
-                        } else {
-                            continuation.resumeWithException(IllegalStateException("Video device error"))
-                        }
-                    } else {
-                        Timber.e("Calling $methodName failed with error code ${error.errorCode}")
-                        continuation.failWithError(error, methodName)
-                    }
-                }
+            val listener = continuation.getChatRequestListener(
+                methodName = "openVideoDevice",
+                chatRequestMapper::invoke
             )
 
-            megaChatApiGateway.openVideoDevice(listener)
+            megaChatApiGateway.openVideoDevice(
+                listener
+            )
 
             continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
-    override suspend fun releaseVideoDevice() = withContext(dispatcher) {
+    override suspend fun releaseVideoDevice(): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val methodName = "releaseVideoDevice"
-            val listener = OptionalMegaChatRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    if (error.errorCode == MegaChatError.ERROR_OK) {
-                        if (!request.flag) {
-                            continuation.resume(Unit)
-                        } else {
-                            continuation.resumeWithException(IllegalStateException("Video device error"))
-                        }
-                    } else {
-                        Timber.e("Calling $methodName failed with error code ${error.errorCode}")
-                        continuation.failWithError(error, methodName)
-                    }
-                }
+            val listener = continuation.getChatRequestListener(
+                methodName = "releaseVideoDevice",
+                chatRequestMapper::invoke
             )
 
-            megaChatApiGateway.releaseVideoDevice(listener)
+            megaChatApiGateway.releaseVideoDevice(
+                listener
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override suspend fun enableVideo(
+        chatId: Long,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener(
+                methodName = "enableVideo",
+                chatRequestMapper::invoke
+            )
+
+            megaChatApiGateway.enableVideo(
+                chatId,
+                listener
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override suspend fun disableVideo(
+        chatId: Long,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener(
+                methodName = "disableVideo",
+                chatRequestMapper::invoke
+            )
+
+            megaChatApiGateway.disableVideo(
+                chatId,
+                listener
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override suspend fun enableAudio(
+        chatId: Long,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener(
+                methodName = "enableAudio",
+                chatRequestMapper::invoke
+            )
+
+            megaChatApiGateway.enableAudio(
+                chatId,
+                listener
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override suspend fun disableAudio(
+        chatId: Long,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener(
+                methodName = "disableAudio",
+                chatRequestMapper::invoke
+            )
+
+            megaChatApiGateway.disableAudio(
+                chatId,
+                listener
+            )
 
             continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }

@@ -80,69 +80,6 @@ class MeetingActivityRepository @Inject constructor(
     fun amIAGuest(): Boolean = megaApi.isEphemeralPlusPlus
 
     /**
-     * Enable or disable Mic
-     *
-     * @param chatId Chat ID
-     * @param shouldAudioBeEnabled True, If the audio is to be enabled. False, otherwise
-     * @param listener receive information about requests
-     */
-    fun switchMic(
-        chatId: Long,
-        shouldAudioBeEnabled: Boolean,
-        listener: MegaChatRequestListenerInterface,
-    ) {
-        if (shouldAudioBeEnabled) {
-            Timber.d("Enable local audio")
-            megaChatApi.enableAudio(chatId, listener)
-        } else {
-            Timber.d("Disable local audio")
-            megaChatApi.disableAudio(chatId, listener)
-        }
-    }
-
-    /**
-     * Enable or disable Camera before starting a meeting.
-     *
-     * @param shouldVideoBeEnabled True, If the video is to be enabled. False, otherwise
-     * @param listener receive information about requests
-     */
-    fun switchCameraBeforeStartMeeting(
-        shouldVideoBeEnabled: Boolean,
-        listener: MegaChatRequestListenerInterface,
-    ) {
-        if (shouldVideoBeEnabled) {
-            Timber.d("Open video device")
-            megaChatApi.openVideoDevice(listener)
-        } else {
-            Timber.d("Release video device")
-            megaChatApi.releaseVideoDevice(listener)
-        }
-    }
-
-    /**
-     * Enable or disable Camera during a meeting.
-     *
-     * @param chatId Chat ID
-     * @param shouldVideoBeEnabled True, If the video is to be enabled. False, otherwise
-     * @param listener receive information about requests
-     */
-    fun switchCamera(
-        chatId: Long,
-        shouldVideoBeEnabled: Boolean,
-        listener: MegaChatRequestListenerInterface,
-    ) {
-        megaChatApi.getChatCall(chatId)?.let {
-            if (shouldVideoBeEnabled && !it.hasLocalVideo()) {
-                Timber.d("Enable local video")
-                megaChatApi.enableVideo(chatId, listener)
-            } else if (!shouldVideoBeEnabled && it.hasLocalVideo()) {
-                Timber.d("Disable local video")
-                megaChatApi.disableVideo(chatId, listener)
-            }
-        }
-    }
-
-    /**
      * Method of obtaining the local video
      *
      * @param chatId Chat ID

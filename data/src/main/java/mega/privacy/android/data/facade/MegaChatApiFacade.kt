@@ -652,6 +652,22 @@ internal class MegaChatApiFacade @Inject constructor(
         chatApi.releaseVideoDevice(listener)
     }
 
+    override fun enableVideo(chatId: Long, listener: MegaChatRequestListenerInterface) {
+        chatApi.enableVideo(chatId, listener)
+    }
+
+    override fun disableVideo(chatId: Long, listener: MegaChatRequestListenerInterface) {
+        chatApi.disableVideo(chatId, listener)
+    }
+
+    override fun enableAudio(chatId: Long, listener: MegaChatRequestListenerInterface) {
+        chatApi.enableAudio(chatId, listener)
+    }
+
+    override fun disableAudio(chatId: Long, listener: MegaChatRequestListenerInterface) {
+        chatApi.disableAudio(chatId, listener)
+    }
+
     override fun pushUsersIntoWaitingRoom(
         chatId: Long,
         userList: MegaHandleList?,

@@ -40,6 +40,8 @@ import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
+import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
+import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
@@ -49,6 +51,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdate
 import mega.privacy.android.domain.usecase.meeting.MuteAllPeersUseCase
 import mega.privacy.android.domain.usecase.meeting.MutePeersUseCase
 import mega.privacy.android.domain.usecase.meeting.RingIndividualInACallUseCase
+import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -113,6 +116,9 @@ class MeetingActivityViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase = mock()
     private val savedStateHandle: SavedStateHandle = mock()
+    private val startVideoDeviceUseCase: StartVideoDeviceUseCase = mock()
+    private val enableOrDisableVideoUseCase: EnableOrDisableVideoUseCase = mock()
+    private val enableOrDisableAudioUseCase: EnableOrDisableAudioUseCase = mock()
 
     private val context: Context = mock()
 
@@ -170,6 +176,9 @@ class MeetingActivityViewModelTest {
             getCurrentSubscriptionPlanUseCase,
             getFeatureFlagValueUseCase,
             getMyUserHandleUseCase,
+            startVideoDeviceUseCase,
+            enableOrDisableAudioUseCase,
+            enableOrDisableVideoUseCase,
             savedStateHandle
         )
     }
@@ -221,7 +230,10 @@ class MeetingActivityViewModelTest {
             getCurrentSubscriptionPlanUseCase = getCurrentSubscriptionPlanUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getMyUserHandleUseCase = getMyUserHandleUseCase,
-            savedStateHandle = savedStateHandle
+            savedStateHandle = savedStateHandle,
+            enableOrDisableAudioUseCase = enableOrDisableAudioUseCase,
+            enableOrDisableVideoUseCase = enableOrDisableVideoUseCase,
+            startVideoDeviceUseCase = startVideoDeviceUseCase
         )
     }
 

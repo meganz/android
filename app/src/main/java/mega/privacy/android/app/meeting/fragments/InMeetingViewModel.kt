@@ -462,6 +462,7 @@ class InMeetingViewModel @Inject constructor(
                         }
                         handleFreeCallEndWarning()
                         isEphemeralAccount()
+                        updateParticipantsWithRaisedHand()
                     }
                 }
             }.onFailure { exception ->

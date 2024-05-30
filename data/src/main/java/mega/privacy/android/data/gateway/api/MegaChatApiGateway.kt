@@ -1117,6 +1117,84 @@ interface MegaChatApiGateway {
     fun releaseVideoDevice(listener: MegaChatRequestListenerInterface)
 
     /**
+     * Enable video for a call that is in progress
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_DISABLE_AUDIO_VIDEO_CALL
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getFlag - Returns true
+     * - MegaChatRequest::getParamType - MegaChatRequest::VIDEO
+     *
+     * The request will fail with MegaChatError::ERROR_TOOMANY when there are too many participants
+     * in the call sending video already (no more video slots are available).
+     *
+     * On the onRequestFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_NOENT   - if there is not any call with in chatroom
+     * - MegaChatError::ERROR_ACCESS  - if you don't have speak permission or you don't participate in the call
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun enableVideo(chatId: Long, listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Disable video for a call that is in progress
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_DISABLE_AUDIO_VIDEO_CALL
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getFlag - Returns false
+     * - MegaChatRequest::getParamType - Returns MegachatRequest::VIDEO
+     *
+     * On the onRequestFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_NOENT   - if there is not any call with in chatroom
+     * - MegaChatError::ERROR_ACCESS  - if you don't have speak permission or you don't participate in the call
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun disableVideo(chatId: Long, listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Enable audio for a call that is in progress
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_DISABLE_AUDIO_VIDEO_CALL
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getFlag - Returns true
+     * - MegaChatRequest::getParamType - Returns MegaChatRequest::AUDIO
+     *
+     * The request will fail with MegaChatError::ERROR_TOOMANY when there are too many participants
+     * in the call sending audio already (no more audio slots are available).
+     *
+     * On the onRequestFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_NOENT   - if there is not any call with in chatroom
+     * - MegaChatError::ERROR_ACCESS  - if you don't have speak permission or you don't participate in the call
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun enableAudio(chatId: Long, listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Disable audio for a call that is in progress
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_DISABLE_AUDIO_VIDEO_CALL
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getFlag - Returns false
+     * - MegaChatRequest::getParamType - Returns MegaChatRequest::AUDIO
+     *
+     * On the onRequestFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_NOENT   - if there is not any call with in chatroom
+     * - MegaChatError::ERROR_ACCESS  - if you don't have speak permission or you don't participate in the call
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun disableAudio(chatId: Long, listener: MegaChatRequestListenerInterface)
+
+    /**
      * Push a list of users (for all it's connected clients) into the waiting room.
      *
      * @param chatId MegaChatHandle that identifies the chat room

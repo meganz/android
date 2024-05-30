@@ -120,7 +120,7 @@ private fun BottomSheetContent(
                         modifier = Modifier.testTag(CALL_OPTIONS_BOTTOM_SHEET_RAISE_HAND_BUTTON),
                         res = R.drawable.raise_hand_icon,
                         text = when {
-                            meetingState.showLowerHandButtonInSnackbar -> R.string.meetings_lower_hand_option_button
+                            meetingState.isMyHandRaisedToSpeak -> R.string.meetings_lower_hand_option_button
                             else -> R.string.meetings_raise_hand_option_button
                         },
                         description = "Raise or lower hand",

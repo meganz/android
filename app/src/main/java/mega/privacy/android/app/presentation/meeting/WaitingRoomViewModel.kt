@@ -37,7 +37,7 @@ import mega.privacy.android.domain.usecase.chat.InitGuestChatSessionUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.JoinGuestChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
-import mega.privacy.android.domain.usecase.chat.StartVideoDeviceUseCase
+import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
