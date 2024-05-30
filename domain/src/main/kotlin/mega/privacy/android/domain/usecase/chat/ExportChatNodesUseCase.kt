@@ -9,7 +9,7 @@ import mega.privacy.android.domain.exception.MegaIllegalArgumentException
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.node.CopyTypedNodeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
 import javax.inject.Inject
 
 /**
@@ -18,7 +18,7 @@ import javax.inject.Inject
  */
 class ExportChatNodesUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
-    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
+    private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase,
     private val copyTypedNodeUseCase: CopyTypedNodeUseCase,
     private val exportNodeUseCase: ExportNodeUseCase
 ) {
@@ -29,7 +29,7 @@ class ExportChatNodesUseCase @Inject constructor(
     suspend operator fun invoke(
         nodes: List<TypedNode>,
     ): Map<NodeId, String> {
-        val myChatFolder = getMyChatsFilesFolderIdUseCase()
+        val myChatFolder = getOrCreateMyChatsFilesFolderIdUseCase()
         return supervisorScope {
             nodes.map { node ->
                 async {

@@ -13,7 +13,7 @@ import javax.inject.Inject
 /**
  * Get the current chats files folder id if already set or set and return default folder.
  */
-class GetMyChatsFilesFolderIdUseCase @Inject constructor(
+class GetOrCreateMyChatsFilesFolderIdUseCase @Inject constructor(
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val chatRepository: ChatRepository,

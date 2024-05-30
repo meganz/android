@@ -8,7 +8,7 @@ import mega.privacy.android.domain.exception.MegaIllegalArgumentException
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.node.CopyTypedNodeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,7 +21,7 @@ import org.mockito.kotlin.whenever
 internal class ExportChatNodesUseCaseTest {
     private val nodeRepository: NodeRepository = mock()
     private val chatFolderId = NodeId(1L)
-    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase = mock {
+    private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase = mock {
         onBlocking { invoke() }.thenReturn(chatFolderId)
     }
     private val copyTypedNodeUseCase: CopyTypedNodeUseCase = mock()
@@ -32,7 +32,7 @@ internal class ExportChatNodesUseCaseTest {
     fun setup() {
         underTest = ExportChatNodesUseCase(
             nodeRepository = nodeRepository,
-            getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
+            getOrCreateMyChatsFilesFolderIdUseCase = getOrCreateMyChatsFilesFolderIdUseCase,
             copyTypedNodeUseCase = copyTypedNodeUseCase,
             exportNodeUseCase = exportNodeUseCase
         )

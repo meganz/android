@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMes
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -32,7 +32,7 @@ class RetryPendingMessageUseCaseTest {
 
     private val startChatUploadsWithWorkerUseCase = mock<StartChatUploadsWithWorkerUseCase>()
     private val attachNodeWithPendingMessageUseCase = mock<AttachNodeWithPendingMessageUseCase>()
-    private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
+    private val getOrCreateMyChatsFilesFolderIdUseCase = mock<GetOrCreateMyChatsFilesFolderIdUseCase>()
 
 
     @BeforeAll
@@ -40,7 +40,7 @@ class RetryPendingMessageUseCaseTest {
         underTest = RetryPendingMessageUseCase(
             startChatUploadsWithWorkerUseCase,
             attachNodeWithPendingMessageUseCase,
-            getMyChatsFilesFolderIdUseCase,
+            getOrCreateMyChatsFilesFolderIdUseCase,
         )
     }
 
@@ -105,7 +105,7 @@ class RetryPendingMessageUseCaseTest {
                     any()
                 )
             ) doReturn emptyFlow()
-            whenever(getMyChatsFilesFolderIdUseCase()) doReturn myChatFilesFolderId
+            whenever(getOrCreateMyChatsFilesFolderIdUseCase()) doReturn myChatFilesFolderId
 
             underTest(message)
 

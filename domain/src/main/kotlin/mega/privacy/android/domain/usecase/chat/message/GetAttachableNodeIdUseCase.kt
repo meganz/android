@@ -4,7 +4,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.node.CopyTypedNodeUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
 import javax.inject.Inject
 
 /**
@@ -14,7 +14,7 @@ import javax.inject.Inject
  */
 class GetAttachableNodeIdUseCase @Inject constructor(
     private val copyNodeUseCase: CopyTypedNodeUseCase,
-    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
+    private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase,
     private val nodeRepository: NodeRepository,
 ) {
     /**
@@ -25,7 +25,7 @@ class GetAttachableNodeIdUseCase @Inject constructor(
         return if (userHandle == nodeRepository.getOwnerNodeHandle(fileNode.id)) {
             fileNode.id
         } else {
-            copyNodeUseCase(fileNode, getMyChatsFilesFolderIdUseCase(), null)
+            copyNodeUseCase(fileNode, getOrCreateMyChatsFilesFolderIdUseCase(), null)
         }
     }
 }

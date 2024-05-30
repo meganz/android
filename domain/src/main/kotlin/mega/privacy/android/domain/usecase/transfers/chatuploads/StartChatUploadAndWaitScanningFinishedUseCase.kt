@@ -15,7 +15,7 @@ import javax.inject.Inject
  */
 class StartChatUploadAndWaitScanningFinishedUseCase @Inject constructor(
     private val uploadFilesUseCase: UploadFilesUseCase,
-    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
+    private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase,
     private val handleChatUploadTransferEventUseCase: HandleChatUploadTransferEventUseCase,
 ) {
     /**
@@ -27,7 +27,7 @@ class StartChatUploadAndWaitScanningFinishedUseCase @Inject constructor(
     ) {
         uploadFilesUseCase(
             filesAndNames,
-            getMyChatsFilesFolderIdUseCase(),
+            getOrCreateMyChatsFilesFolderIdUseCase(),
             pendingMessageIds.map {
                 TransferAppData.ChatUpload(it)
             },

@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.node.CopyTypedNodeUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,14 +22,14 @@ class GetAttachableNodeIdUseCaseTest {
     private lateinit var underTest: GetAttachableNodeIdUseCase
 
     private val copyTypedNodeUseCase = mock<CopyTypedNodeUseCase>()
-    private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
+    private val getOrCreateMyChatsFilesFolderIdUseCase = mock<GetOrCreateMyChatsFilesFolderIdUseCase>()
     private val nodeRepository = mock<NodeRepository>()
 
     @BeforeAll
     internal fun setup() {
         underTest = GetAttachableNodeIdUseCase(
             copyTypedNodeUseCase,
-            getMyChatsFilesFolderIdUseCase,
+            getOrCreateMyChatsFilesFolderIdUseCase,
             nodeRepository,
         )
     }
@@ -38,7 +38,7 @@ class GetAttachableNodeIdUseCaseTest {
     internal fun resetMocks() {
         reset(
             copyTypedNodeUseCase,
-            getMyChatsFilesFolderIdUseCase,
+            getOrCreateMyChatsFilesFolderIdUseCase,
             nodeRepository,
         )
         commonStub()
@@ -46,7 +46,7 @@ class GetAttachableNodeIdUseCaseTest {
 
     private fun commonStub() = runTest {
         whenever(nodeRepository.getMyUserHandleBinary()).thenReturn(USER_ID)
-        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(MY_CHATS_FOLDER_ID))
+        whenever(getOrCreateMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(MY_CHATS_FOLDER_ID))
     }
 
     @Test

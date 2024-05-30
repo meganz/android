@@ -28,8 +28,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetMyChatsFilesFolderIdUseCaseTest {
-    private lateinit var underTest: GetMyChatsFilesFolderIdUseCase
+class GetOrCreateMyChatsFilesFolderIdUseCaseTest {
+    private lateinit var underTest: GetOrCreateMyChatsFilesFolderIdUseCase
 
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val chatRepository = mock<ChatRepository>()
@@ -40,7 +40,7 @@ class GetMyChatsFilesFolderIdUseCaseTest {
 
     @BeforeAll
     fun setup() {
-        underTest = GetMyChatsFilesFolderIdUseCase(
+        underTest = GetOrCreateMyChatsFilesFolderIdUseCase(
             createFolderNodeUseCase = createFolderNodeUseCase,
             fileSystemRepository = fileSystemRepository,
             chatRepository = chatRepository,

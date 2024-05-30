@@ -27,14 +27,14 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
     private lateinit var underTest: StartChatUploadAndWaitScanningFinishedUseCase
 
     private val uploadFilesUseCase = mock<UploadFilesUseCase>()
-    private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
+    private val getOrCreateMyChatsFilesFolderIdUseCase = mock<GetOrCreateMyChatsFilesFolderIdUseCase>()
     private val handleChatUploadTransferEventUseCase = mock<HandleChatUploadTransferEventUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = StartChatUploadAndWaitScanningFinishedUseCase(
             uploadFilesUseCase,
-            getMyChatsFilesFolderIdUseCase,
+            getOrCreateMyChatsFilesFolderIdUseCase,
             handleChatUploadTransferEventUseCase,
         )
     }
@@ -43,10 +43,10 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
     fun resetMocks() = runTest {
         reset(
             uploadFilesUseCase,
-            getMyChatsFilesFolderIdUseCase,
+            getOrCreateMyChatsFilesFolderIdUseCase,
             handleChatUploadTransferEventUseCase,
         )
-        whenever(getMyChatsFilesFolderIdUseCase()) doReturn myChatsFolderId
+        whenever(getOrCreateMyChatsFilesFolderIdUseCase()) doReturn myChatsFolderId
     }
 
     @Test

@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ import javax.inject.Inject
 class RetryPendingMessageUseCase @Inject constructor(
     private val startChatUploadsWithWorkerUseCase: StartChatUploadsWithWorkerUseCase,
     private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
-    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
+    private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase,
 ) : RetryMessageUseCase() {
     override fun canRetryMessage(message: TypedMessage): Boolean =
         message is PendingAttachmentMessage
@@ -27,7 +27,7 @@ class RetryPendingMessageUseCase @Inject constructor(
                 message.file?.let {
                     startChatUploadsWithWorkerUseCase(
                         file = it,
-                        chatFilesFolderId = getMyChatsFilesFolderIdUseCase(),
+                        chatFilesFolderId = getOrCreateMyChatsFilesFolderIdUseCase(),
                         message.msgId
                     ).collect()
                 }

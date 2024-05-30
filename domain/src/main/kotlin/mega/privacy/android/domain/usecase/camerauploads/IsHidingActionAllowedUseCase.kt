@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import javax.inject.Inject
 
 /**
@@ -26,7 +26,7 @@ class IsHidingActionAllowedUseCase @Inject constructor(
     suspend operator fun invoke(nodeId: NodeId): Boolean = nodeId.longValue !in listOf(
         getPrimarySyncHandleUseCase(),
         getSecondarySyncHandleUseCase(),
-        getMyChatsFilesFolderIdUseCase().longValue,
+        getMyChatsFilesFolderIdUseCase()?.longValue ?: -1,
         getRootNodeUseCase()?.id?.longValue ?: 0,
     )
 }

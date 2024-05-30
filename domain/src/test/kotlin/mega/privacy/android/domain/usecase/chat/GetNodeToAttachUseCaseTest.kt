@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.filenode.GetOwnNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -25,13 +25,13 @@ class GetNodeToAttachUseCaseTest {
 
     private val copyNodeUseCase: CopyNodeUseCase = mock()
     private val getOwnNodeUseCase: GetOwnNodeUseCase = mock()
-    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase = mock()
+    private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
 
     private val underTest = GetNodeToAttachUseCase(
         copyNodeUseCase = copyNodeUseCase,
         getOwnNodeUseCase = getOwnNodeUseCase,
-        getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
+        getOrCreateMyChatsFilesFolderIdUseCase = getOrCreateMyChatsFilesFolderIdUseCase,
         getNodeByIdUseCase = getNodeByIdUseCase
     )
 
@@ -53,7 +53,7 @@ class GetNodeToAttachUseCaseTest {
         expected: TypedNode?,
     ) = runTest {
         whenever(getOwnNodeUseCase(inputNode)).thenReturn(myNode)
-        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(CHAT_FOLDER_HANDLE))
+        whenever(getOrCreateMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(CHAT_FOLDER_HANDLE))
         whenever(
             copyNodeUseCase(
                 inputNode.id,
@@ -94,7 +94,7 @@ class GetNodeToAttachUseCaseTest {
         reset(
             copyNodeUseCase,
             getOwnNodeUseCase,
-            getMyChatsFilesFolderIdUseCase,
+            getOrCreateMyChatsFilesFolderIdUseCase,
             getNodeByIdUseCase
         )
     }
