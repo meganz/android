@@ -1,40 +1,28 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import mega.privacy.android.domain.repository.FileSystemRepository
-import java.nio.file.Paths
 import javax.inject.Inject
 
 /**
  * Use Case that checks whether the Secondary Folder path is valid or not
  *
- * @property getPrimaryFolderPathUseCase [GetPrimaryFolderPathUseCase]
- * @property fileSystemRepository [FileSystemRepository]
+ * @property isFolderPathExistingUseCase Checks if the specific Local Folder exists or not
+ * @property isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase Checks if the specific Local
+ * Secondary Folder Path is not the same Folder or a parent Folder or a sub Folder from the current
+ * Local Primary Folder
  */
 class IsSecondaryFolderPathValidUseCase @Inject constructor(
-    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
-    private val fileSystemRepository: FileSystemRepository,
+    private val isFolderPathExistingUseCase: IsFolderPathExistingUseCase,
+    private val isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase: IsSecondaryFolderPathUnrelatedToPrimaryFolderUseCase,
 ) {
 
     /**
      * Invocation function
      *
-     * @param path The Secondary Folder path, which can be nullable
-     * @return true if the Secondary Folder exists and is different from the Primary Folder
-     * local path. Otherwise, return false
+     * @param path The Local Secondary Folder path, which can be nullable
+     * @return true if the Local Secondary Folder exists and is unrelated to the Local Primary
+     * Folder
      */
-    suspend operator fun invoke(path: String?): Boolean =
-        if (!path.isNullOrBlank() && fileSystemRepository.doesFolderExists(path)) {
-            val primaryFolderPath = getPrimaryFolderPathUseCase()
-
-            if (primaryFolderPath.isNotBlank()) {
-                val primaryAbsolutePath = Paths.get(primaryFolderPath).toAbsolutePath()
-                val secondaryAbsolutePath = Paths.get(path).toAbsolutePath()
-
-                !secondaryAbsolutePath.startsWith(primaryAbsolutePath) &&
-                        !primaryAbsolutePath.startsWith(secondaryAbsolutePath)
-            } else {
-                // An empty Primary Folder Path automatically makes the Secondary Folder Path valid
-                true
-            }
-        } else false
+    suspend operator fun invoke(path: String?) = path?.let {
+        isFolderPathExistingUseCase(it) && isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase(it)
+    } ?: false
 }
