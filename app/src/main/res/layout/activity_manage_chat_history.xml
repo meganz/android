@@ -59,7 +59,7 @@
                         android:layout_weight="1"
                         android:gravity="end|center_vertical">
 
-                        <androidx.appcompat.widget.SwitchCompat
+                        <mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
                             android:id="@+id/history_retention_switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

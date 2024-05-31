@@ -28,7 +28,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import kotlin.Unit;
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
 
 import java.util.ArrayList;
 
@@ -119,7 +120,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         TextView optionDownload = contentView.findViewById(R.id.option_download);
         TextView optionImport = contentView.findViewById(R.id.option_import);
         LinearLayout optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
-        SwitchMaterial offlineSwitch = contentView.findViewById(R.id.option_save_offline_switch);
+        MegaSwitch offlineSwitch = contentView.findViewById(R.id.option_save_offline_switch);
 
         optionDownload.setOnClickListener(this);
         optionView.setOnClickListener(this);
@@ -186,7 +187,10 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         offlineSwitch.setChecked(availableOffline(requireContext(), node));
-        offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> onClick(v));
+        offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> {
+            onClick(v);
+            return Unit.INSTANCE;
+        });
 
         super.onViewCreated(view, savedInstanceState);
     }

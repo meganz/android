@@ -35,7 +35,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -153,12 +153,12 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         private ImageView editImageView;
         private LinearLayout notificationsLayout;
         private RelativeLayout notificationsSwitchLayout;
-        private SwitchCompat notificationsSwitch;
+        private MegaSwitch notificationsSwitch;
         private TextView notificationsTitle;
         private TextView notificationsSubTitle;
         private View dividerNotifications;
         private LinearLayout allowParticipantsLayout;
-        private SwitchCompat allowParticipantsSwitch;
+        private MegaSwitch allowParticipantsSwitch;
         private View dividerAllowParticipants;
         private LinearLayout chatLinkLayout;
         private View chatLinkSeparator;

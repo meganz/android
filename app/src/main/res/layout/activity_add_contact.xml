@@ -313,16 +313,28 @@
 				android:layout_height="match_parent"
 				android:orientation="vertical">
 
-				<androidx.appcompat.widget.SwitchCompat
-					android:id="@+id/ekr_switch"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:textAppearance="?attr/textAppearanceSubtitle1"
-					android:checked="false"
-					android:text="@string/ekr_label"
-					android:layout_marginTop="14dp"
-					android:layout_marginStart="16dp"
-					android:layout_marginEnd="6dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/ekr_label"
+                        android:textAppearance="?attr/textAppearanceSubtitle1" />
+
+                    <mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
+                        android:id="@+id/ekr_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:mega_switch_checked="false" />
+                </LinearLayout>
 
 				<TextView
 					android:layout_width="match_parent"
@@ -390,17 +402,29 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content">
 
-					<androidx.appcompat.widget.SwitchCompat
-						android:id="@+id/allow_add_participants_switch"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_marginStart="16dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
 						android:layout_marginTop="14dp"
 						android:layout_marginEnd="14dp"
 						android:layout_marginBottom="14dp"
-						android:checked="false"
-						android:text="@string/chat_group_chat_info_allow_non_host_participants_option"
-						android:textAppearance="?attr/textAppearanceSubtitle1" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/chat_group_chat_info_allow_non_host_participants_option"
+                            android:textAppearance="?attr/textAppearanceSubtitle1" />
+
+                        <mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
+                            android:id="@+id/allow_add_participants_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+							app:mega_switch_checked="false" />
+                    </LinearLayout>
 
 					<View
 						android:id="@+id/separator_allow_participants_participants"

@@ -74,7 +74,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.SwitchCompat;
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
@@ -295,11 +295,11 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private LinearLayout addContactsLayout;
     private NestedScrollView newGroupLayout;
-    private SwitchCompat ekrSwitch;
+    private MegaSwitch ekrSwitch;
     private boolean isEKREnabled = false;
     private RelativeLayout getChatLinkLayout;
     private CheckBox getChatLinkBox;
-    private SwitchCompat allowAddParticipantsSwitch;
+    private MegaSwitch allowAddParticipantsSwitch;
     private boolean isAllowAddParticipantsEnabled = true;
     private LinearLayoutManager newGrouplinearLayoutManager;
     private RecyclerView newGroupRecyclerView;
@@ -1631,7 +1631,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         newGroupLayout = (NestedScrollView) findViewById(R.id.new_group_layout);
         newGroupLayout.setVisibility(View.GONE);
-        ekrSwitch = (SwitchCompat) findViewById(R.id.ekr_switch);
+        ekrSwitch = (MegaSwitch) findViewById(R.id.ekr_switch);
         ekrSwitch.setOnClickListener(this);
         getChatLinkBox = (CheckBox) findViewById(R.id.get_chat_link_checkbox);
         getChatLinkLayout = (RelativeLayout) findViewById(R.id.get_chat_link_layout);

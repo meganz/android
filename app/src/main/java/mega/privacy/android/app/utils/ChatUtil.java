@@ -56,7 +56,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.SwitchCompat;
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -839,10 +839,10 @@ public class ChatUtil {
      * Method to checking when chat notifications are enabled and update the UI elements.
      *
      * @param chatHandle            Chat ID.
-     * @param notificationsSwitch   The SwitchCompat.
+     * @param notificationsSwitch   The MegaSwitch.
      * @param notificationsSubTitle The TextView with the info.
      */
-    public static void checkSpecificChatNotifications(long chatHandle, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle, @NonNull Context context) {
+    public static void checkSpecificChatNotifications(long chatHandle, final MegaSwitch notificationsSwitch, final TextView notificationsSubTitle, @NonNull Context context) {
         if (MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting() != null) {
             updateSwitchButton(chatHandle, notificationsSwitch, notificationsSubTitle, context);
         }
@@ -852,10 +852,10 @@ public class ChatUtil {
      * Method to update the switch element related to the notifications of a specific chat.
      *
      * @param chatId                The chat ID.
-     * @param notificationsSwitch   The SwitchCompat.
+     * @param notificationsSwitch   The MegaSwitch.
      * @param notificationsSubTitle The TextView with the info.
      */
-    public static void updateSwitchButton(long chatId, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle, @NonNull Context context) {
+    public static void updateSwitchButton(long chatId, final MegaSwitch notificationsSwitch, final TextView notificationsSubTitle, @NonNull Context context) {
         MegaPushNotificationSettings push = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
         if (push == null)
             return;

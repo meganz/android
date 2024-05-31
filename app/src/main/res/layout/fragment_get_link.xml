@@ -120,7 +120,7 @@
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor"
                 />
 
-            <androidx.appcompat.widget.SwitchCompat
+            <mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
                 android:id="@+id/expiry_date_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -255,7 +255,7 @@
 
             </LinearLayout>
 
-            <androidx.appcompat.widget.SwitchCompat
+            <mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
                 android:id="@+id/decrypted_key_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

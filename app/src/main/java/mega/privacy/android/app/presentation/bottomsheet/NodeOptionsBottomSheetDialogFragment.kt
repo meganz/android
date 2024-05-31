@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -30,7 +29,6 @@ import androidx.lifecycle.lifecycleScope
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.switchmaterial.SwitchMaterial
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -91,6 +89,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
@@ -168,7 +167,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val optionLabelCurrent = contentView.findViewById<TextView>(R.id.option_label_current)
         //      counterSave
         val optionDownload = contentView.findViewById<TextView>(R.id.download_option)
-        val offlineSwitch = contentView.findViewById<SwitchMaterial>(R.id.file_properties_switch)
+        val offlineSwitch = contentView.findViewById<MegaSwitch>(R.id.file_properties_switch)
         //      counterShares
         val optionLink = contentView.findViewById<TextView>(R.id.link_option)
         val optionRemoveLink = contentView.findViewById<TextView>(R.id.remove_link_option)
@@ -700,7 +699,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 separatorDownload.visibility = if (counterSave <= 0) View.GONE else View.VISIBLE
                 separatorShares.visibility = if (counterShares <= 0) View.GONE else View.VISIBLE
                 separatorModify.visibility = if (counterModify <= 0) View.GONE else View.VISIBLE
-                offlineSwitch.setOnCheckedChangeListener { _: CompoundButton, _: Boolean ->
+                offlineSwitch.setOnCheckedChangeListener { _, _ ->
                     onClick {
                         onOfflineClicked(
                             node = node,

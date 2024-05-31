@@ -25,7 +25,7 @@ class MegaSwitchPreference @JvmOverloads constructor(
         val customSwitch = holder.findViewById(R.id.switchWidget) as MegaSwitch
         customSwitch.setOnCheckedChangeListener(null)
         super.onBindViewHolder(holder)
-        customSwitch.setOnCheckedChangeListener { isChecked ->
+        customSwitch.setOnCheckedChangeListener { _, isChecked ->
             performClick()
         }
     }

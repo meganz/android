@@ -65,7 +65,7 @@ class MegaSwitch : AbstractComposeView, Checkable {
     @get:JvmName("isEnabledKt")
     @set:JvmName("setEnabledKt")
     var enabled by mutableStateOf(true)
-    var onCheckedChange by mutableStateOf<((Boolean) -> Unit)?>(null)
+    var onCheckedChange by mutableStateOf<((MegaSwitch, Boolean) -> Unit)?>(null)
 
     /**
      * overridden getter to be sure it's not used by mistake or from java code
@@ -96,25 +96,27 @@ class MegaSwitch : AbstractComposeView, Checkable {
     override fun Content() {
         OriginalTempTheme(isDark = isSystemInDarkTheme()) {
             MegaSwitch(checked = checked, onCheckedChange = {
+                val changed = checked != it
                 checked = it
-                onCheckedChange?.invoke(it)
+                onCheckedChange?.takeIf { changed }?.invoke(this, it)
             })
         }
     }
 
     override fun setChecked(checked: Boolean) {
+        val changed = checked != this.checked
         this.checked = checked
-        onCheckedChange?.invoke(checked)
+        onCheckedChange?.takeIf { changed }?.invoke(this, checked)
     }
 
     override fun isChecked() = checked
 
     override fun toggle() {
         checked = !checked
-        onCheckedChange?.invoke(checked)
+        onCheckedChange?.invoke(this, checked)
     }
 
-    fun setOnCheckedChangeListener(listener: ((Boolean) -> Unit)?) {
+    fun setOnCheckedChangeListener(listener: ((MegaSwitch, Boolean) -> Unit)?) {
         onCheckedChange = listener
     }
 }
