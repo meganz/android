@@ -36,7 +36,6 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -44,7 +43,7 @@ import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContact
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
-import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
@@ -59,7 +58,7 @@ import javax.inject.Inject
  * @param getContactsUseCase            Use case to get contacts
  * @param get1On1ChatIdUseCase          Use case to get 1on1 chat id
  * @param removedContactByEmailUseCase  Use case to remove contact by email
- * @param startChatCall                 Use case to start chat call
+ * @param startCallUseCase              Use case to start chat call
  * @param passcodeManagement            PasscodeManagement object
  * @param chatApiGateway                MegaChatApiGateway object
  * @param setChatVideoInDeviceUseCase   Use case to set chat video in device
@@ -75,7 +74,7 @@ class ContactListViewModel @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val removedContactByEmailUseCase: RemoveContactByEmailUseCase,
-    private val startChatCall: StartChatCall,
+    private val startCallUseCase: StartCallUseCase,
     private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
@@ -300,29 +299,24 @@ class ContactListViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 setChatVideoInDeviceUseCase()
-                startChatCall(chatId, video, audio)
+                startCallUseCase(chatId, video)
             }.onFailure { exception ->
                 Timber.e(exception)
-            }.onSuccess { resultStartCall ->
-                val resultChatId = resultStartCall.chatHandle
-                val videoEnable = resultStartCall.flag
-                val paramType = resultStartCall.paramType
-                val audioEnable: Boolean = paramType == ChatRequestParamType.Video
-                CallUtil.addChecksForACall(resultChatId, videoEnable)
-
-                chatApiGateway.getChatCall(resultChatId)?.let { call ->
-                    if (call.isOutgoing) {
-                        chatManagement.setRequestSentCall(call.callId, true)
+            }.onSuccess { call ->
+                call?.apply {
+                    CallUtil.addChecksForACall(chatId, hasLocalVideo)
+                    if (isOutgoing) {
+                        chatManagement.setRequestSentCall(call.callId, isRequestSent = true)
                     }
-                }
 
-                CallUtil.openMeetingWithAudioOrVideo(
-                    MegaApplication.getInstance().applicationContext,
-                    resultChatId,
-                    audioEnable,
-                    videoEnable,
-                    passcodeManagement
-                )
+                    CallUtil.openMeetingWithAudioOrVideo(
+                        MegaApplication.getInstance().applicationContext,
+                        chatId,
+                        hasLocalAudio,
+                        hasLocalVideo,
+                        passcodeManagement
+                    )
+                }
             }
         }
     }

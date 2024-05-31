@@ -26,7 +26,7 @@ class StartCallUseCase @Inject constructor(
             throw StartCallException(chatId)
         } else {
             val result = runCatching {
-                callRepository.startCallRinging(chatId, video, true)
+                callRepository.startCallRinging(chatId, video, enabledAudio = true)
             }
 
             if (result.isSuccess) {

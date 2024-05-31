@@ -97,7 +97,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorParticipatingInAnother
 import mega.privacy.android.domain.usecase.meeting.RequestHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestLowResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
-import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StopHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.StopLowResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.raisehandtospeak.IsRaiseToHandSuggestionShownUseCase
@@ -124,7 +124,7 @@ import javax.inject.Inject
  *
  * @property inMeetingRepository                [InMeetingRepository]
  * @property getCallUseCase                     [GetCallUseCase]
- * @property startChatCall                      [StartChatCall]
+ * @property startCallUseCase                   [StartCallUseCase]
  * @property monitorCallReconnectingStatusUseCase       [MonitorCallReconnectingStatusUseCase]
  * @property endCallUseCase                     [EndCallUseCase]
  * @property getParticipantsChangesUseCase      [GetParticipantsChangesUseCase]
@@ -162,7 +162,7 @@ import javax.inject.Inject
 class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository,
     private val getCallUseCase: GetCallUseCase,
-    private val startChatCall: StartChatCall,
+    private val startCallUseCase: StartCallUseCase,
     private val monitorCallReconnectingStatusUseCase: MonitorCallReconnectingStatusUseCase,
     private val endCallUseCase: EndCallUseCase,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
@@ -1488,17 +1488,14 @@ class InMeetingViewModel @Inject constructor(
                 viewModelScope.launch {
                     runCatching {
                         setChatVideoInDeviceUseCase()
-                        startChatCall(_state.value.currentChatId, enableVideo, enableAudio)
+                        startCallUseCase(_state.value.currentChatId, enableVideo)
                     }.onFailure { exception ->
                         Timber.e(exception)
-                    }.onSuccess { resultStartCall ->
-                        val chatId = resultStartCall.chatHandle
-                        if (chatId != MEGACHAT_INVALID_HANDLE) {
-                            chatManagement.setSpeakerStatus(chatId, resultStartCall.flag)
-                            megaChatApiGateway.getChatCall(chatId)?.let { call ->
-                                if (call.isOutgoing) {
-                                    chatManagement.setRequestSentCall(call.callId, true)
-                                }
+                    }.onSuccess { call ->
+                        call?.apply {
+                            chatManagement.setSpeakerStatus(chatId, hasLocalVideo)
+                            if (isOutgoing) {
+                                chatManagement.setRequestSentCall(callId, isRequestSent = true)
                             }
 
                             chatIdResult.value = chatId

@@ -41,7 +41,7 @@ import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
-import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaChatRoom
@@ -52,7 +52,7 @@ import javax.inject.Inject
  * GroupChatInfoActivity view model.
  *
  * @property setOpenInvite                                  [SetOpenInvite]
- * @property startChatCall                                  [StartChatCall]
+ * @property startCallUseCase                               [StartCallUseCase]
  * @property passcodeManagement                             [PasscodeManagement]
  * @property chatApiGateway                                 [MegaChatApiGateway]
  * @property setChatVideoInDeviceUseCase                    [SetChatVideoInDeviceUseCase]
@@ -69,7 +69,7 @@ import javax.inject.Inject
 class GroupChatInfoViewModel @Inject constructor(
     private val setOpenInvite: SetOpenInvite,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val startChatCall: StartChatCall,
+    private val startCallUseCase: StartCallUseCase,
     private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
@@ -226,30 +226,24 @@ class GroupChatInfoViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 setChatVideoInDeviceUseCase()
-                startChatCall(chatId, video, audio)
+                startCallUseCase(chatId, video)
             }.onFailure { exception ->
                 Timber.e(exception)
-            }.onSuccess { resultStartCall ->
-                val resultChatId = resultStartCall.chatHandle
-                val videoEnable = resultStartCall.flag
-                val paramType = resultStartCall.paramType
-                val audioEnable: Boolean = paramType == ChatRequestParamType.Video
-
-                CallUtil.addChecksForACall(resultChatId, videoEnable)
-
-                chatApiGateway.getChatCall(resultChatId)?.let { call ->
-                    if (call.isOutgoing) {
-                        chatManagement.setRequestSentCall(call.callId, true)
+            }.onSuccess { call ->
+                call?.apply {
+                    CallUtil.addChecksForACall(chatId, hasLocalVideo)
+                    if (isOutgoing) {
+                        chatManagement.setRequestSentCall(callId, isRequestSent = true)
                     }
-                }
 
-                openMeetingWithAudioOrVideo(
-                    MegaApplication.getInstance().applicationContext,
-                    resultChatId,
-                    audioEnable,
-                    videoEnable,
-                    passcodeManagement
-                )
+                    openMeetingWithAudioOrVideo(
+                        MegaApplication.getInstance().applicationContext,
+                        chatId,
+                        hasLocalAudio,
+                        hasLocalVideo,
+                        passcodeManagement
+                    )
+                }
             }
         }
     }

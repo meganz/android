@@ -24,7 +24,7 @@ import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
-import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.After
@@ -48,7 +48,7 @@ class GroupChatInfoViewModelTest {
 
     private val setOpenInvite: SetOpenInvite = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
-    private val startChatCall: StartChatCall = mock()
+    private val startCallUseCase: StartCallUseCase = mock()
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
     private val passcodeManagement: PasscodeManagement = mock()
     private val chatApiGateway: MegaChatApiGateway = mock()
@@ -87,7 +87,7 @@ class GroupChatInfoViewModelTest {
         underTest = GroupChatInfoViewModel(
             setOpenInvite = setOpenInvite,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            startChatCall = startChatCall,
+            startCallUseCase = startCallUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             passcodeManagement = passcodeManagement,
             chatApiGateway = chatApiGateway,
@@ -162,7 +162,7 @@ class GroupChatInfoViewModelTest {
         reset(
             setOpenInvite,
             monitorConnectivityUseCase,
-            startChatCall,
+            startCallUseCase,
             get1On1ChatIdUseCase,
             passcodeManagement,
             chatApiGateway,

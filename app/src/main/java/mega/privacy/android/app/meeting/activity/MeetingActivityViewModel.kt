@@ -1304,9 +1304,12 @@ class MeetingActivityViewModel @Inject constructor(
     private fun enableVideo(enable: Boolean) {
         state.value.currentCall?.apply {
             val enableVideo = enable && !hasLocalVideo
+            if (enable && hasLocalVideo) {
+                return
+            }
             viewModelScope.launch {
                 runCatching {
-                    enableOrDisableVideoUseCase(chatId, enableVideo)
+                    enableOrDisableVideoUseCase(chatId = chatId, enable = enableVideo)
                 }.onFailure { exception ->
                     Timber.e(exception)
                 }.onSuccess { chatRequest ->
