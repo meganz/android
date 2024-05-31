@@ -1,9 +1,11 @@
 import com.android.build.gradle.LibraryExtension
+import mega.privacy.android.gradle.extension.MegaJacocoPluginExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.fileTree
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
@@ -14,6 +16,10 @@ import java.util.Locale
  */
 class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
 
+    private var userExcludedFiles: Set<String> = emptySet()
+    private var userIncludedFiles: Set<String> = emptySet()
+    private var excludedFiles: List<String> = emptyList()
+
     /**
      * Apply the Jacoco configuration to the project.
      *
@@ -21,7 +27,20 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
      */
     override fun apply(target: Project) {
         with(target) {
+            println("AndroidLibraryJacocoConventionPlugin applied to project ${project.name}")
             pluginManager.apply("jacoco")
+
+            extensions.create("mega-jacoco", MegaJacocoPluginExtension::class.java)
+            extensions.getByType<MegaJacocoPluginExtension>().defaultExcludedFiles =
+                defaultExcludedFiles
+
+            afterEvaluate {
+                extensions.getByType<MegaJacocoPluginExtension>().let {
+                    userExcludedFiles = it.excludedFiles
+                    userIncludedFiles = it.includedFiles
+                    excludedFiles = mergeExcludedFiles()
+                }
+            }
 
             tasks.withType<Test> {
                 configure<JacocoTaskExtension> {
@@ -45,24 +64,24 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
                         } else {
                             sourceName =
                                 "${productFlavorName}${capitalise(buildTypeName)}"
-                            sourcePath = "${productFlavorName}/${buildTypeName}"
                         }
 
                         val testTaskName = "test${capitalise(sourceName)}UnitTest"
 
-                        val javaTree = this@with.fileTree(
-                            "dir" to "${layout.buildDirectory.get()}/intermediates/javac/$sourceName/classes",
-                            "excludes" to excludedFileList,
-                        )
-                        val kotlinTree = this@with.fileTree(
-                            "dir" to "${layout.buildDirectory.get()}/tmp/kotlin-classes/$sourceName",
-                            "excludes" to excludedFileList
-                        )
                         tasks.register("${testTaskName}Coverage", JacocoReport::class.java) {
                             dependsOn(testTaskName)
                             group = "Reporting"
                             description =
                                 "Generate Jacoco coverage reports on the ${capitalise(sourceName)} build."
+
+                            val javaTree = this@with.fileTree(
+                                "dir" to "${layout.buildDirectory.get()}/intermediates/javac/$sourceName/classes",
+                                "excludes" to excludedFiles,
+                            )
+                            val kotlinTree = this@with.fileTree(
+                                "dir" to "${layout.buildDirectory.get()}/tmp/kotlin-classes/$sourceName",
+                                "excludes" to defaultExcludedFiles.toList()
+                            )
 
                             classDirectories.setFrom(
                                 files(
@@ -97,7 +116,14 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
         }
     }
 
-    private val excludedFileList = listOf(
+    private fun mergeExcludedFiles(): List<String> {
+        val result: MutableSet<String> = defaultExcludedFiles.toMutableSet()
+        result += userExcludedFiles
+        result -= userIncludedFiles
+        return result.toList()
+    }
+
+    private val defaultExcludedFiles = setOf(
         // data binding
         "android/databinding/**/*.class",
         "**/android/databinding/*Binding.class",
