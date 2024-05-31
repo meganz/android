@@ -4,13 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.meeting.LeftMeetingViewModel
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,7 +18,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.wheneverBlocking
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class LeftMeetingViewModelTest {
@@ -27,11 +25,11 @@ internal class LeftMeetingViewModelTest {
     private val callEndedDueLimit: Boolean = true
 
     private lateinit var underTest: LeftMeetingViewModel
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val savedStateHandle: SavedStateHandle = mock {
         on { get<Boolean>(MeetingActivity.MEETING_FREE_PLAN_USERS_LIMIT) } doReturn true
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeAll
     internal fun init() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -40,18 +38,15 @@ internal class LeftMeetingViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            getFeatureFlagValueUseCase,
             savedStateHandle,
         )
         whenever(savedStateHandle.get<Boolean>(MeetingActivity.MEETING_FREE_PLAN_USERS_LIMIT)).thenReturn(
             true
         )
-        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.CallUnlimitedProPlan) } doReturn true
     }
 
     private fun initTestClass() {
         underTest = LeftMeetingViewModel(
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -66,6 +61,4 @@ internal class LeftMeetingViewModelTest {
             Truth.assertThat(awaitItem().callEndedDueToFreePlanLimits).isEqualTo(callEndedDueLimit)
         }
     }
-
-
 }

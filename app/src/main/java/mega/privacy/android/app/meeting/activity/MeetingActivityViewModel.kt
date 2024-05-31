@@ -118,6 +118,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdate
 import mega.privacy.android.domain.usecase.meeting.MuteAllPeersUseCase
 import mega.privacy.android.domain.usecase.meeting.MutePeersUseCase
 import mega.privacy.android.domain.usecase.meeting.RingIndividualInACallUseCase
+import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
@@ -931,9 +932,7 @@ class MeetingActivityViewModel @Inject constructor(
 
                                     ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification -> {
                                         Timber.d("Chat call termCode: ${call.termCode}")
-                                        if (call.termCode == ChatCallTermCodeType.CallUsersLimit || call.termCode == ChatCallTermCodeType.TooManyParticipants
-                                            && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
-                                        ) {
+                                        if (call.termCode == ChatCallTermCodeType.CallUsersLimit) {
                                             _state.update { state ->
                                                 state.copy(
                                                     callEndedDueToFreePlanLimits = true

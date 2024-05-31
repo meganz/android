@@ -11,11 +11,13 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.rxFlowable
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants
@@ -31,6 +33,7 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.chat.MonitorCallsReconnectingStatusUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -57,6 +60,7 @@ class GetCallSoundsUseCase @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
+    @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
 
     companion object {
@@ -133,6 +137,7 @@ class GetCallSoundsUseCase @Inject constructor(
                                             Timber.d("Session in progress")
                                             stopCountDown(call.chatid, participant)
                                         }
+
                                         MegaChatSession.SESSION_STATUS_DESTROYED -> {
                                             isRecoverable?.let { isRecoverableSession ->
                                                 if (isRecoverableSession) {
@@ -198,7 +203,8 @@ class GetCallSoundsUseCase @Inject constructor(
                                 }
 
                                 waitingForOthersCountDownTimer?.start(
-                                    SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL)
+                                    SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL
+                                )
                             } else {
                                 MegaApplication.getChatManagement()
                                     .startCounterToFinishCall(chatId)
@@ -216,36 +222,38 @@ class GetCallSoundsUseCase @Inject constructor(
             sharingScope.launch {
                 monitorChatCallUpdatesUseCase()
                     .collectLatest { call ->
-                        call.changes?.apply {
-                            Timber.d("Monitor chat call updated, changes $this")
-                            if (contains(ChatCallChanges.Status)) {
-                                when (call.status) {
-                                    ChatCallStatus.TerminatingUserParticipation -> {
-                                        Timber.d("Terminating user participation")
-                                        removeWaitingForOthersCountDownTimer()
-                                        MegaApplication.getChatManagement()
-                                            .stopCounterToFinishCall()
-                                        rtcAudioManagerGateway.removeRTCAudioManager()
-                                        emitter.onNext(CallSoundType.CALL_ENDED)
-                                    }
-
-                                    else -> {}
-                                }
-                            }
-
-                            if (contains(ChatCallChanges.WaitingRoomUsersEntered)) {
-                                if (call.waitingRoom?.peers?.size == 1) {
-                                    shouldPlaySoundWhenShowWaitingRoomDialog = true
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        if (shouldPlaySoundWhenShowWaitingRoomDialog) {
-                                            emitter.onNext(CallSoundType.WAITING_ROOM_USERS_ENTERED)
+                        withContext(mainImmediateDispatcher) {
+                            call.changes?.apply {
+                                Timber.d("Monitor chat call updated, changes $this")
+                                if (contains(ChatCallChanges.Status)) {
+                                    when (call.status) {
+                                        ChatCallStatus.TerminatingUserParticipation -> {
+                                            Timber.d("Terminating user participation")
+                                            removeWaitingForOthersCountDownTimer()
+                                            MegaApplication.getChatManagement()
+                                                .stopCounterToFinishCall()
+                                            rtcAudioManagerGateway.removeRTCAudioManager()
+                                            emitter.onNext(CallSoundType.CALL_ENDED)
                                         }
-                                    }, 1000)
-                                }
-                            }
 
-                            if (contains(ChatCallChanges.WaitingRoomUsersLeave)) {
-                                shouldPlaySoundWhenShowWaitingRoomDialog = false
+                                        else -> {}
+                                    }
+                                }
+
+                                if (contains(ChatCallChanges.WaitingRoomUsersEntered)) {
+                                    if (call.waitingRoom?.peers?.size == 1) {
+                                        shouldPlaySoundWhenShowWaitingRoomDialog = true
+                                        Handler(Looper.getMainLooper()).postDelayed({
+                                            if (shouldPlaySoundWhenShowWaitingRoomDialog) {
+                                                emitter.onNext(CallSoundType.WAITING_ROOM_USERS_ENTERED)
+                                            }
+                                        }, 1000)
+                                    }
+                                }
+
+                                if (contains(ChatCallChanges.WaitingRoomUsersLeave)) {
+                                    shouldPlaySoundWhenShowWaitingRoomDialog = false
+                                }
                             }
                         }
                     }
@@ -277,13 +285,17 @@ class GetCallSoundsUseCase @Inject constructor(
                 )
                 .addTo(disposable)
 
-            LiveEventBus.get(EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE,
-                MegaChatCall::class.java)
+            LiveEventBus.get(
+                EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE,
+                MegaChatCall::class.java
+            )
                 .observeForever(outgoingRingingStatusObserver)
 
             emitter.setCancellable {
-                LiveEventBus.get(EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE,
-                    MegaChatCall::class.java)
+                LiveEventBus.get(
+                    EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE,
+                    MegaChatCall::class.java
+                )
                     .removeObserver(outgoingRingingStatusObserver)
 
                 removeWaitingForOthersCountDownTimer()
