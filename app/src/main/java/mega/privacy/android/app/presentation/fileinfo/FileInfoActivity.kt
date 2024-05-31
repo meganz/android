@@ -66,6 +66,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionAddedMessageDisplayedEvent
+import mega.privacy.mobile.analytics.event.NodeInfoDescriptionUpdatedMessageDisplayedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoScreenEvent
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
@@ -518,6 +519,9 @@ class FileInfoActivity : BaseActivity() {
                 snackBarHostState.showSnackbar(getString(event.message))
                 if (event is FileInfoOneOffViewEvent.Message.NodeDescriptionAdded) {
                     Analytics.tracker.trackEvent(NodeInfoDescriptionAddedMessageDisplayedEvent)
+                }
+                if (event is FileInfoOneOffViewEvent.Message.NodeDescriptionUpdated) {
+                    Analytics.tracker.trackEvent(NodeInfoDescriptionUpdatedMessageDisplayedEvent)
                 }
             }
 

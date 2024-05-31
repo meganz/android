@@ -55,7 +55,6 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
@@ -64,6 +63,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -199,10 +199,17 @@ class FileInfoViewModel @Inject constructor(
                 setNodeDescriptionUseCase(nodeHandle = nodeId, description = description)
             }.onSuccess {
                 _uiState.update {
-                    it.copy(
-                        oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionAdded),
-                        descriptionText = description
-                    )
+                    if (it.descriptionText.isEmpty()) {
+                        it.copy(
+                            oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionAdded),
+                            descriptionText = description
+                        )
+                    } else {
+                        it.copy(
+                            oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionUpdated),
+                            descriptionText = description
+                        )
+                    }
                 }
             }.onFailure {
                 Timber.e("Set Node Description Failed $it")
