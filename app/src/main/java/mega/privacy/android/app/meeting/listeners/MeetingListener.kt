@@ -7,10 +7,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_SPEAK_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AUDIO_LEVEL_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_NETWORK_QUALITY_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE
@@ -75,23 +72,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             stopCountDown()
         }
 
-        // Speak has been enabled
-        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_SPEAK)) {
-            Timber.d("Call speak changed")
-            sendCallEvent(EVENT_CALL_SPEAK_CHANGE, call)
-        }
-
-        // Indicates if we are speaking
-        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_AUDIO_LEVEL)) {
-            Timber.d("Local audio level changed")
-            sendCallEvent(EVENT_LOCAL_AUDIO_LEVEL_CHANGE, call)
-        }
-
-        // Network quality has changed
-        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_NETWORK_QUALITY)) {
-            Timber.d("Network quality changed")
-            sendCallEvent(EVENT_LOCAL_NETWORK_QUALITY_CHANGE, call)
-        }
     }
 
     override fun onChatSessionUpdate(

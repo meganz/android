@@ -54,7 +54,6 @@ import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChange
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChangeType
 import mega.privacy.android.app.usecase.call.GetCallUseCase
-import mega.privacy.android.app.usecase.call.GetNetworkChangesUseCase
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
@@ -73,6 +72,7 @@ import mega.privacy.android.domain.entity.meeting.CallOnHoldType
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.NetworkQualityType
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
@@ -125,7 +125,6 @@ import javax.inject.Inject
  * @property inMeetingRepository                [InMeetingRepository]
  * @property getCallUseCase                     [GetCallUseCase]
  * @property startChatCall                      [StartChatCall]
- * @property getNetworkChangesUseCase           [GetNetworkChangesUseCase]
  * @property monitorCallReconnectingStatusUseCase       [MonitorCallReconnectingStatusUseCase]
  * @property endCallUseCase                     [EndCallUseCase]
  * @property getParticipantsChangesUseCase      [GetParticipantsChangesUseCase]
@@ -148,16 +147,13 @@ import javax.inject.Inject
  * @property joinMeetingAsGuestUseCase          [JoinMeetingAsGuestUseCase]
  * @property chatLogoutUseCase                  [ChatLogoutUseCase]
  * @property getFeatureFlagValueUseCase         [GetFeatureFlagValueUseCase]
- * @property getMyUserHandleUseCase             [GetMyUserHandleUseCase]
  * @property raiseHandToSpeakUseCase            [RaiseHandToSpeakUseCase]
  * @property lowerHandToStopSpeakUseCase        [LowerHandToStopSpeakUseCase]
  * @property holdChatCallUseCase                [HoldChatCallUseCase]
  * @property monitorParticipatingInAnotherCallUseCase [MonitorParticipatingInAnotherCallUseCase]
  * @property getStringFromStringResMapper        [GetStringFromStringResMapper]
- * @property getPluralStringFromStringResMapper  [GetPluralStringFromStringResMapper]
  * @property isEphemeralPlusPlusUseCase         [IsEphemeralPlusPlusUseCase]
  * @property isRaiseToHandSuggestionShownUseCase [IsRaiseToHandSuggestionShownUseCase]
- * @property setRaiseToHandSuggestionShown      [SetRaiseToHandSuggestionShown]
  * @property state                              Current view state as [InMeetingUiState]
  * @property context                            Application context
  */
@@ -167,7 +163,6 @@ class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository,
     private val getCallUseCase: GetCallUseCase,
     private val startChatCall: StartChatCall,
-    private val getNetworkChangesUseCase: GetNetworkChangesUseCase,
     private val monitorCallReconnectingStatusUseCase: MonitorCallReconnectingStatusUseCase,
     private val endCallUseCase: EndCallUseCase,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
@@ -218,7 +213,6 @@ class InMeetingViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     private var anotherCallInProgressDisposable: Disposable? = null
-    private var networkQualityDisposable: Disposable? = null
     private var reconnectingJob: Job? = null
 
     private var monitorParticipatingInAnotherCallJob: Job? = null
@@ -463,6 +457,7 @@ class InMeetingViewModel @Inject constructor(
                         handleFreeCallEndWarning()
                         isEphemeralAccount()
                         updateParticipantsWithRaisedHand()
+                        updateNetworkQuality(call.networkQuality)
                     }
                 }
             }.onFailure { exception ->
@@ -470,6 +465,16 @@ class InMeetingViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Update network quality
+     *
+     * @param quality   [NetworkQualityType]
+     */
+    private fun updateNetworkQuality(quality: NetworkQualityType?) {
+        _showPoorConnectionBanner.value = quality == NetworkQualityType.Bad
+    }
+
 
     /**
      * Get chat room updates
@@ -524,21 +529,14 @@ class InMeetingViewModel @Inject constructor(
                                 }
                             }
 
-                            contains(ChatCallChanges.CallWillEnd) -> {
-                                handleFreeCallEndWarning()
-                            }
+                            contains(ChatCallChanges.CallWillEnd) -> handleFreeCallEndWarning()
+                            contains(ChatCallChanges.CallRaiseHand) -> updateParticipantsWithRaisedHand()
+                            contains(ChatCallChanges.LocalAVFlags) -> checkUpdatesInLocalAVFlags(
+                                update = true
+                            )
 
-                            contains(ChatCallChanges.CallRaiseHand) -> {
-                                updateParticipantsWithRaisedHand()
-                            }
-
-                            contains(ChatCallChanges.LocalAVFlags) -> {
-                                checkUpdatesInLocalAVFlags(update = true)
-                            }
-
-                            contains(ChatCallChanges.OnHold) -> {
-                                checkUpdatesInCallOnHold(update = true)
-                            }
+                            contains(ChatCallChanges.NetworkQuality) -> updateNetworkQuality(call.networkQuality)
+                            contains(ChatCallChanges.OnHold) -> checkUpdatesInCallOnHold(update = true)
                         }
                     }
                 }
@@ -902,23 +900,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Method that controls whether to display the bad connection banner
-     */
-    private fun checkNetworkQualityChanges() {
-        networkQualityDisposable?.dispose()
-        networkQualityDisposable = getNetworkChangesUseCase.get(_state.value.currentChatId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    _showPoorConnectionBanner.value =
-                        it == GetNetworkChangesUseCase.NetworkQuality.NETWORK_QUALITY_BAD
-                },
-                onError = Timber::e
-            ).addTo(composite)
-    }
-
-    /**
      * Method that controls whether to display the reconnecting banner
      */
     private fun checkReconnectingChanges() {
@@ -963,7 +944,6 @@ class InMeetingViewModel @Inject constructor(
                     _updateCallId.value = it.callId
                     checkAnotherCallBanner()
                     checkParticipantsList()
-                    checkNetworkQualityChanges()
                     checkReconnectingChanges()
                     updateMeetingInfoBottomPanel()
                 }
