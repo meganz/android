@@ -48,7 +48,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
@@ -366,13 +365,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private val callOnHoldObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId)) {
-            Timber.d("Change in call on hold status")
-            isCallOnHold(it.isOnHold)
-            checkSwapCameraMenuItemVisibility()
-        }
-    }
+
 
     private val sessionOnHoldObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
@@ -891,9 +884,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
             .observe(this, callCompositionObserver)
 
-        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
-            .observe(this, callOnHoldObserver)
-
         //Sessions Level
         LiveEventBus.get<Pair<MegaChatCall, MegaChatSession>>(EVENT_SESSION_STATUS_CHANGE)
             .observe(this, sessionStatusObserver)
@@ -994,27 +984,39 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun collectFlows() {
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
+            if (state.shouldFinish) {
+                finishActivity()
+            }
 
-            when {
-                state.shouldFinish -> finishActivity()
-                state.joinedAsGuest -> {
-                    inMeetingViewModel.onJoinedAsGuestConsumed()
-                    controlWhenJoinedAChat(state.currentChatId)
-                }
+            if (state.joinedAsGuest) {
+                inMeetingViewModel.onJoinedAsGuestConsumed()
+                controlWhenJoinedAChat(state.currentChatId)
+            }
 
-                state.error != null -> sharedModel.showSnackBar(getString(state.error))
-                state.updateListUi -> {
-                    inMeetingViewModel.onUpdateListConsumed()
-                    speakerViewCallFragment?.let {
-                        if (it.isAdded) {
-                            it.updateFullList()
-                        }
+            if (state.error != null) {
+                sharedModel.showSnackBar(getString(state.error))
+            }
+
+            if (state.updateListUi) {
+                inMeetingViewModel.onUpdateListConsumed()
+                speakerViewCallFragment?.let {
+                    if (it.isAdded) {
+                        it.updateFullList()
                     }
                 }
+            }
 
-                state.chatTitle.isNotEmpty() -> toolbarTitle?.apply {
+            if (state.chatTitle.isNotEmpty()) {
+                toolbarTitle?.apply {
                     text = state.chatTitle
                 }
+            }
+
+            if (state.shouldUpdateCallOnHold) {
+                state.call?.apply {
+                    isCallOnHold(isOnHold)
+                }
+                checkSwapCameraMenuItemVisibility()
             }
 
             state.userIdsWithChangesInRaisedHand.takeIf { it.isNotEmpty() }?.let {

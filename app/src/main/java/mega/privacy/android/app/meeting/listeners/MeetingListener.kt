@@ -6,7 +6,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_SPEAK_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
@@ -74,12 +73,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             Timber.d("Call composition changed. Call status is ${callStatusToString(call.status)}. Num of participants is ${call.numParticipants}")
             sendCallEvent(EVENT_CALL_COMPOSITION_CHANGE, call)
             stopCountDown()
-        }
-
-        // Call is set onHold
-        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_ON_HOLD)) {
-            Timber.d("Call on hold changed")
-            sendCallEvent(EVENT_CALL_ON_HOLD_CHANGE, call)
         }
 
         // Speak has been enabled

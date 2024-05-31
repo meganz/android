@@ -51,6 +51,7 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property userIdsWithChangesInRaisedHand         User identifiers with changes in the raised hand
  * @property isRaiseToHandSuggestionShown           True, if the Raise to Hand suggestion has been shown. False, otherwise.
  * @property shouldUpdateLocalAVFlags               True, if should update local av flag. False, if not
+ * @property shouldUpdateCallOnHold                True, if should update on hold call. False, if not
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -91,6 +92,7 @@ data class InMeetingUiState(
     val userIdsWithChangesInRaisedHand: List<Long> = emptyList(),
     val isRaiseToHandSuggestionShown: Boolean = true,
     val shouldUpdateLocalAVFlags: Boolean = true,
+    val shouldUpdateCallOnHold: Boolean = true,
 ) {
     /**
      * Is call on hold

@@ -14,7 +14,6 @@ object EventConstants {
     const val EVENT_CALL_STATUS_CHANGE = "call_status_change"
     const val EVENT_RINGING_STATUS_CHANGE = "ringing_status_change"
     const val EVENT_CALL_COMPOSITION_CHANGE = "call_composition_change"
-    const val EVENT_CALL_ON_HOLD_CHANGE = "call_on_hold_change"
     const val EVENT_CALL_SPEAK_CHANGE = "call_speak_change"
     const val EVENT_LOCAL_AUDIO_LEVEL_CHANGE = "local_audio_level_change"
     const val EVENT_LOCAL_NETWORK_QUALITY_CHANGE = "local_network_quality_change"
