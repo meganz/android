@@ -25,7 +25,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 
 /**
  * Available offline row

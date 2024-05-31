@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +24,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
@@ -33,8 +33,8 @@ import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
@@ -101,7 +101,7 @@ fun MenuActionListTile(
                         onActionClicked?.invoke()
                     }
                 }
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .semantics { testTagsAsResourceId = true },
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -170,8 +170,7 @@ private fun PreviewMegaMenuActionWithSwitch(
             text = "Menu Item",
             icon = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),
         ) {
-            // The MegaSwitch from :core-ui is not ready yet. Please use it instead when it is ready.
-            Switch(
+            MegaSwitch(
                 modifier = Modifier.testTag(MENU_ITEM_SWITCH_TAG),
                 checked = true,
                 onCheckedChange = {}

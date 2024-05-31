@@ -54,7 +54,7 @@ import mega.privacy.android.shared.original.core.ui.theme.white_alpha_070
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
-import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import nz.mega.sdk.MegaNode
 
 @OptIn(ExperimentalMaterialApi::class)

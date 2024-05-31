@@ -24,7 +24,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionLis
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
-import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.mobile.analytics.event.ChatConversationAvailableOfflineActionMenuItemEvent
 import timber.log.Timber
 
@@ -60,12 +60,11 @@ internal class AvailableOfflineMessageAction(
             dividerType = null,
             trailingItem = {
                 MegaSwitch(
+                    checked = isAvailableOffline,
                     modifier = Modifier
                         .testTag(OFFLINE_SWITCH_TEST_TAG)
                         .padding(end = 16.dp),
-                    checked = isAvailableOffline,
-                    onCheckedChange = { onClick() },
-                )
+                ) { onClick() }
             }
         )
     }

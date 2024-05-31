@@ -67,7 +67,14 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.dialog.WaitingRoomWarningDialog
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.chat.ChatScheduledRules
+import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
+import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
+import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
@@ -75,18 +82,11 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericD
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTitleTextField
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.chat.ChatScheduledRules
-import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
-import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
-import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
-import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
-import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 

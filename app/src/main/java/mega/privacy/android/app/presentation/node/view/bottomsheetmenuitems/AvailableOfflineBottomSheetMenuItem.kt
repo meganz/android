@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
-import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,8 +48,7 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
                 trailingItem = {
                     MegaSwitch(
                         checked = selectedNode.isAvailableOffline,
-                        onCheckedChange = { onClick() },
-                    )
+                    ) { onClick() }
                 }
             )
         }

@@ -14,7 +14,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -24,8 +23,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
+import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.content.withStyledAttributes
@@ -128,9 +131,9 @@ fun MegaSwitch(
     checked: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    onCheckedChange: (Boolean) -> Unit,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    onCheckedChange: ((Boolean) -> Unit)?,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val thumbOffsetRaw = remember(checked) {
@@ -178,11 +181,18 @@ fun MegaSwitch(
     )
     Box(
         modifier = modifier
-            .clickable(
-                enabled = enabled,
-                onClick = { onCheckedChange(!checked) },
-                interactionSource = interactionSource,
-                indication = null,
+            .minimumInteractiveComponentSize()
+            .then(
+                if (onCheckedChange != null) {
+                    Modifier.toggleable(
+                        value = checked,
+                        onValueChange = onCheckedChange,
+                        enabled = enabled,
+                        role = Role.Switch,
+                        interactionSource = interactionSource,
+                        indication = null
+                    )
+                } else Modifier
             )
             .padding((rippleSize - trackHeight) / 2)
             .size(width = trackWidth, height = trackHeight)
@@ -214,13 +224,14 @@ fun MegaSwitch(
             ) { checked ->
                 if (checked) {
                     Icon(
+                        modifier = Modifier.testTag(CHECKED_TAG),
                         painter = painterResource(id = R.drawable.checked),
                         tint = trackColor,
                         contentDescription = "Checked",
                     )
                 } else {
                     Spacer(
-                        modifier
+                        Modifier
                             .size(width = 10.dp, height = 2.dp)
                             .background(trackColor, CircleShape)
                     )
@@ -235,10 +246,41 @@ private val thumbSize = 16.dp
 private val trackHeight = 24.dp
 private val trackWidth = 48.dp
 private val rippleSize = 32.dp
+internal const val CHECKED_TAG = "mega_switch:icon_checked"
 
 @CombinedThemePreviews
 @Composable
 private fun MegaSwitchPreview(
+    @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
+) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        var checked by remember {
+            mutableStateOf(initialChecked)
+        }
+        MegaSwitch(checked) {
+            checked = !checked
+        }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun MegaSwitchDisabledPreview(
+    @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
+) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        var checked by remember {
+            mutableStateOf(initialChecked)
+        }
+        MegaSwitch(checked, enabled = false) {
+            checked = !checked
+        }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun MegaSwitchTempAndNewPreview(
     @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
 ) {
     PreviewWithTempAndNewCoreColorTokens(isDark = isSystemInDarkTheme()) {
@@ -253,7 +295,7 @@ private fun MegaSwitchPreview(
 
 @CombinedThemePreviews
 @Composable
-private fun MegaSwitchDisabledPreview(
+private fun MegaSwitchDisabledTempAndNewPreview(
     @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
 ) {
     PreviewWithTempAndNewCoreColorTokens(isDark = isSystemInDarkTheme()) {
