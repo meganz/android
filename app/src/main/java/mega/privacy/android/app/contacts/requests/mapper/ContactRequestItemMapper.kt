@@ -48,7 +48,7 @@ internal class ContactRequestItemMapper(
             email = email,
             avatarUri = userImageUri,
             placeholder = placeholder,
-            createdTime = formatCreationTime(creationTime).toString(),
+            createdTime = formatCreationTime(creationTime * 1000).toString(),
             isOutgoing = isOutgoing,
         )
     }

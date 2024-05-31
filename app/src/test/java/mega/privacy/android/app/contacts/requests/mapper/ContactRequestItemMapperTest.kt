@@ -125,7 +125,7 @@ class ContactRequestItemMapperTest {
         assertThat(actual?.handle).isEqualTo(handle)
         assertThat(actual?.avatarUri).isEqualTo(uri)
         assertThat(actual?.placeholder).isEqualTo(drawable)
-        assertThat(actual?.createdTime).isEqualTo(formatCreationTime(creationTime))
+        assertThat(actual?.createdTime).isEqualTo(formatCreationTime(creationTime * 1000))
         assertThat(actual?.isOutgoing).isEqualTo(isOutgoing)
     }
 

@@ -14,6 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs
+import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.databinding.FragmentContactRequestsBinding
 import mega.privacy.android.app.utils.ColorUtils.setElevationWithColor
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
@@ -60,8 +61,8 @@ class ContactRequestsFragment : Fragment() {
             }
             setViewPagerPosition(position)
 
-            viewModel.getDefaultPagerPosition(isOutgoing).observe(viewLifecycleOwner) { pagePosition ->
-                setViewPagerPosition(pagePosition)
+            viewModel.getDefaultPagerPosition(isOutgoing).observeOnce { pagePosition ->
+                pagePosition?.let { setViewPagerPosition(it) }
             }
         }
     }
