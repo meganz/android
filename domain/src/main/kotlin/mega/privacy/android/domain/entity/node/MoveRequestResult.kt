@@ -79,6 +79,17 @@ sealed class MoveRequestResult(
     )
 
     /**
+     * Result of a removal of offline node
+     */
+    class RemoveOffline(
+        count: Int,
+        errorCount: Int,
+    ) : MoveRequestResult(
+        count = count,
+        errorCount = errorCount,
+    )
+
+    /**
      * Result of copy
      */
     class Copy(

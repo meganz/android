@@ -218,5 +218,9 @@ class MoveRequestMessageMapper @Inject constructor(
                     }
                 }
             }
+
+            is MoveRequestResult.RemoveOffline -> {
+                context.resources.getString(R.string.file_removed_offline)
+            }
         }
 }
