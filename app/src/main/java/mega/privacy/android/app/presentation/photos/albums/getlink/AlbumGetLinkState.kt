@@ -9,6 +9,7 @@ data class AlbumGetLinkState(
     val link: String = "",
     val exitScreen: Boolean = false,
     val showCopyright: Boolean = false,
+    val showSharingSensitiveWarning: Boolean = false,
 )
 
 data class AlbumSummary(

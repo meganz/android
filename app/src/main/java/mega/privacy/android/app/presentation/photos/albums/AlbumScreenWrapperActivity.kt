@@ -282,6 +282,8 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
         const val MESSAGE: String = "message"
 
+        const val HAS_SENSITIVE_ELEMENT: String = "has_sensitive_element"
+
         fun createAlbumPhotosSelectionScreen(
             context: Context,
             albumId: AlbumId,
@@ -303,19 +305,21 @@ class AlbumScreenWrapperActivity : BaseActivity() {
         fun createAlbumGetLinkScreen(
             context: Context,
             albumId: AlbumId,
+            hasSensitiveElement: Boolean,
         ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
             putExtra(ALBUM_SCREEN, AlbumScreen.AlbumGetLinkScreen.name)
             putExtra(ALBUM_ID, albumId.id)
+            putExtra(HAS_SENSITIVE_ELEMENT, hasSensitiveElement)
         }
 
         fun createAlbumGetMultipleLinksScreen(
             context: Context,
             albumIds: Set<AlbumId>,
+            hasSensitiveElement: Boolean,
         ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
             putExtra(ALBUM_SCREEN, AlbumScreen.AlbumGetMultipleLinksScreen.name)
-            putExtra(ALBUM_ID, albumIds.map {
-                it.id
-            }.toLongArray())
+            putExtra(ALBUM_ID, albumIds.map { it.id }.toLongArray())
+            putExtra(HAS_SENSITIVE_ELEMENT, hasSensitiveElement)
         }
 
         fun createAlbumDecryptionKeyScreen(

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
@@ -70,14 +71,14 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     init {
         extractAlbumFlow()
 
-        fetchAlbum()
-        fetchPhotos()
-
         viewModelScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
                 monitorShowHiddenItems()
                 monitorAccountDetail()
             }
+
+            fetchAlbum()
+            fetchPhotos()
         }
     }
 
@@ -207,20 +208,9 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun monitorShowHiddenItems() = monitorShowHiddenItemsUseCase()
-        .onEach {
-            showHiddenItems = it
-            if (_state.value.sourcePhotos.isEmpty()) return@onEach
-
-            val filteredPhotos = filterNonSensitivePhotos(photos = _state.value.sourcePhotos)
-            _state.update {
-                it.copy(photos = filteredPhotos)
-            }
-
-            filterPhotos()
-            updateSelection(photos = filteredPhotos)
-        }
-        .launchIn(viewModelScope)
+    private suspend fun monitorShowHiddenItems() {
+        showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull()
+    }
 
     private fun monitorAccountDetail() = monitorAccountDetailUseCase()
         .onEach { accountDetail ->

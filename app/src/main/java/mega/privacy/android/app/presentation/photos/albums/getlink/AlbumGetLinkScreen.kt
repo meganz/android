@@ -138,7 +138,10 @@ internal fun AlbumGetLinkScreen(
     LaunchedEffect(isCopyrightAgreed) {
         if (isCopyrightAgreed) {
             albumGetLinkViewModel.hideCopyright()
-            albumGetLinkViewModel.fetchAlbum()
+
+            if (!state.showSharingSensitiveWarning) {
+                albumGetLinkViewModel.fetchAlbum()
+            }
         }
     }
 
@@ -160,6 +163,23 @@ internal fun AlbumGetLinkScreen(
 
                 showShareKeyConfirmation = false
             },
+        )
+    }
+
+    if (!state.showCopyright && state.showSharingSensitiveWarning) {
+        ConfirmationDialog(
+            title = pluralStringResource(id = R.plurals.hidden_nodes_items, 2),
+            text = stringResource(id = R.string.hidden_nodes_sharing_album),
+            confirmButtonText = stringResource(id = R.string.button_continue),
+            cancelButtonText = stringResource(id = R.string.button_cancel),
+            dismissOnClickOutside = false,
+            dismissOnBackPress = false,
+            onConfirm = {
+                albumGetLinkViewModel.hideSharingSensitiveWarning()
+                albumGetLinkViewModel.fetchAlbum()
+            },
+            onDismiss = {},
+            onCancel = onBack,
         )
     }
 

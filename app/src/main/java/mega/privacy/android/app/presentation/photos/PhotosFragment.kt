@@ -783,9 +783,16 @@ class PhotosFragment : Fragment() {
      */
     fun openAlbumGetLinkScreen() {
         val albumId = albumsViewModel.state.value.selectedAlbumIds.elementAt(0)
+        val album = albumsViewModel.getUserAlbum(albumId) ?: return
+        val hasSensitiveElement = if (!album.isExported) {
+            albumsViewModel.hasSensitiveElement(albumId)
+        } else {
+            false
+        }
         val intent = AlbumScreenWrapperActivity.createAlbumGetLinkScreen(
             context = requireContext(),
             albumId = albumId,
+            hasSensitiveElement = hasSensitiveElement,
         )
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)
@@ -795,9 +802,20 @@ class PhotosFragment : Fragment() {
      * Navigates to the Album Get Multiple Links Screen
      */
     fun openAlbumGetMultipleLinksScreen() {
+        val albumIds = albumsViewModel.state.value.selectedAlbumIds
+        val albums = albumIds.mapNotNull(albumsViewModel::getUserAlbum)
+        val hasSensitiveElement = albums.any { album ->
+            if (!album.isExported) {
+                albumsViewModel.hasSensitiveElement(album.id)
+            } else {
+                false
+            }
+        }
+
         val intent = AlbumScreenWrapperActivity.createAlbumGetMultipleLinksScreen(
             context = requireContext(),
-            albumIds = albumsViewModel.state.value.selectedAlbumIds,
+            albumIds = albumIds,
+            hasSensitiveElement = hasSensitiveElement,
         )
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)

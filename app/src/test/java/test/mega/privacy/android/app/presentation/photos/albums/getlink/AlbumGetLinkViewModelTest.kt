@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -60,6 +61,9 @@ class AlbumGetLinkViewModelTest {
             shouldShowCopyrightUseCase = shouldShowCopyrightUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
+            getFeatureFlagValueUseCase = mock {
+                onBlocking { invoke(any()) }.thenReturn(false)
+            },
         )
 
         whenever(getUserAlbumUseCase(userAlbum.id))
@@ -105,6 +109,9 @@ class AlbumGetLinkViewModelTest {
             shouldShowCopyrightUseCase = shouldShowCopyrightUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
+            getFeatureFlagValueUseCase = mock {
+                onBlocking { invoke(any()) }.thenReturn(false)
+            },
         )
 
         whenever(getUserAlbumUseCase(userAlbum.id))

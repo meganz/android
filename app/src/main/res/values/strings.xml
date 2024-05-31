@@ -5314,6 +5314,13 @@
         <item quantity="one">%1$d item hidden</item>
         <item quantity="other">%1$d items hidden</item>
     </plurals>
+    <!-- Hidden nodes items -->
+    <plurals name="hidden_nodes_items">
+        <item quantity="one">Hidden item</item>
+        <item quantity="other">Hidden items</item>
+    </plurals>
+    <!-- Hidden nodes sharing album -->
+    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priority support</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->

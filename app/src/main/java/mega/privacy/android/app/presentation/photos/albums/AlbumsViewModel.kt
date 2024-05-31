@@ -631,4 +631,13 @@ class AlbumsViewModel @Inject constructor(
             val videoCount = photos.size - imageCount
             imageCount to videoCount
         }
+
+    fun getUserAlbum(albumId: AlbumId): Album.UserAlbum? {
+        return userAlbums[albumId]
+    }
+
+    fun hasSensitiveElement(albumId: AlbumId): Boolean {
+        val photos = userAlbumPhotos[albumId].orEmpty()
+        return photos.any { it.isSensitive || it.isSensitiveInherited }
+    }
 }

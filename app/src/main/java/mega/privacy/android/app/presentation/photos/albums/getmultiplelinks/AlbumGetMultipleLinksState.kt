@@ -22,4 +22,5 @@ data class AlbumGetMultipleLinksState(
     val albumLinksList: List<String> = listOf(),
     val exitScreen: Boolean = false,
     val showCopyright: Boolean = false,
+    val showSharingSensitiveWarning: Boolean = false,
 )

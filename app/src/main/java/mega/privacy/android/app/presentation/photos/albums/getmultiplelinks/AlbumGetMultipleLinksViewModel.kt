@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumSummary
 import mega.privacy.android.domain.entity.photos.Album
@@ -27,6 +29,7 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUse
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import timber.log.Timber
 import java.io.File
@@ -45,6 +48,7 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
     private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumGetMultipleLinksState())
     val stateFlow = state.asStateFlow()
@@ -52,7 +56,12 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val showCopyright = shouldShowCopyrightUseCase()
-            if (!showCopyright) {
+            val hasSensitiveElement = if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                savedStateHandle.get<Boolean>(AlbumScreenWrapperActivity.HAS_SENSITIVE_ELEMENT) ?: false
+            } else {
+                false
+            }
+            if (!showCopyright && !hasSensitiveElement) {
                 fetchAlbums()
                 fetchLinks()
             }
@@ -61,6 +70,7 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
                 it.copy(
                     isInitialized = true,
                     showCopyright = showCopyright,
+                    showSharingSensitiveWarning = hasSensitiveElement,
                 )
             }
         }
@@ -134,6 +144,12 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
     fun hideCopyright() {
         state.update {
             it.copy(showCopyright = false)
+        }
+    }
+
+    fun hideSharingSensitiveWarning() {
+        state.update {
+            it.copy(showSharingSensitiveWarning = false)
         }
     }
 }

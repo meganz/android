@@ -391,9 +391,15 @@ class AlbumContentFragment : Fragment() {
 
     private fun openAlbumGetLinkScreen() {
         val album = albumContentViewModel.state.value.uiAlbum?.id as? UserAlbum ?: return
+        val hasSensitiveElement = if (!album.isExported) {
+            albumContentViewModel.state.value.photos.any { it.isSensitive || it.isSensitiveInherited }
+        } else {
+            false
+        }
         val intent = AlbumScreenWrapperActivity.createAlbumGetLinkScreen(
             context = requireContext(),
             albumId = album.id,
+            hasSensitiveElement = hasSensitiveElement,
         )
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)
