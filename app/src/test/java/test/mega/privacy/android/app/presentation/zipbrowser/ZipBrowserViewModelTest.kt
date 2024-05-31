@@ -3,33 +3,44 @@ package test.mega.privacy.android.app.presentation.zipbrowser
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserViewModel
 import mega.privacy.android.app.presentation.zipbrowser.mapper.ZipInfoUiEntityMapper
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.domain.entity.zipbrowser.ZipTreeNode
 import mega.privacy.android.domain.usecase.zipbrowser.GetZipTreeMapUseCase
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ZipBrowserViewModelTest {
     private lateinit var underTest: ZipBrowserViewModel
 
     private val getZipTreeMapUseCase = mock<GetZipTreeMapUseCase>()
     private val zipInfoUiEntityMapper = mock<ZipInfoUiEntityMapper>()
-    private lateinit var savedStateHandle: SavedStateHandle
+    private val savedStateHandle = mock<SavedStateHandle>()
+
+    private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
     private val testZipFullPath = "/testZipFullPath.zip"
 
     @BeforeEach
     fun setUp() {
-        savedStateHandle = SavedStateHandle(mapOf(EXTRA_PATH_ZIP to testZipFullPath))
+        Dispatchers.setMain(testDispatcher)
         initUnderTest()
     }
 
@@ -45,12 +56,22 @@ class ZipBrowserViewModelTest {
     fun resetMocks() {
         reset(
             getZipTreeMapUseCase,
-            zipInfoUiEntityMapper
+            zipInfoUiEntityMapper,
+            savedStateHandle
         )
+    }
+
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
     fun `test that the initial state is returned`() = runTest {
+        whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(emptyMap())
+        whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
+        initUnderTest()
+
         underTest.uiState.test {
             val initial = awaitItem()
             assertThat(initial.items).isEmpty()
@@ -68,7 +89,8 @@ class ZipBrowserViewModelTest {
             on { children }.thenReturn(testChildren)
         }
         val testZipNodeTree: Map<String, ZipTreeNode> = mapOf(testZipFullPath to testZipTreeNode)
-        whenever(getZipTreeMapUseCase(testZipFullPath)).thenReturn(testZipNodeTree)
+        whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
+        whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(testZipNodeTree)
 
         initUnderTest()
 

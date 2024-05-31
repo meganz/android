@@ -10,6 +10,7 @@ package mega.privacy.android.domain.entity.zipbrowser
  *
  * @property name name for display
  * @property path current zip entry name
+ * @property parentPath parent folder path
  * @property size current file size
  * @property zipEntryType ZipEntryType
  * @property children all files or folders under this zip tree node.
@@ -17,6 +18,7 @@ package mega.privacy.android.domain.entity.zipbrowser
 data class ZipTreeNode(
     val name: String,
     val path: String,
+    val parentPath: String?,
     val size: Long,
     val zipEntryType: ZipEntryType,
     val children: List<ZipTreeNode>

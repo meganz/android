@@ -10,11 +10,11 @@ import mega.privacy.android.data.repository.AudioSectionRepositoryImpl
 import mega.privacy.android.data.repository.BackupRepositoryImpl
 import mega.privacy.android.data.repository.CacheRepositoryImpl
 import mega.privacy.android.data.repository.CallRepositoryImpl
+import mega.privacy.android.data.repository.CameraUploadsRepositoryImpl
 import mega.privacy.android.data.repository.ChatRepositoryImpl
 import mega.privacy.android.data.repository.DefaultAlbumRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
 import mega.privacy.android.data.repository.DefaultBillingRepository
-import mega.privacy.android.data.repository.CameraUploadsRepositoryImpl
 import mega.privacy.android.data.repository.DefaultCancelTokenRepository
 import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
 import mega.privacy.android.data.repository.DefaultClipboardRepository
@@ -60,6 +60,7 @@ import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.VideoRepositoryImpl
 import mega.privacy.android.data.repository.VideoSectionRepositoryImpl
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
+import mega.privacy.android.data.repository.ZipBrowserRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.data.repository.apiserver.ApiServerRepositoryImpl
@@ -123,6 +124,7 @@ import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.repository.VideoRepository
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import mega.privacy.android.domain.repository.ViewTypeRepository
+import mega.privacy.android.domain.repository.ZipBrowserRepository
 import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
@@ -355,4 +357,7 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindMediaRecorderRepository(implementation: MediaRecorderRepositoryImpl): MediaRecorderRepository
+
+    @Binds
+    abstract fun bindZipBrowserRepository(implementation: ZipBrowserRepositoryImpl): ZipBrowserRepository
 }
