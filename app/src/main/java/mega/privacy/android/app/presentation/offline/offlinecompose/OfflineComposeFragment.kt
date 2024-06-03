@@ -22,6 +22,7 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.offline.confirmremovedialog.ConfirmRemoveFromOfflineDialogFragment
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.OfflineOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.offline.view.OfflineFeatureScreen
 import mega.privacy.android.app.utils.ColorUtils
@@ -193,6 +194,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
             }
 
             R.id.cab_menu_delete -> {
+                showConfirmRemoveFromOfflineDialog(viewModel.uiState.value.selectedNodeHandles)
                 viewModel.clearSelection()
             }
 
@@ -207,6 +209,14 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
         }
 
         return false
+    }
+
+    private fun showConfirmRemoveFromOfflineDialog(handles: List<Long>) {
+        ConfirmRemoveFromOfflineDialogFragment.newInstance(handles)
+            .show(
+                requireActivity().supportFragmentManager,
+                ConfirmRemoveFromOfflineDialogFragment::class.java.simpleName
+            )
     }
 
     private fun updateActionModeTitle(selectedItemsCount: Int) {
