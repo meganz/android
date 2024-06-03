@@ -110,6 +110,7 @@ import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.domain.usecase.notifications.GetNumUnreadPromoNotificationsUseCase
+import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -286,6 +287,7 @@ class ManagerViewModelTest {
     private val monitorBackupFolder = FakeMonitorBackupFolder()
     private val moveNodesToRubbishUseCase = mock<MoveNodesToRubbishUseCase>()
     private val deleteNodesUseCase = mock<DeleteNodesUseCase>()
+    private val removeOfflineNodesUseCase = mock<RemoveOfflineNodesUseCase>()
     private val moveNodesUseCase = mock<MoveNodesUseCase>()
     private val copyNodesUseCase = mock<CopyNodesUseCase>()
     private val renameRecoveryKeyFileUseCase = mock<RenameRecoveryKeyFileUseCase>()
@@ -373,6 +375,7 @@ class ManagerViewModelTest {
             monitorBackupFolder = monitorBackupFolder,
             moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
             deleteNodesUseCase = deleteNodesUseCase,
+            removeOfflineNodesUseCase = removeOfflineNodesUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
             renameRecoveryKeyFileUseCase = renameRecoveryKeyFileUseCase,

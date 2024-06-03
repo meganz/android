@@ -16,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.offline.confirmremovedialog.ConfirmRemoveFromOfflineDialogFragment
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.OfflineFileInfoComposeViewModel
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.OfflineFileInfoComposeViewModel.Companion.NODE_HANDLE
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.view.OfflineOptionsContent
@@ -55,7 +56,7 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
                     OfflineOptionsContent(
                         uiState = uiState,
                         fileTypeIconMapper = fileTypeIconMapper,
-                        onRemoveFromOfflineClicked = { showConfirmationRemoveOfflineNode() },
+                        onRemoveFromOfflineClicked = { showConfirmationRemoveOfflineNode(uiState.handle) },
                         onOpenInfoClicked = { openInfo(uiState.handle) },
                         onOpenWithClicked = { openWith(uiState.handle) },
                         onSaveToDeviceClicked = { saveToDevice(uiState.handle) },
@@ -104,8 +105,13 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
         dismissAllowingStateLoss()
     }
 
-    private fun showConfirmationRemoveOfflineNode() {
-        // The functionality will be implemented in succeeding MRs
+    private fun showConfirmationRemoveOfflineNode(handle: Long) {
+        ConfirmRemoveFromOfflineDialogFragment.newInstance(listOf(handle))
+            .show(
+                requireActivity().supportFragmentManager,
+                ConfirmRemoveFromOfflineDialogFragment::class.java.simpleName
+            )
+        dismissAllowingStateLoss()
     }
 
     private fun onBackPressed() {

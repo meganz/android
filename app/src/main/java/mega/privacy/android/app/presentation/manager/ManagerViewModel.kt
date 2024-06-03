@@ -100,6 +100,7 @@ import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.domain.usecase.notifications.GetNumUnreadPromoNotificationsUseCase
+import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -220,6 +221,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorBackupFolder: MonitorBackupFolder,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
     private val deleteNodesUseCase: DeleteNodesUseCase,
+    private val removeOfflineNodesUseCase: RemoveOfflineNodesUseCase,
     private val moveNodesUseCase: MoveNodesUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
     private val renameRecoveryKeyFileUseCase: RenameRecoveryKeyFileUseCase,
@@ -998,6 +1000,21 @@ class ManagerViewModel @Inject constructor(
                 Timber.e(it)
             }
             _state.update { state -> state.copy(moveRequestResult = result) }
+        }
+    }
+
+    /**
+     * Remove offline nodes
+     *
+     * @param nodeHandles
+     */
+    fun removeOfflineNodes(nodeHandles: List<Long>) {
+        viewModelScope.launch {
+            runCatching {
+                removeOfflineNodesUseCase(nodeHandles.map { NodeId(it) })
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 
