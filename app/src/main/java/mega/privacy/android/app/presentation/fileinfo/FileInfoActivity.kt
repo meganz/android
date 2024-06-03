@@ -70,7 +70,6 @@ import mega.privacy.mobile.analytics.event.NodeInfoDescriptionUpdatedMessageDisp
 import mega.privacy.mobile.analytics.event.NodeInfoScreenEvent
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 /**
@@ -156,10 +155,7 @@ class FileInfoActivity : BaseActivity() {
                     onTakeDownLinkClick = this::navigateToLink,
                     onLocationClick = { this.navigateToLocation(uiState.nodeLocationInfo) },
                     availableOfflineChanged = { availableOffline ->
-                        viewModel.availableOfflineChanged(
-                            availableOffline,
-                            WeakReference(this@FileInfoActivity)
-                        )
+                        viewModel.availableOfflineChanged(availableOffline)
                     },
                     onVersionsClick = this::navigateToVersions,
                     onSetDescriptionClick = viewModel::setNodeDescription,
@@ -504,7 +500,11 @@ class FileInfoActivity : BaseActivity() {
                     event.successMessage(this)?.let {
                         snackBarHostState.showSnackbar(it)
                     }
-                    sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN).setPackage(applicationContext.packageName))
+                    sendBroadcast(
+                        Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN).setPackage(
+                            applicationContext.packageName
+                        )
+                    )
                 } else {
                     Timber.e(event.exception)
                     if (!manageCopyMoveException(event.exception)) {

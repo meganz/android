@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.fileinfo
 
-import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +15,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
-import mega.privacy.android.app.domain.usecase.offline.RemoveAvailableOfflineUseCase
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -79,6 +77,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
+import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
@@ -88,7 +87,6 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 /**
@@ -122,7 +120,7 @@ class FileInfoViewModel @Inject constructor(
     private val getNodeLocationInfo: GetNodeLocationInfo,
     private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
-    private val removeAvailableOfflineUseCase: RemoveAvailableOfflineUseCase,
+    private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val setOutgoingPermissions: SetOutgoingPermissions,
     private val stopSharingNode: StopSharingNode,
@@ -362,7 +360,6 @@ class FileInfoViewModel @Inject constructor(
      */
     fun availableOfflineChanged(
         availableOffline: Boolean,
-        activity: WeakReference<Activity>,
     ) {
         viewModelScope.launch {
             if (availableOffline == _uiState.value.isAvailableOffline) return@launch
@@ -382,9 +379,8 @@ class FileInfoViewModel @Inject constructor(
                     it.copy(isAvailableOfflineEnabled = false) // to avoid multiple changes while changing
                 }
                 viewModelScope.launch {
-                    removeAvailableOfflineUseCase(
-                        typedNode.id,
-                        activity
+                    removeOfflineNodeUseCase(
+                        typedNode.id
                     )
                     updateState {
                         it.copy(
