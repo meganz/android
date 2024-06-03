@@ -39,6 +39,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUs
 import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -362,6 +363,30 @@ internal class TransfersViewModelTest {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
         }
+
+    @Test
+    fun `test that active transfers are swap when active transfers swap is called`() = runTest {
+        val activeTransfer1 = mock<Transfer>()
+        val activeTransfer2 = mock<Transfer>()
+        val expected = listOf(activeTransfer2, activeTransfer1)
+        whenever(getInProgressTransfersUseCase()) doReturn listOf(activeTransfer1, activeTransfer2)
+        underTest.getAllActiveTransfers().join()
+
+
+        underTest.activeTransfersSwap(0, 1)
+
+        assertThat(underTest.getActiveTransfers()).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that active transfers swap doesn't throw an error if indices are wrong`() = runTest {
+        whenever(getInProgressTransfersUseCase()) doReturn listOf(mock())
+        underTest.getAllActiveTransfers().join()
+
+        assertDoesNotThrow {
+            underTest.activeTransfersSwap(0, 1)
+        }
+    }
 
 
     companion object {

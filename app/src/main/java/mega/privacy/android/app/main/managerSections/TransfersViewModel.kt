@@ -236,7 +236,12 @@ class TransfersViewModel @Inject constructor(
      */
     fun activeTransfersSwap(currentPos: Int, targetPos: Int) {
         val current = activeTransfer.value.toMutableList()
-        Collections.swap(current, currentPos, targetPos)
+        if (currentPos in current.indices && targetPos in current.indices) {
+            Collections.swap(current, currentPos, targetPos)
+        } else {
+            // This can happen if one or several transfers finish while the user is dragging
+            Timber.d("Error: index out of range $currentPos $targetPos")
+        }
         _activeTransfers.update { current }
     }
 
