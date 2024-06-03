@@ -359,7 +359,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.deleteDirectory(path = "${cameraUploadsCacheFolder?.absolutePath}${File.separator}")
         }
 
-    override suspend fun createCameraUploadTemporaryRootDirectory() =
+    override suspend fun createCameraUploadsTemporaryRootDirectory() =
         withContext(ioDispatcher) {
             cacheGateway.getCameraUploadsCacheFolder()
         }

@@ -73,7 +73,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
-import mega.privacy.android.domain.usecase.camerauploads.CreateCameraUploadTemporaryRootDirectoryUseCase
+import mega.privacy.android.domain.usecase.camerauploads.CreateCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
@@ -181,7 +181,7 @@ internal class CameraUploadsWorkerTest {
         mock()
     private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase = mock()
     private val disableMediaUploadSettingsUseCase: DisableMediaUploadsSettingsUseCase = mock()
-    private val createCameraUploadTemporaryRootDirectoryUseCase: CreateCameraUploadTemporaryRootDirectoryUseCase =
+    private val createCameraUploadsTemporaryRootDirectoryUseCase: CreateCameraUploadsTemporaryRootDirectoryUseCase =
         mock()
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase =
         mock()
@@ -282,7 +282,7 @@ internal class CameraUploadsWorkerTest {
                 establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
                 resetTotalUploadsUseCase = resetTotalUploadsUseCase,
                 disableMediaUploadSettingsUseCase = disableMediaUploadSettingsUseCase,
-                createCameraUploadTemporaryRootDirectoryUseCase = createCameraUploadTemporaryRootDirectoryUseCase,
+                createCameraUploadsTemporaryRootDirectoryUseCase = createCameraUploadsTemporaryRootDirectoryUseCase,
                 deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
                 scheduleCameraUploadUseCase = scheduleCameraUploadUseCase,
                 updateCameraUploadsBackupStatesUseCase = updateCameraUploadsBackupStatesUseCase,
@@ -350,7 +350,7 @@ internal class CameraUploadsWorkerTest {
 
 
         // mock upload process
-        whenever(createCameraUploadTemporaryRootDirectoryUseCase()).thenReturn(tempPath)
+        whenever(createCameraUploadsTemporaryRootDirectoryUseCase()).thenReturn(tempPath)
         whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary))
             .thenReturn(primaryNodeHandle)
         whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
@@ -1255,7 +1255,7 @@ internal class CameraUploadsWorkerTest {
     fun `test that the worker returns failure when it fails to create the temporary folder`() =
         runTest {
             setupDefaultCheckConditionMocks()
-            whenever(createCameraUploadTemporaryRootDirectoryUseCase()).thenThrow(RuntimeException())
+            whenever(createCameraUploadsTemporaryRootDirectoryUseCase()).thenThrow(RuntimeException())
 
             val result = underTest.doWork()
 

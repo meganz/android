@@ -131,9 +131,9 @@ interface FileSystemRepository {
     suspend fun createDirectory(path: String): File
 
     /**
-     * Creates the temporary Camera Uploads root directory
+     * Creates a temporary Camera Uploads root directory
      */
-    suspend fun createCameraUploadTemporaryRootDirectory(): File?
+    suspend fun createCameraUploadsTemporaryRootDirectory(): File?
 
     /**
      * Recursively deletes the temporary Camera Uploads root directory

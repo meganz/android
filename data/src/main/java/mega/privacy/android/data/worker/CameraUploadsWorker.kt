@@ -76,7 +76,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
-import mega.privacy.android.domain.usecase.camerauploads.CreateCameraUploadTemporaryRootDirectoryUseCase
+import mega.privacy.android.domain.usecase.camerauploads.CreateCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
@@ -158,7 +158,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase,
     private val disableMediaUploadSettingsUseCase: DisableMediaUploadsSettingsUseCase,
-    private val createCameraUploadTemporaryRootDirectoryUseCase: CreateCameraUploadTemporaryRootDirectoryUseCase,
+    private val createCameraUploadsTemporaryRootDirectoryUseCase: CreateCameraUploadsTemporaryRootDirectoryUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val updateCameraUploadsBackupStatesUseCase: UpdateCameraUploadsBackupStatesUseCase,
@@ -1198,7 +1198,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun createTempCacheFile(): Boolean {
         return runCatching {
-            tempRoot = createCameraUploadTemporaryRootDirectoryUseCase()
+            tempRoot = createCameraUploadsTemporaryRootDirectoryUseCase()
         }.onFailure {
             Timber.e(it)
         }.isSuccess
