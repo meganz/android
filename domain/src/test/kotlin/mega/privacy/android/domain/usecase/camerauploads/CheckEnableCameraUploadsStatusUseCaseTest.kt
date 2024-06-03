@@ -5,7 +5,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
-import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import org.junit.jupiter.api.BeforeAll

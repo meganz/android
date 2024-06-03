@@ -1,7 +1,9 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
+import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import javax.inject.Inject
 
 /**
