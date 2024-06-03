@@ -626,6 +626,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             uris.map { it.toString() }.associateWith { null },
             destinationId
         ).catch {
+            if (transferTriggerEvent is TransferTriggerEvent.StartUpload.TextFile) {
+                lastUploadError = it
+            }
             Timber.e(it)
         }.onCompletion {
             if (it is CancellationException) {
@@ -666,10 +669,27 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 .catch { Timber.e(it) }
                 .collect { totalFiles ->
                     if (active) {
-                        lastUpload?.let {
-                            _uiState.updateEventAndClearProgress(
+                        when (lastUpload) {
+                            is TransferTriggerEvent.StartUpload.TextFile -> {
+                                val isSuccess = lastUploadError == null
+                                val lastUpload =
+                                    lastUpload as TransferTriggerEvent.StartUpload.TextFile
+                                lastUploadError = null
+
+                                StartTransferEvent.Message.FinishTextFileUpload(
+                                    isSuccess = isSuccess,
+                                    isEditMode = lastUpload.isEditMode,
+                                    isCloudFile = lastUpload.fromHomePage
+                                )
+                            }
+
+                            is TransferTriggerEvent.StartUpload.Files -> {
                                 StartTransferEvent.MessagePlural.FinishUploading(totalFiles)
-                            )
+                            }
+
+                            else -> null
+                        }?.let { finishEvent ->
+                            _uiState.updateEventAndClearProgress(finishEvent)
                         }
                         lastUpload = null
                     }
@@ -687,5 +707,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
          * The last trigger event that started the upload, we need to keep it to know what to do when the upload finishes even in other screens
          */
         private var lastUpload: TransferTriggerEvent.StartUpload? = null
+
+        /**
+         * The last upload error, we need to keep it to know what to show when the upload finishes in other screens
+         */
+        private var lastUploadError: Throwable? = null
     }
 }

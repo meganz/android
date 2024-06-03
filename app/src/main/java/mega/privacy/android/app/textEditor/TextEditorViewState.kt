@@ -7,12 +7,12 @@ import mega.privacy.android.domain.entity.AccountType
 
 /**
  * Text editor view state
- * @param downloadEvent event to trigger download actions
+ * @param transferEvent event to trigger download actions
  * @property accountType the account type
  * @property isHiddenNodesOnboarded if the user has been onboarded with hidden nodes
  */
 data class TextEditorViewState(
-    val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    val transferEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
 )

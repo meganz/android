@@ -136,5 +136,22 @@ sealed interface TransferTriggerEvent {
             override val uris: List<Uri>,
             override val destinationId: NodeId,
         ) : StartUpload
+
+        /**
+         * Upload text file.
+         *
+         * @param uri the uri of the text file to be uploaded.
+         * @param destinationId the id of the folder where the file will be uploaded.
+         * @param isEditMode true if the file is uploaded in edit mode, false otherwise.
+         * @param fromHomePage true if the file is uploaded from home page, false otherwise.
+         */
+        data class TextFile(
+            val uri: Uri,
+            override val destinationId: NodeId,
+            val isEditMode: Boolean,
+            val fromHomePage: Boolean,
+        ) : StartUpload {
+            override val uris = listOf(uri)
+        }
     }
 }

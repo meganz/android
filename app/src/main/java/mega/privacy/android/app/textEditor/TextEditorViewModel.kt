@@ -29,6 +29,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -75,6 +76,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.CopyChatNodeUseCase
@@ -136,6 +138,7 @@ class TextEditorViewModel @Inject constructor(
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -666,17 +669,34 @@ class TextEditorViewModel @Inject constructor(
         tempFile: File,
         parentHandle: Long,
     ) {
-        PermissionUtils.checkNotificationsPermission(activity)
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                _uiState.update { state ->
+                    state.copy(
+                        transferEvent = triggered(
+                            TransferTriggerEvent.StartUpload.TextFile(
+                                uri = tempFile.toUri(),
+                                destinationId = NodeId(parentHandle),
+                                isEditMode = isEditMode(),
+                                fromHomePage = fromHome
+                            )
+                        )
+                    )
+                }
+            } else {
+                PermissionUtils.checkNotificationsPermission(activity)
 
-        val uploadServiceIntent = Intent(activity, UploadService::class.java)
-            .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
-            .putExtra(FROM_HOME_PAGE, fromHome)
-            .putExtra(UploadService.EXTRA_FILE_PATH, tempFile.absolutePath)
-            .putExtra(UploadService.EXTRA_NAME, fileName.value)
-            .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
-        ContextCompat.startForegroundService(activity, uploadServiceIntent)
+                val uploadServiceIntent = Intent(activity, UploadService::class.java)
+                    .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
+                    .putExtra(FROM_HOME_PAGE, fromHome)
+                    .putExtra(UploadService.EXTRA_FILE_PATH, tempFile.absolutePath)
+                    .putExtra(UploadService.EXTRA_NAME, fileName.value)
+                    .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
+                ContextCompat.startForegroundService(activity, uploadServiceIntent)
 
-        activity.finish()
+                activity.finish()
+            }
+        }
     }
 
     /**
@@ -939,7 +959,7 @@ class TextEditorViewModel @Inject constructor(
 
     private fun updateDownloadEvent(event: TransferTriggerEvent) {
         _uiState.update {
-            it.copy(downloadEvent = triggered(event))
+            it.copy(transferEvent = triggered(event))
         }
     }
 
@@ -948,7 +968,7 @@ class TextEditorViewModel @Inject constructor(
      */
     fun consumeDownloadEvent() {
         _uiState.update {
-            it.copy(downloadEvent = consumed())
+            it.copy(transferEvent = consumed())
         }
     }
 

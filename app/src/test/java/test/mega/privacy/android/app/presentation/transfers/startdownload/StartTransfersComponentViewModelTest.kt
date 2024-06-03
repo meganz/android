@@ -61,6 +61,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -101,6 +102,19 @@ class StartTransfersComponentViewModelTest {
     private val nodes = listOf(node)
     private val parentNode: TypedFolderNode = mock()
     private val startDownloadEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+    private val startUploadFilesEvent =
+        TransferTriggerEvent.StartUpload.Files(listOf(uploadUri), parentId)
+    private val startUploadTextFileEvent = TransferTriggerEvent.StartUpload.TextFile(
+        uploadUri,
+        parentId,
+        isEditMode = false,
+        fromHomePage = false
+    )
+    private val finishProcessingEvent = mock<MultiTransferEvent.SingleTransferEvent> {
+        on { scanningFinished } doReturn true
+        on { allTransfersUpdated } doReturn true
+        on { startedFiles } doReturn 1
+    }
 
     @BeforeAll
     fun setup() {
@@ -432,12 +446,7 @@ class StartTransfersComponentViewModelTest {
             commonStub()
             whenever(isConnectedToInternetUseCase()).thenReturn(false)
 
-            underTest.startTransfer(
-                TransferTriggerEvent.StartUpload.Files(
-                    listOf(uploadUri),
-                    parentId
-                )
-            )
+            underTest.startTransfer(startUploadFilesEvent)
 
             assertCurrentEventIsEqualTo(StartTransferEvent.NotConnected)
         }
@@ -462,12 +471,7 @@ class StartTransfersComponentViewModelTest {
                 awaitCancellation()
             })
 
-            underTest.startTransfer(
-                TransferTriggerEvent.StartUpload.Files(
-                    listOf(uploadUri),
-                    parentId
-                )
-            )
+            underTest.startTransfer(startUploadFilesEvent)
 
             assertThat(underTest.uiState.value.jobInProgressState)
                 .isEqualTo(StartTransferJobInProgress.ScanningTransfers)
@@ -490,8 +494,7 @@ class StartTransfersComponentViewModelTest {
         runTest {
             commonStub()
 
-            val triggerEvent = TransferTriggerEvent.StartUpload.Files(listOf(uploadUri), parentId)
-            underTest.startTransfer(triggerEvent)
+            underTest.startTransfer(startUploadFilesEvent)
 
             assertThat(underTest.uiState.value.jobInProgressState).isNull()
             assertCurrentEventIsEqualTo(
@@ -504,8 +507,7 @@ class StartTransfersComponentViewModelTest {
         runTest {
             commonStub()
 
-            val triggerEvent = TransferTriggerEvent.StartUpload.Files(listOf(uploadUri), parentId)
-            underTest.startTransfer(triggerEvent)
+            underTest.startTransfer(startUploadFilesEvent)
 
             assertCurrentEventIsEqualTo(
                 StartTransferEvent.FinishUploadProcessing(1)
@@ -518,18 +520,13 @@ class StartTransfersComponentViewModelTest {
             commonStub()
             stubStartUpload(flowOf(MultiTransferEvent.InsufficientSpace))
 
-            underTest.startTransfer(
-                TransferTriggerEvent.StartUpload.Files(
-                    listOf(uploadUri),
-                    parentId
-                )
-            )
+            underTest.startTransfer(startUploadFilesEvent)
 
             assertCurrentEventIsEqualTo(StartTransferEvent.Message.NotSufficientSpace)
         }
 
     @Test
-    fun `test that finish uploading event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartUpload`() =
+    fun `test that finish uploading event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartUploadFiles`() =
         runTest {
             val monitorActiveTransferFinishedFlow = MutableSharedFlow<Int>()
             setup()
@@ -537,12 +534,7 @@ class StartTransfersComponentViewModelTest {
             whenever(monitorActiveTransferFinishedUseCase(any()))
                 .thenReturn(monitorActiveTransferFinishedFlow)
 
-            underTest.startTransfer(
-                TransferTriggerEvent.StartUpload.Files(
-                    listOf(uploadUri),
-                    parentId
-                )
-            ) //to set lastTriggerEvent to StartUpload
+            underTest.startTransfer(startUploadFilesEvent) //to set lastTriggerEvent to StartUpload
             underTest.onResume(mock())
             underTest.uiState.test {
                 val finished = 1
@@ -550,6 +542,50 @@ class StartTransfersComponentViewModelTest {
                 monitorActiveTransferFinishedFlow.emit(finished)
                 val expected =
                     triggered(StartTransferEvent.MessagePlural.FinishUploading(finished))
+
+                val actual = awaitItem().oneOffViewEvent
+
+                assertThat(actual).isEqualTo(expected)
+            }
+        }
+
+    @ParameterizedTest(name = "when start upload finishes with {0}, then {1} is emitted")
+    @MethodSource("provideUploadParameters")
+    fun `test that a specific StartUpload is emitted`(
+        multiTransferEvent: MultiTransferEvent,
+        startTransferEvent: StartTransferEvent,
+    ) = runTest {
+        commonStub()
+        stubStartUpload(flowOf(multiTransferEvent))
+
+        underTest.startTransfer(startUploadFilesEvent)
+
+        assertCurrentEventIsEqualTo(startTransferEvent)
+    }
+
+    @Test
+    fun `test that finish uploading event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartUploadTextFile`() =
+        runTest {
+            val monitorActiveTransferFinishedFlow = MutableSharedFlow<Int>()
+            setup()
+            commonStub()
+            whenever(monitorActiveTransferFinishedUseCase(any()))
+                .thenReturn(monitorActiveTransferFinishedFlow)
+
+            underTest.startTransfer(startUploadTextFileEvent) //to set lastTriggerEvent to StartUpload
+            underTest.onResume(mock())
+            underTest.uiState.test {
+                val finished = 1
+                awaitItem() //current value doesn't matter
+                monitorActiveTransferFinishedFlow.emit(finished)
+                val expected =
+                    triggered(
+                        StartTransferEvent.Message.FinishTextFileUpload(
+                            isSuccess = true,
+                            isEditMode = startUploadTextFileEvent.isEditMode,
+                            isCloudFile = startUploadTextFileEvent.fromHomePage
+                        )
+                    )
 
                 val actual = awaitItem().oneOffViewEvent
 
@@ -570,6 +606,21 @@ class StartTransfersComponentViewModelTest {
         ),
     )
 
+    private fun provideUploadParameters() = listOf(
+        Arguments.of(
+            finishProcessingEvent,
+            StartTransferEvent.FinishUploadProcessing(1),
+        ),
+        Arguments.of(
+            MultiTransferEvent.InsufficientSpace,
+            StartTransferEvent.Message.NotSufficientSpace,
+        ),
+        Arguments.of(
+            MultiTransferEvent.TransferNotStarted(mock<File>(), mock()),
+            StartTransferEvent.Message.TransferCancelled,
+        ),
+    )
+
     private fun provideStartDownloadEvents() = listOf(
         TransferTriggerEvent.StartDownloadNode(nodes),
         TransferTriggerEvent.StartDownloadForOffline(node),
@@ -582,7 +633,8 @@ class StartTransfersComponentViewModelTest {
     )
 
     private fun provideStartUploadEvents() = listOf(
-        TransferTriggerEvent.StartUpload.Files(listOf(uploadUri), parentId)
+        startUploadFilesEvent,
+        startUploadTextFileEvent,
     )
 
     private fun provideStartEvents() = provideStartDownloadEvents() +
@@ -606,14 +658,7 @@ class StartTransfersComponentViewModelTest {
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(1)
         whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
-        stubStartTransfers(
-            flowOf(
-                mock<MultiTransferEvent.SingleTransferEvent> {
-                    on { scanningFinished } doReturn true
-                    on { allTransfersUpdated } doReturn true
-                    on { startedFiles } doReturn 1
-                })
-        )
+        stubStartTransfers(flowOf(finishProcessingEvent))
     }
 
     private fun stubStartTransfers(flow: Flow<MultiTransferEvent>) {

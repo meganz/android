@@ -103,6 +103,28 @@ sealed interface StartTransferEvent {
          * Save offline has finished
          */
         data object FinishOffline : Message(R.string.file_available_offline, null, null)
+
+        /**
+         * Text file upload has finished
+         *
+         * @property isSuccess True if the upload finished with success, false otherwise.
+         * @property isEditMode True if the file is uploaded in edit mode, false otherwise.
+         * @property isCloudFile True if the file is uploaded from home page, false otherwise.
+         */
+        data class FinishTextFileUpload(
+            val isSuccess: Boolean,
+            val isEditMode: Boolean,
+            val isCloudFile: Boolean,
+        ) : Message(
+            when {
+                isSuccess && isEditMode -> R.string.file_updated
+                isEditMode -> R.string.file_update_failed
+                isSuccess && isCloudFile -> R.string.text_editor_creation_success
+                isCloudFile -> R.string.text_editor_creation_error
+                isSuccess -> R.string.file_created
+                else -> R.string.file_creation_failed
+            }, null, null
+        )
     }
 
     /**
