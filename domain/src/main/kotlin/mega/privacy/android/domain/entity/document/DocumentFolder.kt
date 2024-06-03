@@ -8,5 +8,5 @@ import mega.privacy.android.domain.entity.uri.UriPath
  * @property files List of [UriPath] that represents the files in the folder
  */
 data class DocumentFolder(
-    val files: List<UriPath>,
+    val files: List<DocumentEntity>,
 )

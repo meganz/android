@@ -10,6 +10,9 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.databinding.ItemFolderContentBinding
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.app.utils.Util
 
 /**
  * RecyclerView's ViewHolder to show FolderContent Data info in a list view.
@@ -50,7 +53,14 @@ class FolderContentListHolder(
             }
 
             name.text = item.name
-            fileInfo.text = item.info
+            fileInfo.text = if (item.isFolder) {
+                TextUtil.getFolderInfo(item.numberOfFolders, item.numberOfFiles, binding.root.context);
+            } else {
+                TextUtil.getFileInfo(
+                    Util.getSizeString(item.size, binding.root.context),
+                    TimeUtils.formatLongDateTime(item.lastModified / 1000)
+                )
+            }
         }
     }
 }

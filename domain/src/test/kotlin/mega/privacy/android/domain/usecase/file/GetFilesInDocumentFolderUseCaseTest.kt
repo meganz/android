@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.file
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -33,12 +34,8 @@ class GetFilesInDocumentFolderUseCaseTest {
     @Test
     fun `test that files are returned when invoked`() = runTest {
         val folder = UriPath("folder")
-        val uriPath = UriPath("file1")
-        val expected = DocumentFolder(
-            listOf(
-                uriPath
-            )
-        )
+        val entity = mock<DocumentEntity>()
+        val expected = DocumentFolder(listOf(entity))
         whenever(repository.getFilesInDocumentFolder(folder)).thenReturn(expected)
         val actual = underTest(folder)
         assertThat(actual).isEqualTo(expected)

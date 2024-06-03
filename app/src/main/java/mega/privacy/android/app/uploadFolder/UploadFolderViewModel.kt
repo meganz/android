@@ -17,7 +17,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
-import mega.privacy.android.app.data.extensions.getInfo
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
@@ -26,8 +25,12 @@ import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.EmptyFolderException
+import mega.privacy.android.domain.usecase.file.ApplySortOrderToDocumentFolderUseCase
+import mega.privacy.android.domain.usecase.file.GetFilesInDocumentFolderUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -43,7 +46,10 @@ import javax.inject.Inject
 class UploadFolderViewModel @Inject constructor(
     private val getFolderContentUseCase: GetFolderContentUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
+    private val getFilesInDocumentFolderUseCase: GetFilesInDocumentFolderUseCase,
+    private val applySortOrderToDocumentFolderUseCase: ApplySortOrderToDocumentFolderUseCase,
     private val transfersManagement: TransfersManagement,
+    private val documentEntityDataMapper: DocumentEntityDataMapper,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -90,9 +96,14 @@ class UploadFolderViewModel @Inject constructor(
     ) = viewModelScope.launch {
         parentFolder = documentFile.name.toString()
         currentFolder.value = FolderContent.Data(
-            null, documentFile, info = documentFile.getInfo(
-                context
-            )
+            parent = null,
+            isFolder = !documentFile.isFile,
+            name = documentFile.name.toString(),
+            lastModified = documentFile.lastModified(),
+            size = documentFile.length(),
+            numberOfFiles = 0,
+            numberOfFolders = 0,
+            uri = documentFile.uri,
         )
         selectedItems.value = mutableListOf()
         this@UploadFolderViewModel.parentHandle = parentHandle
@@ -130,23 +141,45 @@ class UploadFolderViewModel @Inject constructor(
             folderItems.value = items.toMutableList()
             return
         }
-
-        getFolderContentUseCase.get(
-            currentFolder = currentFolder.value!!,
-            order = order,
-            isList = isList,
-            context = context
-        )
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { folderItems.value = mutableListOf() },
-                onSuccess = { finalItems ->
-                    folderItems.value = finalItems
-                    folderContent[currentFolder.value] = finalItems
+        viewModelScope.launch {
+            val currentFolder = currentFolder.value ?: return@launch
+            runCatching {
+                val folder =
+                    getFilesInDocumentFolderUseCase(UriPath(currentFolder.uri.toString()))
+                val (files, folders) = applySortOrderToDocumentFolderUseCase(folder)
+                with(mapHeaderAndSeparator(currentFolder, files, folders)) {
+                    folderItems.value = this
+                    folderContent[currentFolder] = this
                 }
-            )
-            .addTo(composite)
+            }
+        }
+    }
+
+    private fun mapHeaderAndSeparator(
+        currentFolder: FolderContent.Data,
+        files: List<DocumentEntity>,
+        folders: List<DocumentEntity>,
+    ): MutableList<FolderContent> {
+        val finalItems = mutableListOf<FolderContent>().apply {
+            add(FolderContent.Header())
+            addAll(folders.map { folder ->
+                documentEntityDataMapper(
+                    parent = currentFolder,
+                    entity = folder
+                )
+            })
+            if (folders.isNotEmpty() && files.isNotEmpty() && !isList) {
+                add(FolderContent.Separator())
+            }
+            addAll(files.map { file ->
+                documentEntityDataMapper(
+                    parent = currentFolder,
+                    entity = file
+                )
+            })
+        }
+        return finalItems
+
     }
 
     /**
@@ -295,11 +328,7 @@ class UploadFolderViewModel @Inject constructor(
                 val selected = selectedItems.value?.contains(index) ?: false
 
                 if (item is FolderContent.Data && item.isSelected != selected) {
-                    val newItem = FolderContent.Data(
-                        item.parent, item.document, selected, info = item.document.getInfo(
-                            context
-                        )
-                    )
+                    val newItem = item.copy(isSelected = selected)
                     finalList.add(newItem)
                 } else {
                     finalList.add(item)

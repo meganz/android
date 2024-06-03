@@ -24,8 +24,14 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.exifinterface.media.ExifInterface
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.FileNotCreatedException
@@ -455,11 +461,47 @@ class FileFacade @Inject constructor(
 
     override suspend fun getFilesInDocumentFolder(folder: UriPath): DocumentFolder {
         val uri = Uri.parse(folder.value)
+        val semaphore = Semaphore(10)
         val document = DocumentFile.fromTreeUri(context, uri) ?: throw FileNotFoundException()
-        val files = document.listFiles().mapNotNull { file ->
-            UriPath(file.uri.toString())
+        val files = document.listFiles()
+        val folders = files.filter { it.isDirectory }
+        val countMap = coroutineScope {
+            folders.map {
+                async {
+                    semaphore.withPermit {
+                        val childFiles = it.listFiles()
+                        val totalDirectory = childFiles.count { it.isDirectory }
+                        val totalFiles = childFiles.size - totalDirectory
+                        totalFiles to totalDirectory
+                    }
+                }
+            }
+        }.awaitAll()
+            .mapIndexed { index, pair ->
+                val file = folders[index]
+                file.uri to pair
+            }.toMap()
+
+        // length, lastModified is heavy operation, so we do it in parallel
+        val entities = coroutineScope {
+            files.mapNotNull { file ->
+                async {
+                    semaphore.withPermit {
+                        val documentUri = file.uri
+                        DocumentEntity(
+                            name = file.name.orEmpty(),
+                            size = file.length(),
+                            lastModified = file.lastModified(),
+                            uri = UriPath(documentUri.toString()),
+                            isFolder = file.isDirectory,
+                            numFiles = countMap[documentUri]?.first ?: 0,
+                            numFolders = countMap[documentUri]?.second ?: 0
+                        )
+                    }
+                }
+            }.awaitAll()
         }
-        return DocumentFolder(files)
+        return DocumentFolder(entities)
     }
 
     private fun File.getCompressFormat(): CompressFormat = when (extension) {

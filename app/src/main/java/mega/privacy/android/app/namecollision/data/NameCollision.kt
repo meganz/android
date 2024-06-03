@@ -116,10 +116,10 @@ sealed class NameCollision : Serializable {
             ): Upload = Upload(
                 collisionHandle = collisionHandle,
                 absolutePath = uploadContent.uri.toString(),
-                name = uploadContent.name!!,
+                name = uploadContent.name,
                 size = if (uploadContent.isFolder) null else uploadContent.size,
-                childFolderCount = uploadContent.document.listFiles().count { it.isDirectory },
-                childFileCount = uploadContent.document.listFiles().count { it.isFile },
+                childFolderCount = uploadContent.numberOfFolders,
+                childFileCount = uploadContent.numberOfFiles,
                 lastModified = uploadContent.lastModified,
                 parentHandle = parentHandle,
                 isFile = !uploadContent.isFolder

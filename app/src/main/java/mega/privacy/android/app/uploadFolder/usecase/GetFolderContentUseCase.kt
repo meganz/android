@@ -1,23 +1,21 @@
 package mega.privacy.android.app.uploadFolder.usecase
 
 import android.content.Context
-import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import kotlinx.coroutines.rx3.rxSingle
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
-import mega.privacy.android.app.data.extensions.getInfo
 import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.uploadFolder.DocumentEntityDataMapper
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.EmptySearchException
 import mega.privacy.android.domain.exception.FolderNameNullException
@@ -39,6 +37,7 @@ class GetFolderContentUseCase @Inject constructor(
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val uploadUseCase: UploadUseCase,
     private val getFilesInDocumentFolderUseCase: GetFilesInDocumentFolderUseCase,
+    private val documentEntityDataMapper: DocumentEntityDataMapper,
 ) {
 
     /**
@@ -51,47 +50,12 @@ class GetFolderContentUseCase @Inject constructor(
         currentFolder: FolderContent.Data,
         context: Context,
     ): Single<List<FolderContent.Data>> = rxSingle {
-        getFilesInDocumentFolderUseCase(UriPath(currentFolder.document.uri.toString()))
+        getFilesInDocumentFolderUseCase(UriPath(currentFolder.uri.toString()))
     }.map {
-        it.files.mapNotNull { fileUri ->
-            val uri = Uri.parse(fileUri.value)
-            DocumentFile.fromTreeUri(context, uri)?.let { document ->
-                FolderContent.Data(
-                    currentFolder,
-                    document,
-                    info = document.getInfo(context = context)
-                )
-            }
+        it.files.mapNotNull { file ->
+            documentEntityDataMapper(currentFolder, file)
         }
     }
-
-    /**
-     * Gets the content of a FolderContent Data. It should represent a folder.
-     * Reorders the list as per [order] and completes the list with the FolderContent Header and
-     * FolderContent Separator if needed.
-     *
-     * @param currentFolder Current FolderContent Data from which the content has to be get.
-     * @param order         Order the list has to fulfill.
-     * @param isList        True if the view is list, false if is grid.
-     * @return Single with the list of FolderContent representing files, folders, header and separator if needed.
-     */
-    fun get(
-        currentFolder: FolderContent.Data,
-        order: SortOrder,
-        isList: Boolean,
-        context: Context,
-    ): Single<MutableList<FolderContent>> =
-        Single.create { emitter ->
-            get(currentFolder, context).blockingSubscribeBy(
-                onError = { error -> emitter.onError(error) },
-                onSuccess = { results ->
-                    completeAndReorder(results, order, isList).blockingSubscribeBy(
-                        onError = { error -> emitter.onError(error) },
-                        onSuccess = { finalContentList -> emitter.onSuccess(finalContentList) }
-                    )
-                }
-            )
-        }
 
     /**
      * Gets the content to upload.

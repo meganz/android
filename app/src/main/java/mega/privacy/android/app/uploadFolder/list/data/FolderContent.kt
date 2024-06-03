@@ -1,6 +1,6 @@
 package mega.privacy.android.app.uploadFolder.list.data
 
-import androidx.documentfile.provider.DocumentFile
+import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.namecollision.data.NameCollision
 
@@ -30,22 +30,23 @@ sealed class FolderContent(val id: Long) {
      * @property size           Size of the item.
      * @property info           Info to show as complementary info of the item.
      *                          Folder content if is a folder, file size and last modified date if a file.
+     * @property numberOfFiles  Number of files if is a folder, 0 otherwise.
+     * @property numberOfFolders Number of folders if is a folder, 0 otherwise.
      */
-    data class Data constructor(
+    data class Data(
         val parent: Data?,
-        val document: DocumentFile,
+        val isFolder: Boolean,
+        val name: String,
+        val lastModified: Long,
+        val size: Long,
+        val numberOfFiles: Int,
+        val numberOfFolders: Int,
         var isSelected: Boolean = false,
-        val info: String,
-    ) : FolderContent(document.uri.hashCode().toLong()) {
-        val isFolder = document.isDirectory
-        val name = document.name
-        val uri = document.uri
-        val lastModified = document.lastModified()
-        val size = document.length()
+        val uri: Uri,
+    ) : FolderContent(uri.hashCode().toLong()) {
         var nameCollision: NameCollision? = null
 
-        override fun getSectionTitle(): String =
-            document.name?.substring(0, 1) ?: ""
+        override fun getSectionTitle(): String = name.substring(0, 1)
     }
 
     /**
