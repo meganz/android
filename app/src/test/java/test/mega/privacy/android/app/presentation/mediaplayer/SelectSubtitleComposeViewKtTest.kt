@@ -65,15 +65,16 @@ internal class SelectSubtitleComposeViewKtTest {
     fun `test that ui is displayed correctly when selected item`() {
         setComposeContent(
             SubtitleLoadState.Success(
-                listOf(
+                items = listOf(
                     SubtitleFileInfoItem(
                         false,
                         mock {
                             on { name }.thenReturn("test")
                             on { parentName }.thenReturn("parentTest")
-                        }
+                        },
                     )
-                )
+                ),
+                accountType = null,
             ),
             mock()
         )

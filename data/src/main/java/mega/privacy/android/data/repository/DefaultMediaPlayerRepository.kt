@@ -458,7 +458,9 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                     id = megaNode.handle,
                     name = megaNode.name,
                     url = megaApi.httpServerGetLocalLink(megaNode),
-                    parentName = megaApi.getParentNode(megaNode)?.name
+                    parentName = megaApi.getParentNode(megaNode)?.name,
+                    isMarkedSensitive = megaNode.isMarkedSensitive,
+                    isSensitiveInherited = megaApi.isSensitiveInherited(megaNode)
                 )
             }
         }

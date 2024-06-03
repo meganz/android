@@ -1,5 +1,7 @@
 package mega.privacy.android.app.mediaplayer.model
 
+import mega.privacy.android.domain.entity.AccountType
+
 /**
  * The subtitle file list load state
  */
@@ -7,17 +9,21 @@ sealed class SubtitleLoadState {
     /**
      * Loading state
      */
-    object Loading : SubtitleLoadState()
+    data object Loading : SubtitleLoadState()
 
     /**
      * Subtitle file list is empty
      */
-    object Empty : SubtitleLoadState()
+    data object Empty : SubtitleLoadState()
 
     /**
      * Get favourite list success
      *
      * @property items subtitle file list
+     * @property accountType
      */
-    data class Success(val items: List<SubtitleFileInfoItem>) : SubtitleLoadState()
+    data class Success(
+        val items: List<SubtitleFileInfoItem>,
+        val accountType: AccountType?,
+    ) : SubtitleLoadState()
 }

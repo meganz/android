@@ -19,13 +19,17 @@ class SubtitleFileInfoMapperTest {
         val expectedSubtitleName = "test.srt"
         val expectedSubtitleUrl = "test.com"
         val expectedSubtitleParentName = "root"
+        val isMarkedSensitive = false
+        val isSensitiveInherited = false
 
         assertThat(
             underTest(
                 expectedId,
                 expectedSubtitleName,
                 expectedSubtitleUrl,
-                expectedSubtitleParentName
+                expectedSubtitleParentName,
+                isMarkedSensitive,
+                isSensitiveInherited,
             )
         )
             .isEqualTo(
@@ -33,7 +37,9 @@ class SubtitleFileInfoMapperTest {
                     expectedId,
                     expectedSubtitleName,
                     expectedSubtitleUrl,
-                    expectedSubtitleParentName
+                    expectedSubtitleParentName,
+                    isMarkedSensitive,
+                    isSensitiveInherited,
                 )
             )
     }

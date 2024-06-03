@@ -33,10 +33,13 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -59,11 +62,12 @@ import mega.privacy.android.app.mediaplayer.Constants.SELECTED_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.mediaplayer.Constants.SUBTITLE_FILES_TEST_TAG
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 
 internal object Constants {
@@ -157,10 +161,14 @@ internal fun SelectSubtitleView(
 ) {
     val isEmpty = uiState is SubtitleLoadState.Empty
     val isLoading = uiState is SubtitleLoadState.Loading
-    val items = if (uiState is SubtitleLoadState.Success) {
-        uiState.items
-    } else {
-        emptyList()
+    var items = emptyList<SubtitleFileInfoItem>()
+    var accountType: AccountType? by remember {
+        mutableStateOf(null)
+    }
+
+    if (uiState is SubtitleLoadState.Success) {
+        items = uiState.items
+        accountType = uiState.accountType
     }
     Scaffold(
         topBar = {
@@ -222,6 +230,7 @@ internal fun SelectSubtitleView(
 
                         else -> SubtitleFileInfoListView(
                             subtitleInfoList = items,
+                            accountType = accountType,
                         ) { index ->
                             itemClicked(index)
                         }
@@ -277,23 +286,28 @@ internal fun SelectSubtitleView(
 @Composable
 internal fun SubtitleFileInfoListItem(
     subtitleFileInfoItem: SubtitleFileInfoItem,
+    accountType: AccountType?,
     onSubtitleFileInfoClicked: (SubtitleFileInfo) -> Unit,
 ) {
     val rotation = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
     Column(
-        modifier = Modifier.clickable {
-            if (!subtitleFileInfoItem.selected) {
-                scope.launch {
-                    rotation.animateTo(
-                        targetValue = 180f,
-                        animationSpec = tween(100, easing = LinearEasing)
-                    )
-                    rotation.snapTo(0f)
+        modifier = Modifier
+            .clickable {
+                if (!subtitleFileInfoItem.selected) {
+                    scope.launch {
+                        rotation.animateTo(
+                            targetValue = 180f,
+                            animationSpec = tween(100, easing = LinearEasing)
+                        )
+                        rotation.snapTo(0f)
+                    }
                 }
+                onSubtitleFileInfoClicked(subtitleFileInfoItem.subtitleFileInfo)
             }
-            onSubtitleFileInfoClicked(subtitleFileInfoItem.subtitleFileInfo)
-        }
+            .alpha(1f.takeIf {
+                !isSensitive(accountType, subtitleFileInfoItem)
+            } ?: 0.5f)
     ) {
         Row {
             Image(
@@ -342,6 +356,14 @@ internal fun SubtitleFileInfoListItem(
     }
 }
 
+@Composable
+private fun isSensitive(
+    accountType: AccountType?,
+    subtitleFileInfoItem: SubtitleFileInfoItem,
+) = (accountType?.isPaid == true
+        && (subtitleFileInfoItem.subtitleFileInfo.isMarkedSensitive
+        || subtitleFileInfoItem.subtitleFileInfo.isSensitiveInherited))
+
 /**
  * The empty view of subtitle
  */
@@ -385,6 +407,7 @@ internal fun SubtitleEmptyView(
 @Composable
 internal fun SubtitleFileInfoListView(
     subtitleInfoList: List<SubtitleFileInfoItem>,
+    accountType: AccountType?,
     onClicked: (SubtitleFileInfo) -> Unit,
 ) {
     Timber.d("render SubtitleFileInfoListView")
@@ -398,6 +421,7 @@ internal fun SubtitleFileInfoListView(
             itemContent = { _, item ->
                 SubtitleFileInfoListItem(
                     subtitleFileInfoItem = item,
+                    accountType = accountType,
                     onSubtitleFileInfoClicked = onClicked
                 )
             })
@@ -507,9 +531,12 @@ private fun PreviewSubtitleFileInfoListItem() {
                     id = 123456,
                     name = "Testing.srt",
                     url = "test@test.com",
-                    parentName = "testFolder"
+                    parentName = "testFolder",
+                    isMarkedSensitive = false,
+                    isSensitiveInherited = false
                 )
             ),
+            accountType = AccountType.FREE,
             onSubtitleFileInfoClicked = { }
         )
     }
@@ -521,6 +548,7 @@ private fun PreviewSubtitleFileInfoListView() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SubtitleFileInfoListView(
             getTestSubtitleFileInfoList(),
+            accountType = AccountType.FREE,
         ) { }
     }
 }
@@ -533,7 +561,9 @@ private fun getTestSubtitleFileInfoList() =
                 id = 123456,
                 name = "Testing.srt",
                 url = "test@test.com",
-                parentName = "testFolder"
+                parentName = "testFolder",
+                isMarkedSensitive = false,
+                isSensitiveInherited = false
             )
         ),
         SubtitleFileInfoItem(
@@ -542,7 +572,9 @@ private fun getTestSubtitleFileInfoList() =
                 id = 1234567,
                 name = "Testing1.srt",
                 url = "test1@test.com",
-                parentName = "testFolder1"
+                parentName = "testFolder1",
+                isMarkedSensitive = false,
+                isSensitiveInherited = false
             )
         ),
         SubtitleFileInfoItem(
@@ -551,7 +583,9 @@ private fun getTestSubtitleFileInfoList() =
                 id = 12345678,
                 name = "Testing2.srt",
                 url = "test2@test.com",
-                parentName = "testFolder2"
+                parentName = "testFolder2",
+                isMarkedSensitive = false,
+                isSensitiveInherited = false
             )
         ),
         SubtitleFileInfoItem(
@@ -560,7 +594,9 @@ private fun getTestSubtitleFileInfoList() =
                 id = 12345789,
                 name = "Testing3.srt",
                 url = "test3@test.com",
-                parentName = "testFolder3"
+                parentName = "testFolder3",
+                isMarkedSensitive = false,
+                isSensitiveInherited = false
             )
         ),
     )

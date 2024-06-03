@@ -21,12 +21,16 @@ internal class SubtitleFileInfoItemMapperTest {
         val expectedSubtitleName = "test.srt"
         val expectedSubtitleUrl = "test.com"
         val expectedSubtitleParentName = "root"
+        val isMarkedSensitive = false
+        val isSensitiveInherited = false
 
         val expectedSubtitleFileInfo = SubtitleFileInfo(
             id = expectedId,
             name = expectedSubtitleName,
             url = expectedSubtitleUrl,
-            parentName = expectedSubtitleParentName
+            parentName = expectedSubtitleParentName,
+            isMarkedSensitive = isMarkedSensitive,
+            isSensitiveInherited = isSensitiveInherited,
         )
 
         assertThat(
