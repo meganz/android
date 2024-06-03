@@ -1,7 +1,6 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.repository.NetworkRepository
-import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import javax.inject.Inject
 
 /**
