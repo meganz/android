@@ -1,7 +1,6 @@
 package mega.privacy.android.app.globalmanagement
 
 import mega.privacy.android.icon.pack.R as iconPackR
-import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -92,49 +91,6 @@ class TransfersManagement @Inject constructor(
         private const val WAIT_TIME_TO_SHOW_NETWORK_WARNING = 30000L
         private const val WAIT_TIME_TO_RESTART_SERVICES = 5000L
         const val WAIT_TIME_BEFORE_UPDATE = 1000L
-
-        /**
-         * Checks if a service is already running.
-         *
-         * @param serviceClass Service it wants to know if its is already running.
-         * @return True if the service is already running, false otherwise.
-         */
-        @JvmStatic
-        @Suppress("DEPRECATION") // Deprecated for third party applications.
-        fun isServiceRunning(serviceClass: Class<*>): Boolean {
-            val manager = MegaApplication.getInstance()
-                .getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-
-            for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-                if (serviceClass.name == service.service.className) {
-                    return true
-                }
-            }
-
-            return false
-        }
-
-        /**
-         * Creates the initial notification when a service starts.
-         *
-         * @param mBuilder                Builder to create the notification.
-         * @return The initial notification created.
-         */
-        @JvmStatic
-        fun createInitialServiceNotification(
-            mBuilder: Notification.Builder,
-        ): Notification {
-            mBuilder.apply {
-                setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                setColor(getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
-                setContentTitle(
-                    MegaApplication.getInstance().getString(R.string.download_preparing_files)
-                )
-                setAutoCancel(true)
-            }
-
-            return mBuilder.build()
-        }
 
         /**
          * Creates the initial notification when a service starts.
@@ -246,6 +202,10 @@ class TransfersManagement @Inject constructor(
      *
      * @return True if it is on transfer over quota, false otherwise.
      */
+    @Deprecated(
+        message = "There's a use case to get the transfer over quota that: MonitorTransferOverQuotaUseCase",
+        replaceWith = ReplaceWith("MonitorTransferOverQuotaUseCase().first()")
+    )
     fun isOnTransferOverQuota(): Boolean = megaApi.bandwidthOverquotaDelay > 0
 
     /**
@@ -253,6 +213,10 @@ class TransfersManagement @Inject constructor(
      *
      * @return True if it is on storage over quota, false otherwise.
      */
+    @Deprecated(
+        message = "There's a use case to get the storage over quota that: MonitorStorageOverQuotaUseCase",
+        replaceWith = ReplaceWith("MonitorStorageOverQuotaUseCase.first()")
+    )
     fun isStorageOverQuota(): Boolean =
         monitorStorageStateEventUseCase.getState() == StorageState.Red
 
@@ -269,18 +233,6 @@ class TransfersManagement @Inject constructor(
         this.hasNotToBeShowDueToTransferOverQuota = hasNotToBeShowDueToTransferOverQuota
         isTransferOverQuotaBannerShown = hasNotToBeShowDueToTransferOverQuota
     }
-
-    /**
-     * Checks if the transfers widget has to be shown.
-     * If the widget does not have to be shown means that:
-     * the user is in transfer over quota, there is not any upload transfer in progress
-     * and they already opened the transfers section by clicking the widget.
-     *
-     * @return True if the widget does not have to be shown, false otherwise
-     */
-    @Suppress("DEPRECATION")
-    fun hasNotToBeShowDueToTransferOverQuota(): Boolean =
-        hasNotToBeShowDueToTransferOverQuota && megaApi.numPendingUploads <= 0
 
     /**
      * Starts a CountDownTimer after show warnings related to no internet connection.
@@ -624,7 +576,7 @@ class TransfersManagement @Inject constructor(
      * Sets shouldBreakTransfersProcessing to false after a second in order
      * to prevent the break processing fails at some point.
      */
-    fun updateShouldBreakTransfersProcessing() {
+    private fun updateShouldBreakTransfersProcessing() {
         Handler(Looper.getMainLooper()).postDelayed({
             shouldBreakTransfersProcessing = false
             isProcessingTransfers = false
