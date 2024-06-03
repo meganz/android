@@ -1,41 +1,11 @@
 package mega.privacy.android.app.utils.contacts;
 
-import java.util.List;
-
 import mega.privacy.android.app.main.InvitationContactInfo;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaUser;
 
 public class ContactsFilter {
-
-    /**
-     * This function filters out the local contacts if the emails exist in the MEGA contacts.
-     *
-     * @param api  [MegaApiJava]
-     * @param list List of local contacts' emails
-     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase} instead.
-     */
-    @Deprecated
-    public static void filterOutContacts(MegaApiJava api, List<String> list) {
-        for (MegaUser user : api.getContacts()) {
-            list.removeIf(email -> isContact(user, email));
-        }
-    }
-
-    /**
-     * This function filters out the local contacts if the email is in a pending state.
-     *
-     * @param api  [MegaApiJava]
-     * @param list List of local contacts' emails
-     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase} instead.
-     */
-    @Deprecated
-    public static void filterOutPendingContacts(MegaApiJava api, List<String> list) {
-        for (MegaContactRequest request : api.getOutgoingContactRequests()) {
-            list.removeIf(email -> isPending(request, email));
-        }
-    }
 
     /**
      * This function determines whether the contact already exists in the MEGA contacts based on the email.
@@ -68,6 +38,14 @@ public class ContactsFilter {
         return hasSameEmail && (isAccepted || isPending);
     }
 
+    /**
+     * This function determines whether the given email exists in the visible contacts..
+     *
+     * @param api   [MegaApiJava].
+     * @param email The email that needs to be checked.
+     * @return Boolean. Whether the email exists.
+     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.IsEmailInContactsUseCase} instead.
+     */
     public static boolean isEmailInContacts(MegaApiJava api, String email) {
         for (MegaUser user : api.getContacts()) {
             if (isContact(user, email)) {
