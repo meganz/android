@@ -78,6 +78,9 @@ internal fun SyncListScreen(
     onActionPressed: (MenuAction) -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     title: String? = null,
+    syncFoldersViewModel: SyncFoldersViewModel = hiltViewModel(),
+    syncStalledIssuesViewModel: SyncStalledIssuesViewModel = hiltViewModel(),
+    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel = hiltViewModel(),
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -155,7 +158,10 @@ internal fun SyncListScreen(
                     },
                     addFolderClicked = addFolderClicked,
                     syncPermissionsManager = syncPermissionsManager,
-                    onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked
+                    onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
+                    syncFoldersViewModel = syncFoldersViewModel,
+                    syncStalledIssuesViewModel = syncStalledIssuesViewModel,
+                    syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
                 )
             },
             snackbarHost = {

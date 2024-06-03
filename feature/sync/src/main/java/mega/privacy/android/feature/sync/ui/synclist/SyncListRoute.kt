@@ -8,14 +8,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
+import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
+import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.feature.sync.ui.views.SyncOptionsDialog
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLocalFileEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseRemoteFileEvent
@@ -34,6 +42,9 @@ internal fun SyncListRoute(
     addFolderClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     title: String? = null,
+    syncFoldersViewModel: SyncFoldersViewModel = hiltViewModel(),
+    syncStalledIssuesViewModel: SyncStalledIssuesViewModel = hiltViewModel(),
+    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -41,13 +52,21 @@ internal fun SyncListRoute(
 
     var showSyncOptionsDialog by rememberSaveable { mutableStateOf(false) }
 
+    var showUpgradeDialog by rememberSaveable { mutableStateOf(false) }
+
     val message = state.snackbarMessage?.let {
         stringResource(id = it)
     }
 
     SyncListScreen(
         stalledIssuesCount = state.stalledIssuesCount,
-        addFolderClicked = addFolderClicked,
+        addFolderClicked = {
+            if (state.isFreeAccount) {
+                showUpgradeDialog = true
+            } else {
+                addFolderClicked()
+            }
+        },
         actionSelected = { item, selectedAction ->
             when (selectedAction.resolutionActionType) {
                 StalledIssueResolutionActionType.RENAME_ALL_ITEMS -> {
@@ -92,7 +111,11 @@ internal fun SyncListRoute(
         onActionPressed = {
             when (it) {
                 is SyncListMenuAction.AddNewSync -> {
-                    addFolderClicked()
+                    if (state.isFreeAccount) {
+                        showUpgradeDialog = true
+                    } else {
+                        addFolderClicked()
+                    }
                 }
 
                 is SyncListMenuAction.ClearSyncOptions -> {
@@ -107,6 +130,9 @@ internal fun SyncListRoute(
         },
         onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
         title = title,
+        syncFoldersViewModel = syncFoldersViewModel,
+        syncStalledIssuesViewModel = syncStalledIssuesViewModel,
+        syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
     )
 
     if (showSyncOptionsDialog) {
@@ -136,6 +162,21 @@ internal fun SyncListRoute(
         )
     }
 
+    if (showUpgradeDialog) {
+        MegaAlertDialog(
+            title = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_title),
+            body = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message),
+            confirmButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_confirm_button),
+            cancelButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_cancel_button),
+            onConfirm = {
+                onOpenUpgradeAccountClicked()
+                showUpgradeDialog = false
+            },
+            onDismiss = { showUpgradeDialog = false },
+            modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG)
+        )
+    }
+
     LaunchedEffect(key1 = state.snackbarMessage) {
         message?.let {
             snackBarHostState.showSnackbar(it)
@@ -156,3 +197,6 @@ private fun prepareMenuActions(state: SyncListState): List<MenuAction> {
     }
     return menuActionList
 }
+
+internal const val TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG =
+    "sync_list_screen:upgrade_dialog"

@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
@@ -33,6 +36,8 @@ internal class SyncListViewModel @Inject constructor(
     private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase,
     private val setSyncByWiFiUseCase: SetSyncByWiFiUseCase,
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
+    private val getAccountTypeUseCase: GetAccountTypeUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncListState())
@@ -43,6 +48,7 @@ internal class SyncListViewModel @Inject constructor(
         monitorStalledIssue()
         monitorSolvedIssue()
         monitorSyncByWifiSetting()
+        getAndMonitorAccountType()
     }
 
     private fun observeOnboardingFlow() {
@@ -88,6 +94,26 @@ internal class SyncListViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    private fun getAndMonitorAccountType() {
+        viewModelScope.launch {
+            runCatching {
+                getAccountTypeUseCase()
+            }.onSuccess { accountType ->
+                _state.update { it.copy(isFreeAccount = accountType == AccountType.FREE) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+
+        viewModelScope.launch {
+            monitorAccountDetailUseCase().collect { accountDetail ->
+                _state.update {
+                    it.copy(isFreeAccount = accountDetail.levelDetail?.accountType == AccountType.FREE)
+                }
+            }
         }
     }
 

@@ -366,4 +366,12 @@
     <string name="device_center_sync_list_empty_state_message_free_account">Keep your information syncing and up to date by upgrading to one of our Pro plans.</string>
     <!-- "Upgrade now" label for a button, menu entry, etc -->
     <string name="general_upgrade_now_label">Upgrade now</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_title">Upgrade to Pro</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_message">Unlock the power to sync your mobile to the cloud with our Pro plans.</string>
+    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_confirm_button">Upgrade</string>
+    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_cancel_button">Not now</string>
 </resources>

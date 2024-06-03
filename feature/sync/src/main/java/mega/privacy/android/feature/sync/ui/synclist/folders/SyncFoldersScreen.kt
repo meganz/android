@@ -101,6 +101,7 @@ internal fun SyncFoldersScreen(
                 modifier = Modifier
                     .padding(16.dp)
                     .align(Alignment.BottomEnd)
+                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
             ) {
                 Icon(
                     Icons.Filled.Add,
@@ -248,3 +249,4 @@ internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS
     "sync_list_screen_empty_status_text_for_free_accounts"
 internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON =
     "sync_list_screen_empty_status_button"
+internal const val TEST_TAG_SYNC_LIST_SCREEN_FAB = "sync_list_screen:fab"
