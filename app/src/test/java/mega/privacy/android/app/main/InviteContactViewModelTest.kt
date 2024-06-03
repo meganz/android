@@ -374,6 +374,122 @@ class InviteContactViewModelTest {
             }
         }
 
+    @Test
+    fun `test that the selected contact information is updated correctly`() = runTest {
+        val contactId = 1L
+        val addedContactInfo = InvitationContactInfo(id = contactId, displayInfo = "(121)-234-567")
+        underTest.addSelectedContactInformation(addedContactInfo)
+        val updatedContactInfo = listOf(
+            InvitationContactInfo(
+                id = contactId,
+                displayInfo = "email@email.email",
+                isHighlighted = true
+            )
+        )
+
+        underTest.updateSelectedContactInfo(updatedContactInfo)
+
+        underTest.uiState.test {
+            assertThat(
+                expectMostRecentItem().selectedContactInformation
+            ).isEqualTo(updatedContactInfo)
+        }
+    }
+
+    @Test
+    fun `test that the de-selected contact information is successfully removed from the existing list by a specified index`() =
+        runTest {
+            val contactInfoWithPhoneNumber = InvitationContactInfo(
+                id = 1L,
+                displayInfo = "(121)-234-567"
+            )
+            val contactInfoWithEmail = InvitationContactInfo(
+                id = 2L,
+                displayInfo = "email@email.email"
+            )
+            underTest.addSelectedContactInformation(contactInfoWithPhoneNumber)
+            underTest.addSelectedContactInformation(contactInfoWithEmail)
+
+            underTest.removeSelectedContactInformationAt(1)
+
+            underTest.uiState.test {
+                assertThat(
+                    expectMostRecentItem().selectedContactInformation
+                ).isEqualTo(
+                    listOf(contactInfoWithPhoneNumber)
+                )
+            }
+        }
+
+    @Test
+    fun `test that the de-selected contact information is successfully removed from the existing list by a specified contact info`() =
+        runTest {
+            val contactInfoWithPhoneNumber = InvitationContactInfo(
+                id = 1L,
+                displayInfo = "(121)-234-567"
+            )
+            val contactInfoWithEmail = InvitationContactInfo(
+                id = 2L,
+                displayInfo = "email@email.email"
+            )
+            underTest.addSelectedContactInformation(contactInfoWithPhoneNumber)
+            underTest.addSelectedContactInformation(contactInfoWithEmail)
+
+            underTest.removeSelectedContactInformationByContact(contactInfoWithEmail)
+
+            underTest.uiState.test {
+                assertThat(
+                    expectMostRecentItem().selectedContactInformation
+                ).isEqualTo(
+                    listOf(contactInfoWithPhoneNumber)
+                )
+            }
+        }
+
+    @ParameterizedTest
+    @MethodSource("provideSameContactInformation")
+    fun `test that true is returned when the contact ID and display information are the same`(
+        firstContact: InvitationContactInfo,
+        secondContact: InvitationContactInfo,
+    ) {
+        val actual = underTest.isTheSameContact(firstContact, secondContact)
+
+        assertThat(actual).isTrue()
+    }
+
+    private fun provideSameContactInformation() = Stream.of(
+        Arguments.of(
+            InvitationContactInfo(id = 1, displayInfo = "08123456789"),
+            InvitationContactInfo(id = 1, displayInfo = "08123456789")
+        ),
+        Arguments.of(
+            InvitationContactInfo(id = 1, displayInfo = "test@GMAIL.COM"),
+            InvitationContactInfo(id = 1, displayInfo = "test@gmail.com")
+        )
+    )
+
+    @ParameterizedTest
+    @MethodSource("provideDifferentContactInformation")
+    fun `test that false is returned when the contact ID and display information are different`(
+        firstContact: InvitationContactInfo,
+        secondContact: InvitationContactInfo,
+    ) {
+        val actual = underTest.isTheSameContact(firstContact, secondContact)
+
+        assertThat(actual).isFalse()
+    }
+
+    private fun provideDifferentContactInformation() = Stream.of(
+        Arguments.of(
+            InvitationContactInfo(id = 1, displayInfo = "08123456789"),
+            InvitationContactInfo(id = 2, displayInfo = "08123456789")
+        ),
+        Arguments.of(
+            InvitationContactInfo(id = 1, displayInfo = "tesst@GMAIL.COM"),
+            InvitationContactInfo(id = 1, displayInfo = "test@gmail.com")
+        )
+    )
+
     @AfterEach
     fun tearDown() {
         reset(

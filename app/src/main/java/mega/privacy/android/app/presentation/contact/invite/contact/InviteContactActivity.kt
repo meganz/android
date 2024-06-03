@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.Parcelable
 import android.text.Html
 import android.util.DisplayMetrics
 import android.view.KeyEvent
@@ -24,9 +23,13 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doBeforeTextChanged
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,8 +40,6 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.ContactInfoListDialog
-import mega.privacy.android.app.components.ContactInfoListDialog.OnMultipleSelectedListener
 import mega.privacy.android.app.components.ContactsDividerDecoration
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
 import mega.privacy.android.app.databinding.ActivityInviteContactBinding
@@ -50,6 +51,9 @@ import mega.privacy.android.app.main.InvitationContactInfo.Companion.createManua
 import mega.privacy.android.app.main.InviteContactViewModel
 import mega.privacy.android.app.main.adapters.InvitationContactsAdapter
 import mega.privacy.android.app.main.model.InvitationStatusUiState
+import mega.privacy.android.app.presentation.contact.invite.contact.component.ContactInfoListDialog
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
@@ -59,18 +63,26 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.contacts.ContactsFilter.isEmailInContacts
 import mega.privacy.android.app.utils.contacts.ContactsFilter.isEmailInPending
 import mega.privacy.android.app.utils.contacts.ContactsFilter.isMySelf
-import mega.privacy.android.app.utils.contacts.ContactsFilter.isTheSameContact
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Invite contact activity.
  */
 @AndroidEntryPoint
-class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
-    InvitationContactsAdapter.OnItemClickListener {
+class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnItemClickListener {
+
+    /**
+     * Current theme
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
 
     private val viewModel: InviteContactViewModel by viewModels()
 
@@ -78,16 +90,13 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
     private var actionBar: ActionBar? = null
     private var invitationContactsAdapter: InvitationContactsAdapter? = null
 
-    private var listDialog: ContactInfoListDialog? = null
-    private var currentSelected: InvitationContactInfo? = null
-
-    private var phoneContacts: MutableList<InvitationContactInfo> = mutableListOf()
-    private var addedContacts: MutableList<InvitationContactInfo> = mutableListOf()
     private var contactsEmailsSelected: MutableList<String> = mutableListOf()
     private var contactsPhoneSelected: MutableList<String> = mutableListOf()
 
     private var isPermissionGranted = false
     private var isGetContactCompleted = false
+
+    private var shouldShowContactListWithContactInfo by mutableStateOf<InvitationContactInfo?>(null)
 
     private lateinit var binding: ActivityInviteContactBinding
 
@@ -113,6 +122,29 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
 
         binding = ActivityInviteContactBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.composeView.setContent {
+            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                shouldShowContactListWithContactInfo?.let {
+                    ContactInfoListDialog(
+                        contactInfo = it,
+                        currentSelectedContactInfo = uiState.selectedContactInformation,
+                        onConfirm = { selectedContactInfo ->
+                            shouldShowContactListWithContactInfo = null
+                            viewModel.updateSelectedContactInfo(selectedContactInfo)
+                            controlHighlighted(it.id)
+                            refreshComponents(true)
+                        },
+                        onCancel = {
+                            shouldShowContactListWithContactInfo = null
+                        }
+                    )
+                }
+            }
+        }
 
         setSupportActionBar(binding.inviteContactToolbar)
 
@@ -154,14 +186,9 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
         }
 
         if (isGetContactCompleted) {
-            if (savedInstanceState != null) {
-                phoneContacts =
-                    savedInstanceState.getParcelableArrayList(KEY_PHONE_CONTACTS) ?: mutableListOf()
-                addedContacts =
-                    savedInstanceState.getParcelableArrayList(KEY_ADDED_CONTACTS) ?: mutableListOf()
-                isPermissionGranted =
-                    savedInstanceState.getBoolean(KEY_IS_PERMISSION_GRANTED, false)
-                currentSelected = savedInstanceState.getParcelable(CURRENT_SELECTED_CONTACT)
+            savedInstanceState?.let {
+                isPermissionGranted = it.getBoolean(KEY_IS_PERMISSION_GRANTED, false)
+                shouldShowContactListWithContactInfo = it.parcelable(CURRENT_SELECTED_CONTACT)
             }
             refreshAddedContactsView(true)
             setRecyclersVisibility()
@@ -177,24 +204,6 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
                 binding.inviteContactListEmptyImage.visibility = View.VISIBLE
                 binding.noPermissionHeader.visibility = View.VISIBLE
             }
-
-            currentSelected?.let { contactInfo ->
-                listDialog = ContactInfoListDialog(this, contactInfo, this)
-                savedInstanceState?.let {
-                    listDialog?.checkedIndex = it.getIntegerArrayList(CHECKED_INDEX)
-                    val selectedList =
-                        it.getParcelableArrayList<InvitationContactInfo>(SELECTED_CONTACT_INFO)
-                    selectedList?.let {
-                        listDialog?.selected = HashSet(selectedList)
-                    }
-                    val unSelectedList =
-                        it.getParcelableArrayList<InvitationContactInfo>(UNSELECTED)
-                    unSelectedList?.let {
-                        listDialog?.unSelected = HashSet(unSelectedList)
-                    }
-                }
-                listDialog?.showInfo(ArrayList(addedContacts), true)
-            }
         } else {
             queryIfHasReadContactsPermissions()
         }
@@ -207,7 +216,7 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
         binding.fabButtonNext.setOnClickListener {
             enableFabButton(false)
             Timber.d("invite Contacts")
-            inviteContacts(addedContacts)
+            inviteContacts(viewModel.uiState.value.selectedContactInformation)
             Util.hideKeyboard(this, 0)
         }
 
@@ -282,10 +291,10 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
                     return@setOnEditorActionListener true
                 }
                 if ((event != null && (event.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_SEND)) {
-                    if (addedContacts.isEmpty()) {
+                    if (viewModel.uiState.value.selectedContactInformation.isEmpty()) {
                         Util.hideKeyboard(this@InviteContactActivity, 0)
                     } else {
-                        inviteContacts(addedContacts)
+                        inviteContacts(viewModel.uiState.value.selectedContactInformation)
                     }
                     return@setOnEditorActionListener true
                 }
@@ -441,25 +450,9 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
     override fun onSaveInstanceState(outState: Bundle) {
         Timber.d("onSaveInstanceState")
         super.onSaveInstanceState(outState)
-        outState.putParcelableArrayList(
-            KEY_PHONE_CONTACTS,
-            ArrayList(phoneContacts)
-        )
-        outState.putParcelableArrayList(
-            KEY_ADDED_CONTACTS,
-            ArrayList(addedContacts)
-        )
+        outState.putParcelable(CURRENT_SELECTED_CONTACT, shouldShowContactListWithContactInfo)
         outState.putBoolean(KEY_IS_PERMISSION_GRANTED, isPermissionGranted)
         outState.putBoolean(KEY_IS_GET_CONTACT_COMPLETED, isGetContactCompleted)
-        outState.putParcelable(CURRENT_SELECTED_CONTACT, currentSelected)
-        listDialog?.let {
-            outState.putIntegerArrayList(CHECKED_INDEX, it.checkedIndex)
-            outState.putParcelableArrayList(
-                SELECTED_CONTACT_INFO,
-                ArrayList<Parcelable>(it.selected)
-            )
-            outState.putParcelableArrayList(UNSELECTED, ArrayList<Parcelable>(it.unSelected))
-        }
     }
 
     override fun onBackPressed() {
@@ -469,21 +462,13 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
         finish()
     }
 
-    /**
-     * Perform any final cleanup before an activity is destroyed.
-     */
-    override fun onDestroy() {
-        super.onDestroy()
-        listDialog?.recycle()
-    }
-
     private fun setTitleAB() {
         Timber.d("setTitleAB")
-        actionBar?.subtitle = if (addedContacts.isNotEmpty()) {
+        actionBar?.subtitle = if (viewModel.uiState.value.selectedContactInformation.isNotEmpty()) {
             resources.getQuantityString(
                 R.plurals.general_selection_num_contacts,
-                addedContacts.size,
-                addedContacts.size
+                viewModel.uiState.value.selectedContactInformation.size,
+                viewModel.uiState.value.selectedContactInformation.size
             )
         } else {
             null
@@ -665,39 +650,6 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
         }
     }
 
-    /**
-     * Called when the user select/deselect multiple contacts.
-     *
-     * @param selected Set of selected contacts.
-     * @param toRemove Set of contacts that need to be removed.
-     */
-    override fun onSelect(
-        selected: Set<InvitationContactInfo>,
-        toRemove: Set<InvitationContactInfo>,
-    ) {
-        var id = -1L
-        cancel()
-        for (select in selected) {
-            id = select.id
-            if (!isContactAdded(select)) {
-                addedContacts.add(select)
-            }
-        }
-        for (select in toRemove) {
-            id = select.id
-            addedContacts.removeIf { isTheSameContact(it, select) }
-        }
-        controlHighlighted(id)
-        refreshComponents(selected.size > toRemove.size)
-    }
-
-    /**
-     * Clear the current selected contacts.
-     */
-    override fun cancel() {
-        currentSelected = null
-    }
-
     private fun refreshComponents(shouldScroll: Boolean) {
         refreshAddedContactsView(shouldScroll)
         refreshInviteContactButton()
@@ -716,18 +668,16 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
             val contactInfo = it.getItem(position)
             Timber.d("on Item click at %d name is %s", position, contactInfo.getContactName())
             if (contactInfo.hasMultipleContactInfos()) {
-                this.currentSelected = contactInfo
-                listDialog = ContactInfoListDialog(this, contactInfo, this)
-                listDialog?.showInfo(ArrayList(addedContacts), false)
+                shouldShowContactListWithContactInfo = contactInfo
             } else {
                 viewModel.toggleContactHighlightedInfo(contactInfo)
                 val singleInvitationContactInfo =
                     viewModel.filterUiState.value.filteredContacts[position]
                 if (isContactAdded(singleInvitationContactInfo)) {
-                    addedContacts.removeIf { isTheSameContact(it, singleInvitationContactInfo) }
+                    viewModel.removeSelectedContactInformationByContact(singleInvitationContactInfo)
                     refreshComponents(false)
                 } else {
-                    addedContacts.add(singleInvitationContactInfo)
+                    viewModel.addSelectedContactInformation(singleInvitationContactInfo)
                     refreshComponents(true)
                 }
             }
@@ -774,8 +724,8 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
             id = viewId
             isClickable = true
             setOnClickListener { v: View ->
-                val invitationContactInfo = addedContacts[v.id]
-                addedContacts.removeAt(viewId)
+                val invitationContactInfo = viewModel.uiState.value.selectedContactInformation[v.id]
+                viewModel.removeSelectedContactInformationAt(viewId)
                 if (invitationContactInfo.hasMultipleContactInfos()) {
                     controlHighlighted(invitationContactInfo.id)
                 } else {
@@ -795,7 +745,7 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
     private fun refreshAddedContactsView(shouldScroll: Boolean) {
         Timber.d("refreshAddedContactsView")
         binding.labelContainer.removeAllViews()
-        addedContacts.forEachIndexed { index, contact ->
+        viewModel.uiState.value.selectedContactInformation.forEachIndexed { index, contact ->
             val displayedLabel = contact.getContactName().ifBlank { contact.displayInfo }
             binding.labelContainer.addView(createContactTextView(displayedLabel, index))
         }
@@ -809,7 +759,7 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
 
     private fun controlHighlighted(id: Long) {
         var shouldHighlighted = false
-        for ((addedId) in addedContacts) {
+        for ((addedId) in viewModel.uiState.value.selectedContactInformation) {
             if (addedId == id) {
                 shouldHighlighted = true
                 break
@@ -824,8 +774,8 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
 
     private fun isContactAdded(invitationContactInfo: InvitationContactInfo): Boolean {
         Timber.d("isContactAdded contact name is %s", invitationContactInfo.getContactName())
-        for (addedContact in addedContacts) {
-            if (isTheSameContact(addedContact, invitationContactInfo)) {
+        for (addedContact in viewModel.uiState.value.selectedContactInformation) {
+            if (viewModel.isTheSameContact(addedContact, invitationContactInfo)) {
                 return true
             }
         }
@@ -843,7 +793,7 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
         val isStringValidNow = (stringInEditText.isEmpty()
                 || isValidEmail(stringInEditText)
                 || isValidPhone(stringInEditText))
-        enableFabButton(addedContacts.isNotEmpty() && isStringValidNow)
+        enableFabButton(viewModel.uiState.value.selectedContactInformation.isNotEmpty() && isStringValidNow)
     }
 
     private fun addContactInfo(inputString: String, type: Int) {
@@ -868,7 +818,7 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
             if (index >= 0 && holder != null) {
                 holder.itemView.performClick()
             } else if (!isContactAdded(info)) {
-                addedContacts.add(info)
+                viewModel.addSelectedContactInformation(info)
                 refreshAddedContactsView(true)
             }
         }
@@ -947,14 +897,9 @@ class InviteContactActivity : PasscodeActivity(), OnMultipleSelectedListener,
         internal const val KEY_SENT_NUMBER = "sentNumber"
 
         private const val SCAN_QR_FOR_INVITE_CONTACTS = 1111
-        private const val KEY_PHONE_CONTACTS = "KEY_PHONE_CONTACTS"
-        private const val KEY_ADDED_CONTACTS = "KEY_ADDED_CONTACTS"
         private const val KEY_IS_PERMISSION_GRANTED = "KEY_IS_PERMISSION_GRANTED"
         private const val KEY_IS_GET_CONTACT_COMPLETED = "KEY_IS_GET_CONTACT_COMPLETED"
         private const val CURRENT_SELECTED_CONTACT = "CURRENT_SELECTED_CONTACT"
-        private const val CHECKED_INDEX = "CHECKED_INDEX"
-        private const val SELECTED_CONTACT_INFO = "SELECTED_CONTACT_INFO"
-        private const val UNSELECTED = "UNSELECTED"
         private const val USER_INDEX_NONE_EXIST = -1
         private const val MIN_LIST_SIZE_FOR_FAST_SCROLLER = 20
         private const val ADDED_CONTACT_VIEW_MARGIN_LEFT = 10

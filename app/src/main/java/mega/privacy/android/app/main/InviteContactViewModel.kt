@@ -18,7 +18,6 @@ import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_
 import mega.privacy.android.app.main.model.InvitationStatusUiState
 import mega.privacy.android.app.main.model.InviteContactFilterUiState
 import mega.privacy.android.app.main.model.InviteContactUiState
-import mega.privacy.android.app.utils.contacts.ContactsFilter
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest.Sent
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -179,7 +178,7 @@ class InviteContactViewModel @Inject constructor(
         // therefore we have to update both
         allContacts = allContacts.toMutableList()
             .map { contact ->
-                if (ContactsFilter.isTheSameContact(contact, contactInfo)) {
+                if (isTheSameContact(contact, contactInfo)) {
                     contact.copy(isHighlighted = value)
                 } else {
                     contact
@@ -190,7 +189,7 @@ class InviteContactViewModel @Inject constructor(
             it.copy(
                 filteredContacts = it.filteredContacts.toMutableList()
                     .map { contact ->
-                        if (ContactsFilter.isTheSameContact(contact, contactInfo)) {
+                        if (isTheSameContact(contact, contactInfo)) {
                             contact.copy(isHighlighted = value)
                         } else {
                             contact
@@ -308,6 +307,58 @@ class InviteContactViewModel @Inject constructor(
                 }
                 .onFailure { Timber.e("Failed to invite contacts by email.") }
         }
+    }
+
+    internal fun updateSelectedContactInfo(contactInfo: List<InvitationContactInfo>) {
+        val selectedContactInfo = mutableListOf<InvitationContactInfo>().apply {
+            addAll(_uiState.value.selectedContactInformation)
+        }
+        // Remove the unselected contact info
+        _uiState.value.selectedContactInformation.forEachIndexed { index, info ->
+            if (!contactInfo.contains(info)) {
+                selectedContactInfo.removeAt(index)
+            }
+        }
+
+        // Add the new selected contact info
+        contactInfo.forEach { selected ->
+            val isContactAdded = selectedContactInfo.any { isTheSameContact(selected, it) }
+            if (!isContactAdded) {
+                // Update the highlighted value as the contact is selected
+                selectedContactInfo.add(selected.copy(isHighlighted = true))
+            }
+        }
+
+        _uiState.update { it.copy(selectedContactInformation = selectedContactInfo) }
+    }
+
+    internal fun removeSelectedContactInformationAt(index: Int) {
+        _uiState.update {
+            it.copy(
+                selectedContactInformation = it.selectedContactInformation.toMutableList().apply {
+                    removeAt(index)
+                }
+            )
+        }
+    }
+
+    internal fun removeSelectedContactInformationByContact(contact: InvitationContactInfo) {
+        _uiState.update { uiState ->
+            uiState.copy(
+                selectedContactInformation = uiState.selectedContactInformation.filterNot {
+                    isTheSameContact(it, contact)
+                }
+            )
+        }
+    }
+
+    internal fun isTheSameContact(
+        first: InvitationContactInfo,
+        second: InvitationContactInfo,
+    ): Boolean = first.id == second.id && first.displayInfo.equals(second.displayInfo, true)
+
+    internal fun addSelectedContactInformation(contact: InvitationContactInfo) {
+        _uiState.update { it.copy(selectedContactInformation = it.selectedContactInformation + contact) }
     }
 
     companion object {

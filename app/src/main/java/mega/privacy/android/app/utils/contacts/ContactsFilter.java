@@ -1,6 +1,5 @@
 package mega.privacy.android.app.utils.contacts;
 
-import mega.privacy.android.app.main.InvitationContactInfo;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaUser;
@@ -70,9 +69,5 @@ public class ContactsFilter {
             return false;
         }
         return user.getEmail().equals(email);
-    }
-
-    public static boolean isTheSameContact(InvitationContactInfo first, InvitationContactInfo second) {
-        return first.getId() == second.getId() && first.getDisplayInfo().equalsIgnoreCase(second.getDisplayInfo());
     }
 }

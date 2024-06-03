@@ -24,11 +24,11 @@ data class InvitationContactInfo @JvmOverloads constructor(
     private val name: String = "",
     val type: Int = 0,
     val filteredContactInfos: List<String> = emptyList(),
-    var displayInfo: String = "",
+    val displayInfo: String = "",
     @ColorRes val avatarColorResId: Int = 0,
     val handle: String? = null,
     var bitmap: Bitmap? = null,
-    var isHighlighted: Boolean = false,
+    val isHighlighted: Boolean = false,
 ) : Parcelable, Cloneable {
 
     /**
@@ -56,6 +56,36 @@ data class InvitationContactInfo @JvmOverloads constructor(
 
     override fun toString(): String =
         "\n{id=$id, isHighlighted=$isHighlighted, type=$type, bitmap=$bitmap, name='$name', displayInfo='$displayInfo', handle='$handle', avatarColorResId='$avatarColorResId'}"
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as InvitationContactInfo
+
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (type != other.type) return false
+        if (filteredContactInfos != other.filteredContactInfos) return false
+        if (displayInfo != other.displayInfo) return false
+        if (avatarColorResId != other.avatarColorResId) return false
+        if (handle != other.handle) return false
+        if (isHighlighted != other.isHighlighted) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + type
+        result = 31 * result + filteredContactInfos.hashCode()
+        result = 31 * result + displayInfo.hashCode()
+        result = 31 * result + avatarColorResId
+        result = 31 * result + (handle?.hashCode() ?: 0)
+        result = 31 * result + isHighlighted.hashCode()
+        return result
+    }
 
     companion object {
         /**
