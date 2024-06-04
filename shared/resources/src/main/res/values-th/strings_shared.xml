@@ -327,9 +327,9 @@
     <!-- Title of fifth tour screen -->
     <string name="cloud_drive_tour_fifth_title">การประชุม MEGA</string>
     <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">ความปลอดภัยคือเหตุผลหลักที่เราดำเนินการอยู่ ไฟล์ของคุณจะมีความปลอดภัยมากยิ่งขึ้น เพราะใช้เครื่องมือเข้ารหัสที่ป้องกันไฟล์ของคุณ ซึ่งมีเพียงคุณเท่านั้นที่สามารถเข้าถึงไฟล์ได้</string>
+    <string name="cloud_drive_tour_first_subtitle">ความปลอดภัยคือหัวใจสำคัญของเรา ข้อมูลของคุณจะถูกเก็บไว้อย่างปลอดภัยด้วยระบบการเข้ารหัสที่ล้ำสมัย เฉพาะคุณเท่านั้นที่จะสามารถเข้าถึงไฟล์ของคุณได้</string>
     <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">แชทที่มีการเข้ารหัสอย่างเต็มที่ไม่ว่าจะเป็นการโทรด้วยเสียงและสนทนาทางวิดีโอ การส่งข้อความแบบกลุ่มและบูรณาการไฟล์ร่วมกันกับคลาวด์ไดรฟ์ของคุณ</string>
+    <string name="cloud_drive_tour_second_subtitle">แชทที่เข้ารหัสเต็มรูปแบบ รองรับการโทรด้วยเสียงและวิดีโอ ส่งข้อความแบบกลุ่ม และแชร์ไฟล์ได้อย่างราบรื่น ผ่านระบบคลาวด์ไดรฟ์ของคุณ</string>
     <!-- Third subtitle of the tour screen -->
     <string name="cloud_drive_tour_third_subtitle">เพิ่มผู้ติดต่อ สร้างกลุ่ม ทำงานร่วมกัน และโทรทั้งแบบเสียงและวิดีโอได้ง่าย ๆ โดยไม่ต้องออกจาก MEGA เลย</string>
     <!-- Fourth subtitle of the tour screen -->
@@ -358,4 +358,18 @@
     <string name="device_center_sync_list_empty_state_message_free_account">อัปเกรดเป็นแผน Pro ช่วยให้คุณซิงค์ข้อมูลกับอุปกรณ์ต่าง ๆ ของคุณได้อย่างราบรื่นและมั่นใจได้ว่าข้อมูลจะอัปเดตอยู่เสมอ</string>
     <!-- "Upgrade now" label for a button, menu entry, etc -->
     <string name="general_upgrade_now_label">อัปเกรดตอนนี้เลย</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_title">อัปเกรดเป็น Pro</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_message">Unlock the power to sync your mobile to the cloud with our Pro plans.</string>
+    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_confirm_button">อัปเกรด</string>
+    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_cancel_button">ไม่ใช่ตอนนี้</string>
+    <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Uploads folder conflict</string>
+    <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your primary camera uploads folder and secondary media uploads folder cannot be related to each other. Please choose a different folder.</string>
+    <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
 </resources>

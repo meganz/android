@@ -1482,7 +1482,7 @@
     <!-- name of the button to attach file from MEGA to another app -->
     <string name="general_attach">Adjuntar</string>
     <!-- Error shown when the user left a name empty -->
-    <string name="empty_name">Nombre inválido</string>
+    <string name="empty_name">Nombre no válido</string>
     <!-- Error shown when the user left names empty and names typed with not allowed characters -->
     <string name="general_incorrect_names">Corrige los nombres de archivo antes de continuar</string>
     <!-- Error text for invalid characters -->
@@ -5625,5 +5625,12 @@
         <item quantity="one">%1$s y %2$d más han levantado la mano</item>
         <item quantity="many">%1$s y otros %2$d han levantado la mano</item>
         <item quantity="other">%1$s y otros %2$d han levantado la mano</item>
+    </plurals>
+    <!-- Hidden nodes sharing album -->
+    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <!-- Hidden nodes items -->
+    <plurals name="hidden_nodes_items">
+        <item quantity="one">Hidden item</item>
+        <item quantity="other">Hidden items</item>
     </plurals>
 </resources>

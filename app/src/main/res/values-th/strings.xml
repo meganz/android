@@ -5150,4 +5150,11 @@
     <plurals name="meetings_other_participants_raised_their_hands_message">
         <item quantity="other">%1$s และคนอื่น ๆ อีก %2$d คนได้ยกมือ</item>
     </plurals>
+    <!-- Hidden nodes sharing album -->
+    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <!-- Hidden nodes items -->
+    <plurals name="hidden_nodes_items">
+        <item quantity="one">Hidden item</item>
+        <item quantity="other">Hidden items</item>
+    </plurals>
 </resources>

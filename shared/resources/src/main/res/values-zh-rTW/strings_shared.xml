@@ -358,4 +358,18 @@
     <string name="device_center_sync_list_empty_state_message_free_account">升級到我們當中一項Pro方案，讓您的資訊同步並保持最新狀態。</string>
     <!-- "Upgrade now" label for a button, menu entry, etc -->
     <string name="general_upgrade_now_label">立即升級</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_title">升級為Pro會員</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_message">透過我們的Pro方案將您手機同步到雲端的功能解鎖。</string>
+    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_confirm_button">升級</string>
+    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_cancel_button">稍後再說</string>
+    <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Uploads folder conflict</string>
+    <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your primary camera uploads folder and secondary media uploads folder cannot be related to each other. Please choose a different folder.</string>
+    <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
 </resources>

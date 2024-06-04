@@ -39,13 +39,13 @@
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">Se necesita el permiso de la cámara para escanear documentos</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">Nombre inválido</string>
+    <string name="scan_incorrect_name">Nombre no válido</string>
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">Caracteres no permitidos</string>
     <!-- Snackbar text for incorrect name -->
     <string name="scan_snackbar_incorrect_name">Corrige el nombre del archivo antes de continuar</string>
     <!-- Dialog message showing file progress -->
-    <string name="scan_dialog_progress">Preparando %1$s. Espera por favor&#8230;</string>
+    <string name="scan_dialog_progress">Preparando %1$s. Espera&#8230;</string>
     <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
     <string name="scan_snackbar_invalid_characters">Los siguientes caracteres no están permitidos: %1$s</string>
 </resources>

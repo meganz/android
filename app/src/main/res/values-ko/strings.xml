@@ -121,7 +121,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">다시 보여주지 마세요</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Are you sure you want to cancel the current login process?</string>
+    <string name="confirm_cancel_login">현재 로그인 과정을 취소 하시겠습니까?</string>
     <!-- Login button -->
     <string name="login_text">로그인</string>
     <!-- email label -->
@@ -1011,7 +1011,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">MEGA 계정을 전환하려면 [A]로그아웃[/A]하세요</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">Are you sure you want to log out of the current account?</string>
+    <string name="confirm_logout_from_sms_verification">현재 계정에서 로그아웃 하시겠습니까?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">이 메시지는 %1$s님에 의해 삭제되었습니다</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -5127,7 +5127,7 @@
     <!-- Title of call button to show more options in call screen -->
     <string name="meetings_more_call_option_button">더 보기</string>
     <!-- Title of raise hand button in call screen -->
-    <string name="meetings_raise_hand_option_button">Raise hand</string>
+    <string name="meetings_raise_hand_option_button">손을 드세요</string>
     <!-- Title of lower hand button in call screen -->
     <string name="meetings_lower_hand_option_button">Lower hand</string>
     <!-- Title of put call on hold button in call screen -->
@@ -5150,5 +5150,12 @@
     <!-- The snackbar message two or more participants raised their hands -->
     <plurals name="meetings_other_participants_raised_their_hands_message">
         <item quantity="other">%1$s 님 외 %2$d명이 손을 들었습니다</item>
+    </plurals>
+    <!-- Hidden nodes sharing album -->
+    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <!-- Hidden nodes items -->
+    <plurals name="hidden_nodes_items">
+        <item quantity="one">Hidden item</item>
+        <item quantity="other">Hidden items</item>
     </plurals>
 </resources>

@@ -5150,4 +5150,10 @@
     <plurals name="meetings_other_participants_raised_their_hands_message">
         <item quantity="other">%1$sさんとその他%2$d人が挙手しました</item>
     </plurals>
+    <!-- Hidden nodes sharing album -->
+    <string name="hidden_nodes_sharing_album">このアルバムには隠し項目があります。アルバムを共有すると、共有相手には非表示の項目が表示されます。それらの項目は引き続きクラウドドライブに隠されたままです。</string>
+    <!-- Hidden nodes items -->
+    <plurals name="hidden_nodes_items">
+        <item quantity="other">非表示項目</item>
+    </plurals>
 </resources>
