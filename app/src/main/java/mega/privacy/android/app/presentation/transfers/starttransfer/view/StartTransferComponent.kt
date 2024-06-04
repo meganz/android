@@ -62,8 +62,8 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
-import mega.privacy.android.shared.original.core.ui.utils.MinimumTimeVisibility
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.MinimumTimeVisibility
 import timber.log.Timber
 
 /**
@@ -214,6 +214,7 @@ private fun StartTransferComponent(
             showAskDestinationDialog = null
         }
     }
+    val coroutineScope = rememberCoroutineScope()
 
     EventEffect(
         event = uiState.oneOffViewEvent,
@@ -321,7 +322,13 @@ private fun StartTransferComponent(
         )
     }
     if (showAskDestinationDialog != null) {
-        folderPicker.launch(null)
+        runCatching {
+            folderPicker.launch(null)
+        }.onFailure {
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(context.getString(R.string.general_warning_no_picker))
+            }
+        }
     }
     showPromptSaveDestinationDialog?.let { destination ->
         //this dialog will be updated once we have a dialog defined for this case that follows our DS
