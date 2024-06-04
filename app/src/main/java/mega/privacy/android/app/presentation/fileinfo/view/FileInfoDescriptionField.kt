@@ -25,8 +25,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionCharacterLimitEvent
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionConfirmedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionEnteredEvent
@@ -91,13 +91,13 @@ fun FileInfoDescriptionField(
             showUnderline = true,
             placeholderId = placeholderId,
             onValueChange = {
-                val oldLength = description.length
-                val newLength = it.length
-                if (newLength - oldLength > descriptionLimit) {
-                    description = it.take(descriptionLimit)
+                if (it.length > descriptionLimit) {
                     Analytics.tracker.trackEvent(NodeInfoDescriptionCharacterLimitEvent)
-                } else if (oldLength < descriptionLimit || newLength < oldLength) {
-                    description = it
+                }
+                val isOverLimit =
+                    description.length >= descriptionLimit && it.length >= description.length
+                if (!isOverLimit) {
+                    description = it.take(descriptionLimit)
                 }
             },
         )
