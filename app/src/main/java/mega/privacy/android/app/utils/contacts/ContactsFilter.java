@@ -38,13 +38,14 @@ public class ContactsFilter {
     }
 
     /**
-     * This function determines whether the given email exists in the visible contacts..
+     * This function determines whether the given email exists in the visible contacts.
      *
      * @param api   [MegaApiJava].
      * @param email The email that needs to be checked.
      * @return Boolean. Whether the email exists.
      * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.IsEmailInContactsUseCase} instead.
      */
+    @Deprecated
     public static boolean isEmailInContacts(MegaApiJava api, String email) {
         for (MegaUser user : api.getContacts()) {
             if (isContact(user, email)) {
@@ -54,6 +55,15 @@ public class ContactsFilter {
         return false;
     }
 
+    /**
+     * This function determines whether the given email is in a pending state.
+     *
+     * @param api   [MegaApiJava].
+     * @param email The email that needs to be checked.
+     * @return Boolean. Whether the email is in a pending state.
+     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.IsEmailInPendingStateUseCase} instead.
+     */
+    @Deprecated
     public static boolean isEmailInPending(MegaApiJava api, String email) {
         for (MegaContactRequest request : api.getOutgoingContactRequests()) {
             if (isPending(request, email)) {
