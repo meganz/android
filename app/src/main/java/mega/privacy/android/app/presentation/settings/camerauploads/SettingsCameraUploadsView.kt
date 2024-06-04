@@ -39,6 +39,7 @@ import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.business.BusinessAccountPromptHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FileUploadDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HowToUploadDialog
+import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.RelatedNewLocalFolderWarningDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VideoCompressionSizeInputDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VideoQualityDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
@@ -62,11 +63,11 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.Requir
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.UploadOnlyWhileChargingTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoCompressionTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoQualityTile
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
@@ -99,6 +100,8 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
  * @param onRegularBusinessAccountSubUserPromptAcknowledged Lambda to execute when the Business
  * Account Sub-User acknowledges that the Business Account Administrator can access the content
  * in Camera Uploads
+ * @param onRelatedNewLocalFolderWarningDismissed Lambda to execute when the User dismisses the
+ * Warning on the related new Local Primary / Secondary Folder
  * @param onRequestPermissionsStateChanged Lambda to execute whether a Camera Uploads permissions
  * request should be done (triggered) or not (consumed)
  * @param onSecondaryFolderNodeSelected Lambda to execute when selecting the new Media Uploads
@@ -129,6 +132,7 @@ internal fun SettingsCameraUploadsView(
     onNewVideoCompressionSizeLimitProvided: (Int) -> Unit,
     onPrimaryFolderNodeSelected: (NodeId) -> Unit,
     onRegularBusinessAccountSubUserPromptAcknowledged: () -> Unit,
+    onRelatedNewLocalFolderWarningDismissed: () -> Unit,
     onRequestPermissionsStateChanged: (StateEvent) -> Unit,
     onSecondaryFolderNodeSelected: (NodeId) -> Unit,
     onSnackbarMessageConsumed: () -> Unit,
@@ -262,6 +266,12 @@ internal fun SettingsCameraUploadsView(
                         onNewVideoCompressionSizeLimitProvided.invoke(newVideoCompressionSize)
                     },
                     onDismiss = { showVideoCompressionSizeInputPrompt = false },
+                )
+            }
+            if (uiState.showRelatedNewLocalFolderWarning) {
+                RelatedNewLocalFolderWarningDialog(
+                    onWarningAcknowledged = onRelatedNewLocalFolderWarningDismissed,
+                    onWarningDismissed = onRelatedNewLocalFolderWarningDismissed,
                 )
             }
             Column(
@@ -404,6 +414,7 @@ private fun SettingsCameraUploadsViewPreview(
             onNewVideoCompressionSizeLimitProvided = {},
             onPrimaryFolderNodeSelected = {},
             onRegularBusinessAccountSubUserPromptAcknowledged = {},
+            onRelatedNewLocalFolderWarningDismissed = {},
             onRequestPermissionsStateChanged = {},
             onSecondaryFolderNodeSelected = {},
             onSnackbarMessageConsumed = {},

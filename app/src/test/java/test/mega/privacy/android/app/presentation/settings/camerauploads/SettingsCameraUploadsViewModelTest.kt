@@ -33,10 +33,9 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
@@ -51,9 +50,12 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUs
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredToUploadContentUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsFolderPathExistingUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderNodeValidUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderNodeValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathUnrelatedToPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
@@ -132,10 +134,14 @@ internal class SettingsCameraUploadsViewModelTest {
     private val isChargingRequiredToUploadContentUseCase =
         mock<IsChargingRequiredToUploadContentUseCase>()
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
-    private val isPrimaryFolderNodeValidUseCase = mock<IsPrimaryFolderNodeValidUseCase>()
-    private val isPrimaryFolderPathValidUseCase = mock<IsPrimaryFolderPathValidUseCase>()
+    private val isFolderPathExistingUseCase = mock<IsFolderPathExistingUseCase>()
     private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
+    private val isPrimaryFolderNodeValidUseCase = mock<IsPrimaryFolderNodeValidUseCase>()
+    private val isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase =
+        mock<IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase>()
     private val isSecondaryFolderNodeValidUseCase = mock<IsSecondaryFolderNodeValidUseCase>()
+    private val isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase =
+        mock<IsSecondaryFolderPathUnrelatedToPrimaryFolderUseCase>()
     private val isSecondaryFolderPathValidUseCase = mock<IsSecondaryFolderPathValidUseCase>()
     private val listenToNewMediaUseCase = mock<ListenToNewMediaUseCase>()
     private val monitorCameraUploadsFolderDestinationUseCase =
@@ -196,10 +202,12 @@ internal class SettingsCameraUploadsViewModelTest {
             isChargingRequiredForVideoCompressionUseCase,
             isChargingRequiredToUploadContentUseCase,
             isConnectedToInternetUseCase,
-            isPrimaryFolderNodeValidUseCase,
-            isPrimaryFolderPathValidUseCase,
+            isFolderPathExistingUseCase,
             isMediaUploadsEnabledUseCase,
+            isPrimaryFolderNodeValidUseCase,
+            isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase,
             isSecondaryFolderNodeValidUseCase,
+            isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase,
             isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase,
             monitorCameraUploadsFolderDestinationUseCase,
@@ -302,10 +310,12 @@ internal class SettingsCameraUploadsViewModelTest {
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
             isChargingRequiredToUploadContentUseCase = isChargingRequiredToUploadContentUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
-            isPrimaryFolderNodeValidUseCase = isPrimaryFolderNodeValidUseCase,
-            isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
+            isFolderPathExistingUseCase = isFolderPathExistingUseCase,
             isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
+            isPrimaryFolderNodeValidUseCase = isPrimaryFolderNodeValidUseCase,
+            isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase = isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase,
             isSecondaryFolderNodeValidUseCase = isSecondaryFolderNodeValidUseCase,
+            isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase = isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase,
             isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase = listenToNewMediaUseCase,
             monitorCameraUploadsFolderDestinationUseCase = monitorCameraUploadsFolderDestinationUseCase,
@@ -979,6 +989,25 @@ internal class SettingsCameraUploadsViewModelTest {
     }
 
     /**
+     * The Test Group that verifies behaviors for both Camera Uploads / Media Uploads Local Folders
+     */
+    @Nested
+    @DisplayName("Local Folder Selection")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class LocalFolderSelectionTestGroup {
+        @Test
+        fun `test that the related new local folder warning prompt is dismissed`() = runTest {
+            initializeUnderTest()
+
+            underTest.onRelatedNewLocalFolderWarningDismissed()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showRelatedNewLocalFolderWarning).isFalse()
+            }
+        }
+    }
+
+    /**
      * The Test Group that verifies behaviors when changing the Camera Uploads Local Primary Folder
      */
     @Nested
@@ -989,25 +1018,12 @@ internal class SettingsCameraUploadsViewModelTest {
         fun `test that an error snackbar is shown when changing the local primary folder throws an exception`() =
             runTest {
                 initializeUnderTest()
-                whenever(isPrimaryFolderPathValidUseCase(any())).thenThrow(RuntimeException())
+                whenever(isFolderPathExistingUseCase(any())).thenThrow(RuntimeException())
 
                 assertDoesNotThrow { underTest.onLocalPrimaryFolderSelected("new/primary/folder/path") }
 
                 underTest.uiState.test {
                     assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
-                }
-            }
-
-        @Test
-        fun `test that an error snackbar is shown when the new local primary folder is invalid`() =
-            runTest {
-                initializeUnderTest()
-                whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(false)
-
-                underTest.onLocalPrimaryFolderSelected("new/primary/folder/path")
-
-                underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.error_invalid_folder_selected))
                 }
             }
 
@@ -1024,26 +1040,62 @@ internal class SettingsCameraUploadsViewModelTest {
             }
 
         @Test
+        fun `test that an error snackbar is shown when the new local primary folder does not exist`() =
+            runTest {
+                val newPath = "new/primary/folder/path"
+                initializeUnderTest()
+                whenever(isFolderPathExistingUseCase(newPath)).thenReturn(false)
+
+                underTest.onLocalPrimaryFolderSelected(newPath)
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.error_invalid_folder_selected))
+                }
+            }
+
+        @Test
+        fun `test that a warning prompt is shown when the new local primary folder exists but is related to the local secondary folder`() =
+            runTest {
+                val newPath = "new/primary/folder/path"
+                initializeUnderTest()
+                whenever(isFolderPathExistingUseCase(newPath)).thenReturn(true)
+                whenever(isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase(newPath)).thenReturn(
+                    false
+                )
+
+                underTest.onLocalPrimaryFolderSelected(newPath)
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().showRelatedNewLocalFolderWarning).isTrue()
+                }
+            }
+
+        @Test
         fun `test that the new local primary folder is set`() = runTest {
+            val newPath = "new/primary/folder/path"
             initializeUnderTest()
-            whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
-            val expectedLocalPrimaryFolder = "new/primary/folder/path"
+            whenever(isFolderPathExistingUseCase(newPath)).thenReturn(true)
+            whenever(isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase(newPath)).thenReturn(true)
 
-            underTest.onLocalPrimaryFolderSelected(expectedLocalPrimaryFolder)
+            underTest.onLocalPrimaryFolderSelected(newPath)
 
-            verify(setPrimaryFolderPathUseCase).invoke(expectedLocalPrimaryFolder)
+            verify(setPrimaryFolderPathUseCase).invoke(newPath)
             underTest.uiState.test {
-                assertThat(awaitItem().primaryFolderPath).isEqualTo(expectedLocalPrimaryFolder)
+                assertThat(awaitItem().primaryFolderPath).isEqualTo(newPath)
             }
         }
 
         @Test
         fun `test that setting the new local primary folder also deletes the camera uploads temporary root directory`() =
             runTest {
+                val newPath = "new/primary/folder/path"
                 initializeUnderTest()
-                whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
+                whenever(isFolderPathExistingUseCase(newPath)).thenReturn(true)
+                whenever(isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase(newPath)).thenReturn(
+                    true
+                )
 
-                underTest.onLocalPrimaryFolderSelected("new/primary/folder/path")
+                underTest.onLocalPrimaryFolderSelected(newPath)
 
                 verify(deleteCameraUploadsTemporaryRootDirectoryUseCase).invoke()
             }
@@ -1051,10 +1103,14 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that setting the new local primary folder also clears the primary folder records`() =
             runTest {
+                val newPath = "new/primary/folder/path"
                 initializeUnderTest()
-                whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
+                whenever(isFolderPathExistingUseCase(newPath)).thenReturn(true)
+                whenever(isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase(newPath)).thenReturn(
+                    true
+                )
 
-                underTest.onLocalPrimaryFolderSelected("new/primary/folder/path")
+                underTest.onLocalPrimaryFolderSelected(newPath)
 
                 verify(clearCameraUploadsRecordUseCase).invoke(listOf(CameraUploadFolderType.Primary))
             }
@@ -1062,10 +1118,14 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that setting the new local primary folder also stops the ongoing camera uploads process`() =
             runTest {
+                val newPath = "new/primary/folder/path"
                 initializeUnderTest()
-                whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
+                whenever(isFolderPathExistingUseCase(newPath)).thenReturn(true)
+                whenever(isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase(newPath)).thenReturn(
+                    true
+                )
 
-                underTest.onLocalPrimaryFolderSelected("new/primary/folder/path")
+                underTest.onLocalPrimaryFolderSelected(newPath)
 
                 verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             }
@@ -1345,26 +1405,14 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that an error snackbar is shown when changing the local secondary folder throws an exception`() =
             runTest {
+                val newPath = "new/secondary/folder/path"
                 initializeUnderTest()
-                whenever(isSecondaryFolderPathValidUseCase(any())).thenThrow(RuntimeException())
+                whenever(isFolderPathExistingUseCase(newPath)).thenThrow(RuntimeException())
 
-                assertDoesNotThrow { underTest.onLocalSecondaryFolderSelected("new/secondary/folder/path") }
+                assertDoesNotThrow { underTest.onLocalSecondaryFolderSelected(newPath) }
 
                 underTest.uiState.test {
                     assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
-                }
-            }
-
-        @Test
-        fun `test that an error snackbar is shown when the new local secondary folder is invalid`() =
-            runTest {
-                initializeUnderTest()
-                whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(false)
-
-                underTest.onLocalSecondaryFolderSelected("new/secondary/folder/path")
-
-                underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.error_invalid_folder_selected))
                 }
             }
 
@@ -1381,26 +1429,62 @@ internal class SettingsCameraUploadsViewModelTest {
             }
 
         @Test
+        fun `test that an error snackbar is shown when the new local secondary folder does not exist`() =
+            runTest {
+                val newPath = "new/secondary/folder/path"
+                initializeUnderTest()
+                whenever(isFolderPathExistingUseCase(newPath)).thenReturn(false)
+
+                underTest.onLocalSecondaryFolderSelected(newPath)
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.error_invalid_folder_selected))
+                }
+            }
+
+        @Test
+        fun `test that a warning prompt is shown when the new local secondary folder exists but is related to the local primary folder`() =
+            runTest {
+                val newPath = "new/secondary/folder/path"
+                initializeUnderTest()
+                whenever(isFolderPathExistingUseCase(newPath)).thenReturn(true)
+                whenever(isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase(newPath)).thenReturn(
+                    false
+                )
+
+                underTest.onLocalSecondaryFolderSelected(newPath)
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().showRelatedNewLocalFolderWarning).isTrue()
+                }
+            }
+
+        @Test
         fun `test that the new local secondary folder is set`() = runTest {
+            val newPath = "new/secondary/folder/path"
             initializeUnderTest()
-            whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(true)
-            val expectedLocalSecondaryFolder = "new/secondary/folder/path"
+            whenever(isFolderPathExistingUseCase(newPath)).thenReturn(true)
+            whenever(isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase(newPath)).thenReturn(true)
 
-            underTest.onLocalSecondaryFolderSelected(expectedLocalSecondaryFolder)
+            underTest.onLocalSecondaryFolderSelected(newPath)
 
-            verify(setSecondaryFolderLocalPathUseCase).invoke(expectedLocalSecondaryFolder)
+            verify(setSecondaryFolderLocalPathUseCase).invoke(newPath)
             underTest.uiState.test {
-                assertThat(awaitItem().secondaryFolderPath).isEqualTo(expectedLocalSecondaryFolder)
+                assertThat(awaitItem().secondaryFolderPath).isEqualTo(newPath)
             }
         }
 
         @Test
         fun `test that setting the new local secondary folder also clears the secondary folder records`() =
             runTest {
+                val newPath = "new/secondary/folder/path"
                 initializeUnderTest()
-                whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(true)
+                whenever(isFolderPathExistingUseCase(newPath)).thenReturn(true)
+                whenever(isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase(newPath)).thenReturn(
+                    true
+                )
 
-                underTest.onLocalSecondaryFolderSelected("new/secondary/folder/path")
+                underTest.onLocalSecondaryFolderSelected(newPath)
 
                 verify(clearCameraUploadsRecordUseCase).invoke(listOf(CameraUploadFolderType.Secondary))
             }
@@ -1408,10 +1492,14 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that setting the new local secondary folder also stops the ongoing camera uploads process`() =
             runTest {
+                val newPath = "new/secondary/folder/path"
                 initializeUnderTest()
-                whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(true)
+                whenever(isFolderPathExistingUseCase(newPath)).thenReturn(true)
+                whenever(isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase(newPath)).thenReturn(
+                    true
+                )
 
-                underTest.onLocalSecondaryFolderSelected("new/secondary/folder/path")
+                underTest.onLocalSecondaryFolderSelected(newPath)
 
                 verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             }

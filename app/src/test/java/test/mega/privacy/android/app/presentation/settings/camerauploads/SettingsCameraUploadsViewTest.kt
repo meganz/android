@@ -12,6 +12,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.SETTINGS_CAM
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsView
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FILE_UPLOAD_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HOW_TO_UPLOAD_DIALOG
+import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.RELATED_NEW_LOCAL_FOLDER_WARNING_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VIDEO_COMPRESSION_SIZE_INPUT_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VIDEO_QUALITY_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
@@ -267,6 +268,16 @@ internal class SettingsCameraUploadsViewTest {
     }
 
     @Test
+    fun `test that the related new local folder warning prompt is shown`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            showRelatedNewLocalFolderWarning = true,
+        )
+
+        composeTestRule.onNodeWithTag(RELATED_NEW_LOCAL_FOLDER_WARNING_DIALOG).assertIsDisplayed()
+    }
+
+    @Test
     fun `test that the camera uploads folder node tile shows a default name when the primary folder name is empty`() {
         initializeComposeContent(
             isCameraUploadsEnabled = true,
@@ -354,6 +365,7 @@ internal class SettingsCameraUploadsViewTest {
         requireChargingDuringVideoCompression: Boolean = true,
         secondaryFolderName: String? = "Secondary Folder Name",
         secondaryFolderPath: String = "secondary/folder/path",
+        showRelatedNewLocalFolderWarning: Boolean = false,
         uploadOptionUiItem: UploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
         videoQualityUiItem: VideoQualityUiItem = VideoQualityUiItem.Original,
     ) {
@@ -367,6 +379,7 @@ internal class SettingsCameraUploadsViewTest {
                     requireChargingDuringVideoCompression = requireChargingDuringVideoCompression,
                     secondaryFolderName = secondaryFolderName,
                     secondaryFolderPath = secondaryFolderPath,
+                    showRelatedNewLocalFolderWarning = showRelatedNewLocalFolderWarning,
                     uploadOptionUiItem = uploadOptionUiItem,
                     videoQualityUiItem = videoQualityUiItem,
                 ),
@@ -385,6 +398,7 @@ internal class SettingsCameraUploadsViewTest {
                 onNewVideoCompressionSizeLimitProvided = {},
                 onPrimaryFolderNodeSelected = {},
                 onRegularBusinessAccountSubUserPromptAcknowledged = {},
+                onRelatedNewLocalFolderWarningDismissed = {},
                 onRequestPermissionsStateChanged = {},
                 onSecondaryFolderNodeSelected = {},
                 onSnackbarMessageConsumed = {},

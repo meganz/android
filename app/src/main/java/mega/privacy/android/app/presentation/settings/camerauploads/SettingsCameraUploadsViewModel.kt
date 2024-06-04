@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.camerauploads
 
+import mega.privacy.android.shared.resources.R as SharedR
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,10 +31,9 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAct
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
@@ -48,9 +48,12 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUs
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredToUploadContentUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsFolderPathExistingUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderNodeValidUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderNodeValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathUnrelatedToPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
@@ -76,7 +79,6 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
-import mega.privacy.android.shared.resources.R as SharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -111,10 +113,16 @@ import javax.inject.Inject
  * @property isChargingRequiredToUploadContentUseCase Checks whether or not the Device must be
  * charged for the active Camera Uploads to start uploading content
  * @property isConnectedToInternetUseCase Checks if the User is connected to the Internet or not
- * @property isPrimaryFolderNodeValidUseCase Checks if the Camera Uploads Folder Node is valid or not
- * @property isPrimaryFolderPathValidUseCase Checks if the Camera Uploads Primary Folder Path is valid or not
+ * @property isFolderPathExistingUseCase Checks if the specific Local Folder exists or not
  * @property isMediaUploadsEnabledUseCase Checks if Media Uploads (the Secondary Folder) is enabled or not
+ * @property isPrimaryFolderNodeValidUseCase Checks if the Camera Uploads Folder Node is valid or not
+ * @property isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase Checks if the specific Camera
+ * Uploads Primary Folder Path is not the same Folder or a parent Folder or a sub Folder from the
+ * current Local Secondary Folder
  * @property isSecondaryFolderNodeValidUseCase Checks if the Media Uploads Folder Node is valid or not
+ * @property isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase Checks if the specific Camera
+ * Uploads Secondary Folder Path is not the same Folder or a parent Folder or a sub Folder from the
+ * current Local Primary Folder
  * @property isSecondaryFolderPathValidUseCase Checks if the Media Uploads Secondary Folder Path is valid or not
  * @property listenToNewMediaUseCase Listens to new Photos and Videos captured by the Device
  * @property monitorCameraUploadsFolderDestinationUseCase Listens for any destination changes in the Camera
@@ -170,10 +178,12 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase,
     private val isChargingRequiredToUploadContentUseCase: IsChargingRequiredToUploadContentUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
-    private val isPrimaryFolderNodeValidUseCase: IsPrimaryFolderNodeValidUseCase,
-    private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
+    private val isFolderPathExistingUseCase: IsFolderPathExistingUseCase,
     private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
+    private val isPrimaryFolderNodeValidUseCase: IsPrimaryFolderNodeValidUseCase,
+    private val isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase: IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase,
     private val isSecondaryFolderNodeValidUseCase: IsSecondaryFolderNodeValidUseCase,
+    private val isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase: IsSecondaryFolderPathUnrelatedToPrimaryFolderUseCase,
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
@@ -737,15 +747,20 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 newPrimaryFolderPath?.let { primaryFolderPath ->
-                    if (isPrimaryFolderPathValidUseCase(primaryFolderPath)) {
-                        setPrimaryFolderPathUseCase(primaryFolderPath)
-                        deleteCameraUploadsTemporaryRootDirectoryUseCase()
-                        clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Primary))
-                        stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                    if (isFolderPathExistingUseCase(primaryFolderPath)) {
+                        if (isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase(primaryFolderPath)) {
+                            setPrimaryFolderPathUseCase(primaryFolderPath)
+                            deleteCameraUploadsTemporaryRootDirectoryUseCase()
+                            clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Primary))
+                            stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
 
-                        _uiState.update { it.copy(primaryFolderPath = primaryFolderPath) }
+                            _uiState.update { it.copy(primaryFolderPath = primaryFolderPath) }
+                        } else {
+                            Timber.d("The new Camera Uploads Local Folder is related to the Media Uploads Folder")
+                            _uiState.update { it.copy(showRelatedNewLocalFolderWarning = true) }
+                        }
                     } else {
-                        Timber.d("The new Camera Uploads Local Folder is invalid")
+                        Timber.d("The new Camera Uploads Local Folder does not exist")
                         showInvalidFolderSnackbar()
                     }
                 } ?: run {
@@ -798,14 +813,19 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 newSecondaryFolderPath?.let { secondaryFolderPath ->
-                    if (isSecondaryFolderPathValidUseCase(secondaryFolderPath)) {
-                        setSecondaryFolderLocalPathUseCase(secondaryFolderPath)
-                        clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Secondary))
-                        stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                    if (isFolderPathExistingUseCase(secondaryFolderPath)) {
+                        if (isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase(secondaryFolderPath)) {
+                            setSecondaryFolderLocalPathUseCase(secondaryFolderPath)
+                            clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Secondary))
+                            stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
 
-                        _uiState.update { it.copy(secondaryFolderPath = secondaryFolderPath) }
+                            _uiState.update { it.copy(secondaryFolderPath = secondaryFolderPath) }
+                        } else {
+                            Timber.d("The new Media Uploads Local Folder is related to the Camera Uploads Folder")
+                            _uiState.update { it.copy(showRelatedNewLocalFolderWarning = true) }
+                        }
                     } else {
-                        Timber.d("The new Media Uploads Local Folder is invalid")
+                        Timber.d("The new Media Uploads Local Folder does not exist")
                         showInvalidFolderSnackbar()
                     }
                 } ?: run {
@@ -847,6 +867,12 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Updates the UI State to hide the related new Local Primary / Secondary Folder warning
+     */
+    fun onRelatedNewLocalFolderWarningDismissed() =
+        _uiState.update { it.copy(showRelatedNewLocalFolderWarning = false) }
 
     /**
      * Notifies the UI State that the Snackbar has been displayed with the specific message

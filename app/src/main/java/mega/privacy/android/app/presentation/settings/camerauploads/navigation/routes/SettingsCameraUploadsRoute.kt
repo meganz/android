@@ -34,6 +34,7 @@ internal fun SettingsCameraUploadsRoute(
         onNewVideoCompressionSizeLimitProvided = viewModel::onNewVideoCompressionSizeLimitProvided,
         onPrimaryFolderNodeSelected = viewModel::onPrimaryFolderNodeSelected,
         onRegularBusinessAccountSubUserPromptAcknowledged = viewModel::onRegularBusinessAccountSubUserPromptAcknowledged,
+        onRelatedNewLocalFolderWarningDismissed = viewModel::onRelatedNewLocalFolderWarningDismissed,
         onRequestPermissionsStateChanged = viewModel::onRequestPermissionsStateChanged,
         onSecondaryFolderNodeSelected = viewModel::onSecondaryFolderNodeSelected,
         onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,

@@ -29,6 +29,8 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
  * @property shouldIncludeLocationTags If true, Location Tags are added when uploading Photos through
  * Camera Uploads
  * @property shouldKeepUploadFileNames true if the content being uploaded should retain their filenames
+ * @property showRelatedNewLocalFolderWarning true if a warning should be shown when the newly
+ * selected Local Primary / Secondary Folder is related to the opposite Local Folder
  * @property snackbarMessage State Event that displays a Snackbar with a specific String when triggered
  * @property uploadConnectionType Determines the connection type for uploading content in Camera Uploads
  * @property uploadOptionUiItem Determines the type of content that Camera Uploads can upload
@@ -49,6 +51,7 @@ internal data class SettingsCameraUploadsUiState(
     val secondaryFolderPath: String = "",
     val shouldIncludeLocationTags: Boolean = false,
     val shouldKeepUploadFileNames: Boolean = false,
+    val showRelatedNewLocalFolderWarning: Boolean = false,
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
     val uploadConnectionType: UploadConnectionType = UploadConnectionType.WIFI,
     val uploadOptionUiItem: UploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
