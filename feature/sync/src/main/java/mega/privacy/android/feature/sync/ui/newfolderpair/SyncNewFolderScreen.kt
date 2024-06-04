@@ -17,10 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
@@ -92,7 +95,8 @@ internal fun SyncNewFolderScreen(
                     syncPermissionsManager = syncPermissionsManager,
                     showStorageOverQuota = showStorageOverQuota,
                     onDismissStorageOverQuota = onDismissStorageOverQuota,
-                    onOpenUpgradeAccount = onOpenUpgradeAccount
+                    onOpenUpgradeAccount = onOpenUpgradeAccount,
+                    snackBarHostState = scaffoldState.snackbarHostState,
                 )
 
                 val context = LocalContext.current
@@ -120,8 +124,10 @@ private fun SyncNewFolderScreenContent(
     showStorageOverQuota: Boolean,
     onDismissStorageOverQuota: () -> Unit,
     onOpenUpgradeAccount: () -> Unit,
+    snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     var showSyncPermissionBanner by rememberSaveable {
         mutableStateOf(false)
     }
@@ -129,6 +135,7 @@ private fun SyncNewFolderScreenContent(
         mutableStateOf(false)
     }
     val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
     Column(
         modifier.verticalScroll(scrollState)
     ) {
@@ -140,7 +147,13 @@ private fun SyncNewFolderScreenContent(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
             if (isGranted) {
-                folderPicker.launch(null)
+                runCatching {
+                    folderPicker.launch(null)
+                }.onFailure {
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar(context.getString(sharedResR.string.general_no_picker_warning))
+                    }
+                }
             } else {
                 showSyncPermissionBanner = true
             }
@@ -190,7 +203,13 @@ private fun SyncNewFolderScreenContent(
         InputSyncInformationView(
             selectDeviceFolderClicked = {
                 if (syncPermissionsManager.isManageExternalStoragePermissionGranted()) {
-                    folderPicker.launch(null)
+                    runCatching {
+                        folderPicker.launch(null)
+                    }.onFailure {
+                        coroutineScope.launch {
+                            snackBarHostState.showSnackbar(context.getString(sharedResR.string.general_no_picker_warning))
+                        }
+                    }
                 } else {
                     if (showSyncPermissionBanner) {
                         syncPermissionsManager.launchAppSettingFileStorageAccess()

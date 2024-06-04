@@ -380,4 +380,6 @@
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your primary camera uploads folder and secondary media uploads folder cannot be related to each other. Please choose a different folder.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_no_picker_warning">This device doesn’t have an app to select folders.</string>
 </resources>
