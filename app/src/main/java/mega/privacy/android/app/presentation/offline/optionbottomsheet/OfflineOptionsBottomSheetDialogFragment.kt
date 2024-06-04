@@ -17,14 +17,14 @@ import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.offline.confirmremovedialog.ConfirmRemoveFromOfflineDialogFragment
-import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.OfflineFileInfoComposeViewModel
-import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.OfflineFileInfoComposeViewModel.Companion.NODE_HANDLE
+import mega.privacy.android.app.presentation.offline.optionbottomsheet.OfflineOptionsViewModel.Companion.NODE_HANDLE
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.view.OfflineOptionsContent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
@@ -32,7 +32,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
-    private val viewModel: OfflineFileInfoComposeViewModel by viewModels()
+    private val viewModel: OfflineOptionsViewModel by viewModels()
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -50,17 +50,17 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
             setContent {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                val uiState by viewModel.state.collectAsStateWithLifecycle()
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     OfflineOptionsContent(
                         uiState = uiState,
                         fileTypeIconMapper = fileTypeIconMapper,
-                        onRemoveFromOfflineClicked = { showConfirmationRemoveOfflineNode(uiState.handle) },
-                        onOpenInfoClicked = { openInfo(uiState.handle) },
-                        onOpenWithClicked = { openWith(uiState.handle) },
-                        onSaveToDeviceClicked = { saveToDevice(uiState.handle) },
-                        onShareNodeClicked = { shareOfflineNode(uiState.handle) },
+                        onRemoveFromOfflineClicked = { showConfirmationRemoveOfflineNode(uiState.nodeId) },
+                        onOpenInfoClicked = { openInfo(uiState.nodeId) },
+                        onOpenWithClicked = { openWith(uiState.nodeId) },
+                        onSaveToDeviceClicked = { saveToDevice(uiState.nodeId) },
+                        onShareNodeClicked = { shareOfflineNode(uiState.nodeId) },
                     )
                 }
 
@@ -72,41 +72,41 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
         }
     }
 
-    private fun openInfo(handle: Long) {
+    private fun openInfo(nodeId: NodeId) {
         val offlineIntent = Intent(requireContext(), OfflineFileInfoActivity::class.java)
-        offlineIntent.putExtra(Constants.HANDLE, handle.toString())
+        offlineIntent.putExtra(Constants.HANDLE, nodeId.longValue.toString())
         startActivity(offlineIntent)
         dismissAllowingStateLoss()
     }
 
-    private fun shareOfflineNode(handle: Long) {
+    private fun shareOfflineNode(nodeId: NodeId) {
         OfflineUtils.shareOfflineNode(
             requireContext(),
-            handle
+            nodeId.longValue
         )
         dismissAllowingStateLoss()
     }
 
-    private fun openWith(handle: Long) {
+    private fun openWith(nodeId: NodeId) {
         OfflineUtils.openWithOffline(
             requireContext(),
-            handle
+            nodeId.longValue
         )
         dismissAllowingStateLoss()
     }
 
-    private fun saveToDevice(handle: Long) {
+    private fun saveToDevice(nodeId: NodeId) {
         callManager {
             it.saveHandlesToDevice(
-                listOf(handle),
+                listOf(nodeId.longValue),
                 true
             )
         }
         dismissAllowingStateLoss()
     }
 
-    private fun showConfirmationRemoveOfflineNode(handle: Long) {
-        ConfirmRemoveFromOfflineDialogFragment.newInstance(listOf(handle))
+    private fun showConfirmationRemoveOfflineNode(nodeId: NodeId) {
+        ConfirmRemoveFromOfflineDialogFragment.newInstance(listOf(nodeId.longValue))
             .show(
                 requireActivity().supportFragmentManager,
                 ConfirmRemoveFromOfflineDialogFragment::class.java.simpleName

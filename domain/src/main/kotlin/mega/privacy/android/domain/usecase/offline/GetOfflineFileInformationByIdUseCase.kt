@@ -15,9 +15,8 @@ class GetOfflineFileInformationByIdUseCase @Inject constructor(
      * Invoke
      * @param nodeId [NodeId]
      */
-    suspend operator fun invoke(nodeId: NodeId) {
+    suspend operator fun invoke(nodeId: NodeId) =
         getOfflineNodeInformationByIdUseCase(nodeId)?.let {
             getOfflineFileInformationUseCase(it)
         }
-    }
 }
