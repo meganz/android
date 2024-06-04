@@ -66,4 +66,10 @@ gradlePlugin {
             implementationClass = "AndroidApplicationJacocoConventionPlugin"
         }
     }
+    plugins {
+        register("lint") {
+            id = "mega.lint"
+            implementationClass = "AndroidLintConventionPlugin"
+        }
+    }
 }

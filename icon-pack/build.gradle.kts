@@ -1,5 +1,6 @@
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.lint)
     id("kotlin-android")
 }
 
@@ -12,11 +13,6 @@ android {
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
-    }
-
-    lint {
-        abortOnError = false
-        xmlOutput = file("build/reports/lint-results.xml")
     }
 }
 

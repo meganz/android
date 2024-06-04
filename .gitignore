@@ -12,6 +12,7 @@
 .idea/kotlinc.xml
 .idea/inspectionProfiles/Project_Default.xml
 .idea/deploymentTargetSelector.xml
+.idea/appInsightsSettings.xml
 
 # User-specific stuff:
 .idea/workspace.xml

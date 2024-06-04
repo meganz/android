@@ -6,6 +6,7 @@ plugins {
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.library.jacoco)
+    alias(convention.plugins.mega.lint)
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
@@ -20,11 +21,6 @@ android {
         resValue("string", "app_version", "\"${appVersion}\"")
 
         consumerProguardFiles("consumer-rules.pro")
-    }
-
-    lint {
-        abortOnError = false
-        xmlOutput = file("build/reports/lint-results.xml")
     }
 
     sourceSets {

@@ -1,9 +1,10 @@
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.test)
+    alias(convention.plugins.mega.lint)
+    alias(convention.plugins.mega.android.library.jacoco)
     id("kotlin-android")
     id("kotlin-kapt")
-    alias(convention.plugins.mega.android.library.jacoco)
 }
 
 android {
@@ -20,10 +21,6 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
-    lint {
-        abortOnError = false
-        xmlOutput = file("build/reports/lint-results.xml")
-    }
     namespace = "mega.privacy.android.core"
 }
 

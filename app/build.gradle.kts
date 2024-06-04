@@ -28,6 +28,7 @@ plugins {
     alias(convention.plugins.mega.android.app)
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.application.jacoco)
+    alias(convention.plugins.mega.lint)
     id("kotlin-parcelize")
     id("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
@@ -132,8 +133,6 @@ android {
             htmlReport = true
             htmlOutput = file("build/reports/combined.html")
         }
-        abortOnError = false
-        xmlOutput = file("build/reports/lint-results.xml")
     }
     namespace = "mega.privacy.android.app"
     packaging {

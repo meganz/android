@@ -5,6 +5,7 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.library.jacoco)
+    alias(convention.plugins.mega.lint)
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
@@ -19,10 +20,6 @@ android {
         kotlinCompilerExtensionVersion = androidx.versions.compose.compiler.get()
     }
 
-    lint {
-        abortOnError = false
-        xmlOutput = file("build/reports/lint-results.xml")
-    }
     namespace = "mega.privacy.android.feature.devicecenter"
 }
 

@@ -9,4 +9,5 @@ mega-jvm-library = { id = "mega.jvm.library", version = "unspecified" }
 mega-android-library-jacoco = { id = "mega.android.library.jacoco", version = "unspecified" }
 mega-jvm-jacoco = { id = "mega.jvm.jacoco", version = "unspecified" }
 mega-android-application-jacoco = { id = "mega.android.application.jacoco", version = "unspecified" }
+mega-lint = { id = "mega.lint", version = "unspecified" }
 

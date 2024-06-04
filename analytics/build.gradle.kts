@@ -1,8 +1,8 @@
-import groovy.lang.Closure
 import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.lint)
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
 }
@@ -21,12 +21,6 @@ android {
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
     }
-
-    lint {
-        abortOnError = false
-        xmlOutput = file("build/reports/lint-results.xml")
-    }
-
 }
 
 dependencies {

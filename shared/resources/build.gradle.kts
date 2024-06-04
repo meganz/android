@@ -1,15 +1,11 @@
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.lint)
     id("kotlin-android")
 }
 
 android {
     namespace = "mega.privacy.android.shared.resources"
-
-    lint {
-        abortOnError = false
-        xmlOutput = file("build/reports/lint-results.xml")
-    }
 
     dependencies {
         lintChecks(project(":lint"))

@@ -4,14 +4,9 @@ plugins {
     alias(convention.plugins.mega.jvm.library)
     alias(convention.plugins.mega.jvm.test)
     alias(convention.plugins.mega.jvm.jacoco)
-    id("com.android.lint")
+    alias(convention.plugins.mega.lint)
     id("kotlin-kapt")
     kotlin("plugin.serialization") version "1.9.21"
-}
-
-lint {
-    abortOnError = false
-    xmlOutput = file("build/reports/lint-results.xml")
 }
 
 dependencies {
