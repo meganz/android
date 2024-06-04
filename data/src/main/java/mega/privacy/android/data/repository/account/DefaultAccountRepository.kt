@@ -51,6 +51,7 @@ import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
 import mega.privacy.android.data.mapper.account.RecoveryKeyToFileMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
+import mega.privacy.android.data.mapper.contact.UserMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
@@ -65,6 +66,7 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -166,6 +168,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val cookieSettingsMapper: CookieSettingsMapper,
     private val cookieSettingsIntMapper: CookieSettingsIntMapper,
     private val credentialsPreferencesGateway: CredentialsPreferencesGateway,
+    private val userMapper: UserMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -1388,6 +1391,10 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun clearCredentials() = withContext(ioDispatcher) {
         credentialsPreferencesGateway.clear()
+    }
+
+    override suspend fun getCurrentUser(): User? = withContext(ioDispatcher) {
+        megaApiGateway.myUser?.let { userMapper(it) }
     }
 
     companion object {

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils.contacts;
 
+import mega.privacy.android.domain.usecase.account.IsTheEmailMineUseCase;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaUser;
@@ -73,6 +74,15 @@ public class ContactsFilter {
         return false;
     }
 
+    /**
+     * This function determines whether the given email matches that of the current user.
+     *
+     * @param api   [MegaApiJava].
+     * @param email The email that needs to be checked.
+     * @return Boolean. Whether the email is in a pending state.
+     * @deprecated <p> Use {@link IsTheEmailMineUseCase} instead.
+     */
+    @Deprecated
     public static boolean isMySelf(MegaApiJava api, String email) {
         MegaUser user = api.getMyUser();
         if (user == null) {

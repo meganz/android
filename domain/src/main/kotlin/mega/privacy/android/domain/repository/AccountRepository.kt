@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
+import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -675,4 +676,11 @@ interface AccountRepository {
      *
      */
     suspend fun clearCredentials()
+
+    /**
+     * Get the [User] of the currently open account.
+     *
+     * @return [User] The current user.
+     */
+    suspend fun getCurrentUser(): User?
 }

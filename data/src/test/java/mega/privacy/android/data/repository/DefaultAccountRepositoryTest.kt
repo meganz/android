@@ -34,6 +34,8 @@ import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
 import mega.privacy.android.data.mapper.account.RecoveryKeyToFileMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
+import mega.privacy.android.data.mapper.contact.UserChangeMapper
+import mega.privacy.android.data.mapper.contact.UserMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
@@ -79,7 +81,9 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.NullSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -146,6 +150,8 @@ class DefaultAccountRepositoryTest {
 
     private val appEventGateway: AppEventGateway = mock()
 
+    private lateinit var userMapper: UserMapper
+
     private val subscriptionOption = SubscriptionOption(
         accountType = AccountType.PRO_I,
         months = 1,
@@ -192,6 +198,7 @@ class DefaultAccountRepositoryTest {
 
     @BeforeAll
     fun setUp() {
+        userMapper = UserMapper(UserChangeMapper())
         underTest = DefaultAccountRepository(
             context = mock(),
             myAccountInfoFacade = accountInfoWrapper,
@@ -226,7 +233,8 @@ class DefaultAccountRepositoryTest {
             cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
             cookieSettingsMapper = cookieSettingsMapper,
             cookieSettingsIntMapper = cookieSettingsIntMapper,
-            credentialsPreferencesGateway = credentialsPreferencesGateway
+            credentialsPreferencesGateway = credentialsPreferencesGateway,
+            userMapper = userMapper
         )
 
     }
@@ -1912,4 +1920,26 @@ class DefaultAccountRepositoryTest {
             underTest.clearCredentials()
             verify(credentialsPreferencesGateway).clear()
         }
+
+    @ParameterizedTest
+    @NullSource
+    @MethodSource("provideMyUser")
+    fun `test that the correct mapped user is returned when getting the current user`(user: MegaUser?) =
+        runTest {
+            whenever(megaApiGateway.myUser) doReturn user
+
+            val actual = underTest.getCurrentUser()
+
+            val expected = user?.let { userMapper(it) }
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    private fun provideMyUser() = Stream.of(
+        Arguments.of(
+            mock<MegaUser> {
+                on { handle }.thenReturn(1L)
+                on { email }.thenReturn(mockEmail)
+            }
+        )
+    )
 }
