@@ -97,7 +97,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
         type: TransferType,
     ) = runTest {
         val flow = listOf(
-            mockTotal(5, 5, 5),
+            mockTotal(5, 5),
             mockTotal(0)
         )
         whenever(transferRepository.getActiveTransferTotalsByType(any())) doReturn flow.asFlow()
@@ -111,11 +111,9 @@ class MonitorActiveTransferFinishedUseCaseTest {
 
     private fun mockTotal(
         totalFileTransfers: Int,
-        totalFinishedTransfers: Int = totalFileTransfers,
         totalAlreadyDownloadedFiles: Int = 0,
     ) = mock<ActiveTransferTotals> {
-        on { this.totalFileTransfers } doReturn totalFileTransfers
-        on { this.totalFinishedTransfers } doReturn totalFinishedTransfers
+        on { this.totalCompletedFileTransfers } doReturn totalFileTransfers
         on { this.totalAlreadyDownloadedFiles } doReturn totalAlreadyDownloadedFiles
     }
 

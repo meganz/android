@@ -21,14 +21,18 @@ class MonitorActiveTransferFinishedUseCase @Inject constructor(
      */
     operator fun invoke(transferType: TransferType) =
         transferRepository.getActiveTransferTotalsByType(transferType)
-            .distinctUntilChanged()
+            .distinctUntilChanged(areEquivalent = { old, new ->
+                // transferredBytes are not important here, this helps distinctUntilChanged emit much less values
+                old.copy(transferredBytes = new.transferredBytes) == new
+
+            })
             .scan(emptyTotals(transferType) to emptyTotals(transferType)) { (_, prev), new ->
                 prev to new
             }.mapNotNull { (prev, current) ->
                 prev.takeIf {
-                    prev.totalFileTransfers != 0 && current.totalFileTransfers == 0
-                            && prev.totalFinishedTransfers > prev.totalAlreadyDownloadedFiles
-                }?.totalFileTransfers
+                    prev.totalCompletedFileTransfers > 0 && current.totalCompletedFileTransfers == 0
+                            && prev.totalCompletedFileTransfers > prev.totalAlreadyDownloadedFiles
+                }?.totalCompletedFileTransfers
             }
 
     private fun emptyTotals(transferType: TransferType) = ActiveTransferTotals(
