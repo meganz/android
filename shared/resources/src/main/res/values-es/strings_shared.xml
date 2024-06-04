@@ -33,9 +33,9 @@
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="general_sync_unknown_temporary_error">Se ha producido un problema al sincronizar o hacer un backup de esta carpeta. Vuelve a intentarlo más tarde. Si el problema persiste, ponte en contacto con el servicio de soporte.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
-    <string name="general_sync_too_many_action_packets">Cuenta recargada. No se han realizado actualizaciones pendientes de tus backups o sincronizaciones.</string>
+    <string name="general_sync_too_many_action_packets">Cuenta recargada. Las actualizaciones pendientes de tus backups o sincronizaciones no se han aplicado.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="general_sync_logged_out">La sincronización o el backup se han detenido porque parece que has cerrado sesión en la aplicación de escritorio. Vuelve a iniciar sesión a través de la aplicación de escritorio y reanuda la operación.</string>
+    <string name="general_sync_logged_out">La sincronización o el backup se han detenido porque se ha cerrado la sesión en la aplicación de escritorio. Vuelve a iniciar sesión a través de la aplicación de escritorio y reanuda la operación.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
@@ -89,9 +89,9 @@
     <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_file_sharing">Comparte archivos de gran tamaño gracias a una generosa cuota de transferencia y garantiza la seguridad con enlaces protegidos por contraseña.</string>
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">No vuelva a perder datos</string>
+    <string name="dialog_onboarding_feature_title_backup_rewind">No vuelvas a perder ningún dato</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Rebobina y restaura tus datos hasta un máximo de 180 días, para que estén protegidos de accidentes y cambios no deseados.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -287,17 +287,17 @@
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
     <string name="account_confirm_email_misspelled_email_description">Si has escrito mal tu dirección de correo electrónico, corrígela y pulsa en [A]Reenviar[/A].</string>
     <!-- Title of the insufficient storage error banner -->
-    <string name="sync_error_storage_over_quota_banner_title">Syncing paused, your MEGA plan has run out of storage</string>
+    <string name="sync_error_storage_over_quota_banner_title">Sincronización pausada, tu plan de MEGA se ha quedado sin almacenamiento disponible</string>
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">Ampliar</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
     <string name="camera_uploads_phone_not_charging_message">Subida en pausa, el teléfono no se está cargando.</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
-    <string name="device_center_list_view_item_status_nothing_setup">No syncs set up</string>
+    <string name="device_center_list_view_item_status_nothing_setup">Ninguna sincronización configurada</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_title">Cuenta desactivada</string>
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
-    <string name="account_pro_flexi_account_deactivated_dialog_body">Your Pro&#160;Flexi account has been deactivated due to payment failure or you’ve cancelled your subscription. You won’t be able to access the data stored in your account. \nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_pro_flexi_account_deactivated_dialog_body">Tu cuenta Pro&#160;Flexi ha sido desactivada porque has cancelado la suscripción o porque el pago ha fallado. No podrás acceder a los datos almacenados en tu cuenta. \nPara realizar el pago y reactivar la suscripción, inicia sesión en MEGA a través de un navegador.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_starter_label">Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
@@ -305,15 +305,15 @@
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Uploads will be paused until you start charging your device. Uploads will still remain paused if your battery is below 20%.</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Las subidas solo se realizarán cuando el dispositivo se esté cargando y la batería esté por encima del 20%.</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_title">No syncs set up</string>
+    <string name="device_center_sync_list_empty_state_title">Ninguna sincronización configurada</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sync a local folder on your device with a folder on MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">Sincroniza una carpeta local en tu dispositivo con una carpeta de MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
-    <string name="device_center_sync_add_new_syn_button_option">Add new sync</string>
+    <string name="device_center_sync_add_new_syn_button_option">Añadir sincronización</string>
     <!-- Text for the Sync solved issues chip -->
-    <string name="device_center_sync_solved_issues_chip_text">Solved issues</string>
+    <string name="device_center_sync_solved_issues_chip_text">Problemas resueltos</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
     <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">You can’t sync folders that are currently synced folders.</string>
     <!-- Label for the file info information screen description field -->
@@ -321,17 +321,17 @@
     <!-- Placeholder for the file info information screen description field -->
     <string name="file_info_information_description_placeholder">Añadir descripción</string>
     <!-- Description added snack bar for the file info information screen-->
-    <string name="file_info_information_snackbar_description_added">Description added</string>
+    <string name="file_info_information_snackbar_description_added">Descripción añadida</string>
     <!-- Description updated snack bar for the file info information screen-->
-    <string name="file_info_information_snackbar_description_updated">Description updated</string>
+    <string name="file_info_information_snackbar_description_updated">Descripción actualizada</string>
     <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
     <string name="dialog_onboarding_feature_title_additional_features">Además de acceso a estos fantásticos beneficios:</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Llamadas y reuniones sin restricciones \n&#8226;&#160;Sincronización automática de carpetas en tu dispositivo móvil \n&#8226;&#160;Sin anuncios</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Llamadas y reuniones sin restricciones \n&#8226;&#160;Sincronización automática de carpetas en tu dispositivo móvil</string>
     <!-- Text for the Sync solved issues list empty state -->
-    <string name="device_center_sync_solved_issues_empty_state_text">No solved issues</string>
+    <string name="device_center_sync_solved_issues_empty_state_text">No hay problemas resueltos</string>
     <!-- Title of first tour screen -->
     <string name="cloud_drive_tour_first_title">Tú tienes las claves</string>
     <!-- Title of second tour screen -->
@@ -347,11 +347,11 @@
     <!-- Second subtitle of the tour screen -->
     <string name="cloud_drive_tour_second_subtitle">Chat totalmente cifrado con llamadas y videollamadas, chat de grupo y capacidad de compartir archivos con tu Cloud Drive.</string>
     <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA.</string>
+    <string name="cloud_drive_tour_third_subtitle">Añade contactos, crea tu propia red, colabora y haz llamadas y videollamadas sin salir de MEGA.</string>
     <!-- Fourth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fourth_subtitle">La función Subidas de la cámara es esencial para cualquier dispositivo móvil y nosotros la tenemos. Crea tu cuenta ahora.</string>
     <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Zero-knowledge encrypted video meeting.</string>
+    <string name="cloud_drive_tour_fifth_subtitle">Reunión con cifrado de conocimiento cero.</string>
     <!-- Titles of the tour screen to onboard users with the MEGA application -->
     <string-array name="cloud_drive_tour_titles">
         <item>@string/cloud_drive_tour_first_title</item>
@@ -369,9 +369,23 @@
         <item>@string/cloud_drive_tour_fifth_subtitle</item>
     </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
-    <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
+    <string name="meetings_raised_hand_tooltip_title">[A]Nueva función: Levantar la mano[/A]</string>
     <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_list_empty_state_message_free_account">Keep your information syncing and up to date by upgrading to one of our Pro plans.</string>
+    <string name="device_center_sync_list_empty_state_message_free_account">Mantén tu información sincronizada y al día ampliando tu cuenta a uno de nuestros planes Pro.</string>
     <!-- "Upgrade now" label for a button, menu entry, etc -->
     <string name="general_upgrade_now_label">Ampliar cuenta</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_title">Ampliar cuenta a Pro</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_message">Mantén tu dispositivo móvil sincronizado con la nube con nuestros planes Pro.</string>
+    <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_confirm_button">Ampliar</string>
+    <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
+    <string name="device_center_sync_upgrade_dialog_cancel_button">Ahora no</string>
+    <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Uploads folder conflict</string>
+    <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your primary camera uploads folder and secondary media uploads folder cannot be related to each other. Please choose a different folder.</string>
+    <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
 </resources>

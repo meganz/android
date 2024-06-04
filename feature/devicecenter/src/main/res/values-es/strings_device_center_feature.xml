@@ -89,9 +89,9 @@
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Se ha producido un problema al sincronizar o hacer un backup de esta carpeta. Vuelve a intentarlo más tarde. Si el problema persiste, ponte en contacto con el servicio de soporte.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
-    <string name="device_center_list_view_item_sub_state_too_many_action_packets">Cuenta recargada. No se han realizado actualizaciones pendientes de tus backups o sincronizaciones.</string>
+    <string name="device_center_list_view_item_sub_state_too_many_action_packets">Cuenta recargada. Las actualizaciones pendientes de tus backups o sincronizaciones no se han aplicado.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="device_center_list_view_item_sub_state_logged_out">La sincronización o el backup se han detenido porque parece que has cerrado sesión en la aplicación de escritorio. Vuelve a iniciar sesión a través de la aplicación de escritorio y reanuda la operación.</string>
+    <string name="device_center_list_view_item_sub_state_logged_out">La sincronización o el backup se han detenido porque se ha cerrado la sesión en la aplicación de escritorio. Vuelve a iniciar sesión a través de la aplicación de escritorio y reanuda la operación.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="device_center_list_view_item_sub_state_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
@@ -123,7 +123,7 @@
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Error desconocido.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
-    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
+    <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Algo ha salido mal</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Los archivos de esta carpeta no se pueden sincronizar ni se puede hacer un backup porque la carpeta de MEGA está en la Papelera</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
