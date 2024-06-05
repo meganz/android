@@ -166,7 +166,7 @@ fun BottomPanelView(
         event = uiState.handRaisedSnackbarMsg,
         onConsumed = {}
     ) {
-        if (!uiState.handRaisedSnackbarMsg.equals(consumed)) {
+        if (!uiState.handRaisedSnackbarMsg.equals(consumed) && uiState.isBottomPanelExpanded) {
             coroutineScope.launch {
                 val result = snackbarHostState.showSnackbar(
                     message = it,

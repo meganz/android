@@ -524,7 +524,7 @@ class MeetingActivityViewModel @Inject constructor(
      * load my user handle and save to ui state
      */
     private fun getMyUserHandle() {
-        if (state.value.myUserHandle != null) return
+        if (state.value.myUserHandle != null && state.value.myUserHandle != 0L) return
 
         viewModelScope.launch {
             runCatching {
