@@ -24,7 +24,6 @@ private const val syncMegaPicker = "sync/mega-picker"
 private const val syncList = "sync/list"
 
 internal fun NavGraphBuilder.syncNavGraph(
-    showOnboardingScreen: Boolean,
     navController: NavController,
     fileTypeIconMapper: FileTypeIconMapper,
     syncPermissionsManager: SyncPermissionsManager,
@@ -32,11 +31,7 @@ internal fun NavGraphBuilder.syncNavGraph(
     title: String? = null,
 ) {
     navigation(
-        startDestination = if (showOnboardingScreen) {
-            syncEmptyRoute
-        } else {
-            syncList
-        },
+        startDestination = syncList,
         route = syncRoute
     ) {
         composable(route = syncEmptyRoute) {
