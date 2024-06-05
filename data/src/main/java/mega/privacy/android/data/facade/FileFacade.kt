@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.os.StatFs
 import android.provider.MediaStore
@@ -17,6 +18,7 @@ import android.provider.MediaStore.MediaColumns.SIZE
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.provider.MediaStore.VOLUME_INTERNAL
 import android.provider.OpenableColumns
+import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.core.net.toFile
 import androidx.core.net.toUri
@@ -95,6 +97,7 @@ class FileFacade @Inject constructor(
                 File(downloadsDir, DOWNLOAD_DIR)
             } ?: context.filesDir
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override suspend fun getLocalFile(
         fileName: String,
         fileSize: Long,
@@ -117,18 +120,21 @@ class FileFacade @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun getExternalFile(
         selectionArgs: Array<String>,
     ) = getExternalCursor(selectionArgs)?.let { cursor ->
         getFileFromCursor(cursor).also { cursor.close() }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun getInternalFile(
         selectionArgs: Array<String>,
     ) = getInternalCursor(selectionArgs)?.let { cursor ->
         getFileFromCursor(cursor).also { cursor.close() }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun getExternalCursor(
         selectionArgs: Array<String>,
     ) = getNonEmptyCursor(
@@ -136,6 +142,7 @@ class FileFacade @Inject constructor(
         selectionArgs,
     )
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun getInternalCursor(
         selectionArgs: Array<String>,
     ) = getNonEmptyCursor(
@@ -328,7 +335,7 @@ class FileFacade @Inject constructor(
             put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             // use default location for below Android Q
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(
                     MediaStore.Images.Media.RELATIVE_PATH,
                     "${Environment.DIRECTORY_PICTURES}/$PHOTO_DIR"
@@ -344,7 +351,7 @@ class FileFacade @Inject constructor(
         val contentValues = ContentValues().apply {
             put(MediaStore.Video.Media.DISPLAY_NAME, fileName)
             put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(
                     MediaStore.Video.Media.RELATIVE_PATH,
                     "${Environment.DIRECTORY_MOVIES}/$PHOTO_DIR"
@@ -504,9 +511,12 @@ class FileFacade @Inject constructor(
         return DocumentFolder(entities)
     }
 
+    @Suppress("Deprecation")
     private fun File.getCompressFormat(): CompressFormat = when (extension) {
         "jpeg", "jpg" -> CompressFormat.JPEG
         "png" -> CompressFormat.PNG
+        // CompressFormat.WEBP is deprecated in API Level 30. Update function to handle both
+        // CompressFormat.WEB_LOSSY and CompressFormat.WEB_LOSSLESS
         "webp" -> CompressFormat.WEBP
         else -> CompressFormat.JPEG
     }

@@ -11,7 +11,7 @@ import javax.inject.Singleton
 /**
  * Class to encrypt given value
  */
-@Suppress("RedundantSuspendModifier")
+@Suppress("RedundantSuspendModifier", "GetInstance")
 @Singleton
 class EncryptData @Inject constructor(
     @Named("aes_key") private val aesKey: ByteArray,

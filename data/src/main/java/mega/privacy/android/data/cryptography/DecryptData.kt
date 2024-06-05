@@ -11,7 +11,7 @@ import javax.inject.Singleton
 /**
  * Decrypt the data encrypted by EncryptData
  */
-@Suppress("RedundantSuspendModifier")
+@Suppress("RedundantSuspendModifier", "GetInstance")
 @Singleton
 class DecryptData @Inject constructor(
     @Named("aes_key") private val aesKey: ByteArray,
