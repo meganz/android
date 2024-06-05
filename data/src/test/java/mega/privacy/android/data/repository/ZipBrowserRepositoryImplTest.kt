@@ -109,7 +109,15 @@ class ZipBrowserRepositoryImplTest {
 
             whenever(testEnumeration.hasMoreElements()).thenReturn(true, false)
             whenever(testEnumeration.nextElement()).thenReturn(testEntry)
-            whenever(zipTreeNodeMapper(testEntry, testPath, testPath, null)).thenReturn(
+            whenever(
+                zipTreeNodeMapper(
+                    testEntry,
+                    testPath,
+                    testPath,
+                    null,
+                    ZipEntryType.File
+                )
+            ).thenReturn(
                 testZipTreeNode
             )
 
@@ -146,7 +154,15 @@ class ZipBrowserRepositoryImplTest {
 
             whenever(testEnumeration.hasMoreElements()).thenReturn(true, false)
             whenever(testEnumeration.nextElement()).thenReturn(testEntry)
-            whenever(zipTreeNodeMapper(testEntry, testName, testName, null)).thenReturn(
+            whenever(
+                zipTreeNodeMapper(
+                    testEntry,
+                    testName,
+                    testName,
+                    null,
+                    ZipEntryType.Folder
+                )
+            ).thenReturn(
                 testZipTreeNode
             )
 

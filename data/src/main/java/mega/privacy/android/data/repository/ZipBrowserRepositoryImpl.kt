@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.mapper.zipbrowser.ZipTreeNodeMapper
+import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 import mega.privacy.android.domain.entity.zipbrowser.ZipTreeNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ZipBrowserRepository
@@ -46,7 +47,16 @@ class ZipBrowserRepositoryImpl @Inject constructor(
                                 zipEntry = zipEntry,
                                 name = subName,
                                 path = subPath,
-                                parentPath = subParentPath
+                                parentPath = subParentPath,
+                                zipEntryType = if (i == nodeDepth) {
+                                    when {
+                                        zipEntry.isDirectory -> ZipEntryType.Folder
+                                        name.endsWith(SUFFIX_ZIP) -> ZipEntryType.Zip
+                                        else -> ZipEntryType.File
+                                    }
+                                } else {
+                                    ZipEntryType.Folder
+                                }
                             )
 
                             zipNodeTree[subPath] = zipTreeNode
@@ -54,14 +64,15 @@ class ZipBrowserRepositoryImpl @Inject constructor(
                             // If parent path is not empty add current path to map
                             // Empty path represents root directory
                             if (!subParentPath.isNullOrEmpty()) {
-                                val parentNode = zipNodeTree[subParentPath] ?: continue
-                                val updatedChildren =
-                                    parentNode.children.toMutableList().apply {
-                                        add(zipTreeNode)
-                                    }
-                                val updatedParentNode =
-                                    parentNode.copy(children = updatedChildren)
-                                zipNodeTree[subParentPath] = updatedParentNode
+                                zipNodeTree[subParentPath]?.let { parentNode ->
+                                    val updatedChildren =
+                                        parentNode.children.toMutableList().apply {
+                                            add(zipTreeNode)
+                                        }
+                                    val updatedParentNode =
+                                        parentNode.copy(children = updatedChildren)
+                                    zipNodeTree[subParentPath] = updatedParentNode
+                                }
                             }
                         }
                     }
@@ -91,4 +102,8 @@ class ZipBrowserRepositoryImpl @Inject constructor(
      */
     private fun String.getZipTreeNodeDepth() =
         removeSuffix(File.separator).split(File.separator).size
+
+    companion object {
+        private const val SUFFIX_ZIP = ".zip"
+    }
 }

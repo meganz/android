@@ -24,20 +24,13 @@ class ZipTreeNodeMapper @Inject constructor() {
         name: String,
         path: String,
         parentPath: String?,
+        zipEntryType: ZipEntryType,
     ) = ZipTreeNode(
         name = name,
         path = path,
         size = zipEntry.size,
-        zipEntryType = when {
-            zipEntry.isDirectory -> ZipEntryType.Folder
-            name.endsWith(SUFFIX_ZIP) -> ZipEntryType.Zip
-            else -> ZipEntryType.File
-        },
+        zipEntryType = zipEntryType,
         parentPath = parentPath,
         children = emptyList()
     )
-
-    companion object {
-        private const val SUFFIX_ZIP = ".zip"
-    }
 }

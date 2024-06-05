@@ -2,22 +2,56 @@ package mega.privacy.android.app.presentation.zipbrowser
 
 import android.app.Activity
 import android.content.Context
+import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.zipbrowser.view.ZipBrowserScreen
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.zip.ZipFile
+import javax.inject.Inject
 
 /**
  * The activity for the zip browser
  */
 @AndroidEntryPoint
 class ZipBrowserComposeActivity : PasscodeActivity() {
+    /**
+     * [GetThemeMode] injection
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
+    private val viewModel by viewModels<ZipBrowserViewModel>()
+
+    /**
+     * onCreate
+     */
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val themeMode by getThemeMode().collectAsStateWithLifecycle(
+                initialValue = ThemeMode.System
+            )
+            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                ZipBrowserScreen(viewModel = viewModel)
+            }
+        }
+    }
+
     companion object {
         /**
          * Use for companion object injection

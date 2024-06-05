@@ -39,7 +39,8 @@ class ZipTreeNodeMapperTest {
                 zipEntry = testZipEntry,
                 name = testName,
                 path = testPath,
-                parentPath = testParentPath
+                parentPath = testParentPath,
+                zipEntryType = testEntryType
             )
             assertZipTreeNodeMapperMapper(
                 zipTreeNode = zipTreeNode,
@@ -60,7 +61,8 @@ class ZipTreeNodeMapperTest {
                 zipEntry = testZipEntry,
                 name = testZipFileName,
                 path = testPath,
-                parentPath = testParentPath
+                parentPath = testParentPath,
+                zipEntryType = testEntryType,
             )
             assertZipTreeNodeMapperMapper(
                 zipTreeNode = zipTreeNode,
@@ -82,7 +84,8 @@ class ZipTreeNodeMapperTest {
                 zipEntry = testZipEntry,
                 name = testName,
                 path = testPath,
-                parentPath = testParentPath
+                parentPath = testParentPath,
+                zipEntryType = testEntryType
             )
             assertZipTreeNodeMapperMapper(
                 zipTreeNode = zipTreeNode,

@@ -54,34 +54,68 @@ class ZipBrowserViewModel @Inject constructor(
             }.getOrNull()
 
             zipNodeTree = getZipTreeMapUseCase(zipFile = zipFile)
-            dataUpdated(zipFullPath.removeSuffix(File.separator))
+            dataUpdated()
         }
     }
 
-    private fun dataUpdated(zipFolderPath: String?) {
-        if (zipNodeTree.isNotEmpty() && zipFolderPath != null) {
-            zipNodeTree[zipFolderPath]?.let { zipTreeNode ->
-                val entities = zipTreeNode.children.map {
-                    zipInfoUiEntityMapper(zipTreeNode)
+    private fun dataUpdated(zipFolderPath: String? = null, folderDepth: Int = 0) {
+        if (zipNodeTree.isNotEmpty()) {
+            var currentZipTreeNode: ZipTreeNode? = null
+            val entities = if (zipFolderPath == null) {
+                zipNodeTree.values.filter { it.parentPath == null }
+            } else {
+                currentZipTreeNode = zipNodeTree[zipFolderPath]
+                currentZipTreeNode?.children?.map {
+                    zipNodeTree[it.path]
                 }
-                val parentFolderName = getTitle(zipFolderPath)
-                _uiState.update {
-                    it.copy(
-                        items = entities,
-                        parentFolderName = parentFolderName,
-                        currentZipTreeNode = zipTreeNode
-                    )
-                }
+            }?.mapNotNull { zipTreeNode ->
+                zipTreeNode?.let { zipInfoUiEntityMapper(it) }
+            } ?: emptyList()
+
+            val parentFolderName = getTitle(zipFolderPath)
+            _uiState.update {
+                it.copy(
+                    items = entities,
+                    parentFolderName = parentFolderName,
+                    currentZipTreeNode = currentZipTreeNode,
+                    folderDepth = folderDepth
+                )
             }
         }
+    }
+
+    internal fun openFolder(zipFolderPath: String? = null) {
+        val folderDepth = _uiState.value.folderDepth.inc()
+        dataUpdated(
+            zipFolderPath = zipFolderPath,
+            folderDepth = folderDepth
+        )
     }
 
     /**
      * Get title of actionbar
      * @param folderPath current folder path
      */
-    private fun getTitle(folderPath: String) =
-        "${TITLE_ZIP}${folderPath.split(File.separator).lastOrNull()?.removeSuffix(SUFFIX_ZIP)}"
+    private fun getTitle(folderPath: String?) =
+        (folderPath ?: zipFullPath)?.let { path ->
+            "${
+                if (path == zipFullPath) {
+                    TITLE_ZIP
+                } else ""
+            }${path.split(File.separator).lastOrNull()?.removeSuffix(SUFFIX_ZIP)}"
+        } ?: ""
+
+    internal fun handleOnBackPressed() {
+        val folderDepth = _uiState.value.folderDepth.dec()
+        dataUpdated(
+            zipFolderPath = if (_uiState.value.folderDepth == 1) {
+                null
+            } else {
+                _uiState.value.currentZipTreeNode?.parentPath
+            },
+            folderDepth = folderDepth
+        )
+    }
 
     companion object {
         private const val TITLE_ZIP = "ZIP "
