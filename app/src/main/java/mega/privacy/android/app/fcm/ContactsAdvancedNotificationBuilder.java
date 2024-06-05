@@ -57,8 +57,6 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     private String firstName = "";
     private String lastName = "";
 
-    private NotificationCompat.Builder mBuilderCompat;
-
     private String notificationChannelIdSimple = NOTIFICATION_CHANNEL_CONTACTS_ID;
     private String notificationChannelNameSimple = NOTIFICATION_CHANNEL_CONTACTS_NAME;
     private String notificationChannelIdSummary = NOTIFICATION_CHANNEL_CONTACTS_SUMMARY_ID;
@@ -113,11 +111,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
             Timber.d("REQUEST: %s", i);
             ContactRequest contactRequest = contacts.get(i);
             Timber.d("User sent: %s", contactRequest.getSourceEmail());
-            if (i == 0) {
-                sendBundledNotificationIPC(contactRequest, true);
-            } else {
-                sendBundledNotificationIPC(contactRequest, false);
-            }
+            sendBundledNotificationIPC(contactRequest, i == 0);
         }
     }
 
@@ -150,15 +144,16 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     public void generateIncomingNotificationPreN(List<ContactRequest> icr) {
         Timber.d("generateIncomingNotificationPreN");
 
-        Intent intent = new Intent(context, ManagerActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(ACTION_IPC);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+        createNotificationChannel(
+                notificationChannelIdSimple,
+                notificationChannelNameSimple,
+                NotificationManager.IMPORTANCE_LOW
+        );
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, notificationChannelIdSimple)
                 .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
                 .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
-                .setContentIntent(pendingIntent)
+                .setContentIntent(getIPCPendingIntent(1))
                 .setAutoCancel(true);
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -181,16 +176,12 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
         if (icr.size() == 1) {
             Bitmap largeIcon = createDefaultAvatar(icr.get(0).getSourceEmail());
-            if (largeIcon != null) {
-                notificationBuilder.setLargeIcon(largeIcon);
-            }
+            notificationBuilder.setLargeIcon(largeIcon);
         } else {
 
             String count = icr.size() + "";
             Bitmap largeIcon = createDefaultAvatar(count);
-            if (largeIcon != null) {
-                notificationBuilder.setLargeIcon(largeIcon);
-            }
+            notificationBuilder.setLargeIcon(largeIcon);
         }
 
         String textToShow = context.getResources().getQuantityString(R.plurals.plural_number_contact_request_notification, icr.size(), icr.size());
@@ -201,11 +192,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
         Notification notif = notificationBuilder.build();
 
-        if (notif != null) {
-            notificationManager.notify(NOTIFICATION_SUMMARY_INCOMING_CONTACT, notif);
-        } else {
-            notificationManager.cancel(NOTIFICATION_SUMMARY_INCOMING_CONTACT);
-        }
+        notificationManager.notify(NOTIFICATION_SUMMARY_INCOMING_CONTACT, notif);
     }
 
     public void sendBundledNotificationAPC() {
@@ -231,17 +218,11 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
             return null;
         }
 
-        Intent intent = new Intent(context, ManagerActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(ACTION_IPC);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) crToShow.getHandle(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-
-        NotificationChannel channel = new NotificationChannel(notificationChannelIdSimple, notificationChannelNameSimple, NotificationManager.IMPORTANCE_LOW);
-        channel.setShowBadge(true);
-        if (notificationManager == null) {
-            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        }
-        notificationManager.createNotificationChannel(channel);
+        createNotificationChannel(
+                notificationChannelIdSimple,
+                notificationChannelNameSimple,
+                NotificationManager.IMPORTANCE_LOW
+        );
 
         NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSimple);
         notificationBuilderO
@@ -250,7 +231,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                 .setContentText(notificationContent)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationContent))
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
+                .setContentIntent(getIPCPendingIntent((int) crToShow.getHandle()))
                 .setGroup(GROUP_KEY_IPC)
                 .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
@@ -261,9 +242,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         }
 
         Bitmap largeIcon = createDefaultAvatar(crToShow.getSourceEmail());
-        if (largeIcon != null) {
-            notificationBuilderO.setLargeIcon(largeIcon);
-        }
+        notificationBuilderO.setLargeIcon(largeIcon);
 
         notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
 
@@ -275,29 +254,21 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         Timber.d("buildAPCNotification");
 
         String title = context.getString(R.string.title_acceptance_contact_request_notification);
-        String fullName = "";
+        String fullName = firstName + " " + lastName;
 
-        if (firstName.trim().length() <= 0) {
+        if (firstName.trim().isEmpty()) {
             fullName = lastName;
-        } else {
-            fullName = firstName + " " + lastName;
         }
 
-        if (fullName.trim().length() > 0) {
+        if (!fullName.trim().isEmpty()) {
             title = title + ": " + fullName;
         }
 
-        Intent intent = new Intent(context, ManagerActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(ACTION_OPEN_CONTACTS_SECTION);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) email.hashCode(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-
-        NotificationChannel channel = new NotificationChannel(notificationChannelIdSimple, notificationChannelNameSimple, NotificationManager.IMPORTANCE_LOW);
-        channel.setShowBadge(true);
-        if (notificationManager == null) {
-            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        }
-        notificationManager.createNotificationChannel(channel);
+        createNotificationChannel(
+                notificationChannelIdSimple,
+                notificationChannelNameSimple,
+                NotificationManager.IMPORTANCE_LOW
+        );
 
         NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSimple);
         notificationBuilderO
@@ -305,7 +276,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                 .setContentTitle(title)
                 .setContentText(email)
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
+                .setContentIntent(getAPCPendingIntent(email.hashCode()))
                 .setGroup(GROUP_KEY_APC)
                 .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
@@ -314,9 +285,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         notificationBuilderO.setVibrate(new long[]{0, 500});
 
         Bitmap largeIcon = setUserAvatar(email);
-        if (largeIcon != null) {
-            notificationBuilderO.setLargeIcon(largeIcon);
-        }
+        notificationBuilderO.setLargeIcon(largeIcon);
 
         notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
 
@@ -340,17 +309,11 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     public Notification buildSummaryIPC(String groupKey) {
-        Intent intent = new Intent(context, ManagerActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(ACTION_IPC);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-
-        NotificationChannel channel = new NotificationChannel(notificationChannelIdSummary, notificationChannelNameSummary, NotificationManager.IMPORTANCE_HIGH);
-        channel.setShowBadge(true);
-        if (notificationManager == null) {
-            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        }
-        notificationManager.createNotificationChannel(channel);
+        createNotificationChannel(
+                notificationChannelIdSummary,
+                notificationChannelNameSummary,
+                NotificationManager.IMPORTANCE_HIGH
+        );
 
         NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSummary);
         notificationBuilderO
@@ -359,25 +322,29 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                 .setGroup(groupKey)
                 .setGroupSummary(true)
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
+                .setContentIntent(getIPCPendingIntent(1))
                 .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
         return notificationBuilderO.build();
+    }
 
+    private PendingIntent getIPCPendingIntent(int requestCode) {
+        Intent intent = getBaseIntent();
+        intent.setAction(ACTION_IPC);
+        return PendingIntent.getActivity(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE
+        );
     }
 
     public Notification buildSummaryAPC(String groupKey) {
-        Intent intent = new Intent(context, ManagerActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(ACTION_OPEN_CONTACTS_SECTION);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 2, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-
-        NotificationChannel channel = new NotificationChannel(notificationChannelIdSummary, notificationChannelNameSummary, NotificationManager.IMPORTANCE_HIGH);
-        channel.setShowBadge(true);
-        if (notificationManager == null) {
-            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        }
-        notificationManager.createNotificationChannel(channel);
+        createNotificationChannel(
+                notificationChannelIdSummary,
+                notificationChannelNameSummary,
+                NotificationManager.IMPORTANCE_HIGH
+        );
 
         NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSummary);
         notificationBuilderO
@@ -386,51 +353,55 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                 .setGroup(groupKey)
                 .setGroupSummary(true)
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
+                .setContentIntent(getAPCPendingIntent(2))
                 .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
         return notificationBuilderO.build();
+    }
 
+    private PendingIntent getAPCPendingIntent(int requestCode) {
+        Intent intent = getBaseIntent();
+        intent.setAction(ACTION_OPEN_CONTACTS_SECTION);
+        return PendingIntent.getActivity(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE
+        );
+    }
+
+    private Intent getBaseIntent() {
+        Intent intent = new Intent(context, ManagerActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        return intent;
     }
 
     public void removeAllIncomingContactNotifications() {
         notificationManager.cancel(NOTIFICATION_SUMMARY_INCOMING_CONTACT);
     }
 
-    public void removeAllAcceptanceContactNotifications() {
-        notificationManager.cancel(NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT);
-    }
-
     public void showSimpleNotificationAPC() {
         String title = context.getString(R.string.title_acceptance_contact_request_notification);
-        String fullName = "";
+        String fullName = firstName + " " + lastName;
 
-        if (firstName.trim().length() <= 0) {
+        if (firstName.trim().isEmpty()) {
             fullName = lastName;
-        } else {
-            fullName = firstName + " " + lastName;
         }
 
-        if (fullName.trim().length() > 0) {
+        if (!fullName.trim().isEmpty()) {
             title = title + ": " + fullName;
         }
 
-        Intent intent = new Intent(context, ManagerActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(ACTION_OPEN_CONTACTS_SECTION);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) email.hashCode(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-
-        NotificationChannel channel = new NotificationChannel(notificationChannelIdSimple, notificationChannelNameSimple, NotificationManager.IMPORTANCE_LOW);
-        channel.setShowBadge(true);
-        if (notificationManager == null) {
-            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        }
-        notificationManager.createNotificationChannel(channel);
+        createNotificationChannel(
+                notificationChannelIdSimple,
+                notificationChannelNameSimple,
+                NotificationManager.IMPORTANCE_LOW
+        );
 
         NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSimple);
         notificationBuilderO
                 .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)
-                .setContentIntent(pendingIntent)
+                .setContentIntent(getAPCPendingIntent(email.hashCode()))
                 .setAutoCancel(true).setTicker(title)
                 .setContentTitle(title).setContentText(email)
                 .setOngoing(false)
@@ -441,14 +412,20 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         notificationBuilderO.setVibrate(new long[]{0, 500});
 
         Bitmap largeIcon = setUserAvatar(email);
-        if (largeIcon != null) {
-            notificationBuilderO.setLargeIcon(largeIcon);
-        }
+        notificationBuilderO.setLargeIcon(largeIcon);
 
         notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
 
         notificationManager.notify(NOTIFICATION_GENERAL_PUSH_CHAT, notificationBuilderO.build());
+    }
 
+    private void createNotificationChannel(String id, String name, int importance) {
+        NotificationChannel channel = new NotificationChannel(id, name, importance);
+        channel.setShowBadge(true);
+        if (notificationManager == null) {
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        }
+        notificationManager.createNotificationChannel(channel);
     }
 
     @Override
