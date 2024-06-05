@@ -50,9 +50,12 @@ fun TextMegaButton(
     contentPadding = contentPadding,
 )
 
-
+/**
+ * Text button
+ * @param textAlign Text alignment
+ */
 @Composable
-internal fun TextMegaButton(
+fun TextMegaButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,

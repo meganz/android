@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
@@ -51,13 +52,11 @@ fun FileInfoTagsView(
         )
         GenericDescriptionTextField(
             value = "#Add tags",
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             onValueChange = {},
             isEnabled = false,
-            placeholderId = R.string.meetings_schedule_meeting_add_description_label,
+            placeholder = stringResource(id = R.string.meetings_schedule_meeting_add_description_label),
             showUnderline = true,
-            charLimit = 32
         )
         FlowRow(
             modifier = Modifier

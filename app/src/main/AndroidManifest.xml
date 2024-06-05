@@ -712,6 +712,7 @@
             android:name="mega.privacy.android.app.camera.CameraActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
+        <activity android:name="mega.privacy.android.app.presentation.tags.TagsActivity" />
     </application>
 
 </manifest>

@@ -77,6 +77,8 @@ import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTitleTextField
@@ -374,6 +376,8 @@ private fun AddDescriptionButton(
     onValueChange: (String) -> Unit,
     onSizeChange: () -> Unit = {},
 ) {
+    val isCharLimitReached =
+        remember(description) { description.length > Constants.MAX_DESCRIPTION_SIZE }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -383,10 +387,7 @@ private fun AddDescriptionButton(
             modifier = Modifier
                 .padding(start = 18.dp, end = 16.dp, top = 1.dp, bottom = 0.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .weight(1f)
-            ) {
+            Row(modifier = Modifier.weight(1f)) {
                 Box(
                     modifier = Modifier
                         .padding(top = 17.dp, end = 36.dp)
@@ -406,21 +407,21 @@ private fun AddDescriptionButton(
                 ) {
                     GenericDescriptionTextField(
                         value = description.ifEmpty { "" },
-                        charLimit = Constants.MAX_DESCRIPTION_SIZE,
                         onValueChange = { text ->
                             onValueChange(text)
                         },
+                        showError = isCharLimitReached,
                         initiallyFocused = description.isEmpty(),
-                        placeholderId = R.string.meetings_schedule_meeting_add_description_label,
-                        charLimitErrorId = R.string.meetings_schedule_meeting_meeting_description_too_long_error,
-                        titleId = R.string.meetings_scheduled_meeting_info_scheduled_meeting_description_label,
+                        placeholder = stringResource(id = R.string.meetings_schedule_meeting_add_description_label),
+                        supportingText = if (isCharLimitReached) stringResource(id = R.string.meetings_schedule_meeting_meeting_description_too_long_error) else null,
+                        title = stringResource(id = R.string.meetings_scheduled_meeting_info_scheduled_meeting_description_label),
                         onSizeChange = onSizeChange
                     )
                 }
             }
         }
 
-        CustomDivider(withStartPadding = false)
+        MegaDivider(dividerType = DividerType.FullSize)
     }
 }
 
