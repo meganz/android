@@ -8,6 +8,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.google.common.io.Files
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.model.OfflineOptionsUiState
+import mega.privacy.android.app.presentation.offline.view.getOfflineNodeDescription
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
@@ -39,7 +40,7 @@ internal fun OfflineOptionsContent(
                     modifier = Modifier.testTag(NODE_VIEW_TEST_TAG),
                     title = name,
                     titleOverflow = LongTextBehaviour.MiddleEllipsis,
-                    subtitle = "", // getOfflineNodeDescription(uiState), will be updated in subsequent MR
+                    subtitle = getOfflineNodeDescription(this@with),
                     icon = if (uiState.offlineFileInformation.isFolder) {
                         R.drawable.ic_folder_medium_solid
                     } else {

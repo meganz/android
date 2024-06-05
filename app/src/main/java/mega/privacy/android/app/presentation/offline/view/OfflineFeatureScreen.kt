@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.offline.view
 
 import mega.privacy.android.icon.pack.R as IconPackR
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,11 +28,11 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUiState
-import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
 import mega.privacy.android.app.presentation.view.NodeGridView
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -39,6 +40,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Scaffold for the Offline Flow Screen
@@ -72,12 +74,12 @@ fun OfflineFeatureScreen(
                 ) {
                     items(uiState.offlineNodes) {
                         NodeListViewItem(
-                            title = it.offlineNode.title,
+                            title = it.offlineNode.name,
                             subtitle = getOfflineNodeDescription(it.offlineNode),
                             icon = if (it.offlineNode.isFolder) {
                                 IconPackR.drawable.ic_folder_medium_solid
                             } else {
-                                fileTypeIconMapper(getFileExtension(it.offlineNode.title))
+                                fileTypeIconMapper(getFileExtension(it.offlineNode.name))
                             },
                             thumbnailData = it.offlineNode.thumbnail,
                             onMoreClicked = {
@@ -110,11 +112,11 @@ fun OfflineFeatureScreen(
                     items(newList) {
                         NodeGridViewItem(
                             isFolderNode = it.offlineNode.isFolder,
-                            name = it.offlineNode.title,
+                            name = it.offlineNode.name,
                             iconRes = if (it.offlineNode.isFolder) {
                                 IconPackR.drawable.ic_folder_medium_solid
                             } else {
-                                fileTypeIconMapper(getFileExtension(it.offlineNode.title))
+                                fileTypeIconMapper(getFileExtension(it.offlineNode.name))
                             },
                             thumbnailData = it.offlineNode.thumbnail,
                             isSelected = it.isSelected,
@@ -168,10 +170,10 @@ private fun rememberNodeListForGrid(
  * Get the description for the offline node
  */
 @Composable
-internal fun getOfflineNodeDescription(offlineFileInfoUiState: OfflineFileInfoUiState): String {
+internal fun getOfflineNodeDescription(offlineFileInformation: OfflineFileInformation): String {
     val context = LocalContext.current
-    return if (offlineFileInfoUiState.isFolder) {
-        offlineFileInfoUiState.folderInfo?.let { folderInfo ->
+    return if (offlineFileInformation.isFolder) {
+        offlineFileInformation.folderInfo?.let { folderInfo ->
             if (folderInfo.numFolders == 0 && folderInfo.numFiles == 0) {
                 stringResource(R.string.file_browser_empty_folder)
             } else if (folderInfo.numFolders == 0 && folderInfo.numFiles > 0) {
@@ -201,8 +203,8 @@ internal fun getOfflineNodeDescription(offlineFileInfoUiState: OfflineFileInfoUi
             ""
         }
     } else {
-        formatFileSize(offlineFileInfoUiState.totalSize, context)
-            .plus(offlineFileInfoUiState.addedTime?.let {
+        formatFileSize(offlineFileInformation.totalSize, context)
+            .plus(offlineFileInformation.addedTime?.let {
                 " · ".plus(
                     formatModifiedDate(
                         java.util.Locale(
@@ -222,38 +224,40 @@ private fun getFileExtension(name: String) =
 @CombinedThemePreviews
 @Composable
 private fun OfflineFeatureScreenPreview() {
-    OfflineFeatureScreen(
-        uiState = OfflineUiState(
-            isLoading = false,
-            offlineNodes = listOf(
-                OfflineNodeUIItem(
-                    offlineNode = OfflineFileInfoUiState(
-                        title = "Some file.txt",
-                        totalSize = 1234,
-                        addedTime = System.currentTimeMillis(),
-                    )
-                ),
-                OfflineNodeUIItem(
-                    offlineNode = OfflineFileInfoUiState(
-                        title = "Some Image.txt",
-                        totalSize = 3456,
-                        addedTime = System.currentTimeMillis(),
-                    )
-                ),
-                OfflineNodeUIItem(
-                    offlineNode = OfflineFileInfoUiState(
-                        title = "Some file",
-                        totalSize = 1234,
-                        addedTime = System.currentTimeMillis(),
-                        isFolder = true,
-                        folderInfo = OfflineFolderInfo(numFiles = 2, numFolders = 3)
-                    )
-                ),
-            )
-        ),
-        fileTypeIconMapper = FileTypeIconMapper(),
-        onOfflineItemClicked = {},
-        onItemLongClicked = {},
-        onOptionClicked = {}
-    )
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        OfflineFeatureScreen(
+            uiState = OfflineUiState(
+                isLoading = false,
+                offlineNodes = listOf(
+                    OfflineNodeUIItem(
+                        offlineNode = OfflineFileInformation(
+                            name = "Some file.txt",
+                            totalSize = 1234,
+                            addedTime = System.currentTimeMillis(),
+                        )
+                    ),
+                    OfflineNodeUIItem(
+                        offlineNode = OfflineFileInformation(
+                            name = "Some file.txt",
+                            totalSize = 3456,
+                            addedTime = System.currentTimeMillis(),
+                        )
+                    ),
+                    OfflineNodeUIItem(
+                        offlineNode = OfflineFileInformation(
+                            name = "Some Folder",
+                            totalSize = 1234,
+                            addedTime = System.currentTimeMillis(),
+                            isFolder = true,
+                            folderInfo = OfflineFolderInfo(numFiles = 2, numFolders = 3)
+                        )
+                    ),
+                )
+            ),
+            fileTypeIconMapper = FileTypeIconMapper(),
+            onOfflineItemClicked = {},
+            onItemLongClicked = {},
+            onOptionClicked = {}
+        )
+    }
 }

@@ -12,20 +12,14 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUiState
-import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
-import mega.privacy.android.shared.original.core.ui.utils.pop
-import mega.privacy.android.shared.original.core.ui.utils.push
-import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
-import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineFileTotalSizeUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineFolderInformationUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.shared.original.core.ui.utils.pop
+import mega.privacy.android.shared.original.core.ui.utils.push
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,10 +33,6 @@ class OfflineComposeViewModel @Inject constructor(
     private val setOfflineWarningMessageVisibilityUseCase: SetOfflineWarningMessageVisibilityUseCase,
     private val monitorOfflineWarningMessageVisibilityUseCase: MonitorOfflineWarningMessageVisibilityUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
-    private val offlineFolderInformationUseCase: GetOfflineFolderInformationUseCase,
-    private val getOfflineFileUseCase: GetOfflineFileUseCase,
-    private val getThumbnailUseCase: GetThumbnailUseCase,
-    private val getOfflineFileTotalSizeUseCase: GetOfflineFileTotalSizeUseCase,
     private val monitorViewType: MonitorViewType,
 ) : ViewModel() {
 
@@ -59,9 +49,14 @@ class OfflineComposeViewModel @Inject constructor(
         monitorOfflineNodeUpdates()
         monitorViewTypeUpdate()
         viewModelScope.launch {
-            monitorTransfersFinishedUseCase().conflate().collect {
-                refreshList()
-            }
+            monitorTransfersFinishedUseCase()
+                .catch {
+                    Timber.e(it)
+                }
+                .conflate()
+                .collect {
+                    loadOfflineNodes()
+                }
         }
     }
 
@@ -101,29 +96,31 @@ class OfflineComposeViewModel @Inject constructor(
                 }
                 .conflate()
                 .collect {
-                    refreshList()
+                    loadOfflineNodes()
                 }
         }
     }
 
-    private fun refreshList() {
+
+    private fun refreshOfflineNodes() {
         viewModelScope.launch {
-            runCatching {
-                getOfflineNodesByParentIdUseCase(uiState.value.parentId)
-            }.onSuccess {
-                val offlineNodeUiList = it?.map { offlineInfo ->
-                    OfflineNodeUIItem(offlineNode = loadOfflineNodeInformation(offlineInfo))
-                } ?: emptyList()
-                _uiState.update {
-                    it.copy(
-                        offlineNodes = offlineNodeUiList
-                    )
-                }
-            }.onFailure {
-                Timber.e(it)
-                _uiState.update {
-                    it.copy(offlineNodes = emptyList())
-                }
+            loadOfflineNodes()
+        }
+    }
+
+    private suspend fun loadOfflineNodes() {
+        runCatching {
+            getOfflineNodesByParentIdUseCase(uiState.value.parentId)
+        }.onSuccess { offlineNodeList ->
+            _uiState.update {
+                it.copy(
+                    offlineNodes = offlineNodeList.map { item -> OfflineNodeUIItem(item) }
+                )
+            }
+        }.onFailure {
+            Timber.e(it)
+            _uiState.update {
+                it.copy(offlineNodes = emptyList())
             }
         }
     }
@@ -135,51 +132,6 @@ class OfflineComposeViewModel @Inject constructor(
         viewModelScope.launch {
             setOfflineWarningMessageVisibilityUseCase(isVisible = false)
         }
-    }
-
-    private suspend fun loadOfflineNodeInformation(offlineNodeInfo: OfflineNodeInformation): OfflineFileInfoUiState {
-        val offlineFile = getOfflineFileUseCase(offlineNodeInfo)
-        val totalSize = getOfflineFileTotalSizeUseCase(offlineFile)
-        val folderInfo = getFolderInfoOrNull(offlineNodeInfo)
-        val addedTime = offlineNodeInfo.lastModifiedTime?.div(1000L)
-        val thumbnail = runCatching {
-            getThumbnailPathOrNull(
-                isFolder = offlineNodeInfo.isFolder,
-                handle = offlineNodeInfo.handle.toLong(),
-            )
-        }.getOrElse {
-            Timber.e(it)
-            null
-        }
-
-        return OfflineFileInfoUiState(
-            id = offlineNodeInfo.id,
-            handle = offlineNodeInfo.handle.toLong(),
-            title = offlineNodeInfo.name,
-            isFolder = offlineNodeInfo.isFolder,
-            addedTime = addedTime,
-            totalSize = totalSize,
-            folderInfo = folderInfo,
-            thumbnail = thumbnail
-        )
-    }
-
-    private suspend fun getThumbnailPathOrNull(
-        isFolder: Boolean,
-        handle: Long,
-    ): String? {
-        if (isFolder) return null
-
-        return getThumbnailUseCase(handle)
-            ?.takeIf { it.exists() }
-            ?.toURI()
-            ?.toString()
-    }
-
-    private suspend fun getFolderInfoOrNull(
-        offlineNodeInfo: OfflineNodeInformation,
-    ) = offlineNodeInfo.takeIf { it.isFolder }?.let {
-        offlineFolderInformationUseCase(it.id)
     }
 
     /**
@@ -196,11 +148,11 @@ class OfflineComposeViewModel @Inject constructor(
                 )
                 _uiState.update {
                     it.copy(
-                        title = offlineNodeUIItem.offlineNode.title,
+                        title = offlineNodeUIItem.offlineNode.name,
                         parentId = offlineNodeUIItem.offlineNode.id,
                     )
                 }
-                refreshList()
+                refreshOfflineNodes()
             }
         } else {
             onLongItemClicked(offlineNodeUIItem)
@@ -218,7 +170,7 @@ class OfflineComposeViewModel @Inject constructor(
                     title = parentTitle
                 )
             }
-            refreshList()
+            refreshOfflineNodes()
             return null
         } ?: run {
             return -1
