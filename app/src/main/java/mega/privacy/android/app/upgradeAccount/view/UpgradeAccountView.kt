@@ -87,6 +87,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_te
 import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
@@ -571,6 +572,14 @@ private fun FeaturesOfPlans(
                 style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
                 modifier = modifier
             )
+            if (showNewFeatures) {
+                MegaText(
+                    text = stringResource(id = sharedR.string.account_upgrade_account_description_feature_sync),
+                    textColor = TextColor.Primary,
+                    style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                    modifier = modifier
+                )
+            }
             MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_description_feature_rewind),
                 textColor = TextColor.Primary,
