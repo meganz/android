@@ -5,6 +5,7 @@ import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +20,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -29,6 +31,7 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
@@ -146,6 +149,7 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import test.mega.privacy.android.app.InstantExecutorExtension
 import test.mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
+import java.io.File
 import java.util.stream.Stream
 import kotlin.test.assertFalse
 
@@ -1514,6 +1518,45 @@ class ManagerViewModelTest {
                 assertThat(awaitItem().message).isEqualTo(InfoToShow.SimpleString(R.string.call_error_too_many_participants))
             }
         }
+
+
+    @Test
+    fun `test that state is updated correctly if upload a File`() = runTest {
+        val file = File("path")
+        val parentHandle = 123L
+        val expected = triggered(
+            TransferTriggerEvent.StartUpload.Files(
+                mapOf(file.absolutePath to null),
+                NodeId(parentHandle)
+            )
+        )
+
+        underTest.uploadFile(file, parentHandle)
+        underTest.state.map { it.uploadEvent }.test {
+            assertThat(awaitItem()).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly if upload a ShareInfo`() = runTest {
+        val file = File("path")
+        val path = file.absolutePath
+        val shareInfo = mock<ShareInfo> {
+            on { fileAbsolutePath } doReturn path
+        }
+        val parentHandle = 123L
+        val expected = triggered(
+            TransferTriggerEvent.StartUpload.Files(
+                mapOf(path to null),
+                NodeId(parentHandle)
+            )
+        )
+
+        underTest.uploadShareInfo(listOf(shareInfo), parentHandle)
+        underTest.state.map { it.uploadEvent }.test {
+            assertThat(awaitItem()).isEqualTo(expected)
+        }
+    }
 
     companion object {
         @JvmField

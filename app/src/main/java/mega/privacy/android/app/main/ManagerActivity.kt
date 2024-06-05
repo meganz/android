@@ -92,6 +92,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -246,6 +247,7 @@ import mega.privacy.android.app.presentation.transfers.TransfersManagementActivi
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
@@ -998,7 +1000,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         Timber.d("Set view")
         setContentView(R.layout.activity_manager)
         initialiseViews()
-        addStartDownloadTransferView()
+        addStartTransferView()
         setInitialViewProperties()
         setViewListeners()
     }
@@ -1038,16 +1040,19 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         navHostView = findViewById(R.id.nav_host_fragment)
     }
 
-    private fun addStartDownloadTransferView() {
+    private fun addStartTransferView() {
         findViewById<ViewGroup>(R.id.root_content_layout).addView(
             createStartTransferView(
                 this,
-                startDownloadViewModel.state,
-                startDownloadViewModel::consumeDownloadEvent
-            )
+                startDownloadViewModel.state
+            ) {
+                if ((startDownloadViewModel.state.value as StateEventWithContentTriggered).content is TransferTriggerEvent.StartUpload) {
+                    viewModel.consumeUploadEvent()
+                }
+                startDownloadViewModel.consumeDownloadEvent()
+            }
         )
     }
-
 
     @SuppressLint("UnrememberedMutableState")
     @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
@@ -1926,6 +1931,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 syncNavigator.startSyncService(this)
             } else {
                 syncNavigator.stopSyncService(this)
+            }
+
+            if (managerState.uploadEvent is StateEventWithContentTriggered) {
+                startDownloadViewModel.onUploadClicked(managerState.uploadEvent.content)
             }
         }
         this.collectFlow(
@@ -6326,14 +6335,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @SuppressLint("CheckResult")
     private fun uploadFile(file: File, parentHandle: Long) {
-        PermissionUtils.checkNotificationsPermission(this)
-        uploadUseCase.upload(this, file, parentHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { Timber.d("Upload started") },
-                { t: Throwable? -> Timber.e(t) })
-            .addTo(composite)
+        applicationScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                viewModel.uploadFile(file, parentHandle)
+            } else {
+                PermissionUtils.checkNotificationsPermission(this@ManagerActivity)
+                uploadUseCase.upload(this@ManagerActivity, file, parentHandle)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        { Timber.d("Upload started") },
+                        { t: Throwable? -> Timber.e(t) })
+                    .addTo(composite)
+            }
+        }
     }
 
     private fun disableNavigationViewMenu(menu: Menu) {
@@ -6610,26 +6625,41 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         nameCollisionActivityContract?.launch(collisions)
                     }
                     if (withoutCollisions.isNotEmpty()) {
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            resources.getQuantityString(
-                                R.plurals.upload_began,
-                                withoutCollisions.size,
-                                withoutCollisions.size
-                            ),
-                            MEGACHAT_INVALID_HANDLE
-                        )
-                        for (info in withoutCollisions) {
-                            if (info.isContact) {
-                                requestContactsPermissions(info, parentNode)
+                        applicationScope.launch {
+                            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                                withoutCollisions.filter { it.isContact }.forEach {
+                                    requestContactsPermissions(it, parentNode)
+                                }
+                                val shareInfo = withoutCollisions.filter { !it.isContact }
+                                viewModel.uploadShareInfo(shareInfo, parentNode.handle)
                             } else {
-                                uploadUseCase.upload(this, info, null, parentNode.handle)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(
-                                        { Timber.d("Upload started") },
-                                        { t: Throwable? -> Timber.e(t) })
-                                    .addTo(composite)
+                                showSnackbar(
+                                    Constants.SNACKBAR_TYPE,
+                                    resources.getQuantityString(
+                                        R.plurals.upload_began,
+                                        withoutCollisions.size,
+                                        withoutCollisions.size
+                                    ),
+                                    MEGACHAT_INVALID_HANDLE
+                                )
+                                for (info in withoutCollisions) {
+                                    if (info.isContact) {
+                                        requestContactsPermissions(info, parentNode)
+                                    } else {
+                                        uploadUseCase.upload(
+                                            this@ManagerActivity,
+                                            info,
+                                            null,
+                                            parentNode.handle
+                                        )
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(
+                                                { Timber.d("Upload started") },
+                                                { t: Throwable? -> Timber.e(t) })
+                                            .addTo(composite)
+                                    }
+                                }
                             }
                         }
                     }
@@ -6784,31 +6814,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             MEGACHAT_INVALID_HANDLE
                         )
                     } else if (throwable is MegaNodeException.ChildDoesNotExistsException) {
-                        uploadFile(file, parentNode)
+                        uploadFile(file, parentNode.handle)
                     }
                 }
         }
-    }
-
-    @SuppressLint("CheckResult")
-    private fun uploadFile(
-        file: File,
-        parentNode: MegaNode,
-    ) {
-        PermissionUtils.checkNotificationsPermission(this)
-        val text: String =
-            resources.getQuantityString(R.plurals.upload_began, 1, 1)
-        uploadUseCase.upload(this, file, parentNode.handle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    text,
-                    MEGACHAT_INVALID_HANDLE
-                )
-            }, { t: Throwable? -> Timber.e(t) })
-            .addTo(composite)
     }
 
     override fun onRequestStart(api: MegaChatApiJava, request: MegaChatRequest) {

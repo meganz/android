@@ -250,4 +250,13 @@ class StartDownloadViewModel @Inject constructor(
     fun consumeDownloadEvent() {
         _state.update { consumed() }
     }
+
+    /**
+     * Triggers the event related to upload files.
+     */
+    fun onUploadClicked(event: TransferTriggerEvent.StartUpload) {
+        _state.update {
+            triggered(event)
+        }
+    }
 }

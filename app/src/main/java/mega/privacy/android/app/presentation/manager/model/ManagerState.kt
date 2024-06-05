@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.manager.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -37,6 +40,7 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property usersCallLimitReminders                    [UsersCallLimitReminders]
  * @property searchQuery                                Search query
  * @property isSyncFeatureFlagEnabled                   True if Android Sync feature flag is enabled. False otherwise.
+ * @property uploadEvent                                Event to trigger upload actions
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -64,4 +68,5 @@ data class ManagerState(
     val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled,
     val searchQuery: String = "",
     val isSyncFeatureFlagEnabled: Boolean = false,
+    val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
 )

@@ -210,7 +210,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
         setUpObservers()
         setUpView(savedInstanceState)
-        addStartDownloadTransferView()
+        addStartTransferView()
 
         if (savedInstanceState != null) {
             nodeAttacher.restoreState(savedInstanceState)
@@ -665,7 +665,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         }
     }
 
-    private fun addStartDownloadTransferView() {
+    private fun addStartTransferView() {
         binding.root.addView(
             createStartTransferView(
                 this,
