@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,8 +31,8 @@ import mega.privacy.android.app.presentation.meeting.chat.view.UserTypingView
 import mega.privacy.android.shared.original.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 
 
 /**
@@ -69,9 +70,11 @@ internal fun ChatBottomBar(
             keyboardController?.show()
         }
     }
-    ComposableLifecycle(key = textFieldValue.text) {
-        if (it == Lifecycle.Event.ON_PAUSE) {
-            viewModel.saveDraftMessage(textFieldValue.text, uiState.editingMessageId)
+    key(textFieldValue.text, uiState.editingMessageId) {
+        ComposableLifecycle {
+            if (it == Lifecycle.Event.ON_PAUSE) {
+                viewModel.saveDraftMessage(textFieldValue.text, uiState.editingMessageId)
+            }
         }
     }
 

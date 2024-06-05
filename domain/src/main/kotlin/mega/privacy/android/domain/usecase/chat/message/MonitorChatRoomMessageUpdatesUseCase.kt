@@ -25,6 +25,9 @@ class MonitorChatRoomMessageUpdatesUseCase @Inject constructor(
     private val chatMessageRepository: ChatMessageRepository,
     private val clearChatMessagesUseCase: ClearChatMessagesUseCase,
 ) {
+    // in case chat reconnects, it emits the truncate message again, we need to exclude the truncate message handled before
+    private val truncateMessageHandledIds = mutableSetOf<Long>()
+
     /**
      * Invoke
      *
@@ -43,7 +46,13 @@ class MonitorChatRoomMessageUpdatesUseCase @Inject constructor(
 
                     is MessageUpdate -> {
                         if (it.message.type == ChatMessageType.TRUNCATE) {
-                            clearChatMessagesUseCase(chatId = chatId, clearPendingMessages = true)
+                            if (!truncateMessageHandledIds.contains(it.message.messageId)) {
+                                clearChatMessagesUseCase(
+                                    chatId = chatId,
+                                    clearPendingMessages = true
+                                )
+                                truncateMessageHandledIds.add(it.message.messageId)
+                            }
                         }
                         saveChatMessagesUseCase(chatId, listOf(it.message))
                     }
