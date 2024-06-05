@@ -85,7 +85,8 @@ internal class AlbumContentViewModel @Inject constructor(
 
     private var observeAlbumPhotosJob: Job? = null
 
-    private var sourcePhotos: List<Photo>? = null
+    var sourcePhotos: List<Photo>? = null
+        private set
 
     private var showHiddenItems: Boolean? = null
 

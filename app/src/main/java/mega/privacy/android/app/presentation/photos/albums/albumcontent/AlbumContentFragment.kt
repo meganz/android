@@ -392,7 +392,7 @@ class AlbumContentFragment : Fragment() {
     private fun openAlbumGetLinkScreen() {
         val album = albumContentViewModel.state.value.uiAlbum?.id as? UserAlbum ?: return
         val hasSensitiveElement = if (!album.isExported) {
-            albumContentViewModel.state.value.photos.any { it.isSensitive || it.isSensitiveInherited }
+            albumContentViewModel.sourcePhotos?.any { it.isSensitive || it.isSensitiveInherited } ?: false
         } else {
             false
         }

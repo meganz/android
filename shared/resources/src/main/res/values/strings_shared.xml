@@ -390,4 +390,6 @@
     <string name="sync_error_dialog_free_user_confirm_action">OK</string>
     <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
     <string name="sync_error_banner_free_user">Syncing is paused because your MEGA Pro plan was cancelled. Upgrade to continue syncing.</string>
+    <!-- Hidden items -->
+    <string name="hidden_items">Hidden items</string>
 </resources>

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.photos.albums.getlink
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.text.TextUtils.TruncateAt.MIDDLE
 import android.view.View
 import android.widget.TextView
@@ -168,7 +169,7 @@ internal fun AlbumGetLinkScreen(
 
     if (!state.showCopyright && state.showSharingSensitiveWarning) {
         ConfirmationDialog(
-            title = pluralStringResource(id = R.plurals.hidden_nodes_items, 2),
+            title = stringResource(id = sharedR.string.hidden_items),
             text = stringResource(id = R.string.hidden_nodes_sharing_album),
             confirmButtonText = stringResource(id = R.string.button_continue),
             cancelButtonText = stringResource(id = R.string.button_cancel),
