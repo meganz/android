@@ -62,6 +62,7 @@ import java.util.Stack;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import de.palm.composestateevents.StateEventWithContentTriggered;
 import kotlin.Unit;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -70,12 +71,14 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
+import mega.privacy.android.app.presentation.contact.ContactFileListViewModel;
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity;
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher;
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource;
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel;
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -109,6 +112,9 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
     }
 
     private StartDownloadViewModel startDownloadViewModel;
+
+    private ContactFileListViewModel viewModel;
+
     Handler handler;
 
     public void activateActionMode() {
@@ -399,11 +405,15 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
     private void addStartDownloadTransferView(View root) {
         if (root instanceof ViewGroup && getActivity() != null) {
             startDownloadViewModel = new ViewModelProvider(requireActivity()).get(StartDownloadViewModel.class);
+            viewModel = new ViewModelProvider(requireActivity()).get(ContactFileListViewModel.class);
             ((ViewGroup) root).addView(
                     createStartTransferView(
                             requireActivity(),
                             startDownloadViewModel.getState(),
                             () -> {
+                                if (((StateEventWithContentTriggered<TransferTriggerEvent>) startDownloadViewModel.getState().getValue()).getContent() instanceof TransferTriggerEvent.StartUpload) {
+                                    viewModel.consumeUploadEvent();
+                                }
                                 startDownloadViewModel.consumeDownloadEvent();
                                 return Unit.INSTANCE;
                             }

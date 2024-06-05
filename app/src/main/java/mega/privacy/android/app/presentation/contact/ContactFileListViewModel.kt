@@ -3,14 +3,19 @@ package mega.privacy.android.app.presentation.contact
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -20,6 +25,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -170,5 +176,59 @@ class ContactFileListViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(snackBarMessage = null) }
         }
+    }
+
+    /**
+     * Uploads a file to the specified destination.
+     *
+     * @param file The file to upload.
+     * @param destination The destination where the file will be uploaded.
+     */
+    fun uploadFile(
+        file: File,
+        destination: Long,
+    ) {
+        uploadFiles(
+            mapOf(file.absolutePath to null),
+            NodeId(destination)
+        )
+    }
+
+    /**
+     * Uploads a list of files to the specified destination.
+     *
+     * @param shareInfo The files as [ShareInfo] to upload.
+     * @param destination The destination where the files will be uploaded.
+     */
+    fun uploadShareInfo(
+        shareInfo: List<ShareInfo>,
+        destination: Long,
+    ) {
+        val pathsAndNames = shareInfo.map { it.fileAbsolutePath }.associateWith { null }
+
+        uploadFiles(pathsAndNames, NodeId(destination))
+    }
+
+    private fun uploadFiles(
+        pathsAndNames: Map<String, String?>,
+        destinationId: NodeId,
+    ) {
+        _state.update { state ->
+            state.copy(
+                uploadEvent = triggered(
+                    TransferTriggerEvent.StartUpload.Files(
+                        pathsAndNames = pathsAndNames,
+                        destinationId = destinationId,
+                    )
+                )
+            )
+        }
+    }
+
+    /**
+     * Consume upload event
+     */
+    fun consumeUploadEvent() {
+        _state.update { it.copy(uploadEvent = consumed()) }
     }
 }
