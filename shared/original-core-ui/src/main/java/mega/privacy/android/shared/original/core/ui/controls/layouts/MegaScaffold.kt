@@ -22,7 +22,10 @@ import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
  * @param topBar TopBar
  * @param bottomBar BottomBar
  * @param floatingActionButton FloatingActionButton
- * @param content Content
+ * @param content content of your screen. The lambda receives an [PaddingValues] that should be
+ * applied to the content root via Modifier.padding to properly offset top and bottom bars. If
+ * you're using VerticalScroller, apply this modifier to the child of the scroller, and not on
+ * the scroller itself.
  */
 @Composable
 fun MegaScaffold(
