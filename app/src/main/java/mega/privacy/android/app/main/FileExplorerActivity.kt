@@ -25,9 +25,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -37,6 +39,7 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -71,6 +74,8 @@ import mega.privacy.android.app.namecollision.data.NameCollision.Upload.Companio
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException.ChildDoesNotExistsException
@@ -103,6 +108,7 @@ import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -139,6 +145,8 @@ import javax.inject.Inject
  * @property checkNameCollisionUseCase [CheckNameCollisionUseCase]
  * @property uploadUseCase             [UploadUseCase]
  * @property copyNodeUseCase           [CopyNodeUseCase]
+ * @property getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
+ * @property loginMutex                Mutex.
  * @property isList                    True if the view is in list mode, false if it is in grid mode.
  * @property mode                      Mode for opening the file explorer: [UPLOAD], [MOVE], [COPY], [CAMERA], [IMPORT], [SELECT], [SELECT_CAMERA_FOLDER], [SHARE_LINK] or [SAVE]
  * @property isMultiselect             True if it should allow multiple selection, false otherwise.
@@ -168,6 +176,9 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     @Inject
     lateinit var copyNodeUseCase: CopyNodeUseCase
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     @LoginMutex
@@ -569,7 +580,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
         binding = ActivityFileExplorerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        addStartUploadTransferView()
 
         setSupportActionBar(binding.toolbarExplorer)
         supportActionBar?.hide()
@@ -1641,31 +1652,40 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         }
 
                         if (withoutCollisions.isNotEmpty()) {
-                            checkNotificationsPermission(this)
+                            lifecycleScope.launch {
+                                if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                                    viewModel.uploadShareInfo(
+                                        infos,
+                                        (parentNode ?: return@launch).handle
+                                    )
+                                } else {
+                                    checkNotificationsPermission(this@FileExplorerActivity)
 
-                            val text =
-                                resources.getQuantityString(
-                                    R.plurals.upload_began,
-                                    withoutCollisions.size,
-                                    withoutCollisions.size
-                                )
+                                    val text =
+                                        resources.getQuantityString(
+                                            R.plurals.upload_began,
+                                            withoutCollisions.size,
+                                            withoutCollisions.size
+                                        )
 
-                            uploadUseCase.uploadInfos(
-                                this,
-                                infos,
-                                viewModel.fileNames.value,
-                                (parentNode ?: return@subscribe).handle
-                            )
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe({
-                                    showSnackbar(text)
-                                    backToCloud(parentNode.handle, infos.size, null)
-                                    filePreparedInfos = null
-                                    Timber.d("finish!!!")
-                                    finishAndRemoveTask()
-                                }) { t: Throwable? -> Timber.e(t) }
-                                .addTo(composite)
+                                    uploadUseCase.uploadInfos(
+                                        this@FileExplorerActivity,
+                                        infos,
+                                        viewModel.fileNames.value,
+                                        (parentNode ?: return@launch).handle
+                                    )
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe({
+                                            showSnackbar(text)
+                                            backToCloud(parentNode.handle, infos.size, null)
+                                            filePreparedInfos = null
+                                            Timber.d("Processing for start uploading ShareInfos finished.")
+                                            finishAndRemoveTask()
+                                        }) { t: Throwable? -> Timber.e(t) }
+                                        .addTo(composite)
+                                }
+                            }
                         }
                     },
                     { throwable: Throwable ->
@@ -1927,22 +1947,29 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     @SuppressLint("CheckResult")
     private fun uploadFile(file: File) {
-        checkNotificationsPermission(this)
-        val text = resources.getQuantityString(R.plurals.upload_began, 1, 1)
-        uploadUseCase.upload(this, file, parentHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    text,
-                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                )
-                Timber.d("After UPLOAD click - back to Cloud")
-                backToCloud(parentHandle, 1, null)
-                finishAndRemoveTask()
-            }) { t: Throwable? -> Timber.e(t) }
-            .addTo(composite)
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                viewModel.uploadFile(file, parentHandle)
+            } else {
+                checkNotificationsPermission(this@FileExplorerActivity)
+                val text = resources.getQuantityString(R.plurals.upload_began, 1, 1)
+                uploadUseCase.upload(this@FileExplorerActivity, file, parentHandle)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        showSnackbar(
+                            Constants.SNACKBAR_TYPE,
+                            text,
+                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                        )
+                        Timber.d("After UPLOAD click - back to Cloud")
+                        backToCloud(parentHandle, 1, null)
+                        finishAndRemoveTask()
+                    }) { t: Throwable? -> Timber.e(t) }
+                    .addTo(composite)
+            }
+        }
+
     }
 
     override fun finishRenameActionWithSuccess(newName: String) {
@@ -2672,6 +2699,24 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 onChatPresenceLastGreen(userHandle, lastGreen)
             }) { t: Throwable? -> Timber.e(t) }
             .addTo(composite)
+    }
+
+    private fun addStartUploadTransferView() {
+        binding.root.addView(
+            createStartTransferView(
+                this,
+                viewModel.uiState.map { it.uploadEvent }
+            ) {
+                ((viewModel.uiState.value.uploadEvent as StateEventWithContentTriggered).content).let { event ->
+                    if (event is TransferTriggerEvent.StartUpload.Files) {
+                        backToCloud(event.destinationId.longValue, event.pathsAndNames.size, null)
+                    }
+                }
+
+                finishAndRemoveTask()
+                viewModel.consumeUploadEvent()
+            }
+        )
     }
 
     companion object {

@@ -103,9 +103,9 @@ class StartTransfersComponentViewModelTest {
     private val parentNode: TypedFolderNode = mock()
     private val startDownloadEvent = TransferTriggerEvent.StartDownloadNode(nodes)
     private val startUploadFilesEvent =
-        TransferTriggerEvent.StartUpload.Files(listOf(uploadUri), parentId)
+        TransferTriggerEvent.StartUpload.Files(mapOf(DESTINATION to null), parentId)
     private val startUploadTextFileEvent = TransferTriggerEvent.StartUpload.TextFile(
-        uploadUri,
+        DESTINATION,
         parentId,
         isEditMode = false,
         fromHomePage = false
@@ -452,12 +452,12 @@ class StartTransfersComponentViewModelTest {
         }
 
     @Test
-    fun `test that cancel event is emitted when start upload files is invoked with empty list`() =
+    fun `test that cancel event is emitted when start upload files is invoked with empty map`() =
         runTest {
             commonStub()
 
             underTest.startTransfer(
-                TransferTriggerEvent.StartUpload.Files(listOf(), parentId)
+                TransferTriggerEvent.StartUpload.Files(mapOf(), parentId)
             )
 
             assertCurrentEventIsEqualTo(StartTransferEvent.Message.TransferCancelled)
@@ -486,7 +486,7 @@ class StartTransfersComponentViewModelTest {
 
         underTest.startTransfer(startEvent)
 
-        verify(startUploadWithWorkerUseCase).invoke(mapOf(uploadUri.toString() to null), parentId)
+        verify(startUploadWithWorkerUseCase).invoke(mapOf(DESTINATION to null), parentId)
     }
 
     @Test
@@ -679,7 +679,7 @@ class StartTransfersComponentViewModelTest {
     private fun stubStartUpload(flow: Flow<MultiTransferEvent>) {
         whenever(
             startUploadWithWorkerUseCase(
-                mapOf(uploadUri.toString() to null),
+                mapOf(DESTINATION to null),
                 parentId
             )
         ).thenReturn(flow)

@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.qrcode
 
 import android.content.Context
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -438,7 +437,7 @@ class QRCodeViewModel @Inject constructor(
             state.copy(
                 uploadEvent = triggered(
                     TransferTriggerEvent.StartUpload.Files(
-                        listOf(qrFile.toUri()),
+                        mapOf(qrFile.absolutePath to null),
                         NodeId(parentHandle)
                     )
                 )

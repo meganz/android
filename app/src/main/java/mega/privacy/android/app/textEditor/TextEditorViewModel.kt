@@ -675,7 +675,7 @@ class TextEditorViewModel @Inject constructor(
                     state.copy(
                         transferEvent = triggered(
                             TransferTriggerEvent.StartUpload.TextFile(
-                                uri = tempFile.toUri(),
+                                path = tempFile.absolutePath,
                                 destinationId = NodeId(parentHandle),
                                 isEditMode = isEditMode(),
                                 fromHomePage = fromHome
@@ -919,7 +919,7 @@ class TextEditorViewModel @Inject constructor(
                                 textEditorData.value?.chatRoom?.chatId ?: INVALID_HANDLE
                             val msgId = textEditorData.value?.msgChat?.msgId ?: INVALID_HANDLE
                             val nodes = listOfNotNull(getChatFileUseCase(chatId, msgId))
-                            updateDownloadEvent(
+                            updateTransferEvent(
                                 TransferTriggerEvent.StartDownloadNode(nodes)
                             )
                         }
@@ -927,7 +927,7 @@ class TextEditorViewModel @Inject constructor(
                         FOLDER_LINK_ADAPTER -> {
                             val nodeId = NodeId(getNode()?.handle ?: INVALID_HANDLE)
                             val nodes = listOfNotNull(getPublicChildNodeFromIdUseCase(nodeId))
-                            updateDownloadEvent(
+                            updateTransferEvent(
                                 TransferTriggerEvent.StartDownloadNode(nodes)
                             )
                         }
@@ -937,7 +937,7 @@ class TextEditorViewModel @Inject constructor(
                                 getPublicNodeFromSerializedDataUseCase(it)
                             }
                             val nodes = listOfNotNull(node)
-                            updateDownloadEvent(
+                            updateTransferEvent(
                                 TransferTriggerEvent.StartDownloadNode(nodes)
                             )
                         }
@@ -947,7 +947,7 @@ class TextEditorViewModel @Inject constructor(
                                 getNodeByIdUseCase(NodeId(it))
                             }
                             val nodes = listOfNotNull(node)
-                            updateDownloadEvent(
+                            updateTransferEvent(
                                 TransferTriggerEvent.StartDownloadNode(nodes)
                             )
                         }
@@ -957,16 +957,16 @@ class TextEditorViewModel @Inject constructor(
         }
     }
 
-    private fun updateDownloadEvent(event: TransferTriggerEvent) {
+    private fun updateTransferEvent(event: TransferTriggerEvent) {
         _uiState.update {
             it.copy(transferEvent = triggered(event))
         }
     }
 
     /**
-     * Consume download event
+     * Consume transfer event
      */
-    fun consumeDownloadEvent() {
+    fun consumeTransferEvent() {
         _uiState.update {
             it.copy(transferEvent = consumed())
         }

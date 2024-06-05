@@ -675,7 +675,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     finish()
                 }
 
-                viewModel.consumeDownloadEvent()
+                viewModel.consumeTransferEvent()
             }
         )
     }

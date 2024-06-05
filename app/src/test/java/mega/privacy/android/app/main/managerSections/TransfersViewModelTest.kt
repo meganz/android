@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.managerSections
 
-import androidx.core.net.toUri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -343,7 +342,7 @@ internal class TransfersViewModelTest {
     fun `test that retryTransfer triggers a StartUpload event when it is an upload and UploadWorker is enabled`() =
         runTest {
             val path = "path"
-            val file = mock<File>()
+            val file = File(path)
             val parentHandle = 123L
             val transfer = mock<CompletedTransfer> {
                 on { type } doReturn MegaTransfer.TYPE_UPLOAD
@@ -352,7 +351,7 @@ internal class TransfersViewModelTest {
             }
             val expected = triggered(
                 TransferTriggerEvent.StartUpload.Files(
-                    listOf(file.toUri()),
+                    mapOf(file.absolutePath to null),
                     NodeId(parentHandle)
                 )
             )

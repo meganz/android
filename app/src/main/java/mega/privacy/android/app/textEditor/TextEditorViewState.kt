@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.AccountType
 
 /**
  * Text editor view state
- * @param transferEvent event to trigger download actions
+ * @param transferEvent event to trigger transfer actions
  * @property accountType the account type
  * @property isHiddenNodesOnboarded if the user has been onboarded with hidden nodes
  */

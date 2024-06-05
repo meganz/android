@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.presentation.qrcode
 
 import android.graphics.Bitmap
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -361,7 +360,7 @@ class QRCodeViewModelTest {
         val parentHandle = 123L
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
-                listOf(file.toUri()),
+                mapOf(file.absolutePath to null),
                 NodeId(parentHandle)
             )
         )

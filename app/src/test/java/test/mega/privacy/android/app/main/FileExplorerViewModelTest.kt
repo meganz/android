@@ -2,11 +2,16 @@ package test.mega.privacy.android.app.main
 
 import android.content.Intent
 import android.os.Bundle
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.main.FileExplorerViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
@@ -29,6 +34,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -166,4 +172,41 @@ class FileExplorerViewModelTest {
 
     private val chatIds = listOf(10L, 20L)
 
+    @Test
+    fun `test that state is updated correctly if upload a File`() = runTest {
+        val file = File("path")
+        val parentHandle = 123L
+        val expected = triggered(
+            TransferTriggerEvent.StartUpload.Files(
+                mapOf(file.absolutePath to null),
+                NodeId(parentHandle)
+            )
+        )
+
+        underTest.uploadFile(file, parentHandle)
+        underTest.uiState.map { it.uploadEvent }.test {
+            assertThat(awaitItem()).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly if upload a ShareInfo`() = runTest {
+        val file = File("path")
+        val path = file.absolutePath
+        val shareInfo = mock<ShareInfo> {
+            on { fileAbsolutePath } doReturn path
+        }
+        val parentHandle = 123L
+        val expected = triggered(
+            TransferTriggerEvent.StartUpload.Files(
+                mapOf(path to null),
+                NodeId(parentHandle)
+            )
+        )
+
+        underTest.uploadShareInfo(listOf(shareInfo), parentHandle)
+        underTest.uiState.map { it.uploadEvent }.test {
+            assertThat(awaitItem()).isEqualTo(expected)
+        }
+    }
 }

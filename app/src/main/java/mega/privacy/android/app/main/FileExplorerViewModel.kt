@@ -8,17 +8,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
@@ -48,6 +53,7 @@ import javax.inject.Inject
  * @property storageState    [StorageState]
  * @property isImportingText True if it is importing text, false if it is importing files.
  * @property fileNames       File names.
+ * @property uiState     [FileExplorerUiState]
  */
 @HiltViewModel
 class FileExplorerViewModel @Inject constructor(
@@ -63,6 +69,10 @@ class FileExplorerViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(FileExplorerUiState())
+
+    val uiState = _uiState.asStateFlow()
 
     private var dataAlreadyRequested = false
     var latestCopyTargetPath: Long? = null
@@ -412,5 +422,66 @@ class FileExplorerViewModel @Inject constructor(
                     attachNodeUseCase(chatId, it as TypedFileNode)
                 }.onFailure { Timber.e("Error attaching a node", it) }
             }
+    }
+
+    /**
+     * Uploads a file to the specified destination.
+     *
+     * @param file The file to upload.
+     * @param destination The destination where the file will be uploaded.
+     */
+    fun uploadFile(
+        file: File,
+        destination: Long,
+    ) {
+        uploadFiles(
+            mapOf(file.absolutePath to fileNames.value?.get(file.name)),
+            NodeId(destination)
+        )
+    }
+
+    /**
+     * Uploads a list of files to the specified destination.
+     *
+     * @param shareInfo The files as [ShareInfo] to upload.
+     * @param destination The destination where the files will be uploaded.
+     */
+    fun uploadShareInfo(
+        shareInfo: List<ShareInfo>,
+        destination: Long,
+    ) {
+        val pathsAndNames =
+            shareInfo.map { it.fileAbsolutePath }
+                .associateWith {
+                    runCatching { fileNames.value?.get(it.split(File.separator).last()) }
+                        .getOrNull()
+                }
+
+        uploadFiles(pathsAndNames, NodeId(destination))
+    }
+
+    private fun uploadFiles(
+        pathsAndNames: Map<String, String?>,
+        destinationId: NodeId,
+    ) {
+        _uiState.update { state ->
+            state.copy(
+                uploadEvent = triggered(
+                    TransferTriggerEvent.StartUpload.Files(
+                        pathsAndNames = pathsAndNames,
+                        destinationId = destinationId,
+                    )
+                )
+            )
+        }
+    }
+
+    /**
+     * Consume upload event
+     */
+    fun consumeUploadEvent() {
+        _uiState.update {
+            it.copy(uploadEvent = consumed())
+        }
     }
 }

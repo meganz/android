@@ -139,7 +139,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         return@launch
                     }
                     startUploads(
-                        uris = transferTriggerEvent.uris,
+                        pathsAndNames = transferTriggerEvent.pathsAndNames,
                         destinationId = transferTriggerEvent.destinationId,
                         transferTriggerEvent = transferTriggerEvent,
                     )
@@ -603,15 +603,15 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     }
 
     private suspend fun startUploads(
-        uris: List<Uri>,
+        pathsAndNames: Map<String, String?>,
         destinationId: NodeId,
         transferTriggerEvent: TransferTriggerEvent.StartUpload,
     ) {
         runCatching { clearActiveTransfersIfFinishedUseCase(TransferType.GENERAL_UPLOAD) }
             .onFailure { Timber.e(it) }
 
-        if (uris.isEmpty()) {
-            Timber.e("Uri in $uris must exist")
+        if (pathsAndNames.isEmpty()) {
+            Timber.e("Paths in $pathsAndNames must exist")
             _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
             return
         }
@@ -623,7 +623,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
         var startMessageShown = false
         startUploadWithWorkerUseCase(
-            uris.map { it.toString() }.associateWith { null },
+            pathsAndNames,
             destinationId
         ).catch {
             if (transferTriggerEvent is TransferTriggerEvent.StartUpload.TextFile) {

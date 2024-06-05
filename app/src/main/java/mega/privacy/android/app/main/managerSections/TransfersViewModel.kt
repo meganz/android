@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.managerSections
 
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -492,7 +491,7 @@ class TransfersViewModel @Inject constructor(
             MegaTransfer.TYPE_UPLOAD -> {
                 val file = File(transfer.originalPath)
                 TransferTriggerEvent.StartUpload.Files(
-                    listOf(file.toUri()),
+                    mapOf(file.absolutePath to null),
                     NodeId(transfer.parentHandle)
                 )
             }
