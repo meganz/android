@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
 import mega.privacy.android.icon.pack.R.drawable as IconPack
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
@@ -25,7 +25,7 @@ internal class RetryMessageAction : MessageAction(
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
         Analytics.tracker.trackEvent(ChatConversationRetryMenuItemEvent)
-        val sendErrorViewModel: SendErrorViewModel = viewModel()
+        val sendErrorViewModel: SendErrorViewModel = hiltViewModel()
         sendErrorViewModel.retry(messages)
         onHandled()
     }
