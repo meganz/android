@@ -60,7 +60,7 @@ enum class ABTestFeatures(
         experimentName = "obusd",
         description = "Enable new design (Variant A) for ChooseAccount screen (Onboarding Upselling dialog)",
         defaultValue = false,
-        checkRemote = false,
+        checkRemote = true,
     ) {
         override fun mapValue(input: Long): Boolean = when (input) {
             1L -> true
@@ -76,7 +76,7 @@ enum class ABTestFeatures(
         experimentName = "obusd",
         description = "Enable new design (Variant B) for ChooseAccount screen (Onboarding Upselling dialog)",
         defaultValue = false,
-        checkRemote = false,
+        checkRemote = true,
     ) {
         override fun mapValue(input: Long): Boolean = when (input) {
             2L -> true
