@@ -726,18 +726,41 @@ class ChatViewModel @Inject constructor(
                     it?.apply {
                         when (status) {
                             ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification ->
-                                if ((termCode == ChatCallTermCodeType.CallUsersLimit || termCode == ChatCallTermCodeType.TooManyParticipants)
-                                    && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
-                                ) {
-                                    _state.update { state -> state.copy(callEndedDueToFreePlanLimits = true) }
-                                } else if (termCode == ChatCallTermCodeType.CallDurationLimit && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
-                                    if (it.isOwnClientCaller) {
+                                when (termCode) {
+                                    ChatCallTermCodeType.TooManyParticipants -> {
+                                        val infoToShow =
+                                            InfoToShow.SimpleString(stringId = R.string.call_error_too_many_participants)
                                         _state.update { state ->
                                             state.copy(
-                                                shouldUpgradeToProPlan = true
+                                                infoToShowEvent = triggered(
+                                                    infoToShow
+                                                )
                                             )
                                         }
                                     }
+
+                                    ChatCallTermCodeType.CallDurationLimit -> {
+                                        if (it.isOwnClientCaller && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
+                                            _state.update { state ->
+                                                state.copy(
+                                                    shouldUpgradeToProPlan = true
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    ChatCallTermCodeType.CallUsersLimit -> {
+                                        if (_state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
+                                            setUsersCallLimitReminder(true)
+                                            _state.update { state ->
+                                                state.copy(
+                                                    callEndedDueToFreePlanLimits = true
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    else -> {}
                                 }
 
                             else -> {}
