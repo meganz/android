@@ -52,7 +52,7 @@ class GetOfflineNodesByParentIdUseCaseTest {
             val expected = listOf(mock<OfflineFileInformation>())
             whenever(nodeRepository.getOfflineNodeByParentId(parentId)).thenReturn(list)
             whenever(sortOfflineInfoUseCase.invoke(any())).thenReturn(list)
-            whenever(getOfflineFileInformationUseCase.invoke(any())).thenReturn(expected[0])
+            whenever(getOfflineFileInformationUseCase.invoke(any(), any())).thenReturn(expected[0])
             val result = underTest.invoke(parentId)
             assertThat(expected).isEqualTo(result)
         }

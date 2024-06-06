@@ -8,15 +8,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
-import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineFileTotalSizeUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineFolderInformationUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,12 +30,7 @@ internal class OfflineFileInfoComposeViewModelTest {
 
     private lateinit var underTest: OfflineFileInfoComposeViewModel
     private val savedStateHandle = mock<SavedStateHandle>()
-    private val getOfflineNodeInformationByIdUseCase = mock<GetOfflineNodeInformationByIdUseCase>()
-    private val getOfflineFileUseCase = mock<GetOfflineFileUseCase>()
-    private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
-    private val isImageFileUseCase = mock<IsImageFileUseCase>()
-    private val getOfflineFolderInformationUseCase = mock<GetOfflineFolderInformationUseCase>()
-    private val getOfflineFileTotalSizeUseCase = mock<GetOfflineFileTotalSizeUseCase>()
+    private val getOfflineFileInformationByIdUseCase = mock<GetOfflineFileInformationByIdUseCase>()
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
 
     @TempDir
@@ -55,23 +43,16 @@ internal class OfflineFileInfoComposeViewModelTest {
         }
     }
 
-    private suspend fun stubCommon() {
+    private fun stubCommon() {
         val offlineFile = File(temporaryFolder, "OfflineFile.jpg")
         offlineFile.createNewFile()
         whenever(savedStateHandle.get<Long>(OfflineFileInfoComposeViewModel.NODE_HANDLE)) doReturn (1)
-        whenever(getOfflineFileUseCase(any())) doReturn (offlineFile)
-        whenever(getOfflineFileTotalSizeUseCase(any())) doReturn (1000L)
     }
 
     private fun initUnderTest() {
         underTest = OfflineFileInfoComposeViewModel(
             savedStateHandle = savedStateHandle,
-            getOfflineNodeInformationByIdUseCase = getOfflineNodeInformationByIdUseCase,
-            getOfflineFileUseCase = getOfflineFileUseCase,
-            getThumbnailUseCase = getThumbnailUseCase,
-            isImageFileUseCase = isImageFileUseCase,
-            getOfflineFolderInformationUseCase = getOfflineFolderInformationUseCase,
-            getOfflineFileTotalSizeUseCase = getOfflineFileTotalSizeUseCase,
+            getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase
         )
     }
@@ -79,66 +60,12 @@ internal class OfflineFileInfoComposeViewModelTest {
     @Test
     fun `test that initial state is returned`() = runTest {
         initUnderTest()
-        underTest.state.test {
+        underTest.uiState.test {
             val initial = awaitItem()
-            assertThat(initial.title).isEmpty()
-            assertThat(initial.totalSize).isEqualTo(0L)
-            assertThat(initial.folderInfo).isNull()
-            assertThat(initial.addedTime).isNull()
-            assertThat(initial.thumbnail).isNull()
-            assertThat(initial.isFolder).isFalse()
+            assertThat(initial.offlineFileInformation).isNull()
+            assertThat(initial.isLoading).isTrue()
         }
     }
-
-    @Test
-    fun `test that folderInfo is set when node is a folder`() = runTest {
-        val offlineNodeInformation = mock<OtherOfflineNodeInformation> {
-            on { id } doReturn 3
-            on { isFolder } doReturn true
-            on { name } doReturn "title"
-            on { lastModifiedTime } doReturn 5679
-        }
-        val folderInfo = OfflineFolderInfo(0, 2)
-        whenever(getOfflineNodeInformationByIdUseCase(NodeId(any()))) doReturn offlineNodeInformation
-        whenever(getOfflineFolderInformationUseCase(any())) doReturn (folderInfo)
-        whenever(isImageFileUseCase(any())) doReturn (false)
-
-        initUnderTest()
-        assertThat(underTest.state.value.folderInfo).isEqualTo(folderInfo)
-        assertThat(underTest.state.value.totalSize).isEqualTo(1000L)
-    }
-
-    @Test
-    fun `test that file is used as thumbnail when node is an image`() = runTest {
-        val offlineNodeInformation = mock<OtherOfflineNodeInformation> {
-            on { id } doReturn 3
-            on { isFolder } doReturn false
-            on { name } doReturn "title.jpg"
-            on { lastModifiedTime } doReturn 5679
-        }
-        whenever(getOfflineNodeInformationByIdUseCase(NodeId(any()))) doReturn offlineNodeInformation
-        whenever(isImageFileUseCase(any())) doReturn (true)
-
-        initUnderTest()
-        assertThat(underTest.state.value.thumbnail).isEqualTo("file:${temporaryFolder.path}/OfflineFile.jpg")
-    }
-
-    @Test
-    fun `test that thumbnail is set null when node is an image but file doesn't exist`() =
-        runTest {
-            val offlineNodeInformation = mock<OtherOfflineNodeInformation> {
-                on { id } doReturn 3
-                on { isFolder } doReturn false
-                on { name } doReturn "title.jpg"
-                on { lastModifiedTime } doReturn 5679
-            }
-            whenever(getOfflineNodeInformationByIdUseCase(NodeId(any()))) doReturn offlineNodeInformation
-            whenever(getOfflineFileUseCase(any())) doReturn (File(temporaryFolder, "NonExistent"))
-            whenever(isImageFileUseCase(any())) doReturn (true)
-
-            initUnderTest()
-            assertThat(underTest.state.value.thumbnail).isNull()
-        }
 
     @Test
     fun `test that removeOfflineNodeUseCase is invoked when removeFromOffline is called`() =
@@ -151,10 +78,10 @@ internal class OfflineFileInfoComposeViewModelTest {
 
     @Test
     fun `test that error event is sent when node is null`() = runTest {
-        whenever(getOfflineNodeInformationByIdUseCase(NodeId(any()))) doReturn null
+        whenever(getOfflineFileInformationByIdUseCase(NodeId(any()), any())) doReturn null
 
         initUnderTest()
-        val event = underTest.state.value.errorEvent
+        val event = underTest.uiState.value.errorEvent
         assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
         val content = (event as StateEventWithContentTriggered).content
         assertThat(content).isTrue()
@@ -164,12 +91,7 @@ internal class OfflineFileInfoComposeViewModelTest {
     fun resetMocks() {
         reset(
             savedStateHandle,
-            getOfflineNodeInformationByIdUseCase,
-            getOfflineFileUseCase,
-            getThumbnailUseCase,
-            isImageFileUseCase,
-            getOfflineFolderInformationUseCase,
-            getOfflineFileTotalSizeUseCase,
+            getOfflineFileInformationByIdUseCase,
             removeOfflineNodeUseCase
         )
     }

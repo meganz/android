@@ -23,12 +23,13 @@ import mega.privacy.android.app.presentation.fileinfo.view.MENU_ACTIONS_TO_SHOW
 import mega.privacy.android.app.presentation.fileinfo.view.PreviewWithShadow
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_TOP_APPBAR
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.time.Instant
 import kotlin.time.Duration.Companion.days
@@ -44,45 +45,48 @@ internal fun OfflineFileInfoScreen(
     onRemoveFromOffline: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     var showRemoveFromOfflineDialog by rememberSaveable { mutableStateOf(false) }
 
-    val iconResource = when {
-        uiState.thumbnail != null -> null
-        uiState.isFolder -> IconPackR.drawable.ic_folder_medium_solid
-        else -> MimeTypeThumbnail.typeForName(uiState.title).iconResourceId
-    }
-
-    ScaffoldWithCollapsibleHeader(
-        modifier = modifier,
-        headerIncludingSystemBar = uiState.thumbnail?.let { previewUri ->
-            {
-                PreviewWithShadow(
-                    previewUri = previewUri,
-                )
+    if (!uiState.isLoading && uiState.offlineFileInformation != null) {
+        with(uiState.offlineFileInformation) {
+            val iconResource = when {
+                thumbnail != null -> null
+                isFolder -> IconPackR.drawable.ic_folder_medium_solid
+                else -> MimeTypeThumbnail.typeForName(name).iconResourceId
             }
-        },
-        topBar = {
-            AppBarForCollapsibleHeader(
-                appBarType = AppBarType.BACK_NAVIGATION,
-                title = uiState.title,
-                modifier = Modifier.testTag(TEST_TAG_TOP_APPBAR),
-                onNavigationPressed = onBackPressed,
-                maxActionsToShow = MENU_ACTIONS_TO_SHOW,
-            )
-        },
-        header = {
-            FileInfoHeader(
-                title = uiState.title,
-                iconResource = iconResource,
-                accessPermissionDescription = null,
-            )
-        },
-        headerSpacerHeight = if (iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp,
-    ) {
-        OfflineFileInfoContent(uiState = uiState, onRemoveFromOffline = {
-            showRemoveFromOfflineDialog = true
-        })
+
+            ScaffoldWithCollapsibleHeader(
+                modifier = modifier,
+                headerIncludingSystemBar = thumbnail?.let { previewUri ->
+                    {
+                        PreviewWithShadow(
+                            previewUri = previewUri,
+                        )
+                    }
+                },
+                topBar = {
+                    AppBarForCollapsibleHeader(
+                        appBarType = AppBarType.BACK_NAVIGATION,
+                        title = name,
+                        modifier = Modifier.testTag(TEST_TAG_TOP_APPBAR),
+                        onNavigationPressed = onBackPressed,
+                        maxActionsToShow = MENU_ACTIONS_TO_SHOW,
+                    )
+                },
+                header = {
+                    FileInfoHeader(
+                        title = name,
+                        iconResource = iconResource,
+                        accessPermissionDescription = null,
+                    )
+                },
+                headerSpacerHeight = if (iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp,
+            ) {
+                OfflineFileInfoContent(offlineFileInformation = this) {
+                    showRemoveFromOfflineDialog = true
+                }
+            }
+        }
     }
 
     if (showRemoveFromOfflineDialog) {
@@ -129,30 +133,39 @@ internal class OfflineFileInfoViewStatePreviewsProvider :
 
     companion object {
         val uiStateFile = OfflineFileInfoUiState(
-            title = "Notes.txt",
-            folderInfo = null,
-            isFolder = false,
-            addedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
-            totalSize = 100L,
-            thumbnail = null
+            offlineFileInformation = OfflineFileInformation(
+                name = "Notes.txt",
+                folderInfo = null,
+                isFolder = false,
+                addedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                totalSize = 100L,
+                thumbnail = null
+            ),
+            isLoading = false
         )
 
         val uiImageStateFile = OfflineFileInfoUiState(
-            title = "Photo.jpg",
-            folderInfo = null,
-            isFolder = false,
-            addedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
-            totalSize = 14500L,
-            thumbnail = "/path"
+            offlineFileInformation = OfflineFileInformation(
+                name = "Photo.jpg",
+                folderInfo = null,
+                isFolder = false,
+                addedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                totalSize = 14500L,
+                thumbnail = "/path"
+            ),
+            isLoading = false
         )
 
         val uiStateFolder = OfflineFileInfoUiState(
-            title = "Favorite",
-            folderInfo = OfflineFolderInfo(1, 4),
-            isFolder = true,
-            addedTime = Instant.now().epochSecond - 10.seconds.inWholeSeconds,
-            totalSize = 5500L,
-            thumbnail = null
+            offlineFileInformation = OfflineFileInformation(
+                name = "Favorite",
+                folderInfo = OfflineFolderInfo(1, 4),
+                isFolder = true,
+                addedTime = Instant.now().epochSecond - 10.seconds.inWholeSeconds,
+                totalSize = 5500L,
+                thumbnail = null
+            ),
+            isLoading = false
         )
     }
 }

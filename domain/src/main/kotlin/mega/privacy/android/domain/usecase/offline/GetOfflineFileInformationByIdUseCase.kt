@@ -13,10 +13,16 @@ class GetOfflineFileInformationByIdUseCase @Inject constructor(
 ) {
     /**
      * Invoke
+     *
      * @param nodeId [NodeId]
+     * @param useOriginalImageAsThumbnail [Boolean] use original image file as thumbnail
      */
-    suspend operator fun invoke(nodeId: NodeId) =
-        getOfflineNodeInformationByIdUseCase(nodeId)?.let {
-            getOfflineFileInformationUseCase(it)
-        }
+    suspend operator fun invoke(
+        nodeId: NodeId, useOriginalImageAsThumbnail: Boolean = false,
+    ) = getOfflineNodeInformationByIdUseCase(nodeId = nodeId)?.let {
+        getOfflineFileInformationUseCase(
+            offlineNodeInformation = it,
+            useOriginalImageAsThumbnail = useOriginalImageAsThumbnail
+        )
+    }
 }

@@ -3,7 +3,9 @@ package mega.privacy.android.domain.usecase.offline
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -15,17 +17,27 @@ class GetOfflineFileInformationUseCase @Inject constructor(
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getOfflineFolderInformationUseCase: GetOfflineFolderInformationUseCase,
     private val getOfflineFileTotalSizeUseCase: GetOfflineFileTotalSizeUseCase,
+    private val isImageFileUseCase: IsImageFileUseCase,
 ) {
     /**
      * Invoke
      * @param offlineNodeInformation [OfflineNodeInformation]
+     * @param useOriginalImageAsThumbnail [Boolean] use original image file as thumbnail
      */
-    suspend operator fun invoke(offlineNodeInformation: OfflineNodeInformation): OfflineFileInformation {
+    suspend operator fun invoke(
+        offlineNodeInformation: OfflineNodeInformation,
+        useOriginalImageAsThumbnail: Boolean = false,
+    ): OfflineFileInformation {
         val nodeHandle = offlineNodeInformation.handle.toLongOrNull() ?: -1L
         val offlineFile = getOfflineFileUseCase(offlineNodeInformation)
         val totalSize = getOfflineFileTotalSizeUseCase(offlineFile)
         val folderInfo = getFolderInfoOrNull(offlineNodeInformation)
-        val thumbnail = getThumbnailPathOrNull(offlineNodeInformation.isFolder, nodeHandle)
+        val thumbnail = getThumbnailPathOrNull(
+            offlineFile = offlineFile,
+            useOriginalImageAsThumbnail = useOriginalImageAsThumbnail,
+            isFolder = offlineNodeInformation.isFolder,
+            handle = nodeHandle
+        )
         val addedTime = offlineNodeInformation.lastModifiedTime?.div(1000L)
 
         return OfflineFileInformation(
@@ -42,15 +54,15 @@ class GetOfflineFileInformationUseCase @Inject constructor(
     }
 
     private suspend fun getThumbnailPathOrNull(
+        offlineFile: File,
+        useOriginalImageAsThumbnail: Boolean,
         isFolder: Boolean,
         handle: Long,
-    ): String? {
-        if (isFolder) return null
-        return getThumbnailUseCase(handle)
-            ?.takeIf { it.exists() }
-            ?.toURI()
-            ?.toString()
-    }
+    ): String? = when {
+        isFolder -> null
+        useOriginalImageAsThumbnail && isImageFileUseCase(offlineFile.absolutePath) -> offlineFile
+        else -> getThumbnailUseCase(handle)
+    }?.takeIf { it.exists() }?.toURI()?.toString()
 
     private suspend fun getFolderInfoOrNull(
         offlineNodeInfo: OfflineNodeInformation,

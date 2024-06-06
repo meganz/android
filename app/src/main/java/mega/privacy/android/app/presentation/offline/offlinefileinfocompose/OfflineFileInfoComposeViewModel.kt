@@ -12,16 +12,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
-import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineFileTotalSizeUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineFolderInformationUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -30,12 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class OfflineFileInfoComposeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
-    private val getOfflineFileUseCase: GetOfflineFileUseCase,
-    private val getThumbnailUseCase: GetThumbnailUseCase,
-    private val isImageFileUseCase: IsImageFileUseCase,
-    private val getOfflineFolderInformationUseCase: GetOfflineFolderInformationUseCase,
-    private val getOfflineFileTotalSizeUseCase: GetOfflineFileTotalSizeUseCase,
+    private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
 ) : ViewModel() {
 
@@ -47,12 +35,12 @@ internal class OfflineFileInfoComposeViewModel @Inject constructor(
     /**
      * private mutable UI state
      */
-    private val _state = MutableStateFlow(OfflineFileInfoUiState())
+    private val _uiState = MutableStateFlow(OfflineFileInfoUiState())
 
     /**
      * public immutable UI State for view
      */
-    val state = _state.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
     init {
         loadOfflineNodeInformation()
@@ -61,23 +49,11 @@ internal class OfflineFileInfoComposeViewModel @Inject constructor(
     private fun loadOfflineNodeInformation() {
         viewModelScope.launch {
             runCatching {
-                getOfflineNodeInformationByIdUseCase(nodeId)?.let { offlineNodeInfo ->
-                    val offlineFile = getOfflineFileUseCase(offlineNodeInfo)
-                    val totalSize = getOfflineFileTotalSizeUseCase(offlineFile)
-                    val folderInfo = getFolderInfoOrNull(offlineNodeInfo)
-                    val thumbnail = getThumbnailPathOrNull(offlineNodeInfo.isFolder, offlineFile)
-                    val addedTime = offlineNodeInfo.lastModifiedTime?.div(1000L)
-
-                    _state.update {
+                getOfflineFileInformationByIdUseCase(nodeId, true)?.let { offlineFileInformation ->
+                    _uiState.update {
                         it.copy(
                             isLoading = false,
-                            title = offlineNodeInfo.name,
-                            isFolder = offlineNodeInfo.isFolder,
-                            addedTime = addedTime,
-                            totalSize = totalSize,
-                            folderInfo = folderInfo,
-                            thumbnail = thumbnail,
-                            handle = nodeId.longValue
+                            offlineFileInformation = offlineFileInformation,
                         )
                     }
                 } ?: run {
@@ -91,30 +67,11 @@ internal class OfflineFileInfoComposeViewModel @Inject constructor(
     }
 
     private fun handleError() {
-        _state.update {
+        _uiState.update {
             it.copy(
                 errorEvent = triggered(true)
             )
         }
-    }
-
-    private suspend fun getThumbnailPathOrNull(
-        isFolder: Boolean,
-        offlineFile: File,
-    ): String? {
-        if (isFolder) return null
-
-        val isImage = isImageFileUseCase(offlineFile.absolutePath)
-        return (if (isImage) offlineFile else getThumbnailUseCase(nodeId.longValue))
-            ?.takeIf { it.exists() }
-            ?.toURI()
-            ?.toString()
-    }
-
-    private suspend fun getFolderInfoOrNull(
-        offlineNodeInfo: OfflineNodeInformation,
-    ) = offlineNodeInfo.takeIf { it.isFolder }?.let {
-        getOfflineFolderInformationUseCase(it.id)
     }
 
     /**
@@ -131,7 +88,7 @@ internal class OfflineFileInfoComposeViewModel @Inject constructor(
     }
 
     fun onErrorEventConsumed() =
-        _state.update { state -> state.copy(errorEvent = consumed()) }
+        _uiState.update { state -> state.copy(errorEvent = consumed()) }
 
     companion object {
         const val NODE_HANDLE = "handle"

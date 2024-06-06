@@ -7,7 +7,6 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.OfflineFileInfoComposeViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -37,7 +36,7 @@ internal class OfflineOptionsViewModelTest {
     @BeforeEach
     fun initStubCommon() {
         runBlocking {
-            whenever(savedStateHandle.get<Long>(OfflineFileInfoComposeViewModel.NODE_HANDLE)) doReturn (1)
+            whenever(savedStateHandle.get<Long>(OfflineOptionsViewModel.NODE_HANDLE)) doReturn (1)
             whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))
         }
     }
@@ -77,7 +76,7 @@ internal class OfflineOptionsViewModelTest {
 
     @Test
     fun `test that error event is sent when offline node is null`() = runTest {
-        whenever(getOfflineFileInformationByIdUseCase(NodeId(any()))) doReturn null
+        whenever(getOfflineFileInformationByIdUseCase(NodeId(any()), any())) doReturn null
 
         initUnderTest()
         val event = underTest.uiState.value.errorEvent

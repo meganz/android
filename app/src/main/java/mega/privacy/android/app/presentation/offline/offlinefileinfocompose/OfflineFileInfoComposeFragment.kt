@@ -41,7 +41,7 @@ class OfflineFileInfoComposeFragment : Fragment() {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDarkMode = themeMode.isDarkMode()
-                val uiState by viewModel.state.collectAsStateWithLifecycle()
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
                 OriginalTempTheme(isDark = isDarkMode) {
                     OfflineFileInfoScreen(

@@ -29,7 +29,7 @@ class GetOfflineNodesByParentIdUseCase @Inject constructor(
             }?.map {
                 async {
                     semaphore.withPermit {
-                        getOfflineFileInformationUseCase(it)
+                        getOfflineFileInformationUseCase(it, false)
                     }
                 }
             }?.awaitAll() ?: emptyList()

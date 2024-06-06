@@ -9,6 +9,7 @@ import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_AVAILABLE_OF
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_ICON
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_PREVIEW
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,7 +25,10 @@ class OfflineFileInfoScreenTest {
     @Test
     fun `test that preview is shown if thumbnail is set`() {
         composeTestRule.setContent {
-            val uiState = OfflineFileInfoUiState(thumbnail = "/path")
+            val uiState = OfflineFileInfoUiState(
+                offlineFileInformation = OfflineFileInformation(thumbnail = "/path"),
+                isLoading = false
+            )
             OfflineFileInfoScreen(
                 uiState = uiState,
                 onBackPressed = { },
@@ -37,7 +41,13 @@ class OfflineFileInfoScreenTest {
     @Test
     fun `test that icon and folder info views are shown if node type is folder`() {
         composeTestRule.setContent {
-            val uiState = OfflineFileInfoUiState(thumbnail = null, isFolder = true)
+            val uiState = OfflineFileInfoUiState(
+                offlineFileInformation = OfflineFileInformation(
+                    thumbnail = null,
+                    isFolder = true
+                ),
+                isLoading = false
+            )
             OfflineFileInfoScreen(
                 uiState = uiState,
                 onBackPressed = { },
@@ -51,7 +61,13 @@ class OfflineFileInfoScreenTest {
     @Test
     fun `test that alert dialog is shown when remove from offline switch is clicked`() {
         composeTestRule.setContent {
-            val uiState = OfflineFileInfoUiState(thumbnail = null, isFolder = true)
+            val uiState = OfflineFileInfoUiState(
+                offlineFileInformation = OfflineFileInformation(
+                    thumbnail = null,
+                    isFolder = true
+                ),
+                isLoading = false
+            )
             OfflineFileInfoScreen(
                 uiState = uiState,
                 onBackPressed = { },

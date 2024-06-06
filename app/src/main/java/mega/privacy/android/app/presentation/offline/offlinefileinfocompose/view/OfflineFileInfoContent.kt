@@ -14,18 +14,17 @@ import mega.privacy.android.app.presentation.fileinfo.view.FileInfoContentDivide
 import mega.privacy.android.app.presentation.fileinfo.view.FolderContentView
 import mega.privacy.android.app.presentation.fileinfo.view.NodeSizeView
 import mega.privacy.android.app.presentation.fileinfo.view.paddingStartDefault
-import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 
 /**
  * To be used inside OfflineFIleInfoScreen
  */
 @Composable
 internal fun OfflineFileInfoContent(
-    uiState: OfflineFileInfoUiState,
+    offlineFileInformation: OfflineFileInformation,
     onRemoveFromOffline: () -> Unit,
 ) {
-
     Column {
         val paddingHorizontal = Modifier.padding(start = paddingStartDefault.dp, end = 16.dp)
 
@@ -42,12 +41,12 @@ internal fun OfflineFileInfoContent(
 
         Spacer(modifier = Modifier.height(10.dp))
         NodeSizeView(
-            forFolder = uiState.isFolder,
-            sizeString = Util.getSizeString(uiState.totalSize, LocalContext.current),
+            forFolder = offlineFileInformation.isFolder,
+            sizeString = Util.getSizeString(offlineFileInformation.totalSize, LocalContext.current),
             modifier = paddingHorizontal,
         )
 
-        uiState.folderInfo?.let {
+        offlineFileInformation.folderInfo?.let {
             FolderContentView(
                 numberOfFolders = it.numFolders,
                 numberOfFiles = it.numFiles,
@@ -55,7 +54,7 @@ internal fun OfflineFileInfoContent(
             )
         }
 
-        uiState.addedTime?.let {
+        offlineFileInformation.addedTime?.let {
             CreationModificationTimesView(
                 creationTimeInSeconds = it,
                 modificationTimeInSeconds = null,
