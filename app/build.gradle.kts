@@ -328,6 +328,7 @@ dependencies {
     testImplementation(androidx.work.test)
     testImplementation(testlib.compose.junit)
     testImplementation(androidx.navigation.testing)
+    testImplementation(lib.rx.coroutines)
 
     //jUnit 5
     testImplementation(platform(testlib.junit5.bom))

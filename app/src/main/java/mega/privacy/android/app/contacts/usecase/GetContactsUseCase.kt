@@ -39,6 +39,7 @@ import nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME
 import nz.mega.sdk.MegaChatApi.STATUS_ONLINE
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
@@ -47,21 +48,91 @@ import java.io.File
 import javax.inject.Inject
 
 /**
- * Use case to retrieve contacts for current user.
+ * Get contacts use case
  *
- * @property context                    Application context required to get resources
- * @property megaApi                    MegaApi required to call the SDK
- * @property megaChatApi                MegaChatApi required to call the SDK
- * @property getChatChangesUseCase      Use case required to get contact request updates
- * @property getGlobalChangesUseCase    Use case required to get contact updates
+ * @property getChatChangesUseCase
+ * @property getGlobalChangesUseCase
+ * @property megaContactsMapper
+ * @property getContacts
+ * @property getUserAttribute
+ * @property getUserAlias
+ * @property getContact
+ * @property areCredentialsVerified
+ * @property getUserFullnameFromCache
+ * @property requestLastGreen
+ * @property getChatRoomIdByUser
+ * @property getUserAvatar
+ * @property onlineString
+ * @property getUnformattedLasSeenDate
  */
-class GetContactsUseCase @Inject constructor(
-    @ApplicationContext private val context: Context,
-    @MegaApi private val megaApi: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid,
+class GetContactsUseCase(
     private val getChatChangesUseCase: GetChatChangesUseCase,
-    private val getGlobalChangesUseCase: GetGlobalChangesUseCase
+    private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
+    private val megaContactsMapper: (MegaUser, File) -> ContactItem.Data,
+    private val getContacts: () -> ArrayList<MegaUser>,
+    private val getUserAttribute: (String, Int, MegaRequestListenerInterface) -> Unit,
+    private val getContact: (String) -> MegaUser?,
+    private val areCredentialsVerified: (MegaUser) -> Boolean,
+    private val getUserFullnameFromCache: (Long) -> String,
+    private val requestLastGreen: (Long) -> Unit,
+    private val getChatRoomIdByUser: (Long) -> Long?,
+    private val getUserAvatar: (String, String, MegaRequestListenerInterface) -> Unit,
+    private val onlineString: () -> String,
+    private val getUnformattedLastSeenDate: (Int) -> String,
+    private val getAliasMap: (MegaRequest) -> Map<Long, String>,
 ) {
+
+    @Inject
+    constructor(
+        @ApplicationContext context: Context,
+        @MegaApi megaApi: MegaApiAndroid,
+        megaChatApi: MegaChatApiAndroid,
+        getChatChangesUseCase: GetChatChangesUseCase,
+        getGlobalChangesUseCase: GetGlobalChangesUseCase,
+    ) : this(
+        getChatChangesUseCase = getChatChangesUseCase,
+        getGlobalChangesUseCase = getGlobalChangesUseCase,
+        megaContactsMapper = { user, avatarFolder ->
+            user.toContactItem(
+                avatarFolder = avatarFolder,
+                megaChatApi = megaChatApi,
+                megaApi = megaApi,
+                context = context
+            )
+        },
+        getContacts = { megaApi.contacts },
+        getUserAttribute = { email, attr, listener ->
+            megaApi.getUserAttribute(email, attr, listener)
+        },
+        getContact = { email ->
+            megaApi.getContact(email)
+        },
+        areCredentialsVerified = { user ->
+            megaApi.areCredentialsVerified(user)
+        },
+        getUserFullnameFromCache = { handle ->
+            megaChatApi.getUserFullnameFromCache(handle)
+        },
+        requestLastGreen = { handle ->
+            megaChatApi.requestLastGreen(handle, null)
+        },
+        getChatRoomIdByUser = { handle ->
+            megaChatApi.getChatRoomByUser(handle)?.chatId
+        },
+        getUserAvatar = { email, file, listener ->
+            megaApi.getUserAvatar(email, file, listener)
+        },
+        onlineString = {
+            context.getString(R.string.online_status)
+        },
+        getUnformattedLastSeenDate = { lastGreen ->
+            TimeUtils.unformattedLastGreenDate(context, lastGreen)
+        },
+        getAliasMap = { request ->
+            request.megaStringMap.getDecodedAliases()
+        },
+    )
+
 
     /**
      * Gets contacts.
@@ -70,9 +141,9 @@ class GetContactsUseCase @Inject constructor(
      */
     fun get(avatarFolder: File): Flowable<List<ContactItem.Data>> = Flowable.create({ emitter ->
         val disposable = CompositeDisposable()
-        val contacts = megaApi.contacts
+        val contacts = getContacts()
             .filter { it.visibility == VISIBILITY_VISIBLE }
-            .map { it.toContactItem(avatarFolder) }
+            .map { megaContactsMapper(it, avatarFolder) }
             .toMutableList()
 
         emitter.onNext(contacts.sortedAlphabetically())
@@ -97,7 +168,7 @@ class GetContactsUseCase @Inject constructor(
 
                             USER_ATTR_FIRSTNAME, USER_ATTR_LASTNAME ->
                                 contacts[index] = currentContact.copy(
-                                    fullName = megaChatApi.getUserFullnameFromCache(currentContact.handle)
+                                    fullName = getUserFullnameFromCache(currentContact.handle)
                                 )
 
                             USER_ATTR_ALIAS ->
@@ -108,7 +179,7 @@ class GetContactsUseCase @Inject constructor(
 
                         emitter.onNext(contacts.sortedAlphabetically())
                     } else if (request.paramType == USER_ATTR_ALIAS) {
-                        val requestAliases = request.megaStringMap.getDecodedAliases()
+                        val requestAliases = getAliasMap(request)
 
                         contacts.forEachIndexed { indexToUpdate, contact ->
                             var newAlias: String? = null
@@ -146,9 +217,9 @@ class GetContactsUseCase @Inject constructor(
                                     status = change.status,
                                     statusColor = getUserStatusColor(change.status),
                                     lastSeen = if (change.status == STATUS_ONLINE) {
-                                        context.getString(R.string.online_status)
+                                        onlineString()
                                     } else {
-                                        megaChatApi.requestLastGreen(change.userHandle, null)
+                                        requestLastGreen(change.userHandle)
                                         currentContact.lastSeen
                                     }
                                 )
@@ -162,8 +233,7 @@ class GetContactsUseCase @Inject constructor(
                             if (index != INVALID_POSITION) {
                                 val currentContact = contacts[index]
                                 contacts[index] = currentContact.copy(
-                                    lastSeen = TimeUtils.unformattedLastGreenDate(
-                                        context,
+                                    lastSeen = getUnformattedLastSeenDate(
                                         change.lastGreen
                                     )
                                 )
@@ -174,7 +244,7 @@ class GetContactsUseCase @Inject constructor(
 
                         is OnChatConnectionStateUpdate -> {
                             val index = contacts.indexOfFirst {
-                                it.isNew && change.chatid == megaChatApi.getChatRoomByUser(it.handle)?.chatId
+                                it.isNew && change.chatid == getChatRoomIdByUser(it.handle)
                             }
                             if (index != INVALID_POSITION) {
                                 val currentContact = contacts[index]
@@ -191,12 +261,10 @@ class GetContactsUseCase @Inject constructor(
                         }
                     }
                 },
-                onError = Timber::e
+                onError = { Timber.e(it) }
             ).addTo(disposable)
 
-        getGlobalChangesUseCase()
-            .filter { it is GetGlobalChangesUseCase.Result.OnUsersUpdate }
-            .map { (it as GetGlobalChangesUseCase.Result.OnUsersUpdate).users ?: emptyList() }
+        getUserUpdates()
             .subscribeBy(
                 onNext = { users ->
                     if (emitter.isCancelled) return@subscribeBy
@@ -207,21 +275,21 @@ class GetContactsUseCase @Inject constructor(
                             index != INVALID_POSITION -> {
                                 when {
                                     user.isExternalChange() && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) ->
-                                        megaApi.getUserAttribute(
+                                        getUserAttribute(
                                             user.email,
-                                            USER_ATTR_ALIAS,
+                                            USER_ATTR_AVATAR, //Should be USER_ATTR_AVATAR instead
                                             userAttrsListener
                                         )
 
                                     user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()) ->
-                                        megaApi.getUserAttribute(
+                                        getUserAttribute(
                                             user.email,
                                             USER_ATTR_FIRSTNAME,
                                             userAttrsListener
                                         )
 
                                     user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME.toLong()) ->
-                                        megaApi.getUserAttribute(
+                                        getUserAttribute(
                                             user.email,
                                             USER_ATTR_LASTNAME,
                                             userAttrsListener
@@ -235,11 +303,11 @@ class GetContactsUseCase @Inject constructor(
                             }
 
                             user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS.toLong()) -> {
-                                megaApi.getUserAttribute(user, USER_ATTR_ALIAS, userAttrsListener)
+                                getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
                             }
 
                             user.visibility == VISIBILITY_VISIBLE -> { // New contact
-                                val contact = user.toContactItem(avatarFolder)
+                                val contact = megaContactsMapper(user, avatarFolder)
                                 contacts.add(contact)
                                 emitter.onNext(contacts.sortedAlphabetically())
                                 contact.requestMissingFields(avatarFolder, userAttrsListener)
@@ -251,10 +319,10 @@ class GetContactsUseCase @Inject constructor(
                                     .forEachIndexed { i, _ ->
                                         val currentContact = contacts[i]
                                         val currentUser =
-                                            megaApi.getContact(currentContact.email)
+                                            getContact(currentContact.email)
 
                                         currentUser?.let {
-                                            val isVerified = megaApi.areCredentialsVerified(it)
+                                            val isVerified = areCredentialsVerified(it)
 
                                             if (currentContact.isVerified != isVerified) {
                                                 contacts[i] = currentContact.copy(
@@ -269,13 +337,17 @@ class GetContactsUseCase @Inject constructor(
                         }
                     }
                 },
-                onError = Timber::e
+                onError = { Timber.e(it) }
             ).addTo(disposable)
 
         contacts.forEach { it.requestMissingFields(avatarFolder, userAttrsListener) }
 
         emitter.setCancellable { disposable.clear() }
     }, BackpressureStrategy.LATEST)
+
+    private fun getUserUpdates() = getGlobalChangesUseCase()
+        .filter { it is GetGlobalChangesUseCase.Result.OnUsersUpdate }
+        .map { (it as GetGlobalChangesUseCase.Result.OnUsersUpdate).users ?: emptyList() }
 
     /**
      * Get MegaUser from email
@@ -286,48 +358,8 @@ class GetContactsUseCase @Inject constructor(
      */
     fun getMegaUser(userEmail: String?): Single<MegaUser> =
         Single.fromCallable {
-            userEmail?.let { megaApi.getContact(userEmail) } ?: error("Error MegaUser is null")
+            userEmail?.let { getContact(userEmail) } ?: error("Error MegaUser is null")
         }
-
-    /**
-     * Build ContactItem.Data from MegaUser object
-     *
-     * @param avatarFolder Avatar folder in cache.
-     * @return  ContactItem.Data
-     */
-    private fun MegaUser.toContactItem(avatarFolder: File): ContactItem.Data {
-        val alias = megaChatApi.getUserAliasFromCache(handle)
-        val fullName = megaChatApi.getUserFullnameFromCache(handle)
-        val userStatus = megaChatApi.getUserOnlineStatus(handle)
-        val userImageColor = megaApi.getUserAvatarColor(this)?.toColorInt() ?: -1
-        val title = when {
-            !alias.isNullOrBlank() -> alias
-            !fullName.isNullOrBlank() -> fullName
-            else -> email
-        }
-        val placeholder = getImagePlaceholder(title, userImageColor)
-        val userAvatarFile = File(avatarFolder, "$email.jpg")
-        val userAvatar = if (userAvatarFile.exists()) {
-            userAvatarFile.toUri()
-        } else {
-            null
-        }
-        val isNew = wasRecentlyAdded() && megaChatApi.getChatRoomByUser(handle) == null
-        val isVerified = megaApi.areCredentialsVerified(this)
-
-        return ContactItem.Data(
-            handle = handle,
-            email = email,
-            alias = alias,
-            fullName = fullName,
-            status = userStatus,
-            statusColor = getUserStatusColor(userStatus),
-            avatarUri = userAvatar,
-            placeholder = placeholder,
-            isNew = isNew,
-            isVerified = isVerified
-        )
-    }
 
     /**
      * Request missing fields for current `ContactItem.Data`
@@ -341,39 +373,84 @@ class GetContactsUseCase @Inject constructor(
     ) {
         if (avatarUri == null) {
             val userAvatarFile = File(avatarFolder, "$email.jpg").absolutePath
-            megaApi.getUserAvatar(email, userAvatarFile, listener)
+            getUserAvatar(email, userAvatarFile, listener)
         }
         if (fullName.isNullOrBlank()) {
-            megaApi.getUserAttribute(email, USER_ATTR_FIRSTNAME, listener)
-            megaApi.getUserAttribute(email, USER_ATTR_LASTNAME, listener)
+            getUserAttribute(email, USER_ATTR_FIRSTNAME, listener)
+            getUserAttribute(email, USER_ATTR_LASTNAME, listener)
         }
         if (alias.isNullOrBlank()) {
-            megaApi.getUserAttribute(email, USER_ATTR_ALIAS, listener)
+            getUserAttribute(email, USER_ATTR_ALIAS, listener)
         }
         if (status != STATUS_ONLINE) {
-            megaChatApi.requestLastGreen(handle, null)
+            requestLastGreen(handle)
         }
     }
-
-    /**
-     * Build Avatar placeholder Drawable given a Title and a Color
-     *
-     * @param title     Title string
-     * @param color     Background color
-     * @return          Drawable with the placeholder
-     */
-    private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
-        TextDrawable.builder()
-            .beginConfig()
-            .width(context.resources.getDimensionPixelSize(R.dimen.image_contact_size))
-            .height(context.resources.getDimensionPixelSize(R.dimen.image_contact_size))
-            .fontSize(context.resources.getDimensionPixelSize(R.dimen.image_contact_text_size))
-            .textColor(ContextCompat.getColor(context, R.color.white))
-            .bold()
-            .toUpperCase()
-            .endConfig()
-            .buildRound(AvatarUtil.getFirstLetter(title), color)
 
     private fun MutableList<ContactItem.Data>.sortedAlphabetically(): List<ContactItem.Data> =
         sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, ContactItem.Data::getTitle))
 }
+
+/**
+ * Build ContactItem.Data from MegaUser object
+ *
+ * @param avatarFolder Avatar folder in cache.
+ * @return  ContactItem.Data
+ */
+private fun MegaUser.toContactItem(
+    avatarFolder: File,
+    megaChatApi: MegaChatApiAndroid,
+    megaApi: MegaApiAndroid,
+    context: Context,
+): ContactItem.Data {
+    val alias = megaChatApi.getUserAliasFromCache(handle)
+    val fullName = megaChatApi.getUserFullnameFromCache(handle)
+    val userStatus = megaChatApi.getUserOnlineStatus(handle)
+    val userImageColor = megaApi.getUserAvatarColor(this)?.toColorInt() ?: -1
+    val title = when {
+        !alias.isNullOrBlank() -> alias
+        !fullName.isNullOrBlank() -> fullName
+        else -> email
+    }
+    val placeholder = getImagePlaceholder(context = context, title = title, color = userImageColor)
+    val userAvatarFile = File(avatarFolder, "$email.jpg")
+    val userAvatar = if (userAvatarFile.exists()) {
+        userAvatarFile.toUri()
+    } else {
+        null
+    }
+    val isNew = wasRecentlyAdded() && megaChatApi.getChatRoomByUser(handle) == null
+    val isVerified = megaApi.areCredentialsVerified(this)
+
+    return ContactItem.Data(
+        handle = handle,
+        email = email,
+        alias = alias,
+        fullName = fullName,
+        status = userStatus,
+        statusColor = getUserStatusColor(userStatus),
+        avatarUri = userAvatar,
+        placeholder = placeholder,
+        isNew = isNew,
+        isVerified = isVerified
+    )
+}
+
+/**
+ * Build Avatar placeholder Drawable given a Title and a Color
+ *
+ * @param title     Title string
+ * @param color     Background color
+ * @return          Drawable with the placeholder
+ */
+private fun getImagePlaceholder(context: Context, title: String, @ColorInt color: Int): Drawable =
+    TextDrawable.builder()
+        .beginConfig()
+        .width(context.resources.getDimensionPixelSize(R.dimen.image_contact_size))
+        .height(context.resources.getDimensionPixelSize(R.dimen.image_contact_size))
+        .fontSize(context.resources.getDimensionPixelSize(R.dimen.image_contact_text_size))
+        .textColor(ContextCompat.getColor(context, R.color.white))
+        .bold()
+        .toUpperCase()
+        .endConfig()
+        .buildRound(AvatarUtil.getFirstLetter(title), color)
