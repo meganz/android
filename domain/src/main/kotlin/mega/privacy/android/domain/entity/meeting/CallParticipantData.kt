@@ -11,13 +11,15 @@ package mega.privacy.android.domain.entity.meeting
  * @property isSpeaker              True, if it is speaker. False, if not.
  * @property isGuest                True, if it is guest. False, if not.
  * @param isRaisedHand              True if is raised hand. False if is lowered hand.
+ * @param order                     Sort order based on raised hand order.
  */
 data class CallParticipantData(
     val clientId: Long = -1L,
-    var isAudioOn: Boolean = false,
-    var isVideoOn: Boolean = false,
-    var isContact: Boolean = true,
-    var isSpeaker: Boolean = false,
-    var isGuest: Boolean = false,
-    var isRaisedHand: Boolean = false,
+    val isAudioOn: Boolean = false,
+    val isVideoOn: Boolean = false,
+    val isContact: Boolean = true,
+    val isSpeaker: Boolean = false,
+    val isGuest: Boolean = false,
+    val isRaisedHand: Boolean = false,
+    val order: Int = Int.MAX_VALUE,
 )

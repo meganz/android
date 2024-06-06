@@ -42,6 +42,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -229,9 +231,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     // Only me in the call Dialog
     private var onlyMeDialog: Dialog? = null
 
-    // Free limit upgrade dialog
-    private var freeLimitUpgradeDialog: Dialog? = null
-
 
     private var countDownTimerToEndCall: CountDownTimer? = null
 
@@ -287,12 +286,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             )
                         }
 
-                        inMeetingViewModel.updateOwnPrivileges(requireContext())
+                        inMeetingViewModel.updateOwnPrivileges()
                     }
 
                     if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
                         Timber.d("Change in the privileges of a participant")
-                        inMeetingViewModel.updateParticipantsPrivileges(requireContext())
+                        inMeetingViewModel.updateParticipantsPrivileges()
                     }
                 }
             }
@@ -366,7 +365,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
 
-
     private val sessionOnHoldObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             if (inMeetingViewModel.isSameCall(callAndSession.first)) {
@@ -403,7 +401,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         Timber.d("Session destroyed, clientID = ${callAndSession.second.clientid}")
                         inMeetingViewModel.removeParticipant(
                             callAndSession.second,
-                            requireContext()
                         ).let { position ->
                             if (position != INVALID_POSITION) {
                                 checkChildFragments()
@@ -1019,10 +1016,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 checkSwapCameraMenuItemVisibility()
             }
 
-            state.userIdsWithChangesInRaisedHand.takeIf { it.isNotEmpty() }?.let {
-                updateParticipantsWithHandRaised(it)
-            }
-
             floatingBottomSheet.isVisible =
                 !state.showEndMeetingAsOnlyHostBottomPanel && !state.showCallOptionsBottomSheet
 
@@ -1155,6 +1148,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 collapsePanel()
             }
             bottomFloatingPanelViewHolder?.setRaiseHandToolTipShown(state.isRaiseToHandSuggestionShown)
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.userIdsWithChangesInRaisedHand }
+            .distinctUntilChanged()) {
+            if (it.isNotEmpty()) {
+                updateParticipantsWithHandRaised(it)
+            }
         }
 
         viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->
@@ -2587,7 +2587,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun updateParticipantInfo(peerId: Long, type: Int) {
         Timber.d("Participant's name has changed")
         val listParticipants =
-            inMeetingViewModel.updateParticipantsNameOrAvatar(peerId, type, requireContext())
+            inMeetingViewModel.updateParticipantsNameOrAvatar(peerId, type)
         if (listParticipants.isNotEmpty()) {
             gridViewCallFragment?.let {
                 if (it.isAdded) {

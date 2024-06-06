@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.view
 
+import mega.privacy.android.icon.pack.R as IconR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -29,19 +31,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.R as IconR
-import androidx.compose.ui.platform.testTag
 import mega.privacy.android.app.presentation.contact.view.ContactStatusView
 import mega.privacy.android.app.presentation.contact.view.DefaultAvatarView
 import mega.privacy.android.app.presentation.contact.view.UriAvatarView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
-import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaButtonWithIcon
-import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
@@ -49,6 +42,13 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.CallParticipantData
 import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaButtonWithIcon
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white
 
 /**
  * View of a participant in the list
@@ -108,6 +108,19 @@ fun ParticipantInCallItem(
                             avatarColor = participant.defaultAvatarColor,
                             avatarFirstLetter = participant.getAvatarFirstLetter(),
                         )
+
+                        if (participant.callParticipantData.isRaisedHand) {
+                            Image(
+                                modifier = Modifier
+                                    .padding(
+                                        horizontal = 16.dp,
+                                        vertical = 8.dp
+                                    )
+                                    .size(40.dp),
+                                painter = painterResource(id = R.drawable.raised_hand_icon),
+                                contentDescription = "Hand Icon Raised"
+                            )
+                        }
 
                         if (participant.areCredentialsVerified) {
                             Image(
@@ -329,7 +342,7 @@ fun PreviewMeParticipantInCallItem() {
                 privilege = ChatRoomPermission.Moderator,
                 defaultAvatarColor = -6624513,
                 callParticipantData = CallParticipantData(
-                    clientId = 2L, isAudioOn = true, isVideoOn = true
+                    clientId = 2L, isAudioOn = true, isVideoOn = true, isRaisedHand = true
                 )
             ),
             onAdmitParticipantClicked = {},

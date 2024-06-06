@@ -4,6 +4,7 @@
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="2dp"
     android:background="@color/black">
 
@@ -21,6 +22,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
+        tools:visibility="visible"
         android:id="@+id/last_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -38,6 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/border_participant_speaking"
+        tools:visibility="visible"
         android:visibility="gone" />
 
     <mega.privacy.android.app.components.RoundedImageView
@@ -62,6 +65,7 @@
         android:layout_marginEnd="4dp"
         android:src="@drawable/raised_hand_icon"
         android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -71,6 +75,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_call_hold_big"
         android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -107,6 +112,7 @@
             android:layout_height="16dp"
             android:layout_gravity="center"
             android:src="@drawable/mic_off_participant_icon_thin"
+            tools:visibility="visible"
             android:visibility="visible" />
 
         <mega.privacy.android.app.components.RoundedImageView
@@ -115,6 +121,7 @@
             android:layout_height="16dp"
             android:layout_gravity="center"
             android:src="@drawable/mic_speaking_participant_icon_thin"
+            tools:visibility="visible"
             android:visibility="gone" />
     </LinearLayout>
 

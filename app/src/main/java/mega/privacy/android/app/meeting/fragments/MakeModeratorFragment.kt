@@ -86,7 +86,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
                         Timber.d("Session destroyed, clientID = ${callAndSession.second.clientid}")
                         inMeetingViewModel.removeParticipant(
                             callAndSession.second,
-                            requireContext()
                         )
                     }
                 }

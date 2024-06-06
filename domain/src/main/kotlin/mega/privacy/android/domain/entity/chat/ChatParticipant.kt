@@ -38,5 +38,5 @@ data class ChatParticipant(
     val privilegesUpdated: Boolean = false,
     val callParticipantData: CallParticipantData = CallParticipantData(),
     val isContact: Boolean = false,
-    var callStatus: MeetingParticipantNotInCallStatus = MeetingParticipantNotInCallStatus.NotInCall,
+    val callStatus: MeetingParticipantNotInCallStatus = MeetingParticipantNotInCallStatus.NotInCall,
 )

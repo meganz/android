@@ -1939,11 +1939,13 @@ class MeetingActivityViewModel @Inject constructor(
                 }
             }
         }
+        val sortedChatParticipantsInCall =
+            chatParticipantsInCall.sortedBy { it.callParticipantData.order }
 
         _state.update { state ->
             state.copy(
                 chatParticipantsInWaitingRoom = chatParticipantsInWaitingRoom,
-                chatParticipantsInCall = chatParticipantsInCall,
+                chatParticipantsInCall = sortedChatParticipantsInCall,
                 chatParticipantsNotInCall = chatParticipantsNotInCall,
             )
         }

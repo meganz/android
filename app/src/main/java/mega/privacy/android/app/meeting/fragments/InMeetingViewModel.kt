@@ -79,9 +79,9 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorCallReconnectingStatusUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorCallReconnectingStatusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -569,36 +569,35 @@ class InMeetingViewModel @Inject constructor(
      * Update participants with hand raised list
      */
     private fun updateParticipantsWithRaisedHand() {
-        val listWithChanges: MutableList<Long> = mutableListOf()
-        state.value.call?.let { call ->
-            participants.value = participants.value?.map { participant ->
-                call.usersRaiseHands.filter { it.key == participant.peerId }.forEach {
-                    when {
-                        participant.isRaisedHand != it.value -> {
-                            listWithChanges.add(participant.peerId)
-                            return@map participant.copy(
-                                isRaisedHand = it.value
-                            )
-                        }
-
-                        else -> return@map participant
-                    }
+        val listWithChanges = buildList {
+            state.value.call?.let { call ->
+                var order = 0
+                val triple = call.usersRaiseHands.map {
+                    Triple(it.key, it.value, ++order)
                 }
-
-                when {
-                    participant.isRaisedHand -> {
-                        listWithChanges.add(participant.peerId)
-                        return@map participant.copy(
-                            isRaisedHand = false
-                        )
+                participants.value = participants.value?.map { participant ->
+                    triple.find { it.first == participant.peerId }
+                        ?.let { (_, isRaisedHand, order) ->
+                            // update the participant's isRaisedHand status and order based on the corresponding values in the triple.
+                            // If the participant's isRaisedHand status changes, their ID is added to the listWithChanges.
+                            if (participant.isRaisedHand != isRaisedHand) {
+                                add(participant.peerId)
+                                participant.copy(isRaisedHand = isRaisedHand, order = order)
+                            } else {
+                                participant
+                            }
+                        } ?: if (participant.isRaisedHand) {
+                        add(participant.peerId)
+                        // If a participant's ID is not found in the triple list, it means they have not raised their hand.
+                        // In this case, their isRaisedHand status is set to false and their order is set to Int.MAX_VALUE.
+                        participant.copy(isRaisedHand = false, order = Int.MAX_VALUE)
+                    } else {
+                        participant
                     }
-
-                    else -> return@map participant
-                }
-            }?.toMutableList()
+                }?.toMutableList()
+            }
         }
-
-        _state.update { state -> state.copy(userIdsWithChangesInRaisedHand = listWithChanges.toMutableList()) }
+        _state.update { state -> state.copy(userIdsWithChangesInRaisedHand = listWithChanges) }
     }
 
     /**
@@ -1244,33 +1243,6 @@ class InMeetingViewModel @Inject constructor(
         if (chatId == MEGACHAT_INVALID_HANDLE) null else inMeetingRepository.getMeeting(chatId)
 
     /**
-     * Method to know if exists another call in progress or on hold.
-     *
-     * @return MegaChatCall the another call
-     */
-    fun getAnotherCall(): MegaChatCall? {
-        val anotherCallChatId = CallUtil.getAnotherCallParticipating(_state.value.currentChatId)
-        if (anotherCallChatId != MEGACHAT_INVALID_HANDLE) {
-            val anotherCall = inMeetingRepository.getMeeting(anotherCallChatId)
-            anotherCall?.let {
-                if (isCallOnHold() && !it.isOnHold) {
-                    Timber.d("This call in on hold, another call in progress")
-                    return anotherCall
-                }
-
-                if (!isCallOnHold() && it.isOnHold) {
-                    Timber.d("This call in progress, another call on hold")
-                    return anotherCall
-                }
-            }
-
-        }
-
-        Timber.d("No other calls in progress or on hold")
-        return null
-    }
-
-    /**
      * Get session of a contact in a one-to-one call
      *
      * @param callChat MegaChatCall
@@ -1297,7 +1269,6 @@ class InMeetingViewModel @Inject constructor(
     fun updateParticipantsNameOrAvatar(
         peerId: Long,
         typeChange: Int,
-        context: Context,
     ): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
         inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
@@ -1327,7 +1298,7 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method that makes the necessary changes to the participant list when my own privileges have changed.
      */
-    fun updateOwnPrivileges(context: Context) {
+    fun updateOwnPrivileges() {
         inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             participants.value = participants.value?.map { participant ->
                 return@map participant.copy(
@@ -1346,7 +1317,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return list of participants with changes
      */
-    fun updateParticipantsPrivileges(context: Context): MutableSet<Participant> {
+    fun updateParticipantsPrivileges(): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
         inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             participants.value = participants.value?.map { participant ->
@@ -1871,7 +1842,7 @@ class InMeetingViewModel @Inject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
-    fun removeParticipant(session: MegaChatSession, context: Context): Int {
+    fun removeParticipant(session: MegaChatSession): Int {
         inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             val iterator = participants.value?.iterator()
             iterator?.let { list ->
