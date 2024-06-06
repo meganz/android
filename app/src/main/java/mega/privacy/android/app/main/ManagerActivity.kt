@@ -865,6 +865,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         Timber.d("onStart")
         mStopped = false
         sortByHeaderViewModel.refreshData(isUpdatedOrderChangeState = true)
+        viewModel.markHandledMessage()
         super.onStart()
     }
 

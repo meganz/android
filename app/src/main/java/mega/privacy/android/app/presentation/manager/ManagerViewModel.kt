@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -321,6 +322,8 @@ class ManagerViewModel @Inject constructor(
      */
     val numUnreadUserAlerts = _numUnreadUserAlerts.asStateFlow()
 
+    private var monitorCallInChatJob: Job? = null
+
     /**
      * Is network connected
      */
@@ -405,7 +408,8 @@ class ManagerViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch {
+        monitorCallInChatJob?.cancel()
+        monitorCallInChatJob = viewModelScope.launch {
             monitorChatCallUpdatesUseCase()
                 .collect {
                     it.apply {
@@ -414,6 +418,7 @@ class ManagerViewModel @Inject constructor(
                                 if (termCode == ChatCallTermCodeType.CallUsersLimit
                                     && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
                                 ) {
+                                    setUsersCallLimitReminder(true)
                                     _state.update { state -> state.copy(callEndedDueToFreePlanLimits = true) }
                                 } else if (termCode == ChatCallTermCodeType.CallDurationLimit && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
                                     if (it.isOwnClientCaller) {
