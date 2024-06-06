@@ -184,6 +184,7 @@ fun MegaAlertDialog(
     onCancel: () -> Unit = onDismiss,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
+    bodyTextColor: TextColor = TextColor.Secondary,
 ) = BaseMegaAlertDialog(
     content = {
         Column(
@@ -205,7 +206,7 @@ fun MegaAlertDialog(
             MegaText(
                 modifier = Modifier.fillMaxWidth(),
                 text = body,
-                textColor = TextColor.Secondary
+                textColor = bodyTextColor
             )
         }
     },

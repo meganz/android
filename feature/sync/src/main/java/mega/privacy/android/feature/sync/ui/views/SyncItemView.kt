@@ -16,6 +16,7 @@ internal fun SyncItemView(
     removeFolderClicked: (folderPairId: Long) -> Unit,
     issuesInfoClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
+    isFreeAccount: Boolean,
     @StringRes errorRes: Int? = null
 ) {
     val sync = syncUiItems[itemIndex]
@@ -33,6 +34,7 @@ internal fun SyncItemView(
         },
         issuesInfoClicked = issuesInfoClicked,
         isLowBatteryLevel = isLowBatteryLevel,
+        isFreeAccount = isFreeAccount,
         errorRes = errorRes
     )
 }

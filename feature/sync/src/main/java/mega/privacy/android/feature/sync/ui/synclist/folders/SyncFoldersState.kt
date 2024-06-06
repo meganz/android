@@ -8,4 +8,5 @@ internal data class SyncFoldersState(
     val isLowBatteryLevel: Boolean = false,
     val isStorageOverQuota: Boolean = false,
     val isFreeAccount: Boolean = true,
+    val showSyncsPausedErrorDialog: Boolean = false,
 )

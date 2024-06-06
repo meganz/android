@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
 import androidx.compose.runtime.Composable
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.OnSyncsPausedErrorDialogDismissed
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.PauseRunClicked
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.RemoveFolderClicked
 
@@ -26,5 +27,9 @@ internal fun SyncFoldersRoute(
         issuesInfoClicked = issuesInfoClicked,
         isLowBatteryLevel = state.isLowBatteryLevel,
         isFreeAccount = state.isFreeAccount,
+        showSyncsPausedErrorDialog = state.showSyncsPausedErrorDialog,
+        onShowSyncsPausedErrorDialogDismissed = {
+            viewModel.handleAction(OnSyncsPausedErrorDialogDismissed)
+        }
     )
 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -35,13 +36,14 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.C
 import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun SyncFoldersScreen(
@@ -54,6 +56,8 @@ internal fun SyncFoldersScreen(
     issuesInfoClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
     isFreeAccount: Boolean,
+    showSyncsPausedErrorDialog: Boolean,
+    onShowSyncsPausedErrorDialogDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -90,10 +94,23 @@ internal fun SyncFoldersScreen(
                         removeFolderClicked = removeFolderClicked,
                         issuesInfoClicked = issuesInfoClicked,
                         isLowBatteryLevel = isLowBatteryLevel,
+                        isFreeAccount = isFreeAccount,
                         errorRes = syncUiItems[itemIndex].error
                     )
                 }
             }
+        }
+        if (showSyncsPausedErrorDialog) {
+            MegaAlertDialog(
+                title = "",
+                body = stringResource(sharedResR.string.sync_error_dialog_free_user),
+                icon = iconPackR.drawable.ic_alert_triangle_color,
+                confirmButtonText = stringResource(sharedResR.string.sync_error_dialog_free_user_confirm_action),
+                cancelButtonText = null,
+                onConfirm = onShowSyncsPausedErrorDialogDismissed,
+                onDismiss = onShowSyncsPausedErrorDialogDismissed,
+                bodyTextColor = TextColor.Primary,
+            )
         }
         if (syncUiItems.isNotEmpty()) {
             FloatingActionButton(
@@ -181,6 +198,8 @@ private fun SyncFoldersScreenEmptyStatePreview(
             issuesInfoClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = isFreeAccount,
+            showSyncsPausedErrorDialog = false,
+            onShowSyncsPausedErrorDialogDismissed = {},
         )
     }
 }
@@ -211,6 +230,8 @@ private fun SyncFoldersScreenSyncingPreview() {
             issuesInfoClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = false,
+            showSyncsPausedErrorDialog = false,
+            onShowSyncsPausedErrorDialogDismissed = {},
         )
     }
 }
@@ -241,6 +262,8 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview() {
             issuesInfoClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = false,
+            showSyncsPausedErrorDialog = false,
+            onShowSyncsPausedErrorDialogDismissed = {},
         )
     }
 }

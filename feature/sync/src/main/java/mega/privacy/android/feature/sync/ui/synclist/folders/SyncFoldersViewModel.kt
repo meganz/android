@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
+import mega.privacy.android.domain.usecase.account.IsProAccountUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
@@ -27,6 +27,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUse
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
+import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.PauseRunClicked
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.RemoveFolderClicked
 import timber.log.Timber
@@ -46,69 +47,19 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFolderTreeInfo: GetFolderTreeInfo,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
-    private val getAccountTypeUseCase: GetAccountTypeUseCase,
+    private val isProAccountUseCase: IsProAccountUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncFoldersState(emptyList()))
     val uiState: StateFlow<SyncFoldersState> = _uiState.asStateFlow()
 
+    private var showSyncsPausedErrorDialogShown = false
+
     init {
         viewModelScope.launch {
-            monitorSyncsUseCase()
-                .map(syncUiItemMapper::invoke)
-                .map { syncs ->
-                    val stalledIssues = getSyncStalledIssuesUseCase()
-                    var numOfFiles = 0
-                    var numOfFolders = 0
-                    var totalSizeInBytes = 0L
-                    var creationTime = 0L
-                    syncs.map { sync ->
-
-                        runCatching {
-                            getNodeByIdUseCase(sync.megaStorageNodeId)
-                        }.onSuccess { node ->
-                            node?.let { folder ->
-                                creationTime = folder.creationTime
-                                runCatching {
-                                    getFolderTreeInfo(folder as TypedFolderNode)
-                                }.onSuccess { folderTreeInfo ->
-                                    with(folderTreeInfo) {
-                                        numOfFiles = numberOfFiles
-                                        numOfFolders =
-                                            numberOfFolders - 1 //we don't want to count itself
-                                        totalSizeInBytes = totalCurrentSizeInBytes
-                                    }
-                                }.onFailure {
-                                    Timber.e(it)
-                                }
-                            }
-                        }.onFailure {
-                            Timber.e(it)
-                        }
-
-                        sync.copy(
-                            hasStalledIssues = stalledIssues.any {
-                                it.localPaths.firstOrNull()?.contains(sync.deviceStoragePath)
-                                    ?: (it.nodeNames.first().contains(sync.megaStoragePath))
-                            },
-                            numberOfFiles = numOfFiles,
-                            numberOfFolders = numOfFolders,
-                            totalSizeInBytes = totalSizeInBytes,
-                            creationTime = creationTime,
-                        )
-                    }
-                }
-                .collect { syncs ->
-                    _uiState.update {
-                        it.copy(
-                            syncUiItems = syncs,
-                            isRefreshing = false
-                        )
-                    }
-                }
+            loadSyncs()
         }
-
         viewModelScope.launch {
             runCatching {
                 isStorageOverQuotaUseCase()
@@ -132,19 +83,86 @@ internal class SyncFoldersViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            runCatching {
-                getAccountTypeUseCase()
-            }.onSuccess { accountType ->
-                _uiState.update { it.copy(isFreeAccount = accountType == AccountType.FREE) }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
-
-        viewModelScope.launch {
             monitorAccountDetailUseCase().collect { accountDetail ->
                 _uiState.update {
                     it.copy(isFreeAccount = accountDetail.levelDetail?.accountType == AccountType.FREE)
+                }
+            }
+        }
+    }
+
+    private suspend fun loadSyncs() {
+        monitorSyncsUseCase().map(syncUiItemMapper::invoke).map { syncs ->
+            val stalledIssues = getSyncStalledIssuesUseCase()
+            var numOfFiles = 0
+            var numOfFolders = 0
+            var totalSizeInBytes = 0L
+            var creationTime = 0L
+            syncs.map { sync ->
+
+                runCatching {
+                    getNodeByIdUseCase(sync.megaStorageNodeId)
+                }.onSuccess { node ->
+                    node?.let { folder ->
+                        creationTime = folder.creationTime
+                        runCatching {
+                            getFolderTreeInfo(folder as TypedFolderNode)
+                        }.onSuccess { folderTreeInfo ->
+                            with(folderTreeInfo) {
+                                numOfFiles = numberOfFiles
+                                numOfFolders =
+                                    numberOfFolders - 1 //we don't want to count itself
+                                totalSizeInBytes = totalCurrentSizeInBytes
+                            }
+                        }.onFailure {
+                            Timber.e(it)
+                        }
+                    }
+                }.onFailure {
+                    Timber.e(it)
+                }
+
+                sync.copy(
+                    hasStalledIssues = stalledIssues.any {
+                        it.localPaths.firstOrNull()?.contains(sync.deviceStoragePath)
+                            ?: (it.nodeNames.first().contains(sync.megaStoragePath))
+                    },
+                    numberOfFiles = numOfFiles,
+                    numberOfFolders = numOfFolders,
+                    totalSizeInBytes = totalSizeInBytes,
+                    creationTime = creationTime,
+                )
+            }
+        }.collect { syncs ->
+            updateSyncsState(syncs)
+        }
+    }
+
+    private suspend fun updateSyncsState(
+        syncs: List<SyncUiItem>,
+    ) {
+        val isProAccount = runCatching { isProAccountUseCase() }.getOrNull() ?: false
+        when {
+            syncs.isNotEmpty() && !showSyncsPausedErrorDialogShown && isProAccount.not() -> {
+                _uiState.update {
+                    it.copy(
+                        syncUiItems = syncs,
+                        isRefreshing = false,
+                        isFreeAccount = isProAccount.not(),
+                        showSyncsPausedErrorDialog = true
+                    )
+                }
+                showSyncsPausedErrorDialogShown = true
+            }
+
+            else -> {
+                _uiState.update {
+                    it.copy(
+                        syncUiItems = syncs,
+                        isRefreshing = false,
+                        isFreeAccount = isProAccount.not(),
+                        showSyncsPausedErrorDialog = false
+                    )
                 }
             }
         }
@@ -157,15 +175,13 @@ internal class SyncFoldersViewModel @Inject constructor(
                 val expanded = action.expanded
 
                 _uiState.update { state ->
-                    state.copy(
-                        syncUiItems = _uiState.value.syncUiItems.map {
-                            if (it.id == syncUiItem.id) {
-                                it.copy(expanded = expanded)
-                            } else {
-                                it
-                            }
+                    state.copy(syncUiItems = _uiState.value.syncUiItems.map {
+                        if (it.id == syncUiItem.id) {
+                            it.copy(expanded = expanded)
+                        } else {
+                            it
                         }
-                    )
+                    })
                 }
             }
 
@@ -184,6 +200,12 @@ internal class SyncFoldersViewModel @Inject constructor(
                         resumeSyncUseCase(action.syncUiItem.id)
                         setUserPausedSyncsUseCase(action.syncUiItem.id, false)
                     }
+                }
+            }
+
+            SyncFoldersAction.OnSyncsPausedErrorDialogDismissed -> {
+                _uiState.update {
+                    it.copy(showSyncsPausedErrorDialog = false)
                 }
             }
         }
