@@ -12,11 +12,11 @@ import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.navigateToChatViewGraph
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileLinkActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFolderLinkActivity
-import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ContactMessageContentView
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ContactMessageContentView
 
 /**
  * Link content
@@ -98,7 +98,7 @@ data class ChatGroupLinkContent(
 
     override fun onClick(context: Context, navHostController: NavHostController) {
         if (isChatAvailable) {
-            navHostController.navigateToChatViewGraph(chatId, link)
+            navHostController.navigateToChatViewGraph(chatId = chatId, chatLink = link)
         }
     }
 }
