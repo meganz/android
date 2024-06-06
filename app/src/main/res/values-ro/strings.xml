@@ -33,7 +33,7 @@
     <!-- button -->
     <string name="general_export">Exportă</string>
     <!-- Answer for confirmation dialog. -->
-    <string name="general_ok">OK</string>
+    <string name="general_ok">Bine</string>
     <!-- Skip a step of a configuration process. -->
     <string name="general_skip">Omite</string>
     <!-- option shown when a message could not be sent -->
@@ -3907,7 +3907,7 @@
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Setări</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
-    <string name="cloud_drive_media_discovery_banner_ok">OK, am înțeles</string>
+    <string name="cloud_drive_media_discovery_banner_ok">Bine, am înțeles</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Oricine cu acest link se poate alătura întâlnirii și poate vedea chatul întâlnirii.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
@@ -5325,7 +5325,7 @@
     <!-- Message of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_message">Rămânând în apel, dați permisiunea de a fi înregistrat. Înregistrarea este stocată numai pe dispozitivul persoanei care o înregistrează.</string>
     <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">OK, am înțeles</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">Bine, am înțeles</string>
     <!-- Label for the negative or cancel button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_negative_button">Părăsește apelul</string>
     <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
@@ -5483,7 +5483,7 @@
     <!-- The body of the Dialog shown to a suspended Business Account Administrator -->
     <string name="account_business_account_deactivated_dialog_admin_body">Contul dvs. Business a fost dezactivat din cauza eșecului plății. Puteți doar să vă consultați datele dvs.\nPentru a efectua o plată și a reactiva abonamentul, conectați-vă la MEGA printr-un browser.</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
-    <string name="account_business_account_deactivated_dialog_button">OK, am înțeles</string>
+    <string name="account_business_account_deactivated_dialog_button">Bine, am înțeles</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
     <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Găzduiți apeluri și întâlniri cu participanți nelimitați și fără restricții de timp.</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
@@ -5523,7 +5523,7 @@
     <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">La acest apel pot participa maximum 100 de persoane. Cereți persoanei care a organizat-o să ridice această limită.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
-    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, am înțeles</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Bine, am înțeles</string>
     <!-- The title of the hidden nodes feature -->
     <string name="hidden_nodes">Fișiere și foldere ascunse</string>
     <!-- Hidden nodes benefit: hide files and folders -->
@@ -5627,10 +5627,11 @@
         <item quantity="other">%1$s și alte %2$d de persoane au ridicat mâna</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="hidden_nodes_sharing_album">Există elemente ascunse în acest album. Împărtășirea albumului înseamnă că elementele ascunse sunt vizibile pentru persoanele cu care îl partajați. Elementele vor rămâne ascunse în Unitatea cloud.</string>
     <!-- Hidden nodes items -->
     <plurals name="hidden_nodes_items">
-        <item quantity="one">Hidden item</item>
-        <item quantity="other">Hidden items</item>
+        <item quantity="one">Un element este ascuns</item>
+        <item quantity="few">Elemente ascunse</item>
+        <item quantity="other">Elemente ascunse</item>
     </plurals>
 </resources>

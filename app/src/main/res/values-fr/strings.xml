@@ -4867,7 +4867,7 @@
     <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_tab_yearly">Annuel</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to">Économisez 16&#160;% avec une facturation annuelle</string>
+    <string name="account_upgrade_account_label_save_up_to">Économisez jusqu’à 16&#160;% avec une facturation annuelle</string>
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_storage">[B]Espace de stockage&#160;:[/B] [A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
@@ -5311,7 +5311,7 @@
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_some_features_title">Les abonnements MEGA&#160;Pro comprennent&#160;:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">La plus grande flexibilité en matière d’espace de stockage</string>
+    <string name="dialog_onboarding_feature_title_storage">La plus grande adaptabilité en matière d’espace de stockage</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
     <string name="dialog_onboarding_feature_description_storage">À partir de %1$s, trouvez la réponse idéale à vos besoins de stockage.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
@@ -5627,10 +5627,11 @@
         <item quantity="other">%1$s et %2$d&#160;autres personnes ont levé la main</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="hidden_nodes_sharing_album">Des éléments cachés sont présents dans cet album. Partager l’album implique que les éléments cachés sont visibles par les personnes avec qui vous le partagez. Les éléments resteront cachés sur votre Disque nuagique.</string>
     <!-- Hidden nodes items -->
     <plurals name="hidden_nodes_items">
-        <item quantity="one">Hidden item</item>
-        <item quantity="other">Hidden items</item>
+        <item quantity="one">Un élément est caché</item>
+        <item quantity="many">Des éléments sont cachés</item>
+        <item quantity="other">Des éléments sont cachés</item>
     </plurals>
 </resources>
