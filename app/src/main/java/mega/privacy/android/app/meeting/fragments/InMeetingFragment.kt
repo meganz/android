@@ -1016,10 +1016,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 checkSwapCameraMenuItemVisibility()
             }
 
-            floatingBottomSheet.isVisible =
-                !state.showEndMeetingAsOnlyHostBottomPanel && !state.showCallOptionsBottomSheet
-
-
             state.call?.let {
                 if (callStatus != it.status) {
                     callStatus = it.status
@@ -1154,6 +1150,40 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .distinctUntilChanged()) {
             if (it.isNotEmpty()) {
                 updateParticipantsWithHandRaised(it)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.showEndMeetingAsOnlyHostBottomPanel }
+            .distinctUntilChanged()) { showedEndMeetingBottomPanel ->
+            when {
+                showedEndMeetingBottomPanel &&
+                        floatingBottomSheet.isVisible -> {
+                    floatingBottomSheet.isVisible = false
+                }
+
+                !showedEndMeetingBottomPanel &&
+                        !inMeetingViewModel.state.value.showCallOptionsBottomSheet &&
+                        !floatingBottomSheet.isVisible &&
+                        toolbar.isVisible -> {
+                    floatingBottomSheet.isVisible = true
+                }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.showCallOptionsBottomSheet }
+            .distinctUntilChanged()) { showedCallOptionsBottomPanel ->
+            when {
+                showedCallOptionsBottomPanel &&
+                        floatingBottomSheet.isVisible -> {
+                    floatingBottomSheet.isVisible = false
+                }
+
+                !showedCallOptionsBottomPanel &&
+                        !inMeetingViewModel.state.value.showEndMeetingAsOnlyHostBottomPanel &&
+                        !floatingBottomSheet.isVisible &&
+                        toolbar.isVisible -> {
+                    floatingBottomSheet.isVisible = true
+                }
             }
         }
 
@@ -1579,7 +1609,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         floatingBottomSheet.fadeInOut(dy = FLOATING_BOTTOM_SHEET_DY, toTop = false)
-
+        
         @Suppress("DEPRECATION")
         if (toolbar.isVisible) {
             meetingActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
