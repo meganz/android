@@ -92,6 +92,8 @@ internal data class FileInfoViewState(
     val actions: List<FileInfoMenuAction> = emptyList(),
     val requiredExtraAction: FileInfoExtraAction? = null,
     val isRemindersForContactVerificationEnabled: Boolean = false,
+    val tagsEnabled: Boolean = false,
+    val tags: List<String> = emptyList(),
 ) {
 
     /**
@@ -114,7 +116,8 @@ internal data class FileInfoViewState(
         creationTime = typedNode.creationTime,
         modificationTime = (typedNode as? TypedFileNode)?.modificationTime,
         descriptionText = typedNode.description.orEmpty(),
-        hasPreview = (typedNode as? TypedFileNode)?.hasPreview == true
+        hasPreview = (typedNode as? TypedFileNode)?.hasPreview == true,
+        tags = typedNode.tags.orEmpty(),
     )
 
 

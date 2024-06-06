@@ -77,6 +77,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
+import mega.privacy.android.domain.usecase.node.UpdateNodeTagUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -85,6 +86,7 @@ import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -135,6 +137,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
+    private val updateNodeTagUseCase: UpdateNodeTagUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -167,10 +170,19 @@ class FileInfoViewModel @Inject constructor(
 
     init {
         checkDescriptionFlag()
+        checkTagsFeatureFlag()
         viewModelScope.launch {
             val isRemindersForContactVerificationEnabled =
                 getContactVerificationWarningUseCase()
             _uiState.update { it.copy(isRemindersForContactVerificationEnabled = isRemindersForContactVerificationEnabled) }
+        }
+    }
+
+    private fun checkTagsFeatureFlag() = viewModelScope.launch {
+        runCatching { getFeatureFlagValueUseCase(AppFeatures.NodeWithTags) }.onSuccess { flag ->
+            _uiState.update { it.copy(tagsEnabled = flag) }
+        }.onFailure {
+            Timber.e("Get feature flag failed $it")
         }
     }
 
@@ -419,7 +431,7 @@ class FileInfoViewModel @Inject constructor(
      * gets the [MegaShare] of the given email if it exists
      */
     @Deprecated("this should be avoided, need while using FileContactsListBottomSheetDialogFragment. To be removed once migrated to compose")
-    fun getShareFromEmail(email: String?) =
+    fun getShareFromEmail(email: String?): MegaShare? =
         _uiState.value.outSharesDeprecated.firstOrNull { it.user == email }
 
     /**
@@ -660,7 +672,6 @@ class FileInfoViewModel @Inject constructor(
                             }
                         }
 
-                        Name -> updateTitle()
                         Owner -> updateOwner()
                         Inshare -> updateAccessPermission()
                         Parent ->
@@ -675,7 +686,7 @@ class FileInfoViewModel @Inject constructor(
                             }
 
                         Timestamp -> updateTimeStamp()
-                        Description -> updateDescription()
+                        Description, Name -> updateTypedNode()
                         Outshare -> {
                             updateOutShares()
                             updateIcon()
@@ -884,16 +895,7 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
-    private fun updateTitle() {
-        updateState {
-            getNodeByIdUseCase(typedNode.id)?.let { updateTypedNode ->
-                typedNode = updateTypedNode
-            }
-            it.copyWithTypedNode(typedNode = typedNode)
-        }
-    }
-
-    private fun updateDescription() {
+    private fun updateTypedNode() {
         updateState {
             getNodeByIdUseCase(typedNode.id)?.let { updateTypedNode ->
                 typedNode = updateTypedNode
@@ -1031,6 +1033,21 @@ class FileInfoViewModel @Inject constructor(
             _uiState.updateDownloadEvent(
                 TransferTriggerEvent.StartDownloadNode(listOf(typedNode))
             )
+        }
+    }
+
+    /**
+     * Removes a tag from the node
+     *
+     * @param tag the tag to remove
+     */
+    fun removeTag(tag: String) = viewModelScope.launch {
+        runCatching {
+            updateNodeTagUseCase(typedNode.id, tag, null)
+        }.onSuccess {
+            println("tags removed")
+        }.onFailure {
+            Timber.e(it)
         }
     }
 }

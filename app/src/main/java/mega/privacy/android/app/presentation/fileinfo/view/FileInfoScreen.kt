@@ -64,6 +64,8 @@ internal fun FileInfoScreen(
     onPublicLinkCopyClick: () -> Unit,
     onMenuActionClick: (FileInfoMenuAction) -> Unit,
     onVerifyContactClick: (String) -> Unit,
+    onAddTagClick: () -> Unit,
+    onRemoveTagClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val actionModeSelect = viewState.outShareContactsSelected.isNotEmpty()
@@ -142,6 +144,8 @@ internal fun FileInfoScreen(
             onPublicLinkCopyClick = onPublicLinkCopyClick,
             onVerifyContactClick = onVerifyContactClick,
             onSetDescriptionClick = onSetDescriptionClick,
+            onAddTagClick = onAddTagClick,
+            onRemoveTagClick = onRemoveTagClick
         )
         viewState.jobInProgressState?.progressMessage?.let {
             LoadingDialog(text = stringResource(id = it))
@@ -182,6 +186,8 @@ private fun FileInfoScreenPreview(
             onPublicLinkCopyClick = {},
             onLocationClick = {},
             onVerifyContactClick = {},
+            onAddTagClick = {},
+            onRemoveTagClick = {},
             onMenuActionClick = { action ->
                 when (action) {
                     FileInfoMenuAction.SelectionModeAction.ClearSelection -> {

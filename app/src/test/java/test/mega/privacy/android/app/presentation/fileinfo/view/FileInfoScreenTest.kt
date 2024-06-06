@@ -40,6 +40,8 @@ class FileInfoScreenTest {
                 onShowMoreSharedWithContactsClick = {},
                 onPublicLinkCopyClick = { },
                 onMenuActionClick = {},
+                onAddTagClick = {},
+                onRemoveTagClick = {},
                 onVerifyContactClick = {},
             )
         }
@@ -71,6 +73,8 @@ class FileInfoScreenTest {
                 onShowMoreSharedWithContactsClick = {},
                 onPublicLinkCopyClick = { },
                 onMenuActionClick = {},
+                onAddTagClick = {},
+                onRemoveTagClick = {},
                 onVerifyContactClick = {},
             )
         }

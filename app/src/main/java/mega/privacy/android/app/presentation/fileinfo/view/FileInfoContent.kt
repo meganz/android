@@ -32,8 +32,8 @@ import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfo
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 
 /**
  * Content for FileInfo screen, all except toolbar, bottom sheets, dialogs
@@ -54,6 +54,8 @@ internal fun FileInfoContent(
     onPublicLinkCopyClick: () -> Unit,
     onVerifyContactClick: (String) -> Unit,
     onSetDescriptionClick: (String) -> Unit,
+    onAddTagClick: () -> Unit,
+    onRemoveTagClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isShareContactExpanded by remember { mutableStateOf(false) }
@@ -207,6 +209,18 @@ internal fun FileInfoContent(
                 )
             }
 
+            //tags
+            if (tagsEnabled) {
+                FileInfoTagsView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    tags = tags,
+                    onAddTagClick = onAddTagClick,
+                    onRemoveTagClick = onRemoveTagClick,
+                )
+            }
+
             //link
             if (showLink && publicLink != null) {
                 ShareLinkView(
@@ -265,6 +279,8 @@ private fun FileInfoContentPreview(
             onLocationClick = {},
             onVerifyContactClick = {},
             onSetDescriptionClick = {},
+            onAddTagClick = {},
+            onRemoveTagClick = {},
             modifier = Modifier.verticalScroll(scrollState)
         )
     }

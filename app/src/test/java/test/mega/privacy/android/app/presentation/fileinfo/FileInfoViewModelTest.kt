@@ -74,6 +74,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
+import mega.privacy.android.domain.usecase.node.UpdateNodeTagUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -146,6 +147,7 @@ internal class FileInfoViewModelTest {
     private val monitorOfflineFileAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
+    private val updateNodeTagUseCase = mock<UpdateNodeTagUseCase>()
     private val fileTypeIconMapper = FileTypeIconMapper()
 
     private val typedFileNode: TypedFileNode = mock()
@@ -202,6 +204,7 @@ internal class FileInfoViewModelTest {
             isMediaUploadsEnabledUseCase,
             monitorOfflineFileAvailabilityUseCase,
             getContactVerificationWarningUseCase,
+            updateNodeTagUseCase,
             typedFileNode,
             previewFile,
         )
@@ -249,6 +252,7 @@ internal class FileInfoViewModelTest {
             isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+            updateNodeTagUseCase = updateNodeTagUseCase,
             fileTypeIconMapper = fileTypeIconMapper
         )
     }

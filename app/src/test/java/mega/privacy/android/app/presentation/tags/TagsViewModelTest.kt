@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.UpdateNodeTagUseCase
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -26,8 +27,14 @@ class TagsViewModelTest {
 
     private val updateNodeTagUseCase = mock<UpdateNodeTagUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
-    private val stateHandle = mock<SavedStateHandle>()
-    private val underTest = TagsViewModel(updateNodeTagUseCase, getNodeByIdUseCase, stateHandle)
+    private lateinit var stateHandle: SavedStateHandle
+    private lateinit var underTest: TagsViewModel
+
+    @BeforeEach
+    fun setup() {
+        stateHandle = SavedStateHandle(mapOf(TagsActivity.NODE_ID to 123L))
+        underTest = TagsViewModel(updateNodeTagUseCase, getNodeByIdUseCase, stateHandle)
+    }
 
     @Test
     fun `test that getNodeByHandle update uiState with nodeHandle and tags`() = runTest {
@@ -36,7 +43,6 @@ class TagsViewModelTest {
             on { name } doReturn "tags"
             on { tags } doReturn listOf("tag1", "tag2")
         }
-        whenever(stateHandle.get<Long>(TagsActivity.NODE_ID)).thenReturn(123L)
         whenever(getNodeByIdUseCase(NodeId(123L))).thenReturn(node)
         val nodeId = NodeId(123L)
         underTest.getNodeByHandle(nodeId)
@@ -46,7 +52,6 @@ class TagsViewModelTest {
 
     @Test
     fun `test that getNodeByHandle log error when getNodeByIdUseCase fails`() = runTest {
-        whenever(stateHandle.get<Long>(TagsActivity.NODE_ID)).thenReturn(123L)
         whenever(getNodeByIdUseCase(NodeId(123L))).thenThrow(RuntimeException())
         val nodeHandle = NodeId(123L)
         underTest.getNodeByHandle(nodeHandle)
@@ -54,7 +59,6 @@ class TagsViewModelTest {
 
     @Test
     fun `test that addNodeTag update node tags`() = runTest {
-        whenever(stateHandle.get<Long>(TagsActivity.NODE_ID)).thenReturn(123L)
         whenever(updateNodeTagUseCase(NodeId(123L), newTag = "new tag")).thenReturn(Unit)
         underTest.addNodeTag("new tag")
         val uiState = underTest.uiState.value

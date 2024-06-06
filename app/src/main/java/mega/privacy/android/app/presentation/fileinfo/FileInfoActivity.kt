@@ -44,6 +44,8 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.tags.TagsActivity
+import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.NODE_ID
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -169,6 +171,8 @@ class FileInfoActivity : BaseActivity() {
                     onPublicLinkCopyClick = viewModel::copyPublicLink,
                     onMenuActionClick = { handleAction(it, uiState) },
                     onVerifyContactClick = this::navigateToVerifyContacts,
+                    onAddTagClick = this::navigateToTags,
+                    onRemoveTagClick = viewModel::removeTag,
                     modifier = Modifier.semantics {
                         testTagsAsResourceId = true
                     }
@@ -189,6 +193,14 @@ class FileInfoActivity : BaseActivity() {
                 updateContactShareBottomSheet(uiState)
             }
         }
+    }
+
+    private fun navigateToTags() {
+        startActivity(
+            Intent(this, TagsActivity::class.java).apply {
+                putExtra(NODE_ID, readExtrasAndGetHandle())
+            }
+        )
     }
 
     override fun onRestart() {

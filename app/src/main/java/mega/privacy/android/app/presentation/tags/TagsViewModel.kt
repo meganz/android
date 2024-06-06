@@ -37,12 +37,10 @@ class TagsViewModel @Inject constructor(
      * the state of the view
      */
     internal val uiState = _uiState.asStateFlow()
-    private val nodeId: Long? = stateHandle.get<Long>(NODE_ID)
+    private val nodeId: NodeId = NodeId(stateHandle.get<Long>(NODE_ID) ?: -1L)
 
     init {
-        nodeId?.let { nodeHandle ->
-            getNodeByHandle(NodeId(nodeHandle))
-        }
+        getNodeByHandle(nodeId)
     }
 
     /**
@@ -67,8 +65,7 @@ class TagsViewModel @Inject constructor(
      */
     fun addNodeTag(tag: String) = viewModelScope.launch {
         runCatching {
-            requireNotNull(nodeId)
-            updateNodeTagUseCase(nodeHandle = NodeId(nodeId), newTag = tag)
+            updateNodeTagUseCase(nodeHandle = nodeId, newTag = tag)
         }.onSuccess {
             _uiState.update { it.copy(informationMessage = triggered(InfoToShow.SimpleString(R.string.choose_file))) }
         }.onFailure {
