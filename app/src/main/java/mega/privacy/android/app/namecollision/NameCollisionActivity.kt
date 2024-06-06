@@ -1,5 +1,6 @@
 package mega.privacy.android.app.namecollision
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -18,8 +19,9 @@ import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
+import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
@@ -28,8 +30,10 @@ import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalRequestListener
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
@@ -147,6 +151,7 @@ class NameCollisionActivity : PasscodeActivity() {
     }
 
     private fun setupView() {
+        addStartUploadTransferView()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             title = getString(R.string.title_duplicated_items)
@@ -184,26 +189,51 @@ class NameCollisionActivity : PasscodeActivity() {
         }
     }
 
+    private fun addStartUploadTransferView() {
+        binding.root.addView(
+            createStartTransferView(
+                this,
+                viewModel.uiState.map { it.uploadEvent },
+            ) {
+                ((viewModel.uiState.value.uploadEvent as StateEventWithContentTriggered).content).let { event ->
+                    setResult(
+                        NameCollisionActionResult(
+                            message = resources.getQuantityString(
+                                R.plurals.upload_began,
+                                event.pathsAndNames.size,
+                                event.pathsAndNames.size,
+                            ),
+                            shouldFinish = viewModel.shouldFinish()
+                        )
+                    )
+                    viewModel.consumeUploadEvent(event)
+                }
+            }
+        )
+    }
+
     private fun setupObservers() {
         viewModel.getCurrentCollision().observe(this, ::showCollision)
         viewModel.getFileVersioningInfo().observe(this, ::updateFileVersioningData)
-        viewModel.onActionResult().observe(this) { result ->
-            if (result.isForeignNode) {
-                showForeignStorageOverQuotaWarningDialog(this)
-                return@observe
-            }
-
-            if (result.shouldFinish) {
-                setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, result.message))
-                finish()
-            }
-        }
+        viewModel.onActionResult().observe(this, this::setResult)
         viewModel.onExceptionThrown().observe(this) { error ->
             if (!manageCopyMoveException(error) && error is MegaException) {
                 showSnackbar(error.message!!)
             }
         }
         viewModel.getCollisionsResolution().observe(this, ::manageCollisionsResolution)
+    }
+
+    private fun setResult(result: NameCollisionActionResult) {
+        if (result.isForeignNode) {
+            showForeignStorageOverQuotaWarningDialog(this)
+            return
+        }
+
+        if (result.shouldFinish) {
+            setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, result.message))
+            finish()
+        }
     }
 
     /**

@@ -1,19 +1,27 @@
 package test.mega.privacy.android.app.namecollision
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.namecollision.NameCollisionViewModel
+import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
@@ -22,6 +30,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.NullSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -42,6 +53,7 @@ internal class NameCollisionViewModelTest {
     private val copyCollidedNodesUseCase = mock<CopyCollidedNodesUseCase>()
     private val copyCollidedNodeUseCase = mock<CopyCollidedNodeUseCase>()
     private val copyRequestMessageMapper = mock<CopyRequestMessageMapper>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private fun initUnderTest() {
         underTest = NameCollisionViewModel(
@@ -59,6 +71,7 @@ internal class NameCollisionViewModelTest {
             getNodeByFingerprintAndParentNodeUseCase = mock(),
             moveCollidedNodeUseCase = mock(),
             moveCollidedNodesUseCase = mock(),
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -171,6 +184,35 @@ internal class NameCollisionViewModelTest {
 
             assertThat(underTest.onExceptionThrown().value).isInstanceOf(RuntimeException::class.java)
         }
+
+    @ParameterizedTest(name = " and call state changes as joined with {0}")
+    @EnumSource(
+        value = NameCollisionChoice::class,
+        names = ["RENAME", "REPLACE_UPDATE_MERGE"]
+    )
+    @NullSource
+    fun `test that state is updated correctly if upload`(
+        choice: NameCollisionChoice?,
+    ) = runTest {
+        val pathsAndNames = mapOf("path" to "name")
+        val destinationId = NodeId(123L)
+        val expected = triggered(
+            TransferTriggerEvent.StartUpload.CollidedFiles(
+                pathsAndNames = pathsAndNames,
+                destinationId = destinationId,
+                collisionChoice = choice
+            )
+        )
+
+        with(underTest) {
+            uploadFiles(pathsAndNames, destinationId, choice)
+            uiState.map { it.uploadEvent }.test {
+                assertThat(awaitItem()).isEqualTo(expected)
+                consumeUploadEvent(expected.content)
+                assertThat(awaitItem()).isEqualTo(consumed())
+            }
+        }
+    }
 
     companion object {
         @JvmField

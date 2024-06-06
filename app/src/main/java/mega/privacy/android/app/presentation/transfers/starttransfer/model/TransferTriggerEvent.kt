@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
 import android.net.Uri
 import androidx.core.net.toUri
+import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -154,5 +155,16 @@ sealed interface TransferTriggerEvent {
         ) : StartUpload {
             override val pathsAndNames = mapOf(path to null)
         }
+
+        /**
+         * Upload collided files.
+         *
+         * @property collisionChoice the choice made by the user to resolve the name collision.
+         */
+        data class CollidedFiles(
+            val collisionChoice: NameCollisionChoice?,
+            override val pathsAndNames: Map<String, String?>,
+            override val destinationId: NodeId,
+        ) : StartUpload
     }
 }

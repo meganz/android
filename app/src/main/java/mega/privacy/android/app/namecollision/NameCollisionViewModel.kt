@@ -6,28 +6,36 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.model.NameCollisionUiState
 import mega.privacy.android.app.namecollision.usecase.GetNameCollisionResultUseCase
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
@@ -39,6 +47,7 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetNodeByFingerprintAndParentNodeUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
@@ -54,6 +63,7 @@ import javax.inject.Inject
  * @property getNameCollisionResultUseCase  Required for getting all the needed info for present a collision.
  * @property uploadUseCase                  Required for uploading files.
  * @property getNodeUseCase                 Required for getting node from handle
+ * @property uiState                        NameCollisionUiState.
  */
 @HiltViewModel
 class NameCollisionViewModel @Inject constructor(
@@ -71,8 +81,13 @@ class NameCollisionViewModel @Inject constructor(
     private val getNodeByFingerprintAndParentNodeUseCase: GetNodeByFingerprintAndParentNodeUseCase,
     private val moveCollidedNodeUseCase: MoveCollidedNodeUseCase,
     private val moveCollidedNodesUseCase: MoveCollidedNodesUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val composite = CompositeDisposable()
+
+    private val _uiState = MutableStateFlow(NameCollisionUiState())
+
+    val uiState: StateFlow<NameCollisionUiState> = _uiState
 
     private val currentCollision: MutableLiveData<NameCollisionResult?> = MutableLiveData()
     private val fileVersioningInfo: MutableLiveData<Triple<Boolean, NameCollisionType, Boolean>> =
@@ -509,16 +524,31 @@ class NameCollisionViewModel @Inject constructor(
         }
 
         val currentCollision = currentCollision.value ?: return
-        uploadUseCase.upload(context, currentCollision, rename)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-                    setUploadResult(1, context)
-                    continueWithNext(choice)
-                },
-                onError = Timber::e
-            ).addTo(composite)
+
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                val parentId = currentCollision.nameCollision.parentHandle ?: return@launch
+                val path = (currentCollision.nameCollision as NameCollision.Upload).absolutePath
+                val name =
+                    if (rename) currentCollision.renameName else currentCollision.nameCollision.name
+
+                uploadFiles(
+                    mapOf(path to name),
+                    NodeId(parentId),
+                )
+            } else {
+                uploadUseCase.upload(context, currentCollision, rename)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onComplete = {
+                            setUploadResult(1, context)
+                            continueWithNext(choice)
+                        },
+                        onError = Timber::e
+                    ).addTo(composite)
+            }
+        }
     }
 
     /**
@@ -550,13 +580,28 @@ class NameCollisionViewModel @Inject constructor(
             return
         }
 
-        uploadUseCase.upload(context, list, rename)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = { setUploadResult(list.size, context) },
-                onError = Timber::e
-            ).addTo(composite)
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                val parentId = list.first().nameCollision.parentHandle ?: return@launch
+                val pathsAndNames = list.associate {
+                    (it.nameCollision as NameCollision.Upload).absolutePath to
+                            if (rename) it.renameName else it.nameCollision.name
+                }
+
+                uploadFiles(
+                    pathsAndNames,
+                    NodeId(parentId)
+                )
+            } else {
+                uploadUseCase.upload(context, list, rename)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onComplete = { setUploadResult(list.size, context) },
+                        onError = Timber::e
+                    ).addTo(composite)
+            }
+        }
     }
 
     /**
@@ -779,6 +824,37 @@ class NameCollisionViewModel @Inject constructor(
                 .onFailure { Timber.e(it) }
         }
     }
+
+    fun uploadFiles(
+        pathsAndNames: Map<String, String?>,
+        destinationId: NodeId,
+        choice: NameCollisionChoice? = null,
+    ) {
+        _uiState.update { state ->
+            state.copy(
+                uploadEvent = triggered(
+                    TransferTriggerEvent.StartUpload.CollidedFiles(
+                        pathsAndNames = pathsAndNames,
+                        destinationId = destinationId,
+                        collisionChoice = choice,
+                    )
+                )
+            )
+        }
+    }
+
+    /**
+     * Consumes the upload event.
+     */
+    fun consumeUploadEvent(event: TransferTriggerEvent.StartUpload.CollidedFiles) {
+        event.collisionChoice?.let { choice -> continueWithNext(choice) }
+        _uiState.update { state -> state.copy(uploadEvent = consumed()) }
+    }
+
+    /**
+     * Checks if all the pending collisions have been processed.
+     */
+    fun shouldFinish() = pendingCollisions.isEmpty()
 
     override fun onCleared() {
         super.onCleared()
