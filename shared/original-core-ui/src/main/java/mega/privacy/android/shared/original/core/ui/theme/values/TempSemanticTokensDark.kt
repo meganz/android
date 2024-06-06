@@ -24,7 +24,8 @@ internal object TempSemanticTokensDark : SemanticTokens {
             surface1 = Colors.Neutral.n800,
             surface3 = Colors.Neutral.n600,
             surface2 = Colors.Neutral.n700,
-            blur = Colors.BlackOpacity.n020,
+            blur = Colors.BlackOpacity.n050,
+            surfaceInverseAccent = Colors.Accent.n200,
             )
 
     override val button: Button = Button(

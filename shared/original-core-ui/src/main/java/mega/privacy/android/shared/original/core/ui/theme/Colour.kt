@@ -177,7 +177,7 @@ val teal_100 = Color(0xFFA9E3D8)
 
 val teal_200 = Color(0xFF6DD2BF)
 
-val teal_300 = Color(0xFF00BFA5)
+val teal_300 = Color(0xFF008262)
 
 val teal_400 = Color(0xFF00B092)
 

@@ -56,7 +56,7 @@ internal object Colors {
 
         public val n800: Color = Color(30, 41, 54, 255)
 
-        public val n900: Color = Color(0, 191, 165, 255)
+        public val n900: Color = Color(0, 130, 98, 255)
 
         public val n1000: Color = Color(0, 0, 0, 255)
 

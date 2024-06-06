@@ -49,6 +49,9 @@ dependencies {
     implementation(google.accompanist.placeholder)
     implementation(lib.mega.core.ui.tokens)
 
+    debugImplementation(google.gson)
+    debugImplementation(lib.kotlinpoet)
+
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.compose.junit)

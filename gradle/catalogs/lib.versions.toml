@@ -28,7 +28,7 @@ kotlin-serialisation = "1.6.3"
 eclipse-jgit = "6.6.0.202305301015-r"
 json = "20230227"
 megagradle = "0.22.20240528013745"
-mega-core-ui = "2.8.20240528052404"
+mega-core-ui = "2.10.20240531102524"
 
 [libraries]
 anko-commons = { module = "org.jetbrains.anko:anko-commons", version.ref = "anko" }
