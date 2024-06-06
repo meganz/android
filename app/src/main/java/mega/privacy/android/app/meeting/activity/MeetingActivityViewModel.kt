@@ -374,6 +374,7 @@ class MeetingActivityViewModel @Inject constructor(
         startMonitoringChatCallUpdates()
         startMonitorChatSessionUpdates()
         getMyFullName()
+        getMyUserHandle()
 
         if (_state.value.chatId != -1L) {
             getChatAndCall()
@@ -524,7 +525,11 @@ class MeetingActivityViewModel @Inject constructor(
      * load my user handle and save to ui state
      */
     private fun getMyUserHandle() {
-        if (state.value.myUserHandle != null && state.value.myUserHandle != 0L) return
+        state.value.myUserHandle?.let { myHandle ->
+            if (myHandle != -1L && myHandle != 0L) {
+                return
+            }
+        }
 
         viewModelScope.launch {
             runCatching {
@@ -578,14 +583,15 @@ class MeetingActivityViewModel @Inject constructor(
             runCatching {
                 getChatCallUseCase(_state.value.chatId)
             }.onSuccess { call ->
+
                 call?.let {
                     _state.update { state ->
                         state.copy(
                             currentCall = it
                         )
                     }
-                    getMyUserHandle()
 
+                    getMyUserHandle()
                     when (call.status) {
                         ChatCallStatus.UserNoPresent -> {
                             if (_state.value.action == MeetingActivity.MEETING_ACTION_IN) {
@@ -600,6 +606,7 @@ class MeetingActivityViewModel @Inject constructor(
                         else -> {
                             checkIfPresenting(it)
                             if (state.value.isRaiseToSpeakFeatureFlagEnabled) {
+                                Timber.d("Call recovered, check the participants with raised  hand")
                                 initialiseUserToShowInHandRaisedSnackbar(call)
                             }
                             if (checkEphemeralAccount) {
@@ -929,7 +936,13 @@ class MeetingActivityViewModel @Inject constructor(
                                 Timber.d("Chat call status: ${call.status}")
                                 when (call.status) {
                                     ChatCallStatus.InProgress -> {
+                                        Timber.d("Call in progress, check my user handle and ephemeral account")
+                                        getMyUserHandle()
                                         checkEphemeralAccountAndWaitingRoom(call)
+                                        if (state.value.isRaiseToSpeakFeatureFlagEnabled) {
+                                            Timber.d("Call in progress, check the participants with raised hand")
+                                            initialiseUserToShowInHandRaisedSnackbar(call)
+                                        }
                                     }
 
                                     ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification -> {
@@ -959,7 +972,7 @@ class MeetingActivityViewModel @Inject constructor(
                                                             )
                                                         }
                                                             ?.associateWith { true } ?: emptyMap())
-
+                                            Timber.d("Change in CallRaiseHand, update participants with raised hand")
                                             updateUserToShowInHandRaisedSnackbar(listToUpdate)
                                             monitorGroupHandRaisedSnackbar()
                                         }
@@ -970,7 +983,7 @@ class MeetingActivityViewModel @Inject constructor(
                                                     call.raisedHandsList?.contains(entry.key)
                                                         ?: false
                                                 }.toMap()
-
+                                            Timber.d("Change in CallRaiseHand, update participants with raised hand")
                                             updateUserToShowInHandRaisedSnackbar(listToUpdate)
                                         }
                                     }
@@ -2004,6 +2017,7 @@ class MeetingActivityViewModel @Inject constructor(
      * @param call  [ChatCall]
      */
     private fun initialiseUserToShowInHandRaisedSnackbar(call: ChatCall) {
+        Timber.d("Initially check participants with raised hand")
         val listToUpdate = buildMap {
             call.raisedHandsList?.forEach { peerId ->
                 this[peerId] = false
@@ -2017,6 +2031,7 @@ class MeetingActivityViewModel @Inject constructor(
      * Clear user ids with changes in raised hand list
      */
     private fun clearUserToShowInHandRaisedSnackbar() {
+        Timber.d("Clear list to update with hand raised")
         val listToUpdate = mutableMapOf<Long, Boolean>()
         state.value.userToShowInHandRaisedSnackbar.forEach {
             listToUpdate[it.key] = false
@@ -2032,7 +2047,6 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun updateUserToShowInHandRaisedSnackbar(list: Map<Long, Boolean>) =
         _state.update { state -> state.copy(userToShowInHandRaisedSnackbar = list) }
-
 
     /**
      * Pin to speaker view

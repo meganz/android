@@ -65,6 +65,7 @@ import mega.privacy.android.app.utils.Constants.NAME_CHANGE
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.meeting.AnotherCallType
@@ -456,7 +457,11 @@ class InMeetingViewModel @Inject constructor(
                         }
                         handleFreeCallEndWarning()
                         isEphemeralAccount()
-                        updateParticipantsWithRaisedHand()
+                        if (status == ChatCallStatus.InProgress && state.value.isRaiseToSpeakFeatureFlagEnabled) {
+                            Timber.d("Call recovered, check the participants with raised  hand")
+                            updateParticipantsWithRaisedHand(call)
+                        }
+
                         updateNetworkQuality(call.networkQuality)
                     }
                 }
@@ -519,6 +524,10 @@ class InMeetingViewModel @Inject constructor(
                                     if (status == ChatCallStatus.InProgress) {
                                         Timber.d("Call in progress, get my user information")
                                         isEphemeralAccount()
+                                        if (state.value.isRaiseToSpeakFeatureFlagEnabled) {
+                                            Timber.d("Call in progress, check the participants with raised hand")
+                                            updateParticipantsWithRaisedHand(call)
+                                        }
                                     }
                                     checkSubtitleToolbar()
                                     _state.update { state ->
@@ -530,7 +539,11 @@ class InMeetingViewModel @Inject constructor(
                             }
 
                             contains(ChatCallChanges.CallWillEnd) -> handleFreeCallEndWarning()
-                            contains(ChatCallChanges.CallRaiseHand) -> updateParticipantsWithRaisedHand()
+                            contains(ChatCallChanges.CallRaiseHand) -> if (state.value.isRaiseToSpeakFeatureFlagEnabled) {
+                                Timber.d("Change in CallRaiseHand, update participants with raised hand")
+                                updateParticipantsWithRaisedHand(call)
+                            }
+
                             contains(ChatCallChanges.LocalAVFlags) -> checkUpdatesInLocalAVFlags(
                                 update = true
                             )
@@ -567,37 +580,38 @@ class InMeetingViewModel @Inject constructor(
 
     /**
      * Update participants with hand raised list
+     *
+     * @param call  [ChatCall]
      */
-    private fun updateParticipantsWithRaisedHand() {
+    private fun updateParticipantsWithRaisedHand(call: ChatCall) {
         val listWithChanges = buildList {
-            state.value.call?.let { call ->
-                var order = 0
-                val triple = call.usersRaiseHands.map {
-                    Triple(it.key, it.value, ++order)
-                }
-                participants.value = participants.value?.map { participant ->
-                    triple.find { it.first == participant.peerId }
-                        ?.let { (_, isRaisedHand, order) ->
-                            // update the participant's isRaisedHand status and order based on the corresponding values in the triple.
-                            // If the participant's isRaisedHand status changes, their ID is added to the listWithChanges.
-                            if (participant.isRaisedHand != isRaisedHand) {
-                                add(participant.peerId)
-                                participant.copy(isRaisedHand = isRaisedHand, order = order)
-                            } else {
-                                participant
-                            }
-                        } ?: if (participant.isRaisedHand) {
-                        add(participant.peerId)
-                        // If a participant's ID is not found in the triple list, it means they have not raised their hand.
-                        // In this case, their isRaisedHand status is set to false and their order is set to Int.MAX_VALUE.
-                        participant.copy(isRaisedHand = false, order = Int.MAX_VALUE)
-                    } else {
-                        participant
-                    }
-                }?.toMutableList()
+            var order = 0
+            val triple = call.usersRaiseHands.map {
+                Triple(it.key, it.value, ++order)
             }
+            participants.value = participants.value?.map { participant ->
+                triple.find { it.first == participant.peerId }
+                    ?.let { (_, isRaisedHand, order) ->
+                        // update the participant's isRaisedHand status and order based on the corresponding values in the triple.
+                        // If the participant's isRaisedHand status changes, their ID is added to the listWithChanges.
+                        if (participant.isRaisedHand != isRaisedHand) {
+                            add(participant.peerId)
+                            participant.copy(isRaisedHand = isRaisedHand, order = order)
+                        } else {
+                            participant
+                        }
+                    } ?: if (participant.isRaisedHand) {
+                    add(participant.peerId)
+                    // If a participant's ID is not found in the triple list, it means they have not raised their hand.
+                    // In this case, their isRaisedHand status is set to false and their order is set to Int.MAX_VALUE.
+                    participant.copy(isRaisedHand = false, order = Int.MAX_VALUE)
+                } else {
+                    participant
+                }
+            }?.toMutableList()
         }
         _state.update { state -> state.copy(userIdsWithChangesInRaisedHand = listWithChanges) }
+
     }
 
     /**
