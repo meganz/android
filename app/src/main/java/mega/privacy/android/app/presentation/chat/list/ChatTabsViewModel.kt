@@ -297,7 +297,11 @@ class ChatTabsViewModel @Inject constructor(
                                         }
                                     } else {
                                         runCatching {
-                                            openOrStartCallUseCase(chatId = chatId, video = false)
+                                            openOrStartCallUseCase(
+                                                chatId = chatId,
+                                                audio = true,
+                                                video = false
+                                            )
                                         }.onSuccess { call ->
                                             call?.let { openCurrentCall(it) }
                                         }.onFailure {

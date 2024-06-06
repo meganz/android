@@ -23,7 +23,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
@@ -1781,23 +1780,25 @@ internal class ChatViewModelTest {
         }
     }
 
-    @ParameterizedTest(name = " when request success {0} and starts with video {1}")
+    @ParameterizedTest(name = " when request success {0} and starts with audio {1} and with video {2}")
     @ArgumentsSource(StartCallArgumentsProvider::class)
     fun `test that start call finish with success`(
         success: Boolean,
+        audio: Boolean,
         video: Boolean,
     ) = runTest {
         val call = mock<ChatCall> {
             on { this.chatId } doReturn chatId
             on { this.callId } doReturn callId
+            on { hasLocalAudio } doReturn audio
             on { hasLocalVideo } doReturn video
             on { isOutgoing } doReturn true
         }
 
         if (success) {
-            whenever(startCallUseCase(chatId, video)).thenReturn(call)
+            whenever(startCallUseCase(chatId, audio, video)).thenReturn(call)
         } else {
-            whenever(startCallUseCase(chatId, video)).thenThrow(RuntimeException())
+            whenever(startCallUseCase(chatId, audio, video)).thenThrow(RuntimeException())
         }
 
         underTest.startCall(video)
@@ -1821,7 +1822,7 @@ internal class ChatViewModelTest {
 
     @Test
     fun `test that on call started updates is starting call`() = runTest {
-        whenever(startCallUseCase(chatId = chatId, false)).thenReturn(mock())
+        whenever(startCallUseCase(chatId = chatId, audio = true, video = false)).thenReturn(mock())
         underTest.startCall(false)
         underTest.state.test {
             assertThat(awaitItem().isStartingCall).isTrue()
@@ -3097,10 +3098,12 @@ internal class StartCallArgumentsProvider : ArgumentsProvider {
 
     override fun provideArguments(context: ExtensionContext): Stream<out Arguments>? {
         return Stream.of(
-            Arguments.of(false, false),
-            Arguments.of(false, true),
-            Arguments.of(true, false),
-            Arguments.of(true, true),
+            Arguments.of(false, false, false),
+            Arguments.of(false, true, false),
+            Arguments.of(false, false, true),
+            Arguments.of(false, true, true),
+            Arguments.of(true, true, false),
+            Arguments.of(true, true, true),
         )
     }
 }

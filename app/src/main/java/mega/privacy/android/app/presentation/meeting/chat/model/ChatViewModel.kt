@@ -967,7 +967,7 @@ class ChatViewModel @Inject constructor(
     fun startCall(video: Boolean) {
         setUsersCallLimitReminder(enabled = true)
         viewModelScope.launch {
-            runCatching { startCallUseCase(chatId, video) }
+            runCatching { startCallUseCase(chatId = chatId, audio = true, video = video) }
                 .onSuccess { call ->
                     setCallReady(call)
                 }.onFailure { Timber.e("Exception starting call $it") }

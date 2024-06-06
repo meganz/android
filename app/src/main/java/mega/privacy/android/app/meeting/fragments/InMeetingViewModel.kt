@@ -1488,7 +1488,11 @@ class InMeetingViewModel @Inject constructor(
                 viewModelScope.launch {
                     runCatching {
                         setChatVideoInDeviceUseCase()
-                        startCallUseCase(_state.value.currentChatId, enableVideo)
+                        startCallUseCase(
+                            chatId = _state.value.currentChatId,
+                            audio = enableAudio,
+                            video = enableVideo
+                        )
                     }.onFailure { exception ->
                         Timber.e(exception)
                     }.onSuccess { call ->

@@ -367,7 +367,10 @@ class ContactInfoViewModel @Inject constructor(
         MegaApplication.isWaitingForCall = false
         runCatching {
             setChatVideoInDeviceUseCase()
-            openOrStartCallUseCase(chatId = chatId, video = hasVideo)
+            openOrStartCallUseCase(
+                chatId = chatId, audio = true,
+                video = hasVideo
+            )
         }.onSuccess { call ->
             call?.let { chatCall ->
                 Timber.d("Call started")

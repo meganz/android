@@ -1,14 +1,12 @@
 package mega.privacy.android.domain.usecase.meeting
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.exception.chat.StartCallException
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -18,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -28,7 +27,6 @@ import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class StartCallUseCaseTest {
 
@@ -58,13 +56,13 @@ class StartCallUseCaseTest {
 
         if (chatId == -1L) {
             assertThrows<StartCallException> {
-                underTest(chatId = chatId, video = true)
+                underTest(chatId = chatId, audio = true, video = true)
                 verify(chatRepository).getChatInvalidHandle()
                 verifyNoMoreInteractions(chatRepository)
                 verifyNoInteractions(callRepository)
             }
         } else {
-            underTest(chatId = chatId, video = true)
+            underTest(chatId = chatId, audio = true, video = true)
             verify(chatRepository).getChatInvalidHandle()
             verifyNoMoreInteractions(chatRepository)
             val chatRequest = mock<ChatRequest> {
@@ -79,7 +77,8 @@ class StartCallUseCaseTest {
                     )
                 ).thenReturn(chatRequest)
                 whenever(callRepository.getChatCall(chatId)).thenReturn(startCall)
-                Truth.assertThat(underTest(chatId = chatId, video = true)).isEqualTo(startCall)
+                Truth.assertThat(underTest(chatId = chatId, audio = true, video = true))
+                    .isEqualTo(startCall)
             } else {
                 whenever(
                     callRepository.startCallRinging(
@@ -92,6 +91,33 @@ class StartCallUseCaseTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that start call ringing is called with correct audio parameters`(
+        audio: Boolean,
+    ) = runTest {
+        val chatId = 123L
+        underTest.invoke(chatId = chatId, audio = audio, video = false)
+        verify(callRepository).startCallRinging(
+            chatId = chatId,
+            enabledAudio = audio,
+            enabledVideo = false
+        )
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that start call ringing is called with correct video parameters`(
+        video: Boolean,
+    ) = runTest {
+        val chatId = 123L
+        underTest.invoke(chatId = chatId, audio = false, video = video)
+        verify(callRepository).startCallRinging(
+            chatId = chatId,
+            enabledAudio = false,
+            enabledVideo = video
+        )
+    }
 }
 
 internal class StartCallArgumentsProvider : ArgumentsProvider {

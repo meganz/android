@@ -16,13 +16,18 @@ class OpenOrStartCallUseCase @Inject constructor(
      * Invoke
      *
      * @param chatId Chat id.
+     * @param audio True if should enable audio, false otherwise.
      * @param video True if should enable video, false otherwise.
      * @return [ChatCall] if any, null otherwise.
      */
-    suspend operator fun invoke(chatId: Long, video: Boolean) =
+    suspend operator fun invoke(chatId: Long, audio: Boolean, video: Boolean) =
         if (chatId == -1L) {
             null
         } else {
-            callRepository.getChatCall(chatId) ?: startCallUseCase(chatId = chatId, video = video)
+            callRepository.getChatCall(chatId) ?: startCallUseCase(
+                chatId = chatId,
+                audio = audio,
+                video = video
+            )
         }
 }

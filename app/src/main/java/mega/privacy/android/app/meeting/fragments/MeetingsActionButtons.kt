@@ -403,9 +403,9 @@ fun MeetingsActionButtons(
                         modifier = Modifier.testTag(END_CALL_BUTTON),
                         isOn = isOn,
                         enabled = true,
-                        onIcon = IconR.drawable.ic_phone_02,
-                        offIcon = IconR.drawable.ic_phone_02,
-                        disableIcon = IconR.drawable.ic_phone_02,
+                        onIcon = IconR.drawable.hang_call_icon,
+                        offIcon = IconR.drawable.hang_call_icon,
+                        disableIcon = IconR.drawable.hang_call_icon,
                         onBackgroundTint = Color(
                             ContextCompat.getColor(
                                 context,
@@ -418,8 +418,8 @@ fun MeetingsActionButtons(
                                 R.color.color_primary_400
                             )
                         ),
-                        onIconTint = Color.Black,
-                        offIconTint = Color.Black,
+                        onIconTint = Color.White,
+                        offIconTint = Color.White,
                         onOff = onEndClicked
                     )
                     MegaText(

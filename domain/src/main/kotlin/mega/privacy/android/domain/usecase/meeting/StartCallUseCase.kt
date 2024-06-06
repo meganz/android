@@ -18,15 +18,20 @@ class StartCallUseCase @Inject constructor(
      * Invoke
      *
      * @param chatId Chat id.
+     * @param audio True if should enable audio, false otherwise.
      * @param video True if should enable video, false otherwise.
      * @return [ChatCall] if any, null otherwise.
      */
-    suspend operator fun invoke(chatId: Long, video: Boolean): ChatCall? =
+    suspend operator fun invoke(chatId: Long, audio: Boolean, video: Boolean): ChatCall? =
         if (chatId == chatRepository.getChatInvalidHandle()) {
             throw StartCallException(chatId)
         } else {
             val result = runCatching {
-                callRepository.startCallRinging(chatId, video, enabledAudio = true)
+                callRepository.startCallRinging(
+                    chatId = chatId,
+                    enabledVideo = video,
+                    enabledAudio = audio
+                )
             }
 
             if (result.isSuccess) {

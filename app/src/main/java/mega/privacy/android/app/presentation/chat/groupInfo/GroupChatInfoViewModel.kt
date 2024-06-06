@@ -226,7 +226,7 @@ class GroupChatInfoViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 setChatVideoInDeviceUseCase()
-                startCallUseCase(chatId, video)
+                startCallUseCase(chatId = chatId, audio = true, video = video)
             }.onFailure { exception ->
                 Timber.e(exception)
             }.onSuccess { call ->

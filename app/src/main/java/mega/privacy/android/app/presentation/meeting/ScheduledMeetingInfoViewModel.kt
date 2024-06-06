@@ -769,7 +769,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun openOrStartChatCall(chatCallId: Long) {
         viewModelScope.launch {
             setChatVideoInDeviceUseCase()
-            runCatching { openOrStartCallUseCase(chatCallId, video = false) }
+            runCatching { openOrStartCallUseCase(chatCallId, audio = false, video = false) }
                 .onSuccess { call ->
                     call?.let {
                         Timber.d("Call started")
