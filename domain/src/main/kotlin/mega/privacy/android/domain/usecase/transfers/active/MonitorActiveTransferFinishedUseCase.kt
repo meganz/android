@@ -24,7 +24,6 @@ class MonitorActiveTransferFinishedUseCase @Inject constructor(
             .distinctUntilChanged(areEquivalent = { old, new ->
                 // transferredBytes are not important here, this helps distinctUntilChanged emit much less values
                 old.copy(transferredBytes = new.transferredBytes) == new
-
             })
             .scan(emptyTotals(transferType) to emptyTotals(transferType)) { (_, prev), new ->
                 prev to new

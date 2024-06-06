@@ -427,7 +427,7 @@ internal class FileSystemRepositoryImplTest {
 
     @Test
     fun `test that copyContentUriToFile calls gateway method`() = runTest {
-        val uri = "uri//:example.txt"
+        val uri = UriPath("uri//:example.txt")
         val file = mock<File>()
         underTest.copyContentUriToFile(uri, file)
         verify(fileGateway).copyContentUriToFile(uri, file)

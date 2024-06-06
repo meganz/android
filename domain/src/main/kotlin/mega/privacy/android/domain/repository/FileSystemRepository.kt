@@ -3,10 +3,10 @@ package mega.privacy.android.domain.repository
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ViewerNode
+import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 import java.io.IOException
 
@@ -359,11 +359,12 @@ interface FileSystemRepository {
     suspend fun getFileSizeFromUri(uriString: String): Long?
 
     /**
-     * Copies the file represented by a content [uriString] to the destination File. Usually, it is to make a content file returned by a share intent usable by the SDK.
-     * @param uriString the string representing the file, it must be a "content" uri
-     * @param file the destination file where the original file will be copied
+     * Copies the file or folder represented by a content [sourceUri] to the destination File.
+     * If [sourceUri] represents a file then [targetFile] must represent a file as well, same for folders.
+     * @param sourceUri the string representing the file, it must be a "content" uri
+     * @param targetFile the destination file where the original file will be copied
      */
-    suspend fun copyContentUriToFile(uriString: String, file: File)
+    suspend fun copyContentUriToFile(sourceUri: UriPath, targetFile: File)
 
     /**
      * @return the files in same folder

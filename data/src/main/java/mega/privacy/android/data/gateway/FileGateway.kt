@@ -294,11 +294,13 @@ interface FileGateway {
     suspend fun getFileSizeFromUri(uriString: String): Long?
 
     /**
-     * Copies the file represented by a content [uriString] to the destination File. Usually, it is to make a content file returned by a share intent usable by the SDK.
-     * @param uriString the string representing the file, it must be a "content" uri
-     * @param file the destination file where the original file will be copied
+     * Copies the file or folder represented by a content [sourceUri] to the destination File.
+     * If [sourceUri] represents a file then [targetFile] must represent a file as well, same for folders.
+     * Usually, it is to make a content file returned by a share intent usable by the SDK.
+     * @param sourceUri the string representing the file or folder, it must be a "content" uri
+     * @param targetFile the destination file or folder where the original file or folder will be copied
      */
-    suspend fun copyContentUriToFile(uriString: String, file: File)
+    suspend fun copyContentUriToFile(sourceUri: UriPath, targetFile: File)
 
     /**
      * Creates a new image from [file] to [destination] with [maxPixels] pixels if the image has more than [maxPixels] pixels

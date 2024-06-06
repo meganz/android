@@ -397,11 +397,39 @@ class FileFacade @Inject constructor(
         }
     }
 
-    override suspend fun copyContentUriToFile(uriString: String, file: File) {
-        val uri = uriString.toUri()
+    override suspend fun copyContentUriToFile(sourceUri: UriPath, targetFile: File) {
+        val uri = sourceUri.value.toUri()
         require(uri.scheme == "content")
-        context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            file.outputStream().use { output ->
+
+        val document = DocumentFile.fromTreeUri(context, uri) ?: run {
+            Timber.e("Content uri doesn't exist: $sourceUri")
+            return
+        }
+        if (document.isDirectory) {
+            copyDirectory(document, targetFile)
+        } else {
+            copyFile(document, targetFile)
+        }
+    }
+
+    private suspend fun copyDirectory(sourceDir: DocumentFile, targetDir: File) {
+        if (!targetDir.exists()) {
+            targetDir.mkdirs()
+        }
+
+        sourceDir.listFiles().forEach { file ->
+            val newFile = File(targetDir, file.name ?: return@forEach)
+            if (file.isDirectory) {
+                copyDirectory(file, newFile)
+            } else {
+                copyFile(file, newFile)
+            }
+        }
+    }
+
+    private suspend fun copyFile(sourceFile: DocumentFile, targetFile: File) {
+        context.contentResolver.openInputStream(sourceFile.uri)?.use { inputStream ->
+            targetFile.outputStream().use { output ->
                 inputStream.copyTo(output)
             }
         }

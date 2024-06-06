@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
@@ -79,6 +80,6 @@ class GetFileForUploadUseCaseTest {
         whenever(fileSystemRepository.getFileNameFromUri(uriString)).thenReturn(fileName)
         whenever(getCacheFileForUploadUseCase(any(), any())).thenReturn(file)
         assertThat(underTest.invoke(uriString, isChatUpload)).isEqualTo(file)
-        verify(fileSystemRepository).copyContentUriToFile(uriString, file)
+        verify(fileSystemRepository).copyContentUriToFile(UriPath(uriString), file)
     }
 }

@@ -20,9 +20,11 @@ class GetCacheFileForUploadUseCase @Inject constructor(
             getCacheFileUseCase(folder, file.name)?.takeIf { !it.exists() }
                 ?: run {
                     (1..99).firstNotNullOfOrNull { suffix ->
+                        val nameWithSuffix = "${file.nameWithoutExtension}_$suffix"
+                            .plus(if (file.extension.isNotBlank()) ".${file.extension}" else "")
                         getCacheFileUseCase(
                             folder,
-                            "${file.nameWithoutExtension}_$suffix.${file.extension}"
+                            nameWithSuffix
                         )?.takeIf { !it.exists() }
                     }
                 }

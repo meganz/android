@@ -51,6 +51,19 @@ class GetCacheFileForUploadUseCaseTest {
 
     @ParameterizedTest(name = " and isChatUpload is {0}")
     @ValueSource(booleans = [true, false])
+    fun `test that folder with the same name is returned when it does not exist`(
+        isChatUpload: Boolean,
+    ) = runTest {
+        val folder = stubFolder()
+        val expected = stubResult()
+        val cacheFolder = getCacheFolder(isChatUpload)
+        whenever(getCacheFileUseCase(cacheFolder, folder.name)) doReturn expected
+        val actual = underTest(folder, isChatUpload)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = " and isChatUpload is {0}")
+    @ValueSource(booleans = [true, false])
     fun `test that suffix is added when file already exists`(
         isChatUpload: Boolean,
     ) = runTest {
@@ -63,6 +76,23 @@ class GetCacheFileForUploadUseCaseTest {
             getCacheFileUseCase(folder, file.nameWithSuffix(1))
         ) doReturn expected
         val actual = underTest(file, isChatUpload)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = " and isChatUpload is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that suffix is added when folder already exists`(
+        isChatUpload: Boolean,
+    ) = runTest {
+        val folder = stubFolder()
+        val expected = stubResult()
+        val alreadyExists = stubResult(true)
+        val cacheFolder = getCacheFolder(isChatUpload)
+        whenever(getCacheFileUseCase(cacheFolder, folder.name)) doReturn alreadyExists
+        whenever(
+            getCacheFileUseCase(cacheFolder, "${folder.name}_1")
+        ) doReturn expected
+        val actual = underTest(folder, isChatUpload)
         assertThat(actual).isEqualTo(expected)
     }
 
@@ -86,6 +116,10 @@ class GetCacheFileForUploadUseCaseTest {
 
     private fun stubFile() = mock<File> {
         on { it.name } doReturn "name.ext"
+    }
+
+    private fun stubFolder() = mock<File> {
+        on { it.name } doReturn "folder"
     }
 
     private fun stubResult(exists: Boolean = false) = mock<File> {

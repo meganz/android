@@ -48,10 +48,10 @@ import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ViewerNode
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -562,9 +562,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.getFileSizeFromUri(uriString)
         }
 
-    override suspend fun copyContentUriToFile(uriString: String, file: File) {
+    override suspend fun copyContentUriToFile(sourceUri: UriPath, targetFile: File) {
         withContext(ioDispatcher) {
-            fileGateway.copyContentUriToFile(uriString, file)
+            fileGateway.copyContentUriToFile(sourceUri, targetFile)
         }
     }
 
