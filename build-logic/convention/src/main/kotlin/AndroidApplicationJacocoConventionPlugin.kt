@@ -56,7 +56,6 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
 
                 doLast {
                     println("Instrumenting classes")
-                    println("Excluded files: ${excludedFiles.size}")
                     val excludesPattern = excludedFiles.joinToString()
                     val jacocoAntConfig = configurations.getByName("jacocoAnt")
                     ant.withGroovyBuilder {

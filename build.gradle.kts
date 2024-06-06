@@ -1,11 +1,11 @@
 import mega.privacy.android.build.isServerBuild
-import mega.privacy.android.build.shouldUsePrebuiltSdk
 
 plugins {
     alias(plugin.plugins.ksp) apply false
     id("org.jetbrains.kotlin.android") version "1.9.22" apply false
     id("mega.android.release") version lib.versions.megagradle.get()
     id("mega.android.cicd") version lib.versions.megagradle.get()
+    id("com.jfrog.artifactory") version plugin.versions.jfrog apply false
 }
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -65,8 +65,6 @@ allprojects {
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor(5, "minutes")
     }
-    apply(plugin = "com.jfrog.artifactory")
-    apply(plugin = "maven-publish")
 }
 
 tasks.register("clean", Delete::class) {
@@ -98,6 +96,3 @@ val shouldSuppressWarnings by extra(
     fun(): Boolean = isServerBuild() && System.getenv("DO_NOT_SUPPRESS_WARNINGS") != "true"
 )
 
-if (!shouldUsePrebuiltSdk() || isServerBuild()) {
-    apply(from = "${project.rootDir}/tools/prebuilt-sdk.gradle")
-}

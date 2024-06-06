@@ -50,7 +50,6 @@ class JvmLibraryJacocoConventionPlugin : Plugin<Project> {
                     classDirectories.setFrom(
                         classDirectories.files.map { dir ->
                             fileTree(dir) {
-                                println("Excluded files: ${excludedFiles.size}")
                                 exclude(excludedFiles.toList())
                             }
                         }

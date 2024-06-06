@@ -1,6 +1,13 @@
+import mega.privacy.android.build.isServerBuild
+import mega.privacy.android.build.shouldUsePrebuiltSdk
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    alias(convention.plugins.mega.artifactory.publish)
 }
 
 android {
@@ -76,3 +83,67 @@ dependencies {
         exclude(group = "org.codehaus.mojo", module = "animal-sniffer-annotations")
     }
 }
+
+// Logic to publish prebuilt SDK to Artifactory
+if (!shouldUsePrebuiltSdk() || isServerBuild()) {
+    val sdkCommit = getEnvironmentVariable("SDK_COMMIT")
+    val chatCommit = getEnvironmentVariable("CHAT_COMMIT")
+    val sdkBuilderName = getEnvironmentVariable("gitlabUserName")
+    val sdkBranch = getEnvironmentVariable("SDK_BRANCH")
+    val chatBranch = getEnvironmentVariable("MEGACHAT_BRANCH")
+
+    println("SDK_COMMIT = $sdkCommit")
+    println("CHAT_COMMIT = $chatCommit")
+    println("SDK_BUILDER_NAME = $sdkBuilderName")
+    println("SDK_BRANCH = $sdkBranch")
+    println("MEGACHAT_BRANCH = $chatBranch")
+
+    megaPublish {
+        repoKey = "mega-sdk-android"
+        groupId = "nz.mega.sdk"
+        artifactId = "sdk"
+        version = sdkVersion() + "-" + sdkLibType()
+        libPath = "${layout.buildDirectory.get()}/outputs/aar/${project.name}-release.aar"
+        sourcePath = "${layout.buildDirectory.get()}/libs/${project.name}-sources.jar"
+        properties = mapOf(
+            "sdk-commit" to sdkCommit,
+            "chat-commit" to chatCommit,
+            "sdk-branch" to sdkBranch,
+            "chat-branch" to chatBranch,
+            "builder" to sdkBuilderName,
+        )
+        dependentTasks = listOf("assembleRelease", "releaseSourcesJar")
+    }
+}
+
+
+/**
+ * Generate the SDK version string. This version is used in the published SDK library and
+ * is used by library users.
+ * Note: the sdk version is in the pattern of yyyyMMdd.HHmmss and is formatted to UTC,
+ * not local time.
+ *
+ * @return SDK lib's version
+ */
+fun sdkVersion(): String {
+    val now = OffsetDateTime.now(ZoneOffset.UTC)
+    val formatter = DateTimeFormatter.ofPattern("yyyyMMdd.HHmmss")
+    return now.format(formatter)
+}
+
+/**
+ * Get the SDK lib type, either "rel" or "dev".
+ *
+ * @return
+ */
+fun sdkLibType(): String =
+    if (System.getenv("SDK_PUBLISH_TYPE") == "rel") "rel" else "dev"
+
+/**
+ * Get the environment variable value.
+ *
+ * @param param the environment variable name
+ * @return the environment variable value
+ */
+fun getEnvironmentVariable(param: String): String =
+    System.getenv(param).takeIf { !it.isNullOrEmpty() } ?: "N/A"

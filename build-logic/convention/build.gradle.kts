@@ -6,6 +6,7 @@ dependencies {
     compileOnly(plugin.build.tools)
     compileOnly(plugin.kotlin.gradle)
     compileOnly(plugin.ksp.gradle.plugin)
+    compileOnly(plugin.jfrog)
     compileOnly(kotlin("stdlib"))
     compileOnly(gradleApi())
     testImplementation(testlib.truth)
@@ -28,6 +29,12 @@ gradlePlugin {
         register("androidTest") {
             id = "mega.android.test"
             implementationClass = "AndroidTestConventionPlugin"
+        }
+    }
+    plugins {
+        register("artifactoryPublish") {
+            id = "mega.artifactory.publish"
+            implementationClass = "ArtifactoryPublishConventionPlugin"
         }
     }
     plugins {
@@ -73,3 +80,4 @@ gradlePlugin {
         }
     }
 }
+
