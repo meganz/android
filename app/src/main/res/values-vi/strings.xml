@@ -5151,10 +5151,9 @@
         <item quantity="other">%1$s và %2$d người khác đang giơ tay</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="hidden_nodes_sharing_album">Có các mục ẩn trong album này. Việc thực&#160;hiện chia&#160;sẻ album sẽ làm các mục ẩn hiển&#160;thị cho những người bạn chia&#160;sẻ. Các mục vẫn sẽ được ẩn đi trong Ổ&#160;Mây của bạn.</string>
     <!-- Hidden nodes items -->
     <plurals name="hidden_nodes_items">
-        <item quantity="one">Hidden item</item>
-        <item quantity="other">Hidden items</item>
+        <item quantity="other">Các mục ẩn</item>
     </plurals>
 </resources>

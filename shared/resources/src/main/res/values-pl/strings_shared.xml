@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">Nigdy więcej nie utrać danych</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Przewiń do tyłu, aby przywrócić katalog z powrotem do dowolnej daty do 180 dni, aby Twoje dane były odporne na wypadki i manipulacje.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore files and folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -299,7 +299,7 @@
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">Zmień</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Przesyłanie wstrzymane, telefon się nie ładuje</string>
+    <string name="camera_uploads_phone_not_charging_message">Upload paused, device is not charging</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
     <string name="device_center_list_view_item_status_nothing_setup">Brak ustawień synchronizacji</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
@@ -323,7 +323,7 @@
     <!-- Text for the Sync solved issues chip -->
     <string name="device_center_sync_solved_issues_chip_text">Rozwiązane problemy</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">You can’t sync folders that are currently synced folders.</string>
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">This folder can’t be synced. Set it up to sync to MEGA using Camera uploads.</string>
     <!-- Label for the file info information screen description field -->
     <string name="file_info_information_description_label">Opis</string>
     <!-- Placeholder for the file info information screen description field -->
@@ -385,7 +385,7 @@
     <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_title">Zmień na wersję Pro</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Unlock the power to sync your mobile to the cloud with our Pro plans.</string>
+    <string name="device_center_sync_upgrade_dialog_message">Unlock the power to sync your mobile device to the cloud with our Pro plans.</string>
     <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_confirm_button">Zmień</string>
     <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
@@ -393,7 +393,11 @@
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Uploads folder conflict</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your primary camera uploads folder and secondary media uploads folder cannot be related to each other. Please choose a different folder.</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your Camera uploads folder and secondary media uploads folder cannot be related to each other. Choose a different folder.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_no_picker_warning">This device doesn’t have an app to select folders</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Automatically sync the folders on your mobile device</string>
 </resources>

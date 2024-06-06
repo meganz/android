@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">다시는 데이터를 잃지 마세요</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore files and folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -271,17 +271,17 @@
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
     <string name="account_confirm_email_misspelled_email_description">만약 이메일 주소를 잘못 입력하였다면, 수정하고 [A]재발송[/A]을 탭하세요.</string>
     <!-- Title of the insufficient storage error banner -->
-    <string name="sync_error_storage_over_quota_banner_title">Syncing paused, your MEGA plan has run out of storage</string>
+    <string name="sync_error_storage_over_quota_banner_title">당신의 MEGA 요금제의 저장소를 다 써서, 동기화가 일시정지 되었습니다</string>
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">업그레이드</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">휴대전화가 충전 중이 아니어서, 업로드가 일시정지 되었습니다</string>
+    <string name="camera_uploads_phone_not_charging_message">Upload paused, device is not charging</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
-    <string name="device_center_list_view_item_status_nothing_setup">No syncs set up</string>
+    <string name="device_center_list_view_item_status_nothing_setup">설정된 동기화가 없습니다</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_title">계정 비활성화됨</string>
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
-    <string name="account_pro_flexi_account_deactivated_dialog_body">Your Pro&#160;Flexi account has been deactivated due to payment failure or you’ve cancelled your subscription. You won’t be able to access the data stored in your account. \nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_pro_flexi_account_deactivated_dialog_body">당신의 Pro&#160;Flexi 계정은 결제 실패 또는 구독 취소로 인해 비활성화 되었습니다. 계정 안에 있는 데이터에 접근하지 못할 것입니다.\n결제를 하고 구독을 재활성화 하려면, 브라우저에서 MEGA에 로그인 하세요.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_starter_label">Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
@@ -289,17 +289,17 @@
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Uploads will be paused until you start charging your device. Uploads will still remain paused if your battery is below 20%.</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">장치 충전을 시작할 때까지 업로드가 일시정지 됩니다. 배터리가 20% 이하일 경우 업로드가 일시정지 상태로 유지됩니다.</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_title">No syncs set up</string>
+    <string name="device_center_sync_list_empty_state_title">설정된 동기화가 없습니다</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sync a local folder on your device with a folder on MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">장치의 로컬 폴더를 MEGA의 폴더와 동기화하세요.</string>
     <!-- Label for the button or menu option to add a new sync -->
-    <string name="device_center_sync_add_new_syn_button_option">Add new sync</string>
+    <string name="device_center_sync_add_new_syn_button_option">새 동기화 추가</string>
     <!-- Text for the Sync solved issues chip -->
     <string name="device_center_sync_solved_issues_chip_text">해결된 문제</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">You can’t sync folders that are currently synced folders.</string>
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">This folder can’t be synced. Set it up to sync to MEGA using Camera uploads.</string>
     <!-- Label for the file info information screen description field -->
     <string name="file_info_information_description_label">설명</string>
     <!-- Placeholder for the file info information screen description field -->
@@ -309,11 +309,11 @@
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">설명 수정됨</string>
     <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">Plus access to these great benefits:</string>
+    <string name="dialog_onboarding_feature_title_additional_features">추가로 이러한 훌륭한 혜택이 있습니다:</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN\n&#8226;&#160;무제한 통화와 회의\n&#8226;&#160;휴대 장치의 폴더를 자동으로 동기화\n&#8226;&#160;광고 없음</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN\n&#8226;&#160;무제한 통화와 회의\n&#8226;&#160;휴대 장치의 폴더를 자동으로 동기화</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">해결된 문제 없음</string>
     <!-- Title of first tour screen -->
@@ -325,17 +325,17 @@
     <!-- Title of fourth tour screen -->
     <string name="cloud_drive_tour_fourth_title">클라우드 속 당신의 사진</string>
     <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">MEGA meeting</string>
+    <string name="cloud_drive_tour_fifth_title">MEGA 회의</string>
     <!-- First subtitle of the tour screen -->
     <string name="cloud_drive_tour_first_subtitle">보안은 우리의 존재 이유이며, 당신의 파일들은 당신만이 접근 할수 있도록 우리 서버에 마치 잘 관리된 암호화 기계 뒤에 있는 것처럼 매우 안전합니다.</string>
     <!-- Second subtitle of the tour screen -->
     <string name="cloud_drive_tour_second_subtitle">완전히 암호화된 대화와 음성과 영상 통화, 그룹 대화 그리고 클라우드 드라이브와 통합된 파일 공유.</string>
     <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA.</string>
+    <string name="cloud_drive_tour_third_subtitle">MEGA를 떠날 필요 없이 연락처를 추가하고, 네트워크를 형성하고, 협업하고, 음성과 영상 통화를 하세요.</string>
     <!-- Fourth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fourth_subtitle">카메라 업로드는 어떠한 모바일 기기에서든 필요한 기능이며 우리는 이 기능이 준비되어 있습니다. 지금 계정을 만드세요.</string>
     <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Zero-knowledge encrypted video meeting.</string>
+    <string name="cloud_drive_tour_fifth_subtitle">영지식 암호화 화상 회의.</string>
     <!-- Titles of the tour screen to onboard users with the MEGA application -->
     <string-array name="cloud_drive_tour_titles">
         <item>@string/cloud_drive_tour_first_title</item>
@@ -353,15 +353,15 @@
         <item>@string/cloud_drive_tour_fifth_subtitle</item>
     </string-array>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
-    <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
+    <string name="meetings_raised_hand_tooltip_title">[A]새로운 기능: 손 들기[/A]</string>
     <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_list_empty_state_message_free_account">Keep your information syncing and up to date by upgrading to one of our Pro plans.</string>
+    <string name="device_center_sync_list_empty_state_message_free_account">Pro 요금제 중 하나로 업그레이드하여 정보를 동기화하고 최신 상태로 유지하세요.</string>
     <!-- "Upgrade now" label for a button, menu entry, etc -->
     <string name="general_upgrade_now_label">지금 업그레이드</string>
     <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_title">Pro로 업그레이드</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Unlock the power to sync your mobile to the cloud with our Pro plans.</string>
+    <string name="device_center_sync_upgrade_dialog_message">Unlock the power to sync your mobile device to the cloud with our Pro plans.</string>
     <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_confirm_button">업그레이드</string>
     <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
@@ -369,7 +369,11 @@
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Uploads folder conflict</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your primary camera uploads folder and secondary media uploads folder cannot be related to each other. Please choose a different folder.</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your Camera uploads folder and secondary media uploads folder cannot be related to each other. Choose a different folder.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
+    <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
+    <string name="general_no_picker_warning">This device doesn’t have an app to select folders</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Automatically sync the folders on your mobile device</string>
 </resources>

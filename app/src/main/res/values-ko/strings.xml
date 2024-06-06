@@ -5129,21 +5129,20 @@
     <!-- Title of raise hand button in call screen -->
     <string name="meetings_raise_hand_option_button">손을 드세요</string>
     <!-- Title of lower hand button in call screen -->
-    <string name="meetings_lower_hand_option_button">Lower hand</string>
+    <string name="meetings_lower_hand_option_button">손 내리기</string>
     <!-- Title of put call on hold button in call screen -->
-    <string name="meetings_put_call_on_hold_option_button">Put call on hold</string>
+    <string name="meetings_put_call_on_hold_option_button">통화를 보류하기</string>
     <!-- Title of swap calls button in call screen -->
-    <string name="meetings_swap_calls_option_button">Swap calls</string>
+    <string name="meetings_swap_calls_option_button">통화 전환</string>
     <!-- Title of resume call button in call screen -->
     <string name="meetings_resume_call_option_button">통화 재개</string>
     <!-- Text of pop up informing about the Raise hand feature -->
-    <string name="meetings_new_feature_raise_hand_layout">New feature: Raise hand</string>
+    <string name="meetings_new_feature_raise_hand_layout">새로운 기능: 손 들기</string>
     <!-- The snackbar message of your hand is raised -->
-    <string name="meeting_your_hand_is_raised_message">You raised your hand</string>
+    <string name="meeting_your_hand_is_raised_message">당신이 손을 들었습니다</string>
     <!-- The snackbar message of you and others raised your hands -->
     <plurals name="meeting_you_and_others_raised_your_hands_message">
-        <item quantity="one">You and %1$d other raised your hands</item>
-        <item quantity="other">You and %1$d others raised your hands</item>
+        <item quantity="other">당신과 %1$d명이 손을 들었습니다</item>
     </plurals>
     <!-- The snackbar message of another participant raised their hand -->
     <string name="meetings_one_participant_raised_their_hand_message">%1$s 님이 손을 들었습니다</string>
@@ -5152,10 +5151,9 @@
         <item quantity="other">%1$s 님 외 %2$d명이 손을 들었습니다</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="hidden_nodes_sharing_album">이 사진첩에 숨겨진 항목이 있습니다. 사진첩을 공유하는 것은 숨겨진 항목이 공유하고자 하는 사람들에게 보인다는 것입니다. 항목은 클라우드 드라이브에서 숨긴 상태로 유지됩니다.</string>
     <!-- Hidden nodes items -->
     <plurals name="hidden_nodes_items">
-        <item quantity="one">Hidden item</item>
-        <item quantity="other">Hidden items</item>
+        <item quantity="other">숨겨진 항목</item>
     </plurals>
 </resources>
