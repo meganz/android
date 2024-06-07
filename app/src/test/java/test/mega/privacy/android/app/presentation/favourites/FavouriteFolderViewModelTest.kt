@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel
@@ -17,8 +18,12 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMa
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,6 +47,22 @@ class FavouriteFolderViewModelTest {
     private val getFavouriteFolderInfoUseCase = mock<GetFavouriteFolderInfoUseCase>()
     private val stringUtilWrapper = mock<StringUtilWrapper>()
     private val favouriteMapper = mock<FavouriteMapper>()
+
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
+        on {
+            invoke()
+        }.thenReturn(flowOf(AccountDetail()))
+    }
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase> {
+        on {
+            runBlocking { invoke() }
+        }.thenReturn(flowOf(false))
+    }
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
+        on {
+            runBlocking { invoke(any()) }
+        }.thenReturn(false)
+    }
 
     private val megaNode: MegaNode = mock {
         on { handle }.thenReturn(123)
@@ -83,7 +104,11 @@ class FavouriteFolderViewModelTest {
             megaUtilWrapper = megaUtilWrapper,
             savedStateHandle = SavedStateHandle(),
             favouriteMapper = favouriteMapper,
-            fetchNodeWrapper = fetchNodeWrapper
+            fetchNodeWrapper = fetchNodeWrapper,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            defaultDispatcher = UnconfinedTestDispatcher(),
         )
     }
 

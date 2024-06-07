@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.favourites.model
 
 import mega.privacy.android.app.usecase.exception.MegaException
-import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -18,7 +18,7 @@ sealed interface FavouriteLoadState {
     data class Success(
         val favourites: List<FavouriteItem>,
         val selectedItems: Set<NodeId>,
-        val accountDetail: AccountDetail? = null,
+        val accountType: AccountType? = null,
         val isHiddenNodesOnboarded: Boolean? = null,
         override val showSearch: Boolean,
         override val isConnected: Boolean,

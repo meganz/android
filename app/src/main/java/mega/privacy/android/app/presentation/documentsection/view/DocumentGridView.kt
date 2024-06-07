@@ -66,6 +66,7 @@ internal fun DocumentGridView(
                     .alpha(0.5f.takeIf {
                         accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
                     } ?: 1f),
+                isSensitive = accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited),
                 isSelected = documentItem.isSelected,
                 name = documentItem.name,
                 iconRes = documentItem.icon,

@@ -25,6 +25,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -40,9 +41,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -62,6 +63,7 @@ internal fun VideoItemView(
     nodeAvailableOffline: Boolean = false,
     onLongClick: (() -> Unit)? = null,
     onMenuClick: () -> Unit = {},
+    isSensitive: Boolean = false,
 ) {
     Row(
         modifier = modifier
@@ -76,7 +78,9 @@ internal fun VideoItemView(
     ) {
         VideoThumbnailView(
             icon = icon,
-            modifier = Modifier.fillMaxHeight(),
+            modifier = Modifier
+                .fillMaxHeight()
+                .blur(16.dp.takeIf { isSensitive } ?: 0.dp),
             thumbnailData = thumbnailData,
             duration = duration,
             isFavourite = isFavourite
@@ -109,7 +113,8 @@ internal fun VideoItemView(
                         if (!isSelected) {
                             onMenuClick()
                         }
-                    }.testTag(VIDEO_ITEM_MENU_ICON_TEST_TAG),
+                    }
+                    .testTag(VIDEO_ITEM_MENU_ICON_TEST_TAG),
                 alignment = Alignment.CenterEnd,
             )
         }

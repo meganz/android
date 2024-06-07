@@ -139,7 +139,7 @@ class FavouritesViewModel @Inject constructor(
                     if (filteredItems.any { it is FavouriteListItem }) {
                         favouritesState.copy(
                             favourites = filteredItems,
-                            accountDetail = accountDetail,
+                            accountType = accountDetail.levelDetail?.accountType,
                             isHiddenNodesOnboarded = isHiddenNodesOnboarded
                         )
                     } else {
@@ -375,8 +375,6 @@ class FavouritesViewModel @Inject constructor(
     fun getIsPaidAccount(): Boolean {
         val state = _state.value
         return (state as? FavouriteLoadState.Success)
-            ?.accountDetail
-            ?.levelDetail
             ?.accountType
             ?.isPaid ?: false
     }

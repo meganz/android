@@ -12,11 +12,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
@@ -27,10 +30,15 @@ import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -53,6 +61,10 @@ class FavouriteFolderViewModel @Inject constructor(
     private val stringUtilWrapper: StringUtilWrapper,
     private val megaUtilWrapper: MegaUtilWrapper,
     private val fetchNodeWrapper: FetchNodeWrapper,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     savedStateHandle: SavedStateHandle,
 ) :
     ViewModel() {
@@ -83,6 +95,40 @@ class FavouriteFolderViewModel @Inject constructor(
         getChildrenNodes(currentRootHandle)
     }
 
+    private suspend fun handleHiddenNodes(parentHandle: Long) {
+        combine(
+            getFavouriteFolderInfoUseCase(parentHandle),
+            monitorAccountDetailUseCase(),
+            monitorShowHiddenItemsUseCase(),
+        ) { folderInfo, accountDetail, showHiddenItems ->
+            currentFavouriteFolderInfo = folderInfo
+            Triple(folderInfo, accountDetail.levelDetail?.accountType, showHiddenItems)
+        }.catch { Timber.e(it) }
+            .collectLatest { (folderInfo, accountType, showHiddenItems) ->
+                val filteredChildren = filterNonSensitiveItems(
+                    folderInfo.children,
+                    showHiddenItems,
+                    accountType?.isPaid
+                )
+                _childrenNodesState.update {
+                    folderInfo.run {
+                        when {
+                            filteredChildren.isEmpty() -> {
+                                ChildrenNodesLoadState.Empty(folderInfo.name)
+                            }
+
+                            else -> getData(
+                                name = name,
+                                children = filteredChildren,
+                                currentHandle = folderInfo.currentHandle,
+                                accountType = accountType,
+                            )
+                        }
+                    }
+                }
+            }
+    }
+
     /**
      * Get children nodes
      * @param parentHandle the parent node handle
@@ -94,20 +140,26 @@ class FavouriteFolderViewModel @Inject constructor(
         // Cancel the previous job avoid to repeatedly observed
         currentNodeJob?.cancel()
         currentNodeJob = viewModelScope.launch {
-            getFavouriteFolderInfoUseCase(parentHandle).collectLatest { folderInfo ->
-                currentFavouriteFolderInfo = folderInfo
-                _childrenNodesState.update {
-                    folderInfo?.run {
-                        when {
-                            children.isEmpty() -> {
-                                ChildrenNodesLoadState.Empty(folderInfo.name)
-                            }
-                            children.isNotEmpty() -> getData(name, children, folderInfo)
-                            else -> {
-                                ChildrenNodesLoadState.Loading
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                handleHiddenNodes(parentHandle = parentHandle)
+            } else {
+                getFavouriteFolderInfoUseCase(parentHandle).collectLatest { folderInfo ->
+                    currentFavouriteFolderInfo = folderInfo
+                    _childrenNodesState.update {
+                        folderInfo.run {
+                            when {
+                                children.isEmpty() -> {
+                                    ChildrenNodesLoadState.Empty(folderInfo.name)
+                                }
+
+                                else -> getData(
+                                    name = name,
+                                    children = children,
+                                    currentHandle = folderInfo.currentHandle
+                                )
                             }
                         }
-                    } ?: ChildrenNodesLoadState.Empty(null)
+                    }
                 }
             }
         }
@@ -116,7 +168,8 @@ class FavouriteFolderViewModel @Inject constructor(
     private suspend fun getData(
         name: String,
         children: List<TypedNode>,
-        folderInfo: FavouriteFolderInfo,
+        currentHandle: Long,
+        accountType: AccountType? = null,
     ): ChildrenNodesLoadState {
         return withContext(ioDispatcher) {
             ChildrenNodesLoadState.Success(
@@ -144,11 +197,28 @@ class FavouriteFolderViewModel @Inject constructor(
                     }.getOrNull()
                 },
                 // If current handle is not current root handle, enable onBackPressedCallback
-                isBackPressedEnable = folderInfo.currentHandle != currentRootHandle
+                isBackPressedEnable = currentHandle != currentRootHandle,
+                accountType = accountType,
             )
         }
     }
 
+    private suspend fun filterNonSensitiveItems(
+        items: List<TypedNode>,
+        showHiddenItems: Boolean?,
+        isPaid: Boolean?,
+    ) = withContext(defaultDispatcher) {
+        showHiddenItems ?: return@withContext items
+        isPaid ?: return@withContext items
+
+        return@withContext if (showHiddenItems || !isPaid) {
+            items
+        } else {
+            items.filter {
+                !it.isMarkedSensitive && !it.isSensitiveInherited
+            }
+        }
+    }
 
     /**
      * Back to previous level page
