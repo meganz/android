@@ -28,15 +28,13 @@ plugins {
     alias(convention.plugins.mega.android.app)
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.application.jacoco)
+    alias(convention.plugins.mega.android.application.firebase)
     alias(convention.plugins.mega.lint)
     id("kotlin-parcelize")
     id("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.firebase.appdistribution")
-    id("com.google.gms.google-services")
     id("de.mannodermaus.android-junit5")
-    id("com.google.firebase.crashlytics")
-    id("com.google.firebase.firebase-perf")
     id("androidx.baselineprofile")
 }
 
@@ -246,11 +244,6 @@ dependencies {
     implementation(google.maps.utils)
     implementation(google.code.scanner)
     implementation(google.install.referrer)
-
-    // Firebase
-    implementation(platform(google.firebase.bom))
-    implementation(google.bundles.firebase.bom)
-    implementation(google.firebase.analytics)
 
     // Play Core
     implementation(google.play.core)

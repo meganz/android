@@ -13,3 +13,6 @@ val Project.testlib
 
 val Project.lib
     get(): VersionCatalog = extensions.getByType<VersionCatalogsExtension>().named("lib")
+
+val Project.google
+    get(): VersionCatalog = extensions.getByType<VersionCatalogsExtension>().named("google")

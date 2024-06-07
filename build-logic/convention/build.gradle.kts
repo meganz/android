@@ -74,6 +74,12 @@ gradlePlugin {
         }
     }
     plugins {
+        register("androidApplicationFirebaseConvention") {
+            id = "mega.android.application.firebase"
+            implementationClass = "AndroidApplicationFirebaseConvention"
+        }
+    }
+    plugins {
         register("lint") {
             id = "mega.lint"
             implementationClass = "AndroidLintConventionPlugin"
