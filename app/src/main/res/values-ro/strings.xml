@@ -2125,7 +2125,7 @@
     <!-- Title of the view to inform that a chat is private -->
     <string name="private_chat">Rotația cheii de criptare, activată</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="make_chat_private_option_text">Rotația cheii de criptare este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele din trecut.</string>
+    <string name="make_chat_private_option_text">Rotația cheii de criptare este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele anterioare.</string>
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
     <string name="make_chat_private_not_available_text">Rotația cheii criptate este dezactivată pentru conversațiile cu mai mult de 100 de participanți.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
@@ -2161,9 +2161,9 @@
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Rotația cheii de criptare</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="ekr_explanation">Rotația cheii de criptare este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele din trecut.</string>
+    <string name="ekr_explanation">Rotația cheii de criptare este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele anterioare.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="subtitle_chat_message_enabled_ERK">Rotația cheii de criptare este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele din trecut.</string>
+    <string name="subtitle_chat_message_enabled_ERK">Rotația cheii de criptare este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele anterioare.</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">Invitația către contactul %s a fost trimisă înainte și poate fi consultată în fila Cereri trimise.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -2527,7 +2527,7 @@
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">Vrei să creezi un nou chat de grup și să obții un link al chatului?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="context_make_private_chat_warning_text">Rotația cheii de criptare este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele din trecut.</string>
+    <string name="context_make_private_chat_warning_text">Rotația cheii de criptare este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele anterioare.</string>
     <!-- Label that indicates the steps of a wizard -->
     <string name="wizard_steps_indicator">%1$d din %2$d</string>
     <!-- Hint of the Search view -->
@@ -3891,7 +3891,7 @@
     <!-- Albums sub-section for all shared albums -->
     <string name="photos_album_subsection_shared_albums">Albume partajate</string>
     <!-- Header title for meeting list past meetings -->
-    <string name="meetings_list_past_header">Întâlniri din trecut</string>
+    <string name="meetings_list_past_header">Întâlniri anterioare</string>
     <!-- Label for upcoming meetings -->
     <string name="meetings_list_upcoming_meeting_label">Întâlnire viitoare</string>
     <!-- Label for recurring meetings -->
@@ -5103,7 +5103,7 @@
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">Această întâlnire va fi arhivată și toți participanții vor fi anunțați.</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">Această întâlnire va fi plasată în cadrul Întâlnirilor din trecut și toți participanții vor fi anunțați.</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">Această întâlnire va fi plasată în cadrul Întâlniri anterioare și toți participanții vor fi anunțați.</string>
     <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">Nu o anula</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
@@ -5123,7 +5123,7 @@
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">Aceasta este singura ocurență a întâlnirii recurente. Anularea acestei ocurențe va anula întâlnirea.\nDacă este anulată, întâlnirea va fi arhivată și toți participanții vor fi anunțați.</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">Aceasta este singura ocurență a întâlnirii recurente. Anularea acestei ocurențe va anula întâlnirea. \nDacă este anulată, întâlnirea va fi plasată sub Întâlniri din trecut și toți participanții vor fi anunțați.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">Aceasta este singura ocurență a întâlnirii recurente. Anularea acestei ocurențe va anula întâlnirea. \nDacă este anulată, întâlnirea va fi plasată sub Întâlniri anterioare și toți participanții vor fi anunțați.</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">Ocurență din %1$s a fost anulat</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
@@ -5133,7 +5133,7 @@
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">Această întâlnire și toate ocurențe sale vor fi arhivate și toți participanții vor fi anunțați.</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">Această întâlnire și toate ocurențele sale vor fi plasate în Întâlniri din trecut și toți participanții vor fi anunțați.</string>
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">Această întâlnire și toate ocurențele sale vor fi plasate în Întâlniri anterioare și toți participanții vor fi anunțați.</string>
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">Acum puteți programa întâlniri unice și recurente.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->

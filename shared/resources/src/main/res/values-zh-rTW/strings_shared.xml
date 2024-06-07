@@ -376,4 +376,12 @@
     <string name="general_no_picker_warning">此裝置沒有可用於選擇資料夾的應用程式</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;自動同步行動裝置上的資料夾</string>
+    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
+    <string name="sync_error_dialog_free_user">您的同步已暫停。同步是Pro方案的功能。</string>
+    <!-- The error dialog confirm action text -->
+    <string name="sync_error_dialog_free_user_confirm_action">確認</string>
+    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
+    <string name="sync_error_banner_free_user">由於您的MEGA Pro方案已取消，因此同步暫停。升級以繼續同步。</string>
+    <!-- Hidden items -->
+    <string name="hidden_items">隱藏的項目</string>
 </resources>

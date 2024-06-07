@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">Nu pierdeți niciodată datele</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore files and folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Derulați înapoi pentru a restabili fișierele și folderele la orice dată de până la 180 de zile, astfel încât datele dvs. să fie protejate împotriva accidentelor și a manipulării.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -291,7 +291,7 @@
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">Upgradează</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Upload paused, device is not charging</string>
+    <string name="camera_uploads_phone_not_charging_message">Încărcarea este întreruptă, deoarece dispozitivul nu se încarcă</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
     <string name="device_center_list_view_item_status_nothing_setup">Nu este configurată nicio sincronizare</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
@@ -377,7 +377,7 @@
     <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_title">Upgradează la Pro</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Unlock the power to sync your mobile device to the cloud with our Pro plans.</string>
+    <string name="device_center_sync_upgrade_dialog_message">Abonamentele noastre Pro dezlănțuie puterea de sincronizare a dispozitivului dvs. mobil cu MEGA.</string>
     <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_confirm_button">Upgradează</string>
     <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
@@ -392,4 +392,12 @@
     <string name="general_no_picker_warning">Acest dispozitiv nu are o aplicație care să selecteze foldere</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Sincronizați automat folderele de pe dispozitivul mobil</string>
+    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
+    <string name="sync_error_dialog_free_user">Sincronizările dvs. au fost întrerupte. Sincronizarea este o funcție a abonamentelor Pro.</string>
+    <!-- The error dialog confirm action text -->
+    <string name="sync_error_dialog_free_user_confirm_action">Bine</string>
+    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
+    <string name="sync_error_banner_free_user">Sincronizarea este întreruptă deoarece abonamentul MEGA Pro a fost anulat. Upgradați pentru a continua sincronizarea.</string>
+    <!-- Hidden items -->
+    <string name="hidden_items">Elemente ascunse</string>
 </resources>
