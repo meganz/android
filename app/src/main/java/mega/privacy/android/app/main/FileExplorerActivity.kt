@@ -25,7 +25,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import de.palm.composestateevents.StateEventWithContentTriggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -74,6 +73,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision.Upload.Companio
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.usecase.UploadUseCase
@@ -2705,16 +2705,17 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         binding.root.addView(
             createStartTransferView(
                 this,
-                viewModel.uiState.map { it.uploadEvent }
-            ) {
-                ((viewModel.uiState.value.uploadEvent as StateEventWithContentTriggered).content).let { event ->
-                    if (event is TransferTriggerEvent.StartUpload.Files) {
-                        backToCloud(event.destinationId.longValue, event.pathsAndNames.size, null)
-                    }
+                viewModel.uiState.map { it.uploadEvent },
+                viewModel::consumeUploadEvent
+            ) { startTransferEvent ->
+                ((startTransferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.Files).let {
+                    backToCloud(
+                        it.destinationId.longValue,
+                        it.pathsAndNames.size,
+                        null
+                    )
+                    finishAndRemoveTask()
                 }
-
-                finishAndRemoveTask()
-                viewModel.consumeUploadEvent()
             }
         )
     }

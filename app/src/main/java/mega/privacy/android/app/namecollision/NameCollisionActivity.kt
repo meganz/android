@@ -19,7 +19,6 @@ import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
-import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -33,6 +32,8 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
@@ -194,19 +195,19 @@ class NameCollisionActivity : PasscodeActivity() {
             createStartTransferView(
                 this,
                 viewModel.uiState.map { it.uploadEvent },
-            ) {
-                ((viewModel.uiState.value.uploadEvent as StateEventWithContentTriggered).content).let { event ->
+                viewModel::consumeUploadEvent,
+            ) { transferEvent ->
+                ((transferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.CollidedFiles).let {
                     setResult(
                         NameCollisionActionResult(
                             message = resources.getQuantityString(
                                 R.plurals.upload_began,
-                                event.pathsAndNames.size,
-                                event.pathsAndNames.size,
+                                it.pathsAndNames.size,
+                                it.pathsAndNames.size,
                             ),
                             shouldFinish = viewModel.shouldFinish()
                         )
                     )
-                    viewModel.consumeUploadEvent(event)
                 }
             }
         )

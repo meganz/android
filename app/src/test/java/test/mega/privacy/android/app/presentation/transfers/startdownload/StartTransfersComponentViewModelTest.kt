@@ -498,7 +498,7 @@ class StartTransfersComponentViewModelTest {
 
             assertThat(underTest.uiState.value.jobInProgressState).isNull()
             assertCurrentEventIsEqualTo(
-                StartTransferEvent.FinishUploadProcessing(1)
+                StartTransferEvent.FinishUploadProcessing(1, startUploadFilesEvent)
             )
         }
 
@@ -510,7 +510,7 @@ class StartTransfersComponentViewModelTest {
             underTest.startTransfer(startUploadFilesEvent)
 
             assertCurrentEventIsEqualTo(
-                StartTransferEvent.FinishUploadProcessing(1)
+                StartTransferEvent.FinishUploadProcessing(1, startUploadFilesEvent)
             )
         }
 
@@ -609,7 +609,7 @@ class StartTransfersComponentViewModelTest {
     private fun provideUploadParameters() = listOf(
         Arguments.of(
             finishProcessingEvent,
-            StartTransferEvent.FinishUploadProcessing(1),
+            StartTransferEvent.FinishUploadProcessing(1, startUploadFilesEvent),
         ),
         Arguments.of(
             MultiTransferEvent.InsufficientSpace,

@@ -32,9 +32,11 @@ sealed interface StartTransferEvent {
      * Upload transfers canning has finished.
      *
      * @param totalFiles total files to upload
+     * @param triggerEvent the event that triggered the start of the transfers
      */
     data class FinishUploadProcessing(
         val totalFiles: Int,
+        val triggerEvent: TransferTriggerEvent,
     ) : StartTransferEvent
 
     /**

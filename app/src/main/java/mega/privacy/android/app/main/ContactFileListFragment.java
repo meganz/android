@@ -416,7 +416,8 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                                 }
                                 startDownloadViewModel.consumeDownloadEvent();
                                 return Unit.INSTANCE;
-                            }
+                            },
+                            (StartTransferEvent) -> Unit.INSTANCE
                     )
             );
         }

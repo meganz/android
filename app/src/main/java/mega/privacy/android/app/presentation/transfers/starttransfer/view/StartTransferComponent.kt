@@ -76,6 +76,7 @@ internal fun StartTransferComponent(
     event: StateEventWithContent<TransferTriggerEvent>,
     onConsumeEvent: () -> Unit,
     snackBarHostState: SnackbarHostState,
+    onScanningFinished: (StartTransferEvent) -> Unit = {},
     viewModel: StartTransfersComponentViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -146,6 +147,7 @@ internal fun StartTransferComponent(
         onResumeTransfers = viewModel::resumeTransfers,
         onAskedResumeTransfers = viewModel::setAskedResumeTransfers,
         snackBarHostState = snackBarHostState,
+        onScanningFinished = onScanningFinished,
     )
 }
 
@@ -153,12 +155,14 @@ internal fun StartTransferComponent(
  * Helper function to wrap [StartTransferComponent] into a [ComposeView] so it can be used in screens using View system
  * @param activity the parent activity where this view will be added, it should implement [SnackbarShower] to show the generated Snackbars
  * @param transferEventState flow that usually comes from the view model and triggers the download Transfer events
- * @param onConsumeEvent lambda to consume the download event, typically it will launch the corresponding consume event in the view model
+ * @param onConsumeEvent lambda to consume the download event, typically it will launch the corresponding consume event in the view model,
+ * @param onScanningFinished lambda to be called when the scanning process is finished.
  */
 fun createStartTransferView(
     activity: Activity,
     transferEventState: Flow<StateEventWithContent<TransferTriggerEvent>>,
     onConsumeEvent: () -> Unit,
+    onScanningFinished: (StartTransferEvent) -> Unit = {},
 ): View = ComposeView(activity).apply {
     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
     setContent {
@@ -178,6 +182,7 @@ fun createStartTransferView(
                 downloadEvent,
                 onConsumeEvent,
                 snackBarHostState = snackbarHostState,
+                onScanningFinished,
             )
         }
     }
@@ -197,6 +202,7 @@ private fun StartTransferComponent(
     onResumeTransfers: () -> Unit,
     onAskedResumeTransfers: () -> Unit,
     snackBarHostState: SnackbarHostState,
+    onScanningFinished: (StartTransferEvent) -> Unit = {},
 ) {
     val context = LocalContext.current
     var showOfflineAlertDialog by rememberSaveable { mutableStateOf(false) }
@@ -221,7 +227,7 @@ private fun StartTransferComponent(
         onConsumed = onOneOffEventConsumed,
         action = {
             when (it) {
-                is StartTransferEvent.FinishDownloadProcessing ->
+                is StartTransferEvent.FinishDownloadProcessing -> {
                     consumeFinishProcessing(
                         event = it,
                         snackBarHostState = snackBarHostState,
@@ -229,6 +235,8 @@ private fun StartTransferComponent(
                         context = context,
                         transferTriggerEvent = it.triggerEvent,
                     )
+                    onScanningFinished(it)
+                 }
 
                 is StartTransferEvent.FinishUploadProcessing -> {
                     val message = context.resources.getQuantityString(
@@ -237,6 +245,7 @@ private fun StartTransferComponent(
                         it.totalFiles,
                     )
                     snackBarHostState.showSnackbar(message)
+                    onScanningFinished(it)
                 }
 
                 is StartTransferEvent.Message ->

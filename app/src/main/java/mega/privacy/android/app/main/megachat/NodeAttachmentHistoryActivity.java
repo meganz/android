@@ -404,7 +404,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                         () -> {
                             startDownloadViewModel.consumeDownloadEvent();
                             return Unit.INSTANCE;
-                        }
+                        },
+                        (StartTransferEvent) -> Unit.INSTANCE
                 )
         );
     }

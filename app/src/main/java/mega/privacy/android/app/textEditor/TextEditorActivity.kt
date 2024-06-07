@@ -34,7 +34,6 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -50,7 +49,6 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.usecase.exception.MegaException
@@ -669,13 +667,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         binding.root.addView(
             createStartTransferView(
                 this,
-                viewModel.uiState.map { it.transferEvent }
+                viewModel.uiState.map { it.transferEvent },
+                viewModel::consumeTransferEvent
             ) {
-                if ((viewModel.uiState.value.transferEvent as StateEventWithContentTriggered).content is TransferTriggerEvent.StartUpload.TextFile) {
-                    finish()
-                }
-
-                viewModel.consumeTransferEvent()
+                finish()
             }
         )
     }

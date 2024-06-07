@@ -1045,13 +1045,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         findViewById<ViewGroup>(R.id.root_content_layout).addView(
             createStartTransferView(
                 this,
-                startDownloadViewModel.state
-            ) {
-                if ((startDownloadViewModel.state.value as StateEventWithContentTriggered).content is TransferTriggerEvent.StartUpload) {
-                    viewModel.consumeUploadEvent()
+                startDownloadViewModel.state,
+                {
+                    if ((startDownloadViewModel.state.value as StateEventWithContentTriggered).content is TransferTriggerEvent.StartUpload) {
+                        viewModel.consumeUploadEvent()
+                    }
+                    startDownloadViewModel.consumeDownloadEvent()
                 }
-                startDownloadViewModel.consumeDownloadEvent()
-            }
+            )
         )
     }
 

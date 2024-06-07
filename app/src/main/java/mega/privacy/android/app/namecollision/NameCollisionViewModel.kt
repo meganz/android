@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -46,11 +47,11 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeByFingerprintAndParentNodeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeByFingerprintAndParentNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveCollidedNodesUseCase
 import nz.mega.sdk.MegaNode
@@ -846,8 +847,10 @@ class NameCollisionViewModel @Inject constructor(
     /**
      * Consumes the upload event.
      */
-    fun consumeUploadEvent(event: TransferTriggerEvent.StartUpload.CollidedFiles) {
-        event.collisionChoice?.let { choice -> continueWithNext(choice) }
+    fun consumeUploadEvent() {
+        (uiState.value.uploadEvent as StateEventWithContentTriggered).content.collisionChoice?.let { choice ->
+            continueWithNext(choice)
+        }
         _uiState.update { state -> state.copy(uploadEvent = consumed()) }
     }
 

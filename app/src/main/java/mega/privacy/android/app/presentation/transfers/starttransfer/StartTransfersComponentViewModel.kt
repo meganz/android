@@ -555,13 +555,12 @@ internal class StartTransfersComponentViewModel @Inject constructor(
 
     private fun MutableStateFlow<StartTransferViewState>.updateEventAndClearProgress(
         event: StartTransferEvent?,
-    ) =
-        this.update {
-            it.copy(
-                oneOffViewEvent = event?.let { triggered(event) } ?: consumed(),
-                jobInProgressState = null,
-            )
-        }
+    ) = this.update {
+        it.copy(
+            oneOffViewEvent = event?.let { triggered(event) } ?: consumed(),
+            jobInProgressState = null,
+        )
+    }
 
     private fun String.ensureSuffix(suffix: String) =
         if (this.endsWith(suffix)) this else this.plus(suffix)
@@ -646,7 +645,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     //show start message as soon as an event with all transfers updated is received
                     if (!startMessageShown && event.allTransfersUpdated) {
                         startMessageShown = true
-                        StartTransferEvent.FinishUploadProcessing(totalFiles = event.startedFiles)
+                        StartTransferEvent.FinishUploadProcessing(
+                            totalFiles = event.startedFiles,
+                            triggerEvent = transferTriggerEvent,
+                        )
                     } else {
                         null
                     }
