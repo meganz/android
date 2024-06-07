@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,19 +18,19 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 @Composable
 internal fun IssuesResolutionDialog(
-    modifier: Modifier = Modifier,
     @DrawableRes icon: Int,
     conflictName: String,
     nodeName: String,
     actions: List<StalledIssueResolutionAction>,
     actionSelected: (action: StalledIssueResolutionAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column {
         FolderHeader(modifier, icon, conflictName, nodeName)
@@ -83,17 +82,19 @@ private fun FolderHeader(
                 .weight(1f)
                 .padding(start = 12.dp)
         ) {
-            Text(
-                modifier = Modifier.testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_CONFLICT_NAME),
+            MegaText(
                 text = conflictName,
-                style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorPrimary)
+                textColor = TextColor.Primary,
+                modifier = Modifier.testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_CONFLICT_NAME),
+                style = MaterialTheme.typography.subtitle1,
             )
-            Text(
+            MegaText(
+                text = nodeName,
+                textColor = TextColor.Secondary,
                 modifier = Modifier
                     .padding(top = 1.dp)
                     .testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_NAME),
-                text = nodeName,
-                style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorSecondary)
+                style = MaterialTheme.typography.subtitle2
             )
         }
     }
@@ -111,10 +112,11 @@ private fun IssueResolutionAction(
             .clickable { actionSelected() },
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
+        MegaText(
             text = actionName,
+            textColor = TextColor.Primary,
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 18.dp),
-            style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorPrimary)
+            style = MaterialTheme.typography.subtitle1
         )
     }
 }
