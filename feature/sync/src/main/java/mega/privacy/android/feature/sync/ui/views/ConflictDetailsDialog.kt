@@ -4,14 +4,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 @Composable
 internal fun ConflictDetailsDialog(
@@ -19,15 +18,17 @@ internal fun ConflictDetailsDialog(
     explanation: String,
 ) {
     Column {
-        Text(
-            conflictName,
-            Modifier.padding(vertical = 14.dp, horizontal = 16.dp),
-            style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorPrimary)
+        MegaText(
+            text = conflictName,
+            textColor = TextColor.Primary,
+            modifier = Modifier.padding(vertical = 14.dp, horizontal = 16.dp),
+            style = MaterialTheme.typography.subtitle1,
         )
-        Text(
-            explanation,
-            Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
-            style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorSecondary)
+        MegaText(
+            text = explanation,
+            textColor = TextColor.Secondary,
+            modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+            style = MaterialTheme.typography.subtitle2
         )
     }
 }
