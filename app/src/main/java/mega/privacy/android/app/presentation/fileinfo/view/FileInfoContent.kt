@@ -212,9 +212,7 @@ internal fun FileInfoContent(
             //tags
             if (tagsEnabled) {
                 FileInfoTagsView(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                     tags = tags,
                     onAddTagClick = onAddTagClick,
                     onRemoveTagClick = onRemoveTagClick,

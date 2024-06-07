@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -22,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
@@ -30,7 +28,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.fileinfo.view.FILE_INFO_CHIP_CLOSE_ICON_TEST_TAG
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -134,6 +131,13 @@ private fun TagsContent(
             )
         }
 
+        MegaText(
+            modifier = Modifier.padding(vertical = 12.dp),
+            text = "Existing Tags",
+            textColor = TextColor.Secondary,
+            style = MaterialTheme.typography.subtitle2,
+        )
+
         FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -143,22 +147,18 @@ private fun TagsContent(
         ) {
             repeat(uiState.tags.size) { tag ->
                 Chip(
-                    selected = false,
+                    selected = true,
                     enabled = true,
                     contentDescription = "Tag Chip",
-                    showTransparentBackground = true,
                 ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(mega.privacy.android.core.R.drawable.ic_filter_selected),
+                        contentDescription = "Location filter selected icon",
+                    )
                     MegaText(
                         text = "#${uiState.tags[tag]}",
-                        textColor = TextColor.Primary,
+                        textColor = TextColor.OnColor,
                         style = MaterialTheme.typography.subtitle2
-                    )
-                    Icon(
-                        modifier = Modifier
-                            .testTag(FILE_INFO_CHIP_CLOSE_ICON_TEST_TAG)
-                            .size(18.dp),
-                        imageVector = ImageVector.vectorResource(id = mega.privacy.android.core.R.drawable.ic_universal_close),
-                        contentDescription = "Choose Options",
                     )
                 }
             }

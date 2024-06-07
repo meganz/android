@@ -15,13 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.chip.Chip
+import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
@@ -42,26 +42,27 @@ fun FileInfoTagsView(
     onRemoveTagClick: (String) -> Unit,
     modifier: Modifier,
 ) {
-    Column(modifier = modifier
-        .padding(vertical = 8.dp)
-        .clickable { onAddTagClick() }) {
-        MegaText(
+    Column(
+        modifier = modifier
+            .clickable { onAddTagClick() },
+    ) {
+        MenuActionListTile(
             text = "Tags",
-            textColor = TextColor.Secondary,
-            style = MaterialTheme.typography.caption,
+            dividerType = null,
+            addIconPadding = false,
+            trailingItem = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_chevron_right),
+                    contentDescription = "Add Tag",
+                    modifier = Modifier.size(24.dp),
+                )
+            },
         )
-        GenericDescriptionTextField(
-            value = "#Add tags",
-            modifier = Modifier.fillMaxWidth(),
-            onValueChange = {},
-            isEnabled = false,
-            placeholder = stringResource(id = R.string.meetings_schedule_meeting_add_description_label),
-            showUnderline = true,
-        )
+
         FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 8.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
