@@ -15,6 +15,6 @@ import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 data class TagsUiState(
     val tags: List<String> = emptyList(),
     val isError: Boolean = false,
-    val message: String? = "Use tags to help you find and organise your data. Try tagging by year, location, project, or subject.",
+    val message: String? = null,
     val informationMessage: StateEventWithContent<InfoToShow> = consumed(),
 )

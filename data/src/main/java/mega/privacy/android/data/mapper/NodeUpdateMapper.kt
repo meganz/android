@@ -11,7 +11,7 @@ typealias NodeUpdateMapper = (@JvmSuppressWildcards MegaNode) -> @JvmSuppressWil
 /**
  * Maps from [MegaNode]  to list of [NodeChanges]
  *
- * @param nodeList
+ * @param node
  */
 internal fun mapMegaNodeListToNodeUpdate(node: MegaNode) = fromMegaNodeChangeFlags(node.changes)
 
@@ -35,4 +35,5 @@ private val nodeChangesMap = mapOf(
     MegaNode.CHANGE_TYPE_FAVOURITE to NodeChanges.Favourite,
     MegaNode.CHANGE_TYPE_SENSITIVE to NodeChanges.Sensitive,
     MegaNode.CHANGE_TYPE_DESCRIPTION to NodeChanges.Description,
+    MegaNode.CHANGE_TYPE_TAGS to NodeChanges.Tags
 )

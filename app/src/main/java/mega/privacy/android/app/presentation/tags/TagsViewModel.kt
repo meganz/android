@@ -8,6 +8,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -15,6 +16,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.NODE_ID
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.node.UpdateNodeTagUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,6 +30,7 @@ import javax.inject.Inject
 class TagsViewModel @Inject constructor(
     private val updateNodeTagUseCase: UpdateNodeTagUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    monitorNodeUpdatesById: MonitorNodeUpdatesById,
     stateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -40,7 +43,12 @@ class TagsViewModel @Inject constructor(
     private val nodeId: NodeId = NodeId(stateHandle.get<Long>(NODE_ID) ?: -1L)
 
     init {
-        getNodeByHandle(nodeId)
+        getNodeByHandle(nodeId, true)
+        viewModelScope.launch {
+            monitorNodeUpdatesById(nodeId).conflate().collect {
+                getNodeByHandle(nodeId)
+            }
+        }
     }
 
     /**
@@ -48,11 +56,14 @@ class TagsViewModel @Inject constructor(
      *
      * @param nodeId    Node ID
      */
-    fun getNodeByHandle(nodeId: NodeId) = viewModelScope.launch {
+    fun getNodeByHandle(nodeId: NodeId, fromInit: Boolean = false) = viewModelScope.launch {
         runCatching {
             getNodeByIdUseCase(nodeId)
         }.onSuccess { node ->
             _uiState.update { it.copy(tags = node?.tags.orEmpty()) }
+            if (fromInit) {
+                validateTagName("")
+            }
         }.onFailure {
             Timber.e(it, "Error getting node by handle")
         }
@@ -90,22 +101,42 @@ class TagsViewModel @Inject constructor(
         val message: String?
         val isError: Boolean
         val isBlank = tag.isBlank()
-        if (isBlank) {
-            message =
-                "Use tags to help you find and organise your data. Try tagging by year, location, project, or subject."
-            isError = false
-        } else if (tag.all { it.isLetterOrDigit() }.not()) {
-            message = "Tags can only contain letters and numbers."
-            isError = true
-        } else if (tag.length > 32) {
-            message = "Tags can be up to 32 characters long."
-            isError = true
-        } else if (uiState.value.tags.contains(tag)) {
-            message = "Tag already exists"
-            isError = true
-        } else {
-            message = null
-            isError = false
+        when {
+            isBlank && uiState.value.tags.isEmpty() -> {
+                message =
+                    "Use tags to help you find and organise your data. Try tagging by year, location, project, or subject."
+                isError = false
+            }
+
+            isBlank -> {
+                message = null
+                isError = false
+            }
+
+            tag.all { it.isLetterOrDigit() }.not() -> {
+                message = "Tags can only contain letters and numbers."
+                isError = true
+            }
+
+            tag.length > 32 -> {
+                message = "Tags can be up to 32 characters long."
+                isError = true
+            }
+
+            uiState.value.tags.size >= 10 && uiState.value.tags.contains(tag).not() -> {
+                message = "You can only add up to 10 tags."
+                isError = true
+            }
+
+            uiState.value.tags.contains(tag) -> {
+                message = "Tag already exists"
+                isError = true
+            }
+
+            else -> {
+                message = null
+                isError = false
+            }
         }
         _uiState.update { it.copy(message = message, isError = isError) }
         return !isError && !isBlank

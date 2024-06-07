@@ -44,6 +44,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges.Owner
 import mega.privacy.android.domain.entity.node.NodeChanges.Parent
 import mega.privacy.android.domain.entity.node.NodeChanges.Public_link
 import mega.privacy.android.domain.entity.node.NodeChanges.Remove
+import mega.privacy.android.domain.entity.node.NodeChanges.Tags
 import mega.privacy.android.domain.entity.node.NodeChanges.Timestamp
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -685,8 +686,7 @@ class FileInfoViewModel @Inject constructor(
                                 return@any true
                             }
 
-                        Timestamp -> updateTimeStamp()
-                        Description, Name -> updateTypedNode()
+                        Description, Name, Tags, Timestamp -> updateTypedNode()
                         Outshare -> {
                             updateOutShares()
                             updateIcon()
@@ -843,16 +843,6 @@ class FileInfoViewModel @Inject constructor(
                     Timber.e(it)
                 }
             }
-        }
-    }
-
-    private fun updateTimeStamp() {
-        updateState {
-            //we need to update the typedNode to get changes in timeStamps
-            getNodeByIdUseCase(typedNode.id)?.let { updateTypedNode ->
-                typedNode = updateTypedNode
-            }
-            it.copyWithTypedNode(typedNode = typedNode)
         }
     }
 

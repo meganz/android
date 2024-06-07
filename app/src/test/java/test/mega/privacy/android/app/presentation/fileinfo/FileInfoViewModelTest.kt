@@ -88,6 +88,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -97,6 +100,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.net.URI
+import java.util.stream.Stream
 import kotlin.test.assertNull
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -717,6 +721,18 @@ internal class FileInfoViewModelTest {
         verify(getContactItemFromInShareFolder, times(2)).invoke(folderNode, true)
     }
 
+    @ParameterizedTest
+    @MethodSource("provideNodeChanges")
+    fun `test monitorNodeUpdatesById updates tag`(nodeChanges: NodeChanges) = runTest {
+        val folderNode = mockFolder()
+        whenever(monitorNodeUpdatesById.invoke(folderNode.id)).thenReturn(
+            flowOf(listOf(nodeChanges))
+        )
+        underTest.setNode(node.handle, true)
+        //check 2 invocations: first invocation when node is set, second one the update itself
+        verify(getNodeByIdUseCase, times(2)).invoke(folderNode.id)
+    }
+
     @Test
     fun `test getNodeAccessPermission is fetched if getContactItemFromInShareFolder returns ContactItem`() =
         runTest {
@@ -1157,6 +1173,13 @@ internal class FileInfoViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    private fun provideNodeChanges() = Stream.of(
+        Arguments.of(NodeChanges.Description),
+        Arguments.of(NodeChanges.Name),
+        Arguments.of(NodeChanges.Tags),
+        Arguments.of(NodeChanges.Timestamp),
+    )
 
     private suspend fun mockFolder() = mock<TypedFolderNode> {
         on { id }.thenReturn(nodeId)
