@@ -10,21 +10,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.controls.chip.Chip
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
+import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Composable that represents the tags view in the file info screen.
@@ -62,31 +57,19 @@ fun FileInfoTagsView(
         FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 16.dp),
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             repeat(tags.size) { tag ->
-                Chip(
+                MegaChip(
                     selected = false,
-                    enabled = true,
-                    contentDescription = "Tag Chip",
-                    showTransparentBackground = true,
+                    text = "#${tags[tag]}",
+                    contentDescription = "",
+                    trailingIcon = mega.privacy.android.core.R.drawable.ic_universal_close,
                     onClick = { onRemoveTagClick(tags[tag]) },
-                ) {
-                    MegaText(
-                        text = "#${tags[tag]}",
-                        textColor = TextColor.Primary,
-                        style = MaterialTheme.typography.subtitle2
-                    )
-                    Icon(
-                        modifier = Modifier
-                            .testTag(FILE_INFO_CHIP_CLOSE_ICON_TEST_TAG)
-                            .size(18.dp),
-                        imageVector = ImageVector.vectorResource(id = mega.privacy.android.core.R.drawable.ic_universal_close),
-                        contentDescription = "Choose Options",
-                    )
-                }
+                    enabled = true,
+                    style = TransparentChipStyle,
+                )
             }
         }
     }
@@ -104,8 +87,3 @@ private fun FileInfoTagsViewPreview() {
         )
     }
 }
-
-/**
- * Test tag for the tags view.
- */
-internal const val FILE_INFO_CHIP_CLOSE_ICON_TEST_TAG = "file_info_chips:close_icon"

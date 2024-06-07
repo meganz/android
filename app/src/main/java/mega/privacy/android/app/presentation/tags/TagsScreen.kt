@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -19,10 +18,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,7 +29,7 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.chip.Chip
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericDescriptionTextField
@@ -40,6 +37,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.transfor
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import java.util.Locale
 
 /**
  * Tags screen composable.
@@ -106,7 +104,8 @@ private fun TagsContent(
             supportingText = uiState.message,
             keyboardActions = KeyboardActions(
                 onDone = {
-                    if (validateTagName(tag)) {
+                    val lowerCaseTag = tag.lowercase(Locale.ROOT)
+                    if (validateTagName(lowerCaseTag)) {
                         addNodeTag(tag)
                         tag = ""
                     }
@@ -131,36 +130,28 @@ private fun TagsContent(
             )
         }
 
-        MegaText(
-            modifier = Modifier.padding(vertical = 12.dp),
-            text = "Existing Tags",
-            textColor = TextColor.Secondary,
-            style = MaterialTheme.typography.subtitle2,
-        )
+        if (uiState.tags.isNotEmpty()) {
+            MegaText(
+                modifier = Modifier.padding(vertical = 12.dp),
+                text = "Existing Tags",
+                textColor = TextColor.Secondary,
+                style = MaterialTheme.typography.subtitle2,
+            )
+        }
 
         FlowRow(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             repeat(uiState.tags.size) { tag ->
-                Chip(
+                MegaChip(
                     selected = true,
-                    enabled = true,
+                    text = "#${uiState.tags[tag]}",
                     contentDescription = "Tag Chip",
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(mega.privacy.android.core.R.drawable.ic_filter_selected),
-                        contentDescription = "Location filter selected icon",
-                    )
-                    MegaText(
-                        text = "#${uiState.tags[tag]}",
-                        textColor = TextColor.OnColor,
-                        style = MaterialTheme.typography.subtitle2
-                    )
-                }
+                    enabled = true,
+                    leadingIcon = mega.privacy.android.core.R.drawable.ic_filter_selected,
+                )
             }
         }
     }

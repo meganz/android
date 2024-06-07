@@ -1,6 +1,10 @@
 package mega.privacy.android.shared.original.core.ui.controls.chip
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SelectableChipColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -8,6 +12,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 
@@ -133,12 +138,27 @@ interface ChipStyle {
     fun colors(): ChipColors
 
     /**
+     * Colors of selectable chip
+     */
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    fun selectableChipColors(): SelectableChipColors
+
+    /**
      * Typography of chip
      *
      * @return typography [TextStyle]
      */
     @Composable
     fun typography(): TextStyle
+
+    /**
+     * Border style of chip
+     *
+     * @return [BorderStroke] or null if no border
+     */
+    @Composable
+    fun borderStyle(): BorderStroke = BorderStroke(1.dp, Color.Transparent)
 }
 
 /**
@@ -162,9 +182,61 @@ object DefaultChipStyle : ChipStyle {
         disabledBorderColor = Color.Transparent,
     )
 
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    override fun selectableChipColors(): SelectableChipColors = ChipDefaults.filterChipColors(
+        selectedBackgroundColor = MegaOriginalTheme.colors.components.selectionControl,
+        selectedContentColor = MegaOriginalTheme.colors.text.inverse,
+        selectedLeadingIconColor = MegaOriginalTheme.colors.icon.inverse,
+        backgroundColor = MegaOriginalTheme.colors.button.secondary,
+        contentColor = MegaOriginalTheme.colors.text.secondary,
+        leadingIconColor = MegaOriginalTheme.colors.icon.inverse,
+        disabledBackgroundColor = MegaOriginalTheme.colors.button.secondary,
+        disabledContentColor = MegaOriginalTheme.colors.text.secondary,
+        disabledLeadingIconColor = MegaOriginalTheme.colors.icon.secondary,
+    )
+
     /**
      * Typography style of chip
      */
     @Composable
     override fun typography(): TextStyle = MaterialTheme.typography.subtitle2medium
+}
+
+/**
+ * Transparent style for chips
+ */
+object TransparentChipStyle : ChipStyle {
+
+    @Composable
+    override fun colors(): ChipColors = DefaultChipColors(
+        selectedBackgroundColor = Color.Transparent,
+        unselectedBackgroundColor = Color.Transparent,
+        disabledBackgroundColor = Color.Transparent,
+        selectedContentColor = MegaOriginalTheme.colors.text.primary,
+        unselectedContentColor = MegaOriginalTheme.colors.text.primary,
+        disabledContentColor = MegaOriginalTheme.colors.text.primary,
+        selectedBorderColor = Color.Transparent,
+        unselectedBorderColor = Color.Transparent,
+        disabledBorderColor = Color.Transparent,
+    )
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    override fun selectableChipColors(): SelectableChipColors = ChipDefaults.filterChipColors(
+        selectedBackgroundColor = Color.Transparent,
+        backgroundColor = Color.Transparent,
+        disabledBackgroundColor = Color.Transparent,
+        selectedContentColor = MegaOriginalTheme.colors.text.primary,
+        contentColor = MegaOriginalTheme.colors.text.primary,
+        disabledContentColor = MegaOriginalTheme.colors.text.primary,
+        leadingIconColor = MegaOriginalTheme.colors.icon.primary,
+        disabledLeadingIconColor = MegaOriginalTheme.colors.icon.primary,
+    )
+
+    @Composable
+    override fun typography(): TextStyle = MaterialTheme.typography.subtitle2medium
+
+    @Composable
+    override fun borderStyle() = BorderStroke(1.dp, MegaOriginalTheme.colors.border.strong)
 }
