@@ -159,14 +159,17 @@ class AdsViewModel @Inject constructor(
         slotId: String = uiState.value.slotId,
         linkHandle: Long? = null,
     ) {
+        // Do not fetch ads if the job is already running, to avoid repeated SDK calls
+        if (fetchAdUrlJob?.isActive == true) return
+
         if (isAdsFeatureEnabled && canConsumeAdSlot(slotId)) {
             val fetchAdDetailRequest = FetchAdDetailRequest(slotId, linkHandle)
             fetchAdUrlJob?.cancel()
             fetchAdUrlJob = viewModelScope.launch {
                 runCatching {
                     val url = fetchAdDetailUseCase(fetchAdDetailRequest)?.url
-                    _uiState.update { state ->
-                        state.copy(
+                    _uiState.update {
+                        it.copy(
                             showAdsView = url != null && isPortrait && canConsumeAdSlot(slotId),
                             slotId = slotId,
                             adsBannerUrl = url.orEmpty()
@@ -177,8 +180,8 @@ class AdsViewModel @Inject constructor(
                 }
             }
         } else {
-            _uiState.update { state ->
-                state.copy(showAdsView = false, slotId = slotId, adsBannerUrl = "")
+            _uiState.update {
+                it.copy(showAdsView = false, slotId = slotId, adsBannerUrl = "")
             }
         }
     }
