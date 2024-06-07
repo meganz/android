@@ -80,7 +80,7 @@ import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
-import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckOrCreateCameraUploadsNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
@@ -98,7 +98,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredUseCa
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorIsChargingRequiredToUploadContentUseCase
-import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase

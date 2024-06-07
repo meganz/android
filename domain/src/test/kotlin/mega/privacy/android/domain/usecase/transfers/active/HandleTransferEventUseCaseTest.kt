@@ -10,7 +10,7 @@ import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
-import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.GetTransferDestinationUriUseCase

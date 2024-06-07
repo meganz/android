@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
 import org.junit.jupiter.api.BeforeAll

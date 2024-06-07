@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.account
 
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import javax.inject.Inject
 
 /**
