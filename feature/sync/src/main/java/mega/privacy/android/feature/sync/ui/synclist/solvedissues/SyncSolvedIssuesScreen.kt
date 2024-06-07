@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -21,6 +20,8 @@ import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
 import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWithBody
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
+import mega.privacy.android.shared.original.core.ui.controls.status.getStatusIconColor
 
 @Composable
 internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
@@ -45,7 +46,7 @@ internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
                         body = solvedIssue.resolutionExplanation,
                         nodeIcon = solvedIssue.icon,
                         bodyIcon = CoreUiR.drawable.ic_check_circle,
-                        bodyIconColor = MaterialTheme.colors.secondary
+                        bodyIconColor = StatusColor.Success.getStatusIconColor()
                     )
                     Divider(
                         Modifier
