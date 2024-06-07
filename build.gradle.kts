@@ -96,3 +96,15 @@ val shouldSuppressWarnings by extra(
     fun(): Boolean = isServerBuild() && System.getenv("DO_NOT_SUPPRESS_WARNINGS") != "true"
 )
 
+tasks.register("runUnitTest") {
+    group = "Verification"
+    description = "Runs all unit tests same as CI/CD pipeline"
+    dependsOn(":domain:jacocoTestReport")
+    dependsOn(":data:testDebugUnitTestCoverage")
+    dependsOn(":app:createUnitTestCoverageReport")
+    dependsOn(":feature:devicecenter:testDebugUnitTestCoverage")
+    dependsOn(":feature:sync:testDebugUnitTestCoverage")
+    dependsOn(":shared:original-core-ui:testDebugUnitTestCoverage")
+    dependsOn(":legacy-core-ui:testDebugUnitTestCoverage")
+}
+

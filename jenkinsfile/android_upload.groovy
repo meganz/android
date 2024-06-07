@@ -463,14 +463,7 @@ pipeline {
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
                     ]) {
 
-                        sh "./gradlew domain:jacocoTestReport"
-                        sh "./gradlew data:testDebugUnitTestCoverage"
-                        sh "./gradlew app:createUnitTestCoverageReport"
-                        sh "./gradlew feature:devicecenter:testDebugUnitTestCoverage"
-                        sh "./gradlew feature:sync:testDebugUnitTestCoverage"
-                        sh "./gradlew shared:original-core-ui:testDebugUnitTestCoverage"
-                        sh "./gradlew legacy-core-ui:testDebugUnitTestCoverage"
-
+                        sh "./gradlew runUnitTest"
                         String artifactoryTargetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
                         String coverageSummaryFile = "coverage_summary.csv"
                         sh "./gradlew collectCoverage --modules \"app,data,domain,shared/original-core-ui,feature/sync,feature/devicecenter,legacy-core-ui\" --csv-output ${coverageSummaryFile}"
