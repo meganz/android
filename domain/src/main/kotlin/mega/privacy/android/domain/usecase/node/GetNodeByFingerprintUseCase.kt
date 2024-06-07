@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.camerauploads
+package mega.privacy.android.domain.usecase.node
 
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.repository.NodeRepository

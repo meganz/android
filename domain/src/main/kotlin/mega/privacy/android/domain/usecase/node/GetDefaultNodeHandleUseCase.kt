@@ -1,7 +1,6 @@
-package mega.privacy.android.domain.usecase.camerauploads
+package mega.privacy.android.domain.usecase.node
 
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import javax.inject.Inject
 
 /**

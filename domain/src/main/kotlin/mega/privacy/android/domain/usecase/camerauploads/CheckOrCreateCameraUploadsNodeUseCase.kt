@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetDefaultNodeHandleUseCase
 import javax.inject.Inject
 
 /**

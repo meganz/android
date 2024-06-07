@@ -10,7 +10,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.UnhideMenuAct
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsHidingActionAllowedUseCase
+import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import javax.inject.Inject

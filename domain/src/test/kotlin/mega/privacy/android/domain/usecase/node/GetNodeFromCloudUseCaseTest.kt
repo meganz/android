@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.camerauploads
+package mega.privacy.android.domain.usecase.node
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -7,6 +7,9 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.AddNodeType
+import mega.privacy.android.domain.usecase.node.GetNodeByFingerprintAndParentNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeByOriginalFingerprintUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeFromCloudUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
