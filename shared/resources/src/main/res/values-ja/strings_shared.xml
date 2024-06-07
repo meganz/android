@@ -376,4 +376,12 @@
     <string name="general_no_picker_warning">この端末には、フォルダを選択するアプリがありません</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;モバイルデバイス上のフォルダを自動的に同期します</string>
+    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
+    <string name="sync_error_dialog_free_user">同期が一時停止されました。同期はProプランの機能です。</string>
+    <!-- The error dialog confirm action text -->
+    <string name="sync_error_dialog_free_user_confirm_action">OK</string>
+    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
+    <string name="sync_error_banner_free_user">MEGA Proプランをキャンセルされたため、同期が一時停止されています。アップグレードしていただくと、同期を継続できます。</string>
+    <!-- Hidden items -->
+    <string name="hidden_items">非表示項目</string>
 </resources>

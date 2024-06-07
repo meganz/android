@@ -376,4 +376,12 @@
     <string name="general_no_picker_warning">This device doesn’t have an app to select folders</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
+    <string name="sync_error_dialog_free_user">Your syncs have been paused. Syncing is a Pro plan feature.</string>
+    <!-- The error dialog confirm action text -->
+    <string name="sync_error_dialog_free_user_confirm_action">Ok</string>
+    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
+    <string name="sync_error_banner_free_user">Syncing is paused because your MEGA Pro plan was cancelled. Upgrade to continue syncing.</string>
+    <!-- Hidden items -->
+    <string name="hidden_items">숨겨진 항목</string>
 </resources>

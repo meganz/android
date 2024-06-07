@@ -392,4 +392,12 @@
     <string name="general_no_picker_warning">Este dispositivo não tem um aplicativo para selecionar pastas</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Sincronização automática das pastas no seu dispositivo móvel</string>
+    <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
+    <string name="sync_error_dialog_free_user">As suas sincronizações foram pausadas: sincronizar é um recurso dos planos Pro.</string>
+    <!-- The error dialog confirm action text -->
+    <string name="sync_error_dialog_free_user_confirm_action">Ok</string>
+    <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
+    <string name="sync_error_banner_free_user">A sincronização foi pausada porque o seu plano Pro do MEGA foi cancelado. Faça upgrade para continuar sincronizando.</string>
+    <!-- Hidden items -->
+    <string name="hidden_items">Itens ocultos</string>
 </resources>
