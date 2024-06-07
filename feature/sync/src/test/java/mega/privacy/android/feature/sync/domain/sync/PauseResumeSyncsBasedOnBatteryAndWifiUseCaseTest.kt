@@ -9,9 +9,9 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -84,6 +84,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             connectedToInternet = false,
             syncOnlyByWifi = true,
             batteryInfo = BatteryInfo(100, true),
+            isFreeAccount = false
         )
 
         verify(pauseSyncUseCase).invoke(firstSyncId)
@@ -100,6 +101,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             connectedToInternet = true,
             syncOnlyByWifi = false,
             batteryInfo = BatteryInfo(100, true),
+            isFreeAccount = false
         )
 
         verify(resumeSyncUseCase).invoke(firstSyncId)
@@ -116,6 +118,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             connectedToInternet = true,
             syncOnlyByWifi = true,
             batteryInfo = BatteryInfo(SyncBackgroundService.LOW_BATTERY_LEVEL - 1, false),
+            isFreeAccount = false
         )
 
         verify(pauseSyncUseCase).invoke(firstSyncId)
@@ -133,9 +136,44 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
                 connectedToInternet = true,
                 syncOnlyByWifi = false,
                 batteryInfo = BatteryInfo(SyncBackgroundService.LOW_BATTERY_LEVEL - 1, true),
+                isFreeAccount = false
             )
 
             verify(resumeSyncUseCase).invoke(firstSyncId)
             verifyNoInteractions(pauseSyncUseCase)
         }
+
+    @Test
+    fun `test that sync is paused when user account is not pro`() = runTest {
+        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
+        whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
+
+        underTest(
+            connectedToInternet = true,
+            syncOnlyByWifi = true,
+            batteryInfo = BatteryInfo(100, true),
+            isFreeAccount = true
+        )
+
+        verify(pauseSyncUseCase).invoke(firstSyncId)
+        verifyNoInteractions(resumeSyncUseCase)
+    }
+
+    @Test
+    fun `test that sync is resumed when user account is pro`() = runTest {
+        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
+        whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
+
+        underTest(
+            connectedToInternet = true,
+            syncOnlyByWifi = true,
+            batteryInfo = BatteryInfo(100, true),
+            isFreeAccount = false
+        )
+
+        verify(pauseSyncUseCase).invoke(firstSyncId)
+        verifyNoInteractions(resumeSyncUseCase)
+    }
 }

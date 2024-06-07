@@ -15,21 +15,25 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -79,6 +83,9 @@ internal class SyncBackgroundService : LifecycleService() {
 
     @Inject
     internal lateinit var monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase
+
+    @Inject
+    internal lateinit var monitorAccountDetailUseCase: MonitorAccountDetailUseCase
 
     override fun onCreate() {
         super.onCreate()
@@ -139,11 +146,20 @@ internal class SyncBackgroundService : LifecycleService() {
                 monitorConnectivityUseCase(),
                 monitorSyncByWiFiUseCase(),
                 monitorSyncsUseCase(),
-                monitorBatteryInfoUseCase()
-            ) { connectedToInternet: Boolean, syncByWifi: Boolean, _, batteryInfo: BatteryInfo ->
-                Triple(connectedToInternet, syncByWifi, batteryInfo)
-            }.collect { (connectedToInternet, syncByWifi, batteryInfo) ->
-                updateSyncState(connectedToInternet, syncByWifi, batteryInfo)
+                monitorBatteryInfoUseCase(),
+                monitorAccountDetailUseCase()
+            ) { connectedToInternet: Boolean, syncByWifi: Boolean, _: List<FolderPair>, batteryInfo: BatteryInfo, accountDetail: AccountDetail ->
+                Triple(
+                    batteryInfo,
+                    Pair(
+                        connectedToInternet,
+                        syncByWifi,
+                    ),
+                    accountDetail.levelDetail?.accountType == AccountType.FREE
+                )
+            }.collect { (batteryInfo, connectionDetails, isFreeAccount) ->
+                val (connectedToInternet, syncByWifi) = connectionDetails
+                updateSyncState(connectedToInternet, syncByWifi, batteryInfo, isFreeAccount)
             }
         }
         return START_STICKY
@@ -153,11 +169,13 @@ internal class SyncBackgroundService : LifecycleService() {
         connectedToInternet: Boolean,
         syncOnlyByWifi: Boolean,
         batteryInfo: BatteryInfo,
+        isFreeAccount: Boolean,
     ) {
         pauseResumeSyncsBasedOnBatteryAndWiFiUseCase(
             connectedToInternet = connectedToInternet,
             syncOnlyByWifi = syncOnlyByWifi,
-            batteryInfo = batteryInfo
+            batteryInfo = batteryInfo,
+            isFreeAccount = isFreeAccount
         )
     }
 
