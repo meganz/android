@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,9 +22,9 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacyTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 @Composable
 internal fun SyncEmptyScreen(getStartedClicked: () -> Unit) {
@@ -68,22 +67,24 @@ private fun SyncEmptyScreenContent(
                 .fillMaxWidth()
         )
 
-        Text(
+        MegaText(
             text = stringResource(id = R.string.sync),
+            textColor = TextColor.Primary,
             modifier = Modifier
                 .padding(bottom = 24.dp)
                 .fillMaxWidth()
                 .testTag(TAG_SYNC_EMPTY_ONBOARDING_TITLE),
+            style = MaterialTheme.typography.h6,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.textColorPrimary)
         )
-        Text(
+        MegaText(
             text = stringResource(id = R.string.sync_empty_state_message),
+            textColor = TextColor.Secondary,
             modifier = Modifier
-                .padding(bottom = 32.dp)
+                .padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
                 .fillMaxWidth(),
+            style = MaterialTheme.typography.subtitle2,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorSecondary)
         )
         Box(
             Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
