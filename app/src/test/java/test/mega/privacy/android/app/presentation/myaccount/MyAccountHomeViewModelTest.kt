@@ -65,7 +65,7 @@ class MyAccountHomeViewModelTest {
             )
         )
     private val connectivityFlow = MutableStateFlow(false)
-    private val userUpdatesFlow = MutableStateFlow(UserChanges.Firstname)
+    private val userUpdatesFlow = MutableStateFlow<UserChanges>(UserChanges.Firstname)
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
         onBlocking { invoke() }.thenReturn(accountDetailFlow)

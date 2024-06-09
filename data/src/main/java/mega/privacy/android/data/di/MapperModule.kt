@@ -41,7 +41,6 @@ import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserSetMapper
-import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapperImpl
@@ -54,7 +53,6 @@ import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
-import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.toAccountSessionDetail
 import mega.privacy.android.data.mapper.toAccountStorageDetail
@@ -123,12 +121,6 @@ internal abstract class MapperModule {
 
 
     companion object {
-
-        /**
-         * Provide user update mapper
-         */
-        @Provides
-        fun provideUserUpdateMapper(): UserUpdateMapper = ::mapMegaUserListToUserUpdate
 
         /**
          * Provide user alert mapper

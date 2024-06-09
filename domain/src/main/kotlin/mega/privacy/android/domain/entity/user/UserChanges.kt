@@ -4,184 +4,191 @@ package mega.privacy.android.domain.entity.user
  * User changes
  *
  */
-enum class UserChanges {
+sealed class UserChanges {
+
     /**
      * User has new or modified authentication information
      *
      */
-    AuthenticationInformation,
+    data object AuthenticationInformation : UserChanges()
 
     /**
      * Last interaction timestamp is modified
      *
      */
-    LastInteractionTimestamp,
+    data object LastInteractionTimestamp : UserChanges()
 
     /**
      * User has a new or modified avatar image
      *
      */
-    Avatar,
+    data object Avatar : UserChanges()
 
     /**
      * User has new or modified firstname
      *
      */
-    Firstname,
+    data object Firstname : UserChanges()
 
     /**
      * User has new or modified lastname
      *
      */
-    Lastname,
+    data object Lastname : UserChanges()
 
     /**
      * User has new or modified email
      *
      */
-    Email,
+    data object Email : UserChanges()
 
     /**
      * User has new or modified keyring
      *
      */
-    Keyring,
+    data object Keyring : UserChanges()
 
     /**
      * User has new or modified country
      *
      */
-    Country,
+    data object Country : UserChanges()
 
     /**
      * User has new or modified birthday
      *
      */
-    Birthday,
+    data object Birthday : UserChanges()
 
     /**
      * User has new or modified public key for chat
      *
      */
-    ChatPublicKey,
+    data object ChatPublicKey : UserChanges()
 
     /**
      * User has new or modified public key for signing
      *
      */
-    SigningPublicKey,
+    data object SigningPublicKey : UserChanges()
 
     /**
      * User has new or modified signature for RSA public key
      *
      */
-    RsaPublicKeySignature,
+    data object RsaPublicKeySignature : UserChanges()
 
     /**
      * User has new or modified signature for chat public key
      *
      */
-    ChatPublicKeySignature,
+    data object ChatPublicKeySignature : UserChanges()
 
     /**
      * User has new or modified language
      *
      */
-    Language,
+    data object Language : UserChanges()
 
     /**
      * User has new or modified password reminder
      *
      */
-    PasswordReminder,
+    data object PasswordReminder : UserChanges()
 
     /**
      * User has new or modified disable versions
      *
      */
-    DisableVersions,
+    data object DisableVersions : UserChanges()
 
     /**
      * User has new or modified contact link verification
      *
      */
-    ContactLinkVerification,
+    data object ContactLinkVerification : UserChanges()
 
     /**
      * User has new or modified rich previews
      *
      */
-    RichPreviews,
+    data object RichPreviews : UserChanges()
 
     /**
      * User has new or modified rubbish time
      *
      */
-    RubbishTime,
+    data object RubbishTime : UserChanges()
 
     /**
      * User has new or modified storage state
      *
      */
-    StorageState,
+    data object StorageState : UserChanges()
 
     /**
      * User has new or modified geolocation
      *
      */
-    Geolocation,
+    data object Geolocation : UserChanges()
 
     /**
      * User has new or modified camera uploads folder
      *
      */
-    CameraUploadsFolder,
+    data object CameraUploadsFolder : UserChanges()
 
     /**
      * User has new or modified my chat files folder
      *
      */
-    MyChatFilesFolder,
+    data object MyChatFilesFolder : UserChanges()
 
     /**
      * User has new or modified push settings
      *
      */
-    PushSettings,
+    data object PushSettings : UserChanges()
 
     /**
      * User has new or modified alias
      *
      */
-    Alias,
+    data object Alias : UserChanges()
 
     /**
      * User has new or modified unshareable key
      *
      */
-    UnshareableKey,
+    data object UnshareableKey : UserChanges()
 
     /**
      * User has new or modified device names
      *
      */
-    DeviceNames,
+    data object DeviceNames : UserChanges()
 
     /**
      * User has new or modified my backups folder
      *
      */
-    MyBackupsFolder,
+    data object MyBackupsFolder : UserChanges()
 
     /**
      * User has new or modified cookie settings
      *
      */
-    CookieSettings,
+    data object CookieSettings : UserChanges()
 
     /**
      * User has new or modified no callkit
      *
      */
-    NoCallkit,
+    data object NoCallkit : UserChanges()
+
+    /**
+     * User has new or modified visibility
+     *  @param userVisibility
+     */
+    data class Visibility(val userVisibility: UserVisibility) : UserChanges()
 }

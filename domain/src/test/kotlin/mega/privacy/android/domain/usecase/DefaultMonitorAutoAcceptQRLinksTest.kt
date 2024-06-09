@@ -8,8 +8,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.user.UserChanges
-import mega.privacy.android.domain.entity.user.UserId
-import mega.privacy.android.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.entity.user.UserVisibility
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -58,9 +57,38 @@ class DefaultMonitorAutoAcceptQRLinksTest {
         runTest {
             whenever(fetchAutoAcceptQRLinks()).thenReturn(true, false)
             whenever(monitorUserUpdates()).thenReturn(
-                UserChanges.values().filterNot {
-                    it == UserChanges.ContactLinkVerification
-                }.asFlow()
+                listOf(
+                    UserChanges.AuthenticationInformation,
+                    UserChanges.LastInteractionTimestamp,
+                    UserChanges.Avatar,
+                    UserChanges.Firstname,
+                    UserChanges.Lastname,
+                    UserChanges.Email,
+                    UserChanges.Keyring,
+                    UserChanges.Country,
+                    UserChanges.Birthday,
+                    UserChanges.ChatPublicKey,
+                    UserChanges.SigningPublicKey,
+                    UserChanges.RsaPublicKeySignature,
+                    UserChanges.ChatPublicKeySignature,
+                    UserChanges.Language,
+                    UserChanges.PasswordReminder,
+                    UserChanges.DisableVersions,
+                    UserChanges.RichPreviews,
+                    UserChanges.RubbishTime,
+                    UserChanges.StorageState,
+                    UserChanges.Geolocation,
+                    UserChanges.CameraUploadsFolder,
+                    UserChanges.MyChatFilesFolder,
+                    UserChanges.PushSettings,
+                    UserChanges.Alias,
+                    UserChanges.UnshareableKey,
+                    UserChanges.DeviceNames,
+                    UserChanges.MyBackupsFolder,
+                    UserChanges.CookieSettings,
+                    UserChanges.NoCallkit,
+                    UserChanges.Visibility(UserVisibility.Visible),
+                ).asFlow()
             )
 
             underTest().test {

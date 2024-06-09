@@ -30,6 +30,7 @@ import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
+import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
 import mega.privacy.android.data.mapper.account.RecoveryKeyToFileMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
@@ -133,6 +134,8 @@ class DefaultAccountRepositoryTest {
     private val cookieSettingsMapper = mock<CookieSettingsMapper>()
     private val cookieSettingsIntMapper = mock<CookieSettingsIntMapper>()
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
+    private val userUpdateMapper =
+        mock<UserUpdateMapper> { on { invoke(any()) } doReturn UserUpdate(emptyMap()) }
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -196,6 +199,7 @@ class DefaultAccountRepositoryTest {
         )
     }
 
+
     @BeforeAll
     fun setUp() {
         userMapper = UserMapper(UserChangeMapper())
@@ -206,7 +210,7 @@ class DefaultAccountRepositoryTest {
             megaChatApiGateway = megaChatApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
-            userUpdateMapper = { UserUpdate(emptyMap()) },
+            userUpdateMapper = userUpdateMapper,
             localStorageGateway = localStorageGateway,
             userAccountMapper = userAccountMapper,
             accountTypeMapper = accountTypeMapper,

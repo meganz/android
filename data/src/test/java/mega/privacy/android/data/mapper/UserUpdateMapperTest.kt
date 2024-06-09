@@ -3,12 +3,20 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserVisibility
 import nz.mega.sdk.MegaUser
 import org.junit.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserUpdateMapperTest {
+    private val underTest = UserUpdateMapper()
 
     @Test
     fun `test that a user the user id is mapped to the change key`() {
@@ -22,7 +30,7 @@ class UserUpdateMapperTest {
         }
 
         val userList = arrayListOf(user1, user2)
-        val actual = mapMegaUserListToUserUpdate(userList)
+        val actual = underTest(userList)
         assertThat(actual.changes).containsKey(UserId(id1))
         assertThat(actual.changes).containsKey(UserId(id2))
     }
@@ -33,7 +41,7 @@ class UserUpdateMapperTest {
         val user = mock<MegaUser> { on { handle }.thenReturn(id) }
         whenever(user.changes).thenReturn(MegaUser.CHANGE_TYPE_ALIAS.toLong())
 
-        val actual = mapMegaUserListToUserUpdate(listOf(user))
+        val actual = underTest(listOf(user))
 
         assertThat(actual.changes[UserId(id)]).containsExactly(UserChanges.Alias)
 
@@ -56,7 +64,7 @@ class UserUpdateMapperTest {
         }
 
         val userList = arrayListOf(user1, user2, user1)
-        val actual = mapMegaUserListToUserUpdate(userList)
+        val actual = underTest(userList)
 
         assertThat(actual.changes.size).isEqualTo(2)
         assertThat(actual.changes[UserId(id1)]).containsExactly(
@@ -99,18 +107,88 @@ class UserUpdateMapperTest {
             MegaUser.CHANGE_TYPE_MY_BACKUPS_FOLDER,
             MegaUser.CHANGE_TYPE_COOKIE_SETTINGS,
             MegaUser.CHANGE_TYPE_NO_CALLKIT,
-        )
-            .map { it.toLong() }
+        ).map { it.toLong() }
             .fold(0L) { acc, value -> acc or value }
 
         val id = 1L
         val user = mock<MegaUser> { on { handle }.thenReturn(id) }
         whenever(user.changes).thenReturn(allFlags)
 
-        val actual = mapMegaUserListToUserUpdate(listOf(user))
+        val actual = underTest(listOf(user))
 
-        assertThat(actual.changes[UserId(id)]).containsExactlyElementsIn(UserChanges.values())
+        assertThat(actual.changes[UserId(id)]).containsExactlyElementsIn(
+            listOf(
+                UserChanges.AuthenticationInformation,
+                UserChanges.LastInteractionTimestamp,
+                UserChanges.Avatar,
+                UserChanges.Firstname,
+                UserChanges.Lastname,
+                UserChanges.Email,
+                UserChanges.Keyring,
+                UserChanges.Country,
+                UserChanges.Birthday,
+                UserChanges.ChatPublicKey,
+                UserChanges.SigningPublicKey,
+                UserChanges.RsaPublicKeySignature,
+                UserChanges.ChatPublicKeySignature,
+                UserChanges.Language,
+                UserChanges.PasswordReminder,
+                UserChanges.DisableVersions,
+                UserChanges.ContactLinkVerification,
+                UserChanges.RichPreviews,
+                UserChanges.RubbishTime,
+                UserChanges.StorageState,
+                UserChanges.Geolocation,
+                UserChanges.CameraUploadsFolder,
+                UserChanges.MyChatFilesFolder,
+                UserChanges.PushSettings,
+                UserChanges.Alias,
+                UserChanges.UnshareableKey,
+                UserChanges.DeviceNames,
+                UserChanges.MyBackupsFolder,
+                UserChanges.CookieSettings,
+                UserChanges.NoCallkit
+            )
+        )
     }
 
+    @Test
+    fun `test that an empty list of changes is mapped to visibility change`() {
+        val id = 1L
+        val user = mock<MegaUser> {
+            on { handle }.thenReturn(id)
+            on { visibility }.thenReturn(MegaUser.VISIBILITY_HIDDEN)
+        }
+        whenever(user.changes).thenReturn(0L)
 
+        val actual = underTest(listOf(user))
+
+        assertThat(actual.changes[UserId(id)]?.all { it is UserChanges.Visibility }).isTrue()
+    }
+
+    @ParameterizedTest(name = "if visibility value is {0}, visibility should be: {1}")
+    @MethodSource("visibilityChanges")
+    fun `test that visibility change include user visibility`(
+        megaVisibility: Int,
+        userVisibility: UserVisibility,
+    ) {
+        val id = 1L
+        val user = mock<MegaUser> {
+            on { handle }.thenReturn(id)
+            on { visibility }.thenReturn(megaVisibility)
+        }
+        whenever(user.changes).thenReturn(0L)
+
+        val actual = underTest(listOf(user))
+
+        assertThat(actual.changes[UserId(id)]).containsExactly(UserChanges.Visibility(userVisibility))
+    }
+
+    private fun visibilityChanges() = Stream.of(
+        Arguments.of(MegaUser.VISIBILITY_HIDDEN, UserVisibility.Hidden),
+        Arguments.of(MegaUser.VISIBILITY_VISIBLE, UserVisibility.Visible),
+        Arguments.of(MegaUser.VISIBILITY_BLOCKED, UserVisibility.Blocked),
+        Arguments.of(MegaUser.VISIBILITY_UNKNOWN, UserVisibility.Unknown),
+        Arguments.of(MegaUser.VISIBILITY_INACTIVE, UserVisibility.Inactive),
+    )
 }

@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
@@ -164,7 +165,38 @@ class DefaultMonitorBackupFolderTest {
     @Test
     fun `test that if non backup folder user updates are emitted, no new id is fetched`() =
         runTest {
-            val updates = UserChanges.values().filterNot { it == UserChanges.MyBackupsFolder }
+            val updates =  listOf(
+                UserChanges.AuthenticationInformation,
+                UserChanges.LastInteractionTimestamp,
+                UserChanges.Avatar,
+                UserChanges.Firstname,
+                UserChanges.Lastname,
+                UserChanges.Email,
+                UserChanges.Keyring,
+                UserChanges.Country,
+                UserChanges.Birthday,
+                UserChanges.ChatPublicKey,
+                UserChanges.SigningPublicKey,
+                UserChanges.RsaPublicKeySignature,
+                UserChanges.ChatPublicKeySignature,
+                UserChanges.Language,
+                UserChanges.PasswordReminder,
+                UserChanges.DisableVersions,
+                UserChanges.RichPreviews,
+                UserChanges.RubbishTime,
+                UserChanges.StorageState,
+                UserChanges.Geolocation,
+                UserChanges.CameraUploadsFolder,
+                UserChanges.MyChatFilesFolder,
+                UserChanges.PushSettings,
+                UserChanges.Alias,
+                UserChanges.UnshareableKey,
+                UserChanges.DeviceNames,
+                UserChanges.ContactLinkVerification,
+                UserChanges.CookieSettings,
+                UserChanges.NoCallkit,
+                UserChanges.Visibility(UserVisibility.Visible),
+            )
             val expected = Result.success(NodeId(1L))
             val notExpected = NodeId(2L)
             nodeRepository.stub {
