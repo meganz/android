@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.NodeType
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
+import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import nz.mega.sdk.MegaSearchFilter
 import javax.inject.Inject
 
@@ -18,6 +19,7 @@ class MegaSearchFilterMapper @Inject constructor(
     private val dateFilterOptionLongMapper: DateFilterOptionLongMapper,
     private val searchTargetIntMapper: SearchTargetIntMapper,
     private val megaNodeTypeMapper: MegaNodeTypeMapper,
+    private val sensitivityFilterOptionIntMapper: SensitivityFilterOptionIntMapper,
 ) {
 
     /**
@@ -35,6 +37,7 @@ class MegaSearchFilterMapper @Inject constructor(
         searchCategory: SearchCategory? = SearchCategory.ALL,
         modificationDate: DateFilterOption? = null,
         creationDate: DateFilterOption? = null,
+        sensitivityFilter: SensitivityFilterOption? = null,
     ): MegaSearchFilter = MegaSearchFilter.createInstance().apply {
 
         // Set the search query
@@ -71,6 +74,10 @@ class MegaSearchFilterMapper @Inject constructor(
             dateFilterOptionLongMapper(creationDate).apply {
                 byCreationTime(first, second)
             }
+        }
+
+        sensitivityFilter?.let {
+            bySensitivity(sensitivityFilterOptionIntMapper(sensitivityFilter))
         }
     }
 }
