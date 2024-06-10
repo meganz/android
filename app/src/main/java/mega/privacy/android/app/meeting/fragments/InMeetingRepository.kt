@@ -12,7 +12,6 @@ import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.AddContactListener
 import mega.privacy.android.app.meeting.listeners.MeetingAvatarListener
-import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -32,7 +31,6 @@ import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaChatVideoListenerInterface
 import nz.mega.sdk.MegaContactRequest
-import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
@@ -46,21 +44,6 @@ class InMeetingRepository @Inject constructor(
     private val getChatChangesUseCase: GetChatChangesUseCase,
     @ApplicationContext private val context: Context,
 ) {
-
-    /**
-     * Set a title for a chat
-     *
-     * @param chatId chat ID
-     * @param newTitle new chat title
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun setTitleChatRoom(
-        chatId: Long,
-        newTitle: String,
-        listener: MegaChatRequestListenerInterface,
-    ) {
-        megaChatApi.setChatTitle(chatId, newTitle, listener)
-    }
 
     /**
      * Get a call from a chat id
@@ -142,18 +125,6 @@ class InMeetingRepository @Inject constructor(
      */
     fun createMeeting(meetingName: String, listener: MegaChatRequestListenerInterface) =
         megaChatApi.createMeeting(meetingName, false, false, true, listener)
-
-    /**
-     * Method to switch a call on hold
-     *
-     * @param chatId chat ID
-     * @param isOn True, if I am going to put it on hold. False, otherwise
-     */
-    fun setCallOnHold(chatId: Long, isOn: Boolean) {
-        if (chatId != MEGACHAT_INVALID_HANDLE) {
-            megaChatApi.setCallOnHold(chatId, isOn, SetCallOnHoldListener(context))
-        }
-    }
 
     /**
      * Method for ignore a call

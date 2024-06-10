@@ -42,7 +42,6 @@ import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.Event
-import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.listeners.GetUserEmailListener
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
@@ -84,6 +83,7 @@ import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallReconnectingStatusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
+import mega.privacy.android.domain.usecase.chat.SetChatTitleUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ChatLogoutUseCase
@@ -197,9 +197,9 @@ class InMeetingViewModel @Inject constructor(
     private val lowerHandToStopSpeakUseCase: LowerHandToStopSpeakUseCase,
     private val isRaiseToHandSuggestionShownUseCase: IsRaiseToHandSuggestionShownUseCase,
     private val setRaiseToHandSuggestionShownUseCase: SetRaiseToHandSuggestionShownUseCase,
+    private val setChatTitleUseCase: SetChatTitleUseCase,
     @ApplicationContext private val context: Context,
-) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
-    GetUserEmailListener.OnUserEmailUpdateCallback {
+) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
 
     private val composite = CompositeDisposable()
 
@@ -2360,12 +2360,20 @@ class InMeetingViewModel @Inject constructor(
         if (_state.value.currentChatId == MEGACHAT_INVALID_HANDLE) {
             _state.update { it.copy(chatTitle = newTitle) }
         } else {
-            inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
-                inMeetingRepository.setTitleChatRoom(
-                    it.chatId,
-                    newTitle,
-                    EditChatRoomNameListener(MegaApplication.getInstance(), this)
-                )
+            viewModelScope.launch {
+                runCatching {
+                    setChatTitleUseCase(chatId = _state.value.currentChatId, title = newTitle)
+                }.onSuccess { chatRequest ->
+                    if (_state.value.currentChatId == chatRequest.chatHandle) {
+                        _state.update { state ->
+                            state.copy(
+                                chatTitle = chatRequest.text ?: "",
+                            )
+                        }
+                    }
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }
             }
         }
     }
@@ -2641,16 +2649,6 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get<Pair<Long, Boolean>>(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
             .removeObserver(waitingForOthersBannerObserver)
-    }
-
-    override fun onEditedChatRoomName(chatId: Long, name: String) {
-        if (_state.value.currentChatId == chatId) {
-            _state.update { state ->
-                state.copy(
-                    chatTitle = name,
-                )
-            }
-        }
     }
 
     /**
