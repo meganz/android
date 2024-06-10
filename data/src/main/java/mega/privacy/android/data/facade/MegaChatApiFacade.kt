@@ -898,4 +898,8 @@ internal class MegaChatApiFacade @Inject constructor(
     }
 
     override suspend fun getChatPresenceConfig(): MegaChatPresenceConfig? = chatApi.presenceConfig
+
+    override fun setIgnoredCall(chatId: Long, listener: MegaChatRequestListenerInterface) {
+        chatApi.setIgnoredCall(chatId)
+    }
 }

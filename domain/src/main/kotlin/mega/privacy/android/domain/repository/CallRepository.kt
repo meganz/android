@@ -552,4 +552,13 @@ interface CallRepository {
      * @return          [Flag]
      */
     suspend fun getFlag(nameFlag: String): Flag?
+
+    /**
+     * Ignore call
+     *
+     * @param chatId Chat id
+     */
+    suspend fun setIgnoredCall(
+        chatId: Long,
+    ): ChatRequest
 }

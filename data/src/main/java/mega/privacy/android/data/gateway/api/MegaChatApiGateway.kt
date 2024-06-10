@@ -1473,7 +1473,7 @@ interface MegaChatApiGateway {
      * - MegaChatRequest::getChatHandle - Returns the call identifier
      * - MegaChatRequest::getFlag - Returns true
      *
-     * @param callId MegaChatHandle that identifies the chat room
+     * @param callId MegaChatHandle that identifies the call
      * @param listener MegaChatRequestListener to track this request
      */
     fun endChatCall(callId: Long, listener: MegaChatRequestListenerInterface)
@@ -1992,4 +1992,12 @@ interface MegaChatApiGateway {
      * @return The current presence configuration
      */
     suspend fun getChatPresenceConfig(): MegaChatPresenceConfig?
+
+    /**
+     * Mark as ignored the call associated with a chatroom
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @return true if call can be marked as ignored, otherwise return false.
+     */
+    fun setIgnoredCall(chatId: Long, listener: MegaChatRequestListenerInterface)
 }

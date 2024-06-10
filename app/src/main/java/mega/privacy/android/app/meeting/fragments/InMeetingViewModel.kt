@@ -98,6 +98,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorParticipatingInAnother
 import mega.privacy.android.domain.usecase.meeting.RequestHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestLowResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
+import mega.privacy.android.domain.usecase.meeting.SetIgnoredCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StopHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.StopLowResolutionVideoUseCase
@@ -197,6 +198,7 @@ class InMeetingViewModel @Inject constructor(
     private val lowerHandToStopSpeakUseCase: LowerHandToStopSpeakUseCase,
     private val isRaiseToHandSuggestionShownUseCase: IsRaiseToHandSuggestionShownUseCase,
     private val setRaiseToHandSuggestionShownUseCase: SetRaiseToHandSuggestionShownUseCase,
+    private val setIgnoredCallUseCase: SetIgnoredCallUseCase,
     private val setChatTitleUseCase: SetChatTitleUseCase,
     @ApplicationContext private val context: Context,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
@@ -2324,11 +2326,17 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Method for ignore a call
+     * Ignore call
      */
     private fun ignoreCall() {
-        _callLiveData.value?.let {
-            inMeetingRepository.ignoreCall(it.chatid)
+        viewModelScope.launch {
+            runCatching {
+                setIgnoredCallUseCase(_state.value.currentChatId)
+            }.onSuccess {
+                Timber.d("Call was ignored")
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
         }
     }
 

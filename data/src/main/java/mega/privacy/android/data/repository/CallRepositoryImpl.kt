@@ -854,4 +854,20 @@ internal class CallRepositoryImpl @Inject constructor(
             megaApiGateway.getFlag(nameFlag, commit = true, listener = null)
                 ?.let(flagMapper::invoke)
         }
+
+    override suspend fun setIgnoredCall(chatId: Long): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val callback = continuation.getChatRequestListener(
+                methodName = "setIgnoredCall",
+                chatRequestMapper::invoke
+            )
+
+            megaChatApiGateway.setIgnoredCall(
+                chatId,
+                callback
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
+        }
+    }
 }
