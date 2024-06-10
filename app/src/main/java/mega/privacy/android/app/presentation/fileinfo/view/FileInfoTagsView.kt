@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.fileinfo.view
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,9 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -41,24 +38,19 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_
 @Composable
 fun FileInfoTagsView(
     tags: List<String>,
-    onAddTagClick: (() -> Unit)? = null,
+    onAddTagClick: () -> Unit,
     onRemoveTagClick: (String) -> Unit,
     modifier: Modifier,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
     Column(
         modifier = modifier
-            .clickable(
-                interactionSource = interactionSource,
-                indication = rememberRipple().takeIf { onAddTagClick != null },
-            ) { onAddTagClick?.invoke() },
+            .clickable { onAddTagClick() },
     ) {
         MenuActionListTile(
             text = "Tags",
             dividerType = null,
             addIconPadding = false,
             trailingItem = {
-                if (onAddTagClick == null) return@MenuActionListTile
                 Icon(
                     imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_chevron_right_medium_regular_outline),
                     contentDescription = "Add Tag",

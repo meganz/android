@@ -124,9 +124,15 @@ internal data class FileInfoViewState(
     /**
      * Check Conditions to enable description field
      */
-    fun canEditNodeAttributes() = !isNodeInRubbish && !isNodeInBackups &&
+    fun isDescriptionEnabled() = !isNodeInRubbish && !isNodeInBackups &&
             (accessPermission == AccessPermission.FULL ||
                     accessPermission == AccessPermission.OWNER)
+
+    /**
+     * Check Conditions to enable tags field
+     */
+    fun canEnableTags() = tagsEnabled && !isNodeInRubbish && !isNodeInBackups &&
+            accessPermission == AccessPermission.OWNER
 
     /**
      * Creates a copy of this view state with the info that can be extracted directly from folderTreeInfo
