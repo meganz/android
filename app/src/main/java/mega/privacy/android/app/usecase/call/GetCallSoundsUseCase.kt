@@ -14,6 +14,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.rxFlowable
@@ -30,17 +31,22 @@ import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatSessionStatus
+import mega.privacy.android.domain.entity.meeting.ChatSessionTermCode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallsReconnectingStatusUseCase
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaChatSession
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -53,7 +59,9 @@ import javax.inject.Inject
 class GetCallSoundsUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
-    private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase,
+    private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
+    private val getChatCallUseCase: GetChatCallUseCase,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorCallsReconnectingStatusUseCase: MonitorCallsReconnectingStatusUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
@@ -121,29 +129,38 @@ class GetCallSoundsUseCase @Inject constructor(
                     }
                 ).addTo(disposable)
 
-            getSessionStatusChangesUseCase.getSessionChanged()
-                .subscribeBy(
-                    onNext = { (call, sessionStatus, isRecoverable, peerId, clientId) ->
+            sharingScope.launch {
+                monitorChatSessionUpdatesUseCase().catch {
+                    Timber.e(it.stackTraceToString())
+                }.collect { sessionUpdate ->
+                    with(sessionUpdate) {
+                        val session = session ?: return@with
+                        val call = getChatCallUseCase(chatId)
                         val participant =
-                            ParticipantInfo(peerId = peerId, clientId = clientId)
+                            ParticipantInfo(peerId = session.peerId, clientId = session.clientId)
 
                         if (call == null) {
                             stopCountDown(INVALID_HANDLE, participant)
                         } else {
-                            megaChatApi.getChatRoom(call.chatid)?.let { chat ->
+                            getChatRoomUseCase(call.chatId)?.let { chat ->
                                 if (!chat.isGroup && !chat.isMeeting) {
-                                    when (sessionStatus) {
-                                        MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
+                                    when (session.status) {
+                                        ChatSessionStatus.Progress -> {
                                             Timber.d("Session in progress")
-                                            stopCountDown(call.chatid, participant)
+                                            stopCountDown(call.chatId, participant)
                                         }
 
-                                        MegaChatSession.SESSION_STATUS_DESTROYED -> {
-                                            isRecoverable?.let { isRecoverableSession ->
+                                        ChatSessionStatus.Destroyed -> {
+                                            (when (session.termCode) {
+                                                ChatSessionTermCode.NonRecoverable -> false
+                                                ChatSessionTermCode.Recoverable -> true
+                                                else -> null
+                                            })?.let { isRecoverableSession ->
                                                 if (isRecoverableSession) {
                                                     Timber.d("Session destroyed, recoverable session. Wait 10 seconds to hang up")
                                                     startFinishCallCountDown(
-                                                        call,
+                                                        chat,
+                                                        call.callId,
                                                         participant,
                                                         SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
                                                     )
@@ -151,22 +168,21 @@ class GetCallSoundsUseCase @Inject constructor(
                                                 } else {
                                                     Timber.d("Session destroyed, unrecoverable session.")
                                                     stopCountDown(
-                                                        call.chatid,
+                                                        call.chatId,
                                                         participant
                                                     )
                                                 }
                                             }
                                         }
+
+                                        else -> {}
                                     }
                                 }
                             }
                         }
-                    },
-                    onError = { error ->
-                        Timber.e(error.stackTraceToString())
                     }
-                )
-                .addTo(disposable)
+                }
+            }
 
             getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
                 .subscribeBy(
@@ -307,43 +323,40 @@ class GetCallSoundsUseCase @Inject constructor(
     /**
      * Method to start the countdown to hang up the call
      *
-     * @param call      MegaChatCall
-     * @param seconds   Seconds to wait
      */
     private fun startFinishCallCountDown(
-        call: MegaChatCall,
+        chat: ChatRoom,
+        callId: Long,
         participant: ParticipantInfo,
         seconds: Long,
     ) {
-        megaChatApi.getChatRoom(call.chatid)?.let { chat ->
-            if (!chat.isGroup && !chat.isMeeting && participants.contains(participant)) {
-                if (finishCallCountDownTimer == null) {
-                    participants.remove(participant)
+        if (!chat.isGroup && !chat.isMeeting && participants.contains(participant)) {
+            if (finishCallCountDownTimer == null) {
+                participants.remove(participant)
 
-                    val countDownTimerLiveData: MutableLiveData<Boolean> = MutableLiveData()
-                    finishCallCountDownTimer = CustomCountDownTimer(countDownTimerLiveData)
+                val countDownTimerLiveData: MutableLiveData<Boolean> = MutableLiveData()
+                finishCallCountDownTimer = CustomCountDownTimer(countDownTimerLiveData)
 
-                    countDownTimerLiveData.observeOnce { counterState ->
-                        counterState?.let { isFinished ->
-                            if (isFinished) {
-                                Timber.d("Count down timer ends. Hang call")
-                                sharingScope.launch {
-                                    runCatching {
-                                        hangChatCallUseCase(call.callId)
-                                    }.onSuccess {
-                                        removeFinishCallCountDownTimer()
-                                    }.onFailure {
-                                        Timber.e(it.stackTraceToString())
-                                    }
+                countDownTimerLiveData.observeOnce { counterState ->
+                    counterState?.let { isFinished ->
+                        if (isFinished) {
+                            Timber.d("Count down timer ends. Hang call")
+                            sharingScope.launch {
+                                runCatching {
+                                    hangChatCallUseCase(callId)
+                                }.onSuccess {
+                                    removeFinishCallCountDownTimer()
+                                }.onFailure {
+                                    Timber.e(it.stackTraceToString())
                                 }
                             }
                         }
                     }
                 }
-
-                Timber.d("Count down timer starts")
-                finishCallCountDownTimer?.start(seconds)
             }
+
+            Timber.d("Count down timer starts")
+            finishCallCountDownTimer?.start(seconds)
         }
     }
 
