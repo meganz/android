@@ -40,7 +40,6 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -54,6 +53,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByAlbumImportNodeUseCase
@@ -94,14 +94,10 @@ import javax.inject.Inject
  *                                      as well as each individual node action required by the menu
  * @property copyNodeUseCase            Needed to copy image node on demand
  * @property moveNodeUseCase            Needed to move image node on demand
- * @property removeNodeUseCase          Needed to remove image node on demand
- * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
- * @property isUserLoggedInUseCase      UseCase required to check when the user is already logged in
- * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
+ * @property deleteNodeAttachmentMessageByIdsUseCase [DeleteNodeAttachmentMessageByIdsUseCase]
  * @property areTransfersPausedUseCase         UseCase required to check if transfers are paused
  * @property copyNodeUseCase            UseCase required to copy nodes
  * @property moveNodeUseCase            UseCase required to move nodes
- * @property removeNodeUseCase          UseCase required to remove nodes
  * @property checkNameCollision         UseCase required to check name collisions
  * @property moveNodeToRubbishBinUseCase  UseCase to move node to rubbish bin
  */
@@ -121,7 +117,7 @@ class ImageViewerViewModel @Inject constructor(
     private val disableExportUseCase: DisableExportUseCase,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val isUserLoggedInUseCase: IsUserLoggedIn,
-    private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
+    private val deleteNodeAttachmentMessageByIdsUseCase: DeleteNodeAttachmentMessageByIdsUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
@@ -672,13 +668,19 @@ class ImageViewerViewModel @Inject constructor(
         val imageItem =
             images.value?.firstOrNull { nodeHandle == it.getNodeHandle() } as? ImageItem.ChatNode
                 ?: return
-        deleteChatMessageUseCase.delete(imageItem.chatRoomId, imageItem.chatMessageId)
-            .subscribeAndComplete {
+        viewModelScope.launch {
+            runCatching {
+                deleteNodeAttachmentMessageByIdsUseCase(
+                    imageItem.chatRoomId,
+                    imageItem.chatMessageId
+                )
+            }.onSuccess {
                 val index = images.value?.indexOfFirst { it.id == imageItem.id } ?: INVALID_POSITION
                 removeImageItemAt(index)
 
                 snackBarMessage.value = context.getString(R.string.context_correctly_removed)
-            }
+            }.onFailure { Timber.e(it) }
+        }
     }
 
     val result = MutableLiveData<String?>()

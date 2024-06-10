@@ -19,12 +19,12 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByAlbumImportNodeUseCase
@@ -84,7 +84,8 @@ internal class ImageViewerViewModelTest {
     private val getNodeUseCase = mock<GetNodeUseCase>()
     private val exportNodeUseCase = mock<ExportNodeUseCase>()
     private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
-    private val deleteChatMessageUseCase = mock<DeleteChatMessageUseCase>()
+    private val deleteNodeAttachmentMessageByIdsUseCase =
+        mock<DeleteNodeAttachmentMessageByIdsUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val deleteNodeByHandleUseCase = mock<DeleteNodeByHandleUseCase>()
     private val moveNodeToRubbishBinUseCase = mock<MoveNodeToRubbishBinUseCase>()
@@ -148,7 +149,7 @@ internal class ImageViewerViewModelTest {
             getNodeUseCase,
             exportNodeUseCase,
             cancelTransferByTagUseCase,
-            deleteChatMessageUseCase,
+            deleteNodeAttachmentMessageByIdsUseCase,
             areTransfersPausedUseCase,
             deleteNodeByHandleUseCase,
             moveNodeToRubbishBinUseCase,
@@ -192,7 +193,7 @@ internal class ImageViewerViewModelTest {
             disableExportUseCase = disableExportUseCase,
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             isUserLoggedInUseCase = isUserLoggedIn,
-            deleteChatMessageUseCase = deleteChatMessageUseCase,
+            deleteNodeAttachmentMessageByIdsUseCase = deleteNodeAttachmentMessageByIdsUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             copyNodeUseCase = copyNodeUseCase,
             moveNodeUseCase = moveNodeUseCase,
