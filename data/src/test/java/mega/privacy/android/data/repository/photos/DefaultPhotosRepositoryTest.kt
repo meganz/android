@@ -422,7 +422,7 @@ class DefaultPhotosRepositoryTest {
                 megaSearchFilterMapper(
                     parentHandle = NodeId(-1),
                     searchQuery = "",
-                    searchTarget = SearchTarget.ALL,
+                    searchTarget = SearchTarget.ROOT_NODES,
                     searchCategory = SearchCategory.IMAGES,
                 )
             ).thenReturn(imageFilter)
@@ -430,7 +430,7 @@ class DefaultPhotosRepositoryTest {
                 megaSearchFilterMapper(
                     parentHandle = NodeId(-1),
                     searchQuery = "",
-                    searchTarget = SearchTarget.ALL,
+                    searchTarget = SearchTarget.ROOT_NODES,
                     searchCategory = SearchCategory.VIDEO,
                 )
             ).thenReturn(videoFilter)
@@ -476,7 +476,7 @@ class DefaultPhotosRepositoryTest {
                 megaSearchFilterMapper(
                     parentHandle = NodeId(-1),
                     searchQuery = "",
-                    searchTarget = SearchTarget.ALL,
+                    searchTarget = SearchTarget.ROOT_NODES,
                     searchCategory = SearchCategory.IMAGES,
                 )
             ).thenReturn(imageFilter)
@@ -484,7 +484,7 @@ class DefaultPhotosRepositoryTest {
                 megaSearchFilterMapper(
                     parentHandle = NodeId(-1),
                     searchQuery = "",
-                    searchTarget = SearchTarget.ALL,
+                    searchTarget = SearchTarget.ROOT_NODES,
                     searchCategory = SearchCategory.VIDEO,
                 )
             ).thenReturn(videoFilter)
@@ -531,7 +531,7 @@ class DefaultPhotosRepositoryTest {
                 megaSearchFilterMapper(
                     parentHandle = NodeId(-1),
                     searchQuery = "",
-                    searchTarget = SearchTarget.ALL,
+                    searchTarget = SearchTarget.ROOT_NODES,
                     searchCategory = SearchCategory.IMAGES,
                 )
             ).thenReturn(imageFilter)
@@ -539,7 +539,7 @@ class DefaultPhotosRepositoryTest {
                 megaSearchFilterMapper(
                     parentHandle = NodeId(-1),
                     searchQuery = "",
-                    searchTarget = SearchTarget.ALL,
+                    searchTarget = SearchTarget.ROOT_NODES,
                     searchCategory = SearchCategory.VIDEO,
                 )
             ).thenReturn(videoFilter)
@@ -589,7 +589,7 @@ class DefaultPhotosRepositoryTest {
                 megaSearchFilterMapper(
                     parentHandle = NodeId(-1),
                     searchQuery = "",
-                    searchTarget = SearchTarget.ALL,
+                    searchTarget = SearchTarget.ROOT_NODES,
                     searchCategory = SearchCategory.IMAGES,
                 )
             ).thenReturn(imageFilter)
@@ -597,7 +597,7 @@ class DefaultPhotosRepositoryTest {
                 megaSearchFilterMapper(
                     parentHandle = NodeId(-1),
                     searchQuery = "",
-                    searchTarget = SearchTarget.ALL,
+                    searchTarget = SearchTarget.ROOT_NODES,
                     searchCategory = SearchCategory.VIDEO,
                 )
             ).thenReturn(videoFilter)

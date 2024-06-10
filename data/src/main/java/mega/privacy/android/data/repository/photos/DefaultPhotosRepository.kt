@@ -457,7 +457,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         val filter = megaSearchFilterMapper(
             parentHandle = parentId,
             searchQuery = query,
-            searchTarget = SearchTarget.ALL,
+            searchTarget = SearchTarget.ROOT_NODES,
             searchCategory = searchCategory,
         )
         return if (isFromFolderLink) {
