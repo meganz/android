@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUse
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailsUseCase
+import mega.privacy.android.domain.usecase.meeting.AreThereOngoingVideoCallsUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -41,6 +42,7 @@ class InviteContactViewModel @Inject constructor(
     private val filterPendingOrAcceptedLocalContactsByEmailUseCase: FilterPendingOrAcceptedLocalContactsByEmailUseCase,
     private val createContactLinkUseCase: CreateContactLinkUseCase,
     private val inviteContactWithEmailsUseCase: InviteContactWithEmailsUseCase,
+    private val areThereOngoingVideoCallsUseCase: AreThereOngoingVideoCallsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -359,6 +361,37 @@ class InviteContactViewModel @Inject constructor(
 
     internal fun addSelectedContactInformation(contact: InvitationContactInfo) {
         _uiState.update { it.copy(selectedContactInformation = it.selectedContactInformation + contact) }
+    }
+
+    internal fun validateCameraAvailability() {
+        viewModelScope.launch {
+            Timber.d("Checking if there are ongoing video calls")
+            runCatching { areThereOngoingVideoCallsUseCase() }
+                .onSuccess {
+                    if (it) {
+                        showOpenCameraConfirmation()
+                    } else {
+                        initializeQRScanner()
+                    }
+                }
+                .onFailure { Timber.e("Failed to check ongoing video calls", it) }
+        }
+    }
+
+    private fun showOpenCameraConfirmation() {
+        _uiState.update { it.copy(showOpenCameraConfirmation = true) }
+    }
+
+    internal fun onOpenCameraConfirmationShown() {
+        _uiState.update { it.copy(showOpenCameraConfirmation = false) }
+    }
+
+    private fun initializeQRScanner() {
+        _uiState.update { it.copy(shouldInitializeQR = true) }
+    }
+
+    internal fun onQRScannerInitialized() {
+        _uiState.update { it.copy(shouldInitializeQR = false) }
     }
 
     companion object {

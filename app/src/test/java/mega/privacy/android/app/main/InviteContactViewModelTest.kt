@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUse
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailsUseCase
+import mega.privacy.android.domain.usecase.meeting.AreThereOngoingVideoCallsUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -45,6 +46,7 @@ class InviteContactViewModelTest {
     private val filterPendingOrAcceptedLocalContactsByEmailUseCase: FilterPendingOrAcceptedLocalContactsByEmailUseCase =
         mock()
     private val inviteContactWithEmailsUseCase: InviteContactWithEmailsUseCase = mock()
+    private val areThereOngoingVideoCallsUseCase: AreThereOngoingVideoCallsUseCase = mock()
     private val defaultQuery = "defaultQuery"
     private val defaultContactLink = "https://mega.nz/C!wf8jTYRB"
 
@@ -67,6 +69,7 @@ class InviteContactViewModelTest {
             filterPendingOrAcceptedLocalContactsByEmailUseCase = filterPendingOrAcceptedLocalContactsByEmailUseCase,
             createContactLinkUseCase = createContactLinkUseCase,
             inviteContactWithEmailsUseCase = inviteContactWithEmailsUseCase,
+            areThereOngoingVideoCallsUseCase = areThereOngoingVideoCallsUseCase,
             savedStateHandle = savedStateHandle
         )
     }
@@ -490,6 +493,44 @@ class InviteContactViewModelTest {
         )
     )
 
+    @Test
+    fun `test that the open camera confirmation is shown when there are ongoing video calls`() =
+        runTest {
+            whenever(areThereOngoingVideoCallsUseCase()) doReturn true
+
+            underTest.validateCameraAvailability()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().showOpenCameraConfirmation).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that the open camera confirmation state is reset after successfully shown`() =
+        runTest {
+            whenever(areThereOngoingVideoCallsUseCase()) doReturn true
+
+            underTest.validateCameraAvailability()
+            underTest.onOpenCameraConfirmationShown()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().showOpenCameraConfirmation).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the QR scanner initialization is state is reset after successfully initialized`() =
+        runTest {
+            whenever(areThereOngoingVideoCallsUseCase()) doReturn false
+
+            underTest.validateCameraAvailability()
+            underTest.onQRScannerInitialized()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().shouldInitializeQR).isFalse()
+            }
+        }
+
     @AfterEach
     fun tearDown() {
         reset(
@@ -498,7 +539,8 @@ class InviteContactViewModelTest {
             getLocalContactsUseCase,
             filterLocalContactsByEmailUseCase,
             filterPendingOrAcceptedLocalContactsByEmailUseCase,
-            inviteContactWithEmailsUseCase
+            inviteContactWithEmailsUseCase,
+            areThereOngoingVideoCallsUseCase
         )
     }
 

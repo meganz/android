@@ -797,7 +797,9 @@ public class CallUtil {
      *                   ACTION_TAKE_PICTURE, TAKE_PICTURE_PROFILE_CODE, ACTION_OPEN_QR
      * @param openScanQR if the action is ACTION_OPEN_QR, it specifies whether to open the "Scan QR" section.
      *                   True if it should open the "Scan QR" section, false otherwise.
+     * @deprecated <p> Use OpenCameraConfirmationDialogRoute instead.
      */
+    @Deprecated
     public static void showConfirmationOpenCamera(Activity activity, String action, boolean openScanQR) {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
             switch (which) {

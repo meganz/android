@@ -55,7 +55,7 @@ import mega.privacy.android.app.presentation.contact.invite.contact.component.Co
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
-import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.presentation.view.open.camera.confirmation.OpenCameraConfirmationDialogRoute
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUEST_READ_CONTACTS
@@ -68,7 +68,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -128,6 +127,17 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                if (uiState.showOpenCameraConfirmation) {
+                    OpenCameraConfirmationDialogRoute(
+                        onConfirm = {
+                            initScanQR()
+                            viewModel.onQRScannerInitialized()
+                            viewModel.onOpenCameraConfirmationShown()
+                        },
+                        onDismiss = viewModel::onOpenCameraConfirmationShown
+                    )
+                }
+
                 shouldShowContactListWithContactInfo?.let {
                     ContactInfoListDialog(
                         contactInfo = it,
@@ -306,11 +316,7 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
 
         binding.layoutScanQr.setOnClickListener {
             Timber.d("Scan QR code pressed")
-            if (CallUtil.isNecessaryDisableLocalCamera() != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-                CallUtil.showConfirmationOpenCamera(this, Constants.ACTION_OPEN_QR, true)
-            } else {
-                initScanQR()
-            }
+            viewModel.validateCameraAvailability()
         }
 
         binding.inviteContactList.setOnTouchListener { _: View?, _: MotionEvent ->
@@ -356,6 +362,17 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
                 .distinctUntilChanged()
         ) {
             showInvitationsResult(it)
+        }
+
+        collectFlow(
+            viewModel
+                .uiState
+                .map { it.shouldInitializeQR }
+                .filter { it }
+                .distinctUntilChanged()
+        ) {
+            initScanQR()
+            viewModel.onQRScannerInitialized()
         }
     }
 
