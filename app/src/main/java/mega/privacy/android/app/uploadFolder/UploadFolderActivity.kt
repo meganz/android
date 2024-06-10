@@ -25,6 +25,7 @@ import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -39,6 +40,9 @@ import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.uploadFolder.list.adapter.FolderContentAdapter
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.utils.Constants.EXTRA_ACTION_RESULT
@@ -111,7 +115,6 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
                 when (result.resultCode) {
                     Activity.RESULT_OK -> {
-                        @Suppress("UNCHECKED_CAST")
                         val collisionsResult =
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 result.data?.getParcelableArrayListExtra(
@@ -127,9 +130,11 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
                         viewModel.proceedWithUpload(this, collisionsResult)
                     }
+
                     Activity.RESULT_CANCELED -> {
                         finish()
                     }
+
                     else -> {
                         Timber.w("resultCode: ${result.resultCode}")
                     }
@@ -253,6 +258,27 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         }
 
         showProgress(true)
+        binding.mainLayout.addView(
+            createStartTransferView(
+                this,
+                viewModel.uiState.map { it.transferTriggerEvent },
+                viewModel::consumeTransferTriggerEvent
+            ) { event ->
+                if (event is StartTransferEvent.FinishUploadProcessing) {
+                    val total = ((event.triggerEvent as? TransferTriggerEvent.StartUpload.Files)
+                        ?.pathsAndNames?.size ?: 0)
+                    if (total > 0) {
+                        resources.getQuantityString(
+                            R.plurals.upload_began,
+                            total,
+                            total,
+                        )
+                    } else {
+                        getString(R.string.no_uploads_empty_folder)
+                    }.let { onActivityResult(it) }
+                }
+            }
+        )
     }
 
     /**
@@ -354,6 +380,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
             selectedItems.isEmpty() -> {
                 actionMode?.finish()
             }
+
             actionMode == null -> startSupportActionMode(object : ActionMode.Callback {
                 override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean = true
 
@@ -508,6 +535,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
                         addItemDecoration(itemDecoration)
                     }
                 }
+
                 ViewType.GRID -> {
                     switchBackToGrid()
                     (layoutManager as CustomizedGridLayoutManager).spanSizeLookup =

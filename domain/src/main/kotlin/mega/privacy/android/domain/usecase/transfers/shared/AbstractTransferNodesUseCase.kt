@@ -57,11 +57,11 @@ abstract class AbstractTransferNodesUseCase<T, R>(
         return channelFlow {
             monitorTransferEvents()
             //start all transfers in parallel
-            items.map { node ->
+            items.map { item ->
                 launch {
-                    doTransfer(node)
+                    doTransfer(item)
                         .catch { cause ->
-                            val id = generateIdFromItem(node)
+                            val id = generateIdFromItem(item)
                             if (cause is NodeDoesNotExistsException) {
                                 send(MultiTransferEvent.TransferNotStarted(id, cause))
                             }

@@ -358,12 +358,14 @@ class UploadFilesUseCaseTest {
     companion object {
         private val file = mock<File> {
             on { name }.thenReturn(FILE_NAME)
+            on { path }.thenReturn(ABSOLUTE_PATH)
             on { absolutePath }.thenReturn(ABSOLUTE_PATH)
             on { lastModified() }.thenReturn(MODIFIED_TIME_MILLIS)
         }
         private val fileNodesAndNullNames = (0L..10L).map { nodeId ->
             mock<File> {
                 on { name }.thenReturn("$FILE_NAME$nodeId")
+                on { path }.thenReturn("$ABSOLUTE_PATH$nodeId")
                 on { absolutePath }.thenReturn("$ABSOLUTE_PATH$nodeId")
                 on { lastModified() }.thenReturn(MODIFIED_TIME_MILLIS)
             }

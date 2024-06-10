@@ -43,7 +43,6 @@ class GetFolderContentUseCase @Inject constructor(
      */
     private fun get(
         currentFolder: FolderContent.Data,
-        context: Context,
     ): Single<List<FolderContent.Data>> = rxSingle {
         getFilesInDocumentFolderUseCase(UriPath(currentFolder.uri.toString()))
     }.map {
@@ -91,7 +90,7 @@ class GetFolderContentUseCase @Inject constructor(
 
                 val results = ArrayList<UploadFolderResult>()
 
-                get(folderItem, context).blockingSubscribeBy(
+                get(folderItem).blockingSubscribeBy(
                     onError = { error -> emitter.onError(error) },
                     onSuccess = { folderContent ->
                         folderContent.forEach { item ->

@@ -76,9 +76,9 @@ class UploadFilesUseCase @Inject constructor(
     }
 
     override fun generateIdFromItem(item: File): String =
-        item.path + File.separator + item.name
+        item.path
 
     override fun generateIdFromTransferEvent(transferEvent: TransferEvent) =
-        transferEvent.transfer.localPath + File.separator + transferEvent.transfer.fileName
+        transferEvent.transfer.localPath
 
 }

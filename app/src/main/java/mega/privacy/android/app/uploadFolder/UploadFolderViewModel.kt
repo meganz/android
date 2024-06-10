@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -15,15 +17,21 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
 import mega.privacy.android.app.utils.notifyObserver
@@ -33,6 +41,7 @@ import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.EmptyFolderException
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.ApplySortOrderToDocumentFolderUseCase
 import mega.privacy.android.domain.usecase.file.GetFilesInDocumentFolderUseCase
 import mega.privacy.android.domain.usecase.file.SearchFilesInDocumentFolderRecursiveUseCase
@@ -56,8 +65,12 @@ class UploadFolderViewModel @Inject constructor(
     private val applySortOrderToDocumentFolderUseCase: ApplySortOrderToDocumentFolderUseCase,
     private val transfersManagement: TransfersManagement,
     private val documentEntityDataMapper: DocumentEntityDataMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val searchFilesInDocumentFolderRecursiveUseCase: SearchFilesInDocumentFolderRecursiveUseCase,
 ) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(UploadFolderViewState())
+    val uiState = _uiState.asStateFlow()
 
     private val composite = CompositeDisposable()
 
@@ -389,38 +402,60 @@ class UploadFolderViewModel @Inject constructor(
     fun proceedWithUpload(
         context: Context,
         collisionsResolution: List<NameCollisionResult>? = null,
-    ) {
-        transfersManagement.setIsProcessingFolders(true)
-        getContentDisposable = getFolderContentUseCase.getContentToUpload(
-            context,
-            NodeId(parentHandle),
-            pendingUploads,
-            collisionsResolution
-        ).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error ->
-                    transfersManagement.setIsProcessingFolders(false)
-
-                    if (error is EmptyFolderException) {
-                        actionResult.value = context.getString(R.string.no_uploads_empty_folder)
-                        return@subscribeBy
-                    } else {
-                        Timber.e(error, "Cannot upload anything")
-                    }
-                },
-                onSuccess = { uploadResults ->
-                    transfersManagement.setIsProcessingFolders(false)
-                    actionResult.value =
-                        if (uploadResults == 0) null
-                        else context.resources.getQuantityString(
-                            R.plurals.upload_began,
-                            uploadResults,
-                            uploadResults
+    ) = viewModelScope.launch {
+        if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+            val collisionRename =
+                collisionsResolution?.filter { it.choice == NameCollisionChoice.RENAME }
+            val pathsAndNames = pendingUploads.associate { folderContentData ->
+                val fileName = (collisionRename
+                    ?.firstOrNull { it.nameCollision.name == folderContentData.name }
+                    ?.renameName
+                        ) ?: folderContentData.name
+                folderContentData.uri.toString() to fileName
+            }
+            _uiState.update { viewState ->
+                viewState.copy(
+                    transferTriggerEvent = triggered(
+                        TransferTriggerEvent.StartUpload.Files(
+                            pathsAndNames,
+                            NodeId(parentHandle)
                         )
-                }
-            )
-            .addTo(composite)
+                    )
+                )
+            }
+        } else {
+            transfersManagement.setIsProcessingFolders(true)
+            getContentDisposable = getFolderContentUseCase.getContentToUpload(
+                context,
+                NodeId(parentHandle),
+                pendingUploads,
+                collisionsResolution
+            ).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onError = { error ->
+                        transfersManagement.setIsProcessingFolders(false)
+
+                        if (error is EmptyFolderException) {
+                            actionResult.value = context.getString(R.string.no_uploads_empty_folder)
+                            return@subscribeBy
+                        } else {
+                            Timber.e(error, "Cannot upload anything")
+                        }
+                    },
+                    onSuccess = { uploadResults ->
+                        transfersManagement.setIsProcessingFolders(false)
+                        actionResult.value =
+                            if (uploadResults == 0) null
+                            else context.resources.getQuantityString(
+                                R.plurals.upload_began,
+                                uploadResults,
+                                uploadResults
+                            )
+                    }
+                )
+                .addTo(composite)
+        }
     }
 
     /**
@@ -436,5 +471,11 @@ class UploadFolderViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         composite.clear()
+    }
+
+    fun consumeTransferTriggerEvent() {
+        _uiState.update {
+            it.copy(transferTriggerEvent = consumed())
+        }
     }
 }
