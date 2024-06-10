@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
@@ -28,7 +26,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -62,6 +59,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -95,7 +93,6 @@ internal fun SyncListScreen(
 
     BottomSheet(
         modalSheetState = modalSheetState,
-        scrimColor = Color.Black.copy(alpha = 0.32f),
         sheetBody = {
             when (val content = sheetContent) {
                 is SyncModalSheetContent.DetailedInfo -> {
@@ -168,11 +165,7 @@ internal fun SyncListScreen(
                 SnackbarHost(
                     hostState = snackBarHostState,
                     snackbar = { data ->
-                        Snackbar(
-                            snackbarData = data,
-                            modifier = Modifier.padding(bottom = 4.dp),
-                            backgroundColor = MaterialTheme.colors.onPrimary,
-                        )
+                        MegaSnackbar(snackbarData = data)
                     }
                 )
             }

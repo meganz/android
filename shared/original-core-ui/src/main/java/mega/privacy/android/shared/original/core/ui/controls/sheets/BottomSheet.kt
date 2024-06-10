@@ -60,7 +60,7 @@ fun BottomSheet(
     sheetHeader: @Composable () -> Unit,
     sheetBody: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    scrimColor: Color = Color.Black.copy(alpha = 0.5f),
+    scrimColor: Color = MegaOriginalTheme.colors.background.blur,
     dividerType: DividerType = DividerType.SmallStartPadding,
     content: (@Composable () -> Unit)? = null,
 ) {
@@ -92,7 +92,7 @@ fun BottomSheet(
     sheetBody: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     sheetGesturesEnabled: Boolean = true,
-    scrimColor: Color = Color.Black.copy(alpha = 0.5f),
+    scrimColor: Color = MegaOriginalTheme.colors.background.blur,
     content: (@Composable () -> Unit)? = null,
 ) {
     val roundedCornerRadius by animateDpAsState(
