@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
@@ -603,4 +604,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             fileGateway.getFilesInDocumentFolder(uri)
         }
+
+    override fun searchFilesInDocumentFolderRecursive(
+        folder: UriPath,
+        query: String,
+    ): Flow<DocumentFolder> = fileGateway.searchFilesInDocumentFolderRecursive(folder, query)
+        .flowOn(ioDispatcher)
 }

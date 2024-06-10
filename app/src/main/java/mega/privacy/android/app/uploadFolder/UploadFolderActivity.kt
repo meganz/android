@@ -330,10 +330,6 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
      * @param folderContent Content to show.
      */
     private fun showFolderContent(folderContent: List<FolderContent>) {
-        if (viewModel.isSearchInProgress()) {
-            return
-        }
-
         val isEmpty = folderContent.isEmpty()
         binding.emptyHintImage.isVisible = isEmpty
         binding.emptyHintText.isVisible = isEmpty

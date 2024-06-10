@@ -25,43 +25,37 @@ class ApplySortOrderToDocumentFolderUseCase @Inject constructor(
     suspend operator fun invoke(folder: DocumentFolder): Pair<List<DocumentEntity>, List<DocumentEntity>> =
         withContext(ioDispatcher) {
             val order = getOfflineSortOrder()
-            val partition = folder.files.partition { !it.isFolder }
-            val childFiles = partition.first.toMutableList()
-            val childFolder = partition.second.toMutableList()
-            when (order) {
+            val partition = folder.files.toList().partition { !it.isFolder }
+            val childFiles = partition.first
+            val childFolder = partition.second
+            return@withContext when (order) {
                 SortOrder.ORDER_DEFAULT_ASC -> {
-                    childFolder.sortBy { item -> item.name }
-                    childFiles.sortBy { item -> item.name }
+                    childFiles.sortedBy { item -> item.name } to childFolder.sortedBy { item -> item.name }
                 }
 
                 SortOrder.ORDER_DEFAULT_DESC -> {
-                    childFolder.sortByDescending { item -> item.name }
-                    childFiles.sortByDescending { item -> item.name }
+                    childFiles.sortedByDescending { item -> item.name } to childFolder.sortedByDescending { item -> item.name }
                 }
 
                 SortOrder.ORDER_MODIFICATION_ASC -> {
-                    childFolder.sortBy { item -> item.name }
-                    childFiles.sortBy { item -> item.lastModified }
+                    childFiles.sortedBy { item -> item.lastModified } to childFolder.sortedBy { item -> item.name }
                 }
 
                 SortOrder.ORDER_MODIFICATION_DESC -> {
-                    childFolder.sortBy { item -> item.name }
-                    childFiles.sortByDescending { item -> item.lastModified }
+                    childFiles.sortedByDescending { item -> item.lastModified } to childFolder.sortedBy { item -> item.name }
                 }
 
                 SortOrder.ORDER_SIZE_ASC -> {
-                    childFolder.sortBy { item -> item.name }
-                    childFiles.sortBy { item -> item.size }
+                    childFiles.sortedBy { item -> item.size } to childFolder.sortedBy { item -> item.name }
                 }
 
                 SortOrder.ORDER_SIZE_DESC -> {
-                    childFolder.sortBy { item -> item.name }
-                    childFiles.sortByDescending { item -> item.size }
+                    childFiles.sortedByDescending { item -> item.size } to childFolder.sortedBy { item -> item.name }
                 }
 
-                else -> Unit
+                else -> {
+                    childFiles to childFolder
+                }
             }
-
-            childFiles to childFolder
         }
 }

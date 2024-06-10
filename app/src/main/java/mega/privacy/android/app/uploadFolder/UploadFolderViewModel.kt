@@ -7,13 +7,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
@@ -26,14 +29,17 @@ import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.usecase.file.ApplySortOrderToDocumentFolderUseCase
 import mega.privacy.android.domain.usecase.file.GetFilesInDocumentFolderUseCase
+import mega.privacy.android.domain.usecase.file.SearchFilesInDocumentFolderRecursiveUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * ViewModel which manages data of [UploadFolderActivity].
@@ -50,7 +56,7 @@ class UploadFolderViewModel @Inject constructor(
     private val applySortOrderToDocumentFolderUseCase: ApplySortOrderToDocumentFolderUseCase,
     private val transfersManagement: TransfersManagement,
     private val documentEntityDataMapper: DocumentEntityDataMapper,
-    @ApplicationContext private val context: Context,
+    private val searchFilesInDocumentFolderRecursiveUseCase: SearchFilesInDocumentFolderRecursiveUseCase,
 ) : ViewModel() {
 
     private val composite = CompositeDisposable()
@@ -69,10 +75,9 @@ class UploadFolderViewModel @Inject constructor(
     private var isPendingToFinishSelection = false
     private var getContentDisposable: Disposable? = null
     private var nameCollisionDisposable: Disposable? = null
-    private var folderContent = HashMap<FolderContent.Data?, MutableList<FolderContent>>()
-    private var searchResults =
-        HashMap<FolderContent.Data, HashMap<String, MutableList<FolderContent>>>()
     private var pendingUploads: MutableList<FolderContent.Data> = mutableListOf()
+    private val folderTree = mutableMapOf<UriPath, DocumentFolder>()
+    private var folderEntities = DocumentFolder(emptyList())
 
     fun getCurrentFolder(): LiveData<FolderContent.Data> = currentFolder
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
@@ -112,46 +117,28 @@ class UploadFolderViewModel @Inject constructor(
         setFolderItems()
     }
 
-
-    /**
-     * Checks if there is a search in progress.
-     *
-     * @return True if there is a search in progress, false otherwise.
-     */
-    fun isSearchInProgress(): Boolean =
-        !query.isNullOrEmpty() && !isSearchAlreadyDone()
-
-
-    /**
-     * Checks if a search has been already done.
-     *
-     * @return True if the search has been already done, false otherwise.
-     */
-    private fun isSearchAlreadyDone(): Boolean =
-        searchResults.containsKey(currentFolder.value)
-                && searchResults[currentFolder.value]!!.containsKey(query)
-
     /**
      * Updates the current folder items with the current folder content.
      * If the content is already get, only sets it. If not, requests it.
      */
     private fun setFolderItems() {
-        val items = folderContent[currentFolder.value]
-        if (items != null) {
-            folderItems.value = items.toMutableList()
-            return
-        }
         viewModelScope.launch {
             val currentFolder = currentFolder.value ?: return@launch
-            runCatching {
-                val folder =
-                    getFilesInDocumentFolderUseCase(UriPath(currentFolder.uri.toString()))
-                val (files, folders) = applySortOrderToDocumentFolderUseCase(folder)
-                with(mapHeaderAndSeparator(currentFolder, files, folders)) {
-                    folderItems.value = this
-                    folderContent[currentFolder] = this
+            val uriPath = UriPath(currentFolder.uri.toString())
+            val entities = folderTree[uriPath]
+            if (entities != null) {
+                folderEntities = entities
+            } else {
+                runCatching {
+                    val folder =
+                        getFilesInDocumentFolderUseCase(uriPath)
+                    folderTree[uriPath] = folder
+                    folderEntities = folder
+                }.onFailure {
+                    Timber.e(it, "Cannot get folder content")
                 }
             }
+            applySortAndReorder()
         }
     }
 
@@ -212,36 +199,25 @@ class UploadFolderViewModel @Inject constructor(
      * @param newOrder The new order to set.
      */
     fun setOrder(newOrder: SortOrder) {
-        if (newOrder != order) {
-            order = newOrder
-
-            if (!folderItems.value.isNullOrEmpty()) {
-                getFolderContentUseCase.reorder(folderItems.value!!, order, isList)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onError = { folderItems.value = mutableListOf() },
-                        onSuccess = { items ->
-                            folderItems.value = items
-
-                            if (query == null && folderContent.containsKey(currentFolder.value!!)) {
-                                folderContent[currentFolder.value] = items
-                            }
-                        }
-                    )
-                    .addTo(composite)
+        viewModelScope.launch {
+            if (newOrder != order) {
+                order = newOrder
+                applySortAndReorder()
             }
+        }
+    }
 
-            val folder: FolderContent.Data? = if (query == null) currentFolder.value else null
-
-            getFolderContentUseCase.reorder(folderContent, folder, order, isList)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onError = { error -> Timber.w(error, "Cannot reorder") },
-                    onSuccess = { newFolderContent -> folderContent = newFolderContent }
-                )
-                .addTo(composite)
+    private suspend fun applySortAndReorder() {
+        val currentFolder = currentFolder.value ?: return
+        runCatching {
+            applySortOrderToDocumentFolderUseCase(folderEntities)
+        }.onSuccess {
+            val (files, folders) = it
+            with(mapHeaderAndSeparator(currentFolder, files, folders)) {
+                folderItems.value = this
+            }
+        }.onFailure { error ->
+            Timber.e(error, "Cannot apply sort order")
         }
     }
 
@@ -251,36 +227,11 @@ class UploadFolderViewModel @Inject constructor(
      * @param newIsList True if the new view type is list, false if is grid.
      */
     fun setIsList(newIsList: Boolean) {
-        if (newIsList != isList) {
-            isList = newIsList
-
-            if (!folderItems.value.isNullOrEmpty()) {
-                getFolderContentUseCase.switchView(folderItems.value!!, isList)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onError = { error -> Timber.w(error, "No switch view.") },
-                        onSuccess = { items ->
-                            folderItems.value = items
-
-                            if (query == null && folderContent.containsKey(currentFolder.value!!)) {
-                                folderContent[currentFolder.value] = items
-                            }
-                        }
-                    )
-                    .addTo(composite)
+        viewModelScope.launch {
+            if (newIsList != isList) {
+                isList = newIsList
+                applySortAndReorder()
             }
-
-            val folder: FolderContent.Data? = if (query == null) currentFolder.value else null
-
-            getFolderContentUseCase.switchView(folderContent, folder, isList)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onError = { error -> Timber.w(error, "Cannot switch view.") },
-                    onSuccess = { newFolderContent -> folderContent = newFolderContent }
-                )
-                .addTo(composite)
         }
     }
 
@@ -362,6 +313,8 @@ class UploadFolderViewModel @Inject constructor(
         return positions
     }
 
+    private var searchJob: Job? = null
+
     /**
      * Performs a search in the folder content.
      * If the search is already done, only updates the folder items. If not, requests it.
@@ -369,65 +322,32 @@ class UploadFolderViewModel @Inject constructor(
      * @param newQuery  Text to set as filter.
      */
     fun search(newQuery: String?) {
-        query = newQuery
-
-        if (newQuery.isNullOrEmpty()) {
-            setFolderItems()
-        } else {
-            if (isSearchAlreadyDone()) {
-                folderItems.value = searchResults[currentFolder.value]!![newQuery]
-                return
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(300L.milliseconds) // debounce to avoid user typing too fast
+            query = newQuery
+            if (newQuery.isNullOrEmpty()) {
+                setFolderItems()
+            } else {
+                val currentFolder = currentFolder.value ?: return@launch
+                searchFilesInDocumentFolderRecursiveUseCase(
+                    UriPath(currentFolder.uri.toString()),
+                    newQuery
+                ).catch { error ->
+                    Timber.e(error, "Cannot search")
+                }.collectLatest { result ->
+                    folderEntities = result
+                    applySortAndReorder()
+                }
             }
-
-            getFolderContentUseCase.search(
-                query = newQuery,
-                currentFolder = currentFolder.value!!,
-                order = order,
-                isList = isList,
-                context = context
-            )
-                .subscribeOn(Schedulers.single())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onError = { addSearchValue(currentFolder.value!!, newQuery, mutableListOf()) },
-                    onSuccess = { searchResult ->
-                        addSearchValue(currentFolder.value!!, newQuery, searchResult)
-                    }
-                )
-                .addTo(composite)
         }
-    }
-
-    /**
-     * Updates the folder items with the search result and includes it if needed in the map of
-     * search results.
-     *
-     * @param folder        Folder in which the search was carried out.
-     * @param query         Text used as filter.
-     * @param searchResult  List of the content as the search result.
-     */
-    private fun addSearchValue(
-        folder: FolderContent.Data,
-        query: String,
-        searchResult: MutableList<FolderContent>,
-    ) {
-        if (searchResults.containsKey(folder)) {
-            searchResults.getValue(folder)[query] = searchResult
-        } else {
-            val map = hashMapOf<String, MutableList<FolderContent>>().apply {
-                put(query, searchResult)
-            }
-
-            searchResults[folder] = map
-        }
-
-        folderItems.value = searchResult
     }
 
     /**
      * Begins the process to upload the selected or all the current folder items.
      */
     fun upload() {
+        searchJob?.cancel()
         getFolderContentUseCase.getRootContentToUpload(
             currentFolder = currentFolder.value!!,
             selectedItems = ArrayList(selectedItems.value!!),

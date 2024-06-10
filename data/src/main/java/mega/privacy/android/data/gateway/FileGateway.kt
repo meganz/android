@@ -2,6 +2,7 @@ package mega.privacy.android.data.gateway
 
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
@@ -322,4 +323,15 @@ interface FileGateway {
      * @return list of files in the folder
      */
     suspend fun getFilesInDocumentFolder(folder: UriPath): DocumentFolder
+
+    /**
+     * Search files in document folder recursive
+     *
+     * @param folder
+     * @param query
+     */
+    fun searchFilesInDocumentFolderRecursive(
+        folder: UriPath,
+        query: String,
+    ): Flow<DocumentFolder>
 }

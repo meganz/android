@@ -12,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.mapper.file.DocumentFileMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -29,6 +30,7 @@ internal class FileFacadeTest {
 
     private lateinit var underTest: FileFacade
     private val context: Context = mock()
+    private val documentFileMapper: DocumentFileMapper = mock()
 
     @TempDir
     lateinit var temporaryFolder: File
@@ -36,7 +38,7 @@ internal class FileFacadeTest {
     @BeforeAll
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = FileFacade(context)
+        underTest = FileFacade(context, documentFileMapper)
     }
 
     @Test

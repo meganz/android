@@ -29,10 +29,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.mapper.file.DocumentFileMapper
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -45,7 +49,9 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.Stack
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 import kotlin.math.sqrt
 
 /**
@@ -58,8 +64,9 @@ const val INTENT_EXTRA_NODE_HANDLE = "NODE_HANDLE"
  *
  * Refer to [mega.privacy.android.app.utils.FileUtil]
  */
-class FileFacade @Inject constructor(
+internal class FileFacade @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val documentFileMapper: DocumentFileMapper,
 ) : FileGateway {
 
     override val localDCIMFolderPath: String
@@ -523,12 +530,8 @@ class FileFacade @Inject constructor(
                 async {
                     semaphore.withPermit {
                         val documentUri = file.uri
-                        DocumentEntity(
-                            name = file.name.orEmpty(),
-                            size = file.length(),
-                            lastModified = file.lastModified(),
-                            uri = UriPath(documentUri.toString()),
-                            isFolder = file.isDirectory,
+                        documentFileMapper(
+                            file = file,
                             numFiles = countMap[documentUri]?.first ?: 0,
                             numFolders = countMap[documentUri]?.second ?: 0
                         )
@@ -537,6 +540,36 @@ class FileFacade @Inject constructor(
             }.awaitAll()
         }
         return DocumentFolder(entities)
+    }
+
+    override fun searchFilesInDocumentFolderRecursive(
+        folder: UriPath,
+        query: String,
+    ): Flow<DocumentFolder> = flow {
+        // using stack to avoid recursive call and optimize memory usage
+        val stack = Stack<DocumentFile>()
+        val uri = Uri.parse(folder.value)
+        val document = DocumentFile.fromTreeUri(context, uri) ?: throw FileNotFoundException()
+        stack.addAll(document.listFiles().toList())
+        val result = mutableListOf<DocumentEntity>()
+        while (stack.isNotEmpty() && coroutineContext.isActive) {
+            val file = stack.pop()
+            val childFiles = if (file.isDirectory) file.listFiles().toList() else emptyList()
+            if (file.name.orEmpty().contains(other = query, ignoreCase = true)) {
+                result.add(
+                    documentFileMapper(
+                        file = file,
+                        numFiles = childFiles.count { it.isFile },
+                        numFolders = childFiles.count { it.isDirectory },
+                    )
+                )
+                emit(DocumentFolder(result))
+            }
+            if (file.isDirectory) {
+                stack.addAll(childFiles)
+            }
+        }
+        emit(DocumentFolder(result))
     }
 
     @Suppress("Deprecation")

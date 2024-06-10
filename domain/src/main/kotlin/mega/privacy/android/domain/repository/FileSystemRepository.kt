@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.FileNode
@@ -403,4 +404,16 @@ interface FileSystemRepository {
      * @return
      */
     suspend fun getFilesInDocumentFolder(uri: UriPath): DocumentFolder
+
+    /**
+     * Search files in document folder recursive
+     *
+     * @param folder
+     * @param query
+     * @return
+     */
+    fun searchFilesInDocumentFolderRecursive(
+        folder: UriPath,
+        query: String
+    ): Flow<DocumentFolder>
 }

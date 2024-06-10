@@ -21,15 +21,12 @@ sealed class FolderContent(val id: Long) {
      * View item which represents a file or a folder at UI level.
      *
      * @property parent         Data as parent folder if any, null otherwise.
-     * @property document       DocumentFile of the file or folder.
      * @property isSelected     True if the item is selected at UI, false otherwise.
      * @property isFolder       True if is a folder, false otherwise.
      * @property name           Name of the item.
      * @property uri            Uri of the item.
      * @property lastModified   Last modified date of the item.
      * @property size           Size of the item.
-     * @property info           Info to show as complementary info of the item.
-     *                          Folder content if is a folder, file size and last modified date if a file.
      * @property numberOfFiles  Number of files if is a folder, 0 otherwise.
      * @property numberOfFolders Number of folders if is a folder, 0 otherwise.
      */
