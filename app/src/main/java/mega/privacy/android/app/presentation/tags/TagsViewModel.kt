@@ -5,30 +5,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.NODE_ID
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
-import mega.privacy.android.domain.usecase.node.UpdateNodeTagUseCase
+import mega.privacy.android.domain.usecase.node.ManageNodeTagUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * ViewModel to handle tags screen logic.
  *
- * @property updateNodeTagUseCase    Use case to update a node tag
+ * @property manageNodeTagUseCase    Use case to update a node tag
  */
 @HiltViewModel
 class TagsViewModel @Inject constructor(
-    private val updateNodeTagUseCase: UpdateNodeTagUseCase,
+    private val manageNodeTagUseCase: ManageNodeTagUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     monitorNodeUpdatesById: MonitorNodeUpdatesById,
     stateHandle: SavedStateHandle,
@@ -76,9 +73,7 @@ class TagsViewModel @Inject constructor(
      */
     fun addNodeTag(tag: String) = viewModelScope.launch {
         runCatching {
-            updateNodeTagUseCase(nodeHandle = nodeId, newTag = tag)
-        }.onSuccess {
-            _uiState.update { it.copy(informationMessage = triggered(InfoToShow.SimpleString(R.string.choose_file))) }
+            manageNodeTagUseCase(nodeHandle = nodeId, newTag = tag)
         }.onFailure {
             Timber.e(it, "Error adding tag to node")
         }
@@ -140,6 +135,20 @@ class TagsViewModel @Inject constructor(
         }
         _uiState.update { it.copy(message = message, isError = isError) }
         return !isError && !isBlank
+    }
 
+    /**
+     * Removes a tag from the node
+     *
+     * @param tag the tag to remove
+     */
+    fun removeTag(tag: String) = viewModelScope.launch {
+        runCatching {
+            manageNodeTagUseCase(nodeId, tag, null)
+        }.onSuccess {
+            println("tags removed")
+        }.onFailure {
+            Timber.e(it)
+        }
     }
 }

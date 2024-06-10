@@ -78,7 +78,6 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
-import mega.privacy.android.domain.usecase.node.UpdateNodeTagUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -138,7 +137,6 @@ class FileInfoViewModel @Inject constructor(
     private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
-    private val updateNodeTagUseCase: UpdateNodeTagUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -1026,18 +1024,4 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Removes a tag from the node
-     *
-     * @param tag the tag to remove
-     */
-    fun removeTag(tag: String) = viewModelScope.launch {
-        runCatching {
-            updateNodeTagUseCase(typedNode.id, tag, null)
-        }.onSuccess {
-            println("tags removed")
-        }.onFailure {
-            Timber.e(it)
-        }
-    }
 }

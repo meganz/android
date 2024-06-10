@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.tags
 
 import androidx.lifecycle.SavedStateHandle
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.StateEventWithContent
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -12,7 +11,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
-import mega.privacy.android.domain.usecase.node.UpdateNodeTagUseCase
+import mega.privacy.android.domain.usecase.node.ManageNodeTagUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,7 +32,7 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TagsViewModelTest {
 
-    private val updateNodeTagUseCase = mock<UpdateNodeTagUseCase>()
+    private val manageNodeTagUseCase = mock<ManageNodeTagUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val monitorNodeUpdatesById = mock<MonitorNodeUpdatesById>()
     private lateinit var stateHandle: SavedStateHandle
@@ -44,7 +43,7 @@ class TagsViewModelTest {
         stateHandle = SavedStateHandle(mapOf(TagsActivity.NODE_ID to 123L))
         whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
         underTest = TagsViewModel(
-            updateNodeTagUseCase = updateNodeTagUseCase,
+            manageNodeTagUseCase = manageNodeTagUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             monitorNodeUpdatesById = monitorNodeUpdatesById,
             stateHandle = stateHandle
@@ -53,7 +52,7 @@ class TagsViewModelTest {
 
     @AfterEach
     fun clear() {
-        reset(updateNodeTagUseCase, getNodeByIdUseCase, monitorNodeUpdatesById)
+        reset(manageNodeTagUseCase, getNodeByIdUseCase, monitorNodeUpdatesById)
     }
 
     @Test
@@ -82,10 +81,9 @@ class TagsViewModelTest {
     @Test
     fun `test that addNodeTag update node tags`() = runTest {
         whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
-        whenever(updateNodeTagUseCase(NodeId(123L), newTag = "new tag")).thenReturn(Unit)
+        whenever(manageNodeTagUseCase(NodeId(123L), newTag = "new tag")).thenReturn(Unit)
         underTest.addNodeTag("new tag")
-        val uiState = underTest.uiState.value
-        assertThat(uiState.informationMessage).isInstanceOf(StateEventWithContent::class.java)
+        verify(manageNodeTagUseCase).invoke(NodeId(123L), newTag = "new tag")
     }
 
     @ParameterizedTest(name = "validateTagName should return {0} when tag is {1} and message is {2}")
@@ -133,5 +131,15 @@ class TagsViewModelTest {
         )
         underTest.getNodeByHandle(NodeId(123L))
         verify(getNodeByIdUseCase, times(2)).invoke(NodeId(123L))
+    }
+
+    @Test
+    fun `test that removeTag update node tags`() = runTest {
+        whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
+        whenever(manageNodeTagUseCase(NodeId(123L), oldTag = "old tag", newTag = null)).thenReturn(
+            Unit
+        )
+        underTest.removeTag("old tag")
+        verify(manageNodeTagUseCase).invoke(NodeId(123L), oldTag = "old tag", newTag = null)
     }
 }

@@ -172,7 +172,6 @@ class FileInfoActivity : BaseActivity() {
                     onMenuActionClick = { handleAction(it, uiState) },
                     onVerifyContactClick = this::navigateToVerifyContacts,
                     onAddTagClick = this::navigateToTags,
-                    onRemoveTagClick = viewModel::removeTag,
                     modifier = Modifier.semantics {
                         testTagsAsResourceId = true
                     }

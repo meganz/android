@@ -56,6 +56,7 @@ class TagsActivity : AppCompatActivity() {
                         consumeInfoMessage = viewModel::consumeInfoMessage,
                         validateTagName = viewModel::validateTagName,
                         onBackPressed = onBackPressedDispatcher::onBackPressed,
+                        removeTag = viewModel::removeTag,
                         uiState = uiState
                     )
                 }

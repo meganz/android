@@ -5,11 +5,11 @@ import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
 /**
- * Use case to update the tag of a node.
+ * Use case to manage the tag of a node.
  *
  * @property nodeRepository Repository to provide the necessary data.
  */
-class UpdateNodeTagUseCase @Inject constructor(
+class ManageNodeTagUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
 ) {
 

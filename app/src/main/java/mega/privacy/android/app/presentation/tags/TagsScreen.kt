@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.tags
 
+import mega.privacy.android.core.R as CoreR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
-import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -52,6 +52,7 @@ fun TagsScreen(
     addNodeTag: (String) -> Unit,
     consumeInfoMessage: () -> Unit,
     validateTagName: (String) -> Boolean,
+    removeTag: (String) -> Unit,
     onBackPressed: () -> Unit,
     uiState: TagsUiState,
 ) {
@@ -79,7 +80,8 @@ fun TagsScreen(
             modifier = Modifier.padding(paddingValues),
             addNodeTag = addNodeTag,
             validateTagName = validateTagName,
-            uiState = uiState
+            removeTag = removeTag,
+            uiState = uiState,
         )
     }
 }
@@ -89,11 +91,19 @@ fun TagsScreen(
 private fun TagsContent(
     addNodeTag: (String) -> Unit,
     validateTagName: (String) -> Boolean,
+    removeTag: (String) -> Unit,
     uiState: TagsUiState,
     modifier: Modifier = Modifier,
 ) {
-    var text by rememberSaveable { mutableStateOf("") }
     var tag by rememberSaveable { mutableStateOf("") }
+
+    fun addTag() {
+        if (tag.isNotBlank() && uiState.isError.not()) {
+            addNodeTag(tag)
+            tag = ""
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -108,38 +118,26 @@ private fun TagsContent(
         GenericDescriptionTextField(
             modifier = Modifier.padding(bottom = 4.dp),
             visualTransformation = PrefixTransformation("#"),
-            value = text,
+            value = tag,
             imeAction = ImeAction.Done,
             supportingText = uiState.message,
             keyboardActions = KeyboardActions(
-                onDone = {
-                    if (validateTagName(tag)) {
-                        addNodeTag(tag)
-                        text = ""
-                        tag = ""
-                    }
-                }
-
+                onDone = { addTag() }
             ),
             showError = uiState.isError,
             onValueChange = {
-                text = it
-                tag = text.removePrefix("#").lowercase(Locale.ROOT)
+                tag = it.removePrefix("#").lowercase(Locale.ROOT)
                 validateTagName(tag)
             },
             title = stringResource(id = R.string.label_red),
             showUnderline = true,
         )
 
-        if (text.isNotBlank() && uiState.isError.not()) {
+        if (tag.isNotBlank() && uiState.isError.not()) {
             TextMegaButton(
                 contentPadding = PaddingValues(vertical = 8.dp),
                 text = "Add \"#$tag\" tag",
-                onClick = {
-                    addNodeTag(tag)
-                    text = ""
-                    tag = ""
-                },
+                onClick = ::addTag,
                 textAlign = TextAlign.Start
             )
         }
@@ -165,6 +163,7 @@ private fun TagsContent(
                     text = "#${uiState.tags[tag]}",
                     contentDescription = "Tag Chip",
                     enabled = true,
+                    onClick = { removeTag(uiState.tags[tag]) },
                     leadingIcon = CoreR.drawable.ic_filter_selected,
                 )
             }
@@ -181,6 +180,7 @@ private fun TagsScreenPreview() {
             consumeInfoMessage = {},
             validateTagName = { it.isNotEmpty() },
             onBackPressed = {},
+            removeTag = {},
             uiState = TagsUiState(tags = listOf("tag1", "tag2"))
         )
     }

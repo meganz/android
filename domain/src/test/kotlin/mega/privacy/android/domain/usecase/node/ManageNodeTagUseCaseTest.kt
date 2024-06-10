@@ -8,10 +8,10 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 
-class UpdateNodeTagUseCaseTest {
+class ManageNodeTagUseCaseTest {
 
     private val nodeRepository = mock<NodeRepository>()
-    private val updateNodeTagUseCase = UpdateNodeTagUseCase(nodeRepository)
+    private val manageNodeTagUseCase = ManageNodeTagUseCase(nodeRepository)
 
     @Test
     fun `test that when newTag is null and oldTag is not null, removeNodeTag is called`() =
@@ -20,7 +20,7 @@ class UpdateNodeTagUseCaseTest {
             val oldTag = "oldTag"
             val newTag = null
 
-            updateNodeTagUseCase(nodeHandle, oldTag, newTag)
+            manageNodeTagUseCase(nodeHandle, oldTag, newTag)
 
             verify(nodeRepository).removeNodeTag(nodeHandle, oldTag)
         }
@@ -32,7 +32,7 @@ class UpdateNodeTagUseCaseTest {
             val oldTag = null
             val newTag = "newTag"
 
-            updateNodeTagUseCase(nodeHandle, oldTag, newTag)
+            manageNodeTagUseCase(nodeHandle, oldTag, newTag)
 
             verify(nodeRepository).addNodeTag(nodeHandle, newTag)
         }
@@ -44,7 +44,7 @@ class UpdateNodeTagUseCaseTest {
             val oldTag = "oldTag"
             val newTag = "newTag"
 
-            updateNodeTagUseCase(nodeHandle, oldTag, newTag)
+            manageNodeTagUseCase(nodeHandle, oldTag, newTag)
 
             verify(nodeRepository).updateNodeTag(nodeHandle, newTag, oldTag)
         }
@@ -57,7 +57,7 @@ class UpdateNodeTagUseCaseTest {
             val newTag = null
 
             assertThrows<IllegalArgumentException> {
-                updateNodeTagUseCase(nodeHandle, oldTag, newTag)
+                manageNodeTagUseCase(nodeHandle, oldTag, newTag)
             }
         }
 }

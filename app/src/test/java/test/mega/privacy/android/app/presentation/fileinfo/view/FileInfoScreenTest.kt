@@ -41,7 +41,6 @@ class FileInfoScreenTest {
                 onPublicLinkCopyClick = { },
                 onMenuActionClick = {},
                 onAddTagClick = {},
-                onRemoveTagClick = {},
                 onVerifyContactClick = {},
             )
         }
@@ -74,7 +73,6 @@ class FileInfoScreenTest {
                 onPublicLinkCopyClick = { },
                 onMenuActionClick = {},
                 onAddTagClick = {},
-                onRemoveTagClick = {},
                 onVerifyContactClick = {},
             )
         }

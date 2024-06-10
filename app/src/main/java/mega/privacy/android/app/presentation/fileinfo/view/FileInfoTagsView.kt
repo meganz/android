@@ -31,7 +31,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_
  *
  * @param tags List of tags to be displayed.
  * @param onAddTagClick Callback to be called when the user clicks on the add tag view.
- * @param onRemoveTagClick Callback to be called when the user clicks on a tag to remove it.
  * @param modifier Modifier.
  */
 @OptIn(ExperimentalLayoutApi::class)
@@ -39,7 +38,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_
 fun FileInfoTagsView(
     tags: List<String>,
     onAddTagClick: () -> Unit,
-    onRemoveTagClick: (String) -> Unit,
     modifier: Modifier,
 ) {
     Column(
@@ -71,8 +69,6 @@ fun FileInfoTagsView(
                     selected = false,
                     text = "#${tags[tag]}",
                     contentDescription = "",
-                    trailingIcon = mega.privacy.android.core.R.drawable.ic_universal_close,
-                    onClick = { onRemoveTagClick(tags[tag]) },
                     enabled = true,
                     style = TransparentChipStyle,
                 )
@@ -89,7 +85,6 @@ private fun FileInfoTagsViewPreview() {
         FileInfoTagsView(
             tags = listOf("josgh", "skljdaökldj", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5"),
             onAddTagClick = {},
-            onRemoveTagClick = {},
             modifier = Modifier
         )
     }
