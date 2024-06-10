@@ -45,7 +45,9 @@ internal const val BOTTOM_SHEET_HEADER =
  * @param onCameraUploadsClicked Lambda that is executed when the "Camera uploads" Tile is selected
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
+ * @param onAddNewSyncClicked Lambda that is executed when the "Add new sync" Tile is selected
  * @param onBottomSheetDismissed Lambda that is executed when the bottom sheet is dismissed
+ * @param isFreeAccount True if is a Free account or False otherwise
  * @param isSyncFeatureFlagEnabled True if Sync feature flag is enabled. False otherwise
  */
 @Composable
@@ -55,7 +57,9 @@ internal fun DeviceBottomSheetBody(
     onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: (DeviceUINode) -> Unit,
     onInfoClicked: (DeviceUINode) -> Unit,
+    onAddNewSyncClicked: (DeviceUINode) -> Unit,
     onBottomSheetDismissed: () -> Unit,
+    isFreeAccount: Boolean,
     isSyncFeatureFlagEnabled: Boolean = false,
 ) {
     Column(Modifier.testTag(BOTTOM_SHEET_CONTAINER)) {
@@ -88,6 +92,11 @@ internal fun DeviceBottomSheetBody(
                         onBottomSheetDismissed()
                         onInfoClicked(device)
                     },
+                    onAddNewSyncClicked = {
+                        onBottomSheetDismissed()
+                        onAddNewSyncClicked(device)
+                    },
+                    isFreeAccount = isFreeAccount,
                     isSyncFeatureFlagEnabled = isSyncFeatureFlagEnabled,
                 )
             }
@@ -163,7 +172,9 @@ private fun DeviceBottomSheetBodyPreview(
             onCameraUploadsClicked = {},
             onRenameDeviceClicked = {},
             onInfoClicked = {},
+            onAddNewSyncClicked = {},
             onBottomSheetDismissed = {},
+            isFreeAccount = true,
         )
     }
 }

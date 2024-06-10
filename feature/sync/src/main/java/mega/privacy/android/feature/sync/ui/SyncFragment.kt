@@ -31,13 +31,17 @@ class SyncFragment : Fragment() {
 
     companion object {
         private const val TITLE_KEY = "titleKey"
+        private const val OPEN_NEW_SYNC_KEY = "openNewSyncKey"
 
         /**
          * Returns the instance of SyncFragment
          */
         @JvmStatic
-        fun newInstance(title: String? = null): SyncFragment {
-            val args = Bundle().apply { putString(TITLE_KEY, title) }
+        fun newInstance(title: String? = null, openNewSync: Boolean = false): SyncFragment {
+            val args = Bundle().apply {
+                putString(TITLE_KEY, title)
+                putBoolean(OPEN_NEW_SYNC_KEY, openNewSync)
+            }
             return SyncFragment().apply { arguments = args }
         }
     }
@@ -71,6 +75,7 @@ class SyncFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val title = arguments?.getString(TITLE_KEY)
+                val openNewSync = arguments?.getBoolean(OPEN_NEW_SYNC_KEY) ?: false
                 val animatedNavController = rememberNavController()
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
@@ -87,6 +92,7 @@ class SyncFragment : Fragment() {
                                 megaNavigator.openUpgradeAccount(requireContext())
                             },
                             title = title,
+                            openNewSync = openNewSync,
                         )
                     }
                 }

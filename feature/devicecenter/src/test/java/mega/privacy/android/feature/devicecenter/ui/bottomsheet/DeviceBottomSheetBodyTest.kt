@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.devicecenter.ui.bottomsheet
 
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -18,7 +17,6 @@ import org.junit.runner.RunWith
 /**
  * Test class for [DeviceBottomSheetBody]
  */
-@OptIn(ExperimentalMaterialApi::class)
 @RunWith(AndroidJUnit4::class)
 internal class DeviceBottomSheetBodyTest {
 
@@ -41,7 +39,9 @@ internal class DeviceBottomSheetBodyTest {
                 onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
+                onAddNewSyncClicked = {},
                 onBottomSheetDismissed = {},
+                isFreeAccount = false,
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)
@@ -65,7 +65,9 @@ internal class DeviceBottomSheetBodyTest {
                 onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
+                onAddNewSyncClicked = {},
                 onBottomSheetDismissed = {},
+                isFreeAccount = false,
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)

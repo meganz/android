@@ -26,6 +26,7 @@ import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
  * @property filteredUiItems The list of [DeviceCenterUINode] objects that are filtered based on the search query
  * @property searchWidgetState The state of the search widget
  * @property infoSelectedItem The item selected to show its Info
+ * @property isFreeAccount True if is a Free account or False otherwise
  * @property enabledFlags Enabled flags
  * @property isSyncFeatureFlagEnabled True if Android Sync feature flag is enabled. False otherwise.
  */
@@ -43,6 +44,7 @@ data class DeviceCenterUiState(
     val filteredUiItems: List<DeviceCenterUINode>? = null,
     val searchWidgetState: SearchWidgetState = SearchWidgetState.COLLAPSED,
     val infoSelectedItem: DeviceCenterUINode? = null,
+    val isFreeAccount: Boolean = true,
     val enabledFlags: Set<Feature> = emptySet(),
 ) {
     val itemsToDisplay: List<DeviceCenterUINode> = selectedDevice?.folders ?: devices

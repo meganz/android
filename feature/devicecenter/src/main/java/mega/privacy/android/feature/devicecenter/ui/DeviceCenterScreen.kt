@@ -23,7 +23,11 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -65,7 +69,10 @@ import mega.privacy.android.feature.devicecenter.ui.renamedevice.RenameDeviceDia
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.resources.R as sharedR
+import androidx.compose.runtime.LaunchedEffect
 
 /**
  * Test tags for the Device Center Screen
@@ -78,6 +85,8 @@ internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
 internal const val DEVICE_CENTER_NO_NETWORK_STATE = "device_center_content:no_network_state"
 internal const val DEVICE_CENTER_NOTHING_SETUP_STATE = "device_center_content:nothing_setup_state"
 internal const val DEVICE_CENTER_NO_ITEMS_FOUND_STATE = "device_center_content:no_items_found_state"
+internal const val TEST_TAG_DEVICE_CENTER_SCREEN_UPGRADE_DIALOG =
+    "device_center_screen:upgrade_dialog"
 
 /**
  * A [Composable] that serves as the main View for the Device Center
@@ -90,6 +99,7 @@ internal const val DEVICE_CENTER_NO_ITEMS_FOUND_STATE = "device_center_content:n
  * @param onNonBackupFolderClicked Lambda that performs a specific action when a Non Backup Folder is clicked
  * @param onCameraUploadsClicked Lambda that performs a specific action when the User clicks the "Camera uploads" Bottom Dialog Option
  * @param onInfoOptionClicked Lambda that performs a specific action when the User clicks the "Info" Bottom Dialog Option
+ * @param onAddNewSyncOptionClicked Lambda that performs a specific action when the User clicks the "Add new sync" Bottom Dialog Option
  * @param onRenameDeviceOptionClicked Lambda that performs a specific action when the User clicks the "Rename" Bottom Dialog Option
  * @param onRenameDeviceCancelled Lambda that performs a specific action when cancelling the Rename Device action
  * @param onRenameDeviceSuccessful Lambda that performs a specific action when the Rename Device action is successful
@@ -109,6 +119,7 @@ internal fun DeviceCenterScreen(
     onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit,
     onCameraUploadsClicked: () -> Unit,
     onInfoOptionClicked: (DeviceCenterUINode) -> Unit,
+    onAddNewSyncOptionClicked: (DeviceUINode) -> Unit,
     onRenameDeviceOptionClicked: (DeviceUINode) -> Unit,
     onRenameDeviceCancelled: () -> Unit,
     onRenameDeviceSuccessful: () -> Unit,
@@ -118,6 +129,7 @@ internal fun DeviceCenterScreen(
     onSearchQueryChanged: (query: String) -> Unit,
     onSearchCloseClicked: () -> Unit,
     onSearchClicked: () -> Unit,
+    onOpenUpgradeAccountClicked: () -> Unit,
     onActionPressed: ((MenuAction) -> Unit)? = null,
 ) {
     val context = LocalContext.current
@@ -129,6 +141,12 @@ internal fun DeviceCenterScreen(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = false,
     )
+
+    var showUpgradeDialog by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = selectedDevice == null) {
+        coroutineScope.launch { modalSheetState.hide() }
+    }
 
     EventEffect(
         event = uiState.exitFeature,
@@ -165,9 +183,17 @@ internal fun DeviceCenterScreen(
                 onCameraUploadsClicked = onCameraUploadsClicked,
                 onRenameDeviceClicked = onRenameDeviceOptionClicked,
                 onInfoClicked = onInfoOptionClicked,
+                onAddNewSyncClicked = {
+                    if (uiState.isFreeAccount) {
+                        showUpgradeDialog = true
+                    } else {
+                        onAddNewSyncOptionClicked(uiState.menuClickedDevice)
+                    }
+                },
                 onBottomSheetDismissed = {
                     coroutineScope.launch { modalSheetState.hide() }
                 },
+                isFreeAccount = uiState.isFreeAccount,
                 isSyncFeatureFlagEnabled = uiState.isSyncFeatureFlagEnabled,
             )
         },
@@ -237,7 +263,23 @@ internal fun DeviceCenterScreen(
                     }
                 },
             )
-        })
+        }
+    )
+
+    if (showUpgradeDialog) {
+        MegaAlertDialog(
+            title = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_title),
+            body = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message),
+            confirmButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_confirm_button),
+            cancelButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_cancel_button),
+            onConfirm = {
+                onOpenUpgradeAccountClicked()
+                showUpgradeDialog = false
+            },
+            onDismiss = { showUpgradeDialog = false },
+            modifier = Modifier.testTag(TEST_TAG_DEVICE_CENTER_SCREEN_UPGRADE_DIALOG)
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -497,6 +539,7 @@ private fun DeviceCenterNoNetworkStatePreview() {
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
+            onAddNewSyncOptionClicked = {},
             onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
@@ -507,6 +550,7 @@ private fun DeviceCenterNoNetworkStatePreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
+            onOpenUpgradeAccountClicked = {},
         )
     }
 }
@@ -529,6 +573,7 @@ private fun DeviceCenterNoItemsFoundPreview() {
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
+            onAddNewSyncOptionClicked = {},
             onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
@@ -539,6 +584,7 @@ private fun DeviceCenterNoItemsFoundPreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
+            onOpenUpgradeAccountClicked = {},
         )
     }
 }
@@ -558,6 +604,7 @@ private fun DeviceCenterInInitialLoadingPreview() {
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
+            onAddNewSyncOptionClicked = {},
             onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
@@ -568,6 +615,7 @@ private fun DeviceCenterInInitialLoadingPreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
+            onOpenUpgradeAccountClicked = {},
         )
     }
 }
@@ -597,6 +645,7 @@ private fun DeviceCenterInDeviceViewPreview() {
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
+            onAddNewSyncOptionClicked = {},
             onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
@@ -607,6 +656,7 @@ private fun DeviceCenterInDeviceViewPreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
+            onOpenUpgradeAccountClicked = {},
         )
     }
 }
@@ -633,6 +683,7 @@ private fun DeviceCenterInFolderViewEmptyStatePreview() {
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
+            onAddNewSyncOptionClicked = {},
             onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
@@ -643,6 +694,7 @@ private fun DeviceCenterInFolderViewEmptyStatePreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
+            onOpenUpgradeAccountClicked = {},
         )
     }
 }
@@ -668,6 +720,7 @@ private fun DeviceCenterInFolderViewPreview() {
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
+            onAddNewSyncOptionClicked = {},
             onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
@@ -678,6 +731,7 @@ private fun DeviceCenterInFolderViewPreview() {
             onSearchQueryChanged = {},
             onSearchCloseClicked = {},
             onSearchClicked = {},
+            onOpenUpgradeAccountClicked = {},
         )
     }
 }

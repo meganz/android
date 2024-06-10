@@ -29,9 +29,13 @@ internal fun NavGraphBuilder.syncNavGraph(
     syncPermissionsManager: SyncPermissionsManager,
     openUpgradeAccountPage: () -> Unit,
     title: String? = null,
+    openNewSync: Boolean = false,
 ) {
     navigation(
-        startDestination = syncList,
+        startDestination = when {
+            openNewSync -> syncNewFolderRoute
+            else -> syncList
+        },
         route = syncRoute
     ) {
         composable(route = syncEmptyRoute) {
@@ -53,7 +57,15 @@ internal fun NavGraphBuilder.syncNavGraph(
                     openUpgradeAccountPage()
                 },
                 onBackClicked = {
-                    navController.popBackStack()
+                    if (openNewSync) {
+                        navController.navigate(syncList) {
+                            popUpTo(syncNewFolderRoute) {
+                                inclusive = true
+                            }
+                        }
+                    } else {
+                        navController.popBackStack()
+                    }
                 }
             )
         }

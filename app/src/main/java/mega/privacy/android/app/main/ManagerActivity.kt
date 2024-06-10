@@ -3672,6 +3672,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * The value is set to -1 by default if no other Backups Node Handle is passed
      * @param errorMessage The [StringRes] of the error message to display
      * @param title Custom title
+     * @param openNewSync Only for [DrawerItem.SYNC]: True to directly open New Sync screen, False otherwise.
      */
     @SuppressLint("NewApi")
     @JvmOverloads
@@ -3682,6 +3683,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         backupsHandle: Long = INVALID_HANDLE,
         @StringRes errorMessage: Int? = null,
         title: String? = null,
+        openNewSync: Boolean = false,
     ) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         if (!this::drawerLayout.isInitialized) {
@@ -3798,7 +3800,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             DrawerItem.SYNC -> {
-                syncFragment = SyncFragment.newInstance(title = title)
+                syncFragment = SyncFragment.newInstance(title = title, openNewSync = openNewSync)
 
                 setBottomNavigationMenuItemChecked(NO_BNV)
                 supportInvalidateOptionsMenu()

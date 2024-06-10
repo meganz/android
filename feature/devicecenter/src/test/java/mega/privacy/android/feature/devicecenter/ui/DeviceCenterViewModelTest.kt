@@ -5,9 +5,17 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -42,12 +50,17 @@ import org.mockito.kotlin.whenever
 internal class DeviceCenterViewModelTest {
     private lateinit var underTest: DeviceCenterViewModel
 
+    private val accountDetailFlow = MutableStateFlow(AccountDetail())
     private val getDevicesUseCase = mock<GetDevicesUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val deviceUINodeListMapper = mock<DeviceUINodeListMapper>()
 
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
         onBlocking { invoke() } doReturn emptyFlow()
+    }
+
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
+        onBlocking { invoke() }.thenReturn(accountDetailFlow)
     }
 
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock {
@@ -78,12 +91,26 @@ internal class DeviceCenterViewModelTest {
             isCameraUploadsEnabledUseCase,
             deviceUINodeListMapper,
         )
+
+        runBlocking {
+            val accountLevelDetail = mock<AccountLevelDetail> {
+                on { accountType } doReturn AccountType.PRO_I
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { levelDetail } doReturn accountLevelDetail
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(
+                flowOf(accountDetail)
+            )
+        }
+
         underTest = DeviceCenterViewModel(
             getDevicesUseCase = getDevicesUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             deviceUINodeListMapper = deviceUINodeListMapper,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         )
     }
 
@@ -471,4 +498,20 @@ internal class DeviceCenterViewModelTest {
 
         assertThat(underTest.state.value.searchWidgetState).isEqualTo(SearchWidgetState.EXPANDED)
     }
+
+    @Test
+    fun `test that account type state is updated when monitorAccountDetail emits data`() =
+        runTest {
+            val expected = AccountDetail()
+            accountDetailFlow.emit(expected)
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isFreeAccount).isEqualTo(
+                    expected.levelDetail?.accountType == AccountType.FREE
+                )
+            }
+        }
 }

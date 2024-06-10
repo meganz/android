@@ -9,6 +9,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.AddNewSyncBottomSheetTile
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.CameraUploadsBottomSheetTile
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.InfoBottomSheetTile
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.RenameDeviceBottomSheetTile
@@ -28,6 +29,8 @@ internal const val BOTTOM_SHEET_BODY_OWN_DEVICE =
  * @param onCameraUploadsClicked Lambda that is executed when the "Camera uploads" Tile is selected
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
+ * @param onAddNewSyncClicked Lambda that is executed when the "Add new sync" Tile is selected
+ * @param isFreeAccount True if is a Free account or False otherwise
  * @param isSyncFeatureFlagEnabled True if Sync feature flag is enabled. False otherwise
  */
 @Composable
@@ -37,13 +40,20 @@ internal fun OwnDeviceBottomSheetBody(
     onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: () -> Unit,
     onInfoClicked: () -> Unit,
+    onAddNewSyncClicked: () -> Unit,
+    isFreeAccount: Boolean,
     isSyncFeatureFlagEnabled: Boolean = false,
 ) {
     Column(modifier = Modifier.testTag(BOTTOM_SHEET_BODY_OWN_DEVICE)) {
         if ((isSyncFeatureFlagEnabled && hasSyncedFolders) || isCameraUploadsEnabled) {
             InfoBottomSheetTile(onActionClicked = onInfoClicked)
         }
-        if (!isSyncFeatureFlagEnabled) {
+        if (isSyncFeatureFlagEnabled) {
+            AddNewSyncBottomSheetTile(
+                isFreeAccount = isFreeAccount,
+                onActionClicked = onAddNewSyncClicked,
+            )
+        } else {
             CameraUploadsBottomSheetTile(
                 isCameraUploadsEnabled = isCameraUploadsEnabled,
                 onActionClicked = onCameraUploadsClicked,
@@ -71,6 +81,8 @@ private fun PreviewOwnDeviceBottomSheet(
             onCameraUploadsClicked = {},
             onRenameDeviceClicked = {},
             onInfoClicked = {},
+            onAddNewSyncClicked = {},
+            isFreeAccount = true,
         )
     }
 }

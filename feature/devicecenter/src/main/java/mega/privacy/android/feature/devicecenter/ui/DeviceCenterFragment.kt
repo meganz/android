@@ -156,6 +156,14 @@ class DeviceCenterFragment : Fragment() {
                             )
                         },
                         onInfoOptionClicked = viewModel::onInfoClicked,
+                        onAddNewSyncOptionClicked = { device ->
+                            megaNavigator.openSyncs(
+                                activity = this@DeviceCenterFragment.activity
+                                    ?: return@DeviceCenterScreen,
+                                deviceName = device.name,
+                                openNewSync = true,
+                            )
+                        },
                         onCameraUploadsClicked = {
                             megaNavigator.openSettingsCameraUploads(requireActivity())
                         },
@@ -189,7 +197,10 @@ class DeviceCenterFragment : Fragment() {
                                     megaNavigator.openSettingsCameraUploads(requireActivity())
                                 }
                             }
-                        }
+                        },
+                        onOpenUpgradeAccountClicked = {
+                            megaNavigator.openUpgradeAccount(requireContext())
+                        },
                     )
                     if (showBlankOverlay) {
                         Box(
