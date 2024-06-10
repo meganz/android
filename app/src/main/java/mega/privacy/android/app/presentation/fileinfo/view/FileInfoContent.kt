@@ -203,8 +203,8 @@ internal fun FileInfoContent(
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     descriptionText = descriptionText,
                     labelId = sharedR.string.file_info_information_description_label,
-                    placeholder = stringResource(id = sharedR.string.file_info_information_description_placeholder).takeIf { isDescriptionEnabled() },
-                    isEditable = isDescriptionEnabled(),
+                    placeholder = stringResource(id = sharedR.string.file_info_information_description_placeholder).takeIf { canEditNodeAttributes() },
+                    isEditable = canEditNodeAttributes(),
                     onConfirmDescription = onSetDescriptionClick,
                 )
             }
@@ -212,9 +212,11 @@ internal fun FileInfoContent(
             //tags
             if (tagsEnabled) {
                 FileInfoTagsView(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                     tags = tags,
-                    onAddTagClick = onAddTagClick,
+                    onAddTagClick = if (canEditNodeAttributes()) onAddTagClick else null,
                     onRemoveTagClick = onRemoveTagClick,
                 )
             }

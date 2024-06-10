@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -25,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
+import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -56,7 +61,10 @@ fun TagsScreen(
         scaffoldState.snackbarHostState.showSnackbar(info.getInfo(context))
     }
     MegaScaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+            .imePadding(),
         scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(
@@ -84,6 +92,7 @@ private fun TagsContent(
     uiState: TagsUiState,
     modifier: Modifier = Modifier,
 ) {
+    var text by rememberSaveable { mutableStateOf("") }
     var tag by rememberSaveable { mutableStateOf("") }
     Column(
         modifier = modifier
@@ -99,14 +108,14 @@ private fun TagsContent(
         GenericDescriptionTextField(
             modifier = Modifier.padding(bottom = 4.dp),
             visualTransformation = PrefixTransformation("#"),
-            value = tag,
+            value = text,
             imeAction = ImeAction.Done,
             supportingText = uiState.message,
             keyboardActions = KeyboardActions(
                 onDone = {
-                    val lowerCaseTag = tag.lowercase(Locale.ROOT)
-                    if (validateTagName(lowerCaseTag)) {
+                    if (validateTagName(tag)) {
                         addNodeTag(tag)
+                        text = ""
                         tag = ""
                     }
                 }
@@ -114,18 +123,23 @@ private fun TagsContent(
             ),
             showError = uiState.isError,
             onValueChange = {
-                tag = it
-                validateTagName(it)
+                text = it
+                tag = text.removePrefix("#").lowercase(Locale.ROOT)
+                validateTagName(tag)
             },
             title = stringResource(id = R.string.label_red),
             showUnderline = true,
         )
 
-        if (tag.isNotBlank() && uiState.isError.not()) {
+        if (text.isNotBlank() && uiState.isError.not()) {
             TextMegaButton(
                 contentPadding = PaddingValues(vertical = 8.dp),
                 text = "Add \"#$tag\" tag",
-                onClick = { addNodeTag(tag) },
+                onClick = {
+                    addNodeTag(tag)
+                    text = ""
+                    tag = ""
+                },
                 textAlign = TextAlign.Start
             )
         }
@@ -141,7 +155,8 @@ private fun TagsContent(
 
         FlowRow(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             repeat(uiState.tags.size) { tag ->
@@ -150,7 +165,7 @@ private fun TagsContent(
                     text = "#${uiState.tags[tag]}",
                     contentDescription = "Tag Chip",
                     enabled = true,
-                    leadingIcon = mega.privacy.android.core.R.drawable.ic_filter_selected,
+                    leadingIcon = CoreR.drawable.ic_filter_selected,
                 )
             }
         }

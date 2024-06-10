@@ -1,25 +1,33 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 
 /**
  * Composable that represents the tags view in the file info screen.
@@ -33,23 +41,29 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 @Composable
 fun FileInfoTagsView(
     tags: List<String>,
-    onAddTagClick: () -> Unit,
+    onAddTagClick: (() -> Unit)? = null,
     onRemoveTagClick: (String) -> Unit,
     modifier: Modifier,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
     Column(
         modifier = modifier
-            .clickable { onAddTagClick() },
+            .clickable(
+                interactionSource = interactionSource,
+                indication = rememberRipple().takeIf { onAddTagClick != null },
+            ) { onAddTagClick?.invoke() },
     ) {
         MenuActionListTile(
             text = "Tags",
             dividerType = null,
             addIconPadding = false,
             trailingItem = {
+                if (onAddTagClick == null) return@MenuActionListTile
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_chevron_right),
+                    imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_chevron_right_medium_regular_outline),
                     contentDescription = "Add Tag",
                     modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
                 )
             },
         )
@@ -72,6 +86,7 @@ fun FileInfoTagsView(
                 )
             }
         }
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
