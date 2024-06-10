@@ -120,25 +120,37 @@ pipeline {
                         }
 
                         def slackChannelId = ""
+                        def qaSlackChannelId = ""
                         if (fileExists(WORKSPACE + "/" + slackInfoFileName)) {
-                            slackChannelId = readFile(WORKSPACE + "/" + slackInfoFileName).trim()
+                            def content = readFile(WORKSPACE + "/" + slackInfoFileName).trim()
+                            def slackInfo = content.split(",")
+                            if (slackInfo.size() > 0) {
+                                slackChannelId = slackInfo[0]
+                            }
+                            if (slackInfo.size() > 1) {
+                                qaSlackChannelId = slackInfo[1]
+                            }
                         }
 
                         if (slackChannelId == "") {
                             def slackResponse = slackSend(channel: "android", message: slackVersionInfo)
+                            def qaSlackResponse = slackSend(channel: "qa", message: slackVersionInfo)
                             // write slackResponse.threadId to local file and upload to slackInfoPath
                             slackChannelId = slackResponse.threadId
+                            qaSlackChannelId = qaSlackResponse.threadId
                             sh """
                                cd ${WORKSPACE}
-                               echo ${slackChannelId} > ${slackInfoFileName}
+                               echo ${slackChannelId},${qaSlackChannelId} > ${slackInfoFileName}
                             """
                             common.uploadToArtifactory(slackInfoFileName, slackInfoPath)
                         } else {
                             slackSend channel: slackChannelId, message: slackVersionInfo, replyBroadcast: true
+                            if (qaSlackChannelId != "") {
+                                slackSend channel: qaSlackChannelId, message: slackVersionInfo, replyBroadcast: true
+                            } else {
+                                slackSend channel: "qa", message: slackVersionInfo
+                            }
                         }
-
-                        // always send new message to QA channel
-                        slackSend channel: "qa", message: slackVersionInfo
 
                         // send to MR
                         common.sendToMR(getBuildVersionInfo(common))
