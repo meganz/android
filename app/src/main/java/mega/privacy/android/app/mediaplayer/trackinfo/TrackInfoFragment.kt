@@ -20,6 +20,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
@@ -78,13 +79,7 @@ class TrackInfoFragment : Fragment() {
 
                             viewModel.makeAvailableOffline(args.handle)
                         })
-                    // Snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet because this fragment is inside an activity with the toolbar, etc.
-                    LaunchedEffect(snackbarHostState.currentSnackbarData) {
-                        snackbarHostState.currentSnackbarData?.message?.let {
-                            Util.showSnackbar(activity, it)
-                        }
-                        snackbarHostState.currentSnackbarData?.dismiss()
-                    }
+                    LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
                     StartTransferComponent(
                         event = uiState.transferTriggerEvent,
                         onConsumeEvent = viewModel::consumeTransferEvent,

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
@@ -169,6 +170,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
         } else {
             lastDownloadTriggerEvent = transferTriggerEvent
+            lastTransferStartedHere = true
             when (transferTriggerEvent) {
                 is TransferTriggerEvent.StartDownloadForOffline -> {
                     startDownloadForOffline(transferTriggerEvent)
@@ -531,6 +533,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             monitorActiveTransferFinishedUseCase(TransferType.DOWNLOAD)
                 .catch { Timber.e(it) }
                 .collect { totalNodes ->
+                    if (!lastTransferStartedHere) {
+                        yield() //wait for others to listen the event to try to show the snackbar in the same component that started the transfer
+                    }
                     if (active) {
                         when (lastDownloadTriggerEvent) {
                             is TransferTriggerEvent.StartDownloadForOffline -> {
@@ -549,6 +554,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         }
                         lastDownloadTriggerEvent = null
                     }
+                    lastTransferStartedHere = false
                 }
         }
     }
@@ -566,6 +572,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         if (this.endsWith(suffix)) this else this.plus(suffix)
 
     private var active = false
+    private var lastTransferStartedHere = false
+
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         active = true
@@ -616,6 +624,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
 
         lastUpload = transferTriggerEvent
+        lastTransferStartedHere = true
         monitorUploadFinish()
         _uiState.update {
             it.copy(jobInProgressState = StartTransferJobInProgress.ScanningTransfers)

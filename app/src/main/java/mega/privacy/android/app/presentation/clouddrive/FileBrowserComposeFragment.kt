@@ -18,7 +18,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -177,8 +176,8 @@ class FileBrowserComposeFragment : Fragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by fileBrowserViewModel.state.collectAsStateWithLifecycle()
                 val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
-                val snackbarHostState = remember { SnackbarHostState() }
                 val scaffoldState = rememberScaffoldState()
+                val snackbarHostState = scaffoldState.snackbarHostState
                 val coroutineScope = rememberCoroutineScope()
                 var clickedFile: TypedFileNode? by remember {
                     mutableStateOf(null)
@@ -248,14 +247,6 @@ class FileBrowserComposeFragment : Fragment() {
                             },
                             fileTypeIconMapper = fileTypeIconMapper
                         )
-
-                        // Snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet
-                        LaunchedEffect(snackbarHostState.currentSnackbarData) {
-                            snackbarHostState.currentSnackbarData?.message?.let {
-                                Util.showSnackbar(activity, it)
-                            }
-                            snackbarHostState.currentSnackbarData?.dismiss()
-                        }
                         StartTransferComponent(
                             uiState.downloadEvent,
                             {

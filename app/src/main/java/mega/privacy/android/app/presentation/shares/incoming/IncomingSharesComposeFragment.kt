@@ -57,6 +57,7 @@ import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.incoming.ui.IncomingSharesView
+import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -220,12 +221,7 @@ class IncomingSharesComposeFragment : Fragment() {
                         fileTypeIconMapper = fileTypeIconMapper,
                     )
 
-                    // Snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet
-                    LaunchedEffect(snackbarHostState.currentSnackbarData) {
-                        snackbarHostState.currentSnackbarData?.message?.let {
-                            Util.showSnackbar(activity, it)
-                        }
-                    }
+                    LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
                     StartTransferComponent(
                         uiState.downloadEvent,
                         {

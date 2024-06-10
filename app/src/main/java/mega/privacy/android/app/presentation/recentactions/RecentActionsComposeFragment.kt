@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.recentactions.view.RecentActionsView
+import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
@@ -132,27 +133,28 @@ class RecentActionsComposeFragment : Fragment() {
                             onScrollStateChanged = ::onScrollStateChanged
                         )
                     }
-                }
-                StartTransferComponent(
-                    event = nodeActionState.downloadEvent,
-                    onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
-                    snackBarHostState = snackbarHostState,
-                )
-                clickedFile?.let {
-                    HandleNodeAction(
-                        typedFileNode = it,
-                        nodeSourceType = when (parentFolderSharesType) {
-                            RecentActionsSharesType.INCOMING_SHARES -> Constants.INCOMING_SHARES_ADAPTER
-                            else -> Constants.FILE_BROWSER_ADAPTER
-                        },
+                    StartTransferComponent(
+                        event = nodeActionState.downloadEvent,
+                        onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                         snackBarHostState = snackbarHostState,
-                        onActionHandled = {
-                            clickedFile = null
-                            parentFolderSharesType = null
-                        },
-                        nodeActionsViewModel = nodeActionsViewModel,
-                        coroutineScope = coroutineScope
                     )
+                    LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
+                    clickedFile?.let {
+                        HandleNodeAction(
+                            typedFileNode = it,
+                            nodeSourceType = when (parentFolderSharesType) {
+                                RecentActionsSharesType.INCOMING_SHARES -> Constants.INCOMING_SHARES_ADAPTER
+                                else -> Constants.FILE_BROWSER_ADAPTER
+                            },
+                            snackBarHostState = snackbarHostState,
+                            onActionHandled = {
+                                clickedFile = null
+                                parentFolderSharesType = null
+                            },
+                            nodeActionsViewModel = nodeActionsViewModel,
+                            coroutineScope = coroutineScope
+                        )
+                    }
                 }
             }
         }

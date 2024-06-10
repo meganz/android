@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,12 +56,12 @@ import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.links.view.LinksView
+import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -190,11 +189,7 @@ class LinksComposeFragment : Fragment() {
                         onToggleAppBarElevation = ::toggleAppBarElevation,
                         fileTypeIconMapper = fileTypeIconMapper,
                     )
-                    LaunchedEffect(snackbarHostState.currentSnackbarData) {
-                        snackbarHostState.currentSnackbarData?.message?.let {
-                            Util.showSnackbar(activity, it)
-                        }
-                    }
+                    LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
                     StartTransferComponent(
                         uiState.downloadEvent,
                         {
