@@ -6,10 +6,11 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
@@ -21,6 +22,8 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.chat.message.delete.IsMessageDeletableUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -37,7 +40,7 @@ import javax.inject.Inject
  * @property megaApi                    MegaAPI required for node requests
  * @property getChatMessageUseCase      ChatMessageUseCase required to retrieve chat node information
  * @property getNodeUseCase             NodeUseCase required to retrieve node information
- * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
+ * @property isMessageDeletableUseCase  [IsMessageDeletableUseCase]
  * @property dbHandler                  Database handler needed to retrieve timeline nodes
  * @property sortOrderIntMapper         SortOrderIntMapper
  */
@@ -49,10 +52,11 @@ class GetImageHandlesUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val getNodeUseCase: GetNodeUseCase,
-    private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
+    private val isMessageDeletableUseCase: IsMessageDeletableUseCase,
     private val dbHandler: DatabaseHandler,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val legacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
     /**
@@ -221,23 +225,24 @@ class GetImageHandlesUseCase @Inject constructor(
      * @param chatRoomId    Node Chat Message Room Id.
      */
     private fun MutableList<ImageItem>.addChatChildren(chatRoomId: Long, messageIds: LongArray) {
-        messageIds.forEach { messageId ->
-            val node = getChatMessageUseCase.getChatNode(chatRoomId, messageId).blockingGetOrNull()
-            if (node?.isValidForImageViewer() == true) {
-                val deletable =
-                    deleteChatMessageUseCase.check(chatRoomId, messageId).blockingGetOrNull()
-                        ?: false
-                this.add(
-                    ImageItem.ChatNode(
-                        id = (chatRoomId.hashCode() + messageId.hashCode()).toLong(),
-                        handle = node.handle,
-                        name = node.name,
-                        infoText = node.getInfoText(context),
-                        chatRoomId = chatRoomId,
-                        chatMessageId = messageId,
-                        isDeletable = deletable
+        applicationScope.launch {
+            messageIds.forEach { messageId ->
+                val node =
+                    getChatMessageUseCase.getChatNode(chatRoomId, messageId).blockingGetOrNull()
+                if (node?.isValidForImageViewer() == true) {
+                    val deletable = isMessageDeletableUseCase(chatRoomId, messageId)
+                    this@addChatChildren.add(
+                        ImageItem.ChatNode(
+                            id = (chatRoomId.hashCode() + messageId.hashCode()).toLong(),
+                            handle = node.handle,
+                            name = node.name,
+                            infoText = node.getInfoText(context),
+                            chatRoomId = chatRoomId,
+                            chatMessageId = messageId,
+                            isDeletable = deletable
+                        )
                     )
-                )
+                }
             }
         }
     }
