@@ -1242,6 +1242,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             setRecIndicatorVisibility()
         }
 
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.isMyHandRaisedToSpeak }
+            .distinctUntilChanged()) {
+            updateParticipantsBottomPanel()
+        }
+
         viewLifecycleOwner.collectFlow(callRecordingViewModel.state) { state: CallRecordingUIState ->
             if (state.participantRecording != null) {
                 showSnackbar(
@@ -2277,7 +2282,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     it.toMutableList(),
                     inMeetingViewModel.getMyOwnInfo(
                         sharedModel.micLiveData.value ?: false,
-                        sharedModel.cameraLiveData.value ?: false
+                        sharedModel.cameraLiveData.value ?: false,
+                        sharedModel.state.value.isMyHandRaisedToSpeak
                     )
                 )
             }
@@ -2480,7 +2486,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 participants.toMutableList(),
                 inMeetingViewModel.getMyOwnInfo(
                     sharedModel.micLiveData.value ?: false,
-                    sharedModel.cameraLiveData.value ?: false
+                    sharedModel.cameraLiveData.value ?: false,
+                    sharedModel.state.value.isMyHandRaisedToSpeak
                 )
             )
         }

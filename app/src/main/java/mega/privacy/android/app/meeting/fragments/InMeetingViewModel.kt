@@ -587,28 +587,21 @@ class InMeetingViewModel @Inject constructor(
      */
     private fun updateParticipantsWithRaisedHand(call: ChatCall) {
         val listWithChanges = buildList {
-            var order = 0
-            val triple = call.usersRaiseHands.map {
-                Triple(it.key, it.value, ++order)
-            }
             participants.value = participants.value?.map { participant ->
-                triple.find { it.first == participant.peerId }
-                    ?.let { (_, isRaisedHand, order) ->
-                        // update the participant's isRaisedHand status and order based on the corresponding values in the triple.
-                        // If the participant's isRaisedHand status changes, their ID is added to the listWithChanges.
-                        if (participant.isRaisedHand != isRaisedHand) {
-                            add(participant.peerId)
-                            participant.copy(isRaisedHand = isRaisedHand, order = order)
-                        } else {
-                            participant
-                        }
-                    } ?: if (participant.isRaisedHand) {
-                    add(participant.peerId)
-                    // If a participant's ID is not found in the triple list, it means they have not raised their hand.
-                    // In this case, their isRaisedHand status is set to false and their order is set to Int.MAX_VALUE.
-                    participant.copy(isRaisedHand = false, order = Int.MAX_VALUE)
-                } else {
-                    participant
+                call.usersRaiseHands[participant.peerId]?.let { isRaisedHand ->
+                    if (participant.isRaisedHand != isRaisedHand) {
+                        add(participant.peerId)
+                        participant.copy(isRaisedHand = isRaisedHand)
+                    } else {
+                        participant
+                    }
+                } ?: run {
+                    if (participant.isRaisedHand) {
+                        add(participant.peerId)
+                        participant.copy(isRaisedHand = false)
+                    } else {
+                        participant
+                    }
                 }
             }?.toMutableList()
         }
@@ -2732,9 +2725,10 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param audio local audio
      * @param video local video
+     * @param isRaisedHand  True, my hand is raised. False, if not.
      * @return Me as a Participant
      */
-    fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant {
+    fun getMyOwnInfo(audio: Boolean, video: Boolean, isRaisedHand: Boolean): Participant {
         val participant = inMeetingRepository.getMyInfo(
             getOwnPrivileges() == PRIV_MODERATOR,
             audio,
@@ -2742,6 +2736,7 @@ class InMeetingViewModel @Inject constructor(
         )
         participant.hasOptionsAllowed =
             shouldParticipantsOptionBeVisible(participant.isMe, participant.isGuest)
+        participant.isRaisedHand = isRaisedHand
 
         return participant
     }

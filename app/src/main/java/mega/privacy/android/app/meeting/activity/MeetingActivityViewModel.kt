@@ -1906,11 +1906,41 @@ class MeetingActivityViewModel @Inject constructor(
     fun updateChatParticipantsInCall(participants: List<Participant>) {
         _state.update { state ->
             state.copy(
-                usersInCall = participants
+                usersInCall = updateOrder(participants)
             )
         }
 
         checkParticipantLists()
+    }
+
+    /**
+     * Update order of participants
+     *
+     * @param participants  List of participants without order
+     * @return  List of participant with order
+     */
+    private fun updateOrder(participants: List<Participant>): List<Participant> {
+        var order = 0
+        state.value.currentCall?.apply {
+            val triple = usersRaiseHands.map {
+                Triple(it.key, it.value, ++order)
+            }
+            val listWithChanges = buildList {
+                participants.map { participant ->
+                    triple.find { it.first == participant.peerId }
+                        ?.let { (_, _, order) ->
+                            add(participant.copy(order = order))
+
+                        } ?: run {
+                        add(participant.copy(order = Int.MAX_VALUE))
+                    }
+                }
+            }
+
+            return listWithChanges
+        }
+
+        return participants
     }
 
     /**
@@ -1952,8 +1982,14 @@ class MeetingActivityViewModel @Inject constructor(
                 }
             }
         }
+
+
         val sortedChatParticipantsInCall =
             chatParticipantsInCall.sortedBy { it.callParticipantData.order }
+
+        sortedChatParticipantsInCall.forEach {
+            Timber.d("************************* part ${it.data.fullName} order ${it.callParticipantData.order}")
+        }
 
         _state.update { state ->
             state.copy(
