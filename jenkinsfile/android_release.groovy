@@ -171,9 +171,6 @@ pipeline {
             }
         }
         stage('Clone transifex') {
-            when {
-                expression { isMajorRelease(common) }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Clone transifex'
@@ -388,6 +385,32 @@ pipeline {
             }
         }
 
+        stage('Delete old strings') {
+            when {
+                expression { triggeredByDeliverAppStore() || triggeredByDeleteOldString() }
+            }
+            steps {
+                script {
+                    withCredentials([
+                            string(credentialsId: 'ANDROID_TRANSIFEX_BOT_TOKEN', variable: 'TRANSIFEX_BOT_TOKEN'),
+                            string(credentialsId: 'ANDROID_TRANSIFEX_BOT_URL', variable: 'TRANSIFEX_BOT_URL'),
+                            string(credentialsId: 'ANDROID_TRANSIFEX_TOKEN', variable: 'ANDROID_TRANSIFEX_TOKEN'),
+                            gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')
+                    ]) {
+                        withEnv([
+                                "TRANSIFEX_BOT_TOKEN=${TRANSIFEX_BOT_TOKEN}",
+                                "TRANSIFEX_BOT_URL=${TRANSIFEX_BOT_URL}",
+                                "TRANSIFEX_TOKEN=${ANDROID_TRANSIFEX_TOKEN}"
+                        ]) {
+                            sh 'echo $TRANSIFEX_BOT_TOKEN'
+                            sh 'echo $TRANSIFEX_BOT_URL'
+                            sh './gradlew deleteOldStrings'
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Deploy to Google Play Alpha') {
             when {
                 expression { triggeredByDeliverAppStore() }
@@ -555,4 +578,15 @@ private boolean triggeredByUploadSymbol() {
     return isOnReleaseBranch() &&
             env.gitlabTriggerPhrase != null &&
             env.gitlabTriggerPhrase == "upload_symbol"
+}
+
+
+/**
+ * Check if build is triggered by 'upload_symbol' command.
+ * @return true if build is triggered by 'upload_symbol' command. Otherwise return false.
+ */
+private boolean triggeredByDeleteOldString() {
+    return isOnReleaseBranch() &&
+            env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase == "delete_oldStrings"
 }
