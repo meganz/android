@@ -2,6 +2,7 @@ package mega.privacy.android.shared.original.core.ui.controls.controlssliders
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.Checkable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
@@ -14,6 +15,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -55,7 +57,9 @@ import mega.privacy.android.shared.original.core.ui.theme.PreviewWithTempAndNewC
  * Custom implementation of Switch View following our design
  * @property checked
  * @property enabled
+ * * @property clickable
  * @property onCheckedChange
+ * @property onClick
  */
 class MegaSwitch : AbstractComposeView, Checkable {
     @get:JvmName("isCheckedKt")
@@ -65,7 +69,12 @@ class MegaSwitch : AbstractComposeView, Checkable {
     @get:JvmName("isEnabledKt")
     @set:JvmName("setEnabledKt")
     var enabled by mutableStateOf(true)
+
+    @get:JvmName("isClickableKt")
+    @set:JvmName("setClickableKt")
+    var clickable by mutableStateOf(true)
     var onCheckedChange by mutableStateOf<((MegaSwitch, Boolean) -> Unit)?>(null)
+    var onClick by mutableStateOf<(() -> Unit)?>(null)
 
     /**
      * overridden getter to be sure it's not used by mistake or from java code
@@ -95,11 +104,17 @@ class MegaSwitch : AbstractComposeView, Checkable {
     @Composable
     override fun Content() {
         OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-            MegaSwitch(checked = checked, onCheckedChange = {
-                val changed = checked != it
-                checked = it
-                onCheckedChange?.takeIf { changed }?.invoke(this, it)
-            })
+            MegaSwitch(
+                checked = checked,
+                onCheckedChange = if (clickable) {
+                    {
+                        val changed = checked != it
+                        checked = it
+                        onCheckedChange?.takeIf { changed }?.invoke(this, it)
+                    }
+                } else null,
+                onClickListener = onClick?.takeIf { clickable }
+            )
         }
     }
 
@@ -119,6 +134,16 @@ class MegaSwitch : AbstractComposeView, Checkable {
     fun setOnCheckedChangeListener(listener: ((MegaSwitch, Boolean) -> Unit)?) {
         onCheckedChange = listener
     }
+
+    fun setOnClickListener(listener: (View) -> Unit) {
+        super.setOnClickListener(listener)
+        this.onClick = { listener(this) }
+    }
+
+    override fun setClickable(clickable: Boolean) {
+        super.setClickable(clickable)
+        this.clickable = clickable
+    }
 }
 
 /**
@@ -134,6 +159,7 @@ fun MegaSwitch(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    onClickListener: (() -> Unit)? = null,
     onCheckedChange: ((Boolean) -> Unit)?,
 ) {
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -188,10 +214,21 @@ fun MegaSwitch(
                 if (onCheckedChange != null) {
                     Modifier.toggleable(
                         value = checked,
-                        onValueChange = onCheckedChange,
+                        onValueChange = {
+                            onCheckedChange(it)
+                            onClickListener?.invoke()
+                        },
                         enabled = enabled,
                         role = Role.Switch,
                         interactionSource = interactionSource,
+                        indication = null
+                    )
+                } else if (onClickListener != null) {
+                    Modifier.clickable(
+                        enabled = enabled,
+                        role = Role.Switch,
+                        interactionSource = interactionSource,
+                        onClick = onClickListener,
                         indication = null
                     )
                 } else Modifier

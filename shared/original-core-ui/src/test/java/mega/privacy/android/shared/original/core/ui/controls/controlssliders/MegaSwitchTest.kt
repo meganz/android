@@ -62,10 +62,30 @@ class MegaSwitchTest {
     }
 
     @Test
+    fun `test that switch is toggleable if it is enabled`() {
+        var checked = false
+        composeRule.setContent {
+            testSwitch(checked = checked, onCheckedChange = { checked = it })
+        }
+        composeRule.onNodeWithTag(tag).performClick()
+        Truth.assertThat(checked).isTrue()
+    }
+
+    @Test
+    fun `test that switch is not toggleable if it is not enabled`() {
+        var checked = false
+        composeRule.setContent {
+            testSwitch(checked = checked, onCheckedChange = { checked = it }, enabled = false)
+        }
+        composeRule.onNodeWithTag(tag).performClick()
+        Truth.assertThat(checked).isFalse()
+    }
+
+    @Test
     fun `test that switch is clickable if it is enabled`() {
         var changed = false
         composeRule.setContent {
-            testSwitch(onCheckedChange = { changed = true })
+            testSwitch(onClickListener = { changed = true })
         }
         composeRule.onNodeWithTag(tag).performClick()
         Truth.assertThat(changed).isTrue()
@@ -75,10 +95,24 @@ class MegaSwitchTest {
     fun `test that switch is not clickable if it is not enabled`() {
         var changed = false
         composeRule.setContent {
-            testSwitch(onCheckedChange = { changed = true }, enabled = false)
+            testSwitch(onClickListener = { changed = true }, enabled = false)
         }
         composeRule.onNodeWithTag(tag).performClick()
         Truth.assertThat(changed).isFalse()
+    }
+
+    fun `test that both listeners work together`() {
+        var changed = false
+        var checked = false
+        composeRule.setContent {
+            testSwitch(
+                onClickListener = { changed = true },
+                checked = checked,
+                onCheckedChange = { checked = it })
+        }
+        composeRule.onNodeWithTag(tag).performClick()
+        Truth.assertThat(changed).isTrue()
+        Truth.assertThat(checked).isTrue()
     }
 
     @Composable
@@ -86,11 +120,13 @@ class MegaSwitchTest {
         checked: Boolean = true,
         enabled: Boolean = true,
         onCheckedChange: ((Boolean) -> Unit)? = null,
+        onClickListener: (() -> Unit)? = null,
     ) = MegaSwitch(
         modifier = Modifier.testTag(tag),
         checked = checked,
         enabled = enabled,
         onCheckedChange = onCheckedChange,
+        onClickListener = onClickListener
     )
 
     private val tag = "switch"
