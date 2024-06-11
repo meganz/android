@@ -202,7 +202,9 @@ internal fun FileInfoContent(
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     descriptionText = descriptionText,
                     labelId = sharedR.string.file_info_information_description_label,
-                    placeholder = stringResource(id = sharedR.string.file_info_information_description_placeholder).takeIf { isDescriptionEnabled() },
+                    placeholder = if (isDescriptionEnabled()) stringResource(id = sharedR.string.file_info_information_description_placeholder) else stringResource(
+                        id = sharedR.string.file_info_information_no_description_placeholder
+                    ),
                     isEditable = isDescriptionEnabled(),
                     onConfirmDescription = onSetDescriptionClick,
                 )
