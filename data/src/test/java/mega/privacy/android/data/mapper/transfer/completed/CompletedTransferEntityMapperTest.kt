@@ -1,7 +1,6 @@
 package mega.privacy.android.data.mapper.transfer.completed
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
@@ -11,7 +10,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class CompletedTransferEntityMapperTest {
     private lateinit var underTest: CompletedTransferEntityMapper
 
@@ -36,6 +34,7 @@ internal class CompletedTransferEntityMapperTest {
             error = "No error",
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = 11622336899311L,
+            appData = "appData",
         )
         val expected = CompletedTransferEntity(
             fileName = "2023-03-24 00.13.20_1.jpg",
@@ -49,6 +48,7 @@ internal class CompletedTransferEntityMapperTest {
             error = "No error",
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = "11622336899311",
+            appData = "appData",
         )
         whenever(encryptData(model.fileName)).thenReturn(model.fileName)
         whenever(encryptData(model.type.toString())).thenReturn(model.type.toString())
@@ -61,6 +61,7 @@ internal class CompletedTransferEntityMapperTest {
         whenever(encryptData(model.error)).thenReturn(model.error)
         whenever(encryptData(model.originalPath)).thenReturn(model.originalPath)
         whenever(encryptData(model.parentHandle.toString())).thenReturn(model.parentHandle.toString())
+        whenever(encryptData(model.appData)).thenReturn(model.appData)
 
         Truth.assertThat(underTest(model)).isEqualTo(expected)
     }

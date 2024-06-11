@@ -32,6 +32,7 @@ class CompletedTransferMapper @Inject constructor(
     private val stringWrapper: StringWrapper,
     private val transferTypeIntMapper: TransferTypeIntMapper,
     private val transferStateIntMapper: TransferStateIntMapper,
+    private val transferAppDataStringMapper: TransferAppDataStringMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -62,6 +63,7 @@ class CompletedTransferMapper @Inject constructor(
                 error = error?.let { getErrorString(transfer, it) },
                 originalPath = transfer.localPath,
                 parentHandle = transfer.parentHandle,
+                appData = transferAppDataStringMapper(transfer.appData)
             )
         }
 

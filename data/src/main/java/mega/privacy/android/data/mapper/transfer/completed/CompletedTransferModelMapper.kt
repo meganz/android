@@ -21,5 +21,6 @@ internal class CompletedTransferModelMapper @Inject constructor(
         error = decryptData(entity.error),
         originalPath = decryptData(entity.originalPath).orEmpty(),
         parentHandle = decryptData(entity.parentHandle)?.toLongOrNull() ?: -1L,
+        appData = decryptData(entity.appData),
     )
 }

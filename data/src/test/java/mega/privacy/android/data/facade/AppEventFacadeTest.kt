@@ -55,7 +55,8 @@ class AppEventFacadeTest {
             timestamp = 0L,
             error = "",
             originalPath = "",
-            parentHandle = 0L
+            parentHandle = 0L,
+            appData = null,
         )
         underTest.monitorCompletedTransfer.test {
             underTest.broadcastCompletedTransfer(expected)

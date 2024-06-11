@@ -15,6 +15,7 @@ package mega.privacy.android.domain.entity.transfer
  * @property originalPath the original local path of the file transferred
  * @property parentHandle  the parent handle of the file transferred
  * @property timestamp represents the time when the transfer is completed
+ * @property appData The application data associated with this transfer
  */
 data class CompletedTransfer(
     val id: Int? = null,
@@ -29,4 +30,5 @@ data class CompletedTransfer(
     val error: String?,
     val originalPath: String,
     val parentHandle: Long,
+    val appData: String?,
 )

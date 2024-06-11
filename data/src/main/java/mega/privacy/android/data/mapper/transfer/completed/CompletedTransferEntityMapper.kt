@@ -21,5 +21,6 @@ internal class CompletedTransferEntityMapper @Inject constructor(
         error = encryptData(completedTransfer.error),
         originalPath = encryptData(completedTransfer.originalPath),
         parentHandle = encryptData(completedTransfer.parentHandle.toString()),
+        appData = encryptData(completedTransfer.appData),
     )
 }

@@ -1,7 +1,6 @@
 package mega.privacy.android.data.mapper.transfer.completed
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
@@ -14,7 +13,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class CompletedTransferModelMapperTest {
     private lateinit var underTest: CompletedTransferModelMapper
@@ -49,6 +47,7 @@ internal class CompletedTransferModelMapperTest {
             error = "No error",
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = "11622336899311",
+            appData = "appData",
         )
         val expected = CompletedTransfer(
             id = 0,
@@ -63,6 +62,7 @@ internal class CompletedTransferModelMapperTest {
             error = "No error",
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = 11622336899311L,
+            appData = "appData",
         )
         whenever(decryptData(entity.fileName)).thenReturn(entity.fileName)
         whenever(decryptData(entity.type)).thenReturn(entity.type)
@@ -75,6 +75,7 @@ internal class CompletedTransferModelMapperTest {
         whenever(decryptData(entity.error)).thenReturn(entity.error)
         whenever(decryptData(entity.originalPath)).thenReturn(entity.originalPath)
         whenever(decryptData(entity.parentHandle)).thenReturn(entity.parentHandle)
+        whenever(decryptData(entity.appData)).thenReturn(entity.appData)
 
         Truth.assertThat(underTest(entity)).isEqualTo(expected)
     }
@@ -94,6 +95,7 @@ internal class CompletedTransferModelMapperTest {
             error = "No error",
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = "11622336899311",
+            appData = "appData",
         )
         val expected = CompletedTransfer(
             id = 0,
@@ -108,6 +110,7 @@ internal class CompletedTransferModelMapperTest {
             error = null,
             originalPath = "",
             parentHandle = -1L,
+            appData = null,
         )
         whenever(decryptData(entity.fileName)).thenReturn(null)
         whenever(decryptData(entity.type)).thenReturn(null)
@@ -120,6 +123,7 @@ internal class CompletedTransferModelMapperTest {
         whenever(decryptData(entity.error)).thenReturn(null)
         whenever(decryptData(entity.originalPath)).thenReturn(null)
         whenever(decryptData(entity.parentHandle)).thenReturn(null)
+        whenever(decryptData(entity.appData)).thenReturn(null)
 
         Truth.assertThat(underTest(entity)).isEqualTo(expected)
     }
@@ -140,6 +144,7 @@ internal class CompletedTransferModelMapperTest {
                 error = "No error",
                 originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
                 parentHandle = "nonLongValue",
+                appData = "appData",
             )
             val expected = CompletedTransfer(
                 id = 0,
@@ -154,6 +159,7 @@ internal class CompletedTransferModelMapperTest {
                 error = "No error",
                 originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
                 parentHandle = -1L,
+                appData = "appData",
             )
             whenever(decryptData(entity.fileName)).thenReturn(entity.fileName)
             whenever(decryptData(entity.type)).thenReturn(entity.type)
@@ -166,6 +172,7 @@ internal class CompletedTransferModelMapperTest {
             whenever(decryptData(entity.error)).thenReturn(entity.error)
             whenever(decryptData(entity.originalPath)).thenReturn(entity.originalPath)
             whenever(decryptData(entity.parentHandle)).thenReturn(entity.parentHandle)
+            whenever(decryptData(entity.appData)).thenReturn(entity.appData)
 
             Truth.assertThat(underTest(entity)).isEqualTo(expected)
         }

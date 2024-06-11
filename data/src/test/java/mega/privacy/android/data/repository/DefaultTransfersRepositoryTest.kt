@@ -703,7 +703,8 @@ class DefaultTransfersRepositoryTest {
                 timestamp = 123L,
                 error = null,
                 originalPath = "originalFilePath",
-                parentHandle = 2L
+                parentHandle = 2L,
+                appData = null,
             )
             val transfer2 = CompletedTransfer(
                 id = 1,
@@ -717,7 +718,8 @@ class DefaultTransfersRepositoryTest {
                 timestamp = 123L,
                 error = null,
                 originalPath = "originalFilePath",
-                parentHandle = 2L
+                parentHandle = 2L,
+                appData = null,
             )
             val existingTransfer1 = CompletedTransfer(
                 id = 3,
@@ -731,7 +733,8 @@ class DefaultTransfersRepositoryTest {
                 timestamp = 123L,
                 error = null,
                 originalPath = "originalFilePath",
-                parentHandle = 2L
+                parentHandle = 2L,
+                appData = null,
             )
             whenever(megaLocalRoomGateway.getAllCompletedTransfers())
                 .thenReturn(flowOf(listOf(existingTransfer1)))

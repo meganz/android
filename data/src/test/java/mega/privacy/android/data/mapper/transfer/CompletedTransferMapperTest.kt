@@ -44,6 +44,7 @@ class CompletedTransferMapperTest {
     private val stringWrapper: StringWrapper = mock()
     private val transferTypeIntMapper: TransferTypeIntMapper = mock()
     private val transferStateIntMapper: TransferStateIntMapper = mock()
+    private val transferAppDataStringMapper = mock<TransferAppDataStringMapper>()
 
     @BeforeAll
     fun setup() {
@@ -54,6 +55,7 @@ class CompletedTransferMapperTest {
             stringWrapper = stringWrapper,
             transferTypeIntMapper = transferTypeIntMapper,
             transferStateIntMapper = transferStateIntMapper,
+            transferAppDataStringMapper = transferAppDataStringMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
         )
     }
@@ -67,6 +69,7 @@ class CompletedTransferMapperTest {
             stringWrapper,
             transferTypeIntMapper,
             transferStateIntMapper,
+            transferAppDataStringMapper,
         )
     }
 

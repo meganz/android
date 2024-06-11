@@ -37,4 +37,5 @@ internal data class CompletedTransferEntity(
     @ColumnInfo(name = "transfererror") val error: String?,
     @ColumnInfo(name = "transferoriginalpath") val originalPath: String?,
     @ColumnInfo(name = "transferparenthandle") val parentHandle: String?,
+    @ColumnInfo(name = "transferappdata") val appData: String?,
 )

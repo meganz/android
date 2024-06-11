@@ -8,7 +8,6 @@ import javax.inject.Inject
 /**
  * [TransferAppData] to [String] mapper. It maps the [TransferAppData] to the format expected by sdk.
  */
-internal
 class TransferAppDataStringMapper @Inject constructor() {
     /**
      * Get a [String] corresponding to a List of [TransferAppData] to use as raw appData in sdk

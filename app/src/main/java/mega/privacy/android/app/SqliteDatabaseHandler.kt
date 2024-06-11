@@ -37,7 +37,6 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_ON
-import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -554,31 +553,6 @@ class SqliteDatabaseHandler @Inject constructor(
             Timber.e(e, "Exception opening or managing DB cursor")
         }
         return null
-    }
-
-    /**
-     * Extracts a completed transfer of a row.
-     *
-     * @param cursor Cursor from which the data should be extracted.
-     * @return The extracted completed transfer.
-     */
-    private fun extractAndroidCompletedTransfer(cursor: Cursor): CompletedTransfer {
-        val id = cursor.getInt(0)
-        val filename = decrypt(cursor.getString(1)).orEmpty()
-        val type = decrypt(cursor.getString(2))?.toInt() ?: -1
-        val state = decrypt(cursor.getString(3))?.toInt() ?: -1
-        val size = decrypt(cursor.getString(4)).orEmpty()
-        val handle = decrypt(cursor.getString(5))?.toLong() ?: -1
-        val path = decrypt(cursor.getString(6)).orEmpty()
-        val offline = decrypt(cursor.getString(7))?.toBooleanStrictOrNull()
-        val timestamp = decrypt(cursor.getString(8))?.toLong() ?: -1
-        val error = decrypt(cursor.getString(9))
-        val originalPath = decrypt(cursor.getString(10)).orEmpty()
-        val parentHandle = decrypt(cursor.getString(11))?.toLong() ?: -1
-        return CompletedTransfer(
-            id, filename, type, state, size, handle, path,
-            offline, timestamp, error, originalPath, parentHandle
-        )
     }
 
     /**

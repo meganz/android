@@ -406,6 +406,7 @@ internal class MegaLocalRoomFacadeTest {
                     error = "No error",
                     originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
                     parentHandle = "11622336899311",
+                    appData = "appData",
                 )
             }
             completedTransfers.forEach { entity ->
@@ -423,6 +424,7 @@ internal class MegaLocalRoomFacadeTest {
                         error = entity.error,
                         originalPath = entity.originalPath.orEmpty(),
                         parentHandle = entity.parentHandle.orEmpty().toLong(),
+                        appData = entity.appData,
                     )
                 )
             }
