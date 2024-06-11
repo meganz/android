@@ -34,7 +34,7 @@ def common
 
 pipeline {
     agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
-    triggers { cron('0 7 * * 1-5') }   // every day at 7.00am NZ time, except Saturday and Sunday
+    triggers { cron('0 7 * * 1-6') }   // every day at 7.00am NZ time, except Sunday
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
