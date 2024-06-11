@@ -17,16 +17,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.util.stream.Stream
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -35,24 +31,32 @@ class TagsViewModelTest {
     private val manageNodeTagUseCase = mock<ManageNodeTagUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val monitorNodeUpdatesById = mock<MonitorNodeUpdatesById>()
+    private val tagsValidationMessageMapper = mock<TagsValidationMessageMapper>()
     private lateinit var stateHandle: SavedStateHandle
     private lateinit var underTest: TagsViewModel
 
     @BeforeEach
     fun resetMock() {
         stateHandle = SavedStateHandle(mapOf(TagsActivity.NODE_ID to 123L))
+        whenever(tagsValidationMessageMapper.invoke("")).thenReturn(Pair("", false))
         whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
         underTest = TagsViewModel(
             manageNodeTagUseCase = manageNodeTagUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             monitorNodeUpdatesById = monitorNodeUpdatesById,
+            tagsValidationMessageMapper = tagsValidationMessageMapper,
             stateHandle = stateHandle
         )
     }
 
     @AfterEach
     fun clear() {
-        reset(manageNodeTagUseCase, getNodeByIdUseCase, monitorNodeUpdatesById)
+        reset(
+            manageNodeTagUseCase,
+            getNodeByIdUseCase,
+            monitorNodeUpdatesById,
+            tagsValidationMessageMapper
+        )
     }
 
     @Test
@@ -86,43 +90,13 @@ class TagsViewModelTest {
         verify(manageNodeTagUseCase).invoke(NodeId(123L), newTag = "new tag")
     }
 
-    @ParameterizedTest(name = "validateTagName should return {0} when tag is {1} and message is {2}")
-    @MethodSource("validateTagNameProvider")
-    fun `test that validateTagName should return true when tag is valid`(
-        expected: Boolean,
-        tag: String,
-        message: String?,
-    ) {
-        val actual = underTest.validateTagName(tag)
-        assertThat(actual).isEqualTo(expected)
-        assertThat(underTest.uiState.value.message).isEqualTo(message)
+    @Test
+    fun `test that validateTagName returns true when tag is valid`() = runTest {
+        whenever(tagsValidationMessageMapper.invoke("tag")).thenReturn(Pair("", false))
+        underTest.validateTagName("tag")
+        verify(tagsValidationMessageMapper).invoke("tag", emptyList(), emptyList())
     }
 
-    private fun validateTagNameProvider(): Stream<Arguments> = Stream.of(
-        Arguments.of(
-            false,
-            "",
-            "Use tags to help you find and organise your data. Try tagging by year, location, project, or subject."
-        ),
-        Arguments.of(
-            false,
-            " ",
-            "Use tags to help you find and organise your data. Try tagging by year, location, project, or subject."
-        ),
-        Arguments.of(false, "tag with space", "Tags can only contain letters and numbers."),
-        Arguments.of(
-            false,
-            "tag with special characters!@#",
-            "Tags can only contain letters and numbers."
-        ),
-        Arguments.of(true, "tag", null),
-        Arguments.of(true, "tag123", null),
-        Arguments.of(
-            false,
-            "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
-            "Tags can be up to 32 characters long."
-        )
-    )
 
     @Test
     fun `test monitorNodeUpdatesById updates node`() = runTest {

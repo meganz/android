@@ -394,4 +394,22 @@
     <string name="hidden_items">Hidden items</string>
     <!-- Label to indicate that is a Pro only feature -->
     <string name="general_pro_only_label">Pro only</string>
+    <!-- Label for the file info information screen tags field -->
+    <string name="file_info_information_tags_label">Tags</string>
+    <!-- label for tags page tag description -->
+    <string name="add_tags_label_tag_description">Use tags to help you find and organise your data. Try tagging by year, location, project, or subject.</string>
+    <!-- label for tag text field in add tags page -->
+    <string name="add_tags_text_label_tag">Tag</string>
+    <!-- label for add tags page add button -->
+    <string name="add_tags_button_label_add">Add “\#%1$s” tag</string>
+    <!-- label for add tags page existing tags label -->
+    <string name="add_tags_label_existing_tags">Existing tags</string>
+    <!-- error label for add tags page when special characters added -->
+    <string name="add_tags_error_special_characters">Tags must be lowercase, with no spaces or symbols. Tags written with capital letters will display in lowercase.</string>
+    <!-- error label for add tags page when tag count is maximum -->
+    <string name="add_tags_error_max_tags">The maximum number of tags is %1$d</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_max_characters">Tags must be %1$d characters or less</string>
+    <!-- title label for tags page -->
+    <string name="add_tags_page_title_label">Tags</string>
 </resources>

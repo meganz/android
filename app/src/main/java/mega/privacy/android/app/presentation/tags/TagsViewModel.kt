@@ -27,6 +27,7 @@ import javax.inject.Inject
 class TagsViewModel @Inject constructor(
     private val manageNodeTagUseCase: ManageNodeTagUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val tagsValidationMessageMapper: TagsValidationMessageMapper,
     monitorNodeUpdatesById: MonitorNodeUpdatesById,
     stateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -93,48 +94,13 @@ class TagsViewModel @Inject constructor(
      * @return      True if the tag is valid, false otherwise
      */
     fun validateTagName(tag: String): Boolean {
-        val message: String?
-        val isError: Boolean
-        val isBlank = tag.isBlank()
-        when {
-            isBlank && uiState.value.tags.isEmpty() -> {
-                message =
-                    "Use tags to help you find and organise your data. Try tagging by year, location, project, or subject."
-                isError = false
-            }
-
-            isBlank -> {
-                message = null
-                isError = false
-            }
-
-            tag.all { it.isLetterOrDigit() }.not() -> {
-                message = "Tags can only contain letters and numbers."
-                isError = true
-            }
-
-            tag.length > 32 -> {
-                message = "Tags can be up to 32 characters long."
-                isError = true
-            }
-
-            uiState.value.tags.size >= 10 && uiState.value.tags.contains(tag).not() -> {
-                message = "You can only add up to 10 tags."
-                isError = true
-            }
-
-            uiState.value.tags.contains(tag) -> {
-                message = "Tag already exists"
-                isError = true
-            }
-
-            else -> {
-                message = null
-                isError = false
-            }
-        }
+        val (message, isError) = tagsValidationMessageMapper(
+            tag = tag,
+            nodeTags = uiState.value.tags,
+            userTags = uiState.value.tags
+        )
         _uiState.update { it.copy(message = message, isError = isError) }
-        return !isError && !isBlank
+        return !isError && tag.isNotBlank()
     }
 
     /**

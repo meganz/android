@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.tags
 
 import mega.privacy.android.core.R as CoreR
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,7 +30,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -70,7 +70,7 @@ fun TagsScreen(
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
-                title = "Tags",
+                title = stringResource(id = sharedR.string.add_tags_page_title_label),
                 elevation = 0.dp,
                 onNavigationPressed = { onBackPressed() },
             )
@@ -110,7 +110,7 @@ private fun TagsContent(
             .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
         MegaText(
-            text = "Tag",
+            text = stringResource(id = sharedR.string.add_tags_text_label_tag),
             textColor = if (uiState.isError) TextColor.Error else TextColor.Accent,
             style = MaterialTheme.typography.caption,
         )
@@ -129,14 +129,13 @@ private fun TagsContent(
                 tag = it.removePrefix("#").lowercase(Locale.ROOT)
                 validateTagName(tag)
             },
-            title = stringResource(id = R.string.label_red),
             showUnderline = true,
         )
 
-        if (tag.isNotBlank() && uiState.isError.not()) {
+        if (tag.isNotBlank() && uiState.isError.not() && uiState.tags.contains(tag).not()) {
             TextMegaButton(
                 contentPadding = PaddingValues(vertical = 8.dp),
-                text = "Add \"#$tag\" tag",
+                text = stringResource(id = sharedR.string.add_tags_button_label_add, tag),
                 onClick = ::addTag,
                 textAlign = TextAlign.Start
             )
@@ -145,7 +144,7 @@ private fun TagsContent(
         if (uiState.tags.isNotEmpty()) {
             MegaText(
                 modifier = Modifier.padding(vertical = 12.dp),
-                text = "Existing Tags",
+                text = stringResource(id = sharedR.string.add_tags_label_existing_tags),
                 textColor = TextColor.Secondary,
                 style = MaterialTheme.typography.subtitle2,
             )

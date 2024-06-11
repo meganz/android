@@ -69,5 +69,15 @@ class TagsActivity : AppCompatActivity() {
          * Node ID extra key.
          */
         const val NODE_ID = "nodeId"
+
+        /**
+         * Maximum characters per tag.
+         */
+        const val MAX_CHARS_PER_TAG = 32
+
+        /**
+         * Maximum tags per node.
+         */
+        const val MAX_TAGS_PER_NODE = 10
     }
 }

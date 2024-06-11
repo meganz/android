@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
@@ -45,7 +47,7 @@ fun FileInfoTagsView(
             .clickable { onAddTagClick() },
     ) {
         MenuActionListTile(
-            text = "Tags",
+            text = stringResource(id = sharedR.string.file_info_information_tags_label),
             dividerType = null,
             addIconPadding = false,
             trailingItem = {
