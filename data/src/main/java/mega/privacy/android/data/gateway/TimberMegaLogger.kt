@@ -35,7 +35,6 @@ internal class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
         }
     }
 
-    private fun getSource(source: String?): String? {
-        return source?.split("jni/mega")?.getOrNull(1) ?: source
-    }
+    private fun getSource(source: String?) =
+        source?.split("jni/mega")?.getOrNull(1) ?: source
 }

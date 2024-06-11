@@ -1,6 +1,6 @@
 package mega.privacy.android.data.gateway
 
-import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatLoggerInterface
 import timber.log.Timber
 import javax.inject.Inject
@@ -14,13 +14,12 @@ internal class TimberChatLogger @Inject constructor() : MegaChatLoggerInterface 
     @Synchronized
     override fun log(loglevel: Int, message: String?) {
         when (loglevel) {
-            MegaApiAndroid.LOG_LEVEL_MAX -> Timber.v(message)
-            MegaApiAndroid.LOG_LEVEL_DEBUG -> Timber.d(message)
-            MegaApiAndroid.LOG_LEVEL_INFO -> Timber.i(message)
-            MegaApiAndroid.LOG_LEVEL_WARNING -> Timber.w(message)
-            MegaApiAndroid.LOG_LEVEL_ERROR,
-            MegaApiAndroid.LOG_LEVEL_FATAL,
-            -> Timber.e(message)
+            MegaChatApi.LOG_LEVEL_MAX, MegaChatApi.LOG_LEVEL_VERBOSE -> Timber.v(message)
+            MegaChatApi.LOG_LEVEL_DEBUG -> Timber.d(message)
+            MegaChatApi.LOG_LEVEL_INFO -> Timber.i(message)
+            MegaChatApi.LOG_LEVEL_WARNING -> Timber.w(message)
+            MegaChatApi.LOG_LEVEL_ERROR -> Timber.e(message)
+            else -> Timber.i(message)
         }
     }
 }
