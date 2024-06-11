@@ -281,4 +281,6 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     override fun getVideoSetsMap() = videoSetsMap
 
     override fun getVideoPlaylistsMap() = videoPlaylistsMap
+
+    override suspend fun getVideoPlaylistSets(): List<UserSet> = getAllUserSets()
 }

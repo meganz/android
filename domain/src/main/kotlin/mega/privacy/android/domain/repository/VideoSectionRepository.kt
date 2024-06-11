@@ -89,4 +89,11 @@ interface VideoSectionRepository {
      * @return Map<Long, UserSet>
      */
     fun getVideoPlaylistsMap(): Map<Long, UserSet>
+
+    /**
+     * Get video playlist sets
+     *
+     * @return video playlist sets
+     */
+    suspend fun getVideoPlaylistSets(): List<UserSet>
 }

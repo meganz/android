@@ -585,4 +585,14 @@ class VideoSectionRepositoryImplTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that getVideoPlaylistSets function returns the correct result`() = runTest {
+        val userSet = getUserSetAndInitReturnValues()
+
+        val actual = underTest.getVideoPlaylistSets()
+        assertThat(actual).isNotEmpty()
+        assertThat(actual.size).isEqualTo(1)
+        assertThat(actual[0]).isEqualTo(userSet)
+    }
 }
