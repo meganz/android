@@ -2,18 +2,14 @@ package mega.privacy.android.feature.sync.ui.megapicker
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
@@ -25,8 +21,9 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.extension.getIcon
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
@@ -92,12 +89,7 @@ internal fun MegaFolderPickerView(
                 onClick = { onFolderClick(nodeEntity) },
                 isEnabled = nodeEntity is FolderNode && nodesList[it].isDisabled.not(),
             )
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
-                thickness = 1.dp
-            )
+            MegaDivider(dividerType = DividerType.FullSize)
         }
     }
 }
