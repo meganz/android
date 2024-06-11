@@ -388,7 +388,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
                         Timber.d("Session in progress, clientID = ${callAndSession.second.clientid}")
                         inMeetingViewModel.addParticipant(
-                            callAndSession.second.clientid, requireContext()
+                            callAndSession.second.clientid
                         )?.let { position ->
                             if (position != INVALID_POSITION) {
                                 checkChildFragments()
@@ -2283,7 +2283,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     inMeetingViewModel.getMyOwnInfo(
                         sharedModel.micLiveData.value ?: false,
                         sharedModel.cameraLiveData.value ?: false,
-                        sharedModel.state.value.isMyHandRaisedToSpeak
                     )
                 )
             }
@@ -2487,7 +2486,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 inMeetingViewModel.getMyOwnInfo(
                     sharedModel.micLiveData.value ?: false,
                     sharedModel.cameraLiveData.value ?: false,
-                    sharedModel.state.value.isMyHandRaisedToSpeak
                 )
             )
         }

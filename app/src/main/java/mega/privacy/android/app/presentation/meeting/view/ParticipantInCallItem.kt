@@ -109,7 +109,7 @@ fun ParticipantInCallItem(
                             avatarFirstLetter = participant.getAvatarFirstLetter(),
                         )
 
-                        if (participant.callParticipantData.isRaisedHand) {
+                        if (participant.isRaisedHand) {
                             Image(
                                 modifier = Modifier
                                     .padding(
@@ -341,8 +341,9 @@ fun PreviewMeParticipantInCallItem() {
                 isMe = true,
                 privilege = ChatRoomPermission.Moderator,
                 defaultAvatarColor = -6624513,
+                isRaisedHand = true,
                 callParticipantData = CallParticipantData(
-                    clientId = 2L, isAudioOn = true, isVideoOn = true, isRaisedHand = true
+                    clientId = 2L, isAudioOn = true, isVideoOn = true
                 )
             ),
             onAdmitParticipantClicked = {},

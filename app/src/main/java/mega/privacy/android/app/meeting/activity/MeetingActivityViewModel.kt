@@ -263,6 +263,8 @@ class MeetingActivityViewModel @Inject constructor(
 
     var tips: MutableLiveData<String> = MutableLiveData<String>()
 
+    private var raisedHandUsersMap: Map<Long, Pair<Boolean, Int>> = emptyMap()
+
     private var monitorChatCallUpdatesJob: Job? = null
 
     // OnOffFab
@@ -592,6 +594,7 @@ class MeetingActivityViewModel @Inject constructor(
                     }
 
                     getMyUserHandle()
+                    updateParticipantsWithRaisedHand()
                     when (call.status) {
                         ChatCallStatus.UserNoPresent -> {
                             if (_state.value.action == MeetingActivity.MEETING_ACTION_IN) {
@@ -941,6 +944,7 @@ class MeetingActivityViewModel @Inject constructor(
                                         checkEphemeralAccountAndWaitingRoom(call)
                                         if (state.value.isRaiseToSpeakFeatureFlagEnabled) {
                                             Timber.d("Call in progress, check the participants with raised hand")
+                                            updateParticipantsWithRaisedHand()
                                             initialiseUserToShowInHandRaisedSnackbar(call)
                                         }
                                     }
@@ -987,6 +991,7 @@ class MeetingActivityViewModel @Inject constructor(
                                             updateUserToShowInHandRaisedSnackbar(listToUpdate)
                                         }
                                     }
+                                    updateParticipantsWithRaisedHand()
                                 }
                             }
 
@@ -1036,6 +1041,22 @@ class MeetingActivityViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    /**
+     * Update chat participants with hand raised list
+     */
+    private fun updateParticipantsWithRaisedHand() {
+        var order = 0
+        raisedHandUsersMap = buildMap {
+            state.value.currentCall?.usersRaiseHands?.map {
+                if (it.value) {
+                    put(it.key, Pair(it.value, ++order))
+                }
+            }
+        }
+        Timber.d("Raised Hands Map and Order $raisedHandUsersMap")
+        checkParticipantLists()
     }
 
     /**
@@ -1906,41 +1927,11 @@ class MeetingActivityViewModel @Inject constructor(
     fun updateChatParticipantsInCall(participants: List<Participant>) {
         _state.update { state ->
             state.copy(
-                usersInCall = updateOrder(participants)
+                usersInCall = participants
             )
         }
 
         checkParticipantLists()
-    }
-
-    /**
-     * Update order of participants
-     *
-     * @param participants  List of participants without order
-     * @return  List of participant with order
-     */
-    private fun updateOrder(participants: List<Participant>): List<Participant> {
-        var order = 0
-        state.value.currentCall?.apply {
-            val triple = usersRaiseHands.map {
-                Triple(it.key, it.value, ++order)
-            }
-            val listWithChanges = buildList {
-                participants.map { participant ->
-                    triple.find { it.first == participant.peerId }
-                        ?.let { (_, _, order) ->
-                            add(participant.copy(order = order))
-
-                        } ?: run {
-                        add(participant.copy(order = Int.MAX_VALUE))
-                    }
-                }
-            }
-
-            return listWithChanges
-        }
-
-        return participants
     }
 
     /**
@@ -1962,7 +1953,13 @@ class MeetingActivityViewModel @Inject constructor(
             state.value.usersInCall.find { it.peerId == chatParticipant.handle }
                 ?.let { participant ->
                     participantAdded = true
-                    chatParticipantsInCall.add(chatParticipantMapper(participant, chatParticipant))
+                    chatParticipantsInCall.add(
+                        chatParticipantMapper(
+                            participant,
+                            chatParticipant,
+                            raisedHandUsersMap[chatParticipant.handle]
+                        )
+                    )
                 }
 
             chatParticipantsNotInCall.find { it.handle == chatParticipant.handle }
@@ -1985,11 +1982,7 @@ class MeetingActivityViewModel @Inject constructor(
 
 
         val sortedChatParticipantsInCall =
-            chatParticipantsInCall.sortedBy { it.callParticipantData.order }
-
-        sortedChatParticipantsInCall.forEach {
-            Timber.d("************************* part ${it.data.fullName} order ${it.callParticipantData.order}")
-        }
+            chatParticipantsInCall.sortedBy { it.order }
 
         _state.update { state ->
             state.copy(
@@ -2199,19 +2192,6 @@ class MeetingActivityViewModel @Inject constructor(
             )
         }
         _state.update { state -> state.copy(isRingingAll = false) }
-    }
-
-    /**
-     * Hang chat call
-     */
-    fun hangChatCall() = viewModelScope.launch {
-        runCatching {
-            getChatCallUseCase(_state.value.chatId)?.let { chatCall ->
-                hangChatCallUseCase(chatCall.callId)
-            }
-        }.onFailure { exception ->
-            Timber.e(exception)
-        }
     }
 
     /**

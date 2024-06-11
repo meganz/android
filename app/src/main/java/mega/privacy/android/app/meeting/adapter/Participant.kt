@@ -34,7 +34,6 @@ import java.io.Serializable
  * @param isCameraOn            True if camera is on. False if camera is off.
  * @param isScreenShareOn       True if screen share is on. False if screen share is off.
  * @param isRaisedHand          True if is raised hand. False if is lowered hand.
- * @param order                 Sort order based on raised hand order
  */
 data class Participant(
     val peerId: Long,
@@ -57,8 +56,7 @@ data class Participant(
     var isScreenShared: Boolean = false,
     var isCameraOn: Boolean = false,
     var isScreenShareOn: Boolean = false,
-    var isRaisedHand: Boolean = false,
-    val order: Int = Int.MAX_VALUE,
+    val isRaisedHand: Boolean = false,
 ) : Serializable {
 
     /**

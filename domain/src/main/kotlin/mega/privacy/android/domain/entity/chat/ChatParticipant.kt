@@ -23,6 +23,8 @@ import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallSta
  * @property privilegesUpdated          Check if privilege are updated.
  * @property isContact                  True, if it's my contact. False, if not.
  * @property callStatus                 [MeetingParticipantNotInCallStatus]
+ * @property isRaisedHand              True if is raised hand. False if is lowered hand.
+ * @property order                     Sort order based on raised hand order.
  */
 data class ChatParticipant(
     val handle: Long,
@@ -39,4 +41,6 @@ data class ChatParticipant(
     val callParticipantData: CallParticipantData = CallParticipantData(),
     val isContact: Boolean = false,
     val callStatus: MeetingParticipantNotInCallStatus = MeetingParticipantNotInCallStatus.NotInCall,
+    val isRaisedHand: Boolean = false,
+    val order: Int = Int.MAX_VALUE,
 )
