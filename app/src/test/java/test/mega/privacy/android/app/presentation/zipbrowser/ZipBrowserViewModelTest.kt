@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 import mega.privacy.android.domain.entity.zipbrowser.ZipTreeNode
 import mega.privacy.android.domain.usecase.zipbrowser.GetZipTreeMapUseCase
+import mega.privacy.android.domain.usecase.zipbrowser.UnzipFileUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -30,10 +31,12 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ZipBrowserViewModelTest {
+
     private lateinit var underTest: ZipBrowserViewModel
 
     private val getZipTreeMapUseCase = mock<GetZipTreeMapUseCase>()
     private val zipInfoUiEntityMapper = mock<ZipInfoUiEntityMapper>()
+    private val unzipFileUseCase = mock<UnzipFileUseCase>()
     private val savedStateHandle = mock<SavedStateHandle>()
 
     private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
@@ -64,8 +67,14 @@ class ZipBrowserViewModelTest {
             subFilePath to testSubFileNode
         )
 
-    private val testZipFolderEntity = mock<ZipInfoUiEntity>()
-    private val testZipFileEntity = mock<ZipInfoUiEntity>()
+    private val testZipFolderEntity = mock<ZipInfoUiEntity> {
+        on { zipEntryType }.thenReturn(ZipEntryType.Folder)
+        on { path }.thenReturn(folderPath)
+    }
+    private val testFileEntity = mock<ZipInfoUiEntity> {
+        on { zipEntryType }.thenReturn(ZipEntryType.File)
+        on { path }.thenReturn(subFilePath)
+    }
 
     @BeforeEach
     fun setUp() {
@@ -77,6 +86,7 @@ class ZipBrowserViewModelTest {
         underTest = ZipBrowserViewModel(
             getZipTreeMapUseCase = getZipTreeMapUseCase,
             zipInfoUiEntityMapper = zipInfoUiEntityMapper,
+            unzipFileUseCase = unzipFileUseCase,
             savedStateHandle = savedStateHandle
         )
     }
@@ -86,6 +96,7 @@ class ZipBrowserViewModelTest {
         reset(
             getZipTreeMapUseCase,
             zipInfoUiEntityMapper,
+            unzipFileUseCase,
             savedStateHandle
         )
     }
@@ -99,7 +110,6 @@ class ZipBrowserViewModelTest {
     fun `test that the initial state is returned`() = runTest {
         whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
         whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(emptyMap())
-        whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
         initUnderTest()
 
         underTest.uiState.test {
@@ -132,14 +142,14 @@ class ZipBrowserViewModelTest {
         }
 
     @Test
-    fun `test that state is updated correctly when openFolder is invoked`() = runTest {
+    fun `test that state is updated correctly when folder item is clicked`() = runTest {
         whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
         whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(testZipNodeTree)
         whenever(zipInfoUiEntityMapper(testSubFolderNode)).thenReturn(testZipFolderEntity)
-        whenever(zipInfoUiEntityMapper(testSubFileNode)).thenReturn(testZipFileEntity)
+        whenever(zipInfoUiEntityMapper(testSubFileNode)).thenReturn(testFileEntity)
 
         initUnderTest()
-        underTest.openFolder(folderPath)
+        underTest.itemClicked(testZipFolderEntity)
 
         underTest.uiState.test {
             val actual = awaitItem()
@@ -148,7 +158,7 @@ class ZipBrowserViewModelTest {
             assertThat(actual.folderDepth).isEqualTo(1)
             assertThat(actual.parentFolderName).isEqualTo(folderPath)
             assertThat(actual.currentZipTreeNode).isEqualTo(testZipTreeNode)
-            assertThat(actual.items[0]).isEqualTo(testZipFileEntity)
+            assertThat(actual.items[0]).isEqualTo(testFileEntity)
             assertThat(actual.items[1]).isEqualTo(testZipFolderEntity)
         }
     }
@@ -159,10 +169,10 @@ class ZipBrowserViewModelTest {
         whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(testZipNodeTree)
         whenever(zipInfoUiEntityMapper(testZipTreeNode)).thenReturn(mock())
         whenever(zipInfoUiEntityMapper(testSubFolderNode)).thenReturn(testZipFolderEntity)
-        whenever(zipInfoUiEntityMapper(testSubFileNode)).thenReturn(testZipFileEntity)
+        whenever(zipInfoUiEntityMapper(testSubFileNode)).thenReturn(testFileEntity)
 
         initUnderTest()
-        underTest.openFolder(folderPath)
+        underTest.itemClicked(testZipFolderEntity)
         underTest.handleOnBackPressed()
 
         underTest.uiState.test {
@@ -174,4 +184,47 @@ class ZipBrowserViewModelTest {
             assertThat(actual.currentZipTreeNode).isNull()
         }
     }
+
+    @Test
+    fun `test that unzipRootPath is returned correctly`() = runTest {
+        whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
+        whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(emptyMap())
+        initUnderTest()
+
+        assertThat(underTest.getUnzipRootPath()).isEqualTo(
+            "/testZipFullPath/"
+        )
+    }
+
+    @Test
+    fun `test that state is updated correctly when updateShouldShowAlertDialog is invoked`() =
+        runTest {
+            whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
+            whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(emptyMap())
+            initUnderTest()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showAlertDialog).isFalse()
+                underTest.updateShowAlertDialog(true)
+                assertThat(awaitItem().showAlertDialog).isTrue()
+                underTest.updateShowAlertDialog(false)
+                assertThat(awaitItem().showAlertDialog).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when updateShouldShowSnackBar is invoked`() =
+        runTest {
+            whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
+            whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(emptyMap())
+            initUnderTest()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showSnackBar).isFalse()
+                underTest.updateShowSnackBar(true)
+                assertThat(awaitItem().showSnackBar).isTrue()
+                underTest.updateShowSnackBar(false)
+                assertThat(awaitItem().showSnackBar).isFalse()
+            }
+        }
 }

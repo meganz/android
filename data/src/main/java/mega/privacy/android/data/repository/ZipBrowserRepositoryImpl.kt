@@ -7,7 +7,10 @@ import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 import mega.privacy.android.domain.entity.zipbrowser.ZipTreeNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ZipBrowserRepository
+import timber.log.Timber
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
@@ -102,6 +105,55 @@ class ZipBrowserRepositoryImpl @Inject constructor(
      */
     private fun String.getZipTreeNodeDepth() =
         removeSuffix(File.separator).split(File.separator).size
+
+    override suspend fun unzipFile(zipFile: ZipFile, unzipRootPath: String): Boolean =
+        withContext(ioDispatcher) {
+            runCatching {
+                val zipEntries = zipFile.entries()
+                zipEntries.toList().forEach { zipEntry ->
+                    val zipDestination = File(unzipRootPath + zipEntry.name)
+                    val canonicalPath = zipDestination.canonicalPath
+                    if (canonicalPath.startsWith(unzipRootPath)) {
+                        if (zipEntry.isDirectory) {
+                            if (!zipDestination.exists()) {
+                                zipDestination.mkdirs()
+                            }
+                        } else {
+                            val inputStream = zipFile.getInputStream(zipEntry)
+                            //Get the parent file. If it is null or
+                            // doesn't exist, created the parent folder.
+                            val parentFile = zipDestination.parentFile
+                            if (parentFile != null) {
+                                if (!parentFile.exists()) {
+                                    parentFile.mkdirs()
+                                }
+                                val byteArrayOutputStream = ByteArrayOutputStream()
+                                val buffer = ByteArray(1024)
+                                var count: Int
+                                FileOutputStream(zipDestination).use { outputStream ->
+                                    //Write the file.
+                                    while (inputStream.read(buffer)
+                                            .also { readCount -> count = readCount } != -1
+                                    ) {
+                                        byteArrayOutputStream.write(buffer, 0, count)
+                                        val bytes = byteArrayOutputStream.toByteArray()
+                                        outputStream.write(bytes)
+                                        byteArrayOutputStream.reset()
+                                    }
+                                }
+                                inputStream.close()
+                            }
+                        }
+                    } else {
+                        throw SecurityException()
+                    }
+                }
+                true
+            }.recover { e ->
+                Timber.e(e)
+                false
+            }.getOrNull() ?: false
+        }
 
     companion object {
         private const val SUFFIX_ZIP = ".zip"

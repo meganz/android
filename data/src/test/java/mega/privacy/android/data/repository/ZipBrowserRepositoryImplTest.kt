@@ -12,9 +12,12 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.io.TempDir
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import java.io.File
 import java.util.Enumeration
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -23,6 +26,9 @@ import java.util.zip.ZipFile
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ZipBrowserRepositoryImplTest {
+    @TempDir
+    lateinit var temporaryFolder: File
+
     private lateinit var underTest: ZipBrowserRepository
 
     private val zipTreeNodeMapper = mock<ZipTreeNodeMapper>()
@@ -170,5 +176,62 @@ class ZipBrowserRepositoryImplTest {
             assertThat(actual).isNotEmpty()
             assertThat(actual.keys.size).isEqualTo(1)
             assertThat(actual[testName]).isEqualTo(testZipTreeNode)
+        }
+
+    @Test
+    fun `test that the unzipFile function returns false`() =
+        runTest {
+            val testEnumeration = mock<Enumeration<out ZipEntry>>()
+            val testZipFile = mock<ZipFile> {
+                on { entries() }.thenReturn(testEnumeration)
+            }
+
+            val testPath = "zipFolder/"
+            val testEntry = initZipEntry(testPath, true)
+
+            whenever(testEnumeration.hasMoreElements()).thenReturn(true, false)
+            whenever(testEnumeration.nextElement()).thenReturn(testEntry)
+
+            val actual = underTest.unzipFile(testZipFile, testPath)
+            assertThat(actual).isFalse()
+        }
+
+    @Test
+    fun `test that the unzipFile function returns true`() =
+        runTest {
+            val testEnumeration = mock<Enumeration<out ZipEntry>>()
+            val testName = "zipFile/"
+            val testPath = File(temporaryFolder, testName)
+            val testZipFile = mock<ZipFile> {
+                on { entries() }.thenReturn(testEnumeration)
+            }
+
+            val testEntry = initZipEntry(testName, true)
+
+            whenever(testEnumeration.hasMoreElements()).thenReturn(true, false)
+            whenever(testEnumeration.nextElement()).thenReturn(testEntry)
+
+            val actual = underTest.unzipFile(testZipFile, testPath.canonicalPath)
+            assertThat(actual).isTrue()
+        }
+
+    @Test
+    fun `test that the unzipFile function returns false when an Exception is raised`() =
+        runTest {
+            val testEnumeration = mock<Enumeration<out ZipEntry>>()
+            val testName = "zipFile/"
+            val testPath = File(temporaryFolder, testName).absolutePath
+            val testZipFile = mock<ZipFile> {
+                on { entries() }.thenReturn(testEnumeration)
+            }
+
+            val testEntry = initZipEntry(testName, false)
+
+            whenever(testEnumeration.hasMoreElements()).thenReturn(true, false)
+            whenever(testEnumeration.nextElement()).thenReturn(testEntry)
+            whenever(testZipFile.getInputStream(anyOrNull())).thenThrow(NullPointerException())
+
+            val actual = underTest.unzipFile(testZipFile, testPath)
+            assertThat(actual).isFalse()
         }
 }

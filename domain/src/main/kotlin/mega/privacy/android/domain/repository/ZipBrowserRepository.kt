@@ -35,4 +35,12 @@ interface ZipBrowserRepository {
      * [older/SubFolder/file.zip, ZipTreeNode]
      */
     suspend fun getZipNodeTree(zipFile: ZipFile?): Map<String, ZipTreeNode>
+
+    /**
+     * Unzip file
+     * @param zipFile ZipFile
+     * @param unzipRootPath unzip destination path
+     * @return true is unzip succeed.
+     */
+    suspend fun unzipFile(zipFile: ZipFile, unzipRootPath: String): Boolean
 }

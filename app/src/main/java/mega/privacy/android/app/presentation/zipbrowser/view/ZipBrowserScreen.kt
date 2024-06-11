@@ -4,7 +4,6 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserViewModel
-import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 
 @Composable
 internal fun ZipBrowserScreen(
@@ -18,17 +17,18 @@ internal fun ZipBrowserScreen(
         items = uiState.items,
         parentFolderName = uiState.parentFolderName,
         folderDepth = uiState.folderDepth,
-        onItemClicked = { uiEntity ->
-            if (uiEntity.zipEntryType == ZipEntryType.Folder) {
-                viewModel.openFolder(uiEntity.path)
-            }
-        },
+        showProgressBar = uiState.showUnzipProgressBar,
+        showAlertDialog = uiState.showAlertDialog,
+        showSnackBar = uiState.showSnackBar,
+        onItemClicked = viewModel::itemClicked,
         onBackPressed = {
             if (uiState.folderDepth == 0) {
                 onBackPressedDispatcher?.onBackPressed()
             } else {
                 viewModel.handleOnBackPressed()
             }
-        }
+        },
+        onDialogDismiss = { viewModel.updateShowAlertDialog(false) },
+        onSnackBarShown = { viewModel.updateShowSnackBar(false) }
     )
 }

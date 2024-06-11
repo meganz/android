@@ -10,9 +10,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.zipbrowser.mapper.ZipInfoUiEntityMapper
 import mega.privacy.android.app.presentation.zipbrowser.model.ZipBrowserUiState
+import mega.privacy.android.app.presentation.zipbrowser.model.ZipInfoUiEntity
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
+import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 import mega.privacy.android.domain.entity.zipbrowser.ZipTreeNode
 import mega.privacy.android.domain.usecase.zipbrowser.GetZipTreeMapUseCase
+import mega.privacy.android.domain.usecase.zipbrowser.UnzipFileUseCase
 import timber.log.Timber
 import java.io.File
 import java.nio.charset.Charset
@@ -26,10 +29,13 @@ import javax.inject.Inject
 class ZipBrowserViewModel @Inject constructor(
     private val getZipTreeMapUseCase: GetZipTreeMapUseCase,
     private val zipInfoUiEntityMapper: ZipInfoUiEntityMapper,
+    private val unzipFileUseCase: UnzipFileUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private lateinit var zipNodeTree: Map<String, ZipTreeNode>
     private val zipFullPath: String? = savedStateHandle[EXTRA_PATH_ZIP]
+    private var unzipRootPath: String? = null
+    private var zipFile: ZipFile? = null
 
     private val _uiState = MutableStateFlow(ZipBrowserUiState())
     internal val uiState = _uiState.asStateFlow()
@@ -42,7 +48,9 @@ class ZipBrowserViewModel @Inject constructor(
 
     private suspend fun initData() {
         zipFullPath?.let {
-            val zipFile = runCatching {
+            unzipRootPath =
+                "${zipFullPath.substring(0, zipFullPath.lastIndexOf("."))}${File.separator}"
+            zipFile = runCatching {
                 ZipFile(zipFullPath)
             }.recover { e ->
                 Timber.e(e)
@@ -84,13 +92,25 @@ class ZipBrowserViewModel @Inject constructor(
         }
     }
 
-    internal fun openFolder(zipFolderPath: String? = null) {
-        val folderDepth = _uiState.value.folderDepth.inc()
-        dataUpdated(
-            zipFolderPath = zipFolderPath,
-            folderDepth = folderDepth
-        )
-    }
+    internal fun itemClicked(item: ZipInfoUiEntity) =
+        unzipRootPath?.let { unzipPath ->
+            when (item.zipEntryType) {
+                ZipEntryType.Folder -> {
+                    val folderDepth = _uiState.value.folderDepth.inc()
+                    dataUpdated(
+                        zipFolderPath = item.path,
+                        folderDepth = folderDepth
+                    )
+                }
+
+                else -> viewModelScope.launch {
+                    _uiState.update { it.copy(showUnzipProgressBar = true) }
+                    unzipFileUseCase(zipFile, unzipPath)
+                    _uiState.update { it.copy(showUnzipProgressBar = false) }
+                }
+            }
+        }
+
 
     /**
      * Get title of actionbar
@@ -116,6 +136,14 @@ class ZipBrowserViewModel @Inject constructor(
             folderDepth = folderDepth
         )
     }
+
+    internal fun getUnzipRootPath() = unzipRootPath
+
+    internal fun updateShowAlertDialog(value: Boolean) =
+        _uiState.update { it.copy(showAlertDialog = value) }
+
+    internal fun updateShowSnackBar(value: Boolean) =
+        _uiState.update { it.copy(showSnackBar = value) }
 
     companion object {
         private const val TITLE_ZIP = "ZIP "

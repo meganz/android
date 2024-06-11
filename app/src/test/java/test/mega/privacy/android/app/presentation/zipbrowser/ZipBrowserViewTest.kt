@@ -6,17 +6,22 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.zipbrowser.model.ZipInfoUiEntity
+import mega.privacy.android.app.presentation.zipbrowser.view.ZIP_BROWSER_ALERT_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.zipbrowser.view.ZIP_BROWSER_ITEM_DIVIDER_TEST_TAG
 import mega.privacy.android.app.presentation.zipbrowser.view.ZIP_BROWSER_LIST_TEST_TAG
 import mega.privacy.android.app.presentation.zipbrowser.view.ZIP_BROWSER_TOP_BAR_TEST_TAG
+import mega.privacy.android.app.presentation.zipbrowser.view.ZIP_BROWSER_UNZIP_PROGRESS_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.zipbrowser.view.ZipBrowserView
 import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 import mega.privacy.android.icon.pack.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class ZipBrowserViewTest {
@@ -29,18 +34,28 @@ class ZipBrowserViewTest {
         items: List<ZipInfoUiEntity> = emptyList(),
         parentFolderName: String = testParentFolderName,
         folderDepth: Int = 0,
+        showProgressBar: Boolean = false,
+        showAlertDialog: Boolean = false,
+        showSnackBar: Boolean = false,
         modifier: Modifier = Modifier,
         onItemClicked: (ZipInfoUiEntity) -> Unit = {},
         onBackPressed: () -> Unit = {},
+        onDialogDismiss: () -> Unit = {},
+        onSnackBarShown: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             ZipBrowserView(
                 items = items,
                 parentFolderName = parentFolderName,
                 folderDepth = folderDepth,
+                showProgressBar = showProgressBar,
+                showAlertDialog = showAlertDialog,
+                showSnackBar = showSnackBar,
                 modifier = modifier,
                 onItemClicked = onItemClicked,
-                onBackPressed = onBackPressed
+                onBackPressed = onBackPressed,
+                onDialogDismiss = onDialogDismiss,
+                onSnackBarShown = onSnackBarShown
             )
         }
     }
@@ -99,5 +114,22 @@ class ZipBrowserViewTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun `test that the progress bar is displayed`() {
+        setComposeContent(showProgressBar = true)
 
+        composeTestRule.onNodeWithTag(ZIP_BROWSER_UNZIP_PROGRESS_BAR_TEST_TAG, true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the alert dialog is displayed`() {
+        val onDialogDismiss: () -> Unit = mock()
+        setComposeContent(showAlertDialog = true, onDialogDismiss = onDialogDismiss)
+
+        composeTestRule.onNodeWithTag(ZIP_BROWSER_ALERT_DIALOG_TEST_TAG, true)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(text = "OK", useUnmergedTree = true).performClick()
+        verify(onDialogDismiss).invoke()
+    }
 }
