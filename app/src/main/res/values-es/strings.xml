@@ -293,8 +293,8 @@
     <!-- Warning shown when it tries to download some empty folders. Plural -->
     <plurals name="empty_folders">
         <item quantity="one">La carpeta está vacía.</item>
-        <item quantity="many">Las carpetas estás vacías.</item>
-        <item quantity="other">Las carpetas estás vacías.</item>
+        <item quantity="many">Las carpetas están vacías.</item>
+        <item quantity="other">Las carpetas están vacías.</item>
     </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Ver transferencias</string>
@@ -831,9 +831,9 @@
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">Tu cuenta ha sido suspendida por infringir nuestros Términos de servicio. Por favor, ponte en contacto con support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
-    <string name="too_many_attempts_login">Demasiados intentos de acceso incorréctos. Vuelve a intentarlo en una hora.</string>
+    <string name="too_many_attempts_login">Demasiados intentos de acceso incorrectos. Vuelve a intentarlo en una hora.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Ve a la bandeja de entrada de tu correo y pulsa en el enlace que te hemos envíado para confirmar tu cuenta.</string>
+    <string name="account_not_validated_login">Ve a la bandeja de entrada de tu correo y pulsa en el enlace que te hemos enviado para confirmar tu cuenta.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Enlace de la carpeta no disponible</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -847,7 +847,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">Confirma tu cuenta</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Ve a la bandeja de entrada de tu correo y pulsa en el enlace que te hemos envíado para confirmar tu cuenta.</string>
+    <string name="confirm_email_explanation">Ve a la bandeja de entrada de tu correo y pulsa en el enlace que te hemos enviado para confirmar tu cuenta.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">%1$d elemento</item>
@@ -1679,7 +1679,7 @@
     <string name="general_revert">Revertir</string>
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
     <plurals name="title_dialog_delete_version">
-        <item quantity="one">¿Eliminar version?</item>
+        <item quantity="one">¿Eliminar versión?</item>
         <item quantity="many">¿Eliminar versiones?</item>
         <item quantity="other">¿Eliminar versiones?</item>
     </plurals>
@@ -1765,7 +1765,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Contraseña correcta</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Contraseña incorrecta.\n¡Haz ya una copia de seguridad de la Clave de recuperación.</string>
+    <string name="test_pwd_wrong">Contraseña incorrecta.\n¡Haz ya una copia de seguridad de la Clave de recuperación!</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Copiar al portapapeles</string>
     <!-- Option that permits user logout -->
@@ -1869,7 +1869,7 @@
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Guarda tu <b>clave de recuperación</b>en un lugar seguro para evitar problemas en el caso de que pierdas el acceso a tu aplicación o quieras desactivar la autenticación de dos factores.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
-    <string name="pin_error_2fa">Código no valido</string>
+    <string name="pin_error_2fa">Código no válido</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="lost_your_authenticator_device">¿Has perdido tu dispositivo de autenticación?</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
@@ -2039,7 +2039,7 @@
     <!-- Error shown if a user tries to add their own email address as a contact -->
     <string name="error_own_email_as_contact">No hace falta que añadas tu propio correo electrónico</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
-    <string name="invalid_code">Código no valido</string>
+    <string name="invalid_code">Código no válido</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
     <string name="text_almost_full_warning">Tu Nube está casi llena. Amplía tu cuenta a Pro y obtén hasta %1$s de almacenamiento y %2$s de cuota de transferencia.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
@@ -2665,7 +2665,7 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Ha habido un problema con tu último pago. Accede a MEGA utilizando el navegador de tu pc para obtener más información.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">Si bien MEGA no tiene acceso a tus datos, el administrador de la cuenta Business puede acceder a tus Subídas de la cámara.</string>
+    <string name="camera_uploads_business_alert">Si bien MEGA no tiene acceso a tus datos, el administrador de la cuenta Business puede acceder a tus Subidas de la cámara.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Algo ha ido mal</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -2823,7 +2823,7 @@
     <!-- Message showing to explain what will happen when the operation of -->
     <string name="modify_phone_number_message">Se eliminará tu número de teléfono actual y empezará el proceso para vincular el nuevo número de teléfono a tu cuenta.</string>
     <!-- Message for action to remove the registered phone number. -->
-    <string name="remove_phone_number_message">Este numero de teléfono se desvinculará de tu cuenta. Si quisieras añadir un número de teléfono en el futuro, tendrás que verificarlo.</string>
+    <string name="remove_phone_number_message">Este número de teléfono se desvinculará de tu cuenta. Si quisieras añadir un número de teléfono en el futuro, tendrás que verificarlo.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Ver</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
@@ -2945,7 +2945,7 @@
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
     <string name="change_of_transfer_priority_failed">No se ha podido cambiar la prioridad de la transferencia “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
-    <string name="option_send_decryption_key_separately">Envíar la clave de descifrado por separado</string>
+    <string name="option_send_decryption_key_separately">Enviar la clave de descifrado por separado</string>
     <!-- Explanation option to send separated the link and decryption key -->
     <string name="explanation_send_decryption_key_separately">Exportar enlace y clave de descifrado por separado.</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
@@ -2969,7 +2969,7 @@
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Ampliar cuenta a Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
-    <string name="link_upgrade_pro_explanation">Los usuarios Pro tienen acceso exclusivo a una capa adicional de seguridad para los enlace que hace que la cuenta sea aún más segura.</string>
+    <string name="link_upgrade_pro_explanation">Los usuarios Pro tienen acceso exclusivo a una capa adicional de seguridad para los enlaces que hacen que la cuenta sea aún más segura.</string>
     <!-- Meaning of links decryption key -->
     <string name="decryption_key_explanation">Nuestro sistema de cifrado de conocimiento cero requiere una clave única generada automáticamente para este archivo o carpeta. El enlace se crea por defecto con esta clave pero puedes exportarla por separado para más seguridad.</string>
     <!-- Reset password label -->
@@ -3509,7 +3509,7 @@
     <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
     <string name="automatic_image_quality">Automática</string>
     <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="automatic_image_quality_text">Envíar imágenes optimizadas cuando usas datos móviles y en tamaño original cuando usas Wi-Fi.</string>
+    <string name="automatic_image_quality_text">Enviar imágenes optimizadas cuando usas datos móviles y en tamaño original cuando usas Wi-Fi.</string>
     <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
     <string name="high_image_quality">Original</string>
     <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
@@ -3893,7 +3893,7 @@
     <!-- Header title for meeting list past meetings -->
     <string name="meetings_list_past_header">Reuniones anteriores</string>
     <!-- Label for upcoming meetings -->
-    <string name="meetings_list_upcoming_meeting_label">Próxima reunion</string>
+    <string name="meetings_list_upcoming_meeting_label">Próxima reunión</string>
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">Reunión periódica</string>
     <!-- Label for scheduled weekly meetings -->
@@ -4761,11 +4761,11 @@
     <!-- Label for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations">Invitaciones a la reunión</string>
     <!-- Text for the meeting invitations option on calls settings -->
-    <string name="settings_calls_preferences_meeting_invitations_text">Notify me when someone invites me to a meeting</string>
+    <string name="settings_calls_preferences_meeting_invitations_text">Notificarme cuando alguien me invite a una reunión</string>
     <!-- Label for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders">Meeting reminders</string>
+    <string name="settings_calls_preferences_meeting_reminders">Recordatorios de reuniones</string>
     <!-- Text for the meeting reminders option on calls settings -->
-    <string name="settings_calls_preferences_meeting_reminders_text">Notify me 15 minutes before the meetings starts and on the time the meeting is schedule to start</string>
+    <string name="settings_calls_preferences_meeting_reminders_text">Notificarme 15 minutos antes del inicio de la reunión y a la hora prevista para el comienzo de la misma.</string>
     <!-- Notification description for scheduled meetings that starts in 15 minutes -->
     <string name="notification_sched_meeting_starts_15_minutes">La reunión empieza en 15 minutos</string>
     <!-- Notification description for scheduled meetings that starts now -->
