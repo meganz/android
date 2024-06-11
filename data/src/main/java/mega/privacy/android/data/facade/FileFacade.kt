@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns.DATA
 import android.provider.MediaStore.MediaColumns.DATE_MODIFIED
@@ -407,8 +408,12 @@ internal class FileFacade @Inject constructor(
     override suspend fun copyContentUriToFile(sourceUri: UriPath, targetFile: File) {
         val uri = sourceUri.value.toUri()
         require(uri.scheme == "content")
-
-        val document = DocumentFile.fromTreeUri(context, uri) ?: run {
+        val isTreeUri = DocumentsContract.isTreeUri(uri)
+        val document = if (isTreeUri) {
+            DocumentFile.fromTreeUri(context, uri)
+        } else {
+            DocumentFile.fromSingleUri(context, uri)
+        } ?: run {
             Timber.e("Content uri doesn't exist: $sourceUri")
             return
         }
