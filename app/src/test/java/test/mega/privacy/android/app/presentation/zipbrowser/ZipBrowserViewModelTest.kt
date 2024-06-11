@@ -23,14 +23,18 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.io.TempDir
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ZipBrowserViewModelTest {
+    @TempDir
+    lateinit var temporaryFolder: File
 
     private lateinit var underTest: ZipBrowserViewModel
 
@@ -73,6 +77,11 @@ class ZipBrowserViewModelTest {
     }
     private val testFileEntity = mock<ZipInfoUiEntity> {
         on { zipEntryType }.thenReturn(ZipEntryType.File)
+        on { path }.thenReturn(subFilePath)
+    }
+    private val testZipFileEntity = mock<ZipInfoUiEntity> {
+        on { zipEntryType }.thenReturn(ZipEntryType.Zip)
+        on { name }.thenReturn(".zipFile.txt")
         on { path }.thenReturn(subFilePath)
     }
 
@@ -162,6 +171,105 @@ class ZipBrowserViewModelTest {
             assertThat(actual.items[1]).isEqualTo(testZipFolderEntity)
         }
     }
+
+    @Test
+    fun `test that shouldShowAlertDialog is true when zip file is not unpack and unzip is failed`() =
+        runTest {
+            whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
+            whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(testZipNodeTree)
+            whenever(zipInfoUiEntityMapper(testSubFolderNode)).thenReturn(testZipFolderEntity)
+            whenever(zipInfoUiEntityMapper(testSubFileNode)).thenReturn(testFileEntity)
+            whenever(unzipFileUseCase(anyOrNull(), anyOrNull())).thenReturn(false)
+
+            initUnderTest()
+            underTest.itemClicked(testFileEntity)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showAlertDialog).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that shouldShowAlertDialog is true when the zip item does not exist`() =
+        runTest {
+            whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
+            whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(testZipNodeTree)
+            whenever(zipInfoUiEntityMapper(testSubFolderNode)).thenReturn(testZipFolderEntity)
+            whenever(zipInfoUiEntityMapper(testSubFileNode)).thenReturn(testFileEntity)
+            whenever(unzipFileUseCase(anyOrNull(), anyOrNull())).thenReturn(false)
+
+            initUnderTest()
+            underTest.getUnzipRootPath()?.let { File(it).mkdirs() }
+            underTest.itemClicked(testFileEntity)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showAlertDialog).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that shouldShowAlertDialog is true when the zip item is not available for opening`() =
+        runTest {
+            val zipFile = File(temporaryFolder, "zipFile.txt").apply { createNewFile() }
+            File(temporaryFolder, "zipFile").apply { createNewFile() }
+
+            whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(zipFile.path)
+            whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(testZipNodeTree)
+            whenever(zipInfoUiEntityMapper(testSubFolderNode)).thenReturn(testZipFolderEntity)
+            whenever(zipInfoUiEntityMapper(testSubFileNode)).thenReturn(testZipFileEntity)
+            whenever(unzipFileUseCase(anyOrNull(), anyOrNull())).thenReturn(false)
+
+            initUnderTest()
+            underTest.itemClicked(testZipFileEntity)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showAlertDialog).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that shouldShowAlertDialog is true when the unzipFileUseCase throws an exception`() =
+        runTest {
+            val zipFile = File(temporaryFolder, "zipFile.txt").apply { createNewFile() }
+            File(temporaryFolder, "zipFile").apply { createNewFile() }
+
+            whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(zipFile.path)
+            whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(testZipNodeTree)
+            whenever(zipInfoUiEntityMapper(testSubFolderNode)).thenReturn(testZipFolderEntity)
+            whenever(zipInfoUiEntityMapper(testSubFileNode)).thenReturn(testZipFileEntity)
+            whenever(unzipFileUseCase(anyOrNull(), anyOrNull())).thenThrow(NullPointerException())
+
+            initUnderTest()
+            underTest.itemClicked(testZipFileEntity)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showAlertDialog).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when the zip item is available for opening`() =
+        runTest {
+            val fileName = "test.txt"
+            val file = File(temporaryFolder, fileName).apply { createNewFile() }
+            val fileEntry = mock<ZipInfoUiEntity> {
+                on { zipEntryType }.thenReturn(ZipEntryType.File)
+                on { path }.thenReturn(file.name)
+            }
+
+            whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(temporaryFolder.path + ".")
+            whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(testZipNodeTree)
+            whenever(zipInfoUiEntityMapper(testSubFolderNode)).thenReturn(testZipFolderEntity)
+            whenever(zipInfoUiEntityMapper(testSubFileNode)).thenReturn(fileEntry)
+            whenever(unzipFileUseCase(anyOrNull(), anyOrNull())).thenReturn(true)
+
+            initUnderTest()
+            underTest.itemClicked(fileEntry)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().openedFile).isEqualTo(fileEntry)
+            }
+        }
 
     @Test
     fun `test that state is updated correctly when handleOnBackPressed is invoked`() = runTest {

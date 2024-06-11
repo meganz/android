@@ -15,6 +15,57 @@ data class MimeTypeList(
     val extension: String,
 ) {
     companion object {
+        private const val MAX_SIZE_OPENABLE_TEXT_FILE = 20971520
+
+        /**
+         * List of extension text files
+         */
+        private val TEXT_EXTENSIONS = listOf(
+            //Text
+            "txt",
+            "ans",
+            "ascii",
+            "log",
+            "wpd",
+            "json",
+            "md",
+            //Web data
+            "html",
+            "xml",
+            "shtml",
+            "dhtml",
+            "js",
+            "css",
+            "jar",
+            "java",
+            "class",
+            //Web lang
+            "php",
+            "php3",
+            "php4",
+            "php5",
+            "phtml",
+            "inc",
+            "asp",
+            "pl",
+            "cgi",
+            "py",
+            "sql",
+            "accdb",
+            "db",
+            "dbf",
+            "mdb",
+            "pdb",
+            "c",
+            "cpp",
+            "h",
+            "cs",
+            "sh",
+            "vb",
+            "swift",
+            "org"
+        )
+
         /**
          * Type for name
          *
@@ -86,5 +137,27 @@ data class MimeTypeList(
     val isAudioNotSupported
         get() = extension == "wma" || extension == "aif" || extension == "aiff"
                 || extension == "iff" || extension == "oga" || extension == "3ga"
+
+    /**
+     * Checks if a file is openable in Text editor.
+     * All the contemplated extension are supported by Web client, so mobile clients should try
+     * to support them too.
+     * @return True if the file is openable, false otherwise.
+     */
+    private val isValidTextFileType
+        get() = type.startsWith("text/plain")
+                //File extensions considered as plain text
+                || TEXT_EXTENSIONS.contains(extension)
+                //Files without extension
+                || type.startsWith("application/octet-stream")
+
+    /**
+     * Checks if a file is openable in Text editor.
+     * It's openable if its size is not bigger than MAX_SIZE_OPENABLE_TEXT_FILE.
+     *
+     * @return True if the file is openable, false otherwise.
+     */
+    fun isOpenableTextFile(fileSize: Long) =
+        isValidTextFileType && fileSize <= MAX_SIZE_OPENABLE_TEXT_FILE
 
 }

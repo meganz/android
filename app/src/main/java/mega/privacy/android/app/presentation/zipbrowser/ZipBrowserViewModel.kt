@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.zipbrowser.mapper.ZipInfoUiEntityMapper
 import mega.privacy.android.app.presentation.zipbrowser.model.ZipBrowserUiState
 import mega.privacy.android.app.presentation.zipbrowser.model.ZipInfoUiEntity
+import mega.privacy.android.app.presentation.zipbrowser.model.ZipItemClickedEventType
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 import mega.privacy.android.domain.entity.zipbrowser.ZipTreeNode
@@ -94,23 +95,79 @@ class ZipBrowserViewModel @Inject constructor(
 
     internal fun itemClicked(item: ZipInfoUiEntity) =
         unzipRootPath?.let { unzipPath ->
-            when (item.zipEntryType) {
-                ZipEntryType.Folder -> {
-                    val folderDepth = _uiState.value.folderDepth.inc()
-                    dataUpdated(
-                        zipFolderPath = item.path,
-                        folderDepth = folderDepth
-                    )
-                }
-
-                else -> viewModelScope.launch {
-                    _uiState.update { it.copy(showUnzipProgressBar = true) }
-                    unzipFileUseCase(zipFile, unzipPath)
-                    _uiState.update { it.copy(showUnzipProgressBar = false) }
-                }
-            }
+            handleItemClickedEventType(item, getItemClickedEventType(item, unzipPath))
         }
 
+    private fun handleItemClickedEventType(
+        item: ZipInfoUiEntity,
+        eventType: ZipItemClickedEventType,
+    ) {
+        when (eventType) {
+            ZipItemClickedEventType.OpenFolder -> {
+                val folderDepth = _uiState.value.folderDepth.inc()
+                dataUpdated(
+                    zipFolderPath = item.path,
+                    folderDepth = folderDepth
+                )
+            }
+
+            ZipItemClickedEventType.OpenFile ->
+                //If the zip file name is start with ".", it cannot be unzip. So show the alert.
+                if (item.zipEntryType == ZipEntryType.Zip && item.name.startsWith(".")) {
+                    Timber.e("zip file ${item.name} start with \".\" cannot unzip")
+                    updateShowAlertDialog(true)
+                } else {
+                    _uiState.update {
+                        it.copy(openedFile = item)
+                    }
+                }
+
+            ZipItemClickedEventType.ZipFileNotUnpacked -> {
+                viewModelScope.launch {
+                    val unzipResult = runCatching {
+                        unzipFileUseCase(zipFile, unzipRootPath)
+                    }.recover { Timber.e(it) }.getOrNull()
+
+                    if (unzipResult == true) {
+                        itemClicked(item)
+                    } else {
+                        updateShowAlertDialog(true)
+                    }
+
+                    _uiState.update {
+                        it.copy(showUnzipProgressBar = false)
+                    }
+                }
+            }
+
+            else -> {
+                Timber.e("zip entry: $item does not exist")
+                updateShowAlertDialog(true)
+            }
+        }
+    }
+
+    private fun getItemClickedEventType(
+        zipInfoUiEntity: ZipInfoUiEntity,
+        rootPath: String,
+    ): ZipItemClickedEventType =
+        when {
+            zipInfoUiEntity.zipEntryType == ZipEntryType.Folder ->
+                ZipItemClickedEventType.OpenFolder
+
+            File(rootPath).exists().not() -> {
+                _uiState.update {
+                    it.copy(showUnzipProgressBar = true)
+                }
+                ZipItemClickedEventType.ZipFileNotUnpacked
+            }
+
+            File(rootPath + zipInfoUiEntity.path).exists() ->
+                ZipItemClickedEventType.OpenFile
+
+            else ->
+                ZipItemClickedEventType.ZipItemNonExistent
+        }
 
     /**
      * Get title of actionbar
@@ -144,6 +201,8 @@ class ZipBrowserViewModel @Inject constructor(
 
     internal fun updateShowSnackBar(value: Boolean) =
         _uiState.update { it.copy(showSnackBar = value) }
+
+    internal fun clearOpenedFile() = _uiState.update { it.copy(openedFile = null) }
 
     companion object {
         private const val TITLE_ZIP = "ZIP "
