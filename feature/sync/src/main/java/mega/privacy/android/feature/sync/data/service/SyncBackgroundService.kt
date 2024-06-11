@@ -126,7 +126,7 @@ internal class SyncBackgroundService : LifecycleService() {
 
         return builderCompat
             .setSmallIcon(iconPackR.drawable.ic_stat_notify)
-            .setColor(getColor(R.color.red_600_red_300))
+            .setColor(getColor(R.color.components_interactive))
             .setOngoing(true)
             .setContentTitle(getString(R.string.sync_notification_monitoring_description))
             .build()

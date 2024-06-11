@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="red_300">#F46762</color>
+    <color name="red_400">#FB6361</color>
     <color name="red_600">#F30C14</color>
 
     <color name="red_600_red_300">@color/red_600</color>
+
+    <color name="components_interactive">@color/red_600</color>
 </resources>
