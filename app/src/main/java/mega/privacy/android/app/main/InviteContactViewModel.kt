@@ -100,6 +100,7 @@ class InviteContactViewModel @Inject constructor(
             initializeAllContacts(_filterUiState.value.filteredContacts)
             _uiState.update { it.copy(onContactsInitialized = true) }
         }.onFailure {
+            _uiState.update { it.copy(onContactsInitialized = true) }
             Timber.e("Failed to get local contacts", it)
         }
     }

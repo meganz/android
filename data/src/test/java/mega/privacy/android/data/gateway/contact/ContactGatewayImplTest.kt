@@ -73,6 +73,45 @@ class ContactGatewayImplTest {
         }
 
     @Test
+    fun `test that the name of a local contact is empty when a contact's name is NULL`() =
+        runTest {
+            val contactID = 1L
+            val contactName = null
+            val projection = arrayOf(
+                ContactsContract.Contacts._ID,
+                ContactsContract.Contacts.DISPLAY_NAME
+            )
+            val mockCursor = mock<Cursor> {
+                on { getLong(0) }.thenReturn(contactID)
+                on { getString(1) }.thenReturn(contactName)
+
+                on { moveToNext() }.thenReturn(true, false)
+            }
+            val contentResolver = mock<ContentResolver> {
+                on {
+                    query(
+                        ContactsContract.Contacts.CONTENT_URI,
+                        projection,
+                        null,
+                        null,
+                        null
+                    )
+                }.thenReturn(mockCursor)
+            }
+            whenever(context.contentResolver).thenReturn(contentResolver)
+
+            val actual = underTest.getLocalContacts()
+
+            val expected = listOf(
+                LocalContact(
+                    id = contactID,
+                    name = ""
+                )
+            )
+            Truth.assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
     fun `test that an empty list is returned when contact items from the content provider are NULL`() =
         runTest {
             val contentResolver = mock<ContentResolver> {

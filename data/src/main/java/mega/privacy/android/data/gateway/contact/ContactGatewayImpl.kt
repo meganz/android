@@ -32,7 +32,7 @@ class ContactGatewayImpl @Inject constructor(
                 Timber.d("getting local contacts, has %d contacts", it.count)
                 while (it.moveToNext()) {
                     val id = it.getLong(0)
-                    val name = it.getString(1)
+                    val name = it.getString(1).orEmpty()
                     add(LocalContact(id, name))
                 }
             }
