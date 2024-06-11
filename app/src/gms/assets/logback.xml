@@ -42,11 +42,11 @@
         </encoder>
     </appender>
 
-    <logger name="mega.privacy.android.data.gateway.TimberMegaLogger">
+    <logger name="mega.privacy.android.data.gateway.TimberMegaLogger" level="TRACE" >
         <appender-ref ref="ROLLING" />
     </logger>
 
-    <logger name="mega.privacy.android.data.gateway.TimberChatLogger">
+    <logger name="mega.privacy.android.data.gateway.TimberChatLogger" level="TRACE" >
         <appender-ref ref="ROLLING_CHAT" />
     </logger>
 
