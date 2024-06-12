@@ -253,49 +253,23 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
      * Handle activity result of REQUEST_CODE_SELECT_FILE.
      *
      * @param data data of onActivityResult
-     * @param contact contact to attach nodes to
+     * @param contactEmail email of the contact to attach nodes to
      * @param snackbarShower interface to show snackbar
      */
     fun handleSelectFileResult(
         data: Intent?,
-        contact: MegaUser,
+        contactEmail: String,
         snackbarShower: SnackbarShower,
     ) {
         if (data == null) {
             return
         }
 
-        data.putStringArrayListExtra(SELECTED_CONTACTS, arrayListOf(contact.email))
+        data.putStringArrayListExtra(SELECTED_CONTACTS, arrayListOf(contactEmail))
 
         handleSelectFileResult(data, snackbarShower)
     }
 
-    /**
-     * Handle activity result of REQUEST_CODE_SELECT_FILE.
-     *
-     * @param data data of onActivityResult
-     * @param chatId chat id to attach nodes to
-     * @param snackbarShower interface to show snackbar
-     * @param attachNodeToChatListener interface for attached message
-     */
-    fun handleSelectFileResult(
-        data: Intent?,
-        chatId: Long,
-        snackbarShower: SnackbarShower,
-        attachNodeToChatListener: AttachNodeToChatListener,
-    ) {
-        val nodeHandles = data?.getLongArrayExtra(NODE_HANDLES) ?: return
-        if (nodeHandles.isEmpty()) {
-            return
-        }
-
-        val chatIds = longArrayOf(chatId)
-        processContactsAndChats(chatIds, emptyList()) {
-            if (it.isNotEmpty()) {
-                attachNodesToChats(nodeHandles, it, snackbarShower, true, attachNodeToChatListener)
-            }
-        }
-    }
 
     /**
      * Handle activity result of REQUEST_CODE_SELECT_FILE.

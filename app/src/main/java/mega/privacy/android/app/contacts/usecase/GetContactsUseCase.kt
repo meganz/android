@@ -9,7 +9,6 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -348,18 +347,6 @@ class GetContactsUseCase(
     private fun getUserUpdates() = getGlobalChangesUseCase()
         .filter { it is GetGlobalChangesUseCase.Result.OnUsersUpdate }
         .map { (it as GetGlobalChangesUseCase.Result.OnUsersUpdate).users ?: emptyList() }
-
-    /**
-     * Get MegaUser from email
-     *
-     * @param userEmail     Email to retrieve
-     * @return              Maybe containing MegaUser
-     * @return              Single containing MegaUser
-     */
-    fun getMegaUser(userEmail: String?): Single<MegaUser> =
-        Single.fromCallable {
-            userEmail?.let { getContact(userEmail) } ?: error("Error MegaUser is null")
-        }
 
     /**
      * Request missing fields for current `ContactItem.Data`

@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -46,7 +45,6 @@ import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCas
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -193,22 +191,6 @@ class ContactListViewModel @Inject constructor(
     fun getContact(userHandle: Long): LiveData<ContactItem.Data?> =
         contacts.map { contact -> contact.find { it.handle == userHandle } }
 
-    fun getMegaUser(userHandle: Long): LiveData<MegaUser> =
-        getContact(userHandle).switchMap { user ->
-            val result = MutableLiveData<MegaUser>()
-            getContactsUseCase.getMegaUser(user?.email)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { megaUser ->
-                        result.value = megaUser
-                    },
-                    onError = Timber::e
-                )
-                .addTo(composite)
-            result
-        }
-
     /**
      * Get chat room ID
      *
@@ -244,10 +226,10 @@ class ContactListViewModel @Inject constructor(
      *
      * @param megaUser MegaUser to be removed
      */
-    fun removeContact(megaUser: MegaUser) {
+    fun removeContact(userEmail: String) {
         viewModelScope.launch {
             runCatching {
-                removedContactByEmailUseCase(megaUser.email)
+                removedContactByEmailUseCase(userEmail)
             }.onFailure {
                 Timber.e(it)
             }
@@ -374,4 +356,7 @@ class ContactListViewModel @Inject constructor(
         super.onCleared()
         composite.clear()
     }
+
+    fun getContactEmail(userHandle: Long) =
+        getContact(userHandle).map { it?.email }
 }

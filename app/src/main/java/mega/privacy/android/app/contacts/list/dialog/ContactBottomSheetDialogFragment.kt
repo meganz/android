@@ -39,7 +39,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.setImageRequestFromUri
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 
 /**
@@ -97,7 +96,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetContactDetailBinding
     private lateinit var selectFileLauncher: ActivityResultLauncher<String>
     private lateinit var selectFolderLauncher: ActivityResultLauncher<String>
-    private lateinit var selectChatLauncher: ActivityResultLauncher<MegaUser>
+    private lateinit var selectChatLauncher: ActivityResultLauncher<Long>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,12 +104,14 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         selectFileLauncher =
             registerForActivityResult(SelectFileToShareActivityContract()) { result ->
                 if (result != null) {
-                    viewModel.getMegaUser(userHandle).observe(viewLifecycleOwner) { user ->
-                        nodeAttacher.handleSelectFileResult(
-                            result,
-                            user,
-                            activity as ContactsActivity
-                        )
+                    viewModel.getContactEmail(userHandle).observe(viewLifecycleOwner) { email ->
+                        email?.let {
+                            nodeAttacher.handleSelectFileResult(
+                                result,
+                                it,
+                                activity as ContactsActivity
+                            )
+                        }
                         dismiss()
                     }
                 }
@@ -155,13 +156,14 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.getContact(userHandle).observe(viewLifecycleOwner, ::showContactInfo)
-        viewModel.getMegaUser(userHandle).observe(viewLifecycleOwner) { megaUser ->
-            setupButtons(megaUser)
+        viewModel.getContactEmail(userHandle).observe(viewLifecycleOwner) { contactEmail ->
+            contactEmail?.let {
+                setupButtons(it, userHandle)
 
-            if (savedInstanceState?.getBoolean(STATE_SHOW_REMOVE_DIALOG) == true) {
-                showRemoveContactDialog(megaUser)
+                if (savedInstanceState?.getBoolean(STATE_SHOW_REMOVE_DIALOG) == true) {
+                    showRemoveContactDialog(it)
+                }
             }
-
             if (savedInstanceState?.containsKey(STATE_NODE_FOLDER) == true) {
                 folderHandle = savedInstanceState.getLong(STATE_NODE_FOLDER)
                 selectedContacts = savedInstanceState.getStringArrayList(STATE_NODE_CONTACTS)
@@ -210,16 +212,14 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      *
      * @param megaUser  MegaUser to be shown
      */
-    private fun setupButtons(megaUser: MegaUser?) {
-        requireNotNull(megaUser) { "MegaUser not found" }
-
+    private fun setupButtons(contactEmail: String, contactHandle: Long) {
         binding.optionInfo.setOnClickListener {
-            ContactUtil.openContactInfoActivity(context, megaUser.email)
+            ContactUtil.openContactInfoActivity(context, contactEmail)
             dismiss()
         }
 
         binding.optionCall.setOnClickListener {
-            MegaApplication.userWaitingForCall = megaUser.handle
+            MegaApplication.userWaitingForCall = contactHandle
             if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
                 val audio = PermissionUtils.hasPermissions(
                     requireContext(),
@@ -231,22 +231,22 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionSendMessage.setOnClickListener {
-            optionSendMessageClick?.invoke(megaUser.handle)
+            optionSendMessageClick?.invoke(contactHandle)
         }
 
         binding.optionSendFile.setOnClickListener {
-            selectFileLauncher.launch(megaUser.email)
+            selectFileLauncher.launch(contactEmail)
         }
 
         binding.optionShareContact.setOnClickListener {
-            selectChatLauncher.launch(megaUser)
+            selectChatLauncher.launch(contactHandle)
         }
 
         binding.optionShareFolder.setOnClickListener {
-            selectFolderLauncher.launch(megaUser.email)
+            selectFolderLauncher.launch(contactEmail)
         }
 
-        binding.optionRemove.setOnClickListener { showRemoveContactDialog(megaUser) }
+        binding.optionRemove.setOnClickListener { showRemoveContactDialog(contactEmail) }
     }
 
     /**
@@ -254,7 +254,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      *
      * @param megaUser  MegaUser to be removed
      */
-    private fun showRemoveContactDialog(megaUser: MegaUser) {
+    private fun showRemoveContactDialog(contactEmail: String) {
         if (removeContactDialog?.isShowing == true) removeContactDialog?.dismiss()
 
         removeContactDialog = MaterialAlertDialogBuilder(requireContext())
@@ -262,7 +262,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             .setMessage(resources.getQuantityString(R.plurals.confirmation_remove_contact, 1))
             .setNegativeButton(R.string.general_cancel, null)
             .setPositiveButton(R.string.general_remove) { _, _ ->
-                viewModel.removeContact(megaUser)
+                viewModel.removeContact(contactEmail)
                 dismiss()
             }
             .show()
