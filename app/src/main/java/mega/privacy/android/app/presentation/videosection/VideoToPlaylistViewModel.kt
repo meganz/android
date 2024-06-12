@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistSetUiEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoToPlaylistUiState
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistSetsUseCase
 import timber.log.Timber
@@ -17,7 +18,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class VideoToPlaylistViewModel @Inject constructor(
-    private val getVideoPlaylistSetsUseCase: GetVideoPlaylistSetsUseCase
+    private val getVideoPlaylistSetsUseCase: GetVideoPlaylistSetsUseCase,
+    private val videoPlaylistSetUiEntityMapper: VideoPlaylistSetUiEntityMapper,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(VideoToPlaylistUiState())
     internal val uiState = _uiState.asStateFlow()
@@ -31,7 +33,10 @@ class VideoToPlaylistViewModel @Inject constructor(
             runCatching {
                 getVideoPlaylistSetsUseCase()
             }.onSuccess { sets ->
-                _uiState.update { it.copy(items = sets) }
+                val newSets = sets.map {
+                    videoPlaylistSetUiEntityMapper(it)
+                }
+                _uiState.update { it.copy(items = newSets) }
             }.onFailure {
                 Timber.e(it)
             }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.videosection.VideoToPlaylistViewModel
+import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistSetUiEntityMapper
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistSetsUseCase
 import nz.mega.sdk.MegaSet
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -28,6 +30,7 @@ class VideoToPlaylistViewModelTest {
     private lateinit var underTest: VideoToPlaylistViewModel
 
     private val getVideoPlaylistSetsUseCase = mock<GetVideoPlaylistSetsUseCase>()
+    private val videoPlaylistSetUiEntityMapper = mock<VideoPlaylistSetUiEntityMapper>()
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeEach
@@ -39,14 +42,16 @@ class VideoToPlaylistViewModelTest {
 
     private fun initUnderTest() {
         underTest = VideoToPlaylistViewModel(
-            getVideoPlaylistSetsUseCase = getVideoPlaylistSetsUseCase
+            getVideoPlaylistSetsUseCase = getVideoPlaylistSetsUseCase,
+            videoPlaylistSetUiEntityMapper = videoPlaylistSetUiEntityMapper
         )
     }
 
     @AfterEach
     fun resetMocks() {
         reset(
-            getVideoPlaylistSetsUseCase
+            getVideoPlaylistSetsUseCase,
+            videoPlaylistSetUiEntityMapper
         )
     }
 
@@ -71,9 +76,10 @@ class VideoToPlaylistViewModelTest {
     fun `test that the state is updated correctly when when getVideoPlaylistSetsUseCase returns not empty`() =
         runTest {
             val expectedUserSets = (1..3L).map {
-                createUserSet(id = it, name = "Playlist $it")
+                createUserSet(id = it, name = "Playlist")
             }
             whenever(getVideoPlaylistSetsUseCase()).thenReturn(expectedUserSets)
+            whenever(videoPlaylistSetUiEntityMapper(anyOrNull())).thenReturn(mock())
 
             initUnderTest()
 

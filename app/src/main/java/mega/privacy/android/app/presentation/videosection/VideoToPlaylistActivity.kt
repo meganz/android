@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.videosection
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
@@ -10,6 +11,7 @@ import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VideoToPlaylistScreen
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -32,6 +34,8 @@ class VideoToPlaylistActivity : ComponentActivity() {
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
+    private val viewModel by viewModels<VideoToPlaylistViewModel>()
+
     /**
      * onCreate
      */
@@ -45,7 +49,7 @@ class VideoToPlaylistActivity : ComponentActivity() {
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     PasscodeContainer(passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
-
+                            VideoToPlaylistScreen(viewModel = viewModel)
                         }
                     )
                 }
