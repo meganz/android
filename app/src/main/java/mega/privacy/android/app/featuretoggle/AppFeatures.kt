@@ -19,7 +19,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     NewZipBrowser(
         "Enable new zip browser",
-        false,
+        true,
     ),
 
     /**
