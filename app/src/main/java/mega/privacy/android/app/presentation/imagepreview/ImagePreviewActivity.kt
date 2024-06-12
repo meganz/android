@@ -57,6 +57,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.PhotoPreviewSaveToDeviceMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
+import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -330,6 +331,7 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun playSlideshow() {
+        Analytics.tracker.trackEvent(PlaySlideshowMenuToolbarEvent)
         val intent = Intent(this, SlideshowActivity::class.java)
         intent.putExtras(this@ImagePreviewActivity.intent)
         startActivity(intent)
