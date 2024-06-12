@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    alias(convention.plugins.mega.artifactory.publish)
+    alias(plugin.plugins.mega.artifactory.publish.convention)
 }
 
 android {

@@ -2,10 +2,11 @@ import mega.privacy.android.build.isServerBuild
 
 plugins {
     alias(plugin.plugins.ksp) apply false
+    alias(plugin.plugins.mega.android.cicd)
+    alias(plugin.plugins.mega.android.release)
+    alias(plugin.plugins.jfrog.artifactory) apply false
+    alias(plugin.plugins.mega.artifactory.publish.convention) apply false
     id("org.jetbrains.kotlin.android") version "1.9.22" apply false
-    id("mega.android.release") version lib.versions.megagradle.get()
-    id("mega.android.cicd") version lib.versions.megagradle.get()
-    id("com.jfrog.artifactory") version plugin.versions.jfrog apply false
 }
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -30,6 +31,7 @@ buildscript {
         classpath(plugin.junit5)
         classpath(plugin.kotlin.gradle)
         classpath("androidx.benchmark:benchmark-baseline-profile-gradle-plugin:1.2.3")
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:${plugin.versions.jfrog.artifactory.get()}")
     }
 }
 

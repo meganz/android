@@ -32,12 +32,6 @@ gradlePlugin {
         }
     }
     plugins {
-        register("artifactoryPublish") {
-            id = "mega.artifactory.publish"
-            implementationClass = "ArtifactoryPublishConventionPlugin"
-        }
-    }
-    plugins {
         register("androidApplication") {
             id = "mega.android.app"
             implementationClass = "AndroidApplicationConventionPlugin"

@@ -12,8 +12,11 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             when (requested.id.id) {
-                "mega.android.release" -> useModule("mega.privacy:megagradle:${requested.version}")
-                "mega.android.cicd" -> useModule("mega.privacy:megagradle:${requested.version}")
+                "mega.android.release",
+                "mega.android.cicd",
+                "mega.artifactory.publish.convention",
+                -> useModule("mega.privacy:megagradle:${requested.version}")
+
                 else -> {}
             }
         }

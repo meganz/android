@@ -27,7 +27,6 @@ sqlcipher = "4.5.4"
 kotlin-serialisation = "1.6.3"
 eclipse-jgit = "6.6.0.202305301015-r"
 json = "20230227"
-megagradle = "0.25.20240604042832"
 mega-core-ui = "2.10.20240531102524"
 
 [libraries]
