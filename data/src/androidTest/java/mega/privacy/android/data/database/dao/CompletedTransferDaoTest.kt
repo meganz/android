@@ -5,7 +5,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
@@ -15,7 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalCoroutinesApi::class)
+
 @RunWith(AndroidJUnit4::class)
 class CompletedTransferDaoTest {
     private lateinit var completedTransferDao: CompletedTransferDao
@@ -50,6 +49,7 @@ class CompletedTransferDaoTest {
                 error = "No error",
                 originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
                 parentHandle = "11622336899311",
+                appData = "appData"
             )
             completedTransferDao.insertOrUpdateCompletedTransfer(entity)
             entity
@@ -67,6 +67,7 @@ class CompletedTransferDaoTest {
             assertThat(actual.error).isEqualTo(entities[i].error)
             assertThat(actual.originalPath).isEqualTo(entities[i].originalPath)
             assertThat(actual.parentHandle).isEqualTo(entities[i].parentHandle)
+            assertThat(actual.appData).isEqualTo(entities[i].appData)
         }
     }
 
@@ -84,6 +85,7 @@ class CompletedTransferDaoTest {
             error = "No error",
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = "11622336899311",
+            appData = null
         )
         completedTransferDao.insertOrUpdateCompletedTransfer(entity)
         val id = completedTransferDao.getAllCompletedTransfers().first().first().id
@@ -101,6 +103,7 @@ class CompletedTransferDaoTest {
         assertThat(actual?.error).isEqualTo(entity.error)
         assertThat(actual?.originalPath).isEqualTo(entity.originalPath)
         assertThat(actual?.parentHandle).isEqualTo(entity.parentHandle)
+        assertThat(actual?.appData).isEqualTo(entity.appData)
     }
 
     @Test
@@ -117,6 +120,7 @@ class CompletedTransferDaoTest {
             error = "No error",
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = "11622336899311",
+            appData = "appData"
         )
         completedTransferDao.insertOrUpdateCompletedTransfer(entity)
 
@@ -138,6 +142,7 @@ class CompletedTransferDaoTest {
                 error = "No error",
                 originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
                 parentHandle = "11622336899311",
+                appData = "appData"
             )
             completedTransferDao.insertOrUpdateCompletedTransfer(entity)
             entity
@@ -163,6 +168,7 @@ class CompletedTransferDaoTest {
                 error = "No error",
                 originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
                 parentHandle = "11622336899311",
+                appData = "appData"
             )
             completedTransferDao.insertOrUpdateCompletedTransfer(entity)
             entity
@@ -196,6 +202,7 @@ class CompletedTransferDaoTest {
                 error = "No error",
                 originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
                 parentHandle = "11622336899311",
+                appData = "appData"
             )
             completedTransferDao.insertOrUpdateCompletedTransfer(entity)
             entity
