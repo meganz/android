@@ -47,6 +47,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
+import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
@@ -113,6 +114,7 @@ class ChatTabsViewModel @Inject constructor(
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val hasArchivedChatsUseCase: HasArchivedChatsUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -136,6 +138,18 @@ class ChatTabsViewModel @Inject constructor(
         viewModelScope.launch {
             monitorScheduledMeetingCanceledUseCase().conflate()
                 .collect { messageResId -> triggerSnackbarMessage(messageResId) }
+        }
+    }
+
+    /**
+     * Check has archived chats
+     *
+     */
+    fun checkHasArchivedChats() {
+        viewModelScope.launch {
+            runCatching { hasArchivedChatsUseCase() }
+                .onSuccess { hasArchivedChats -> state.update { it.copy(hasArchivedChats = hasArchivedChats) } }
+                .onFailure(Timber::e)
         }
     }
 
@@ -429,6 +443,7 @@ class ChatTabsViewModel @Inject constructor(
                             intArg = intParam,
                         )
                     )
+                    checkHasArchivedChats()
                 }
                 .onFailure {
                     Timber.e(it)

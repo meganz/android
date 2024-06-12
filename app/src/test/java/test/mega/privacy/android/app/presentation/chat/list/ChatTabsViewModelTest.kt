@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatsUnreadStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
+import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
@@ -75,6 +76,7 @@ internal class ChatTabsViewModelTest {
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase = mock()
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase = mock()
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
+    private val hasArchivedChatsUseCase: HasArchivedChatsUseCase = mock()
 
     @BeforeEach
     fun resetMocks() {
@@ -130,7 +132,8 @@ internal class ChatTabsViewModelTest {
             getChatsUnreadStatusUseCase,
             startMeetingInWaitingRoomChatUseCase,
             monitorLeaveChatUseCase,
-            monitorChatCallUpdatesUseCase
+            monitorChatCallUpdatesUseCase,
+            hasArchivedChatsUseCase
         )
     }
 
@@ -176,4 +179,17 @@ internal class ChatTabsViewModelTest {
             verify(chatManagement).addLeavingChatId(chatId)
             verify(leaveChatUseCase).invoke(chatId)
         }
+
+    @Test
+    fun `test that hasArchivedChats updated when calling checkHasArchivedChats`() = runTest {
+        initTestClass()
+        whenever(hasArchivedChatsUseCase()).thenReturn(true)
+        underTest.getState().test {
+            val state = awaitItem()
+            Truth.assertThat(state.hasArchivedChats).isFalse()
+            underTest.checkHasArchivedChats()
+            val updatedState = awaitItem()
+            Truth.assertThat(updatedState.hasArchivedChats).isTrue()
+        }
+    }
 }

@@ -103,6 +103,7 @@ class ChatTabsFragment : Fragment() {
     }
 
     private var actionMode: ActionMode? = null
+    private var archivedMenuItem: MenuItem? = null
     private var currentTab: ChatTab = ChatTab.CHATS
 
     private val viewModel by viewModels<ChatTabsViewModel>()
@@ -229,6 +230,7 @@ class ChatTabsFragment : Fragment() {
             state.isParticipatingInChatCallResult?.let { isInCall ->
                 handleUserInCall(isInCall)
             }
+            archivedMenuItem?.isVisible = state.hasArchivedChats
         }
         (activity as? NavigationDrawerManager)?.addDrawerListener(drawerListener)
         view.post {
@@ -260,6 +262,7 @@ class ChatTabsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        viewModel.checkHasArchivedChats()
         Analytics.tracker.trackEvent(ChatScreenEvent)
         Firebase.crashlytics.log("Screen: ${ChatScreenEvent.eventName}")
     }
@@ -281,6 +284,9 @@ class ChatTabsFragment : Fragment() {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.fragment_chat_tabs, menu)
                 menu.findItem(R.id.menu_search)?.setupSearchView(viewModel::setSearchQuery)
+                archivedMenuItem = menu.findItem(R.id.action_menu_archived)?.also {
+                    it.isVisible = viewModel.getState().value.hasArchivedChats
+                }
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean = true

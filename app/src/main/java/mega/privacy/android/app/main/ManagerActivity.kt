@@ -450,9 +450,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     lateinit var restoreNodeResultMapper: RestoreNodeResultMapper
 
     @Inject
-    lateinit var hasArchivedChatsUseCase: HasArchivedChatsUseCase
-
-    @Inject
     lateinit var getChatRoomUseCase: GetChatRoomUseCase
 
     @Inject
@@ -603,7 +600,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private var searchMenuItem: MenuItem? = null
     private var doNotDisturbMenuItem: MenuItem? = null
-    private var archivedMenuItem: MenuItem? = null
     private var clearRubbishBinMenuItem: MenuItem? = null
     private var returnCallMenuItem: MenuItem? = null
     private var openLinkMenuItem: MenuItem? = null
@@ -4435,7 +4431,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         })
         val enableSelectMenuItem = menu.findItem(R.id.action_enable_select)
         doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb)
-        archivedMenuItem = menu.findItem(R.id.action_menu_archived)
         clearRubbishBinMenuItem = menu.findItem(R.id.action_menu_clear_rubbish_bin)
         returnCallMenuItem = menu.findItem(R.id.action_return_call)
         val rootView = returnCallMenuItem?.actionView as? RelativeLayout
@@ -4516,7 +4511,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 DrawerItem.CHAT -> if (searchExpand) {
                     openSearchView()
                 } else {
-                    checkArchivedChats()
                     doNotDisturbMenuItem?.isVisible = true
                     openLinkMenuItem?.isVisible = true
                 }
@@ -4807,7 +4801,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun hideItemsWhenSearchSelected() {
         if (searchMenuItem != null) {
             doNotDisturbMenuItem?.isVisible = false
-            archivedMenuItem?.isVisible = false
             clearRubbishBinMenuItem?.isVisible = false
             searchMenuItem?.isVisible = false
             openLinkMenuItem?.isVisible = false
@@ -6844,51 +6837,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             (application as MegaApplication).disableMegaChatApi()
             loggingSettings.resetLoggerSDK()
-        } else if (request.type == MegaChatRequest.TYPE_ARCHIVE_CHATROOM) {
-            val chatHandle: Long = request.chatHandle
-            val chat: MegaChatRoom = megaChatApi.getChatRoom(chatHandle)
-            var chatTitle = ChatUtil.getTitleChat(chat)
-            if (chatTitle == null) {
-                chatTitle = ""
-            } else if (chatTitle.isNotEmpty() && chatTitle.length > 60) {
-                chatTitle = chatTitle.substring(0, 59) + "..."
-            }
-            if (chatTitle.isNotEmpty() && chat.isGroup && !chat.hasCustomTitle()) {
-                chatTitle = "\"" + chatTitle + "\""
-            }
-            if (e.errorCode == MegaChatError.ERROR_OK) {
-                if (request.flag) {
-                    Timber.d("Chat archived")
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.success_archive_chat, chatTitle),
-                        -1
-                    )
-                } else {
-                    Timber.d("Chat unarchived")
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.success_unarchive_chat, chatTitle),
-                        -1
-                    )
-                }
-            } else {
-                if (request.flag) {
-                    Timber.e("ERROR WHEN ARCHIVING CHAT %s", e.errorString)
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.error_archive_chat, chatTitle),
-                        -1
-                    )
-                } else {
-                    Timber.e("ERROR WHEN UNARCHIVING CHAT %s", e.errorString)
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.error_unarchive_chat, chatTitle),
-                        -1
-                    )
-                }
-            }
         } else if (request.type == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE) {
             if (e.errorCode == MegaChatError.ERROR_OK) {
                 Timber.d("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: %s", request.flag)
@@ -8260,17 +8208,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     invalidateOptionsMenu()
                 }
             }
-        }
-    }
-
-    /**
-     * Check for existing archived chat rooms and show the menu item accordingly
-     */
-    private fun checkArchivedChats() {
-        lifecycleScope.launch {
-            runCatching { hasArchivedChatsUseCase() }
-                .onSuccess { archivedMenuItem?.isVisible = it }
-                .onFailure { Timber.e(it) }
         }
     }
 
