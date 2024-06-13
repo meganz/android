@@ -233,23 +233,29 @@ private fun OfflineFeatureScreenPreview() {
                         offlineNode = OfflineFileInformation(
                             name = "Some file.txt",
                             totalSize = 1234,
-                            addedTime = System.currentTimeMillis(),
+                            lastModifiedTime = System.currentTimeMillis(),
+                            handle = "1234",
+                            path = ""
                         )
                     ),
                     OfflineNodeUIItem(
                         offlineNode = OfflineFileInformation(
                             name = "Some file.txt",
                             totalSize = 3456,
-                            addedTime = System.currentTimeMillis(),
+                            lastModifiedTime = System.currentTimeMillis(),
+                            handle = "1234",
+                            path = ""
                         )
                     ),
                     OfflineNodeUIItem(
                         offlineNode = OfflineFileInformation(
                             name = "Some Folder",
                             totalSize = 1234,
-                            addedTime = System.currentTimeMillis(),
+                            lastModifiedTime = System.currentTimeMillis(),
                             isFolder = true,
-                            folderInfo = OfflineFolderInfo(numFiles = 2, numFolders = 3)
+                            folderInfo = OfflineFolderInfo(numFiles = 2, numFolders = 3),
+                            handle = "1234",
+                            path = ""
                         )
                     ),
                 )

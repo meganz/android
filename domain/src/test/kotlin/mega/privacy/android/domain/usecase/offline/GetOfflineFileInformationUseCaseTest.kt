@@ -68,6 +68,7 @@ internal class GetOfflineFileInformationUseCaseTest {
             on { name } doReturn "title"
             on { lastModifiedTime } doReturn 5679
             on { handle } doReturn "3"
+            on { path } doReturn "path"
         }
         val folderInfo = OfflineFolderInfo(0, 2)
         whenever(getOfflineFolderInformationUseCase(any())) doReturn (folderInfo)
@@ -87,6 +88,7 @@ internal class GetOfflineFileInformationUseCaseTest {
                 on { name } doReturn "title.jpg"
                 on { lastModifiedTime } doReturn 5679
                 on { handle } doReturn "3"
+                on { path } doReturn "path"
             }
             whenever(getOfflineFileUseCase(any())) doReturn (File(temporaryFolder, "NonExistent"))
 
@@ -103,6 +105,7 @@ internal class GetOfflineFileInformationUseCaseTest {
             on { name } doReturn "title.jpg"
             on { lastModifiedTime } doReturn 5679
             on { handle } doReturn "3"
+            on { path } doReturn "path"
         }
         whenever(isImageFileUseCase(any())) doReturn (true)
 
@@ -120,6 +123,7 @@ internal class GetOfflineFileInformationUseCaseTest {
                 on { name } doReturn "title.jpg"
                 on { lastModifiedTime } doReturn 5679
                 on { handle } doReturn "3"
+                on { path } doReturn "path"
             }
             whenever(getOfflineFileUseCase(any())) doReturn (File(temporaryFolder, "NonExistent"))
             whenever(isImageFileUseCase(any())) doReturn (true)

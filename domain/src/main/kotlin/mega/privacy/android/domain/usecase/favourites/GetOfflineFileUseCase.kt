@@ -3,7 +3,6 @@ package mega.privacy.android.domain.usecase.favourites
 import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
-import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.repository.FileSystemRepository
 import java.io.File
 import javax.inject.Inject
@@ -36,7 +35,7 @@ class GetOfflineFileUseCase @Inject constructor(
                 offlineInformation.name
             )
 
-            is OtherOfflineNodeInformation -> getFile(
+            else -> getFile(
                 fileSystemRepository.getOfflinePath(),
                 offlineInformation.path,
                 offlineInformation.name

@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.offline
 
+import java.util.concurrent.TimeUnit
+
 /**
  * OfflineFileInformation
  *
@@ -14,13 +16,16 @@ package mega.privacy.android.domain.entity.offline
  * @property thumbnail thumbnail of the node
  */
 data class OfflineFileInformation(
-    val id: Int = 0,
-    val handle: Long = 0,
-    val parentId: Int = -1,
-    val name: String = "",
     val totalSize: Long = 0L,
-    val isFolder: Boolean = false,
     val folderInfo: OfflineFolderInfo? = null,
-    val addedTime: Long? = null,
     val thumbnail: String? = null,
-)
+    override val id: Int = 0,
+    override val handle: String,
+    override val parentId: Int = -1,
+    override val name: String = "",
+    override val isFolder: Boolean = false,
+    override val path: String,
+    override val lastModifiedTime: Long?,
+) : OfflineNodeInformation {
+    val addedTime = lastModifiedTime?.let { TimeUnit.MICROSECONDS.toMillis(it) }
+}

@@ -1,14 +1,17 @@
 package mega.privacy.android.app.presentation.offline.offlinecompose
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
@@ -19,8 +22,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -37,6 +43,7 @@ class OfflineComposeViewModelTest {
         mock()
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase = mock()
     private val monitorViewType: MonitorViewType = mock()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private lateinit var underTest: OfflineComposeViewModel
 
     @BeforeEach
@@ -54,8 +61,21 @@ class OfflineComposeViewModelTest {
             setOfflineWarningMessageVisibilityUseCase = setOfflineWarningMessageVisibilityUseCase,
             monitorOfflineWarningMessageVisibilityUseCase = monitorOfflineWarningMessageVisibilityUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
-            monitorViewType = monitorViewType
+            monitorViewType = monitorViewType,
+            monitorConnectivityUseCase = monitorConnectivityUseCase
         )
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the online status is updated correctly`(isOnline: Boolean) = runTest {
+        whenever(monitorConnectivityUseCase()) doReturn flowOf(isOnline)
+
+        initViewModel()
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().isOnline).isEqualTo(isOnline)
+        }
     }
 
     @Test
@@ -71,13 +91,13 @@ class OfflineComposeViewModelTest {
         val offlineList1 = mock<OfflineFileInformation>()
         whenever(offlineList1.isFolder).thenReturn(true)
         whenever(offlineList1.name).thenReturn("folder")
-        whenever(offlineList1.handle).thenReturn(1234)
+        whenever(offlineList1.handle).thenReturn("1234")
         whenever(offlineList1.addedTime).thenReturn(100000L)
 
         val offlineList2 = mock<OfflineFileInformation>()
         whenever(offlineList2.isFolder).thenReturn(false)
         whenever(offlineList2.name).thenReturn("file")
-        whenever(offlineList2.handle).thenReturn(2345)
+        whenever(offlineList2.handle).thenReturn("2345")
         whenever(offlineList2.addedTime).thenReturn(100000L)
 
         val list = listOf(offlineList1, offlineList2)
@@ -89,7 +109,10 @@ class OfflineComposeViewModelTest {
                     id = parentId,
                     parentId = 0,
                     name = "Sample",
-                    isFolder = true
+                    isFolder = true,
+                    handle = "1234",
+                    lastModifiedTime = 100000L,
+                    path = ""
                 ),
                 isSelected = false
             )
@@ -103,13 +126,13 @@ class OfflineComposeViewModelTest {
         val offlineList1 = mock<OfflineFileInformation>()
         whenever(offlineList1.isFolder).thenReturn(true)
         whenever(offlineList1.name).thenReturn("folder")
-        whenever(offlineList1.handle).thenReturn(1234)
+        whenever(offlineList1.handle).thenReturn("1234")
         whenever(offlineList1.addedTime).thenReturn(100000L)
 
         val offlineList2 = mock<OfflineFileInformation>()
         whenever(offlineList2.isFolder).thenReturn(false)
         whenever(offlineList2.name).thenReturn("file")
-        whenever(offlineList2.handle).thenReturn(2345)
+        whenever(offlineList2.handle).thenReturn("2345")
         whenever(offlineList2.addedTime).thenReturn(100000L)
 
         val list = listOf(offlineList1, offlineList2)
@@ -120,7 +143,10 @@ class OfflineComposeViewModelTest {
                     id = parentId,
                     parentId = 0,
                     name = "Sample",
-                    isFolder = true
+                    isFolder = true,
+                    handle = "1234",
+                    lastModifiedTime = 100000L,
+                    path = ""
                 ),
                 isSelected = false
             )
@@ -137,13 +163,13 @@ class OfflineComposeViewModelTest {
             val offlineList1 = mock<OfflineFileInformation>()
             whenever(offlineList1.isFolder).thenReturn(true)
             whenever(offlineList1.name).thenReturn("folder")
-            whenever(offlineList1.handle).thenReturn(1234)
+            whenever(offlineList1.handle).thenReturn("1234")
             whenever(offlineList1.addedTime).thenReturn(100000L)
 
             val offlineList2 = mock<OfflineFileInformation>()
             whenever(offlineList2.isFolder).thenReturn(false)
             whenever(offlineList2.name).thenReturn("file")
-            whenever(offlineList2.handle).thenReturn(2345)
+            whenever(offlineList2.handle).thenReturn("2345")
             whenever(offlineList2.addedTime).thenReturn(100000L)
 
             val list = listOf(offlineList1, offlineList2)
@@ -154,7 +180,10 @@ class OfflineComposeViewModelTest {
                         id = parentId,
                         parentId = 0,
                         name = "Sample",
-                        isFolder = true
+                        isFolder = true,
+                        handle = "1234",
+                        lastModifiedTime = 100000L,
+                        path = ""
                     ),
                     isSelected = false
                 )
@@ -170,13 +199,13 @@ class OfflineComposeViewModelTest {
             val offlineList1 = mock<OfflineFileInformation>()
             whenever(offlineList1.isFolder).thenReturn(true)
             whenever(offlineList1.name).thenReturn("folder")
-            whenever(offlineList1.handle).thenReturn(1234)
+            whenever(offlineList1.handle).thenReturn("1234")
             whenever(offlineList1.addedTime).thenReturn(100000L)
 
             val offlineList2 = mock<OfflineFileInformation>()
             whenever(offlineList2.isFolder).thenReturn(false)
             whenever(offlineList2.name).thenReturn("file")
-            whenever(offlineList2.handle).thenReturn(2345)
+            whenever(offlineList2.handle).thenReturn("2345")
             whenever(offlineList2.addedTime).thenReturn(100000L)
 
             val list = listOf(offlineList1, offlineList2)
@@ -187,7 +216,10 @@ class OfflineComposeViewModelTest {
                         id = parentId,
                         parentId = 0,
                         name = "Sample",
-                        isFolder = true
+                        isFolder = true,
+                        handle = "1234",
+                        lastModifiedTime = 100000L,
+                        path = ""
                     ),
                     isSelected = false
                 )
@@ -202,13 +234,13 @@ class OfflineComposeViewModelTest {
         val offlineList1 = mock<OfflineFileInformation>()
         whenever(offlineList1.isFolder).thenReturn(true)
         whenever(offlineList1.name).thenReturn("folder")
-        whenever(offlineList1.handle).thenReturn(1234)
+        whenever(offlineList1.handle).thenReturn("1234")
         whenever(offlineList1.addedTime).thenReturn(100000L)
 
         val offlineList2 = mock<OfflineFileInformation>()
         whenever(offlineList2.isFolder).thenReturn(false)
         whenever(offlineList2.name).thenReturn("file")
-        whenever(offlineList2.handle).thenReturn(2345)
+        whenever(offlineList2.handle).thenReturn("2345")
         whenever(offlineList2.addedTime).thenReturn(100000L)
 
         val list = listOf(offlineList1, offlineList2)
@@ -219,7 +251,10 @@ class OfflineComposeViewModelTest {
                     id = parentId,
                     parentId = 0,
                     name = "Sample",
-                    isFolder = true
+                    isFolder = true,
+                    handle = "1234",
+                    lastModifiedTime = 100000L,
+                    path = ""
                 ),
                 isSelected = false
             )
@@ -228,7 +263,9 @@ class OfflineComposeViewModelTest {
             offlineNodeUIItem = OfflineNodeUIItem(
                 offlineNode = OfflineFileInformation(
                     id = 1,
-                    handle = 1234,
+                    handle = "1234",
+                    lastModifiedTime = 100000L,
+                    path = ""
                 ),
             )
         )
@@ -242,6 +279,7 @@ class OfflineComposeViewModelTest {
         whenever(monitorOfflineWarningMessageVisibilityUseCase()).thenReturn(emptyFlow())
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorViewType()).thenReturn(emptyFlow())
+        whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
     }
 
     @AfterEach

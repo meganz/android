@@ -26,7 +26,12 @@ class OfflineFileInfoScreenTest {
     fun `test that preview is shown if thumbnail is set`() {
         composeTestRule.setContent {
             val uiState = OfflineFileInfoUiState(
-                offlineFileInformation = OfflineFileInformation(thumbnail = "/path"),
+                offlineFileInformation = OfflineFileInformation(
+                    handle = "1",
+                    path = "/path",
+                    lastModifiedTime = 1000L,
+                    thumbnail = "/path"
+                ),
                 isLoading = false
             )
             OfflineFileInfoScreen(
@@ -44,7 +49,10 @@ class OfflineFileInfoScreenTest {
             val uiState = OfflineFileInfoUiState(
                 offlineFileInformation = OfflineFileInformation(
                     thumbnail = null,
-                    isFolder = true
+                    isFolder = true,
+                    handle = "1",
+                    path = "/path",
+                    lastModifiedTime = 1000L,
                 ),
                 isLoading = false
             )
@@ -64,7 +72,10 @@ class OfflineFileInfoScreenTest {
             val uiState = OfflineFileInfoUiState(
                 offlineFileInformation = OfflineFileInformation(
                     thumbnail = null,
-                    isFolder = true
+                    isFolder = true,
+                    handle = "1",
+                    path = "/path",
+                    lastModifiedTime = 1000L,
                 ),
                 isLoading = false
             )

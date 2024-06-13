@@ -38,18 +38,18 @@ class GetOfflineFileInformationUseCase @Inject constructor(
             isFolder = offlineNodeInformation.isFolder,
             handle = nodeHandle
         )
-        val addedTime = offlineNodeInformation.lastModifiedTime?.div(1000L)
 
         return OfflineFileInformation(
             id = offlineNodeInformation.id,
-            handle = nodeHandle,
+            handle = offlineNodeInformation.handle,
             parentId = offlineNodeInformation.parentId,
             name = offlineNodeInformation.name,
             totalSize = totalSize,
             isFolder = offlineNodeInformation.isFolder,
             folderInfo = folderInfo,
-            addedTime = addedTime,
             thumbnail = thumbnail,
+            path = offlineNodeInformation.path,
+            lastModifiedTime = offlineNodeInformation.lastModifiedTime,
         )
     }
 

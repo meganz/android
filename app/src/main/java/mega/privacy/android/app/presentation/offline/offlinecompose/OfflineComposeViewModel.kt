@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -13,6 +14,7 @@ import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUiState
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
@@ -33,6 +35,7 @@ class OfflineComposeViewModel @Inject constructor(
     private val setOfflineWarningMessageVisibilityUseCase: SetOfflineWarningMessageVisibilityUseCase,
     private val monitorOfflineWarningMessageVisibilityUseCase: MonitorOfflineWarningMessageVisibilityUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorViewType: MonitorViewType,
 ) : ViewModel() {
 
@@ -45,6 +48,7 @@ class OfflineComposeViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
+        monitorConnectivity()
         monitorOfflineWarningMessage()
         monitorOfflineNodeUpdates()
         monitorViewTypeUpdate()
@@ -57,6 +61,14 @@ class OfflineComposeViewModel @Inject constructor(
                 .collect {
                     loadOfflineNodes()
                 }
+        }
+    }
+
+    private fun monitorConnectivity() {
+        viewModelScope.launch {
+            monitorConnectivityUseCase()
+                .catch { Timber.e(it) }
+                .collectLatest { isOnline -> _uiState.update { it.copy(isOnline = isOnline) } }
         }
     }
 
@@ -194,7 +206,7 @@ class OfflineComposeViewModel @Inject constructor(
         val selectedHandleList = newNodesList.filter {
             it.isSelected
         }.map {
-            it.offlineNode.handle
+            it.offlineNode.handle.toLong()
         }
         _uiState.update {
             it.copy(
@@ -227,7 +239,7 @@ class OfflineComposeViewModel @Inject constructor(
             val selectedList = _uiState.value.offlineNodes.map {
                 it.copy(isSelected = true)
             }
-            val selectedListHandles = selectedList.map { it.offlineNode.handle }
+            val selectedListHandles = selectedList.map { it.offlineNode.handle.toLong() }
             _uiState.update {
                 it.copy(
                     offlineNodes = selectedList,

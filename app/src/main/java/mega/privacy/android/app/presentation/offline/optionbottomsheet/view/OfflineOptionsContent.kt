@@ -31,7 +31,7 @@ internal fun OfflineOptionsContent(
     onOpenInfoClicked: () -> Unit,
     onOpenWithClicked: () -> Unit,
     onSaveToDeviceClicked: () -> Unit,
-    onShareNodeClicked: () -> Unit,
+    onShareNodeClicked: (OfflineFileInformation) -> Unit,
 ) {
     if (!uiState.isLoading && uiState.offlineFileInformation != null)
         with(uiState.offlineFileInformation) {
@@ -79,7 +79,7 @@ internal fun OfflineOptionsContent(
                         icon = painterResource(id = R.drawable.ic_share_network_medium_regular_outline),
                         dividerType = DividerType.BigStartPadding,
                         onActionClicked = {
-                            onShareNodeClicked()
+                            onShareNodeClicked(this@with)
                         },
                     )
 
@@ -125,6 +125,9 @@ private fun OfflineOptionsContentPreview() {
                     name = "Title",
                     isFolder = false,
                     thumbnail = null,
+                    handle = "123",
+                    path = "",
+                    lastModifiedTime = System.currentTimeMillis()
                 ),
                 isLoading = false
             ),
@@ -150,6 +153,9 @@ private fun OfflineOptionsContentFolderPreview() {
                     name = "Title",
                     isFolder = true,
                     thumbnail = null,
+                    handle = "123",
+                    path = "",
+                    lastModifiedTime = System.currentTimeMillis()
                 ),
                 isLoading = false
             ),

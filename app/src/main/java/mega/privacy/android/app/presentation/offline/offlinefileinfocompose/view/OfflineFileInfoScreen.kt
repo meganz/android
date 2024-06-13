@@ -137,9 +137,11 @@ internal class OfflineFileInfoViewStatePreviewsProvider :
                 name = "Notes.txt",
                 folderInfo = null,
                 isFolder = false,
-                addedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
                 totalSize = 100L,
-                thumbnail = null
+                thumbnail = null,
+                handle = "1234",
+                path = ""
             ),
             isLoading = false
         )
@@ -149,9 +151,11 @@ internal class OfflineFileInfoViewStatePreviewsProvider :
                 name = "Photo.jpg",
                 folderInfo = null,
                 isFolder = false,
-                addedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
                 totalSize = 14500L,
-                thumbnail = "/path"
+                thumbnail = "/path",
+                handle = "1234",
+                path = ""
             ),
             isLoading = false
         )
@@ -161,9 +165,11 @@ internal class OfflineFileInfoViewStatePreviewsProvider :
                 name = "Favorite",
                 folderInfo = OfflineFolderInfo(1, 4),
                 isFolder = true,
-                addedTime = Instant.now().epochSecond - 10.seconds.inWholeSeconds,
+                lastModifiedTime = Instant.now().epochSecond - 10.seconds.inWholeSeconds,
                 totalSize = 5500L,
-                thumbnail = null
+                thumbnail = null,
+                handle = "1234",
+                path = ""
             ),
             isLoading = false
         )

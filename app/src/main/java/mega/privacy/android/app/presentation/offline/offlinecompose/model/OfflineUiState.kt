@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.offline.offlinecompose.model
 
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
@@ -11,6 +12,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param parentId Parent id of Node
  * @param title Title of screen
  * @param currentViewType ViewType [ViewType]
+ * @param isOnline true if connected to network
  */
 data class OfflineUiState(
     val isLoading: Boolean = false,
@@ -20,4 +22,13 @@ data class OfflineUiState(
     val parentId: Int = -1,
     val title: String = "",
     val currentViewType: ViewType = ViewType.LIST,
-)
+    val isOnline: Boolean = false,
+) {
+    /**
+     * Get the selected offline nodes
+     */
+    val selectedOfflineNodes: List<OfflineFileInformation>
+        get() = offlineNodes.filter {
+            it.isSelected
+        }.map { it.offlineNode }
+}

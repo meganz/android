@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -16,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.offline.action.OfflineNodeActionsViewModel
 import mega.privacy.android.app.presentation.offline.confirmremovedialog.ConfirmRemoveFromOfflineDialogFragment
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.OfflineOptionsViewModel.Companion.NODE_HANDLE
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.view.OfflineOptionsContent
@@ -25,6 +27,7 @@ import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
@@ -33,6 +36,7 @@ import javax.inject.Inject
 internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private val viewModel: OfflineOptionsViewModel by viewModels()
+    private val offlineNodeActionsViewModel: OfflineNodeActionsViewModel by activityViewModels()
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -60,7 +64,12 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
                         onOpenInfoClicked = { openInfo(uiState.nodeId) },
                         onOpenWithClicked = { openWith(uiState.nodeId) },
                         onSaveToDeviceClicked = { saveToDevice(uiState.nodeId) },
-                        onShareNodeClicked = { shareOfflineNode(uiState.nodeId) },
+                        onShareNodeClicked = {
+                            shareOfflineNode(
+                                offlineFileInformation = it,
+                                isOnline = uiState.isOnline
+                            )
+                        },
                     )
                 }
 
@@ -79,10 +88,13 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
         dismissAllowingStateLoss()
     }
 
-    private fun shareOfflineNode(nodeId: NodeId) {
-        OfflineUtils.shareOfflineNode(
-            requireContext(),
-            nodeId.longValue
+    private fun shareOfflineNode(
+        offlineFileInformation: OfflineFileInformation,
+        isOnline: Boolean,
+    ) {
+        offlineNodeActionsViewModel.handleShareOfflineNodes(
+            nodes = listOf(offlineFileInformation),
+            isOnline = isOnline
         )
         dismissAllowingStateLoss()
     }

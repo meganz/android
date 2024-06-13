@@ -610,6 +610,7 @@ public class OfflineUtils {
      * @param context    Required to build the intent
      * @param nodeHandle Offline node handle to be shared
      */
+    @Deprecated
     public static void shareOfflineNode(Context context, Long nodeHandle) {
         LegacyDatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
         MegaOffline node = dbH.findByHandle(nodeHandle);
@@ -631,6 +632,7 @@ public class OfflineUtils {
      * @param context      the current Context
      * @param offlineNodes offline nodes to share
      */
+    @Deprecated
     public static void shareOfflineNodes(Context context, List<MegaOffline> offlineNodes) {
         boolean allFiles = true;
         for (MegaOffline offlineNode : offlineNodes) {

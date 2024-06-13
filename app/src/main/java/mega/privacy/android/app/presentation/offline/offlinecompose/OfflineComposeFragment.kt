@@ -22,6 +22,8 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.offline.action.HandleOfflineNodeActions
+import mega.privacy.android.app.presentation.offline.action.OfflineNodeActionsViewModel
 import mega.privacy.android.app.presentation.offline.confirmremovedialog.ConfirmRemoveFromOfflineDialogFragment
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.OfflineOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.offline.view.OfflineFeatureScreen
@@ -54,6 +56,8 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     private val viewModel: OfflineComposeViewModel by activityViewModels()
+    private val offlineNodeActionsViewModel: OfflineNodeActionsViewModel by activityViewModels()
+
     private val args: OfflineComposeFragmentArgs by navArgs()
     private var actionMode: ActionMode? = null
 
@@ -103,7 +107,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                             }
                         },
                         onOptionClicked = {
-                            showOptionPanelBottomSheet(it.offlineNode.handle)
+                            showOptionPanelBottomSheet(it.offlineNode.handle.toLong())
                         }
                     )
                     (requireActivity() as? ManagerActivity)?.setToolbarTitleFromFullscreenOfflineFragment(
@@ -114,6 +118,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                     updateActionModeTitle(
                         selectedItemsCount = uiState.selectedNodeHandles.size
                     )
+                    HandleOfflineNodeActions(offlineNodeActionsViewModel)
                 }
             }
         }
@@ -175,21 +180,24 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
         actionMode = null
     }
 
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+    override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
         Timber.d("ActionBarCallBack::onActionItemClicked")
-
-        when (item!!.itemId) {
+        when (item.itemId) {
             R.id.cab_menu_download -> {
                 callManager {
                     it.saveHandlesToDevice(
-                        viewModel.uiState.value.selectedNodeHandles,
-                        true
+                        handles = viewModel.uiState.value.selectedNodeHandles,
+                        highPriority = true
                     )
                 }
                 viewModel.clearSelection()
             }
 
             R.id.cab_menu_share_out -> {
+                offlineNodeActionsViewModel.handleShareOfflineNodes(
+                    nodes = viewModel.uiState.value.selectedOfflineNodes,
+                    isOnline = viewModel.uiState.value.isOnline
+                )
                 viewModel.clearSelection()
             }
 

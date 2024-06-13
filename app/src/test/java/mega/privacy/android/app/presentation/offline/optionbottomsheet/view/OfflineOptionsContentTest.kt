@@ -28,7 +28,10 @@ class RecentActionsEmptyViewTest {
                 offlineFileInformation = OfflineFileInformation(
                     name = "Title",
                     isFolder = false,
-                    thumbnail = null
+                    thumbnail = null,
+                    handle = "1",
+                    path = "/path",
+                    lastModifiedTime = 1000L,
                 ),
                 isOnline = true,
                 isLoading = false
@@ -60,7 +63,10 @@ class RecentActionsEmptyViewTest {
                 offlineFileInformation = OfflineFileInformation(
                     name = "Title",
                     isFolder = true,
-                    thumbnail = null
+                    thumbnail = null,
+                    handle = "1",
+                    path = "/path",
+                    lastModifiedTime = 1000L,
                 ),
                 isLoading = false
             )
@@ -86,7 +92,10 @@ class RecentActionsEmptyViewTest {
                 offlineFileInformation = OfflineFileInformation(
                     name = "Title",
                     isFolder = true,
-                    thumbnail = null
+                    thumbnail = null,
+                    handle = "1",
+                    path = "/path",
+                    lastModifiedTime = 1000L,
                 ),
                 isLoading = false
             )
