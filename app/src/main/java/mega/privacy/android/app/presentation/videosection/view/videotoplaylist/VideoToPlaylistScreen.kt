@@ -13,8 +13,17 @@ internal fun VideoToPlaylistScreen(
 
     VideoToPlaylistView(
         items = uiState.items,
+        isLoading = uiState.isLoading,
+        isInputTitleValid = uiState.isInputTitleValid,
+        showCreateVideoPlaylistDialog = uiState.shouldCreateVideoPlaylist,
+        inputPlaceHolderText = uiState.createVideoPlaylistPlaceholderTitle,
+        setShouldCreateVideoPlaylist = viewModel::setShouldCreateVideoPlaylist,
+        onCreateDialogPositiveButtonClicked = viewModel::createNewPlaylist,
+        setInputValidity = viewModel::setNewPlaylistTitleValidity,
+        setDialogInputPlaceholder = viewModel::setPlaceholderTitle,
         searchState = uiState.searchState,
         query = uiState.query,
-        hasSelectedItems = uiState.selectedItemIds.isNotEmpty()
+        hasSelectedItems = uiState.selectedPlaylistIds.isNotEmpty(),
+        errorMessage = uiState.createDialogErrorMessage
     )
 }

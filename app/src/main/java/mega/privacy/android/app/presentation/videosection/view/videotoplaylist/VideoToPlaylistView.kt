@@ -3,13 +3,17 @@ package mega.privacy.android.app.presentation.videosection.view.videotoplaylist
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -20,6 +24,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSetUiEntity
+import mega.privacy.android.app.presentation.videosection.view.playlist.CreateVideoPlaylistDialog
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -29,6 +34,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -38,6 +44,14 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 @Composable
 internal fun VideoToPlaylistView(
     items: List<VideoPlaylistSetUiEntity>,
+    isLoading: Boolean,
+    isInputTitleValid: Boolean,
+    showCreateVideoPlaylistDialog: Boolean,
+    inputPlaceHolderText: String,
+    setShouldCreateVideoPlaylist: (Boolean) -> Unit,
+    onCreateDialogPositiveButtonClicked: (String) -> Unit,
+    setInputValidity: (Boolean) -> Unit,
+    setDialogInputPlaceholder: (String) -> Unit,
     searchState: SearchWidgetState,
     query: String?,
     hasSelectedItems: Boolean,
@@ -47,8 +61,8 @@ internal fun VideoToPlaylistView(
     onSearchClicked: () -> Unit = {},
     onBackPressed: () -> Unit = {},
     onItemClicked: (VideoPlaylistSetUiEntity) -> Unit = {},
-    onNewPlaylistClicked: () -> Unit = {},
     onDoneButtonClicked: () -> Unit = {},
+    errorMessage: Int? = null,
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -70,26 +84,64 @@ internal fun VideoToPlaylistView(
             )
         }
     ) { paddingValues ->
+        if (showCreateVideoPlaylistDialog) {
+            CreateVideoPlaylistDialog(
+                modifier = Modifier.testTag(VIDEO_TO_PLAYLIST_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
+                title = stringResource(id = sharedR.string.video_section_playlists_create_playlist_dialog_title),
+                positiveButtonText = stringResource(id = R.string.general_create),
+                inputPlaceHolderText = { inputPlaceHolderText },
+                errorMessage = errorMessage,
+                onDialogInputChange = setInputValidity,
+                onDismissRequest = {
+                    setShouldCreateVideoPlaylist(false)
+                    setInputValidity(true)
+                },
+                onDialogPositiveButtonClicked = { titleOfNewVideoPlaylist ->
+                    onCreateDialogPositiveButtonClicked(titleOfNewVideoPlaylist)
+                },
+            ) {
+                isInputTitleValid
+            }
+        }
+
         Column(modifier = Modifier.padding(paddingValues)) {
             MegaText(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 10.dp)
                     .testTag(VIDEO_TO_PLAYLIST_NEW_PLAYLIST_TEST_TAG)
                     .clickable {
-                        onNewPlaylistClicked()
+                        val placeholderText = "New playlist"
+                        setShouldCreateVideoPlaylist(true)
+                        setDialogInputPlaceholder(placeholderText)
                     },
                 text = stringResource(id = sharedR.string.video_to_playlist_new_playlist_text),
                 textColor = TextColor.Accent
             )
 
-            if (items.isEmpty()) {
-                LegacyMegaEmptyView(
+            when {
+                isLoading -> Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 20.dp)
+                        .testTag(VIDEO_TO_PLAYLIST_PROGRESS_BAR_CONTAINER_TEST_TAG),
+                    contentAlignment = Alignment.TopCenter,
+                    content = {
+                        MegaCircularProgressIndicator(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .testTag(VIDEO_TO_PLAYLIST_PROGRESS_BAR_TEST_TAG),
+                            strokeWidth = 4.dp,
+                        )
+                    },
+                )
+
+                items.isEmpty() -> LegacyMegaEmptyView(
                     modifier = Modifier.testTag(VIDEO_TO_PLAYLIST_EMPTY_VIEW_TEST_TAG),
                     text = stringResource(id = sharedR.string.video_section_playlists_empty_hint_playlist),
                     imagePainter = painterResource(id = R.drawable.ic_homepage_empty_playlists)
                 )
-            } else {
-                LazyColumn(
+
+                else -> LazyColumn(
                     state = lazyListState,
                     modifier = Modifier
                         .fillMaxHeight()
@@ -141,7 +193,15 @@ private fun VideoToPlaylistViewPreview() {
             items = provideTestItems(),
             searchState = SearchWidgetState.COLLAPSED,
             query = "",
-            hasSelectedItems = true
+            hasSelectedItems = true,
+            isLoading = false,
+            isInputTitleValid = true,
+            showCreateVideoPlaylistDialog = false,
+            inputPlaceHolderText = "",
+            setShouldCreateVideoPlaylist = {},
+            onCreateDialogPositiveButtonClicked = {},
+            setInputValidity = {},
+            setDialogInputPlaceholder = {}
         )
     }
 }
@@ -183,3 +243,19 @@ const val VIDEO_TO_PLAYLIST_NEW_PLAYLIST_TEST_TAG = "video_to_playlist_item:text
  * Test tag for empty view
  */
 const val VIDEO_TO_PLAYLIST_EMPTY_VIEW_TEST_TAG = "video_to_playlist_view:empty_view"
+
+/**
+ * Test tag for progressBar
+ */
+const val VIDEO_TO_PLAYLIST_PROGRESS_BAR_TEST_TAG = "video_to_playlist_view:progress_bar"
+
+/**
+ * Test tag for progressBar container
+ */
+const val VIDEO_TO_PLAYLIST_PROGRESS_BAR_CONTAINER_TEST_TAG = "video_to_playlist_view:box_container"
+
+/**
+ * Test tag for CreateVideoPlaylistDialog
+ */
+const val VIDEO_TO_PLAYLIST_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+    "video_to_playlist_view:dialog_create_video_playlist"
