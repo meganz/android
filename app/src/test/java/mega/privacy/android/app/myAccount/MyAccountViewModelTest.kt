@@ -507,13 +507,6 @@ internal class MyAccountViewModelTest {
         }
     }
 
-    @Test
-    fun `test that showNewCancelSubscriptionFeature is null`() = runTest {
-        underTest.state.test {
-            assertThat(awaitItem().showNewCancelSubscriptionFeature).isNull()
-        }
-    }
-
     @ParameterizedTest(name = "when CancelSubscription flag is {0}, showNewCancelSubscriptionFeature is {1}")
     @MethodSource("provideShowNewCancelSubscriptionFeatureParameters")
     fun `test that showNewCancelSubscriptionFeature is correct when CancelSubscription flag is provided`(
@@ -521,7 +514,7 @@ internal class MyAccountViewModelTest {
         expected: Boolean,
     ) = runTest {
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(flag)
-        underTest.checkForNewCancelSubscriptionFeature()
+        initializeViewModel()
         underTest.state.test {
             assertThat(awaitItem().showNewCancelSubscriptionFeature).isEqualTo(expected)
         }
@@ -531,26 +524,6 @@ internal class MyAccountViewModelTest {
         Arguments.of(true, true),
         Arguments.of(false, false)
     )
-
-    @Test
-    fun `test that showNewCancelSubscriptionFeature is true when CancelSubscription flag is true`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
-            underTest.checkForNewCancelSubscriptionFeature()
-            underTest.state.test {
-                assertThat(awaitItem().showNewCancelSubscriptionFeature).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that showNewCancelSubscriptionFeature is false when CancelSubscription flag is false`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
-            underTest.checkForNewCancelSubscriptionFeature()
-            underTest.state.test {
-                assertThat(awaitItem().showNewCancelSubscriptionFeature).isFalse()
-            }
-        }
 
     @AfterEach
     fun resetMocks() {

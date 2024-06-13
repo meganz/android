@@ -274,6 +274,7 @@ class MyAccountViewModel @Inject constructor(
                     }
                 }
         }
+        checkNewCancelSubscriptionFeature()
     }
 
     override fun onCleared() {
@@ -281,10 +282,17 @@ class MyAccountViewModel @Inject constructor(
         resetJob?.cancel()
     }
 
+
     /**
      * Checks if the new cancel subscription feature is enabled.
      */
-    fun checkForNewCancelSubscriptionFeature() {
+    fun isNewCancelSubscriptionFeatureEnabled(): Boolean =
+        state.value.showNewCancelSubscriptionFeature
+
+    /**
+     * Checks if the cancel subscription feature is enabled
+     */
+    private fun checkNewCancelSubscriptionFeature() {
         viewModelScope.launch {
             runCatching {
                 val isEnabled = getFeatureFlagValueUseCase(AppFeatures.CancelSubscription)
@@ -292,19 +300,14 @@ class MyAccountViewModel @Inject constructor(
                     it.copy(showNewCancelSubscriptionFeature = isEnabled)
                 }
             }.onFailure {
-                Timber.e(it, "Failed to check for new cancel subscription feature")
+                Timber.e(
+                    it,
+                    "Failed to check for new cancel subscription feature"
+                )
             }
         }
     }
 
-    /**
-     * Resets the check for the new cancel subscription feature flag.
-     */
-    fun resetCheckForNewCancelSubscriptionFeature() {
-        _state.update {
-            it.copy(showNewCancelSubscriptionFeature = null)
-        }
-    }
 
     private fun refreshUserName(forceRefresh: Boolean) {
         viewModelScope.launch {

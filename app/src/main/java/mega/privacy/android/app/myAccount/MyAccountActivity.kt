@@ -144,7 +144,7 @@ class MyAccountActivity : PasscodeActivity(),
 
                 savedInstanceState.getBoolean(CANCEL_SUBSCRIPTIONS_SHOWN, false) -> {
                     cancelSubscriptionsFeedback = savedInstanceState.getString(TYPED_FEEDBACK)
-                    viewModel.checkForNewCancelSubscriptionFeature()
+                    handleShowCancelSubscription()
                 }
 
                 savedInstanceState.getBoolean(CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN, false) -> {
@@ -285,11 +285,25 @@ class MyAccountActivity : PasscodeActivity(),
                 viewModel.setOpenUpgradeFrom()
             }
 
-            R.id.action_cancel_subscriptions -> viewModel.checkForNewCancelSubscriptionFeature()
+            R.id.action_cancel_subscriptions -> {
+                handleShowCancelSubscription()
+            }
+
             R.id.action_logout -> viewModel.logout(this)
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    /**
+     * Handles the show cancel subscription action depending on the feature flag.
+     */
+    private fun handleShowCancelSubscription() {
+        if (viewModel.isNewCancelSubscriptionFeatureEnabled()) {
+            // Enable the new cancel subscription feature
+        } else {
+            showCancelSubscriptions()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -316,7 +330,7 @@ class MyAccountActivity : PasscodeActivity(),
             R.id.my_account -> {
                 menu.toggleAllMenuItemsVisibility(true)
 
-                if (viewModel.thereIsNoSubscription() || isProFlexiAccount) {
+                if (viewModel.thereIsNoSubscription() || (isProFlexiAccount && !viewModel.isNewCancelSubscriptionFeatureEnabled())) {
                     menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
                 }
 
@@ -466,14 +480,6 @@ class MyAccountActivity : PasscodeActivity(),
             if (state.showChangeEmailConfirmation) {
                 showConfirmChangeEmailDialog()
                 viewModel.resetChangeEmailConfirmation()
-            }
-            state.showNewCancelSubscriptionFeature?.let { isEnabled ->
-                if (isEnabled) {
-                    // Enable the new cancel subscription feature
-                } else {
-                    showCancelSubscriptions()
-                }
-                viewModel.resetCheckForNewCancelSubscriptionFeature()
             }
         }
     }
