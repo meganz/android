@@ -83,17 +83,18 @@ SQLITE_SHA1="350fa5ccedc70f4979d7f954fba9525542809ba2"
 
 CURL=curl
 CURL_VERSION=8.1.1
-C_ARES_VERSION=1.19.1
 CURL_EXTRA="--disable-dict --disable-file --disable-ftp --disable-gopher --disable-imap --disable-ldap --disable-ldaps --disable-mime --disable-netrc --disable-pop3 --disable-proxy --disable-rtsp --disable-smb --disable-smtp --disable-telnet --disable-tftp --disable-manual"
 CURL_SOURCE_FILE=curl-${CURL_VERSION}.tar.gz
 CURL_SOURCE_FOLDER=curl-${CURL_VERSION}
 CURL_DOWNLOAD_URL=http://curl.haxx.se/download/${CURL_SOURCE_FILE}
 CURL_SHA1="5ff2ecaa4a68ecc06434644ce76d9837e99e7d1d"
 
+C_ARES_VERSION=1.19.1
+C_ARES_VERSION2=1_19_1
 ARES_SOURCE_FILE=c-ares-${C_ARES_VERSION}.tar.gz
 ARES_SOURCE_FOLDER=c-ares-${C_ARES_VERSION}
 ARES_CONFIGURED=${CURL}/${ARES_SOURCE_FOLDER}/Makefile.inc
-ARES_DOWNLOAD_URL=http://c-ares.haxx.se/download/${ARES_SOURCE_FILE}
+ARES_DOWNLOAD_URL=https://github.com/c-ares/c-ares/releases/download/cares-${C_ARES_VERSION2}/${ARES_SOURCE_FILE}
 ARES_SHA1="99566278e4ed4b261891aa62c8b88227bf1a2823"
 
 CRASHLYTICS=crashlytics
