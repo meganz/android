@@ -27,6 +27,7 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.VideoListViewAdapter
 import mega.privacy.android.app.presentation.meeting.view.SpeakerCallView
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -715,12 +716,12 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Check changes session on hold
      *
-     * @param session MegaChatSession of a participant
+     * @param session ChatSession of a participant
      */
-    fun updateSessionOnHold(session: MegaChatSession) {
+    fun updateSessionOnHold(session: ChatSession) {
         //Speaker
         inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
-            if (speaker.peerId == session.peerid && speaker.clientId == session.clientid) {
+            if (speaker.peerId == session.peerId && speaker.clientId == session.clientId) {
                 when (session.isOnHold) {
                     true -> {
                         Timber.d("Speaker session is on hold")
@@ -737,16 +738,16 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
         //Participant in list
         inMeetingViewModel.getParticipant(
-            session.peerid,
-            session.clientid
+            session.peerId,
+            session.clientId
         )?.let {
             Timber.d("Update session on hold status")
             adapter.updateSessionOnHold(it, session.isOnHold)
         }
 
         inMeetingViewModel.getScreenShared(
-            session.peerid,
-            session.clientid
+            session.peerId,
+            session.clientId
         )?.let {
             Timber.d("Update session on hold status")
             adapter.updateSessionOnHold(it, session.isOnHold)

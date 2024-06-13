@@ -23,7 +23,7 @@ class MonitorCallSessionOnRecordingUseCase @Inject constructor(
      */
     operator fun invoke(chatId: Long) = monitorChatSessionUpdatesUseCase()
         .filter {
-            chatId == it.chatId && it.session?.changes != null
+            chatId == it.call?.chatId && it.session?.changes != null
                     && (it.session.hasChanged(ChatSessionChanges.SessionOnRecording)
                     || (it.session.hasChanged(ChatSessionChanges.Status) && it.session.status == ChatSessionStatus.Progress && it.session.isRecording))
         }.map {

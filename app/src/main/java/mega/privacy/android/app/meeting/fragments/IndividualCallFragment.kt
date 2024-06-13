@@ -11,7 +11,6 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -23,7 +22,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
@@ -57,9 +55,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private lateinit var onHoldImageView: ImageView
     private var microOffImageView: ImageView? = null
     private var raisedHandIcon: ImageView? = null
-
-    val individualCallViewModel: InMeetingViewModel by activityViewModels()
-
 
     private lateinit var inMeetingFragment: InMeetingFragment
 
@@ -117,18 +112,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
         }
 
-    private val sessionOnHoldObserver = Observer<Pair<Long, MegaChatSession>> {
-        val callId = it.first
-        val session = it.second
-
-        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId) && isAdded) {
-            Timber.d("Check changes in session on hold")
-            checkChangesInOnHold(
-                session.isOnHold
-            )
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -168,9 +151,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         LiveEventBus.get<Pair<Long, MegaChatSession>>(EventConstants.EVENT_SESSION_ON_HIRES_CHANGE)
             .observe(this, sessionHiResObserver)
-
-        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_SESSION_ON_HOLD_CHANGE)
-            .observe(this, sessionOnHoldObserver)
     }
 
     override fun onCreateView(
@@ -258,13 +238,21 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
         }
 
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.shouldUpdateCallOnHold }
-            .distinctUntilChanged()) {
-            if (it) {
-                inMeetingViewModel.checkUpdatesInCallOnHold(update = false)
-                inMeetingViewModel.state.value.call?.apply {
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.sessionOnHoldChanges }
+            .distinctUntilChanged()) { session ->
+            session?.apply {
+                if (inMeetingViewModel.state.value.isOneToOneCall && isAdded) {
+                    Timber.d("Check changes in session on hold")
                     checkChangesInOnHold(isOnHold)
                 }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.isCallOnHold }
+            .distinctUntilChanged()) {
+            it?.let { isOnHold ->
+                Timber.d("Check changes in call on hold")
+                checkChangesInOnHold(isOnHold)
             }
         }
     }
@@ -409,9 +397,12 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Method to control the Call on hold icon visibility
      */
     private fun showCallOnHoldIcon() {
-        val isOneToOneCall = inMeetingViewModel.isOneToOneCall()
-        if (isOneToOneCall && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall() && !isFloatingWindow ||
-            !isOneToOneCall && inMeetingViewModel.isCallOnHold()
+        val isOneToOneCall = inMeetingViewModel.state.value.isOneToOneCall
+        val isCallOnHold = inMeetingViewModel.state.value.isCallOnHold == true
+        val isSessionOnHold = inMeetingViewModel.state.value.isSessionOnHold == true
+
+        if ((isOneToOneCall && (isCallOnHold || isSessionOnHold) && !isFloatingWindow) ||
+            (!isOneToOneCall && isCallOnHold)
         ) {
             Timber.d("Show on hold icon")
             onHoldImageView.isVisible = true

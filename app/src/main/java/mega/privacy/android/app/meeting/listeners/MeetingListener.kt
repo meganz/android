@@ -10,9 +10,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_OUTGOING_RIN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
@@ -52,12 +50,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             if (call.status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION || call.status == MegaChatCall.CALL_STATUS_DESTROYED) {
                 stopCountDown()
             }
-        }
-
-        // Peer has changed its ringing state
-        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)) {
-            Timber.d("Changes in ringing status call. Call is ${call.callId}. Call is Ringing ${call.isRinging}")
-            sendCallEvent(EVENT_RINGING_STATUS_CHANGE, call)
         }
 
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_OUTGOING_RINGING_STOP)) {
@@ -117,12 +109,6 @@ class MeetingListener : MegaChatCallListenerInterface {
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_ON_LOWRES)) {
             Timber.d("Session on low resolution changed. Client ID  ${session.clientid}")
             sendSessionEvent(EVENT_SESSION_ON_LOWRES_CHANGE, session, callid)
-        }
-
-        // Session is on hold
-        if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_ON_HOLD)) {
-            Timber.d("Session on hold changed. Session on hold ${session.isOnHold}. Client ID  ${session.clientid}")
-            sendSessionEvent(EVENT_SESSION_ON_HOLD_CHANGE, session, callid)
         }
 
         // Indicates if peer is speaking

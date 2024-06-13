@@ -213,15 +213,18 @@ class CallChangesObserver @Inject constructor(
 
     private suspend fun handleSessionStatusChange(callAndSession: ChatSessionUpdatesResult) {
         val session = callAndSession.session
-        val chatId = callAndSession.chatId
         val sessionStatus = session?.status
-        megaChatApi.getChatRoom(chatId)?.let { room ->
-            if (sessionStatus == ChatSessionStatus.Progress &&
-                (room.isGroup || room.isMeeting || session.peerId != getMyUserHandleUseCase())
-            ) {
-                Timber.d("Session is in progress")
-                chatManagement.setRequestSentCall(callAndSession.callId, false)
-                rtcAudioManagerGateway.updateRTCAudioMangerTypeStatus(Constants.AUDIO_MANAGER_CALL_IN_PROGRESS)
+        callAndSession.call?.apply {
+            megaChatApi.getChatRoom(chatId)?.let { room ->
+                if (sessionStatus == ChatSessionStatus.Progress &&
+                    (room.isGroup || room.isMeeting || session.peerId != getMyUserHandleUseCase())
+                ) {
+                    Timber.d("Session is in progress")
+                    callAndSession.call?.let {
+                        chatManagement.setRequestSentCall(it.callId, false)
+                    }
+                    rtcAudioManagerGateway.updateRTCAudioMangerTypeStatus(Constants.AUDIO_MANAGER_CALL_IN_PROGRESS)
+                }
             }
         }
     }

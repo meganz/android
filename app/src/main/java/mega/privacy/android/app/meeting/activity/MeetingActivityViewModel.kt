@@ -1087,7 +1087,7 @@ class MeetingActivityViewModel @Inject constructor(
     private fun startMonitorChatSessionUpdates() =
         viewModelScope.launch {
             monitorChatSessionUpdatesUseCase()
-                .filter { it.chatId == _state.value.chatId }
+                .filter { it.call?.chatId == _state.value.chatId }
                 .collectLatest { result ->
                     result.session?.let { session ->
                         session.changes?.apply {

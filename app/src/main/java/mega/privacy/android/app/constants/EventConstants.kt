@@ -12,7 +12,6 @@ object EventConstants {
     /** Event Keys related to calls*/
     const val EVENT_UPDATE_CALL = "update_call"
     const val EVENT_CALL_STATUS_CHANGE = "call_status_change"
-    const val EVENT_RINGING_STATUS_CHANGE = "ringing_status_change"
     const val EVENT_CALL_COMPOSITION_CHANGE = "call_composition_change"
     const val EVENT_NOT_OUTGOING_CALL = "not_outgoing_call"
     const val EVENT_OUTGOING_CALL = "outgoing_call"
@@ -31,7 +30,6 @@ object EventConstants {
     const val EVENT_SESSION_ON_HIRES_CHANGE = "session_on_hires_change"
     const val EVENT_SESSION_ON_LOWRES_CHANGE = "session_on_lowres_change"
     const val EVENT_REMOTE_AUDIO_LEVEL_CHANGE = "remote_audio_level_change"
-    const val EVENT_SESSION_ON_HOLD_CHANGE = "session_on_hold_change"
     const val EVENT_PRIVILEGES_CHANGE = "privileges_in_char_change"
     const val EVENT_USER_VISIBILITY_CHANGE = "user_visibility_change"
     const val EVENT_CHAT_CONNECTION_STATUS = "chat_connection_status_change"

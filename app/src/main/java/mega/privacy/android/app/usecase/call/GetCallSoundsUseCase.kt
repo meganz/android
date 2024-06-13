@@ -135,19 +135,15 @@ class GetCallSoundsUseCase @Inject constructor(
                 }.collect { sessionUpdate ->
                     with(sessionUpdate) {
                         val session = session ?: return@with
-                        val call = getChatCallUseCase(chatId)
                         val participant =
                             ParticipantInfo(peerId = session.peerId, clientId = session.clientId)
-
-                        if (call == null) {
-                            stopCountDown(INVALID_HANDLE, participant)
-                        } else {
-                            getChatRoomUseCase(call.chatId)?.let { chat ->
+                        call?.apply {
+                            getChatRoomUseCase(chatId)?.let { chat ->
                                 if (!chat.isGroup && !chat.isMeeting) {
                                     when (session.status) {
                                         ChatSessionStatus.Progress -> {
                                             Timber.d("Session in progress")
-                                            stopCountDown(call.chatId, participant)
+                                            stopCountDown(chatId, participant)
                                         }
 
                                         ChatSessionStatus.Destroyed -> {
@@ -160,7 +156,7 @@ class GetCallSoundsUseCase @Inject constructor(
                                                     Timber.d("Session destroyed, recoverable session. Wait 10 seconds to hang up")
                                                     startFinishCallCountDown(
                                                         chat,
-                                                        call.callId,
+                                                        callId,
                                                         participant,
                                                         SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
                                                     )
@@ -168,7 +164,7 @@ class GetCallSoundsUseCase @Inject constructor(
                                                 } else {
                                                     Timber.d("Session destroyed, unrecoverable session.")
                                                     stopCountDown(
-                                                        call.chatId,
+                                                        chatId,
                                                         participant
                                                     )
                                                 }
@@ -179,7 +175,10 @@ class GetCallSoundsUseCase @Inject constructor(
                                     }
                                 }
                             }
+                        } ?: run {
+                            stopCountDown(INVALID_HANDLE, participant)
                         }
+
                     }
                 }
             }

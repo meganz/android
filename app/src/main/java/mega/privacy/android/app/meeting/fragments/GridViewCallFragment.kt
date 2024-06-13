@@ -11,6 +11,7 @@ import androidx.viewpager2.widget.ViewPager2
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
 import nz.mega.sdk.MegaChatSession
 import timber.log.Timber
@@ -272,12 +273,12 @@ class GridViewCallFragment : MeetingBaseFragment() {
     /**
      * Check changes session on hold
      *
-     * @param session MegaChatSession
+     * @param session [ChatSession]
      */
-    fun updateSessionOnHold(session: MegaChatSession) {
+    fun updateSessionOnHold(session: ChatSession) {
         (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
-            session.peerid,
-            session.clientid
+            session.peerId,
+            session.clientId
         )?.let {
             Timber.d("Update session on hold status")
             adapterPager.updateSessionOnHold(

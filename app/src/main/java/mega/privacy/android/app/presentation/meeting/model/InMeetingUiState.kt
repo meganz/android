@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.meeting.AnotherCallType
 import mega.privacy.android.domain.entity.meeting.CallOnHoldType
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 
 /**
@@ -51,7 +52,7 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property userIdsWithChangesInRaisedHand         User identifiers with changes in the raised hand
  * @property isRaiseToHandSuggestionShown           True, if the Raise to Hand suggestion has been shown. False, otherwise.
  * @property shouldUpdateLocalAVFlags               True, if should update local av flag. False, if not
- * @property shouldUpdateCallOnHold                True, if should update on hold call. False, if not
+ * @property sessionOnHoldChanges                   [ChatSession] with changes
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -92,13 +93,43 @@ data class InMeetingUiState(
     val userIdsWithChangesInRaisedHand: List<Long> = emptyList(),
     val isRaiseToHandSuggestionShown: Boolean = true,
     val shouldUpdateLocalAVFlags: Boolean = true,
-    val shouldUpdateCallOnHold: Boolean = true,
+    val sessionOnHoldChanges: ChatSession? = null
 ) {
     /**
      * Is call on hold
      */
     val isCallOnHold
-        get():Boolean = call?.isOnHold == true
+        get():Boolean? {
+            call?.apply {
+                return isOnHold
+            }
+
+            return null
+        }
+
+    /**
+     * Has local video
+     */
+    val hasLocalVideo
+        get():Boolean = call?.hasLocalVideo == true
+
+    /**
+     * Check session is on hold in one to one call
+     */
+    val isSessionOnHold
+        get(): Boolean? {
+            call?.apply {
+                sessionsClientId?.takeIf { it.isNotEmpty() }?.let {
+                    it.first().let { clientId ->
+                        sessionByClientId[clientId]?.let { session ->
+                            return session.isOnHold
+                        }
+                    }
+                }
+            }
+
+            return null
+        }
 
     /**
      * Get the button to be displayed depending on the type of call on hold you have
@@ -106,7 +137,7 @@ data class InMeetingUiState(
     val getButtonTypeToShow
         get():CallOnHoldType = when {
             anotherCall != null -> CallOnHoldType.SwapCalls
-            !isCallOnHold -> CallOnHoldType.PutCallOnHold
+            isCallOnHold == null || isCallOnHold == false -> CallOnHoldType.PutCallOnHold
             else -> CallOnHoldType.ResumeCall
         }
 }

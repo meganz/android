@@ -455,8 +455,7 @@ internal class CallRepositoryImpl @Inject constructor(
             .map {
                 ChatSessionUpdatesResult(
                     session = if (it.session != null) chatSessionMapper(it.session) else null,
-                    callId = it.callId,
-                    chatId = it.chatId
+                    call = getChatCall(it.chatId),
                 )
             }
             .flowOn(dispatcher)

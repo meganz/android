@@ -72,6 +72,7 @@ import mega.privacy.android.domain.entity.meeting.CallOnHoldType
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
@@ -94,6 +95,7 @@ import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUseCase
 import mega.privacy.android.domain.usecase.meeting.JoinMeetingAsGuestUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorParticipatingInAnotherCallUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestLowResolutionVideoUseCase
@@ -177,6 +179,7 @@ class InMeetingViewModel @Inject constructor(
     private val enableAudioLevelMonitorUseCase: EnableAudioLevelMonitorUseCase,
     private val isAudioLevelMonitorEnabledUseCase: IsAudioLevelMonitorEnabledUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
     private val requestHighResolutionVideoUseCase: RequestHighResolutionVideoUseCase,
     private val requestLowResolutionVideoUseCase: RequestLowResolutionVideoUseCase,
@@ -221,6 +224,7 @@ class InMeetingViewModel @Inject constructor(
     private var monitorParticipatingInAnotherCallJob: Job? = null
     private var monitorChatRoomUpdatesJob: Job? = null
     private var monitorChatCallUpdatesJob: Job? = null
+    private var monitorChatSessionUpdatesJob: Job? = null
 
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
@@ -339,7 +343,7 @@ class InMeetingViewModel @Inject constructor(
     init {
         startMonitorChatRoomUpdates()
         startMonitorChatCallUpdates()
-
+        startMonitorChatSessionUpdates()
         viewModelScope.launch {
             runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.RaiseToSpeak).let { flag ->
@@ -508,6 +512,32 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Get chat call updates
      */
+    private fun startMonitorChatSessionUpdates() {
+        monitorChatSessionUpdatesJob?.cancel()
+        monitorChatSessionUpdatesJob = viewModelScope.launch {
+            monitorChatSessionUpdatesUseCase()
+                .filter { it.call?.chatId == _state.value.currentChatId }
+                .collectLatest { result ->
+                    result.call?.let { call ->
+                        _state.update { it.copy(call = call) }
+                        result.session?.let { session ->
+                            session.changes?.apply {
+                                when {
+                                    contains(ChatSessionChanges.SessionOnHold) -> {
+                                        _state.update { it.copy(sessionOnHoldChanges = session) }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
+    /**
+     * Get chat call updates
+     */
     private fun startMonitorChatCallUpdates() {
         monitorChatCallUpdatesJob?.cancel()
         monitorChatCallUpdatesJob = viewModelScope.launch {
@@ -551,7 +581,6 @@ class InMeetingViewModel @Inject constructor(
                             )
 
                             contains(ChatCallChanges.NetworkQuality) -> updateNetworkQuality(call.networkQuality)
-                            contains(ChatCallChanges.OnHold) -> checkUpdatesInCallOnHold(update = true)
                         }
                     }
                 }
@@ -566,17 +595,6 @@ class InMeetingViewModel @Inject constructor(
     fun checkUpdatesInLocalAVFlags(update: Boolean) = _state.update { state ->
         state.copy(
             shouldUpdateLocalAVFlags = update,
-        )
-    }
-
-    /**
-     * Check update call on hold
-     *
-     * @param update    True, is updated. False, if not.
-     */
-    fun checkUpdatesInCallOnHold(update: Boolean) = _state.update { state ->
-        state.copy(
-            shouldUpdateCallOnHold = update,
         )
     }
 
@@ -3250,7 +3268,7 @@ class InMeetingViewModel @Inject constructor(
     private fun swapCalls() {
         putCallOnHoldOrResumeCall(
             chatId = state.value.currentChatId,
-            setOnHold = !state.value.isCallOnHold
+            setOnHold = state.value.isCallOnHold == false
         )
 
         state.value.anotherCall?.let {

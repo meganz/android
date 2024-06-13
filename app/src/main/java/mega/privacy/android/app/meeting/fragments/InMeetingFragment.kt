@@ -60,7 +60,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
@@ -130,6 +129,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.meeting.AnotherCallType
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
@@ -363,23 +363,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
     }
-
-
-    private val sessionOnHoldObserver =
-        Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (inMeetingViewModel.isSameCall(callAndSession.first)) {
-                showMuteBanner()
-                val call = inMeetingViewModel.getCall()
-                call?.let {
-                    Timber.d("Change in session on hold status")
-                    if (!inMeetingViewModel.isOneToOneCall()) {
-                        updateOnHoldRemote(callAndSession.second)
-                    } else if (it.hasLocalVideo() && callAndSession.second.isOnHold) {
-                        sharedModel.clickCamera(false)
-                    }
-                }
-            }
-        }
 
     private val sessionStatusObserver =
         Observer<Pair<MegaChatCall, MegaChatSession>> { callAndSession ->
@@ -884,8 +867,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         //Sessions Level
         LiveEventBus.get<Pair<MegaChatCall, MegaChatSession>>(EVENT_SESSION_STATUS_CHANGE)
             .observe(this, sessionStatusObserver)
-        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_SESSION_ON_HOLD_CHANGE)
-            .observe(this, sessionOnHoldObserver)
         LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AVFLAGS_CHANGE)
             .observe(this, remoteAVFlagsObserver)
         LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AUDIO_LEVEL_CHANGE)
@@ -1007,13 +988,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 toolbarTitle?.apply {
                     text = state.chatTitle
                 }
-            }
-
-            if (state.shouldUpdateCallOnHold) {
-                state.call?.apply {
-                    isCallOnHold(isOnHold)
-                }
-                checkSwapCameraMenuItemVisibility()
             }
 
             state.call?.let {
@@ -1150,6 +1124,28 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .distinctUntilChanged()) {
             if (it.isNotEmpty()) {
                 updateParticipantsWithHandRaised(it)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.isCallOnHold }
+            .distinctUntilChanged()) {
+            it?.let { isOnHold ->
+                isCallOnHold(isOnHold)
+                checkSwapCameraMenuItemVisibility()
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.sessionOnHoldChanges }
+            .distinctUntilChanged()) { session ->
+            session?.let {
+                showMuteBanner()
+                when (inMeetingViewModel.state.value.isOneToOneCall) {
+                    true -> if (inMeetingViewModel.state.value.hasLocalVideo && inMeetingViewModel.state.value.isCallOnHold == true) {
+                        sharedModel.clickCamera(false)
+                    }
+
+                    false -> updateOnHoldRemote(session = it)
+                }
             }
         }
 
@@ -2496,7 +2492,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      *
      * @param session The session of a participant
      */
-    private fun updateOnHoldRemote(session: MegaChatSession) {
+    private fun updateOnHoldRemote(session: ChatSession) {
         Timber.d("Changes to the on hold status of the session")
         gridViewCallFragment?.let {
             if (it.isAdded) {

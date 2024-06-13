@@ -39,6 +39,7 @@ class MonitorCallSessionOnRecordingUseCaseTest {
     private val getParticipantFullNameUseCase: GetParticipantFullNameUseCase = mock()
 
     private val chatId = 123L
+    private val callId = 789L
     private val peerId = 456L
     private val peerName = "peerName"
 
@@ -79,8 +80,12 @@ class MonitorCallSessionOnRecordingUseCaseTest {
             on { this.changes } doReturn listOf(ChatSessionChanges.SessionOnRecording)
             on { this.hasChanged(ChatSessionChanges.SessionOnRecording) } doReturn true
         }
-        val result = mock<ChatSessionUpdatesResult> {
+        val call = mock<ChatCall> {
             on { this.chatId } doReturn chatId
+            on { this.callId } doReturn callId
+        }
+        val result = mock<ChatSessionUpdatesResult> {
+            on { this.call } doReturn call
             on { this.session } doReturn session
         }
         val event = CallRecordingEvent(isRecording, peerName)
@@ -106,8 +111,12 @@ class MonitorCallSessionOnRecordingUseCaseTest {
                 on { this.changes } doReturn listOf(ChatSessionChanges.Status)
                 on { this.hasChanged(ChatSessionChanges.Status) } doReturn true
             }
-            val result = mock<ChatSessionUpdatesResult> {
+            val call = mock<ChatCall> {
                 on { this.chatId } doReturn chatId
+                on { this.callId } doReturn callId
+            }
+            val result = mock<ChatSessionUpdatesResult> {
+                on { this.call } doReturn call
                 on { this.session } doReturn session
             }
             val event = CallRecordingEvent(true, null)
@@ -131,8 +140,12 @@ class MonitorCallSessionOnRecordingUseCaseTest {
                 on { this.status } doReturn ChatSessionStatus.Progress
                 on { this.changes } doReturn listOf(ChatSessionChanges.Status)
             }
-            val result = mock<ChatSessionUpdatesResult> {
+            val call = mock<ChatCall> {
                 on { this.chatId } doReturn chatId
+                on { this.callId } doReturn callId
+            }
+            val result = mock<ChatSessionUpdatesResult> {
+                on { this.call } doReturn call
                 on { this.session } doReturn session
             }
 
@@ -164,7 +177,7 @@ class MonitorCallSessionOnRecordingUseCaseTest {
                 on { this.hasChanged(ChatSessionChanges.SessionOnRecording) } doReturn true
             }
             val result = mock<ChatSessionUpdatesResult> {
-                on { this.chatId } doReturn chatId
+                on { this.call } doReturn call
                 on { this.session } doReturn session2
             }
             val event1 = CallRecordingEvent(true, null)
@@ -189,8 +202,12 @@ class MonitorCallSessionOnRecordingUseCaseTest {
                 on { this.peerId } doReturn peerId
                 on { this.changes } doReturn listOf(ChatSessionChanges.SessionOnHold)
             }
-            val result = mock<ChatSessionUpdatesResult> {
+            val call = mock<ChatCall> {
                 on { this.chatId } doReturn chatId
+                on { this.callId } doReturn callId
+            }
+            val result = mock<ChatSessionUpdatesResult> {
+                on { this.call } doReturn call
                 on { this.session } doReturn session
             }
 
