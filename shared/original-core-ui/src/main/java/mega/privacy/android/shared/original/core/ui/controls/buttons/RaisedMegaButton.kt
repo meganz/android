@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Raised default text button
@@ -35,9 +35,25 @@ fun RaisedDefaultMegaButton(
     onClick = onClick,
     modifier = modifier,
     enabled = enabled,
+    text = stringResource(id = textId)
+)
+
+/**
+ * Raised default text button
+ */
+@Composable
+fun RaisedDefaultMegaButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) = RaisedDefaultMegaButton(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
 ) {
     Text(
-        text = stringResource(id = textId),
+        text = text,
         style = MaterialTheme.typography.button
     )
 }

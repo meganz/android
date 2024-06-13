@@ -32,6 +32,7 @@ import mega.android.core.ui.tokens.theme.tokens.SemanticTokens
 import mega.android.core.ui.tokens.theme.tokens.Support
 import mega.android.core.ui.tokens.theme.tokens.Text
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.theme.values.BackgroundColor
 import mega.privacy.android.shared.original.core.ui.theme.values.TempSemanticTokensDark
 import mega.privacy.android.shared.original.core.ui.theme.values.TempSemanticTokensLight
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
@@ -172,6 +173,10 @@ internal object MegaOriginalTheme {
 
     @Composable
     fun textColor(textColor: TextColor) = textColor.getTextColor(LocalMegaColors.current.text)
+
+    @Composable
+    fun backgroundColor(backgroundColor: BackgroundColor) =
+        backgroundColor.getBackgroundColor(LocalMegaColors.current.background)
 }
 
 private val LocalMegaColors = staticCompositionLocalOf {

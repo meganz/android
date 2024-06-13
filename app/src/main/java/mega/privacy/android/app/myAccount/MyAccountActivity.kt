@@ -40,6 +40,7 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_NO_NAVIGATION
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
+import mega.privacy.android.app.presentation.cancelaccountplan.CancelAccountPlanActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -300,7 +301,7 @@ class MyAccountActivity : PasscodeActivity(),
      */
     private fun handleShowCancelSubscription() {
         if (viewModel.isNewCancelSubscriptionFeatureEnabled()) {
-            // Enable the new cancel subscription feature
+            navigateToCancelAccountPlan()
         } else {
             showCancelSubscriptions()
         }
@@ -482,6 +483,23 @@ class MyAccountActivity : PasscodeActivity(),
                 viewModel.resetChangeEmailConfirmation()
             }
         }
+    }
+
+    private fun navigateToCancelAccountPlan() {
+        val accountType = viewModel.getAccountType()
+        val totalStorage = viewModel.getTotalStorage()
+        val totalTransfer = viewModel.getTotalTransfer()
+
+        startActivity(
+            Intent(this, CancelAccountPlanActivity::class.java)
+                .putExtra(
+                    CancelAccountPlanActivity.EXTRA_ACCOUNT_TYPE, accountType
+                ).putExtra(
+                    CancelAccountPlanActivity.EXTRA_TRANSFER_QUOTA, totalTransfer
+                ).putExtra(
+                    CancelAccountPlanActivity.EXTRA_STORAGE_QUOTA, totalStorage
+                )
+        )
     }
 
     /**
