@@ -1,23 +1,24 @@
 package mega.privacy.android.app.upgradeAccount
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LifecycleEventObserver
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.security.PasscodeCheck
-import javax.inject.Inject
 
+/**
+ * Activity to upgrade an account.
+ */
 @AndroidEntryPoint
 class UpgradeAccountActivity : AppCompatActivity() {
 
     /**
-     * A [LifecycleEventObserver] to display a passcode screen when the app is resumed
+     * Initializes the activity.
+     *
+     * @param savedInstanceState Bundle containing the activity's previously saved state.
      */
-    @Inject
-    lateinit var passcodeFacade: PasscodeCheck
-
+    @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -31,6 +32,13 @@ class UpgradeAccountActivity : AppCompatActivity() {
         }
     }
 
+
+    /**
+     * Handles the back button press.
+     *
+     * @param item The menu item that was selected.
+     * @return True if the event was handled, false otherwise.
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             finish()
@@ -39,6 +47,10 @@ class UpgradeAccountActivity : AppCompatActivity() {
     }
 
     companion object {
+
+        /**
+         * Key to save the flag indicating if the match is cross account.
+         */
         const val IS_CROSS_ACCOUNT_MATCH = "is_cross_account_match"
     }
 }

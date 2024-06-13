@@ -217,6 +217,7 @@ internal fun FileInfoContent(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     tags = tags,
+                    isProAccount = isProAccount,
                     onAddTagClick = onAddTagClick,
                 )
             }

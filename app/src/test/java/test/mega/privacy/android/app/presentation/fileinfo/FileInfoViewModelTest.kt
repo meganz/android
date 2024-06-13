@@ -54,6 +54,7 @@ import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
+import mega.privacy.android.domain.usecase.account.IsProAccountUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -147,6 +148,7 @@ internal class FileInfoViewModelTest {
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
+    private val isProAccountUseCase = mock<IsProAccountUseCase>()
     private val monitorOfflineFileAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
@@ -208,6 +210,7 @@ internal class FileInfoViewModelTest {
             getContactVerificationWarningUseCase,
             typedFileNode,
             previewFile,
+            isProAccountUseCase,
         )
     }
 
@@ -253,6 +256,7 @@ internal class FileInfoViewModelTest {
             isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+            isProAccountUseCase = isProAccountUseCase,
             fileTypeIconMapper = fileTypeIconMapper
         )
     }
@@ -1011,6 +1015,13 @@ internal class FileInfoViewModelTest {
 
             verify(removeOfflineNodeUseCase).invoke(nodeId)
         }
+
+    @Test
+    fun `test that isProAccount is invoked when view model is initialized`() = runTest {
+        whenever(isProAccountUseCase()).thenReturn(true)
+        underTest.setNode(node.handle, true)
+        verify(isProAccountUseCase).invoke()
+    }
 
     private fun mockMonitorStorageStateEvent(state: StorageState) {
         val storageStateEvent = StorageStateEvent(

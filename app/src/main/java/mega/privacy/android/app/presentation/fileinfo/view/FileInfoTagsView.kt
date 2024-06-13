@@ -20,13 +20,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Composable that represents the tags view in the file info screen.
@@ -41,6 +46,7 @@ fun FileInfoTagsView(
     tags: List<String>,
     onAddTagClick: () -> Unit,
     modifier: Modifier,
+    isProAccount: Boolean,
 ) {
     Column(
         modifier = modifier
@@ -51,12 +57,19 @@ fun FileInfoTagsView(
             dividerType = null,
             addIconPadding = false,
             trailingItem = {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_chevron_right_medium_regular_outline),
-                    contentDescription = "Add Tag",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
-                )
+                if (isProAccount) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_chevron_right_medium_regular_outline),
+                        contentDescription = "Add Tag",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
+                    )
+                } else {
+                    MegaText(
+                        text = stringResource(id = R.string.general_pro_only),
+                        textColor = TextColor.Accent,
+                    )
+                }
             },
         )
 
@@ -82,11 +95,14 @@ fun FileInfoTagsView(
 
 @CombinedThemePreviews
 @Composable
-private fun FileInfoTagsViewPreview() {
+private fun FileInfoTagsViewPreview(
+    @PreviewParameter(BooleanProvider::class) isProAccount: Boolean,
+) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FileInfoTagsView(
             tags = listOf("josgh", "skljdaökldj", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5"),
             onAddTagClick = {},
+            isProAccount = true,
             modifier = Modifier
         )
     }

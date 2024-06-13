@@ -93,6 +93,7 @@ internal data class FileInfoViewState(
     val requiredExtraAction: FileInfoExtraAction? = null,
     val isRemindersForContactVerificationEnabled: Boolean = false,
     val tagsEnabled: Boolean = false,
+    val isProAccount: Boolean = false,
     val tags: List<String> = emptyList(),
 ) {
 
