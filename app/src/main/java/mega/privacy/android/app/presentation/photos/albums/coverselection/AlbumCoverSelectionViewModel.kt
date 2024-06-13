@@ -61,13 +61,13 @@ class AlbumCoverSelectionViewModel @Inject constructor(
     internal var showHiddenItems: Boolean? = null
 
     init {
-        fetchAlbum()
-
         viewModelScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
-                monitorShowHiddenItems()
-                monitorAccountDetail()
+                fetchShowHiddenItems()
+                fetchAccountDetail()
             }
+
+            fetchAlbum()
         }
     }
 
@@ -80,23 +80,16 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         .catch { exception -> Timber.e(exception) }
         .launchIn(viewModelScope)
 
-    private fun monitorShowHiddenItems() = monitorShowHiddenItemsUseCase()
-        .onEach {
-            showHiddenItems = it
-            if (_state.value.photos.isEmpty()) return@onEach
+    private suspend fun fetchShowHiddenItems() {
+        showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull() ?: true
+    }
 
-            updatePhotos(photos = _state.value.photos)
-        }.launchIn(viewModelScope)
-
-    private fun monitorAccountDetail() = monitorAccountDetailUseCase()
-        .onEach { accountDetail ->
-            _state.update {
-                it.copy(accountType = accountDetail.levelDetail?.accountType)
-            }
-            if (_state.value.photos.isEmpty()) return@onEach
-
-            updatePhotos(photos = _state.value.photos)
-        }.launchIn(viewModelScope)
+    private suspend fun fetchAccountDetail() {
+        val accountDetail = monitorAccountDetailUseCase().firstOrNull()
+        _state.update {
+            it.copy(accountType = accountDetail?.levelDetail?.accountType)
+        }
+    }
 
     private fun updateAlbum(album: Album.UserAlbum?) {
         val showHiddenItems = showHiddenItems ?: true
@@ -141,7 +134,7 @@ class AlbumCoverSelectionViewModel @Inject constructor(
 
     private suspend fun sortPhotos(photos: List<Photo>): List<Photo> =
         withContext(defaultDispatcher) {
-            photos.sortedByDescending { it.modificationTime }
+            photos.sortedWith(compareByDescending<Photo> { it.modificationTime }.thenByDescending { it.id })
         }
 
     private fun filterNonSensitivePhotos(photos: List<Photo>): List<Photo> {
