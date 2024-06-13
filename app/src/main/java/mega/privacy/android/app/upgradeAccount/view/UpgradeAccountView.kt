@@ -94,22 +94,6 @@ import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleNoTitleTopAppBar
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
-internal const val UPGRADE_ACCOUNT_SCREEN_TAG = "upgrade_account_screen:"
-internal const val BILLING_WARNING_TAG = "upgrade_account_screen:box_warning_unavailable_payments"
-internal const val BILLING_WARNING_CLOSE_BUTTON_TAG =
-    "upgrade_account_screen:button_close_billing_warning"
-internal const val EMPTY_CARD_TAG = "upgrade_account_screen:card_empty_loading_plans"
-internal const val PRO_PLAN_CARD_TAG = "upgrade_account_screen:card_pro_plan_"
-internal const val PRICING_PAGE_LINK_TAG = "upgrade_account_screen:text_pricing_page_link"
-internal const val BUY_BUTTON_TAG = "upgrade_account_screen:button_buy_pro_plan_"
-internal const val UPGRADE_WARNING_BANNER_TAG = "upgrade_account_screen:upgrade_warning_banner"
-internal const val GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG =
-    "upgrade_account_screen:text_link_google_play_store_subscription"
-internal const val SUBSCRIPTION_DETAILS_TITLE_TAG =
-    "upgrade_account_screen:text_subscription_details_title"
-internal const val SUBSCRIPTION_DETAILS_DESCRIPTION_TAG =
-    "upgrade_account_screen:text_subscription_details_description"
-
 /**
  * Screen is shown when user taps on Upgrade button
  * where user can view Pro plans and check the features available for these plans
@@ -586,23 +570,21 @@ private fun FeaturesOfPlans(
                 style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
                 modifier = modifier
             )
-            if (showNewFeatures) {
-                MegaText(
-                    text = stringResource(id = R.string.account_upgrade_account_description_feature_meetings),
-                    textColor = TextColor.Primary,
-                    style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
-                    modifier = modifier
+            MegaText(
+                text = stringResource(id = R.string.account_upgrade_account_description_feature_meetings),
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                modifier = modifier
+            )
+            MegaText(
+                text = stringResource(id = R.string.account_upgrade_account_description_feature_vpn),
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                modifier = Modifier.padding(
+                    start = 10.dp,
+                    bottom = 12.dp
                 )
-                MegaText(
-                    text = stringResource(id = R.string.account_upgrade_account_description_feature_vpn),
-                    textColor = TextColor.Primary,
-                    style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
-                    modifier = Modifier.padding(
-                        start = 10.dp,
-                        bottom = 12.dp
-                    )
-                )
-            }
+            )
             MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_description_feature_rubbish_bin),
                 textColor = TextColor.Primary,
@@ -772,4 +754,20 @@ private class UpgradeAccountPreviewProvider :
         )
     }
 }
+
+internal const val UPGRADE_ACCOUNT_SCREEN_TAG = "upgrade_account_screen:"
+internal const val BILLING_WARNING_TAG = "upgrade_account_screen:box_warning_unavailable_payments"
+internal const val BILLING_WARNING_CLOSE_BUTTON_TAG =
+    "upgrade_account_screen:button_close_billing_warning"
+internal const val EMPTY_CARD_TAG = "upgrade_account_screen:card_empty_loading_plans"
+internal const val PRO_PLAN_CARD_TAG = "upgrade_account_screen:card_pro_plan_"
+internal const val PRICING_PAGE_LINK_TAG = "upgrade_account_screen:text_pricing_page_link"
+internal const val BUY_BUTTON_TAG = "upgrade_account_screen:button_buy_pro_plan_"
+internal const val UPGRADE_WARNING_BANNER_TAG = "upgrade_account_screen:upgrade_warning_banner"
+internal const val GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG =
+    "upgrade_account_screen:text_link_google_play_store_subscription"
+internal const val SUBSCRIPTION_DETAILS_TITLE_TAG =
+    "upgrade_account_screen:text_subscription_details_title"
+internal const val SUBSCRIPTION_DETAILS_DESCRIPTION_TAG =
+    "upgrade_account_screen:text_subscription_details_description"
 
