@@ -9,6 +9,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
@@ -97,15 +98,16 @@ class ChatUploadsWorker @AssistedInject constructor(
 ) {
     override val updateNotificationId = NOTIFICATION_CHAT_UPLOAD
 
-    private var chatCompressionProgress: ChatCompressionState =
+    private var chatCompressionProgress: MutableStateFlow<ChatCompressionState> = MutableStateFlow(
         ChatCompressionProgress(0, 0, Progress(0f))
+    )
 
     override fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ) = chatUploadNotificationMapper(
         activeTransferTotals,
-        (chatCompressionProgress as? ChatCompressionProgress),
+        (chatCompressionProgress.value as? ChatCompressionProgress),
         paused
     )
 
@@ -119,7 +121,8 @@ class ChatUploadsWorker @AssistedInject constructor(
                 PendingMessageState.UPLOADING,
                 PendingMessageState.ATTACHING,
             ),
-        ) { monitorOngoingActiveTransfersResult, pendingMessages ->
+            chatCompressionProgress,
+        ) { monitorOngoingActiveTransfersResult, pendingMessages, _ ->
             monitorOngoingActiveTransfersResult to pendingMessages.size
         }.transformWhile { (ongoingActiveTransfersResult, pendingMessagesCount) ->
             emit(ongoingActiveTransfersResult)
@@ -139,7 +142,7 @@ class ChatUploadsWorker @AssistedInject constructor(
         }
         scope.launch {
             compressPendingMessagesUseCase().collect {
-                chatCompressionProgress = it
+                chatCompressionProgress.value = it
             }
         }
         scope.launch {
@@ -148,7 +151,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     }
 
     override fun hasCompleted(activeTransferTotals: ActiveTransferTotals): Boolean {
-        return activeTransferTotals.hasCompleted() && chatCompressionProgress is ChatCompressionFinished
+        return activeTransferTotals.hasCompleted() && chatCompressionProgress.value is ChatCompressionFinished
     }
 
     override suspend fun onStart() {
