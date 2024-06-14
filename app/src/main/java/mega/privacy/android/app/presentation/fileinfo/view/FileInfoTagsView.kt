@@ -47,10 +47,11 @@ fun FileInfoTagsView(
     onAddTagClick: () -> Unit,
     modifier: Modifier,
     isProAccount: Boolean,
+    onUpgradeAccountClick: () -> Unit,
 ) {
     Column(
         modifier = modifier
-            .clickable { onAddTagClick() },
+            .clickable { if (isProAccount) onAddTagClick() else onUpgradeAccountClick() }
     ) {
         MenuActionListTile(
             text = stringResource(id = sharedR.string.file_info_information_tags_label),
@@ -99,10 +100,11 @@ private fun FileInfoTagsViewPreview(
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         FileInfoTagsView(
-            tags = listOf("josgh", "skljdaökldj", "Tag 1", "Tag 2", "Tag 3", "Tag 4", "Tag 5"),
+            tags = listOf("Tag", "SampleTag", "Tag1", "Tag2", "Tag3", "Tag4", "Tag5"),
             onAddTagClick = {},
-            isProAccount = true,
-            modifier = Modifier
+            modifier = Modifier,
+            isProAccount = isProAccount,
+            onUpgradeAccountClick = {},
         )
     }
 }

@@ -48,6 +48,7 @@ import mega.privacy.android.app.presentation.tags.TagsActivity
 import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.NODE_ID
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
@@ -172,6 +173,7 @@ class FileInfoActivity : BaseActivity() {
                     onMenuActionClick = { handleAction(it, uiState) },
                     onVerifyContactClick = this::navigateToVerifyContacts,
                     onAddTagClick = this::navigateToTags,
+                    onUpgradeAccountClick = this::navigateToUpgradeAccountScreen,
                     modifier = Modifier.semantics {
                         testTagsAsResourceId = true
                     }
@@ -192,6 +194,10 @@ class FileInfoActivity : BaseActivity() {
                 updateContactShareBottomSheet(uiState)
             }
         }
+    }
+
+    private fun navigateToUpgradeAccountScreen() {
+        startActivity(Intent(this, UpgradeAccountActivity::class.java))
     }
 
     private fun navigateToTags() {

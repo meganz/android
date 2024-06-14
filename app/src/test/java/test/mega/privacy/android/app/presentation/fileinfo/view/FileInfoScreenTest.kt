@@ -40,8 +40,9 @@ class FileInfoScreenTest {
                 onShowMoreSharedWithContactsClick = {},
                 onPublicLinkCopyClick = { },
                 onMenuActionClick = {},
-                onAddTagClick = {},
                 onVerifyContactClick = {},
+                onAddTagClick = {},
+                onUpgradeAccountClick = {},
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_PREVIEW, true).assertExists()
@@ -72,8 +73,9 @@ class FileInfoScreenTest {
                 onShowMoreSharedWithContactsClick = {},
                 onPublicLinkCopyClick = { },
                 onMenuActionClick = {},
-                onAddTagClick = {},
                 onVerifyContactClick = {},
+                onAddTagClick = {},
+                onUpgradeAccountClick = {},
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_ICON, true).assertDoesNotExist()

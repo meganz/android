@@ -56,6 +56,7 @@ internal fun FileInfoContent(
     onSetDescriptionClick: (String) -> Unit,
     onAddTagClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onUpgradeAccountClick: () -> Unit,
 ) {
     var isShareContactExpanded by remember { mutableStateOf(false) }
     Column(
@@ -219,6 +220,7 @@ internal fun FileInfoContent(
                     tags = tags,
                     isProAccount = isProAccount,
                     onAddTagClick = onAddTagClick,
+                    onUpgradeAccountClick = onUpgradeAccountClick
                 )
             }
 
@@ -281,6 +283,7 @@ private fun FileInfoContentPreview(
             onVerifyContactClick = {},
             onSetDescriptionClick = {},
             onAddTagClick = {},
+            onUpgradeAccountClick = {},
             modifier = Modifier.verticalScroll(scrollState)
         )
     }
