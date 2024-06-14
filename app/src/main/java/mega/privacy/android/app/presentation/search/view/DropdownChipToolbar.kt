@@ -1,18 +1,12 @@
 package mega.privacy.android.app.presentation.search.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
-import mega.privacy.android.shared.original.core.ui.controls.chip.Chip
 import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
@@ -46,23 +40,14 @@ private fun DropdownChip(
     chipTestTag: String,
     modifier: Modifier = Modifier,
 ) {
-    Chip(
+    MegaChip(
         selected = isSelected,
+        text = if (isSelected) selectedFilterTitle else notSelectedTitle,
         enabled = isEnabled,
-        contentDescription = "Dropdown Chip",
-        modifier = modifier,
+        modifier = modifier.testTag(chipTestTag),
         onClick = onFilterClicked,
-    ) {
-        Text(
-            modifier = Modifier.testTag(chipTestTag),
-            text = if (isSelected) selectedFilterTitle else notSelectedTitle,
-        )
-        Icon(
-            modifier = Modifier.testTag(DROPDOWN_CHIP_ICON_TEST_TAG).size(18.dp),
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_chevron_down),
-            contentDescription = "Choose Options",
-        )
-    }
+        trailingIcon = R.drawable.ic_chevron_down,
+    )
 }
 
 /**
@@ -122,5 +107,3 @@ private fun DropdownChipToolbarPreview() {
         )
     }
 }
-
-internal const val DROPDOWN_CHIP_ICON_TEST_TAG = "drop_down_chips:drop_down_icon"

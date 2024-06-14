@@ -1,8 +1,8 @@
 package mega.privacy.android.shared.original.core.ui.controls.chip
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FilterChip
 import androidx.compose.material.Icon
@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
@@ -29,33 +29,27 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
  *
  * @param selected if chip is selected or not
  * @param text text of chip
- * @param contentDescription accessibility text
  * @param modifier optional modifier
  * @param style style of chip
  * @param onClick callback this chip is clicked
  * @param enabled if chip is enabled or grayed out
- * @param onClickLabel optional label after chip is clicked
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MegaChip(
     selected: Boolean,
     text: String,
-    contentDescription: String,
     modifier: Modifier = Modifier,
     style: ChipStyle = DefaultChipStyle,
     onClick: () -> Unit = {},
-    onClickLabel: String? = null,
     enabled: Boolean = true,
     leadingIcon: Int? = null,
     trailingIcon: Int? = null,
-    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
 ) {
     FilterChip(
         modifier = modifier
             .clearAndSetSemantics {
-                this.contentDescription = contentDescription
-                this.onClick(label = onClickLabel) { onClick(); true }
+                this.contentDescription = text
             },
         selected = selected,
         enabled = enabled,
@@ -85,12 +79,12 @@ fun MegaChip(
                     Icon(
                         modifier = Modifier.size(18.dp),
                         imageVector = ImageVector.vectorResource(id = it),
-                        contentDescription = "Trail icon",
+                        contentDescription = "Trailing icon",
                     )
                 }
             }
         },
-        shape = shape,
+        shape = style.shape()
     ) {
         ProvideTextStyle(
             value = style.typography(),
@@ -100,7 +94,9 @@ fun MegaChip(
                     .contentColor(selected, enabled).value,
             ) {
                 Text(
+                    modifier = Modifier.fillMaxWidth(),
                     text = text,
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -115,7 +111,6 @@ private fun ChipPreview(
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaChip(
             selected = selected,
-            contentDescription = "",
             text = "Type",
         )
     }
@@ -129,7 +124,6 @@ private fun ChipPreviewWithLeadAndTrail(
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaChip(
             selected = selected,
-            contentDescription = "",
             text = "Type",
             leadingIcon = R.drawable.ic_chevron_down,
             trailingIcon = R.drawable.ic_icon_chevron_left_medium_regular_outline,

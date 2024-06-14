@@ -2,10 +2,10 @@ package test.mega.privacy.android.app.presentation.videosection
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.videosection.view.allvideos.DURATION_FILTER_BUTTON_TEXT_TEST_TAG
@@ -23,25 +23,25 @@ class VideosFilterButtonViewTest {
     val composeTestRule = createComposeRule()
 
     private fun setComposeContent(
+        modifier: Modifier = Modifier,
         isLocationFilterSelected: Boolean = false,
         isDurationFilterSelected: Boolean = false,
         locationDefaultText: String = "",
         durationDefaultText: String = "",
         locationFilterSelectText: String = "",
         durationFilterSelectText: String = "",
-        modifier: Modifier = Modifier,
         onLocationFilterClicked: () -> Unit = {},
         onDurationFilterClicked: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideosFilterButtonView(
+                modifier = modifier,
                 isLocationFilterSelected = isLocationFilterSelected,
                 isDurationFilterSelected = isDurationFilterSelected,
                 locationDefaultText = locationDefaultText,
                 durationDefaultText = durationDefaultText,
                 locationFilterSelectText = locationFilterSelectText,
                 durationFilterSelectText = durationFilterSelectText,
-                modifier = modifier,
                 onLocationFilterClicked = onLocationFilterClicked,
                 onDurationFilterClicked = onDurationFilterClicked
             )
@@ -59,8 +59,8 @@ class VideosFilterButtonViewTest {
 
         composeTestRule.onNodeWithTag(LOCATION_FILTER_BUTTON_TEXT_TEST_TAG, true)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(LOCATION_FILTER_BUTTON_TEXT_TEST_TAG, true)
-            .assertTextEquals(testLocationDefaultText)
+        composeTestRule.onNodeWithText(text = testLocationDefaultText, useUnmergedTree = true)
+            .assertIsDisplayed()
     }
 
     @Test
@@ -75,13 +75,12 @@ class VideosFilterButtonViewTest {
 
         composeTestRule.onNodeWithTag(LOCATION_FILTER_BUTTON_TEXT_TEST_TAG, true)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(LOCATION_FILTER_BUTTON_TEXT_TEST_TAG, true)
-            .assertTextEquals(testLocationSelectedText)
-        composeTestRule.onNodeWithContentDescription(
-            label = "Location filter selected icon",
-            useUnmergedTree = true
-        )
+        composeTestRule.onNodeWithText(text = testLocationSelectedText, useUnmergedTree = true)
             .assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(
+            label = "Leading icon",
+            useUnmergedTree = true
+        ).assertIsDisplayed()
     }
 
     @Test
@@ -95,8 +94,8 @@ class VideosFilterButtonViewTest {
 
         composeTestRule.onNodeWithTag(DURATION_FILTER_BUTTON_TEXT_TEST_TAG, true)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(DURATION_FILTER_BUTTON_TEXT_TEST_TAG, true)
-            .assertTextEquals(testDurationDefaultText)
+        composeTestRule.onNodeWithText(testDurationDefaultText, useUnmergedTree = true)
+            .assertIsDisplayed()
     }
 
     @Test
@@ -111,10 +110,9 @@ class VideosFilterButtonViewTest {
 
         composeTestRule.onNodeWithTag(DURATION_FILTER_BUTTON_TEXT_TEST_TAG, true)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(DURATION_FILTER_BUTTON_TEXT_TEST_TAG, true)
-            .assertTextEquals(testDurationSelectedText)
+        composeTestRule.onNodeWithText(testDurationSelectedText, useUnmergedTree = true)
         composeTestRule.onNodeWithContentDescription(
-            label = "Duration filter selected icon",
+            label = "Leading icon",
             useUnmergedTree = true
         ).assertIsDisplayed()
     }
@@ -124,7 +122,7 @@ class VideosFilterButtonViewTest {
         val onLocationFilterClicked: () -> Unit = Mockito.mock()
         setComposeContent(onLocationFilterClicked = onLocationFilterClicked)
 
-        composeTestRule.onNodeWithContentDescription("Location filter chip").performClick()
+        composeTestRule.onNodeWithTag(LOCATION_FILTER_BUTTON_TEXT_TEST_TAG, true).performClick()
         verify(onLocationFilterClicked).invoke()
     }
 
@@ -133,7 +131,7 @@ class VideosFilterButtonViewTest {
         val onDurationFilterClicked: () -> Unit = Mockito.mock()
         setComposeContent(onDurationFilterClicked = onDurationFilterClicked)
 
-        composeTestRule.onNodeWithContentDescription("Duration filter chip").performClick()
+        composeTestRule.onNodeWithTag(DURATION_FILTER_BUTTON_TEXT_TEST_TAG, true).performClick()
         verify(onDurationFilterClicked).invoke()
     }
 }

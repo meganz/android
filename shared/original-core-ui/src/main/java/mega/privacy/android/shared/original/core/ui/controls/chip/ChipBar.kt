@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -56,16 +55,17 @@ private fun ChipBarPreview() {
         ChipBar {
             chips.forEach { item ->
                 val isSelected = selectedChips.contains(item)
-
-                Chip(selected = isSelected, contentDescription = "", onClick = {
-                    if (isSelected) {
-                        selectedChips.remove(item)
-                    } else {
-                        selectedChips.add(item)
-                    }
-                }) {
-                    Text(text = item)
-                }
+                MegaChip(
+                    selected = isSelected,
+                    text = item,
+                    onClick = {
+                        if (isSelected) {
+                            selectedChips.remove(item)
+                        } else {
+                            selectedChips.add(item)
+                        }
+                    },
+                )
             }
         }
     }

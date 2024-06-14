@@ -83,7 +83,6 @@ fun FileInfoTagsView(
                 MegaChip(
                     selected = false,
                     text = "#${tags[tag]}",
-                    contentDescription = "",
                     enabled = true,
                     style = TransparentChipStyle,
                 )

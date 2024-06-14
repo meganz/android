@@ -160,7 +160,6 @@ private fun TagsContent(
                 MegaChip(
                     selected = true,
                     text = "#${uiState.tags[tag]}",
-                    contentDescription = "Tag Chip",
                     enabled = true,
                     onClick = { removeTag(uiState.tags[tag]) },
                     leadingIcon = CoreR.drawable.ic_filter_selected,

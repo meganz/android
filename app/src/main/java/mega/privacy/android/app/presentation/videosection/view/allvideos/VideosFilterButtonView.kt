@@ -3,18 +3,13 @@ package mega.privacy.android.app.presentation.videosection.view.allvideos
 import mega.privacy.android.core.R as coreR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.controls.chip.Chip
 import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
@@ -30,68 +25,25 @@ internal fun VideosFilterButtonView(
     onDurationFilterClicked: () -> Unit,
 ) {
     ChipBar(modifier = modifier) {
-        Chip(
+        MegaChip(
             selected = isLocationFilterSelected,
-            contentDescription = "Location filter chip",
-            modifier = Modifier,
-            onClick = onLocationFilterClicked
-        ) {
-            if (isLocationFilterSelected) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(coreR.drawable.ic_filter_selected),
-                    contentDescription = "Location filter selected icon",
-                )
-            }
-            MegaText(
-                modifier = Modifier.testTag(LOCATION_FILTER_BUTTON_TEXT_TEST_TAG),
-                text = getDisplayedText(
-                    isSelected = isLocationFilterSelected,
-                    defaultText = locationDefaultText,
-                    selectedText = locationFilterSelectText
-                ),
-                textColor = getTextColor(isLocationFilterSelected)
-            )
-            Icon(
-                imageVector = ImageVector.vectorResource(coreR.drawable.ic_filter_not_selected),
-                contentDescription = "Location filter icon",
-            )
-        }
-
-        Chip(
+            text = if (isLocationFilterSelected) locationFilterSelectText else locationDefaultText,
+            modifier = Modifier.testTag(LOCATION_FILTER_BUTTON_TEXT_TEST_TAG),
+            onClick = onLocationFilterClicked,
+            trailingIcon = coreR.drawable.ic_chevron_down,
+            leadingIcon = coreR.drawable.ic_filter_selected.takeIf { isLocationFilterSelected },
+        )
+        MegaChip(
             selected = isDurationFilterSelected,
-            contentDescription = "Duration filter chip",
-            modifier = Modifier.padding(start = 10.dp),
-            onClick = onDurationFilterClicked
-        ) {
-            if (isDurationFilterSelected) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(coreR.drawable.ic_filter_selected),
-                    contentDescription = "Duration filter selected icon",
-                )
-            }
+            text = if (isDurationFilterSelected) durationFilterSelectText else durationDefaultText,
+            modifier = Modifier.testTag(DURATION_FILTER_BUTTON_TEXT_TEST_TAG),
+            onClick = onDurationFilterClicked,
+            trailingIcon = coreR.drawable.ic_chevron_down,
+            leadingIcon = coreR.drawable.ic_filter_selected.takeIf { isDurationFilterSelected },
+        )
 
-            MegaText(
-                modifier = Modifier.testTag(DURATION_FILTER_BUTTON_TEXT_TEST_TAG),
-                text = getDisplayedText(
-                    isSelected = isDurationFilterSelected,
-                    defaultText = durationDefaultText,
-                    selectedText = durationFilterSelectText
-                ),
-                textColor = getTextColor(isDurationFilterSelected)
-            )
-            Icon(
-                imageVector = ImageVector.vectorResource(coreR.drawable.ic_filter_not_selected),
-                contentDescription = "Duration filter icon",
-            )
-        }
     }
 }
-
-private fun getDisplayedText(isSelected: Boolean, defaultText: String, selectedText: String) =
-    if (isSelected) selectedText else defaultText
-
-private fun getTextColor(isSelected: Boolean) =
-    if (isSelected) TextColor.Inverse else TextColor.Secondary
 
 @CombinedThemePreviews
 @Composable

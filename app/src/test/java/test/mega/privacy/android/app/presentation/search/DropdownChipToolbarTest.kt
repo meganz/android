@@ -1,10 +1,9 @@
 package test.mega.privacy.android.app.presentation.search
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.search.view.ChipItem
@@ -53,8 +52,8 @@ class DropdownChipToolbarTest {
 
         composeTestRule.onNodeWithTag(TYPE_DROPDOWN_CHIP_TEST_TAG, true)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TYPE_DROPDOWN_CHIP_TEST_TAG, true)
-            .assertTextEquals(typeTitle)
+        composeTestRule.onNodeWithText(typeTitle, useUnmergedTree = true)
+            .assertIsDisplayed()
     }
 
     @Test
@@ -69,8 +68,8 @@ class DropdownChipToolbarTest {
 
         composeTestRule.onNodeWithTag(TYPE_DROPDOWN_CHIP_TEST_TAG, true)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TYPE_DROPDOWN_CHIP_TEST_TAG, true)
-            .assertTextEquals(selectedTypeTitle)
+        composeTestRule.onNodeWithText(selectedTypeTitle, useUnmergedTree = true)
+            .assertIsDisplayed()
     }
 
     @Test
@@ -78,7 +77,7 @@ class DropdownChipToolbarTest {
         val onTypeFilterClicked: () -> Unit = Mockito.mock()
         setComposeContent(onTypeFilterClicked = onTypeFilterClicked)
 
-        composeTestRule.onNodeWithContentDescription("Dropdown Chip").performClick()
+        composeTestRule.onNodeWithTag(TYPE_DROPDOWN_CHIP_TEST_TAG, true).performClick()
         verify(onTypeFilterClicked).invoke()
     }
 }

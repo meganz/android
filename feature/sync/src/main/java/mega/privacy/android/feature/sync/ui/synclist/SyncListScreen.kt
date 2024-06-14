@@ -12,7 +12,6 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Text
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -54,8 +53,8 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.banners.ActionBanner
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.shared.original.core.ui.controls.chip.Chip
 import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
@@ -278,33 +277,25 @@ private fun HeaderChips(
     modifier: Modifier = Modifier,
 ) {
     ChipBar(modifier = modifier.padding(vertical = 8.dp)) {
-        Chip(
+        MegaChip(
             selected = selectedChip == SYNC_FOLDERS,
-            contentDescription = stringResource(id = R.string.sync_folders),
-            onClick = { onChipSelected(SYNC_FOLDERS) },
-        ) {
-            Text(text = stringResource(id = R.string.sync_folders))
-        }
-        Chip(
+            text = stringResource(id = R.string.sync_folders),
+            onClick = { onChipSelected(SYNC_FOLDERS) }
+        )
+        MegaChip(
             selected = selectedChip == STALLED_ISSUES,
-            contentDescription = stringResource(id = R.string.sync_stalled_issue_zero),
-            onClick = { onChipSelected(STALLED_ISSUES) },
-        ) {
-            Text(
-                text = if (stalledIssuesCount > 0) {
-                    stringResource(R.string.sync_stalled_issues, stalledIssuesCount)
-                } else {
-                    stringResource(id = R.string.sync_stalled_issue_zero)
-                }
-            )
-        }
-        Chip(
+            text = if (stalledIssuesCount > 0) {
+                stringResource(R.string.sync_stalled_issues, stalledIssuesCount)
+            } else {
+                stringResource(id = R.string.sync_stalled_issue_zero)
+            },
+            onClick = { onChipSelected(STALLED_ISSUES) }
+        )
+        MegaChip(
             selected = selectedChip == SOLVED_ISSUES,
-            contentDescription = stringResource(id = sharedR.string.device_center_sync_solved_issues_chip_text),
-            onClick = { onChipSelected(SOLVED_ISSUES) },
-        ) {
-            Text(text = stringResource(id = sharedR.string.device_center_sync_solved_issues_chip_text))
-        }
+            text = stringResource(id = sharedR.string.device_center_sync_solved_issues_chip_text),
+            onClick = { onChipSelected(SOLVED_ISSUES) }
+        )
     }
 }
 
