@@ -1,32 +1,62 @@
 package mega.privacy.android.data.mapper.login
 
 import androidx.datastore.preferences.core.MutablePreferences
-import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.preferences.EphemeralCredentialsDataStore
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
+/**
+ * Test class for [EphemeralCredentialsMapper]
+ */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class EphemeralCredentialsMapperTest {
-    private val decryptData = mock<DecryptData>()
-    private val underTest = EphemeralCredentialsMapper(decryptData)
+    private lateinit var underTest: EphemeralCredentialsMapper
 
-    @Test
-    fun `test that mapper returns null when session is empty`() = runTest {
-        val preference = mock<MutablePreferences>()
-        val session = ""
-        whenever(preference[EphemeralCredentialsDataStore.sessionPreferenceKey]).thenReturn(session)
-        whenever(decryptData(session)).thenReturn("")
-        Truth.assertThat(underTest(preference)).isNull()
+    private val decryptData = mock<DecryptData>()
+
+    @BeforeAll
+    fun setUp() {
+        underTest = EphemeralCredentialsMapper(decryptData)
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(decryptData)
     }
 
     @Test
-    fun `test that mapper returns model when session is not empty`() = runTest {
+    fun `test that the mapper returns null when the session is empty`() = runTest {
+        val preference = mock<MutablePreferences>()
+        val session = ""
+
+        whenever(preference[EphemeralCredentialsDataStore.sessionPreferenceKey]).thenReturn(session)
+        whenever(decryptData(session)).thenReturn("")
+
+        assertThat(underTest(preference)).isNull()
+    }
+
+    @Test
+    fun `test that the mapper returns null when the session only contains blanks`() = runTest {
+        val preference = mock<MutablePreferences>()
+        val session = " "
+
+        whenever(preference[EphemeralCredentialsDataStore.sessionPreferenceKey]).thenReturn(" ")
+        whenever(decryptData(session)).thenReturn(" ")
+
+        assertThat(underTest(preference)).isNull()
+    }
+
+    @Test
+    fun `test that the mapper returns the model when the session is not empty`() = runTest {
         val preference = mock<MutablePreferences>()
         val encryptedSession = "encryptedSession"
         val encryptedPassword = "encryptedPassword"
@@ -40,6 +70,7 @@ internal class EphemeralCredentialsMapperTest {
             lastName = "lastName",
             password = "password"
         )
+
         whenever(preference[EphemeralCredentialsDataStore.sessionPreferenceKey])
             .thenReturn(encryptedSession)
         whenever(preference[EphemeralCredentialsDataStore.emailPreferenceKey])
@@ -55,6 +86,7 @@ internal class EphemeralCredentialsMapperTest {
         whenever(decryptData(encryptedFirstName)).thenReturn(expected.firstName)
         whenever(decryptData(encryptedLastName)).thenReturn(expected.lastName)
         whenever(decryptData(encryptedEmail)).thenReturn(expected.email)
-        Truth.assertThat(underTest(preference)).isEqualTo(expected)
+
+        assertThat(underTest(preference)).isEqualTo(expected)
     }
 }

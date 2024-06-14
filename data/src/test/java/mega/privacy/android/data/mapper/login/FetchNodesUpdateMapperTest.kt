@@ -11,7 +11,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 
-class FetchNodesUpdateMapperImplTest {
+class FetchNodesUpdateMapperTest {
 
     private lateinit var underTest: FetchNodesUpdateMapper
 
