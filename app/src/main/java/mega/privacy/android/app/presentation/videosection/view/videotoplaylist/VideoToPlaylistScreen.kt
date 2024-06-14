@@ -1,15 +1,23 @@
 package mega.privacy.android.app.presentation.videosection.view.videotoplaylist
 
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.videosection.VideoToPlaylistViewModel
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
 @Composable
 internal fun VideoToPlaylistScreen(
     viewModel: VideoToPlaylistViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    BackHandler(uiState.searchState == SearchWidgetState.EXPANDED) {
+        viewModel.closeSearch()
+    }
 
     VideoToPlaylistView(
         items = uiState.items,
@@ -24,6 +32,18 @@ internal fun VideoToPlaylistScreen(
         searchState = uiState.searchState,
         query = uiState.query,
         hasSelectedItems = uiState.selectedPlaylistIds.isNotEmpty(),
-        errorMessage = uiState.createDialogErrorMessage
+        errorMessage = uiState.createDialogErrorMessage,
+        onSearchClicked = viewModel::searchWidgetStateUpdate,
+        onSearchTextChange = viewModel::searchQuery,
+        onCloseClicked = viewModel::closeSearch,
+        onBackPressed = {
+            when {
+                uiState.searchState == SearchWidgetState.EXPANDED ->
+                    viewModel.closeSearch()
+
+                else ->
+                    onBackPressedDispatcher?.onBackPressed()
+            }
+        }
     )
 }

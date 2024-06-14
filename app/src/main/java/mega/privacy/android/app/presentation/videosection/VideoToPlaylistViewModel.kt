@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistSetUiEntityMapper
+import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSetUiEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoToPlaylistUiState
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistSetsUseCase
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,6 +32,8 @@ class VideoToPlaylistViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(VideoToPlaylistUiState())
     internal val uiState = _uiState.asStateFlow()
 
+    private val originalData = mutableListOf<VideoPlaylistSetUiEntity>()
+
     private var createVideoPlaylistJob: Job? = null
 
     init {
@@ -43,7 +47,7 @@ class VideoToPlaylistViewModel @Inject constructor(
             }.onSuccess { sets ->
                 val newSets = sets.map {
                     videoPlaylistSetUiEntityMapper(it)
-                }
+                }.updateOriginalData().filterItemBySearchQuery()
                 _uiState.update {
                     it.copy(
                         items = newSets,
@@ -55,6 +59,18 @@ class VideoToPlaylistViewModel @Inject constructor(
             }
         }
     }
+
+    private fun List<VideoPlaylistSetUiEntity>.updateOriginalData() = also { data ->
+        if (originalData.isNotEmpty()) {
+            originalData.clear()
+        }
+        originalData.addAll(data)
+    }
+
+    private fun List<VideoPlaylistSetUiEntity>.filterItemBySearchQuery() =
+        filter { item ->
+            item.title.contains(uiState.value.query ?: "", true)
+        }
 
     /**
      * Create new video playlist
@@ -139,6 +155,47 @@ class VideoToPlaylistViewModel @Inject constructor(
                     defaultName = placeholderTitle,
                     currentNames = playlistTitles
                 )
+            )
+        }
+    }
+
+    internal fun searchWidgetStateUpdate() {
+        val searchState = when (_uiState.value.searchState) {
+            SearchWidgetState.EXPANDED -> SearchWidgetState.COLLAPSED
+
+            SearchWidgetState.COLLAPSED -> SearchWidgetState.EXPANDED
+        }
+        _uiState.update {
+            it.copy(
+                searchState = searchState
+            )
+        }
+    }
+
+    internal fun closeSearch() {
+        _uiState.update {
+            it.copy(
+                query = null,
+                searchState = SearchWidgetState.COLLAPSED
+            )
+        }
+        searchItemByQueryString()
+    }
+
+    internal fun searchQuery(queryString: String) {
+        _uiState.update {
+            it.copy(
+                query = queryString
+            )
+        }
+        searchItemByQueryString()
+    }
+
+    private fun searchItemByQueryString() {
+        val items = originalData.filterItemBySearchQuery()
+        _uiState.update {
+            it.copy(
+                items = items
             )
         }
     }

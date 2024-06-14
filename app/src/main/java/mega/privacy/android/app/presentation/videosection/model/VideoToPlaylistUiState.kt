@@ -20,7 +20,7 @@ data class VideoToPlaylistUiState(
     val items: List<VideoPlaylistSetUiEntity> = emptyList(),
     val isLoading: Boolean = true,
     val searchState: SearchWidgetState = SearchWidgetState.COLLAPSED,
-    val query: String = "",
+    val query: String? = null,
     val selectedPlaylistIds: List<Long> = emptyList(),
     val isInputTitleValid: Boolean = true,
     val createVideoPlaylistPlaceholderTitle: String = "",

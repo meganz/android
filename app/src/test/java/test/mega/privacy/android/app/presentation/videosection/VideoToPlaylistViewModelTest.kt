@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistSetsUseCase
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import nz.mega.sdk.MegaSet
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -94,8 +95,14 @@ class VideoToPlaylistViewModelTest {
             val expectedUserSets = (1..3L).map {
                 createUserSet(id = it, name = "Playlist$it")
             }
+            val expectedSetUiEntities = expectedUserSets.map {
+                getMockUiEntity(it.name)
+            }
+            expectedUserSets.forEachIndexed { index, set ->
+                whenever(videoPlaylistSetUiEntityMapper(set)).thenReturn(expectedSetUiEntities[index])
+            }
             whenever(getVideoPlaylistSetsUseCase()).thenReturn(expectedUserSets)
-            whenever(videoPlaylistSetUiEntityMapper(anyOrNull())).thenReturn(mock())
+
 
             initUnderTest()
 
@@ -127,6 +134,10 @@ class VideoToPlaylistViewModelTest {
                     && modificationTime == otherSet.modificationTime
                     && isExported == otherSet.isExported
         }
+    }
+
+    private fun getMockUiEntity(expectedTitle: String) = mock<VideoPlaylistSetUiEntity> {
+        on { title }.thenReturn(expectedTitle)
     }
 
     @Test
@@ -270,4 +281,76 @@ class VideoToPlaylistViewModelTest {
             underTest.createNewPlaylist(expectedTitle)
             verifyNoInteractions(createVideoPlaylistUseCase(expectedTitle))
         }
+
+    @Test
+    fun `test that search state is updated as expected`() = runTest {
+        initUnderTest()
+        underTest.uiState.test {
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+            underTest.searchWidgetStateUpdate()
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.EXPANDED)
+            underTest.searchWidgetStateUpdate()
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+        }
+    }
+
+    @Test
+    fun `test that states of the search feature are updated as expected`() = runTest {
+        val testQuery = "query string"
+        initUnderTest()
+        underTest.searchWidgetStateUpdate()
+        underTest.searchQuery(testQuery)
+        underTest.uiState.test {
+            val initial = awaitItem()
+            assertThat(initial.searchState).isEqualTo(SearchWidgetState.EXPANDED)
+            assertThat(initial.query).isEqualTo(testQuery)
+            underTest.closeSearch()
+            val actual = awaitItem()
+            assertThat(actual.searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+            assertThat(actual.query).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the state is updated correctly when the search process is ongoing`() = runTest {
+        val testQuery = "query"
+        val expectedUserSets = (1..3L).map {
+            createUserSet(id = it, name = "Playlist$it")
+        }
+        val expectedSetUiEntities =
+            expectedUserSets.mapIndexed { index, item ->
+                getMockUiEntity(
+                    if (index == 1) {
+                        "$testQuery${item.name}"
+                    } else {
+                        item.name
+                    }
+                )
+            }
+        expectedUserSets.forEachIndexed { index, set ->
+            whenever(videoPlaylistSetUiEntityMapper(set)).thenReturn(expectedSetUiEntities[index])
+        }
+        whenever(getVideoPlaylistSetsUseCase()).thenReturn(expectedUserSets)
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            awaitItem().let {
+                assertThat(it.items.size).isEqualTo(3)
+                assertThat(it.searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+                assertThat(it.query).isNull()
+            }
+            underTest.searchWidgetStateUpdate()
+            underTest.searchQuery(testQuery)
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.EXPANDED)
+            assertThat(awaitItem().query).isEqualTo(testQuery)
+            awaitItem().let {
+                assertThat(it.items).isNotEmpty()
+                assertThat(it.items.size).isEqualTo(1)
+                assertThat(it.items[0].title).isEqualTo(expectedSetUiEntities[1].title)
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
