@@ -64,8 +64,6 @@
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">선택한 폴더는 동기화할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">파일은 개별적으로 동기화할 수 없습니다. 폴더에서 동기화를 설정하여야 합니다.</string>
-    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">초기 탐색 실패. 데스크톱 앱에서 동기화 또는 백업을 다시 활성화 해야 합니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">MEGA의 폴더가 이동 되었거나, 삭제 되었거나, 접근 권한이 없어서 찾을 수 없습니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -74,8 +72,6 @@
     <string name="device_center_list_view_item_sub_state_account_expired">요금제가 만료되었기 때문에 이 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="device_center_list_view_item_sub_state_foreign_target_overshare">이 폴더를 공유한 사람의 저장소 할당량에 도달하여 폴더를 동기화할 수 없습니다</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">MEGA의 폴더가 이동 되었거나, 삭제 되었거나, 접근 권한이 없어서 찾을 수 없습니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">전체 권한 없이 공유된 폴더이기 때문에 폴더를 동기화할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -102,24 +98,14 @@
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">이름 변경 실패.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">이 동기화를 위한 .megaignore 파일을 만들 수 없습니다</string>
-    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">동기화 설정을 읽을 수 없습니다. 나중에 다시 시도하거나 폴더 권한을 확인하세요.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">동기화 폴더 위치를 알 수 없습니다</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
-    <string name="device_center_list_view_item_sub_state_invalid_scan_interval">잘못된 탐색 간격. 탐색 간격 설정을 확인하고 다시 시도하세요.</string>
-    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">폴더 위치와 통신할 수 없습니다. 위치에 접근 가능한지 여부와 폴더 위치에 대한 권한이 승인 되었는지 확인하세요.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
     <string name="device_center_list_view_item_sub_state_unable_to_add_watch">파일 시스템 감시를 추가할 수 없습니다. 충분한 여유 공간과 메모리가 있고, 폴더 위치에 대하여 권한을 승인 받았는지 확인하세요.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
-    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">동기화 위치를 읽을 수 없습니다. 위치에 접근 가능한지 여부와 폴더 위치에 대한 권한이 승인 되었는지 확인하세요.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database">상태 캐시 데이터베이스를 열 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">다운로드에 필요한 공간 부족</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage">동기화 위치를 읽을 수 없습니다. 위치에 접근 가능한지 여부와 폴더 위치에 대한 권한이 승인 되었는지 확인하세요.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">알 수 없는 오류.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->

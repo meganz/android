@@ -384,4 +384,80 @@
     <string name="sync_error_banner_free_user">Syncing is paused because your MEGA Pro plan was cancelled. Upgrade to continue syncing.</string>
     <!-- Hidden items -->
     <string name="hidden_items">숨겨진 항목</string>
+    <!-- Label to indicate that is a Pro only feature -->
+    <string name="general_pro_only_label">Pro 전용</string>
+    <!-- Label for the file info information screen tags field -->
+    <string name="file_info_information_tags_label">Tags</string>
+    <!-- label for tags page tag description -->
+    <string name="add_tags_label_tag_description">Use tags to help you find and organise your data. Try tagging by year, location, project, or subject.</string>
+    <!-- label for tag text field in add tags page -->
+    <string name="add_tags_text_label_tag">Tag</string>
+    <!-- label for add tags page add button -->
+    <string name="add_tags_button_label_add">Add “#%1$s” tag</string>
+    <!-- label for add tags page existing tags label -->
+    <string name="add_tags_label_existing_tags">Existing tags</string>
+    <!-- error label for add tags page when special characters added -->
+    <string name="add_tags_error_special_characters">Tags can’t contain spaces or non-alphanumeric symbols. Tags written with capital letters will be displayed in lowercase.</string>
+    <!-- error label for add tags page when tag count is maximum -->
+    <string name="add_tags_error_max_tags">The maximum number of tags is %1$d</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_max_characters">Tags must be %1$d characters or less</string>
+    <!-- title label for tags page -->
+    <string name="add_tags_page_title_label">Tags</string>
+    <!-- The placeholder for read only files/folders with no description in info screen-->
+    <string name="file_info_information_no_description_placeholder">설명 없음</string>
+    <!-- Top bar title of the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_top_bar_title">Add to playlist</string>
+    <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_new_playlist_text">새 재생 목록</string>
+    <!-- Text of the done button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_done_button">완료</string>
+    <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
+    <string name="account_cancel_account_screen_plan_miss_out_on_features">이러한 기능들을 잃게 됩니다</string>
+    <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
+    <string name="account_cancel_account_screen_plan_access_until_expiration">You’ll still have access to these features until your MEGA plan expires, then you’ll be moved to a free account.</string>
+    <!-- Warning message about current storage usage when cancelling the plan -->
+    <string name="account_cancel_account_screen_plan_current_storage_warning">You currently are using %1s of storage, you will be at risk of losing your files</string>
+    <!-- Column header in the feature comparison table -->
+    <string name="account_cancel_account_screen_plan_feature">기능</string>
+    <!-- Column header indicating features available with the free plan -->
+    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <!-- Row label for storage feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_storage">저장소</string>
+    <!-- Storage amount available in the free plan -->
+    <string name="account_cancel_account_screen_plan_free_storage">20&#160;GB</string>
+    <!-- Row label for transfer feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_transfer">전송</string>
+    <!-- Transfer limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_free_limited_transfer">제한됨</string>
+    <!-- Feature indicating password protection for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_password_protected_links">비밀번호로 보호된 링크</string>
+    <!-- Feature indicating expiry dates for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_links_with_expiry_dates">만료일이 있는 링크</string>
+    <!-- Feature indicating transfer sharing, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_transfer_sharing">전송 공유</string>
+    <!-- Row label for rewind feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_rewind">되감기</string>
+    <!-- Rewind duration available in the free plan -->
+    <string name="account_cancel_account_screen_plan_rewind_free">최대 30일 (보기 전용)</string>
+    <!-- Rewind duration available in the current plan -->
+    <string name="account_cancel_account_screen_plan_rewind_current">최대 180일</string>
+    <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
+    <!-- Row label for call and meeting duration in the comparison table -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp; meeting duration</string>
+    <!-- Call and meeting duration limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Up to 1 hour</string>
+    <!-- Unlimited call and meeting duration available in the pro plan -->
+    <string name="cancel_account_plan_call_meeting_duration_pro">무제한</string>
+    <!-- Row label for call and meeting participants in the comparison table -->
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp; meeting participants</string>
+    <!-- Limit on call and meeting participants in the free plan -->
+    <string name="account_cancel_account_free_plan_call_meeting_participants">Up to 100</string>
+    <!-- Unlimited call and meeting participants available in the pro plan -->
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">무제한</string>
+    <!-- Button label to keep the current pro plan -->
+    <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
+    <!-- Button label to continue with the cancellation -->
+    <string name="account_cancel_account_plan_continue_cancellation">취소 진행</string>
 </resources>

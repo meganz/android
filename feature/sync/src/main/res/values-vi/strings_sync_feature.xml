@@ -58,8 +58,6 @@
     <string name="sync_dialog_battery_optimization_negative_button">Không cho phép</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">Cho phép</string>
-    <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">Không có vấn&#160;đề đã giải&#160;quyết</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">Không có vấn&#160;đề</string>
     <!-- Sync option to choose device folder -->
@@ -134,8 +132,6 @@
     <string name="sync_stalled_issues">Các vấn&#160;đề (%d)</string>
     <!-- Sync stalled issue count chip title for 0 stalled issues-->
     <string name="sync_stalled_issue_zero">Vấn đề</string>
-    <!-- Sync solved issues chip title -->
-    <string name="sync_solved_issues">Vấn&#160;đề đã giải&#160;quyết</string>
     <!-- Sync start sync button -->
     <string name="sync_start_sync">Thiết&#160;lập đồng&#160;bộ</string>
     <!-- Text that indicates that a folder is currently empty -->

@@ -64,8 +64,6 @@
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">Выбранную папку невозможно синхронизировать</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">Файл нельзя синхронизировать отдельно. Нужно настроить синхронизацию из папки.</string>
-    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Не удалось выполнить первоначальное сканирование. Вам нужно будет повторно включить синхронизацию или резервное копирование из настольного приложения.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">Не удалось найти папку в MEGA, так как она была перемещена или удалена, либо у вас нет доступа.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -74,8 +72,6 @@
     <string name="device_center_list_view_item_sub_state_account_expired">Невозможно синхронизировать или создать резервную копию этой папки, так как срок действия вашего плана истёк</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Невозможно синхронизировать папку, так как у пользователя, который поделился ей, хранилище полностью заполнено</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">Не удалось найти папку в MEGA, так как она была перемещена или удалена, либо у вас нет доступа.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">Папку нельзя синхронизировать, так как это общая папка без полного доступа</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -102,24 +98,14 @@
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Не удалось переименовать.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Не удалось создать файл .megaignore для этой синхронизации</string>
-    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Не удалось прочитать конфигурацию синхронизации. Повторите попытку позже или проверьте права доступа к папке.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">Расположение папки синхронизации неизвестно</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
-    <string name="device_center_list_view_item_sub_state_invalid_scan_interval">Недействительный интервал сканирования. Проверьте настройку интервала сканирования и попробуйте ещё раз.</string>
-    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">Не удалось связаться с расположением папки. Убедитесь, что расположение папки доступно и предоставлены права доступа к нему.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
     <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Невозможно добавить наблюдение за файловой системой. Убедитесь, что достаточно свободного места и памяти, а также предоставлены права доступа к расположению папки.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
-    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Не удалось прочитать расположение синхронизации. Убедитесь, что расположение папки доступно и предоставлены права доступа к нему.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database">Не удалось открыть базу данных кэша состояний</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Недостаточно места для скачивания.</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage">Не удалось прочитать расположение синхронизации. Убедитесь, что расположение папки доступно и предоставлены права доступа к нему.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Неизвестная ошибка.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->

@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">Verlies nooit meer gegevens</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore files and folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Terugspoelen om bestanden en mappen terug te zetten naar een willekeurige datum, tot 180 dagen, zodat uw gegevens ongevalbestendig en fraudebestendig zijn.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -283,7 +283,7 @@
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">Upgraden</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Upload paused, device is not charging</string>
+    <string name="camera_uploads_phone_not_charging_message">Het uploaden is gepauzeerd, het apparaat wordt niet opgeladen</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
     <string name="device_center_list_view_item_status_nothing_setup">Geen synchronisaties ingesteld</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
@@ -307,7 +307,7 @@
     <!-- Text for the Sync solved issues chip -->
     <string name="device_center_sync_solved_issues_chip_text">Opgeloste problemen</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">This folder can’t be synced. Set it up to sync to MEGA using Camera uploads.</string>
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">Deze map kan niet worden gesynchroniseerd. Stel het in om te synchroniseren met MEGA met behulp van Camera-uploads.</string>
     <!-- Label for the file info information screen description field -->
     <string name="file_info_information_description_label">Omschrijving</string>
     <!-- Placeholder for the file info information screen description field -->
@@ -369,27 +369,103 @@
     <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_title">Upgraden naar Pro</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Unlock the power to sync your mobile device to the cloud with our Pro plans.</string>
+    <string name="device_center_sync_upgrade_dialog_message">Maak gebruik van de mogelijkheid om je mobiele apparaat te synchroniseren met de cloud met onze Pro-abonnementen.</string>
     <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_confirm_button">Upgraden</string>
     <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_cancel_button">Niet Nu</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Uploads folder conflict</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Er wordt een conflict met de map geüpload</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your Camera uploads folder and secondary media uploads folder cannot be related to each other. Choose a different folder.</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Uw map voor het uploaden van de camera en de map voor het uploaden van secundaire media kunnen niet aan elkaar worden gekoppeld. Kies een andere map.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Oké, ik snap het</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_no_picker_warning">This device doesn’t have an app to select folders</string>
+    <string name="general_no_picker_warning">Dit apparaat heeft geen applicatie om mappen te selecteren</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="account_upgrade_account_description_feature_sync">&#8226; &#160; De mappen op uw mobiele apparaat automatisch synchroniseren</string>
     <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">Your syncs have been paused. Syncing is a Pro plan feature.</string>
+    <string name="sync_error_dialog_free_user">Uw synchronisaties zijn gepauzeerd. Synchronisatie is een kenmerk van het Pro-abonnement.</string>
     <!-- The error dialog confirm action text -->
     <string name="sync_error_dialog_free_user_confirm_action">OK</string>
     <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">Syncing is paused because your MEGA Pro plan was cancelled. Upgrade to continue syncing.</string>
+    <string name="sync_error_banner_free_user">De synchronisatie is gepauzeerd omdat uw MEGA Pro-abonnement is geannuleerd. Upgrade om door te gaan met synchroniseren.</string>
     <!-- Hidden items -->
     <string name="hidden_items">Verborgen items</string>
+    <!-- Label to indicate that is a Pro only feature -->
+    <string name="general_pro_only_label">Alleen Pro</string>
+    <!-- Label for the file info information screen tags field -->
+    <string name="file_info_information_tags_label">Labels</string>
+    <!-- label for tags page tag description -->
+    <string name="add_tags_label_tag_description">Gebruik tags om uw gegevens te vinden en te ordenen. Probeer te taggen op jaar, lokatie, project of onderwerp.</string>
+    <!-- label for tag text field in add tags page -->
+    <string name="add_tags_text_label_tag">Label</string>
+    <!-- label for add tags page add button -->
+    <string name="add_tags_button_label_add">“#%1$s” label toevoegen</string>
+    <!-- label for add tags page existing tags label -->
+    <string name="add_tags_label_existing_tags">Bestaande labels</string>
+    <!-- error label for add tags page when special characters added -->
+    <string name="add_tags_error_special_characters">Tags mogen geen spaties of niet-alfanumerieke symbolen bevatten. Labels die met hoofdletters zijn geschreven, worden in kleine letters weergegeven.</string>
+    <!-- error label for add tags page when tag count is maximum -->
+    <string name="add_tags_error_max_tags">Het maximale aantal labels is %1$d</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_max_characters">Labels moeten %1$d tekens of minder</string>
+    <!-- title label for tags page -->
+    <string name="add_tags_page_title_label">Labels</string>
+    <!-- The placeholder for read only files/folders with no description in info screen-->
+    <string name="file_info_information_no_description_placeholder">Geen omschrijving</string>
+    <!-- Top bar title of the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_top_bar_title">Aan afspeellijst toevoegen</string>
+    <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_new_playlist_text">Nieuwe afspeellijst</string>
+    <!-- Text of the done button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_done_button">Klaar</string>
+    <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
+    <string name="account_cancel_account_screen_plan_miss_out_on_features">U zult deze functies missen</string>
+    <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
+    <string name="account_cancel_account_screen_plan_access_until_expiration">U heeft nog steeds toegang tot deze kenmerken tot uw MEGA-abonnement afloopt, dan word u overgezet naar een gratis account.</string>
+    <!-- Warning message about current storage usage when cancelling the plan -->
+    <string name="account_cancel_account_screen_plan_current_storage_warning">U gebruikt momenteel %1s van de opslag en loopt het risico uw bestanden kwijt te raken</string>
+    <!-- Column header in the feature comparison table -->
+    <string name="account_cancel_account_screen_plan_feature">Functie</string>
+    <!-- Column header indicating features available with the free plan -->
+    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <!-- Row label for storage feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_storage">Opslag</string>
+    <!-- Storage amount available in the free plan -->
+    <string name="account_cancel_account_screen_plan_free_storage">20 &#160; GB</string>
+    <!-- Row label for transfer feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_transfer">Overdracht</string>
+    <!-- Transfer limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_free_limited_transfer">Beperkt</string>
+    <!-- Feature indicating password protection for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_password_protected_links">Wachtwoord beveiligde links</string>
+    <!-- Feature indicating expiry dates for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_links_with_expiry_dates">Links met vervaldata</string>
+    <!-- Feature indicating transfer sharing, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_transfer_sharing">Overdrachtsdeling</string>
+    <!-- Row label for rewind feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_rewind">Terugspoelen</string>
+    <!-- Rewind duration available in the free plan -->
+    <string name="account_cancel_account_screen_plan_rewind_free">Tot 30 dagen (alleen weergeven)</string>
+    <!-- Rewind duration available in the current plan -->
+    <string name="account_cancel_account_screen_plan_rewind_current">Tot op 180 dagen</string>
+    <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
+    <!-- Row label for call and meeting duration in the comparison table -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Duur van het gesprek en de vergadering</string>
+    <!-- Call and meeting duration limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Tot 1 uur</string>
+    <!-- Unlimited call and meeting duration available in the pro plan -->
+    <string name="cancel_account_plan_call_meeting_duration_pro">ONBEPERKT</string>
+    <!-- Row label for call and meeting participants in the comparison table -->
+    <string name="account_cancel_account_plan_call_meeting_participants">Deelnemers aan de oproep en vergadering</string>
+    <!-- Limit on call and meeting participants in the free plan -->
+    <string name="account_cancel_account_free_plan_call_meeting_participants">Tot 100</string>
+    <!-- Unlimited call and meeting participants available in the pro plan -->
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">ONBEPERKT</string>
+    <!-- Button label to keep the current pro plan -->
+    <string name="account_cancel_account_plan_keep_pro_plan">%1s behouden</string>
+    <!-- Button label to continue with the cancellation -->
+    <string name="account_cancel_account_plan_continue_cancellation">Ga door met annuleren</string>
 </resources>

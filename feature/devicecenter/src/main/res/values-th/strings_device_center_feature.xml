@@ -64,8 +64,6 @@
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">โฟลเดอร์ที่คุณเลือกไม่สามารถซิงค์ได้</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">ไม่สามารถซิงค์ไฟล์ทีละไฟล์ได้ คุณต้องตั้งค่าการซิงค์จากโฟลเดอร์แทน</string>
-    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">การสแกนเริ่มต้นล้มเหลว คุณจะต้องเปิดใช้งานการซิงค์หรือสำรองข้อมูลจากแอปเดสก์ทอปของคุณใหม่</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">ไม่สามารถหาโฟลเดอร์ใน MEGAได้ อาจถูกย้ายหรือลบออก หรือคุณอาจไม่สามารถเข้าถึงได้</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -74,8 +72,6 @@
     <string name="device_center_list_view_item_sub_state_account_expired">ไม่สามารถซิงค์หรือสำรองข้อมูลในโฟลเดอร์นี้ได้เนื่องจากแผนของคุณหมดอายุแล้ว</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="device_center_list_view_item_sub_state_foreign_target_overshare">ไม่สามารถซิงค์โฟลเดอร์ได้ เนื่องจากผู้ใช้ที่แชร์โฟลเดอร์นี้ได้ใช้พื้นที่จัดเก็บข้อมูลเต็มแล้ว</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">ไม่สามารถหาโฟลเดอร์ใน MEGAได้ อาจถูกย้ายหรือลบออก หรือคุณอาจไม่สามารถเข้าถึงได้</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">ไม่สามารถซิงค์โฟลเดอร์นี้ได้เนื่องจากเป็นโฟลเดอร์ที่มีการแชร์โดยไม่มีการเข้าถึงแบบเต็ม</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -102,24 +98,14 @@
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">การเปลี่ยนชื่อไม่สำเร็จ</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">ไม่สามารถสร้างไฟล์ .megaignore เพื่อใช้การซิงค์นี้ได้</string>
-    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">ไม่สามารถอ่านการกำหนดค่าการซิงค์ได้ กรุณาลองใหม่ในภายหลังหรือตรวจสอบสิทธิ์ในโฟลเดอร์ของคุณอีกครั้ง</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">ไม่ทราบตำแหน่งที่ตั้งโฟลเดอร์สำหรับซิงค์ได้</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
-    <string name="device_center_list_view_item_sub_state_invalid_scan_interval">ช่วงเวลาสแกนไม่ถูกต้อง กรุณาตรวจสอบการตั้งค่าช่วงเวลาสแกนและลองใหม่อีกครั้ง</string>
-    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">ไม่สามารถสื่อสารกับตำแหน่งที่ตั้งโฟลเดอร์ได้ กรุณาตรวจสอบว่าสามารถเข้าถึงได้และได้รับอนุญาตให้ใช้งานโฟลเดอร์ตามตำแหน่งที่ตั้งนี้หรือไม่</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
     <string name="device_center_list_view_item_sub_state_unable_to_add_watch">ไม่สามารถติดตามการเปลี่ยนแปลงไฟล์ในโฟลเดอร์นี้ได้ ตรวจสอบพื้นที่ว่างบนอุปกรณ์และหน่วยความจำ และตรวจสอบให้แน่ใจว่าคุณมีสิทธิ์เข้าถึงโฟลเดอร์นี้</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
-    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">ไม่สามารถอ่านตำแหน่งที่ตั้งการซิงค์ได้ กรุณาตรวจสอบว่าสามารถเข้าถึงได้และได้รับอนุญาตให้ใช้งานโฟลเดอร์ตามตำแหน่งที่ตั้งนี้หรือไม่</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database">ไม่สามารถเปิดฐานข้อมูลแคชสถานะได้</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">มีพื้นที่ไม่เพียงพอที่จะดาวน์โหลด</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage">ไม่สามารถอ่านตำแหน่งที่ตั้งการซิงค์ได้ กรุณาตรวจสอบว่าสามารถเข้าถึงได้และได้รับอนุญาตให้ใช้งานโฟลเดอร์ตามตำแหน่งที่ตั้งนี้หรือไม่</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">ข้อผิดพลาดที่ไม่รู้จัก</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->

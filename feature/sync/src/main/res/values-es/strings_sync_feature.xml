@@ -66,8 +66,6 @@
     <string name="sync_dialog_battery_optimization_negative_button">Denegar</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">Permitir</string>
-    <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">No hay problemas resueltos</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">No hay problemas</string>
     <!-- Sync option to choose device folder -->
@@ -142,8 +140,6 @@
     <string name="sync_stalled_issues">Problemas (%d)</string>
     <!-- Sync stalled issue count chip title for 0 stalled issues-->
     <string name="sync_stalled_issue_zero">Problemas</string>
-    <!-- Sync solved issues chip title -->
-    <string name="sync_solved_issues">Problemas resueltos</string>
     <!-- Sync start sync button -->
     <string name="sync_start_sync">Configurar sincronización</string>
     <!-- Text that indicates that a folder is currently empty -->

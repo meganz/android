@@ -58,8 +58,6 @@
     <string name="sync_dialog_battery_optimization_negative_button">不允許</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">允許</string>
-    <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">沒有已解決的問題</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">沒有問題</string>
     <!-- Sync option to choose device folder -->
@@ -134,8 +132,6 @@
     <string name="sync_stalled_issues">問題（%d）</string>
     <!-- Sync stalled issue count chip title for 0 stalled issues-->
     <string name="sync_stalled_issue_zero">問題</string>
-    <!-- Sync solved issues chip title -->
-    <string name="sync_solved_issues">已解決的問題</string>
     <!-- Sync start sync button -->
     <string name="sync_start_sync">設定同步</string>
     <!-- Text that indicates that a folder is currently empty -->

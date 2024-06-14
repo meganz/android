@@ -3,53 +3,53 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="general_sync_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported</string>
+    <string name="general_sync_unsupported_file_system">MEGA tidak dapat menyinkronkan atau membuat cadangan folder ini karena sistem file pada perangkat anda tidak didukung</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
-    <string name="general_sync_invalid_remote_type">The folder you chose can’t be synced</string>
+    <string name="general_sync_invalid_remote_type">Folder yang anda pilih tidak dapat disinkronkan</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="general_sync_invalid_local_type">File tidak dapat disinkronkan satu per satu. Anda perlu mengatur sinkronisasi dari folder.</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
     <string name="general_sync_initial_scan_failed">Pemindaian awal gagal. Anda harus mengaktifkan kembali sinkronisasi atau cadangan dari aplikasi desktop.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="general_sync_remote_node_not_found">Folder in MEGA can’t be located as it’s been moved or deleted, or you might not have access</string>
+    <string name="general_sync_remote_node_not_found">Folder di MEGA tidak dapat ditemukan karena telah dipindahkan atau dihapus, atau anda mungkin tidak memiliki akses</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
-    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <string name="general_sync_storage_overquota">Tidak dapat menyinkronkan atau mencadangkan folder ini karena penyimpanan anda penuh</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
-    <string name="general_sync_account_expired">Unable to sync or back up this folder as your plan has expired</string>
+    <string name="general_sync_account_expired">Tidak dapat menyinkronkan atau membuat cadangan folder ini karena paket anda telah kedaluwarsa</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="general_sync_foreign_target_overshare">Folder can’t be synced as the user who shared this folder has reached their storage limit</string>
+    <string name="general_sync_foreign_target_overshare">Folder tidak dapat disinkronkan karena pengguna yang berbagi folder ini telah mencapai batas penyimpanan mereka</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="general_sync_remote_path_has_changed">Folder in MEGA can’t be located as it’s been moved or deleted, or you might not have access</string>
+    <string name="general_sync_remote_path_has_changed">Folder di MEGA tidak dapat ditemukan karena telah dipindahkan atau dihapus, atau anda mungkin tidak memiliki akses</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="general_sync_share_non_full_access">Folder can’t be synced as it’s a shared folder that you don’t have full access to</string>
+    <string name="general_sync_share_non_full_access">Folder tidak dapat disinkronkan karena ini adalah folder bersama dan anda tidak memiliki akses penuh</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="general_sync_put_nodes_error">Files in this folder can’t be synced or backed up. You’ll need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_put_nodes_error">File dalam folder ini tidak dapat disinkronkan atau dicadangkan. Anda harus mengaktifkan kembali sinkronisasi atau cadangan dari aplikasi desktop.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="general_sync_active_sync_below_path">Folder can’t be synced as it already contains synced folders</string>
+    <string name="general_sync_active_sync_below_path">Folder tidak dapat disinkronkan karena sudah berisi folder yang disinkronkan</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="general_sync_vboxsharedfolder_unsupported">MEGA can’t sync or back up VirtualBox folders</string>
+    <string name="general_sync_vboxsharedfolder_unsupported">MEGA tidak dapat menyinkronkan atau mencadangkan folder VirtualBox</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <string name="general_sync_account_blocked">Tidak dapat menyinkronkan atau mencadangkan folder ini karena akun telah diblokir</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="general_sync_unknown_temporary_error">Masalah saat menyinkronkan atau membuat cadangan folder ini. Coba lagi nanti. Jika masalah berlanjut, hubungi Bantuan.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="general_sync_too_many_action_packets">Akun dimuat ulang. Pembaruan apa pun yang terlewat untuk cadangan atau sinkronisasi anda belum diterapkan.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="general_sync_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
+    <string name="general_sync_logged_out">Sinkronisasi atau pencadangan telah dihentikan karena anda tampaknya telah keluar dari aplikasi desktop. Masuk kembali melalui aplikasi desktop, dan lanjutkan sinkronisasi atau pencadangan.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">Folder di drive eksternal tidak dapat ditemukan.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="general_sync_active_sync_same_path">There’s already a synced folder at the same location</string>
+    <string name="general_sync_active_sync_same_path">Sudah ada folder yang disinkronkan di lokasi yang sama</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="general_sync_could_not_move_cloud_nodes">Renaming failed</string>
+    <string name="general_sync_could_not_move_cloud_nodes">Mengganti nama gagal</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="general_sync_could_not_create_ignore_file">Couldn’t create a .megaignore file for this sync</string>
+    <string name="general_sync_could_not_create_ignore_file">Tidak dapat membuat file .megaignore untuk sinkronisasi ini</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="general_sync_config_read_failure">Couldn’t read sync configuration. Try again later or check folder permissions.</string>
+    <string name="general_sync_config_read_failure">Tidak dapat membaca konfigurasi sinkronisasi. Coba lagi nanti atau periksa izin folder.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="general_sync_unknown_drive_path">Sync location is unknown</string>
+    <string name="general_sync_unknown_drive_path">Lokasi sinkronisasi tidak diketahui</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="general_sync_invalid_scan_interval">Interval pemindaian tidak valid. Periksa pengaturan interval pemindaian dan coba lagi.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -61,29 +61,29 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="general_sync_unable_to_open_database">Unable to open state cache database</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
-    <string name="general_sync_insufficient_disk_space">Insufficient storage space on your device</string>
+    <string name="general_sync_insufficient_disk_space">Ruang penyimpanan tidak mencukupi di perangkat anda</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">Tidak dapat membaca lokasi sinkronisasi. Periksa lokasi dapat diakses dan izin untuk lokasi folder diberikan.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact Support.</string>
+    <string name="general_sync_message_unknown_error">Terjadi kesalahan yang tidak diketahui. Hubungi Bantuan.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
+    <string name="general_sync_message_node_in_rubbish_bin">Folder tidak dapat disinkronkan atau dicadangkan karena folder MEGA ada di tempat sampah</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="general_sync_message_cannot_locate_local_drive_now">Folder in your device can’t be located right now. Try again later.</string>
+    <string name="general_sync_message_cannot_locate_local_drive_now">Folder di perangkat anda tidak dapat ditemukan saat ini. Coba lagi nanti.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
-    <string name="general_sync_message_cannot_locate_local_drive">Folder in your device can’t be located</string>
+    <string name="general_sync_message_cannot_locate_local_drive">Folder di perangkat anda tidak dapat ditemukan</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the sync or backup and try setting it up again in the desktop app, or contact Support.</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Masalah menyinkronkan atau membuat cadangan folder ini karena perubahan pada folder MEGA. Hentikan sinkronisasi atau pencadangan dan coba atur lagi di aplikasi desktop, atau hubungi Bantuan.</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue">Masalah saat menyinkronkan atau membuat cadangan folder ini. Hentikan sinkronisasi atau pencadangan dan coba atur lagi di aplikasi Desktop, atau hubungi Bantuan.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder tidak dapat disinkronkan karena sudah berada di dalam folder yang disinkronkan</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="general_sync_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_local_filesystem_mismatch">File dalam folder ini tidak dapat disinkronkan atau dicadangkan. Anda harus mengaktifkan kembali sinkronisasi atau cadangan dari aplikasi desktop.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
-    <string name="general_message_sync_paused_low_battery_level">Syncing paused, battery level too low. Charge battery to resume syncing.</string>
+    <string name="general_message_sync_paused_low_battery_level">Sinkronisasi dihentikan sementara, tingkat baterai terlalu rendah. Isi daya baterai untuk melanjutkan sinkronisasi.</string>
     <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_file_sharing">Berbagi file yang mudah dan aman</string>
     <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -177,7 +177,7 @@
     <!-- Text that indicates that there’s no playlist to show. -->
     <string name="video_section_playlists_empty_hint_playlist">Tidak ada daftar putar yang ditemukan</string>
     <!-- Delete option title of the video section playlist bottom sheet -->
-    <string name="video_section_playlist_bottom_sheet_option_title_delete">Delete playlist</string>
+    <string name="video_section_playlist_bottom_sheet_option_title_delete">Hapus daftar putar</string>
     <!-- Remove videos dialog title of the video section playlist detail -->
     <string name="video_section_playlist_detail_remove_videos_dialog_title">Remove from playlist?</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
@@ -239,8 +239,7 @@
     </plurals>
     <!-- String which indicates the number of folders contained into a device/folder -->
     <plurals name="info_num_folders">
-        <item quantity="one">%1$d folder</item>
-        <item quantity="other">%1$d folders</item>
+        <item quantity="other">%1$d folder</item>
     </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="info_num_folders_and_files">
@@ -388,4 +387,80 @@
     <string name="sync_error_banner_free_user">Syncing is paused because your MEGA Pro plan was cancelled. Upgrade to continue syncing.</string>
     <!-- Hidden items -->
     <string name="hidden_items">Item tersembunyi</string>
+    <!-- Label to indicate that is a Pro only feature -->
+    <string name="general_pro_only_label">Hanya Pro</string>
+    <!-- Label for the file info information screen tags field -->
+    <string name="file_info_information_tags_label">Tags</string>
+    <!-- label for tags page tag description -->
+    <string name="add_tags_label_tag_description">Use tags to help you find and organise your data. Try tagging by year, location, project, or subject.</string>
+    <!-- label for tag text field in add tags page -->
+    <string name="add_tags_text_label_tag">Tag</string>
+    <!-- label for add tags page add button -->
+    <string name="add_tags_button_label_add">Add “#%1$s” tag</string>
+    <!-- label for add tags page existing tags label -->
+    <string name="add_tags_label_existing_tags">Existing tags</string>
+    <!-- error label for add tags page when special characters added -->
+    <string name="add_tags_error_special_characters">Tags can’t contain spaces or non-alphanumeric symbols. Tags written with capital letters will be displayed in lowercase.</string>
+    <!-- error label for add tags page when tag count is maximum -->
+    <string name="add_tags_error_max_tags">The maximum number of tags is %1$d</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_max_characters">Tags must be %1$d characters or less</string>
+    <!-- title label for tags page -->
+    <string name="add_tags_page_title_label">Tags</string>
+    <!-- The placeholder for read only files/folders with no description in info screen-->
+    <string name="file_info_information_no_description_placeholder">Tidak ada deskripsi</string>
+    <!-- Top bar title of the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_top_bar_title">Add to playlist</string>
+    <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_new_playlist_text">Daftar putar baru</string>
+    <!-- Text of the done button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_done_button">Selesai</string>
+    <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
+    <string name="account_cancel_account_screen_plan_miss_out_on_features">Anda akan kehilangan fitur-fitur ini</string>
+    <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
+    <string name="account_cancel_account_screen_plan_access_until_expiration">You’ll still have access to these features until your MEGA plan expires, then you’ll be moved to a free account.</string>
+    <!-- Warning message about current storage usage when cancelling the plan -->
+    <string name="account_cancel_account_screen_plan_current_storage_warning">You currently are using %1s of storage, you will be at risk of losing your files</string>
+    <!-- Column header in the feature comparison table -->
+    <string name="account_cancel_account_screen_plan_feature">Fitur</string>
+    <!-- Column header indicating features available with the free plan -->
+    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <!-- Row label for storage feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_storage">Gudang</string>
+    <!-- Storage amount available in the free plan -->
+    <string name="account_cancel_account_screen_plan_free_storage">20&#160;GB</string>
+    <!-- Row label for transfer feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_transfer">Transfer</string>
+    <!-- Transfer limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_free_limited_transfer">Terbatas</string>
+    <!-- Feature indicating password protection for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_password_protected_links">Tautan yang dilindungi kata sandi</string>
+    <!-- Feature indicating expiry dates for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_links_with_expiry_dates">Tautan dengan tanggal kedaluwarsa</string>
+    <!-- Feature indicating transfer sharing, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_transfer_sharing">Berbagi transfer</string>
+    <!-- Row label for rewind feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_rewind">Putar balik</string>
+    <!-- Rewind duration available in the free plan -->
+    <string name="account_cancel_account_screen_plan_rewind_free">Hingga 30 hari (hanya lihat)</string>
+    <!-- Rewind duration available in the current plan -->
+    <string name="account_cancel_account_screen_plan_rewind_current">Hingga 180 days</string>
+    <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
+    <!-- Row label for call and meeting duration in the comparison table -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp; meeting duration</string>
+    <!-- Call and meeting duration limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Hingga 1 jam</string>
+    <!-- Unlimited call and meeting duration available in the pro plan -->
+    <string name="cancel_account_plan_call_meeting_duration_pro">TAK TERBATAS</string>
+    <!-- Row label for call and meeting participants in the comparison table -->
+    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp; meeting participants</string>
+    <!-- Limit on call and meeting participants in the free plan -->
+    <string name="account_cancel_account_free_plan_call_meeting_participants">Hingga 100</string>
+    <!-- Unlimited call and meeting participants available in the pro plan -->
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">TAK TERBATAS</string>
+    <!-- Button label to keep the current pro plan -->
+    <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
+    <!-- Button label to continue with the cancellation -->
+    <string name="account_cancel_account_plan_continue_cancellation">Lanjutkan pembatalan</string>
 </resources>

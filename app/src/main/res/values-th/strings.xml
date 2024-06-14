@@ -286,8 +286,6 @@
     </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">ดูการถ่ายโอน</string>
-    <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">ส่วนใหญ่แล้วอุปกรณ์ไม่สามารถดาวน์โหลดไฟล์ที่มีขนาดเกิน 4&#160;GB ได้ ดังนั้นการดาวน์โหลดของคุณอาจล้มเหลวได้</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">ไม่มีแอปใดที่สามารถเรียกใช้ไฟล์นี้บนอุปกรณ์ของคุณได้</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -950,8 +948,6 @@
     <string name="busy_status">ไม่ว่าง</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">ข้อความนี้ถูกลบแล้ว</string>
-    <!-- Text shown when a message has been deleted in the chat -->
-    <string name="text_deleted_message_by">[A]ข้อความนี้ถูกลบโดย [/A][B]%1$s[/B]</string>
     <!-- Confirmation before deleting messages -->
     <string name="confirmation_delete_several_messages">นำข้อความออกหรือไม่</string>
     <!-- Confirmation before deleting one message -->
@@ -1028,8 +1024,6 @@
     <string name="messages_copied_clipboard">คัดลอกไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">พบข้อผิดพลาดในแชท</string>
-    <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">ไม่สามารถเปิดแชทได้</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d ผู้ติดต่อ</item>
@@ -1048,8 +1042,6 @@
     <string name="message_option_retry">ลองใหม่</string>
     <!-- title of the menu for a non sent message -->
     <string name="title_message_not_sent_options">ข้อความยังไม่ถูกส่ง</string>
-    <!-- title of the menu for an uploading message with attachment -->
-    <string name="title_message_uploading_options">อัปโหลดเอกสารแนบ</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">ไม่มีประวัติการสนทนา</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
@@ -1283,22 +1275,12 @@
     <string name="file_properties_shared_folder_read_write">อ่านและเขียน</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">หยุดการถ่ายโอนชั่วคราวแล้ว</string>
-    <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state_uploading">กำลังอัปโหลด&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_compressing">กำลังบีบอัด&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_error">ผิดพลาด ยังไม่ได้ส่ง</string>
     <!--  -->
     <string name="contact_is_me">ไม่มีตัวเลือกที่คุณเลือกเอง</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">นำไฟล์แนบออกหรือไม่</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">ดูไฟล์ (%1$d ถูกลบแล้ว)</string>
-    <!-- Error message when the attachment cannot be sent -->
-    <string name="error_attaching_node_from_cloud">ผิดพลาด ยังไม่ได้ส่งไฟล์</string>
-    <!-- Error message when the attachment cannot be revoked -->
-    <string name="error_revoking_node">ผิดพลาด ยังไม่ได้นำไฟล์แนบออก</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">เงียบ</string>
     <!-- part of the string in incoming shared folder notification -->
@@ -1638,8 +1620,6 @@
     <plurals name="number_of_versions_inside_folder">
         <item quantity="other">%1$d เวอร์ชันไฟล์</item>
     </plurals>
-    <!-- Confirmation message after forwarding one or several messages, version items -->
-    <string name="messages_forwarded_success">ส่งข้อความแล้ว</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="other">พบข้อผิดพลาด มีข้อความ %1$d รายการที่ไม่สามารถส่งต่อได้</item>
@@ -1698,8 +1678,6 @@
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s ข้อความที่ยังไม่ได้อ่าน</item>
     </plurals>
-    <!-- Message shown when a chat is opened and the messages are being recovered -->
-    <string name="chat_loading_messages">[A]กำลังโหลด[/A][B]ข้อความ&#8230;[/B]</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">ความปลอดภัย</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -1754,8 +1732,6 @@
     <string name="file_browser_empty_folder_new">[B]โฟลเดอร์[/B][A]ว่าง[/A]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
     <string name="type_message_hint_with_customized_title">เขียนข้อความถึง “%s”&#8230;</string>
-    <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
-    <string name="type_message_hint_with_default_title">เขียนข้อความถึง %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">การรับรองความถูกต้องด้วยสองปัจจัย (2FA)</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
@@ -1834,10 +1810,6 @@
     <plurals name="error_forwarding_messages">
         <item quantity="other">ไม่ได้ส่งต่อข้อความ</item>
     </plurals>
-    <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">แสดงตัวอย่าง URL</string>
-    <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">คุณกำลังปิดการแสดงตัวอย่าง URL คุณสามารถเปิดใช้งานได้อีกครั้งในการตั้งค่า คุณต้องการดำเนินการต่อหรือไม่</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]สายที่ไม่ได้รับ[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -1872,8 +1844,6 @@
     <string name="archived_chats_show_option">แชทที่จัดเก็บ (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">จัดเก็บแชท</string>
-    <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">ยกเลิกจัดเก็บการสนทนา</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">จัดเก็บ</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2056,12 +2026,8 @@
     <string name="action_join">เข้าร่วม</string>
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">ผู้สังเกตการณ์</string>
-    <!-- Message on the title of the chat screen if there were any error loading the chat link -->
-    <string name="error_chat_link">เกิดข้อผิดพลาดในการโหลดลิงก์แชท</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">เกิดข้อผิดพลาดในการเริ่มต้นแชทเมื่อโหลดลิงก์แชท</string>
-    <!-- Message on the alert to close a chat preview if the link is invalid -->
-    <string name="alert_invalid_preview">ตัวอย่างแชทนี้ไม่สามารถใช้ได้อีกต่อไป หากคุณออกจากหน้าตัวอย่าง คุณจะไม่สามารถเปิดอีกครั้งได้</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B] ได้เปิดใช้งานการสลับกุญแจเข้ารหัส[/B]</string>
     <!-- error message shown when a chat link is invalid -->
@@ -2256,8 +2222,6 @@
     <string name="allow_acces_calls_subtitle_microphone">อนุญาตให้เข้าถึงไมโครโฟนของคุณ เพื่อให้โทรแบบเข้ารหัสได้</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">ไฟล์ที่ใช้ร่วมกัน</string>
-    <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
-    <string name="error_message_already_sent">เอกสารแนบที่ส่งไปแล้ว</string>
     <!-- Message shown when a group call ends. -->
     <string name="group_call_ended_message">[A]สิ้นสุดการโทรกลุ่มแล้ว[/A][C] รวมระยะเวลา: [/C]</string>
     <!-- Message to indicate a call has ended and indicate the call duration. -->
@@ -2498,8 +2462,6 @@
     <string name="bucket_word_me">ฉัน</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">เพิ่มหมายเลขโทรศัพท์ของคุณเข้าไปยัง MEGA จะช่วยให้ผู้ติดต่อสามารถหาคุณเจอได้ง่ายขึ้นใน MEGA</string>
-    <!-- Error message when trying to record a voice message while on a call in progress -->
-    <string name="not_allowed_recording_voice_clip">ไม่สามารถบันทึกข้อความเสียงในขณะที่มีการโทรได้</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">สายเรียกเข้า</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
@@ -2656,10 +2618,6 @@
     <string name="action_reset">รีเซ็ต</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
     <string name="already_verifying_credentials">มีการอัปเดตข้อมูลประจำตัว กรุณาลองอีกครั้งในภายหลัง</string>
-    <!-- Info message displayed when the user is joining a chat conversation -->
-    <string name="joining_label">กำลังเข้าร่วม&#8230;</string>
-    <!-- Info message displayed when the user is leaving a chat conversation -->
-    <string name="leaving_label">กำลังออก&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">นำหมายเลขโทรศัพท์ออกแล้ว</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -2720,10 +2678,6 @@
     <string name="show_info_chat_msg_enabled">เปิดใช้งานข้อมูลการดีบักข้อความแชท</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_disabled">ปิดใช้งานข้อมูลการดีบักข้อความแชท</string>
-    <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_user">คุณแสดงความรู้ถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
-    <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_message">ข้อความนี้แสดงความรู้สึกถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
     <string name="retention_history_changed_by">[A]%1$s[/A][B] เปลี่ยนเวลาล้างข้อความเป็น [/B][A]%2$s[/A][B][/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
@@ -3442,8 +3396,6 @@
     <string name="folder_already_exists_in_location">มีโฟลเดอร์ชื่อ [B]%1$s[/B] อยู่ที่ปลายทางนี้แล้ว</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">การเชื่อมต่อไม่ดี</string>
-    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
-    <string name="calls_chat_screen_unable_to_reconnect_the_call">ไม่สามารถเชื่อมต่อใหม่ได้</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3462,8 +3414,6 @@
     <string name="calls_call_screen_count_down_timer_to_end_call">จะวางสายในอีก %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
     <string name="calls_call_screen_dialog_title_only_you_in_the_call">ตอนนี้มีแค่คุณที่อยู่ในสาย</string>
-    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
-    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">คุณยังอยู่ในสาย</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
     <string name="calls_call_screen_dialog_description_only_you_in_the_call">อีก 2 นาทีระบบจะวางสายสนทนาโดยอัตโนมัติ เว้นแต่คุณต้องการให้อยู่สายสนทนาต่อ</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
@@ -4882,8 +4832,6 @@
     <string name="settings_cookies_settings_ads_summary">คุกกี้เหล่านี้ใช้โดยพันธมิตรโฆษณาที่ได้รับอนุมัติจากเราเพื่อรวบรวมข้อมูลเกี่ยวกับกิจกรรมการท่องเว็บของคุณและปรับแต่งโฆษณาที่คุณเห็นในบริการของเราและบนเว็บไซต์อื่น ๆ การไม่ยอมรับคุกกี้เหล่านี้หมายความว่าคุณจะยังคงเห็นโฆษณา แต่โฆษณาเหล่านั้นจะไม่ตรงกับความสนใจของคุณมากนัก</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">เราใช้คุกกี้และเทคโนโลยีที่คล้ายคลึงกันเพื่อปรับปรุงบริการของเราและเพื่อวัตถุประสงค์ในการโฆษณา หากคุณยังคงใช้ MEGA อยู่ แสดงว่าคุณยอมรับเงื่อนไขของ[A]นโยบายคุกกี้[/A]ฉบับอัปเดตของเรา</string>
-    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
-    <string name="home_side_menu_sync_title">ซิงค์</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;ไม่มีโฆษณา</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
@@ -4954,8 +4902,6 @@
     <string name="meetings_chat_screen_app_update_dialog_message">คุณกำลังใช้แอปเวอร์ชันเก่า ไม่สามารถเริ่มหรือเข้าร่วมการโทรได้ กรุณาอัปเดตแอปเป็นเวอร์ชันล่าสุดเพื่อใช้งานต่อไป</string>
     <!-- Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_update_button">อัปเดต</string>
-    <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
-    <string name="meetings_chat_screen_app_update_dialog_cancel_button">ปิด</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">มอบหมายให้คนอื่นเป็นผู้จัดการประชุมก่อนที่จะออกจากการโทร</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->

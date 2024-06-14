@@ -286,8 +286,6 @@
     </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">查看傳輸</string>
-    <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">大多數的裝置無法下載大於4&#160;GB的檔案。怹的下載可能會失敗。</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">你的裝置上沒有任何應用程式可以執行這個檔案</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -950,8 +948,6 @@
     <string name="busy_status">忙碌</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">此訊息已刪除</string>
-    <!-- Text shown when a message has been deleted in the chat -->
-    <string name="text_deleted_message_by">[B]%1$s[/B][A]已刪除此訊息[/A]</string>
     <!-- Confirmation before deleting messages -->
     <string name="confirmation_delete_several_messages">要刪除多則訊息嗎？</string>
     <!-- Confirmation before deleting one message -->
@@ -1028,8 +1024,6 @@
     <string name="messages_copied_clipboard">已複製到剪貼簿</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">開啟對話時發生錯誤</string>
-    <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">無法打開對話</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d個聯絡人</item>
@@ -1048,8 +1042,6 @@
     <string name="message_option_retry">重試</string>
     <!-- title of the menu for a non sent message -->
     <string name="title_message_not_sent_options">訊息未送出</string>
-    <!-- title of the menu for an uploading message with attachment -->
-    <string name="title_message_uploading_options">上傳附件</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">沒有對話記錄</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
@@ -1283,22 +1275,12 @@
     <string name="file_properties_shared_folder_read_write">讀取與編輯</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">傳輸已暫停</string>
-    <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state_uploading">正在上傳⋯</string>
-    <!--  -->
-    <string name="attachment_uploading_state_compressing">正在壓縮⋯</string>
-    <!--  -->
-    <string name="attachment_uploading_state_error">發生錯誤，未送出。</string>
     <!--  -->
     <string name="contact_is_me">沒有可用的選項，您已經選擇了自己</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">要移除附加檔案嗎？</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">檢視檔案（%1$d已刪除）</string>
-    <!-- Error message when the attachment cannot be sent -->
-    <string name="error_attaching_node_from_cloud">發生錯誤。未能發送檔案</string>
-    <!-- Error message when the attachment cannot be revoked -->
-    <string name="error_revoking_node">發生錯誤，附件尚未移除</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">靜音</string>
     <!-- part of the string in incoming shared folder notification -->
@@ -1638,8 +1620,6 @@
     <plurals name="number_of_versions_inside_folder">
         <item quantity="other">%1$d個版本檔案</item>
     </plurals>
-    <!-- Confirmation message after forwarding one or several messages, version items -->
-    <string name="messages_forwarded_success">轉發的訊息</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="other">發生錯誤。%1$d則訊息未轉發</item>
@@ -1698,8 +1678,6 @@
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s則未讀訊息</item>
     </plurals>
-    <!-- Message shown when a chat is opened and the messages are being recovered -->
-    <string name="chat_loading_messages">[A]正在加載[/A][B]訊息⋯[/B]</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">安全性</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -1754,8 +1732,6 @@
     <string name="file_browser_empty_folder_new">[B]空[/B][A]資料夾[/A]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
     <string name="type_message_hint_with_customized_title">寫訊息給「%s」⋯</string>
-    <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
-    <string name="type_message_hint_with_default_title">寫訊息給%s⋯</string>
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">雙重驗證</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
@@ -1834,10 +1810,6 @@
     <plurals name="error_forwarding_messages">
         <item quantity="other">訊息未轉發</item>
     </plurals>
-    <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">網址連結預覽</string>
-    <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">您正停用連結預覽。您可以在設定中重新啟用。要繼續嗎？</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]未接來電[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -1872,8 +1844,6 @@
     <string name="archived_chats_show_option">已封存（%d）</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">封存</string>
-    <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">未封存</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">封存</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2056,12 +2026,8 @@
     <string name="action_join">加入</string>
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">觀察員</string>
-    <!-- Message on the title of the chat screen if there were any error loading the chat link -->
-    <string name="error_chat_link">加載對話連結時發生錯誤。</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">當加載對話連結初始化時發生錯誤。</string>
-    <!-- Message on the alert to close a chat preview if the link is invalid -->
-    <string name="alert_invalid_preview">此對話預覽已不再可用。如果您退出預覽將無法再開啟它。</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B]開啟加密金鑰輪替。[/B]</string>
     <!-- error message shown when a chat link is invalid -->
@@ -2256,8 +2222,6 @@
     <string name="allow_acces_calls_subtitle_microphone">允許存取麥克風以進行加密通話。</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">共享的檔案</string>
-    <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
-    <string name="error_message_already_sent">已經發送附件</string>
     <!-- Message shown when a group call ends. -->
     <string name="group_call_ended_message">[A]群組通話結束[/A][C]。通話時間：[/C]</string>
     <!-- Message to indicate a call has ended and indicate the call duration. -->
@@ -2498,8 +2462,6 @@
     <string name="bucket_word_me">我</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">將您的手機門號加到MEGA。這可以讓您的聯絡人更容易的在MEGA上找到您。</string>
-    <!-- Error message when trying to record a voice message while on a call in progress -->
-    <string name="not_allowed_recording_voice_clip">通話進行中無法錄製語音留言。</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">來電</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
@@ -2656,10 +2618,6 @@
     <string name="action_reset">重設</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
     <string name="already_verifying_credentials">更新憑證中。請稍後再試。</string>
-    <!-- Info message displayed when the user is joining a chat conversation -->
-    <string name="joining_label">正在加入⋯</string>
-    <!-- Info message displayed when the user is leaving a chat conversation -->
-    <string name="leaving_label">正在離開⋯</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">已移除手機號碼</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -2720,10 +2678,6 @@
     <string name="show_info_chat_msg_enabled">對話訊息除錯資訊已啟用</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_disabled">對話訊息除錯資訊已停用</string>
-    <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_user">您已達到%d個回應的最大限制。</string>
-    <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_message">此訊息已達到%d個回應的最大限制。</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
     <string name="retention_history_changed_by">[A]%1$s[/A][B]將訊息清除時間改為[/B][A]%2$s[/A][B]。[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
@@ -3442,8 +3396,6 @@
     <string name="folder_already_exists_in_location">此目的地已存在名稱為[B]%1$s[/B]的資料夾。</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">連線品質不良</string>
-    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
-    <string name="calls_chat_screen_unable_to_reconnect_the_call">無法重新連線</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3462,8 +3414,6 @@
     <string name="calls_call_screen_count_down_timer_to_end_call">通話將於%s後結束</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
     <string name="calls_call_screen_dialog_title_only_you_in_the_call">這裡只有您一人</string>
-    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
-    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">您仍在通話中</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
     <string name="calls_call_screen_dialog_description_only_you_in_the_call">除非您想繼續通話，否則通話將在2分鐘後自動結束。</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
@@ -4882,8 +4832,6 @@
     <string name="settings_cookies_settings_ads_summary">由我們認可的廣告合作伙伴用於收集有關您的瀏覽活動的資料，並自訂您在我們的服務和其它網站上看到的廣告。不接受這些cookie意味著您仍然會看到廣告，但它們不會是個人化的。</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">我們使用cookie和類似技術來幫助我們改善服務和廣告目的。繼續使用MEGA即表示您同意我們更新過的[A]Cookie政策[/A]條款。</string>
-    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
-    <string name="home_side_menu_sync_title">同步</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226; 無&#160;廣告&#160;</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
@@ -4954,8 +4902,6 @@
     <string name="meetings_chat_screen_app_update_dialog_message">您沒有使用我們應用程式的最新版本，因此您無法啟動或加入通話。立即更新以繼續。</string>
     <!-- Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_update_button">更改</string>
-    <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
-    <string name="meetings_chat_screen_app_update_dialog_cancel_button">忽略</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">指定主持人再離開通話</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
@@ -5151,7 +5097,7 @@
         <item quantity="other">%1$s和其他%2$d個人舉起手</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="hidden_nodes_sharing_album">此相簿包含隱藏的項目。共享相簿意味著與您共享的人可以看到隱藏的項目。這些項目仍會在您的雲端硬碟中隱藏。</string>
     <!-- Hidden nodes items -->
     <plurals name="hidden_nodes_items">
         <item quantity="other">隱藏的項目</item>

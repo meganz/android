@@ -292,8 +292,6 @@
     </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Overdrachten weergeven</string>
-    <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">De meeste apparaten kunnen geen bestanden downloaden die groter zijn dan 4&#160;GB. Uw download zal waarschijnlijk mislukken</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Er is geen applicatie beschikbaar om dit bestand te openen op uw apparaat</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -966,8 +964,6 @@
     <string name="busy_status">Bezig</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">Dit bericht is verwijderd</string>
-    <!-- Text shown when a message has been deleted in the chat -->
-    <string name="text_deleted_message_by">[A]Dit bericht werd verwijderd door [/A][B]%1$s[/B]</string>
     <!-- Confirmation before deleting messages -->
     <string name="confirmation_delete_several_messages">Berichten verwijderen?</string>
     <!-- Confirmation before deleting one message -->
@@ -1044,8 +1040,6 @@
     <string name="messages_copied_clipboard">Gekopieerd naar klembord</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Gespreksfout</string>
-    <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Chat kon niet geopend worden</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d contact</item>
@@ -1067,8 +1061,6 @@
     <string name="message_option_retry">Opnieuw proberen</string>
     <!-- title of the menu for a non sent message -->
     <string name="title_message_not_sent_options">Bericht niet verstuurd</string>
-    <!-- title of the menu for an uploading message with attachment -->
-    <string name="title_message_uploading_options">Bijlage Uploaden</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Geen gespreksgeschiedenis</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
@@ -1314,22 +1306,12 @@
     <string name="file_properties_shared_folder_read_write">Lezen en schrijven</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">Overdrachten gepauzeerd</string>
-    <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state_uploading">Uploaden&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_compressing">Comprimeren&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_error">Fout. Niet verzonden.</string>
     <!--  -->
     <string name="contact_is_me">Geen opties beschikbaar, u heeft zichzelf geselecteerd</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">Bijlage verwijderen?</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">Bestanden weergeven (%1$d verwijderd)</string>
-    <!-- Error message when the attachment cannot be sent -->
-    <string name="error_attaching_node_from_cloud">Fout. Het bestand was niet verzonden</string>
-    <!-- Error message when the attachment cannot be revoked -->
-    <string name="error_revoking_node">Fout. De bijlage was niet verwijderd</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">Stil</string>
     <!-- part of the string in incoming shared folder notification -->
@@ -1676,8 +1658,6 @@
         <item quantity="one">%1$d versiebestand</item>
         <item quantity="other">%1$d versie bestanden</item>
     </plurals>
-    <!-- Confirmation message after forwarding one or several messages, version items -->
-    <string name="messages_forwarded_success">Berichten doorgestuurd</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="one">Fout. %1$d bericht niet doorverstuurd</item>
@@ -1740,8 +1720,6 @@
         <item quantity="one">%1$s ongelezen bericht</item>
         <item quantity="other">%1$s ongelezen berichten</item>
     </plurals>
-    <!-- Message shown when a chat is opened and the messages are being recovered -->
-    <string name="chat_loading_messages">[A]Berichten[/A] [B]Laden&#8230;[/B]</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Beveiliging</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -1797,8 +1775,6 @@
     <string name="file_browser_empty_folder_new">[A]Map[/A][B]leegmaken[/B]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
     <string name="type_message_hint_with_customized_title">Schrijf bericht naar “%s”&#8230;</string>
-    <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
-    <string name="type_message_hint_with_default_title">Schrijf bericht naar %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">Twee-staps authenticatie</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
@@ -1878,10 +1854,6 @@
         <item quantity="one">Bericht niet doorgestuurd</item>
         <item quantity="other">Berichten niet doorgestuurd</item>
     </plurals>
-    <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">Rijke URL weergave</string>
-    <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">U schakelt uitgebreide URL-voorbeelden uit. U kunt ze opnieuw inschakelen in Instellingen. Wilt u doorgaan?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Gemiste oproep[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -1916,8 +1888,6 @@
     <string name="archived_chats_show_option">Gearchiveerd (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">Archiveren</string>
-    <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Dearchiveren</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archiveren</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2102,12 +2072,8 @@
     <string name="action_join">Aansluiten</string>
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">Waarnemers</string>
-    <!-- Message on the title of the chat screen if there were any error loading the chat link -->
-    <string name="error_chat_link">Fout bij het laden van de Gesprekslink.</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">Fout bij het initialiseren van de chat bij het laden van de gesprekslink.</string>
-    <!-- Message on the alert to close a chat preview if the link is invalid -->
-    <string name="alert_invalid_preview">Deze chat weergave is niet langer beschikbaar. Als u deze weergave verlaat, bent u niet in staat het te heropenen.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B] coderingssleutelrotatie ingeschakeld.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
@@ -2310,8 +2276,6 @@
     <string name="allow_acces_calls_subtitle_microphone">Bied toegang tot uw microfoon om gecodeerde oproepen te maken.</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Gedeelde bestanden</string>
-    <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
-    <string name="error_message_already_sent">Bijlage al verzonden</string>
     <!-- Message shown when a group call ends. -->
     <string name="group_call_ended_message">[A]Groepsoproep beëindigd [/A][C]. Duur: [/C]</string>
     <!-- Message to indicate a call has ended and indicate the call duration. -->
@@ -2566,8 +2530,6 @@
     <string name="bucket_word_me">Mij</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">Voeg uw telefoonnummer toe tot MEGA. Dit maakt het makkelijker voor uw contacten u te vinden op MEGA.</string>
-    <!-- Error message when trying to record a voice message while on a call in progress -->
-    <string name="not_allowed_recording_voice_clip">Het is niet mogelijk om spraakberichten op te nemen tijdens een oproep die in behandeling is.</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">Binnenkomende oproep</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
@@ -2727,10 +2689,6 @@
     <string name="action_reset">Resetten</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
     <string name="already_verifying_credentials">Inloggegevens bijwerken. Probeer het later opnieuw.</string>
-    <!-- Info message displayed when the user is joining a chat conversation -->
-    <string name="joining_label">Deelnemen&#8230;</string>
-    <!-- Info message displayed when the user is leaving a chat conversation -->
-    <string name="leaving_label">Verlaten&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">Telefoonnummer verwijderd</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -2791,10 +2749,6 @@
     <string name="show_info_chat_msg_enabled">Foutopsporingsinformatie voor chatberichten ingeschakeld</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_disabled">Foutopsporingsinformatie voor gespreksberichten uitgeschakeld</string>
-    <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_user">U heeft de maximale limiet van %d reacties bereikt.</string>
-    <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_message">Dit bericht heeft de maximale limiet van %d reacties bereikt.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
     <string name="retention_history_changed_by">[A]%1$s[/A][B] heeft de tijd voor het wissen van berichten gewijzigd in [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
@@ -3535,8 +3489,6 @@
     <string name="folder_already_exists_in_location">Een map genaamd [B]%1$s[/B] bestaat al op deze locatie.</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">Slechte verbinding</string>
-    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
-    <string name="calls_chat_screen_unable_to_reconnect_the_call">Kan niet opnieuw verbinden</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3555,8 +3507,6 @@
     <string name="calls_call_screen_count_down_timer_to_end_call">Oproep eindigt over %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
     <string name="calls_call_screen_dialog_title_only_you_in_the_call">U bent de enige hier</string>
-    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
-    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">U bent nog steeds in de oproep</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
     <string name="calls_call_screen_dialog_description_only_you_in_the_call">De oproep wordt over 2 minuten automatisch beëindigd, tenzij wilt blijven.</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
@@ -5112,8 +5062,6 @@
     <string name="settings_cookies_settings_ads_summary">Gebruikt door onze goedgekeurde advertentiepartners om gegevens over uw browse-activiteiten te verzamelen en de advertenties die u op onze diensten en op andere websites ziet, aan te passen. Als u deze cookies niet accepteert, krijgt u nog steeds advertenties te zien, maar niet gepersonaliseerd.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">Wij gebruiken cookies en soortgelijke technologieën om ons te helpen onze dienstverlening te verbeteren. Als u MEGA blijft gebruiken, gaat u akkoord met de voorwaarden van ons [A]Cookiebeleid[/A].</string>
-    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
-    <string name="home_side_menu_sync_title">Synchroniseren</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Advertentie&#160;gratis</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
@@ -5186,8 +5134,6 @@
     <string name="meetings_chat_screen_app_update_dialog_message">U gebruikt niet de laatste versie van onze applicatie, dus u kunt geen oproepen starten of aansluiten. Update nu om door te gaan.</string>
     <!-- Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_update_button">Updaten</string>
-    <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
-    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Afwijzen</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Gastheer toewijzen om oproep te verlaten</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->

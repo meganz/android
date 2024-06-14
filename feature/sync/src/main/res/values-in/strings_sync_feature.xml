@@ -7,9 +7,9 @@
     <!-- Sync text of sync-->
     <string name="sync">Sinkronkan</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">MEGA needs to access your device storage in order to sync your local folder. Tap here to allow access.</string>
+    <string name="sync_storage_permission_banner">MEGA perlu mengakses penyimpanan perangkat anda untuk menyinkronkan folder lokal anda. Ketuk di sini untuk mengizinkan akses.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
+    <string name="sync_battery_optimisation_banner">Untuk terus menyinkronkan file dan folder anda, izinkan MEGA berjalan di latar belakang</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d file</item>
@@ -27,59 +27,57 @@
         <item quantity="other">%1$d berkas</item>
     </plurals>
     <!-- Sync options -->
-    <string name="sync_menu_sync_options">Sync options</string>
+    <string name="sync_menu_sync_options">Opsi sinkronisasi</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear resolved issues</string>
+    <string name="sync_menu_clear_issues">Hapus masalah terselesaikan</string>
     <!-- Sync message for two way sync-->
-    <string name="sync_two_way">Two-way sync</string>
+    <string name="sync_two_way">Sinkronisasi dua arah</string>
     <!-- Sync when stalled issues, message of the conflict -->
-    <string name="sync_resolve_rename_all_items">Rename all items</string>
+    <string name="sync_resolve_rename_all_items">Ganti nama semua item</string>
     <!-- Sync to resolve conflict Merge folders -->
-    <string name="sync_stalled_issue_merge_folders">Merge folders</string>
+    <string name="sync_stalled_issue_merge_folders">Gabungkan folder</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Choose the local file</string>
+    <string name="sync_stalled_issue_choose_local_file">Pilih file lokal</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Choose the file stored in MEGA</string>
+    <string name="sync_stalled_issue_choose_remote_file">Pilih file yang disimpan di MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
-    <string name="sync_stalled_issue_choose_latest_modified_time">Choose the last modified file</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time">Pilih file terakhir yang dimodifikasi</string>
     <!-- Sync message when conflict resolved -->
-    <string name="sync_stalled_issue_conflict_resolved">Conflict resolved</string>
+    <string name="sync_stalled_issue_conflict_resolved">Konflik diselesaikan</string>
     <!-- Sync message to access storage permission on device -->
-    <string name="sync_access_storage_permission_message">To back up your files, MEGA needs access to the files and folders in this device. Your data is always safe with us.</string>
+    <string name="sync_access_storage_permission_message">Untuk membuat cadangan file anda, MEGA memerlukan akses ke file dan folder di perangkat ini. Data anda selalu aman bersama kami.</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">Lanjutkan</string>
     <!-- Sync dialog not now button -->
     <string name="sync_dialog_file_permission_negative_button">Jangan Sekarang</string>
     <!-- Sync dialog title for storage access -->
-    <string name="sync_dialog_storage_access_title">Access to all files</string>
+    <string name="sync_dialog_storage_access_title">Akses ke semua file</string>
     <!-- Sync dialog title for battery optimization -->
-    <string name="sync_dialog_battery_optimization_title">Battery optimisation</string>
+    <string name="sync_dialog_battery_optimization_title">Pengoptimalan baterai</string>
     <!-- Sync dialog cancel button text -->
     <string name="sync_dialog_battery_optimization_negative_button">Jangan izinkan</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">Izinkan</string>
-    <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">No resolved issues</string>
     <!-- Sync state message for No Stalled Issues -->
-    <string name="sync_stalled_issues_empty_message">No issues</string>
+    <string name="sync_stalled_issues_empty_message">Tidak ada masalah</string>
     <!-- Sync option to choose device folder -->
-    <string name="sync_folder_choose_device_folder_title">Device folder</string>
+    <string name="sync_folder_choose_device_folder_title">Folder perangkat</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">Folder MEGA</string>
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">Berhenti sementara</string>
     <!-- Sync state syncing -->
-    <string name="sync_list_sync_state_syncing">Syncing&#8230;</string>
+    <string name="sync_list_sync_state_syncing">Menyinkronkan...</string>
     <!-- Sync state failed -->
-    <string name="sync_folders_sync_state_failed">Stopped</string>
+    <string name="sync_folders_sync_state_failed">Berhenti</string>
     <!-- Sync state synced -->
-    <string name="sync_list_sync_state_synced">Synced</string>
+    <string name="sync_list_sync_state_synced">Tersinkronkan</string>
     <!-- Sync permission title for device storage -->
-    <string name="sync_folders_device_storage">Device folder</string>
+    <string name="sync_folders_device_storage">Folder perangkat</string>
     <!-- Sync permission title for mega storage -->
     <string name="sync_folders_mega_storage">Folder MEGA</string>
     <!-- Sync while syncing title for Issues info -->
-    <string name="sync_card_sync_issues_info">Issues info</string>
+    <string name="sync_card_sync_issues_info">Info masalah</string>
     <!-- Sync Pause -->
     <string name="sync_card_pause_sync">Hentikan sementara</string>
     <!-- Sync Run -->
@@ -91,25 +89,25 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Hanya Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
+    <string name="sync_empty_state_message">Anda harus menyiapkan folder lokal di perangkat anda yang akan disinkronkan dengan folder yang dipilih di drive Cloud anda</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_notification_monitoring_description">Monitoring syncs</string>
+    <string name="sync_notification_monitoring_description">Memantau sinkronisasi</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
-    <string name="sync_options_changed_to_wifi_only">Sync options changed to: Wi-Fi only</string>
+    <string name="sync_options_changed_to_wifi_only">Opsi sinkronisasi diubah menjadi: hanya Wi-Fi</string>
     <!-- Snackbar message shown when Wi-Fi or mobile data sync option is selected -->
-    <string name="sync_options_changed_to_wifi_and_mobile_data">Sync options changed to: Wi-Fi or mobile data</string>
+    <string name="sync_options_changed_to_wifi_and_mobile_data">Opsi sinkronisasi diubah menjadi: Wi-Fi atau data seluler</string>
     <!-- Sync stalled issue reason is no reason-->
     <string name="sync_stalled_issue_no_reason">No reason</string>
     <!-- Sync stalled issue reason is no file issue-->
-    <string name="sync_stalled_issue_file_issue">File or folder issue</string>
+    <string name="sync_stalled_issue_file_issue">Masalah file atau folder</string>
     <!-- Sync stalled issue reason is move or rename-->
-    <string name="sync_stalled_issue_move_or_rename">Can’t move or rename</string>
+    <string name="sync_stalled_issue_move_or_rename">Tidak dapat memindahkan atau mengganti nama</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Tindakan hapus atau pindah sedang menunggu pemindaian</string>
     <!-- Sync stalled issue reason is delete or move-->
-    <string name="sync_stalled_issue_delete_or_move">Can’t delete yet</string>
+    <string name="sync_stalled_issue_delete_or_move">Belum bisa menghapus</string>
     <!-- Sync stalled issue reason is upload issue-->
-    <string name="sync_stalled_issue_upload_issue">Upload problem</string>
+    <string name="sync_stalled_issue_upload_issue">Masalah unggah</string>
     <!-- Sync stalled issue reason is download issue-->
     <string name="sync_stalled_issue_download_issue">Download problem</string>
     <!-- Sync stalled issue reason is can not create folder-->
@@ -134,8 +132,6 @@
     <string name="sync_stalled_issues">Issues (%d)</string>
     <!-- Sync stalled issue count chip title for 0 stalled issues-->
     <string name="sync_stalled_issue_zero">Issues</string>
-    <!-- Sync solved issues chip title -->
-    <string name="sync_solved_issues">Resolved issues</string>
     <!-- Sync start sync button -->
     <string name="sync_start_sync">Set up a sync</string>
     <!-- Text that indicates that a folder is currently empty -->

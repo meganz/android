@@ -286,8 +286,6 @@
     </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Xem các truyền tải</string>
-    <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Đa&#160;số các thiết&#160;bị di&#160;động không thể tải&#160;xuống tệp&#160;tin lớn hơn 4&#160;GB. Phiên tải&#160;xuống này có thể sẽ thất&#160;bại.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Điện thoại của bạn không có ứng dụng nào có thể mở được tệp này</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -950,8 +948,6 @@
     <string name="busy_status">Đang bận</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">Tin nhắn này đã bị xóa</string>
-    <!-- Text shown when a message has been deleted in the chat -->
-    <string name="text_deleted_message_by">[A]Tin nhắn này đã bị xóa bởi [/A][B]%1$s[/B]</string>
     <!-- Confirmation before deleting messages -->
     <string name="confirmation_delete_several_messages">Xóa tin nhắn?</string>
     <!-- Confirmation before deleting one message -->
@@ -1028,8 +1024,6 @@
     <string name="messages_copied_clipboard">Đã được ghi vào bảng&#160;nhớ&#160;tạm</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Chát lỗi</string>
-    <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Cuộc chát không&#160;thể mở được</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d tên liên lạc</item>
@@ -1048,8 +1042,6 @@
     <string name="message_option_retry">Thử lại</string>
     <!-- title of the menu for a non sent message -->
     <string name="title_message_not_sent_options">Tin nhắn chưa được gửi</string>
-    <!-- title of the menu for an uploading message with attachment -->
-    <string name="title_message_uploading_options">Đăng tải tệp đính kèm</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Không có lịch&#160;sử trò&#160;chuyện</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
@@ -1283,22 +1275,12 @@
     <string name="file_properties_shared_folder_read_write">Xem và sửa</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">Phiên truyền tải bị dừng</string>
-    <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state_uploading">Đang tải lên&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_compressing">Đang nén&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_error">Lỗi. Không gửi được.</string>
     <!--  -->
     <string name="contact_is_me">Không có tác vụ nào khả thi, vì bạn tự chọn chính tên mình</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">Loại bỏ mục đính kèm?</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">Xem các tệp tin (%1$d đã xóa)</string>
-    <!-- Error message when the attachment cannot be sent -->
-    <string name="error_attaching_node_from_cloud">Lỗi. Tệp tin chưa gửi được</string>
-    <!-- Error message when the attachment cannot be revoked -->
-    <string name="error_revoking_node">Phát sinh lỗi. Không tháo bỏ được tệp đính kèm</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">Im lặng</string>
     <!-- part of the string in incoming shared folder notification -->
@@ -1638,8 +1620,6 @@
     <plurals name="number_of_versions_inside_folder">
         <item quantity="other">%1$d têp tin có phiên bản</item>
     </plurals>
-    <!-- Confirmation message after forwarding one or several messages, version items -->
-    <string name="messages_forwarded_success">Tin nhắn đã được chuyển đi</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="other">Lỗi. %1$d tin&#160;nhắn chưa được chuyển&#160;tiếp</item>
@@ -1698,8 +1678,6 @@
     <plurals name="number_unread_messages">
         <item quantity="other">Có %1$s tin nhắn chưa đọc</item>
     </plurals>
-    <!-- Message shown when a chat is opened and the messages are being recovered -->
-    <string name="chat_loading_messages">[A]Đang tải các[/A] [B]Tin Nhắn&#8230;[/B]</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Bảo mật</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -1754,8 +1732,6 @@
     <string name="file_browser_empty_folder_new">[A]Thư Mục[/A] [B]Trống[/B]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
     <string name="type_message_hint_with_customized_title">Viết tin nhắn cho “%s”&#8230;</string>
-    <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
-    <string name="type_message_hint_with_default_title">Viết tin nhắn cho %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">Xác&#160;thực 2&#160;yếu&#160;tố</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
@@ -1834,10 +1810,6 @@
     <plurals name="error_forwarding_messages">
         <item quantity="other">Tin nhắn chưa được chuyển tiếp</item>
     </plurals>
-    <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">Xem trước nội dung URL</string>
-    <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Tính năng xem trước nội dụng URL sẽ bị tắt. Bạn có thể bật lại trong phần Thiết Đặt. Bạn có muốn tiếp tục không?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Cuộc&#160;gọi nhỡ[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -1872,8 +1844,6 @@
     <string name="archived_chats_show_option">Đã bảo&#160;lưu (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">Bảo&#160;lưu</string>
-    <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Chuyển&#160;ra khỏi bảo&#160;lưu</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Chuyển Vào Bảo Lưu</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2056,12 +2026,8 @@
     <string name="action_join">Tham gia</string>
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">Người theo dõi</string>
-    <!-- Message on the title of the chat screen if there were any error loading the chat link -->
-    <string name="error_chat_link">Lỗi tải đường liên kết vào chát.</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">Lỗi khởi tạo chát phát sinh khi tải đường liên kết cuộc chát.</string>
-    <!-- Message on the alert to close a chat preview if the link is invalid -->
-    <string name="alert_invalid_preview">Phần xem tổng quan của phòng chát không còn tồn tại. Nếu bạn thoát ra, bạn sẽ không mở lại được nữa.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B] đã bật luân&#160;phiên chìa&#160;khóa&#160;mã.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
@@ -2256,8 +2222,6 @@
     <string name="allow_acces_calls_subtitle_microphone">Cho phép ứng dụng MEGA sử dụng micrôphone của điện thoại để thực hiện cuộc gọi khi bạn yêu cầu.</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Chia sẻ tệp tin</string>
-    <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
-    <string name="error_message_already_sent">Tệp đsính kèm đã được gửi đi rồi</string>
     <!-- Message shown when a group call ends. -->
     <string name="group_call_ended_message">[A]Cuộc gọi nhóm kết thúc[/A][C]. Thời lượng: [/C]</string>
     <!-- Message to indicate a call has ended and indicate the call duration. -->
@@ -2498,8 +2462,6 @@
     <string name="bucket_word_me">Tôi</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">Thêm số điện thoại vào MEGA để kết nối vào danh bạ và tìm bạn bè dễ dàng hơn.</string>
-    <!-- Error message when trying to record a voice message while on a call in progress -->
-    <string name="not_allowed_recording_voice_clip">Không thể thực hiện việc ghi âm tin nhắn thoại khi đang có cuộc gọi.</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">Cuộc gọi đến</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
@@ -2656,10 +2618,6 @@
     <string name="action_reset">Đặt lại</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
     <string name="already_verifying_credentials">Đang cập nhật chứng thực. Xin thử lại sau.</string>
-    <!-- Info message displayed when the user is joining a chat conversation -->
-    <string name="joining_label">Đang tham gia&#8230;</string>
-    <!-- Info message displayed when the user is leaving a chat conversation -->
-    <string name="leaving_label">Đang rời khỏi&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">Số điện&#160;thoại đã loại&#160;bỏ</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -2720,10 +2678,6 @@
     <string name="show_info_chat_msg_enabled">Bản ghi thông tin gỡ lỗi cho tin nhắn chát đã được bật</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_disabled">Bản ghi thông tin gỡ lỗi cho tin nhắn chát đã bị tắt</string>
-    <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_user">Bạn đã đạt giới hạn bày tỏ tối đa %d cảm xúc.</string>
-    <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_message">Tin nhắn này đã đạt giới hạn bày tỏ tối đa %d cảm xúc.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
     <string name="retention_history_changed_by">[A]%1$s[/A][B] đã thay đổi thời gian tự động xóa tin nhắn đã có lâu là [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
@@ -3442,8 +3396,6 @@
     <string name="folder_already_exists_in_location">Đã có một thư mục mang tên [B]%1$s[/B] ở tại chỗ này rồi.</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">Mạng yếu</string>
-    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
-    <string name="calls_chat_screen_unable_to_reconnect_the_call">Không thể kết nối lại</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3462,8 +3414,6 @@
     <string name="calls_call_screen_count_down_timer_to_end_call">Cuộc gọi sẽ kết thúc trong %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
     <string name="calls_call_screen_dialog_title_only_you_in_the_call">Bạn là người duy nhất ở đây</string>
-    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
-    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">Bạn vẫn đang ở trong cuộc gọi</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
     <string name="calls_call_screen_dialog_description_only_you_in_the_call">Cuộc gọi sẽ tự động kết thúc trong 2 phút trừ khi bạn muốn ở lại duy trì cuộc gọi.</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
@@ -4882,8 +4832,6 @@
     <string name="settings_cookies_settings_ads_summary">Được sử&#160;dụng bởi các đối&#160;tác quảng&#160;cáo đã được phê&#160;duyệt của chúng&#160;tôi để thu&#160;thập dữ&#160;liệu về các hoạt&#160;động duyệt web của bạn và tùy&#160;chỉnh quảng&#160;cáo bạn thấy trên các dịch&#160;vụ của chúng&#160;tôi và trên các trang web khác. Không chấp&#160;nhận các cookies này có nghĩa là bạn vẫn sẽ thấy quảng&#160;cáo nhưng nội&#160;dung sẽ không liên&#160;quan.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">Chúng&#160;tôi sử dụng cookies và các công&#160;nghệ tương&#160;tự để giúp chúng&#160;tôi cải&#160;thiện dịch&#160;vụ của mình và cho mục&#160;đích quảng&#160;cáo. Với việc tiếp&#160;tục sử&#160;dụng MEGA là bạn đồng&#160;ý với các điều&#160;khoản được cập&#160;nhật nêu trong [A]Chính&#160;Sách Cookie[/A]</string>
-    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
-    <string name="home_side_menu_sync_title">Đồng bộ</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Không&#160;có quảng&#160;cáo</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
@@ -4954,8 +4902,6 @@
     <string name="meetings_chat_screen_app_update_dialog_message">Bạn hiện không sử&#160;dụng phiên&#160;bản mới nhất của ứng&#160;dụng nên bạn không thể bắt&#160;đầu hoặc tham&#160;gia cuộc gọi được. Cập&#160;nhật ngay bây&#160;giờ để tiếp&#160;tục.</string>
     <!-- Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_update_button">Cập nhật</string>
-    <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
-    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Bỏ qua</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Giao&#160;chức chủ&#160;trì để rời khỏi cuộc gọi</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->

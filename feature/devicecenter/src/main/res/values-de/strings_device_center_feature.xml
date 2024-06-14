@@ -64,8 +64,6 @@
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">Der gewählte Ordner kann nicht synchronisiert werden</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">Dateien können nicht einzeln synchronisiert werden. Sie müssen die Synchronisierung für einen Ordner einrichten.</string>
-    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Der Anfangsscan ist fehlgeschlagen. Sie müssen die Synchronisierung bzw. das Backup in der Desktop-App wieder aktivieren.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">Der Ordner wurde auf MEGA nicht gefunden, da er verschoben oder gelöscht wurde oder Sie keinen Zugriff auf ihn haben.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -74,8 +72,6 @@
     <string name="device_center_list_view_item_sub_state_account_expired">Dieser Ordner kann nicht synchronisiert oder gesichert werden, da Ihr Paket abgelaufen ist.</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Der Ordner kann nicht synchronisiert werden, da der freigebende Benutzer sein Speicherplatzlimit erreicht hat</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">Der Ordner wurde auf MEGA nicht gefunden, da er verschoben oder gelöscht wurde oder Sie keinen Zugriff auf ihn haben.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">Der Ordner kann nicht synchronisiert werden, da es sich um einen freigegebenen Ordner handelt, auf den Sie keinen Vollzugriff haben</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -102,24 +98,14 @@
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Die Umbenennung ist fehlgeschlagen.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Für diese Synchronisierung konnte keine .megaignore-Datei erstellt werden</string>
-    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Synchronisierungskonfigurationen konnten nicht vom Laufwerk gelesen werden.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">Speicherort des Synchronisierungsordners ist unbekannt</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
-    <string name="device_center_list_view_item_sub_state_invalid_scan_interval">Ungültiges Scan-Intervall</string>
-    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">Beim Subsystem für Dateisystem-Benachrichtigungen ist ein nicht behebbarer Fehler aufgetreten.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
     <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Eine Dateisystemüberwachung konnte nicht angelegt werden.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
-    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Die FSID eines Synchronisierungs-Stammordners konnte nicht abgerufen werden.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database">Statuscache-Datenbank kann nicht geöffnet werden</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Nicht genügend Speicherplatz für den Download.</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage">Speicherort der Synchronisierung konnte nicht gelesen werden. Überprüfen Sie, ob auf den Speicherort zugegriffen werden kann und die erforderlichen Berechtigungen für den Ordner gewährt wurden.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Unbekannter Fehler.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->

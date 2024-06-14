@@ -400,4 +400,80 @@
     <string name="sync_error_banner_free_user">La synchronisation est interrompue, car votre abonnement MEGA Pro a été annulé. Pour que la synchronisation reprenne, surclassez votre compte.</string>
     <!-- Hidden items -->
     <string name="hidden_items">Éléments cachés</string>
+    <!-- Label to indicate that is a Pro only feature -->
+    <string name="general_pro_only_label">Pro seulement</string>
+    <!-- Label for the file info information screen tags field -->
+    <string name="file_info_information_tags_label">Balises</string>
+    <!-- label for tags page tag description -->
+    <string name="add_tags_label_tag_description">Utilisez des étiquettes pour vous aider à trouver et à organiser vos données. Essayez d’étiqueter par année, emplacement, projet ou sujet.</string>
+    <!-- label for tag text field in add tags page -->
+    <string name="add_tags_text_label_tag">Étiquette</string>
+    <!-- label for add tags page add button -->
+    <string name="add_tags_button_label_add">Ajouter l’étiquette «&#160;#%1$s&#160;»</string>
+    <!-- label for add tags page existing tags label -->
+    <string name="add_tags_label_existing_tags">Étiquettes existantes</string>
+    <!-- error label for add tags page when special characters added -->
+    <string name="add_tags_error_special_characters">Les étiquettes ne peuvent pas comporter d’espaces ni de symboles non alphanumériques. Les étiquettes écrites en majuscules seront affichées en minuscules.</string>
+    <!-- error label for add tags page when tag count is maximum -->
+    <string name="add_tags_error_max_tags">Le nombre maximal d’étiquettes est de %1$d</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_max_characters">Les étiquettes doivent comprendre %1$d&#160;caractères ou moins</string>
+    <!-- title label for tags page -->
+    <string name="add_tags_page_title_label">Balises</string>
+    <!-- The placeholder for read only files/folders with no description in info screen-->
+    <string name="file_info_information_no_description_placeholder">Aucune description</string>
+    <!-- Top bar title of the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_top_bar_title">Ajouter à la liste de lecture</string>
+    <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_new_playlist_text">Nouvelle liste de lecture</string>
+    <!-- Text of the done button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_done_button">Terminé</string>
+    <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
+    <string name="account_cancel_account_screen_plan_miss_out_on_features">Vous ne profiterez pas des avantages suivants</string>
+    <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
+    <string name="account_cancel_account_screen_plan_access_until_expiration">Vous y aurez toujours accès jusqu’à l’expiration de votre abonnement MEGA, après quoi vous passerez à un compte gratuit.</string>
+    <!-- Warning message about current storage usage when cancelling the plan -->
+    <string name="account_cancel_account_screen_plan_current_storage_warning">Vous utilisez actuellement %1s d’espace de stockage, vous risquez de perdre vos fichiers</string>
+    <!-- Column header in the feature comparison table -->
+    <string name="account_cancel_account_screen_plan_feature">Caractéristique</string>
+    <!-- Column header indicating features available with the free plan -->
+    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <!-- Row label for storage feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_storage">Espace de stockage</string>
+    <!-- Storage amount available in the free plan -->
+    <string name="account_cancel_account_screen_plan_free_storage">20&#160;Go</string>
+    <!-- Row label for transfer feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_transfer">Transferts</string>
+    <!-- Transfer limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_free_limited_transfer">limités</string>
+    <!-- Feature indicating password protection for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_password_protected_links">Liens protégés par mot de passe</string>
+    <!-- Feature indicating expiry dates for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_links_with_expiry_dates">Liens avec date d’expiration</string>
+    <!-- Feature indicating transfer sharing, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_transfer_sharing">Partage des transferts</string>
+    <!-- Row label for rewind feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_rewind">Retour en arrière</string>
+    <!-- Rewind duration available in the free plan -->
+    <string name="account_cancel_account_screen_plan_rewind_free">Jusqu’à 30&#160;jours (visualiser seulement)</string>
+    <!-- Rewind duration available in the current plan -->
+    <string name="account_cancel_account_screen_plan_rewind_current">Jusqu’à 180&#160;jours</string>
+    <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_mega_vpn">RPV&#160;MEGA&#160;VPN</string>
+    <!-- Row label for call and meeting duration in the comparison table -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Durée des appels et réunions</string>
+    <!-- Call and meeting duration limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Jusqu’à 1&#160;heure</string>
+    <!-- Unlimited call and meeting duration available in the pro plan -->
+    <string name="cancel_account_plan_call_meeting_duration_pro">ILLIMITÉE</string>
+    <!-- Row label for call and meeting participants in the comparison table -->
+    <string name="account_cancel_account_plan_call_meeting_participants">Participants aux appels et réunions</string>
+    <!-- Limit on call and meeting participants in the free plan -->
+    <string name="account_cancel_account_free_plan_call_meeting_participants">Jusqu’à 100</string>
+    <!-- Unlimited call and meeting participants available in the pro plan -->
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">ILLIMITÉE</string>
+    <!-- Button label to keep the current pro plan -->
+    <string name="account_cancel_account_plan_keep_pro_plan">Garder %1s</string>
+    <!-- Button label to continue with the cancellation -->
+    <string name="account_cancel_account_plan_continue_cancellation">Poursuivre l’annulation</string>
 </resources>

@@ -58,8 +58,6 @@
     <string name="sync_dialog_battery_optimization_negative_button">ไม่อนุญาต</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">อนุญาต</string>
-    <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">ปัญหาทั้งหมดได้รับการแก้ไขแล้ว</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">ยังไม่พบปัญหาใด ๆ</string>
     <!-- Sync option to choose device folder -->
@@ -134,8 +132,6 @@
     <string name="sync_stalled_issues">พบปัญหา (%d)</string>
     <!-- Sync stalled issue count chip title for 0 stalled issues-->
     <string name="sync_stalled_issue_zero">ปัญหา</string>
-    <!-- Sync solved issues chip title -->
-    <string name="sync_solved_issues">แก้ไขปัญหาแล้ว</string>
     <!-- Sync start sync button -->
     <string name="sync_start_sync">ตั้งค่าการซิงค์</string>
     <!-- Text that indicates that a folder is currently empty -->

@@ -286,8 +286,6 @@
     </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">転送を表示</string>
-    <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">ほとんどの端末は4&#160;GBを超えるファイルをダウンロードできません。あなたのダウンロードはおそらく失敗するでしょう。</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">端末上にこのファイルを実行できるアプリがありません</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -950,8 +948,6 @@
     <string name="busy_status">取り込み中</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">このメッセージは削除されました</string>
-    <!-- Text shown when a message has been deleted in the chat -->
-    <string name="text_deleted_message_by">[A]このメッセージは[/A][B]%1$s[/B]によって削除されました</string>
     <!-- Confirmation before deleting messages -->
     <string name="confirmation_delete_several_messages">メッセージを削除しますか？</string>
     <!-- Confirmation before deleting one message -->
@@ -1028,8 +1024,6 @@
     <string name="messages_copied_clipboard">クリップボードにコピーしました</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">チャットエラー！</string>
-    <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">チャットを開けませんでした</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d件の連絡先</item>
@@ -1048,8 +1042,6 @@
     <string name="message_option_retry">再試行</string>
     <!-- title of the menu for a non sent message -->
     <string name="title_message_not_sent_options">メッセージが送信されていません</string>
-    <!-- title of the menu for an uploading message with attachment -->
-    <string name="title_message_uploading_options">添付ファイルのアップロード中</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">会話履歴なし</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
@@ -1283,22 +1275,12 @@
     <string name="file_properties_shared_folder_read_write">読み取りと書き込み</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">転送一時停止</string>
-    <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state_uploading">アップロード中&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_compressing">圧縮中&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_error">エラー。送信されていません。</string>
     <!--  -->
     <string name="contact_is_me">使用可能なオプションはありません。自分自身を選択しました</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">添付ファイルを削除しますか？</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">ファイルを表示（%1$d件が削除済み）</string>
-    <!-- Error message when the attachment cannot be sent -->
-    <string name="error_attaching_node_from_cloud">エラー。ファイルは送信されていません</string>
-    <!-- Error message when the attachment cannot be revoked -->
-    <string name="error_revoking_node">エラー。添付ファイルは削除されていません</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">サイレント</string>
     <!-- part of the string in incoming shared folder notification -->
@@ -1638,8 +1620,6 @@
     <plurals name="number_of_versions_inside_folder">
         <item quantity="other">%1$dバージョンのファイル</item>
     </plurals>
-    <!-- Confirmation message after forwarding one or several messages, version items -->
-    <string name="messages_forwarded_success">メッセージが転送されました</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="other">エラー。%1$d件のメッセージが転送されませんでした</item>
@@ -1698,8 +1678,6 @@
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s件の未読メッセージ</item>
     </plurals>
-    <!-- Message shown when a chat is opened and the messages are being recovered -->
-    <string name="chat_loading_messages">[B]メッセージを[/B][A]読み込み中&#8230;[/A]</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">セキュリティ</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -1754,8 +1732,6 @@
     <string name="file_browser_empty_folder_new">[A]フォルダ[/A]は[B]空[/B]です</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
     <string name="type_message_hint_with_customized_title">「%s」に向けてメッセージを書き込みます&#8230;</string>
-    <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
-    <string name="type_message_hint_with_default_title">%sに向けてメッセージを書き込みます&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">二要素認証</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
@@ -1834,10 +1810,6 @@
     <plurals name="error_forwarding_messages">
         <item quantity="other">メッセージは転送されませんでした</item>
     </plurals>
-    <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">リッチURLプレビュー</string>
-    <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">リッチURLのプレビューを無効にしています。設定で再度有効にすることができます。続行しますか？</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]不在着信[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -1872,8 +1844,6 @@
     <string name="archived_chats_show_option">アーカイブ済み（%d）</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">アーカイブ</string>
-    <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">アーカイブを解除</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">アーカイブ</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2056,12 +2026,8 @@
     <string name="action_join">参加する</string>
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">オブザーバー</string>
-    <!-- Message on the title of the chat screen if there were any error loading the chat link -->
-    <string name="error_chat_link">チャットリンクの読み込みでエラーが発生しました。</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">チャットリンクの読み込み中にチャットの初期化でエラーが発生しました。</string>
-    <!-- Message on the alert to close a chat preview if the link is invalid -->
-    <string name="alert_invalid_preview">このチャットのプレビューは利用できなくなりました。プレビューを終了すると、もう一度開くことはできません。</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B]さんが暗号化キーローテーションを有効にしました。[/B]</string>
     <!-- error message shown when a chat link is invalid -->
@@ -2256,8 +2222,6 @@
     <string name="allow_acces_calls_subtitle_microphone">あなたのマイクへのアクセスを許可して、暗号化通話を行います。</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">共有ファイル</string>
-    <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
-    <string name="error_message_already_sent">添付ファイルは既に送信されています</string>
     <!-- Message shown when a group call ends. -->
     <string name="group_call_ended_message">[A]グループ通話が終了しました[/A][C]。通話時間：[/C]</string>
     <!-- Message to indicate a call has ended and indicate the call duration. -->
@@ -2498,8 +2462,6 @@
     <string name="bucket_word_me">私</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">あなたの電話番号をMEGAに追加します。これにより、あなたの連絡先がMEGAであなたを見つけやすくなります。</string>
-    <!-- Error message when trying to record a voice message while on a call in progress -->
-    <string name="not_allowed_recording_voice_clip">通話中にボイスメッセージの録音はできません。</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">着信</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
@@ -2656,10 +2618,6 @@
     <string name="action_reset">リセット</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
     <string name="already_verifying_credentials">資格情報を更新しています。後でもう一度お試しください。</string>
-    <!-- Info message displayed when the user is joining a chat conversation -->
-    <string name="joining_label">参加中&#8230;</string>
-    <!-- Info message displayed when the user is leaving a chat conversation -->
-    <string name="leaving_label">退席中&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">電話番号が削除されました</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -2720,10 +2678,6 @@
     <string name="show_info_chat_msg_enabled">チャットメッセージのデバッグ情報が有効になりました</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_disabled">チャットメッセージのデバッグ情報が無効になりました</string>
-    <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_user">反応の上限(%d)に達しました。</string>
-    <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_message">このメッセージは、反応の上限（%d）に達しました。</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
     <string name="retention_history_changed_by">[A]%1$s[/A][B] さんがメッセージクリア時間を [/B][A]%2$s[/A][B]に変更しました。[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
@@ -3442,8 +3396,6 @@
     <string name="folder_already_exists_in_location">[B]%1$s[/B]という名前のフォルダは、この場所にすでに存在しています。</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">接続不良</string>
-    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
-    <string name="calls_chat_screen_unable_to_reconnect_the_call">再接続できません</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3462,8 +3414,6 @@
     <string name="calls_call_screen_count_down_timer_to_end_call">通話は%sに終了します</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
     <string name="calls_call_screen_dialog_title_only_you_in_the_call">ここにいるのはあなただけです</string>
-    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
-    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">まだ通話中です</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
     <string name="calls_call_screen_dialog_description_only_you_in_the_call">通話は2分後に自動的に終了します（通話を継続したい場合は除きます）。</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
@@ -4882,8 +4832,6 @@
     <string name="settings_cookies_settings_ads_summary">お客様の閲覧活動に関するデータを収集し、当社のサービスや他のウェブサイトで表示される広告をカスタマイズするために、当社の承認された広告パートナーによって使用されます。これらのクッキーを受け入れない場合、広告は引き続き表示される一方で、パーソナライズされません。</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">当社では、サービスの向上および広告目的としてクッキー（Cookie）および同様のテクノロジーを使用しています。MEGAのご使用を続けることで、当社の更新された[A]クッキーポリシー[/A]の条件に同意されたことになります。</string>
-    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
-    <string name="home_side_menu_sync_title">同期</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;広告&#160;なし</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
@@ -4954,8 +4902,6 @@
     <string name="meetings_chat_screen_app_update_dialog_message">当社の最新バージョンのアプリを使用されていないため、通話を開始したり、通話に参加したりできません。今すぐアップデートしてから続行してください。</string>
     <!-- Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_update_button">更新</string>
-    <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
-    <string name="meetings_chat_screen_app_update_dialog_cancel_button">却下</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">主催者を割り当てて通話を終了する</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->

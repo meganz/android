@@ -292,8 +292,6 @@
     </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Transferübersicht</string>
-    <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Die meisten Geräte haben Probleme mit Dateien größer als 4&#160;GB. Ihr Download wird vermutlich fehlschlagen.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Für diesen Dateityp existiert keine geeignete App</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -966,8 +964,6 @@
     <string name="busy_status">Beschäftigt</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">Diese Nachricht wurde gelöscht</string>
-    <!-- Text shown when a message has been deleted in the chat -->
-    <string name="text_deleted_message_by">[A]Diese Nachricht wurde von [/A][B]%1$s[/B] gelöscht</string>
     <!-- Confirmation before deleting messages -->
     <string name="confirmation_delete_several_messages">Nachrichten entfernen?</string>
     <!-- Confirmation before deleting one message -->
@@ -1044,8 +1040,6 @@
     <string name="messages_copied_clipboard">In die Zwischenablage kopiert</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Chatfehler</string>
-    <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Der Chat konnte nicht geöffnet werden</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d Kontakt</item>
@@ -1067,8 +1061,6 @@
     <string name="message_option_retry">Wiederholen</string>
     <!-- title of the menu for a non sent message -->
     <string name="title_message_not_sent_options">Nachricht konnte nicht gesendet werden</string>
-    <!-- title of the menu for an uploading message with attachment -->
-    <string name="title_message_uploading_options">Anhang wird hochgeladen</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Keine Nachrichten vorhanden</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
@@ -1314,22 +1306,12 @@
     <string name="file_properties_shared_folder_read_write">Lese- und Schreibzugriff</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">Übertragungen angehalten</string>
-    <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state_uploading">Upload&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_compressing">Komprimierung&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_error">Fehler. Nicht versandt</string>
     <!--  -->
     <string name="contact_is_me">Keine Optionen verfügbar, Sie haben sich selbst ausgewählt</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">Anhang entfernen?</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">Dateien anzeigen (%1$d gelöscht)</string>
-    <!-- Error message when the attachment cannot be sent -->
-    <string name="error_attaching_node_from_cloud">Fehler. Die Datei wurde nicht versandt</string>
-    <!-- Error message when the attachment cannot be revoked -->
-    <string name="error_revoking_node">Fehler. Der Anhang wurde nicht entfernt</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">keine</string>
     <!-- part of the string in incoming shared folder notification -->
@@ -1676,8 +1658,6 @@
         <item quantity="one">%1$d Datei mit Versionen</item>
         <item quantity="other">%1$d Dateien mit Versionen</item>
     </plurals>
-    <!-- Confirmation message after forwarding one or several messages, version items -->
-    <string name="messages_forwarded_success">Nachrichten weitergeleitet</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="one">Fehler. %1$d Nachricht nicht weitergeleitet</item>
@@ -1740,8 +1720,6 @@
         <item quantity="one">%1$s ungelesene Nachricht</item>
         <item quantity="other">%1$s ungelesene Nachrichten</item>
     </plurals>
-    <!-- Message shown when a chat is opened and the messages are being recovered -->
-    <string name="chat_loading_messages">[B]Nachrichten[/B] [A]werden geladen&#8230;[/A]</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Sicherheit</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -1797,8 +1775,6 @@
     <string name="file_browser_empty_folder_new">[B]Leerer[/B][A] Ordner[/A]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
     <string name="type_message_hint_with_customized_title">Nachricht an „%s“&#8230;</string>
-    <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
-    <string name="type_message_hint_with_default_title">Nachricht an %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">Zwei-Faktor-Authentifizierung</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
@@ -1878,10 +1854,6 @@
         <item quantity="one">Nachricht nicht weitergeleitet</item>
         <item quantity="other">Nachrichten nicht weitergeleitet</item>
     </plurals>
-    <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">Detaillierte URL-Vorschau</string>
-    <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Sie sind dabei, die detaillierte URL-Vorschau zu deaktivieren. Sie können sie in den Einstellungen wieder aktivieren. Fortfahren?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Verpasster Anruf[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -1916,8 +1888,6 @@
     <string name="archived_chats_show_option">Archiviert (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">Archivieren</string>
-    <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Dearchivieren</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archivieren</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2102,12 +2072,8 @@
     <string name="action_join">Beitreten</string>
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">Beobachter</string>
-    <!-- Message on the title of the chat screen if there were any error loading the chat link -->
-    <string name="error_chat_link">Chatlink konnte nicht geladen werden.</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">Fehler bei der Initialisierung des Chats beim Laden des Chatlinks.</string>
-    <!-- Message on the alert to close a chat preview if the link is invalid -->
-    <string name="alert_invalid_preview">Diese Chat-Vorschau ist nicht mehr verfügbar. Wenn Sie die Vorschau verlassen, können Sie sie danach nicht mehr öffnen.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B] hat Schlüsselrotation aktiviert.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
@@ -2310,8 +2276,6 @@
     <string name="allow_acces_calls_subtitle_microphone">Zugriff auf das Mikrofon für verschlüsselte Anrufe freigeben.</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Freigegebene Dateien</string>
-    <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
-    <string name="error_message_already_sent">Anhang schon versandt</string>
     <!-- Message shown when a group call ends. -->
     <string name="group_call_ended_message">[A]Konferenz beendet[/A][C]. Dauer: [/C]</string>
     <!-- Message to indicate a call has ended and indicate the call duration. -->
@@ -2566,8 +2530,6 @@
     <string name="bucket_word_me">Ich</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">Erleichtern Sie es Ihren Freunden und Bekannten, Sie auf MEGA zu finden. Erweitern Sie Ihren MEGA-Account um Ihre Mobilnummer.</string>
-    <!-- Error message when trying to record a voice message while on a call in progress -->
-    <string name="not_allowed_recording_voice_clip">Sie können während eines laufenden Gesprächs keine Sprachnachricht aufzeichnen.</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">Eingehender Anruf</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
@@ -2727,10 +2689,6 @@
     <string name="action_reset">Zurücksetzen</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
     <string name="already_verifying_credentials">Anmeldeinformationen werden aktualisiert. Bitte versuchen Sie es später noch einmal.</string>
-    <!-- Info message displayed when the user is joining a chat conversation -->
-    <string name="joining_label">Beitreten&#8230;</string>
-    <!-- Info message displayed when the user is leaving a chat conversation -->
-    <string name="leaving_label">Verlassen&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">Telefonnummer entfernt</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -2791,10 +2749,6 @@
     <string name="show_info_chat_msg_enabled">Debugging-Informationen für Chatnachrichten aktiviert</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_disabled">Debugging-Informationen für Chatnachrichten deaktiviert</string>
-    <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_user">Sie haben das Limit von %d Reaktionen errecht.</string>
-    <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_message">Maximale Anzahl von %d Reaktionen erreicht.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
     <string name="retention_history_changed_by">[A]%1$s[/A][B] hat die Lebensdauer von Chatnachrichten auf [/B][A]%2$s[/A][B] geändert.[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
@@ -3535,8 +3489,6 @@
     <string name="folder_already_exists_in_location">An diesem Zielort befindet sich bereits ein Ordner namens [B]%1$s[/B].</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">Schlechte Verbindung</string>
-    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
-    <string name="calls_chat_screen_unable_to_reconnect_the_call">Verbindung kann nicht wiederhergestellt werden</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3555,8 +3507,6 @@
     <string name="calls_call_screen_count_down_timer_to_end_call">Die Konferenz wird in %s beendet</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
     <string name="calls_call_screen_dialog_title_only_you_in_the_call">Sie sind der einzige Teilnehmer</string>
-    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
-    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">Sie befinden sich noch in einer Konferenz</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
     <string name="calls_call_screen_dialog_description_only_you_in_the_call">Die Konferenz wird nach 2 Minuten automatisch beendet, es sei denn, Sie möchten sie fortsetzen.</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
@@ -5112,8 +5062,6 @@
     <string name="settings_cookies_settings_ads_summary">Verwendet von unseren autorisierten Werbepartnern, um Daten über Ihre Browsing-Aktivitäten zu sammeln und die Werbung, die Sie auf unseren Diensten und auf anderen Websites sehen, zu individualisieren. Wenn Sie diese Cookies nicht akzeptieren, werden Sie zwar weiterhin Werbeanzeigen sehen, diese werden aber nicht personalisiert sein.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">Wir verwenden Cookies und verwandte Technologien zur Verbesserung unserer Dienste und zu Werbezwecken. Durch die weitere Nutzung von MEGA erklären Sie sich mit den Bedingungen unserer aktualisierten [A]Cookie-Richtlinien[/A] einverstanden.</string>
-    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
-    <string name="home_side_menu_sync_title">Synchronisierung</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Werbefrei</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
@@ -5186,8 +5134,6 @@
     <string name="meetings_chat_screen_app_update_dialog_message">Da Sie nicht die neueste Version unserer App verwenden, können Sie keine Anrufe oder Konferenzen starten oder an diesen teilnehmen. Führen Sie jetzt ein Update durch, um fortzufahren.</string>
     <!-- Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_update_button">Aktualisieren</string>
-    <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
-    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Später</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Zum Verlassen der Konferenz Gastgeber zuweisen</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
@@ -5389,7 +5335,7 @@
         <item quantity="other">%1$s und %2$d weitere Personen haben die Hand gehoben</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="hidden_nodes_sharing_album">Dieses Album enthält verborgene Inhalte. Durch die Freigabe des Albums werden die verborgenen Inhalte für die Personen sichtbar, für die Sie das Album freigeben. Die Inhalte bleiben in Ihrem Cloud Drive weiterhin verborgen.</string>
     <!-- Hidden nodes items -->
     <plurals name="hidden_nodes_items">
         <item quantity="one"></item>

@@ -408,4 +408,80 @@
     <string name="sync_error_banner_free_user">Синхронизация приостановлена, так как ваша подписка на план MEGA Pro была отменена. Оформите подписку, чтобы продолжить синхронизацию.</string>
     <!-- Hidden items -->
     <string name="hidden_items">Скрытые элементы</string>
+    <!-- Label to indicate that is a Pro only feature -->
+    <string name="general_pro_only_label">Только Pro</string>
+    <!-- Label for the file info information screen tags field -->
+    <string name="file_info_information_tags_label">Метки</string>
+    <!-- label for tags page tag description -->
+    <string name="add_tags_label_tag_description">Используйте метки, чтобы облегчить поиск и систематизацию данных. Попробуйте отметить год, место, проект или тему.</string>
+    <!-- label for tag text field in add tags page -->
+    <string name="add_tags_text_label_tag">Метка</string>
+    <!-- label for add tags page add button -->
+    <string name="add_tags_button_label_add">Добавить метку «#%1$s»</string>
+    <!-- label for add tags page existing tags label -->
+    <string name="add_tags_label_existing_tags">Существующие метки</string>
+    <!-- error label for add tags page when special characters added -->
+    <string name="add_tags_error_special_characters">Метки не могут содержать пробелы или небуквенно-цифровые символы. Метки, написанные заглавными буквами, будут отображаться в нижнем регистре.</string>
+    <!-- error label for add tags page when tag count is maximum -->
+    <string name="add_tags_error_max_tags">Максимальное количество меток — %1$d</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_max_characters">Теги должны состоять из %1$d символов или меньше</string>
+    <!-- title label for tags page -->
+    <string name="add_tags_page_title_label">Метки</string>
+    <!-- The placeholder for read only files/folders with no description in info screen-->
+    <string name="file_info_information_no_description_placeholder">Нет описания</string>
+    <!-- Top bar title of the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_top_bar_title">Добавить в плейлист</string>
+    <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_new_playlist_text">Новый плейлист</string>
+    <!-- Text of the done button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_done_button">Готово</string>
+    <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
+    <string name="account_cancel_account_screen_plan_miss_out_on_features">Вы потеряете эти функции</string>
+    <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
+    <string name="account_cancel_account_screen_plan_access_until_expiration">Эти функции будут доступны, пока не истечёт срок действия подписки MEGA, после чего вы будете переведены на бесплатный план.</string>
+    <!-- Warning message about current storage usage when cancelling the plan -->
+    <string name="account_cancel_account_screen_plan_current_storage_warning">В настоящее время используется %1s хранилища, вы рискуете потерять свои файлы</string>
+    <!-- Column header in the feature comparison table -->
+    <string name="account_cancel_account_screen_plan_feature">Особенность</string>
+    <!-- Column header indicating features available with the free plan -->
+    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <!-- Row label for storage feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_storage">Хранилище</string>
+    <!-- Storage amount available in the free plan -->
+    <string name="account_cancel_account_screen_plan_free_storage">20&#160;ГБ</string>
+    <!-- Row label for transfer feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_transfer">Передача данных</string>
+    <!-- Transfer limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_free_limited_transfer">Ограничено</string>
+    <!-- Feature indicating password protection for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_password_protected_links">Защищённые паролем ссылки</string>
+    <!-- Feature indicating expiry dates for links, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_links_with_expiry_dates">Ссылки со сроком действия</string>
+    <!-- Feature indicating transfer sharing, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_transfer_sharing">Совместное использование объёма передач</string>
+    <!-- Row label for rewind feature in the comparison table -->
+    <string name="account_cancel_account_screen_plan_rewind">Перемотка</string>
+    <!-- Rewind duration available in the free plan -->
+    <string name="account_cancel_account_screen_plan_rewind_free">До 30 дней (только просмотр)</string>
+    <!-- Rewind duration available in the current plan -->
+    <string name="account_cancel_account_screen_plan_rewind_current">До 180 дней</string>
+    <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
+    <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
+    <!-- Row label for call and meeting duration in the comparison table -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Длительнось звонка и встречи</string>
+    <!-- Call and meeting duration limit in the free plan -->
+    <string name="account_cancel_account_screen_plan_call_meeting_duration_free">До 1 часа</string>
+    <!-- Unlimited call and meeting duration available in the pro plan -->
+    <string name="cancel_account_plan_call_meeting_duration_pro">НЕОГРАНИЧЕН</string>
+    <!-- Row label for call and meeting participants in the comparison table -->
+    <string name="account_cancel_account_plan_call_meeting_participants">Участники звонка и встречи</string>
+    <!-- Limit on call and meeting participants in the free plan -->
+    <string name="account_cancel_account_free_plan_call_meeting_participants">До 100</string>
+    <!-- Unlimited call and meeting participants available in the pro plan -->
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">НЕОГРАНИЧЕН</string>
+    <!-- Button label to keep the current pro plan -->
+    <string name="account_cancel_account_plan_keep_pro_plan">Оставить %1s</string>
+    <!-- Button label to continue with the cancellation -->
+    <string name="account_cancel_account_plan_continue_cancellation">Продолжить отмену</string>
 </resources>

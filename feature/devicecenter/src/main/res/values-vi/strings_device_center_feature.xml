@@ -64,8 +64,6 @@
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">Thư&#160;mục bạn đã chọn không thể đồng&#160;bộ được</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">Đồng&#160;bộ không&#160;thể thực&#160;hiện với tệp&#160;tin riêng&#160;lẻ. Bạn cần&#160;phải thiết&#160;lập đồng&#160;bộ từ một thư&#160;mục.</string>
-    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Quét khởi&#160;đầu đã không thành&#160;công. Bạn sẽ cần kích&#160;hoạt lại đồng&#160;bộ hóa hoặc sao&#160;lưu của mình từ ứng&#160;dụng cho máy&#160;tính.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">Không tìm thấy vị&#160;trí của thư&#160;mục trên MEGA, có thể do đã bị di&#160;chuyển hoặc bị xóa, cũng có thể là bạn không có quyền truy&#160;cập.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -74,8 +72,6 @@
     <string name="device_center_list_view_item_sub_state_account_expired">Không thể đồng&#160;bộ hóa hoặc sao&#160;lưu thư&#160;mục này vì gói đăng&#160;ký của bạn đã hết hạn</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Thư&#160;mục không thể đồng&#160;bộ được do tài&#160;khoản của người chia&#160;sẻ thư&#160;mục này đã vượt mức lưu&#160;trữ</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">Không tìm thấy vị&#160;trí của thư&#160;mục trên MEGA, có thể do đã bị di&#160;chuyển hoặc bị xóa, cũng có thể là bạn không có quyền truy&#160;cập.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">Thư&#160;mục không thể đồng&#160;bộ được bởi vì thư&#160;mục đã chia&#160;sẻ mà không có cấp quyền truy&#160;cập toàn quyền</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -102,24 +98,14 @@
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Đổi tên không thành&#160;công.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Không thể tạo tệp .megaignore cho việc đồng bộ này</string>
-    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Không thể đọc cấu hình đồng bộ hóa. Thử lại sau hoặc kiểm tra quyền hạn của thư mục.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">Không xác&#160;định được vị&#160;trí thư&#160;mục đồng&#160;bộ</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
-    <string name="device_center_list_view_item_sub_state_invalid_scan_interval">Khoảng thời&#160;gian quét khởi&#160;đầu không hợp&#160;lệ. Kiểm&#160;tra thiết&#160;lập khoảng thời&#160;gian quét và thử lại.</string>
-    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">Không thể giao&#160;tiếp với vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
     <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Không thể thêm đồng&#160;hồ hệ&#160;thống tệp. Hãy đảm&#160;bảo có đủ không&#160;gian và bộ nhớ trống, và bạn đã có cấp quyền truy&#160;cập vào vị&#160;trí thư&#160;mục.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
-    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Không thể đọc được vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database">Không thể mở cơ&#160;sở dữ&#160;liệu bộ đệm trạng&#160;thái</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Không đủ dung&#160;lượng cho việc tải&#160;xuống.</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage">Không thể đọc được vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Lỗi không xác&#160;định được.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->

@@ -64,8 +64,6 @@
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">La cartella che hai scelto non può essere sincronizzata</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">Un file non può essere sincronizzato individualmente. Devi impostare la sincronizzazione di una cartella.</string>
-    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Scansione iniziale fallita. Dovrai riattivare la tua sincronizzazione o il tuo backup dall\’app per desktop.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">La cartella in MEGA non può essere trovata perché è stata eliminata o spostata, o potresti non avere accesso ad essa.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -74,8 +72,6 @@
     <string name="device_center_list_view_item_sub_state_account_expired">Impossibile sincronizzare o effettuare il backup perché il tuo piano è scaduto</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="device_center_list_view_item_sub_state_foreign_target_overshare">La cartella non può essere sincronizzata poiché l\’utente che ha condiviso questa cartella ha esaurito il proprio spazio di archiviazione</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">La cartella in MEGA non può essere trovata perché è stata eliminata o spostata, o potresti non avere accesso ad essa.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">La cartella non può essere sincronizzata perché è una cartella condivisa senza pieno accesso</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -102,24 +98,14 @@
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Rinominazione fallita.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Impossibile creare un file .megaignore per questa sincronizzazione</string>
-    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Impossibile leggere la configurazione della sincronizzazione. Riprova più tardi o controlla le autorizzazioni della cartella.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">La posizione della cartella di sincronizzazione è sconosciuta</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
-    <string name="device_center_list_view_item_sub_state_invalid_scan_interval">Intervallo della scansione invalido. Controlla l\’impostazione dell\’intervallo della scansione e riprova.</string>
-    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">Impossibile comunicare con la cartella della posizione. Controlla che la posizione sia accessibile e i permessi per la cartella della posizione siano garantiti.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
     <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Impossibile aggiungere un orologio del filesystem. Assicurati che ci sia abbastanza spazio libero e di aver garantito le autorizzazioni per la posizione della cartella.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
-    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Impossibile leggere la posizione della sincronizzazione. Controlla che la posizione sia accessibile e i permessi per la cartella della posizione siano garantiti.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database">Impossibile aprire il database della cache di stato</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Spazio per il download insufficiente.</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage">Impossibile leggere la posizione della sincronizzazione. Controlla che la posizione sia accessibile e i permessi per la cartella della posizione siano garantiti.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Errore sconosciuto.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->

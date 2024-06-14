@@ -316,8 +316,6 @@
     </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">عرض عمليات تراسل المعطيات</string>
-    <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">لا يمكن لمعظم الأجهزة تنزيل ملفات أكبر من 4&#160;غيغابايت. تنزيلك ربما يفشل.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">ليس هناك أي التطبيق متاح لتنفيذ هذا الملف على جهازك</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1030,8 +1028,6 @@
     <string name="busy_status">مشغول</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">هذه الرسالة قد تم حذفها</string>
-    <!-- Text shown when a message has been deleted in the chat -->
-    <string name="text_deleted_message_by">[A]هذه الرسالة تم حذفها من قبل[/A][B]%1$s[/B]</string>
     <!-- Confirmation before deleting messages -->
     <string name="confirmation_delete_several_messages">حذف الرسائل؟</string>
     <!-- Confirmation before deleting one message -->
@@ -1108,8 +1104,6 @@
     <string name="messages_copied_clipboard">تم النسخ الى حافظة النصوص</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">خطأ في المحادثة</string>
-    <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">تعذر فتح المحادثة</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="zero">%1$d جهة اتصال</item>
@@ -1143,8 +1137,6 @@
     <string name="message_option_retry">اعادة المحاولة</string>
     <!-- title of the menu for a non sent message -->
     <string name="title_message_not_sent_options">لم يتم إرسال الرسالة</string>
-    <!-- title of the menu for an uploading message with attachment -->
-    <string name="title_message_uploading_options">ترفيع المرفق</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">لا توجد سجل للمحادثات</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
@@ -1438,22 +1430,12 @@
     <string name="file_properties_shared_folder_read_write">قراءة وكتابة</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">تم إيقاف عمليات التراسل مؤقتاً</string>
-    <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state_uploading">جاري الرفع&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_compressing">جاري الضغط&#8230;</string>
-    <!--  -->
-    <string name="attachment_uploading_state_error">خطأ. لم ترسل.</string>
     <!--  -->
     <string name="contact_is_me">لا توجد خيارات متاحة. لقد اخترت نفسك</string>
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">إزالة المرفقات؟</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">عرض الملفات (%1$d حذفت)</string>
-    <!-- Error message when the attachment cannot be sent -->
-    <string name="error_attaching_node_from_cloud">خطأ. لم يتم إرسال الملف</string>
-    <!-- Error message when the attachment cannot be revoked -->
-    <string name="error_revoking_node">خطأ. المرفقات لم تتم إزالتها</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">صامت</string>
     <!-- part of the string in incoming shared folder notification -->
@@ -1828,8 +1810,6 @@
         <item quantity="many">%1$d ملف مع نسخ</item>
         <item quantity="other">%1$d ملف مع نسخ</item>
     </plurals>
-    <!-- Confirmation message after forwarding one or several messages, version items -->
-    <string name="messages_forwarded_success">تمت إعادة توجيه الرسائل</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="zero">خطأ. لم يتم إعادة توجيه %1$d رسالة</item>
@@ -1908,8 +1888,6 @@
         <item quantity="many">%1$s رسالة غير مقروءة</item>
         <item quantity="other">%1$s رسالة غير مقروءة</item>
     </plurals>
-    <!-- Message shown when a chat is opened and the messages are being recovered -->
-    <string name="chat_loading_messages">[A]جاري تحميل[/A] [B]الرسائل&#8230; [/B]</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">أمن</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -1969,8 +1947,6 @@
     <string name="file_browser_empty_folder_new">[A]مجلد[/A][B]فارغ[/B]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
     <string name="type_message_hint_with_customized_title">اكتب رسالة إلى “%s”&#8230;</string>
-    <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
-    <string name="type_message_hint_with_default_title">اكتب رسالة إلى %s &#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">المصادقة المزدوجة Two-Factor</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
@@ -2054,10 +2030,6 @@
         <item quantity="many">لم تتم إعادة توجيه الرسائل</item>
         <item quantity="other">لم تتم إعادة توجيه الرسائل</item>
     </plurals>
-    <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">عرض الروابط الإلكترونية المعززة URL</string>
-    <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">أنت تقوم بتعطيل عرض الروابط الإلكترونية المعززة URL. يمكنك إعادة تمكينها في الإعدادات. هل تريد الاستمرار؟</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]مكالمة فائتة[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2092,8 +2064,6 @@
     <string name="archived_chats_show_option">مؤرشفة (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">الأرشيف</string>
-    <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">اعادة من الارشفة</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">الأرشيف</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2286,12 +2256,8 @@
     <string name="action_join">الانضمام</string>
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">مراقبون</string>
-    <!-- Message on the title of the chat screen if there were any error loading the chat link -->
-    <string name="error_chat_link">حدث خطأ أثناء تحميل رابط المحادثة.</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
     <string name="error_chat_link_init_error">خطأ في بدء المحادثة عند تحميل رابط المحادثة.</string>
-    <!-- Message on the alert to close a chat preview if the link is invalid -->
-    <string name="alert_invalid_preview">عرض هذه المحادثة لم يعد متاحاً. إذا غادرت العرض، فلن تتمكن من إعادة فتحه.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B] بتمكين تدوير المفتاح المشفر.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
@@ -2526,8 +2492,6 @@
     <string name="allow_acces_calls_subtitle_microphone">السماح بالوصول إلى ميكروفونك لإجراء مكالمات مشفرة.</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">الملفات المشاركة</string>
-    <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
-    <string name="error_message_already_sent">تم إرسال المرفق</string>
     <!-- Message shown when a group call ends. -->
     <string name="group_call_ended_message">[A]انتهت المكالمة الجماعية[/A][C]. المدة: [/C]</string>
     <!-- Message to indicate a call has ended and indicate the call duration. -->
@@ -2838,8 +2802,6 @@
     <string name="bucket_word_me">أنا</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">أضف رقم هاتفك إلى ميغا MEGA. هذا يسهل على جهات الاتصال الخاصة بك العثور عليك على ميغا MEGA.</string>
-    <!-- Error message when trying to record a voice message while on a call in progress -->
-    <string name="not_allowed_recording_voice_clip">لا يمكن تسجيل الرسائل الصوتية أثناء وجود مكالمة جارية.</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="title_notification_incoming_call">مكالمة واردة</string>
     <!-- Title of the notification shown on the action bar when there is a incoming group call -->
@@ -3011,10 +2973,6 @@
     <string name="action_reset">إعادة تعيين</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
     <string name="already_verifying_credentials">تحديث بيانات الاعتماد. يرجى المحاولة مرة أخرى في وقت لاحق.</string>
-    <!-- Info message displayed when the user is joining a chat conversation -->
-    <string name="joining_label">جاري الانضمام&#8230;</string>
-    <!-- Info message displayed when the user is leaving a chat conversation -->
-    <string name="leaving_label">جاري المغادرة&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">تم حذف رقم الهاتف</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -3075,10 +3033,6 @@
     <string name="show_info_chat_msg_enabled">تم تمكين معلومات التصحيح لرسائل المحادثة</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_disabled">تم تعطيل معلومات التصحيح لرسائل المحادثة</string>
-    <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_user">لقد وصلت إلى الحد الأقصى من التفاعلات وهو %d.</string>
-    <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_message">وصلت هذه الرسالة إلى الحد الأقصى من ردود الفعل وهو %d.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
     <string name="retention_history_changed_by">قام [A]%1$s[/A][B] بتغيير وقت مسح الرسالة إلى [/B][A] %2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
@@ -3907,8 +3861,6 @@
     <string name="folder_already_exists_in_location">يوجد ملف اسمه [B]%1$s[/B] بالفعل في هذا الموقع.</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">اتصال ضعيف</string>
-    <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
-    <string name="calls_chat_screen_unable_to_reconnect_the_call">غير قادر على إعادة الاتصال</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;بايت</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3927,8 +3879,6 @@
     <string name="calls_call_screen_count_down_timer_to_end_call">ستنتهي المكالمة خلال %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
     <string name="calls_call_screen_dialog_title_only_you_in_the_call">انت الوحيد هنا</string>
-    <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
-    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">أنت لاتزال في مكالمة</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
     <string name="calls_call_screen_dialog_description_only_you_in_the_call">ستنتهي المكالمة تلقائيًا في غضون 2 دقيقتين ما لم ترغب في الاستمرار فيها.</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
@@ -5997,7 +5947,7 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">احصل على المزيد مع باقة برو Pro</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">قم بالترقية إلى باقة برو Pro واحصل على المزيد من مساحة التخزين والوصول إلى ميزات برو Pro. تبدأ الباقات من مستوى منخفض يصل حتى %1$s شهر.</string>
+    <string name="dialog_onboarding_get_pro_description">قم بالترقية إلى باقة برو Pro واحصل على المزيد من مساحة التخزين والوصول إلى ميزات برو Pro. تبدأ الباقات من حد أدنى يبدأ من %1$s شهرياً.</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_some_features_title">تتضمن باقة ميغا برو MEGA&#160;Pro ما يلي:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -6032,8 +5982,6 @@
     <string name="settings_cookies_settings_ads_summary">يستخدمها شركاؤنا الإعلانيون المعتمدون لجمع بيانات حول أنشطة التصفح الخاصة بك وتخصيص الإعلانات التي تراها على خدماتنا وعلى مواقع الويب الأخرى. إن عدم قبول ملفات تعريف الارتباط cookies هذه يعني أنك ستظل ترى الإعلانات ولكن لن يتم تخصيصها.</string>
     <!-- Body for Cookie dialog, visible for users, who will see the advertisements, as we want users to accept Advertisement cookies as well. Please, keep the placeholders to format the string. -->
     <string name="dialog_ads_cookie_alert_message">نحن نستخدم ملفات تعريف الارتباط cookies والتقنيات المشابهة لمساعدتنا على تحسين خدماتنا ولأغراض إعلانية. من خلال الاستمرار في استخدام ميغا MEGA فإنك توافق على شروط [A]سياسة ملفات تعريف الارتباط cookies[/A] المحدثة لدينا.</string>
-    <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
-    <string name="home_side_menu_sync_title">مزامنة</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;خالي &#160;من الإعلانات</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
@@ -6114,8 +6062,6 @@
     <string name="meetings_chat_screen_app_update_dialog_message">انت لا تستخدم أحدث إصدار من تطبيقنا لذا لا يمكنك بدء المكالمات أو الانضمام إليها. قم بالتحديث الآن للمتابعة.</string>
     <!-- Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_update_button">تحديث</string>
-    <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
-    <string name="meetings_chat_screen_app_update_dialog_cancel_button">رفض</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">تعيين مضيف لمغادرة المكالمة</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
@@ -6341,7 +6287,7 @@
         <item quantity="other">%1$s و %2$d آخرون رفعوا يدهم</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="hidden_nodes_sharing_album">هناك عناصر مخفية في هذا الألبوم. تعني مشاركة الألبوم أن العناصر المخفية مرئية لأولئك الذين تشاركهم معهم. ستظل العناصر مخفية في السواقة السحابية الخاص بك.</string>
     <!-- Hidden nodes items -->
     <plurals name="hidden_nodes_items">
         <item quantity="zero"></item>

@@ -64,8 +64,6 @@
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">選択したフォルダは同期できません</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">ファイルを個別に同期することはできません。フォルダから同期を設定する必要があります。</string>
-    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">初期スキャンに失敗しました。デスクトップアプリから同期またはバックアップを再度有効にする必要があります。</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">MEGA内のフォルダは、移動または削除されたため見つからないか、アクセス権がない可能性があります。</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -74,8 +72,6 @@
     <string name="device_center_list_view_item_sub_state_account_expired">お客様のプランの有効期限が切れているため、このフォルダを同期またはバックアップできません</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="device_center_list_view_item_sub_state_foreign_target_overshare">このフォルダを共有したユーザーはストレージ容量に達したため、フォルダを同期できません</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">MEGA内のフォルダは、移動または削除されたため見つからないか、アクセス権がない可能性があります。</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">フォルダは、フルアクセスのない共有フォルダであるため、同期できません</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -102,24 +98,14 @@
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">名前の変更に失敗しました。</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">この同期用の.megaignoreファイルを作成できませんでした</string>
-    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">同期構成を読み取れませんでした。後でもう一度試すか、フォルダのアクセス許可を確認してください。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">同期フォルダの場所が不明です</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
-    <string name="device_center_list_view_item_sub_state_invalid_scan_interval">無効なスキャン間隔です。スキャン間隔の設定を確認して、再試行してください。</string>
-    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">フォルダの場所と通信できませんでした。場所がアクセス可能であること、およびフォルダの場所に対するアクセス許可が付与されていることを確認してください。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
     <string name="device_center_list_view_item_sub_state_unable_to_add_watch">ファイルシステム監視を追加できません。十分な空き容量とメモリがあること、およびフォルダの場所に対するアクセス許可が付与されていることを確認してください。</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
-    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">同期の場所を読み取れませんでした。場所がアクセス可能であること、およびフォルダの場所に対するアクセス許可が付与されていることを確認してください。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database">状態キャッシュデータベースを開けません</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">ダウンロード用のスペースが不足しています。</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage">同期の場所を読み取れませんでした。場所がアクセス可能であること、およびフォルダの場所に対するアクセス許可が付与されていることを確認してください。</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">不明なエラー。</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->

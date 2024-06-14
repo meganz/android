@@ -64,8 +64,6 @@
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">لا يمكن مزامنة المجلد الذي اخترته</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">لا يمكن مزامنة الملف بشكل فردي. تحتاج إلى إعداد المزامنة من المجلد.</string>
-    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">فشل الفحص الأولي. ستحتاج إلى إعادة تمكين المزامنة أو النسخ الاحتياطي من تطبيق الحاسوب المكتبي.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">لا يمكن تحديد موقع المجلد الموجود في ميغا MEGA نظرًا لأنه تم نقله أو حذفه، أو ربما ليس لديك إذن للوصول إليه.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -74,8 +72,6 @@
     <string name="device_center_list_view_item_sub_state_account_expired">غير قادر على مزامنة هذا المجلد أو نسخه احتياطيًا نظرًا لانتهاء صلاحية باقتك</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="device_center_list_view_item_sub_state_foreign_target_overshare">لا يمكن مزامنة المجلد لأن المستخدم الذي شارك هذا المجلد قد وصل إلى الحد المتاح من مساحة التخزين الخاصة به</string>
-    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">لا يمكن تحديد موقع المجلد الموجود في ميغا MEGA نظرًا لأنه تم نقله أو حذفه، أو ربما ليس لديك إذن للوصول إليه.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">لا يمكن مزامنة المجلد لأنه مجلد مشارك بدون إذن وصول كامل</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -102,24 +98,14 @@
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">فشلت عملية إعادة التسمية.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">تعذّر إنشاء ملف.megaignore لهذه المزامنة</string>
-    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">تعذرت قراءة تكوين المزامنة. حاول مرة أخرى لاحقًا أو تحقق من أذونات المجلد.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">موقع مجلد المزامنة غير معروف</string>
-    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
-    <string name="device_center_list_view_item_sub_state_invalid_scan_interval">الفاصل الزمني للفحص غير صالح. تحقق من إعداد الفاصل الزمني للفحص وحاول مرة أخرى.</string>
-    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">لا يمكن الاتصال بموقع المجلد. تحقق من إمكانية الوصول إلى الموقع ومن منح الأذونات لموقع المجلد.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
     <string name="device_center_list_view_item_sub_state_unable_to_add_watch">غير قادر على إضافة ساعة نظام الملفات. تأكد من وجود مساحة كافية وذاكرة كافية ومن أنك منحت الأذونات لموقع المجلد.</string>
-    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
-    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">تعذرت قراءة موقع المزامنة. تحقق من إمكانية الوصول إلى الموقع ومن منح الأذونات لموقع المجلد.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database">غير قادر على فتح قاعدة بيانات ذاكرة التخزين المؤقت للحالة</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">مساحة غير كافية للتحميل.</string>
-    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage">تعذرت قراءة موقع المزامنة. تحقق من إمكانية الوصول إلى الموقع ومن منح الأذونات لموقع المجلد.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">خطأ غير معروف.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
