@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.ApplySortOrderToDocumentFolderUseCase
+import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.file.GetFilesInDocumentFolderUseCase
 import mega.privacy.android.domain.usecase.file.SearchFilesInDocumentFolderRecursiveUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -67,6 +68,7 @@ class UploadFolderViewModel @Inject constructor(
     private val documentEntityDataMapper: DocumentEntityDataMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val searchFilesInDocumentFolderRecursiveUseCase: SearchFilesInDocumentFolderRecursiveUseCase,
+    private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UploadFolderViewState())
@@ -87,7 +89,7 @@ class UploadFolderViewModel @Inject constructor(
     var query: String? = null
     private var isPendingToFinishSelection = false
     private var getContentDisposable: Disposable? = null
-    private var nameCollisionDisposable: Disposable? = null
+    private var nameCollisionJob: Job? = null
     private var pendingUploads: MutableList<FolderContent.Data> = mutableListOf()
     private val folderTree = mutableMapOf<UriPath, DocumentFolder>()
     private var folderEntities = DocumentFolder(emptyList())
@@ -361,36 +363,40 @@ class UploadFolderViewModel @Inject constructor(
      */
     fun upload() {
         searchJob?.cancel()
-        getFolderContentUseCase.getRootContentToUpload(
-            currentFolder = currentFolder.value!!,
-            selectedItems = ArrayList(selectedItems.value!!),
-            folderItems = folderItems.value
-        ).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error -> Timber.e(error, "Cannot upload anything") },
-                onSuccess = { results -> checkNameCollisions(results) }
-            ).addTo(composite)
-    }
-
-    /**
-     * Checks name collisions before starting the upload.
-     *
-     * @param uploadResults List of UploadFolderResult to upload.
-     */
-    private fun checkNameCollisions(uploadResults: MutableList<FolderContent.Data>) {
-        nameCollisionDisposable =
-            checkNameCollisionUseCase.checkFolderUploadList(parentHandle, uploadResults)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onError = { error -> Timber.e(error, "Cannot upload anything") },
-                    onSuccess = { result ->
-                        collisions.value = result.first
-                        pendingUploads.addAll(result.second)
-                    }
+        val currentFolder = currentFolder.value ?: return
+        val selectedIndex = selectedItems.value.orEmpty()
+        val files = if (selectedIndex.isNotEmpty()) {
+            selectedIndex.mapNotNull { index ->
+                folderItems.value?.getOrNull(index) as? FolderContent.Data
+            }
+        } else {
+            listOf(currentFolder)
+        }
+        nameCollisionJob = viewModelScope.launch {
+            runCatching {
+                checkFileNameCollisionsUseCase(
+                    files = files.map {
+                        DocumentEntity(
+                            name = it.name,
+                            size = it.size,
+                            lastModified = it.lastModified,
+                            uri = UriPath(it.uri.toString()),
+                            isFolder = it.isFolder,
+                            numFiles = it.numberOfFiles,
+                            numFolders = it.numberOfFolders,
+                        )
+                    },
+                    parentNodeId = NodeId(parentHandle)
                 )
-                .addTo(composite)
+            }.onSuccess { fileCollisions ->
+                collisions.value = ArrayList(fileCollisions.map {
+                    NameCollision.Upload.getUploadCollision(it)
+                })
+                pendingUploads.addAll(files)
+            }.onFailure {
+                Timber.e(it, "Cannot check name collisions")
+            }
+        }
     }
 
     /**
@@ -464,7 +470,7 @@ class UploadFolderViewModel @Inject constructor(
     fun cancelUpload() {
         if (transfersManagement.shouldBreakTransfersProcessing()) {
             getContentDisposable?.dispose()
-            nameCollisionDisposable?.dispose()
+            nameCollisionJob?.cancel()
         }
     }
 

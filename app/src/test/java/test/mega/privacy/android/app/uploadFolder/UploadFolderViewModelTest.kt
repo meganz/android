@@ -8,11 +8,14 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.uploadFolder.UploadFolderViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import kotlin.test.Test
 
@@ -22,18 +25,28 @@ class UploadFolderViewModelTest {
     private lateinit var underTest: UploadFolderViewModel
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase = mock()
 
     @BeforeAll
     fun setup() {
         underTest = UploadFolderViewModel(
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
+            getFolderContentUseCase = mock(),
+            checkNameCollisionUseCase = mock(),
+            getFilesInDocumentFolderUseCase = mock(),
+            applySortOrderToDocumentFolderUseCase = mock(),
+            transfersManagement = mock(),
+            documentEntityDataMapper = mock(),
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            searchFilesInDocumentFolderRecursiveUseCase = mock(),
+            checkFileNameCollisionsUseCase = checkFileNameCollisionsUseCase
+        )
+    }
+
+    @BeforeEach
+    fun reset() {
+        reset(
             getFeatureFlagValueUseCase,
-            mock(),
+            checkFileNameCollisionsUseCase
         )
     }
 

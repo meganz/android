@@ -1,7 +1,7 @@
 package mega.privacy.android.app.namecollision.data
 
 import mega.privacy.android.app.ShareInfo
-import mega.privacy.android.app.uploadFolder.list.data.FolderContent
+import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import nz.mega.sdk.MegaNode
 import java.io.File
@@ -103,26 +103,24 @@ sealed class NameCollision : Serializable {
             )
 
             /**
-             * Gets a [NameCollision.Upload] from an [FolderContent.Data].
+             * Get upload collision
              *
-             * @param collisionHandle   The node handle with which there is a name collision.
-             * @param uploadContent     The file from which the [NameCollision.Upload] will be get.
+             * @param collision The [FileNameCollision] from which the [NameCollision.Upload] will be get.
+             * @return
              */
             @JvmStatic
             fun getUploadCollision(
-                collisionHandle: Long,
-                uploadContent: FolderContent.Data,
-                parentHandle: Long,
+                collision: FileNameCollision,
             ): Upload = Upload(
-                collisionHandle = collisionHandle,
-                absolutePath = uploadContent.uri.toString(),
-                name = uploadContent.name,
-                size = if (uploadContent.isFolder) null else uploadContent.size,
-                childFolderCount = uploadContent.numberOfFolders,
-                childFileCount = uploadContent.numberOfFiles,
-                lastModified = uploadContent.lastModified,
-                parentHandle = parentHandle,
-                isFile = !uploadContent.isFolder
+                collisionHandle = collision.collisionHandle,
+                absolutePath = collision.path.value,
+                name = collision.name,
+                size = if (collision.isFile) collision.size else null,
+                childFolderCount = collision.childFolderCount,
+                childFileCount = collision.childFileCount,
+                lastModified = collision.lastModified,
+                parentHandle = collision.parentHandle,
+                isFile = collision.isFile
             )
         }
     }

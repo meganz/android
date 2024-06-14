@@ -14,7 +14,6 @@ import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.FolderNameNullException
 import mega.privacy.android.domain.usecase.file.GetFilesInDocumentFolderUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
@@ -125,46 +124,6 @@ class GetFolderContentUseCase @Inject constructor(
                         )
                     )
                 )
-            }
-        }
-
-    /**
-     * Gets the root content to upload.
-     *
-     * @param currentFolder Name of the parent folder of the item.
-     * @param selectedItems List of the selected items' positions if any.
-     * @param folderItems   List of the content to be uploaded.
-     * @return Single with a list of FolderContent.
-     */
-    fun getRootContentToUpload(
-        currentFolder: FolderContent.Data,
-        selectedItems: List<Int>,
-        folderItems: MutableList<FolderContent>?,
-    ): Single<MutableList<FolderContent.Data>> =
-        Single.create { emitter ->
-            if (folderItems == null) {
-                emitter.onError(EmptyFolderException())
-                return@create
-            }
-
-            val results = mutableListOf<FolderContent.Data>()
-
-            if (selectedItems.isNotEmpty()) {
-                selectedItems.forEach { selected ->
-                    if (emitter.isDisposed) {
-                        return@create
-                    }
-
-                    results.add((folderItems[selected] as FolderContent.Data))
-                }
-            } else {
-                results.add(currentFolder)
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                results.isEmpty() -> emitter.onError(EmptyFolderException())
-                else -> emitter.onSuccess(results)
             }
         }
 

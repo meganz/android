@@ -9,14 +9,12 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
-import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -373,55 +371,6 @@ class CheckNameCollisionUseCase @Inject constructor(
             result
         }
     }
-
-    /**
-     * Checks a list of [FolderContent.Data] in order to know which names already exist
-     * on the provided parent node.
-     *
-     * @param parentHandle  Parent handle of the MegaNode in which the content will be uploaded.
-     * @param uploadContent List of [FolderContent.Data] to check.
-     * @return Single with the list of collisions if any and the list of [FolderContent.Data]
-     * updated with them.
-     */
-    fun checkFolderUploadList(
-        parentHandle: Long,
-        uploadContent: MutableList<FolderContent.Data>,
-    ): Single<Pair<ArrayList<NameCollision>, MutableList<FolderContent.Data>>> =
-        rxSingle(ioDispatcher) {
-            return@rxSingle checkFolderUploadListAsync(parentHandle, uploadContent)
-
-
-        }
-
-    /**
-     * Check folder upload list async
-     *
-     * @param parentHandle
-     * @param uploadContent
-     * @return
-     */
-    suspend fun checkFolderUploadListAsync(
-        parentHandle: Long,
-        uploadContent: MutableList<FolderContent.Data>,
-    ): Pair<ArrayList<NameCollision>, MutableList<FolderContent.Data>> {
-        val parent = getParentOrRootNode(parentHandle)
-            ?: throw MegaNodeException.ParentDoesNotExistException()
-        if (uploadContent.isEmpty()) throw EmptyFolderException()
-
-        val collisions = uploadContent.mapNotNull { item ->
-            runCatching {
-                val name = item.name ?: return@mapNotNull null
-                val handle = checkAsync(name = name, parent)
-                NameCollision.Upload.getUploadCollision(
-                    handle,
-                    item,
-                    parentHandle,
-                )
-            }.getOrNull()
-        }
-        return Pair(ArrayList(collisions), uploadContent)
-    }
-
 
     /**
      * Checks a list of attached nodes in a chat conversation in order to know which names already
