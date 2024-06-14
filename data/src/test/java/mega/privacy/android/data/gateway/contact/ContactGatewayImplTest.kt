@@ -4,9 +4,11 @@ import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
 import android.provider.ContactsContract
-import com.google.common.truth.Truth
+import android.provider.ContactsContract.Contacts
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.contacts.LocalContact
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,20 +40,25 @@ class ContactGatewayImplTest {
         runTest {
             val contactID = 1L
             val contactName = "name"
+            val photoUri = "photoUri"
             val projection = arrayOf(
-                ContactsContract.Contacts._ID,
-                ContactsContract.Contacts.DISPLAY_NAME
+                Contacts._ID,
+                Contacts.DISPLAY_NAME,
+                Contacts.PHOTO_URI,
+                Contacts.PHOTO_THUMBNAIL_URI,
             )
             val mockCursor = mock<Cursor> {
                 on { getLong(0) }.thenReturn(contactID)
                 on { getString(1) }.thenReturn(contactName)
+                on { getString(2) }.thenReturn(photoUri)
+                on { getString(3) }.thenReturn(photoUri)
 
                 on { moveToNext() }.thenReturn(true, false)
             }
             val contentResolver = mock<ContentResolver> {
                 on {
                     query(
-                        ContactsContract.Contacts.CONTENT_URI,
+                        Contacts.CONTENT_URI,
                         projection,
                         null,
                         null,
@@ -66,10 +73,145 @@ class ContactGatewayImplTest {
             val expected = listOf(
                 LocalContact(
                     id = contactID,
-                    name = contactName
+                    name = contactName,
+                    photoUri = UriPath(photoUri)
                 )
             )
-            Truth.assertThat(actual).isEqualTo(expected)
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that a local data with NULL photo data is returned when the contact item has no photo`() =
+        runTest {
+            val contactID = 1L
+            val contactName = "name"
+            val projection = arrayOf(
+                Contacts._ID,
+                Contacts.DISPLAY_NAME,
+                Contacts.PHOTO_URI,
+                Contacts.PHOTO_THUMBNAIL_URI,
+            )
+            val mockCursor = mock<Cursor> {
+                on { getLong(0) }.thenReturn(contactID)
+                on { getString(1) }.thenReturn(contactName)
+                on { getString(2) }.thenReturn(null)
+                on { getString(3) }.thenReturn(null)
+
+                on { moveToNext() }.thenReturn(true, false)
+            }
+            val contentResolver = mock<ContentResolver> {
+                on {
+                    query(
+                        Contacts.CONTENT_URI,
+                        projection,
+                        null,
+                        null,
+                        null
+                    )
+                }.thenReturn(mockCursor)
+            }
+            whenever(context.contentResolver).thenReturn(contentResolver)
+
+            val actual = underTest.getLocalContacts()
+
+            val expected = listOf(
+                LocalContact(
+                    id = contactID,
+                    name = contactName,
+                    photoUri = null
+                )
+            )
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that the returned Local Contact contains a photo Uri when the photo thumbnail Uri is NULL`() =
+        runTest {
+            val contactID = 1L
+            val contactName = "name"
+            val photoUri = "photoUri"
+            val projection = arrayOf(
+                Contacts._ID,
+                Contacts.DISPLAY_NAME,
+                Contacts.PHOTO_URI,
+                Contacts.PHOTO_THUMBNAIL_URI,
+            )
+            val mockCursor = mock<Cursor> {
+                on { getLong(0) }.thenReturn(contactID)
+                on { getString(1) }.thenReturn(contactName)
+                on { getString(2) }.thenReturn(photoUri)
+                on { getString(3) }.thenReturn(null)
+
+                on { moveToNext() }.thenReturn(true, false)
+            }
+            val contentResolver = mock<ContentResolver> {
+                on {
+                    query(
+                        Contacts.CONTENT_URI,
+                        projection,
+                        null,
+                        null,
+                        null
+                    )
+                }.thenReturn(mockCursor)
+            }
+            whenever(context.contentResolver).thenReturn(contentResolver)
+
+            val actual = underTest.getLocalContacts()
+
+            val expected = listOf(
+                LocalContact(
+                    id = contactID,
+                    name = contactName,
+                    photoUri = UriPath(photoUri)
+                )
+            )
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that the returned Local Contact contains a photo thumbnail Uri when the photo thumbnail Uri is not NULL`() =
+        runTest {
+            val contactID = 1L
+            val contactName = "name"
+            val photoThumbnailUri = "photoThumbnailUri"
+            val projection = arrayOf(
+                Contacts._ID,
+                Contacts.DISPLAY_NAME,
+                Contacts.PHOTO_URI,
+                Contacts.PHOTO_THUMBNAIL_URI,
+            )
+            val mockCursor = mock<Cursor> {
+                on { getLong(0) }.thenReturn(contactID)
+                on { getString(1) }.thenReturn(contactName)
+                on { getString(2) }.thenReturn(null)
+                on { getString(3) }.thenReturn(photoThumbnailUri)
+
+                on { moveToNext() }.thenReturn(true, false)
+            }
+            val contentResolver = mock<ContentResolver> {
+                on {
+                    query(
+                        Contacts.CONTENT_URI,
+                        projection,
+                        null,
+                        null,
+                        null
+                    )
+                }.thenReturn(mockCursor)
+            }
+            whenever(context.contentResolver).thenReturn(contentResolver)
+
+            val actual = underTest.getLocalContacts()
+
+            val expected = listOf(
+                LocalContact(
+                    id = contactID,
+                    name = contactName,
+                    photoUri = UriPath(photoThumbnailUri)
+                )
+            )
+            assertThat(actual).isEqualTo(expected)
         }
 
     @Test
@@ -78,19 +220,23 @@ class ContactGatewayImplTest {
             val contactID = 1L
             val contactName = null
             val projection = arrayOf(
-                ContactsContract.Contacts._ID,
-                ContactsContract.Contacts.DISPLAY_NAME
+                Contacts._ID,
+                Contacts.DISPLAY_NAME,
+                Contacts.PHOTO_URI,
+                Contacts.PHOTO_THUMBNAIL_URI
             )
             val mockCursor = mock<Cursor> {
                 on { getLong(0) }.thenReturn(contactID)
                 on { getString(1) }.thenReturn(contactName)
+                on { getString(2) }.thenReturn(null)
+                on { getString(3) }.thenReturn(null)
 
                 on { moveToNext() }.thenReturn(true, false)
             }
             val contentResolver = mock<ContentResolver> {
                 on {
                     query(
-                        ContactsContract.Contacts.CONTENT_URI,
+                        Contacts.CONTENT_URI,
                         projection,
                         null,
                         null,
@@ -108,7 +254,7 @@ class ContactGatewayImplTest {
                     name = ""
                 )
             )
-            Truth.assertThat(actual).isEqualTo(expected)
+            assertThat(actual).isEqualTo(expected)
         }
 
     @Test
@@ -121,7 +267,7 @@ class ContactGatewayImplTest {
 
             val actual = underTest.getLocalContacts()
 
-            Truth.assertThat(actual).isEqualTo(emptyList<LocalContact>())
+            assertThat(actual).isEqualTo(emptyList<LocalContact>())
         }
 
     @Test
@@ -164,7 +310,7 @@ class ContactGatewayImplTest {
                     normalizedPhoneNumbers = listOf(normalizedPhoneNumber)
                 )
             )
-            Truth.assertThat(actual).isEqualTo(expected)
+            assertThat(actual).isEqualTo(expected)
         }
 
     @Test
@@ -177,7 +323,7 @@ class ContactGatewayImplTest {
 
             val actual = underTest.getLocalContactNumbers()
 
-            Truth.assertThat(actual).isEqualTo(emptyList<LocalContact>())
+            assertThat(actual).isEqualTo(emptyList<LocalContact>())
         }
 
     @Test
@@ -216,7 +362,7 @@ class ContactGatewayImplTest {
                     emails = listOf(email)
                 )
             )
-            Truth.assertThat(actual).isEqualTo(expected)
+            assertThat(actual).isEqualTo(expected)
         }
 
     @Test
@@ -229,6 +375,6 @@ class ContactGatewayImplTest {
 
             val actual = underTest.getLocalContactEmailAddresses()
 
-            Truth.assertThat(actual).isEqualTo(emptyList<LocalContact>())
+            assertThat(actual).isEqualTo(emptyList<LocalContact>())
         }
 }

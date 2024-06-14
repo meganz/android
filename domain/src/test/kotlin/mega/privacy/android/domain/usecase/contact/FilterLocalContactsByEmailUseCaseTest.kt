@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.contacts.User
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.repository.ContactsRepository
 import org.junit.jupiter.api.AfterEach
@@ -23,6 +24,8 @@ class FilterLocalContactsByEmailUseCaseTest {
 
     private val contactsRepository: ContactsRepository = mock()
     private val isAMegaContactByEmailUseCase: IsAMegaContactByEmailUseCase = mock()
+
+    private val photoUri = UriPath("photoUri")
 
     @BeforeEach
     fun setup() {
@@ -65,7 +68,8 @@ class FilterLocalContactsByEmailUseCaseTest {
             LocalContact(
                 id = firstUserID,
                 name = firstUserName,
-                emails = listOf(addedEmail, unAddedEmail)
+                emails = listOf(addedEmail, unAddedEmail),
+                photoUri = photoUri
             ),
             LocalContact(
                 id = secondUserID,
@@ -79,7 +83,8 @@ class FilterLocalContactsByEmailUseCaseTest {
             LocalContact(
                 id = firstUserID,
                 name = firstUserName,
-                emails = listOf(unAddedEmail)
+                emails = listOf(unAddedEmail),
+                photoUri = photoUri
             ),
             LocalContact(
                 id = secondUserID,
@@ -102,7 +107,8 @@ class FilterLocalContactsByEmailUseCaseTest {
                 LocalContact(
                     id = contactID,
                     name = userName,
-                    emails = listOf(email)
+                    emails = listOf(email),
+                    photoUri = photoUri
                 )
             )
             val actual = underTest(localContacts)
@@ -111,7 +117,8 @@ class FilterLocalContactsByEmailUseCaseTest {
                 LocalContact(
                     id = contactID,
                     name = userName,
-                    emails = listOf(email)
+                    emails = listOf(email),
+                    photoUri = photoUri
                 )
             )
             assertThat(actual).isEqualTo(expected)

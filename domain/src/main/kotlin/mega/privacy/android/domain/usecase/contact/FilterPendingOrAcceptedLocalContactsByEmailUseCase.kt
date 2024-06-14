@@ -54,7 +54,8 @@ class FilterPendingOrAcceptedLocalContactsByEmailUseCase @Inject constructor(
             name = name,
             phoneNumbers = phoneNumbers,
             normalizedPhoneNumbers = normalizedPhoneNumbers,
-            emails = newEmailList
+            emails = newEmailList,
+            photoUri = photoUri
         )
     }
 }

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main
 
-import android.graphics.Bitmap
 import android.os.Parcelable
 import androidx.annotation.ColorRes
 import kotlinx.parcelize.Parcelize
@@ -15,8 +14,8 @@ import kotlinx.parcelize.Parcelize
  * @property displayInfo display info of the contact
  * @property avatarColorResId Contact's avatar color ID
  * @property handle the contact handle
- * @property bitmap the contact bitmap
  * @property isHighlighted indicates whether the contact is selected or not
+ * @property photoUri The contact's photo Uri.
  */
 @Parcelize
 data class InvitationContactInfo @JvmOverloads constructor(
@@ -27,8 +26,8 @@ data class InvitationContactInfo @JvmOverloads constructor(
     val displayInfo: String = "",
     @ColorRes val avatarColorResId: Int = 0,
     val handle: String? = null,
-    var bitmap: Bitmap? = null,
     val isHighlighted: Boolean = false,
+    val photoUri: String? = null,
 ) : Parcelable, Cloneable {
 
     /**
@@ -45,47 +44,6 @@ data class InvitationContactInfo @JvmOverloads constructor(
      * Check whether the contact is an email contact
      */
     fun isEmailContact(): Boolean = displayInfo.contains(AT_SIGN)
-
-    /**
-     * Creates and returns a copy of this object.
-     *
-     * Need to override this as public because clone is protected hence it will be a private subclass in Kotlin.
-     */
-    @Throws(CloneNotSupportedException::class)
-    public override fun clone(): Any = super.clone()
-
-    override fun toString(): String =
-        "\n{id=$id, isHighlighted=$isHighlighted, type=$type, bitmap=$bitmap, name='$name', displayInfo='$displayInfo', handle='$handle', avatarColorResId='$avatarColorResId'}"
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as InvitationContactInfo
-
-        if (id != other.id) return false
-        if (name != other.name) return false
-        if (type != other.type) return false
-        if (filteredContactInfos != other.filteredContactInfos) return false
-        if (displayInfo != other.displayInfo) return false
-        if (avatarColorResId != other.avatarColorResId) return false
-        if (handle != other.handle) return false
-        if (isHighlighted != other.isHighlighted) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + name.hashCode()
-        result = 31 * result + type
-        result = 31 * result + filteredContactInfos.hashCode()
-        result = 31 * result + displayInfo.hashCode()
-        result = 31 * result + avatarColorResId
-        result = 31 * result + (handle?.hashCode() ?: 0)
-        result = 31 * result + isHighlighted.hashCode()
-        return result
-    }
 
     companion object {
         /**

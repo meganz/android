@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.contacts.LocalContact
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.environment.IsConnectivityInRoamingStateUseCase
 import org.junit.jupiter.api.AfterEach
@@ -34,6 +35,7 @@ class GetLocalContactsUseCaseTest {
 
     private val phoneNumber = "1234567890"
     private val normalizedPhoneNumber = "+621234567890"
+    private val photoUri = UriPath("photoUri")
 
     @BeforeEach
     fun setup() {
@@ -58,7 +60,8 @@ class GetLocalContactsUseCaseTest {
                 ),
                 LocalContact(
                     id = 2L,
-                    name = firstContactName
+                    name = firstContactName,
+                    photoUri = photoUri
                 )
             )
             whenever(contactsRepository.getLocalContacts()).thenReturn(availableLocalContacts)
@@ -101,7 +104,8 @@ class GetLocalContactsUseCaseTest {
                 LocalContact(
                     id = 2L,
                     name = firstContactName,
-                    emails = listOf(secondEmail)
+                    emails = listOf(secondEmail),
+                    photoUri = photoUri
                 ),
                 LocalContact(
                     id = 1L,
@@ -125,7 +129,7 @@ class GetLocalContactsUseCaseTest {
     fun `test that a list of local contacts with empty emails is returned given invalid emails`(
         availableLocalContactEmails: List<LocalContact>,
     ) = runTest {
-        val availableLocalContacts = listOf(LocalContact(id = 1L))
+        val availableLocalContacts = listOf(LocalContact(id = 1L, photoUri = photoUri))
         whenever(contactsRepository.getLocalContacts()).thenReturn(availableLocalContacts)
         whenever(contactsRepository.getLocalContactNumbers()).thenReturn(emptyList())
         whenever(contactsRepository.getLocalContactEmailAddresses()).thenReturn(
@@ -135,7 +139,7 @@ class GetLocalContactsUseCaseTest {
 
         val actual = underTest()
 
-        val expected = listOf(LocalContact(id = 1L))
+        val expected = listOf(LocalContact(id = 1L, photoUri = photoUri))
         assertThat(actual).isEqualTo(expected)
     }
 
@@ -144,7 +148,7 @@ class GetLocalContactsUseCaseTest {
         Arguments.of(
             listOf(
                 LocalContact(
-                    id = 1L,
+                    id = 2L,
                     emails = listOf(email)
                 )
             )
@@ -155,14 +159,15 @@ class GetLocalContactsUseCaseTest {
     fun `test that a list of local contacts with empty phone numbers is returned when there are no contacts with phone numbers`() =
         runTest {
             val contactID = 1L
-            val availableLocalContacts = listOf(LocalContact(id = contactID))
+            val availableLocalContacts =
+                listOf(LocalContact(id = contactID, photoUri = photoUri))
             whenever(contactsRepository.getLocalContacts()).thenReturn(availableLocalContacts)
             whenever(contactsRepository.getLocalContactNumbers()).thenReturn(emptyList())
             whenever(contactsRepository.getLocalContactEmailAddresses()).thenReturn(emptyList())
 
             val actual = underTest()
 
-            val expected = listOf(LocalContact(id = contactID))
+            val expected = listOf(LocalContact(id = contactID, photoUri = photoUri))
             assertThat(actual).isEqualTo(expected)
         }
 
@@ -173,7 +178,7 @@ class GetLocalContactsUseCaseTest {
         isPhoneNumberValid: Boolean,
         nonCountryCodeNormalizedNumber: String,
     ) = runTest {
-        val availableLocalContacts = listOf(LocalContact(id = 1L))
+        val availableLocalContacts = listOf(LocalContact(id = 1L, photoUri = photoUri))
         whenever(contactsRepository.getLocalContacts()).thenReturn(availableLocalContacts)
         val availableLocalContactNumbers = listOf(
             LocalContact(
@@ -196,7 +201,8 @@ class GetLocalContactsUseCaseTest {
         val expected = listOf(
             LocalContact(
                 id = 1L,
-                phoneNumbers = listOf(phoneNumber)
+                phoneNumbers = listOf(phoneNumber),
+                photoUri = photoUri
             )
         )
         assertThat(actual).isEqualTo(expected)

@@ -78,7 +78,8 @@ class GetLocalContactsUseCase @Inject constructor(
                 name = contact.name,
                 phoneNumbers = phoneNumberList,
                 normalizedPhoneNumbers = normalizedPhoneNumberList,
-                emails = emailList
+                emails = emailList,
+                photoUri = contact.photoUri
             )
         }.sortedBy { it.name }
     }

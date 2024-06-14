@@ -50,7 +50,8 @@ class FilterLocalContactsByEmailUseCase @Inject constructor(
             name = localContact.name,
             phoneNumbers = localContact.phoneNumbers,
             normalizedPhoneNumbers = localContact.normalizedPhoneNumbers,
-            emails = newEmailList
+            emails = newEmailList,
+            photoUri = localContact.photoUri
         )
     }
 }

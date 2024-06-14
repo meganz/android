@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.contacts.LocalContact
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.ContactsRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -24,6 +25,8 @@ class FilterPendingOrAcceptedLocalContactsByEmailUseCaseTest {
     private val contactsRepository: ContactsRepository = mock()
     private val isContactRequestByEmailInPendingOrAcceptedStateUseCase: IsContactRequestByEmailInPendingOrAcceptedStateUseCase =
         mock()
+
+    private val photoUri = UriPath("photoUri")
 
     @BeforeEach
     fun setup() {
@@ -81,7 +84,8 @@ class FilterPendingOrAcceptedLocalContactsByEmailUseCaseTest {
             LocalContact(
                 id = firstUserID,
                 name = firstUserName,
-                emails = listOf(notPendingNorAcceptedEmail, pendingEmail)
+                emails = listOf(notPendingNorAcceptedEmail, pendingEmail),
+                photoUri = photoUri
             ),
             LocalContact(
                 id = secondUserID,
@@ -95,7 +99,8 @@ class FilterPendingOrAcceptedLocalContactsByEmailUseCaseTest {
             LocalContact(
                 id = firstUserID,
                 name = firstUserName,
-                emails = listOf(notPendingNorAcceptedEmail)
+                emails = listOf(notPendingNorAcceptedEmail),
+                photoUri = photoUri
             ),
             LocalContact(
                 id = secondUserID,
@@ -118,7 +123,8 @@ class FilterPendingOrAcceptedLocalContactsByEmailUseCaseTest {
                 LocalContact(
                     id = contactID,
                     name = userName,
-                    emails = listOf(email)
+                    emails = listOf(email),
+                    photoUri = photoUri
                 )
             )
             val actual = underTest(localContacts)
@@ -127,7 +133,8 @@ class FilterPendingOrAcceptedLocalContactsByEmailUseCaseTest {
                 LocalContact(
                     id = contactID,
                     name = userName,
-                    emails = listOf(email)
+                    emails = listOf(email),
+                    photoUri = photoUri
                 )
             )
             assertThat(actual).isEqualTo(expected)

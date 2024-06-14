@@ -1,25 +1,23 @@
-package mega.privacy.android.app.main
+package mega.privacy.android.app.presentation.contact.invite.contact
 
-import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
+import mega.privacy.android.app.main.InvitationContactInfo
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
 import mega.privacy.android.app.main.model.InvitationStatusUiState
 import mega.privacy.android.app.main.model.InviteContactFilterUiState
 import mega.privacy.android.app.main.model.InviteContactUiState
+import mega.privacy.android.app.presentation.contact.invite.contact.mapper.InvitationContactInfoUiMapper
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest.Sent
-import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
@@ -28,7 +26,6 @@ import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailsUseCas
 import mega.privacy.android.domain.usecase.meeting.AreThereOngoingVideoCallsUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import timber.log.Timber
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 /**
@@ -36,18 +33,16 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class InviteContactViewModel @Inject constructor(
-    @ApplicationContext applicationContext: Context,
     private val getLocalContactsUseCase: GetLocalContactsUseCase,
     private val filterLocalContactsByEmailUseCase: FilterLocalContactsByEmailUseCase,
     private val filterPendingOrAcceptedLocalContactsByEmailUseCase: FilterPendingOrAcceptedLocalContactsByEmailUseCase,
     private val createContactLinkUseCase: CreateContactLinkUseCase,
     private val inviteContactWithEmailsUseCase: InviteContactWithEmailsUseCase,
     private val areThereOngoingVideoCallsUseCase: AreThereOngoingVideoCallsUseCase,
+    private val invitationContactInfoUiMapper: InvitationContactInfoUiMapper,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
-    private val context = WeakReference(applicationContext)
 
     private val _uiState = MutableStateFlow(InviteContactUiState())
 
@@ -93,55 +88,30 @@ class InviteContactViewModel @Inject constructor(
      * Initialize the list of contacts
      */
     fun initializeContacts() = viewModelScope.launch {
-        runCatching {
-            localContactToInvitationContactInfo(getLocalContactsUseCase())
-        }.onSuccess { localContacts ->
-            initializeFilteredContacts(localContacts)
-            initializeAllContacts(_filterUiState.value.filteredContacts)
-            _uiState.update { it.copy(onContactsInitialized = true) }
-        }.onFailure {
-            _uiState.update { it.copy(onContactsInitialized = true) }
-            Timber.e("Failed to get local contacts", it)
-        }
+        runCatching { getInvitationContactInfo() }
+            .onSuccess { invitationContactInfo ->
+                initializeFilteredContacts(invitationContactInfo)
+                initializeAllContacts(_filterUiState.value.filteredContacts)
+                _uiState.update { it.copy(onContactsInitialized = true) }
+            }.onFailure { throwable ->
+                _uiState.update { it.copy(onContactsInitialized = true) }
+                Timber.e("Failed to get local contacts", throwable)
+            }
     }
 
-    private suspend fun localContactToInvitationContactInfo(localContact: List<LocalContact>) =
-        buildList {
-            Timber.d("megaContactToContactInfo %s", localContact.size)
+    private suspend fun getInvitationContactInfo(): List<InvitationContactInfo> {
+        val localContacts = getLocalContactsUseCase()
+        if (localContacts.isEmpty()) return emptyList()
 
-            if (localContact.isEmpty()) return@buildList
+        // Filter contacts if the emails exist in the MEGA contact
+        val filteredMEGAContactList = filterLocalContactsByEmailUseCase(localContacts)
 
-            add(
-                InvitationContactInfo(
-                    id = ID_PHONE_CONTACTS_HEADER,
-                    name = context.get()?.getString(R.string.contacts_phone).orEmpty(),
-                    type = TYPE_PHONE_CONTACT_HEADER
-                )
-            )
+        // Filter out pending contacts by email
+        val filteredPendingMEGAContactList =
+            filterPendingOrAcceptedLocalContactsByEmailUseCase(filteredMEGAContactList)
 
-            // Filter contacts if the emails exist in the MEGA contact
-            val filteredMEGAContactList = filterLocalContactsByEmailUseCase(localContact)
-
-            // Filter out pending contacts by email
-            val filteredPendingMEGAContactList =
-                filterPendingOrAcceptedLocalContactsByEmailUseCase(filteredMEGAContactList)
-
-            filteredPendingMEGAContactList.forEach {
-                val phoneNumberList = it.phoneNumbers + it.emails
-                if (phoneNumberList.isNotEmpty()) {
-                    add(
-                        InvitationContactInfo(
-                            id = it.id,
-                            name = it.name,
-                            type = TYPE_PHONE_CONTACT,
-                            filteredContactInfos = phoneNumberList,
-                            displayInfo = phoneNumberList[0],
-                            avatarColorResId = R.color.grey_500_grey_400
-                        )
-                    )
-                }
-            }
-        }
+        return invitationContactInfoUiMapper(localContacts = filteredPendingMEGAContactList)
+    }
 
     /**
      * Initialize all available contacts. Keeping all contacts for records.
@@ -258,9 +228,8 @@ class InviteContactViewModel @Inject constructor(
                     listOf(
                         // Header
                         InvitationContactInfo(
-                            ID_PHONE_CONTACTS_HEADER,
-                            context.get()?.getString(R.string.contacts_phone).orEmpty(),
-                            TYPE_PHONE_CONTACT_HEADER
+                            id = ID_PHONE_CONTACTS_HEADER,
+                            type = TYPE_PHONE_CONTACT_HEADER
                         )
                     ).plus(phoneContacts)
                 } else emptyList()

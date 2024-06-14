@@ -48,7 +48,6 @@ import mega.privacy.android.app.main.InvitationContactInfo
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_EMAIL
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_PHONE
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.createManualInput
-import mega.privacy.android.app.main.InviteContactViewModel
 import mega.privacy.android.app.main.adapters.InvitationContactsAdapter
 import mega.privacy.android.app.main.model.InvitationStatusUiState
 import mega.privacy.android.app.presentation.contact.invite.contact.component.ContactInfoListDialog

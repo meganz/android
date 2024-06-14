@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main
 
-import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -8,8 +7,10 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
-import mega.privacy.android.app.main.InviteContactViewModel.Companion.ID_PHONE_CONTACTS_HEADER
 import mega.privacy.android.app.main.model.InvitationStatusUiState
+import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactViewModel
+import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactViewModel.Companion.ID_PHONE_CONTACTS_HEADER
+import mega.privacy.android.app.presentation.contact.invite.contact.mapper.InvitationContactInfoUiMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
@@ -39,7 +40,6 @@ class InviteContactViewModelTest {
 
     private lateinit var underTest: InviteContactViewModel
 
-    private val context: Context = mock()
     private val createContactLinkUseCase: CreateContactLinkUseCase = mock()
     private val getLocalContactsUseCase: GetLocalContactsUseCase = mock()
     private val filterLocalContactsByEmailUseCase: FilterLocalContactsByEmailUseCase = mock()
@@ -51,18 +51,21 @@ class InviteContactViewModelTest {
     private val defaultContactLink = "https://mega.nz/C!wf8jTYRB"
 
     private lateinit var savedStateHandle: SavedStateHandle
+    private lateinit var invitationContactInfoUiMapper: InvitationContactInfoUiMapper
 
     @BeforeEach
     fun setup() = runTest {
         whenever(createContactLinkUseCase(false)) doReturn defaultContactLink
 
         savedStateHandle = SavedStateHandle(mapOf("CONTACT_SEARCH_QUERY" to defaultQuery))
+        invitationContactInfoUiMapper = InvitationContactInfoUiMapper(
+            defaultDispatcher = extension.testDispatcher
+        )
         initializeViewModel()
     }
 
     private fun initializeViewModel() {
         underTest = InviteContactViewModel(
-            applicationContext = context,
             defaultDispatcher = extension.testDispatcher,
             getLocalContactsUseCase = getLocalContactsUseCase,
             filterLocalContactsByEmailUseCase = filterLocalContactsByEmailUseCase,
@@ -70,6 +73,7 @@ class InviteContactViewModelTest {
             createContactLinkUseCase = createContactLinkUseCase,
             inviteContactWithEmailsUseCase = inviteContactWithEmailsUseCase,
             areThereOngoingVideoCallsUseCase = areThereOngoingVideoCallsUseCase,
+            invitationContactInfoUiMapper = invitationContactInfoUiMapper,
             savedStateHandle = savedStateHandle
         )
     }
@@ -195,16 +199,14 @@ class InviteContactViewModelTest {
                 )
             )
             underTest.initializeAllContacts(contacts)
-            whenever(context.getString(R.string.contacts_phone)).thenReturn("Phone contacts")
 
             underTest.filterContacts("que")
 
             underTest.filterUiState.test {
                 val expected = listOf(
                     InvitationContactInfo(
-                        ID_PHONE_CONTACTS_HEADER,
-                        "Phone contacts",
-                        TYPE_PHONE_CONTACT_HEADER
+                        id = ID_PHONE_CONTACTS_HEADER,
+                        type = TYPE_PHONE_CONTACT_HEADER
                     ),
                     InvitationContactInfo(
                         id = 123L,
@@ -229,7 +231,6 @@ class InviteContactViewModelTest {
     @Test
     fun `test that no contacts emitted when no local contacts are available`() =
         runTest {
-            whenever(context.getString(R.string.contacts_phone)).thenReturn("Phone contacts")
             whenever(getLocalContactsUseCase()).thenReturn(emptyList())
 
             underTest.initializeContacts()
@@ -245,7 +246,6 @@ class InviteContactViewModelTest {
     fun `test that the right list of mapped contact information is returned`(
         localContacts: List<LocalContact>,
     ) = runTest {
-        whenever(context.getString(R.string.contacts_phone)).thenReturn("Phone contacts")
         whenever(getLocalContactsUseCase()).thenReturn(localContacts)
         whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
         whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
@@ -275,7 +275,6 @@ class InviteContactViewModelTest {
                 listOf(
                     InvitationContactInfo(
                         id = ID_PHONE_CONTACTS_HEADER,
-                        name = "Phone contacts",
                         type = TYPE_PHONE_CONTACT_HEADER
                     )
                 ).plus(expected)
@@ -336,7 +335,6 @@ class InviteContactViewModelTest {
     @Test
     fun `test that filter contacts is invoked when the search query is changed`() =
         runTest {
-            whenever(context.getString(R.string.contacts_phone)).thenReturn("Phone contacts")
             val newSearchQuery = "newSearchQuery"
 
             underTest.onSearchQueryChange(newSearchQuery)
@@ -534,7 +532,6 @@ class InviteContactViewModelTest {
     @AfterEach
     fun tearDown() {
         reset(
-            context,
             createContactLinkUseCase,
             getLocalContactsUseCase,
             filterLocalContactsByEmailUseCase,
