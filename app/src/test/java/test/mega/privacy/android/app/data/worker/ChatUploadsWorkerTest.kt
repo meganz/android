@@ -35,7 +35,6 @@ import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.data.worker.ChatUploadsWorker
 import mega.privacy.android.data.worker.ForegroundSetter
 import mega.privacy.android.domain.entity.Progress
-import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
@@ -49,7 +48,6 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.monitoring.CrashReporter
-import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
@@ -108,7 +106,6 @@ class ChatUploadsWorkerTest {
     private val clearActiveTransfersIfFinishedUseCase =
         mock<ClearActiveTransfersIfFinishedUseCase>()
     private val chatUploadNotificationMapper = mock<ChatUploadNotificationMapper>()
-    private val chatMessageRepository = mock<ChatMessageRepository>()
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
     private val checkFinishedChatUploadsUseCase = mock<CheckFinishedChatUploadsUseCase>()
     private val setForeground = mock<ForegroundSetter>()
@@ -405,11 +402,6 @@ class ChatUploadsWorkerTest {
             on { this.transfer } doReturn transfer
             on { this.error } doReturn error
         }
-        val pendingMsg = mock<PendingMessage> {
-            on { id } doReturn PENDING_MSG_ID
-            on { this.chatId } doReturn CHAT_ID
-        }
-        whenever(chatMessageRepository.getPendingMessage(PENDING_MSG_ID)).thenReturn(pendingMsg)
         val totals = mock<ActiveTransferTotals> {
             on { transferredBytes }.thenReturn(100L)
             on { totalBytes }.thenReturn(200L)

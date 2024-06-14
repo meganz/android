@@ -15,6 +15,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
 import java.io.File
@@ -35,6 +36,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
     private val handleChatUploadTransferEventUseCase: HandleChatUploadTransferEventUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
+    private val getPendingMessageUseCase: GetPendingMessageUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : AbstractStartTransfersWithWorkerUseCase(cancelCancelTokenUseCase) {
 
@@ -60,7 +62,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
             return@flow
         }
         val name = runCatching {
-            chatMessageRepository.getPendingMessage(pendingMessageIds.first())?.name
+            getPendingMessageUseCase(pendingMessageIds.first())?.name
         }.getOrElse {
             emit(
                 MultiTransferEvent.TransferNotStarted(file, it)

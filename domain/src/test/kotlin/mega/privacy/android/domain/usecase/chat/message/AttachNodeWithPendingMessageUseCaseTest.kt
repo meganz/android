@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -35,16 +36,18 @@ class AttachNodeWithPendingMessageUseCaseTest {
     private val createSaveSentMessageRequestUseCase = mock<CreateSaveSentMessageRequestUseCase>()
     private val setNodeAttributesAfterUploadUseCase = mock<SetNodeAttributesAfterUploadUseCase>()
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
+    private val getPendingMessageUseCase = mock<GetPendingMessageUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = AttachNodeWithPendingMessageUseCase(
-            chatMessageRepository,
-            chatRepository,
-            getChatMessageUseCase,
-            createSaveSentMessageRequestUseCase,
-            setNodeAttributesAfterUploadUseCase,
-            updatePendingMessageUseCase,
+            chatMessageRepository = chatMessageRepository,
+            chatRepository = chatRepository,
+            getChatMessageUseCase = getChatMessageUseCase,
+            createSaveSentMessageRequestUseCase = createSaveSentMessageRequestUseCase,
+            setNodeAttributesAfterUploadUseCase = setNodeAttributesAfterUploadUseCase,
+            updatePendingMessageUseCase = updatePendingMessageUseCase,
+            getPendingMessageUseCase = getPendingMessageUseCase,
         )
     }
 
@@ -57,6 +60,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
             createSaveSentMessageRequestUseCase,
             setNodeAttributesAfterUploadUseCase,
             updatePendingMessageUseCase,
+            getPendingMessageUseCase,
         )
     }
 
@@ -64,7 +68,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
     fun `test that pending message is updated to attaching when use case is invoked`() = runTest {
         val pendingMessage = createPendingMessageMock()
         val nodeId = 34L
-        whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(pendingMessage)
+        whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(pendingMessage)
 
         underTest(pendingMsgId, NodeId(nodeId))
         verify(updatePendingMessageUseCase)
@@ -81,7 +85,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
     fun `test that pending message is updated to error attaching when attachNode fails`() =
         runTest {
             val pendingMessage = createPendingMessageMock()
-            whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(
+            whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(
                 pendingMessage
             )
             whenever(chatMessageRepository.attachNode(chatId, nodeHandle)).thenReturn(null)
@@ -103,7 +107,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
             val pendingMessage = createPendingMessageMock()
             val createTypedMessageRequest = mock<CreateTypedMessageRequest>()
 
-            whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(
+            whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(
                 pendingMessage
             )
             whenever(chatMessageRepository.attachNode(chatId, nodeHandle)).thenReturn(msgId)
@@ -120,7 +124,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
     fun `test that setNodeAttributesAfterUploadUseCase is invoked before attaching the file`() =
         runTest {
             val pendingMessage = createPendingMessageMock()
-            whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(
+            whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(
                 pendingMessage
             )
 
@@ -144,7 +148,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
         runTest {
             val pendingMessage = createPendingMessageMock()
             val nodeId = NodeId(1L)
-            whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(
+            whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(
                 pendingMessage
             )
             whenever(chatMessageRepository.getCachedOriginalPathForPendingMessage(pendingMsgId))
@@ -160,7 +164,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
         val pendingMessage = createPendingMessageMock()
         val nodeId = NodeId(1L)
         val originalUri = "content://example.uri"
-        whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(pendingMessage)
+        whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(pendingMessage)
         whenever(chatMessageRepository.getCachedOriginalPathForPendingMessage(pendingMsgId))
             .thenReturn(originalUri)
 
@@ -174,7 +178,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
         runTest {
             val pendingMessage = createPendingMessageMock()
             whenever(pendingMessage.isVoiceClip) doReturn true
-            whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(
+            whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(
                 pendingMessage
             )
             whenever(chatMessageRepository.attachVoiceMessage(chatId, nodeHandle)).thenReturn(null)

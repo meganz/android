@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import java.io.File
 import javax.inject.Inject
@@ -22,6 +23,7 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
     private val createSaveSentMessageRequestUseCase: CreateSaveSentMessageRequestUseCase,
     private val setNodeAttributesAfterUploadUseCase: SetNodeAttributesAfterUploadUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
+    private val getPendingMessageUseCase: GetPendingMessageUseCase,
 ) {
     /**
      * Invoke
@@ -31,7 +33,7 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
      */
     suspend operator fun invoke(pendingMessageId: Long, nodeId: NodeId) {
 
-        chatMessageRepository.getPendingMessage(pendingMessageId)
+        getPendingMessageUseCase(pendingMessageId)
             ?.let { pendingMessage ->
                 val originalPath =
                     chatMessageRepository.getCachedOriginalPathForPendingMessage(pendingMessage.id)
