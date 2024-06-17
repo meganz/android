@@ -1,9 +1,8 @@
 package mega.privacy.android.app.presentation.rubbishbin.model
 
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
@@ -15,7 +14,6 @@ import nz.mega.sdk.MegaNode
  *  @property selectedFileNodes number of selected file [NodeUIItem] on Compose
  *  @property selectedFolderNodes number of selected folder [NodeUIItem] on Compose
  *  @property isInSelection to identify if [NodeUIItem] list is in navigation state
- *  @property itemIndex index of item clicked
  *  @property currentViewType ViewType The current ViewType used by the UI
  *  @property sortOrder [SortOrder] of current list
  *  @property isPendingRefresh
@@ -23,6 +21,7 @@ import nz.mega.sdk.MegaNode
  *  @property selectedMegaNodes List of selected [MegaNode]
  *  @property isRubbishBinEmpty If parent rubbish is empty or not
  *  @property restoreType Determines the specific "Restore" behavior
+ *  @property accountType
  */
 data class RubbishBinState(
     val rubbishBinHandle: Long = -1L,
@@ -38,4 +37,5 @@ data class RubbishBinState(
     val isPendingRefresh: Boolean = false,
     val isRubbishBinEmpty: Boolean = false,
     val restoreType: RestoreType? = null,
+    val accountType: AccountType? = null,
 )

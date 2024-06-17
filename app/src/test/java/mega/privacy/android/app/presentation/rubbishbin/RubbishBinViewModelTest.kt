@@ -15,7 +15,11 @@ import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.FileDurationMapper
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -23,6 +27,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
@@ -62,6 +67,8 @@ class RubbishBinViewModelTest {
     private val getRubbishBinNodeChildrenUseCase = mock<GetRubbishBinNodeChildrenUseCase>()
     private val fileDurationMapper: FileDurationMapper = mock()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val accountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
 
     @BeforeEach
     fun setUp() {
@@ -84,6 +91,7 @@ class RubbishBinViewModelTest {
             getNodeByHandle = getNodeByHandle,
             fileDurationMapper = fileDurationMapper,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         )
     }
 
@@ -104,6 +112,7 @@ class RubbishBinViewModelTest {
             Truth.assertThat(initial.isPendingRefresh).isFalse()
             Truth.assertThat(initial.isRubbishBinEmpty).isTrue()
             Truth.assertThat(initial.restoreType).isNull()
+            Truth.assertThat(initial.accountType).isNull()
         }
     }
 
@@ -411,6 +420,25 @@ class RubbishBinViewModelTest {
             }
         }
 
+    @Test
+    fun `test that account type is updated when monitorAccountDetailUseCase emits`() = runTest {
+        val newAccountDetail = AccountDetail(
+            levelDetail = AccountLevelDetail(
+                accountType = AccountType.PRO_I,
+                subscriptionStatus = null,
+                subscriptionRenewTime = 0,
+                accountSubscriptionCycle = AccountSubscriptionCycle.YEARLY,
+                proExpirationTime = 0L,
+            )
+        )
+        accountDetailFakeFlow.emit(newAccountDetail)
+
+        underTest.state.test {
+            Truth.assertThat(awaitItem().accountType)
+                .isEqualTo(newAccountDetail.levelDetail?.accountType)
+        }
+    }
+
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorViewType()).thenReturn(emptyFlow())
@@ -419,6 +447,7 @@ class RubbishBinViewModelTest {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(getRubbishBinFolderUseCase()).thenReturn(null)
         whenever(fileDurationMapper(any())).thenReturn(1.seconds)
+        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
     }
 
     @AfterEach

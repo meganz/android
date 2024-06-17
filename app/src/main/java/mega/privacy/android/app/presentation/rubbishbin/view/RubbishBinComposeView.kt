@@ -65,6 +65,7 @@ fun RubbishBinComposeView(
             onDisputeTakeDownClicked = onDisputeTakeDownClicked,
             fileTypeIconMapper = fileTypeIconMapper,
             inSelectionMode = uiState.isInSelection,
+            accountType = uiState.accountType,
         )
     } else {
         LegacyMegaEmptyView(

@@ -8,6 +8,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
@@ -22,11 +25,11 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
@@ -35,6 +38,7 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -62,6 +66,7 @@ class RubbishBinViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val fileDurationMapper: FileDurationMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
 
     /**
@@ -77,6 +82,7 @@ class RubbishBinViewModel @Inject constructor(
     init {
         nodeUpdates()
         checkViewType()
+        monitorAccountDetail()
     }
 
     /**
@@ -108,6 +114,15 @@ class RubbishBinViewModel @Inject constructor(
                 checkForDeletedNodes(it.changes)
             }
         }
+    }
+
+    private fun monitorAccountDetail() {
+        monitorAccountDetailUseCase()
+            .onEach { accountDetail ->
+                _state.update { it.copy(accountType = accountDetail.levelDetail?.accountType) }
+                setPendingRefreshNodes()
+            }.catch { Timber.e(it) }
+            .launchIn(viewModelScope)
     }
 
     /**
