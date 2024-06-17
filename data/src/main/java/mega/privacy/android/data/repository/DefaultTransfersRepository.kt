@@ -684,28 +684,6 @@ internal class DefaultTransfersRepository @Inject constructor(
             )
         }
 
-    @Deprecated(
-        "This value is deprecated in SDK. " +
-                "Replace with the corresponding value get from ActiveTransfers when ready"
-    )
-    override suspend fun getTotalDownloadedBytes() = withContext(ioDispatcher) {
-        megaApiGateway.totalDownloadedBytes
-    }
-
-    @Deprecated(
-        "This value is deprecated in SDK. " +
-                "Replace with the corresponding value get from ActiveTransfers when ready"
-    )
-    override suspend fun getTotalDownloadBytes() = withContext(ioDispatcher) {
-        megaApiGateway.totalDownloadBytes
-    }
-
-    @Deprecated(
-        "This value is deprecated in SDK. " +
-                "Replace with the corresponding value get from ActiveTransfers when ready"
-    )
-    override suspend fun getTotalDownloads() = megaApiGateway.totalDownloads
-
     private val transferredBytesFlowMutex = Mutex()
     private suspend fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Int, Long>> {
         transferredBytesFlowMutex.withLock {

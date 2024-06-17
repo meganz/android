@@ -3035,33 +3035,6 @@ interface MegaApiGateway {
     val currentDownloadSpeed: Int
 
     /**
-     * Total downloaded bytes
-     */
-    @Deprecated(
-        "This value is deprecated in SDK. " +
-                "Replace with the corresponding value get from ActiveTransfers when ready"
-    )
-    val totalDownloadedBytes: Long
-
-    /**
-     * Total download bytes
-     */
-    @Deprecated(
-        "This value is deprecated in SDK. " +
-                "Replace with the corresponding value get from ActiveTransfers when ready"
-    )
-    val totalDownloadBytes: Long
-
-    /**
-     * Total downloads
-     */
-    @Deprecated(
-        "This value is deprecated in SDK. " +
-                "Replace with the corresponding value get from ActiveTransfers when ready"
-    )
-    val totalDownloads: Int
-
-    /**
      * Get psa
      *
      * @param listener

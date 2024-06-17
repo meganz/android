@@ -510,39 +510,6 @@ interface TransferRepository {
     suspend fun getOrCreateSDCardTransfersCacheFolder(): File?
 
     /**
-     * Get current downloaded bytes.
-     *
-     * @return Current downloaded bytes.
-     */
-    @Deprecated(
-        "This value is deprecated in SDK. " +
-                "Replace with the corresponding value get from ActiveTransfers when ready"
-    )
-    suspend fun getTotalDownloadedBytes(): Long
-
-    /**
-     * Get current download bytes.
-     *
-     * @return Current download bytes.
-     */
-    @Deprecated(
-        "This value is deprecated in SDK. " +
-                "Replace with the corresponding value get from ActiveTransfers when ready"
-    )
-    suspend fun getTotalDownloadBytes(): Long
-
-    /**
-     * Get total downloads
-     *
-     * @return Total downloads.
-     */
-    @Deprecated(
-        "This value is deprecated in SDK. " +
-                "Replace with the corresponding value get from ActiveTransfers when ready"
-    )
-    suspend fun getTotalDownloads(): Int
-
-    /**
      * @return a flow that emits true if DownloadsWorker is enqueued. false otherwise
      */
     fun isDownloadsWorkerEnqueuedFlow(): Flow<Boolean>
