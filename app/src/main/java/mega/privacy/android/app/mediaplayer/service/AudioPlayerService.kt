@@ -161,14 +161,6 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         super.onCreate()
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
-
-        startForegroundByVersion(
-            PLAYBACK_NOTIFICATION_ID,
-            NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID).build()
-        ).apply {
-            crashReporter.log("StartForeground is invoked")
-        }
-
         createPlayer()
         if (!isNotificationCreated) {
             createPlayerControlNotification()
@@ -178,29 +170,6 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
-    }
-
-    private fun startForegroundByVersion(notificationId: Int, notification: Notification) {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                startForeground(
-                    notificationId, notification,
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-                    } else {
-                        0
-                    },
-                )
-            } else {
-                startForeground(notificationId, notification)
-            }
-        } catch (e: Exception) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-                && e is ForegroundServiceStartNotAllowedException
-            ) {
-                Timber.e("App not in a valid state to start foreground service: ${e.message}")
-            }
-        }
     }
 
     private fun createPlayer() {
@@ -302,7 +271,26 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 onNotificationPostedCallback = { notificationId, notification, ongoing ->
                     if (ongoing && isForeground) {
                         // Make sure the service will not get destroyed while playing media.
-                        startForegroundByVersion(notificationId, notification)
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                startForeground(
+                                    notificationId, notification,
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                                    } else {
+                                        0
+                                    },
+                                )
+                            } else {
+                                startForeground(notificationId, notification)
+                            }
+                        } catch (e: Exception) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                                && e is ForegroundServiceStartNotAllowedException
+                            ) {
+                                Timber.e("App not in a valid state to start foreground service: ${e.message}")
+                            }
+                        }
                         currentNotification = notification
                     } else {
                         // Make notification cancellable.
