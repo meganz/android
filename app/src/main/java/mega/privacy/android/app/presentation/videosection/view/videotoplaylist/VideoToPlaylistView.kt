@@ -60,7 +60,7 @@ internal fun VideoToPlaylistView(
     onCloseClicked: () -> Unit = {},
     onSearchClicked: () -> Unit = {},
     onBackPressed: () -> Unit = {},
-    onItemClicked: (VideoPlaylistSetUiEntity) -> Unit = {},
+    onItemClicked: (Int, VideoPlaylistSetUiEntity) -> Unit = { _, _ -> },
     onDoneButtonClicked: () -> Unit = {},
     errorMessage: Int? = null,
 ) {
@@ -148,24 +148,26 @@ internal fun VideoToPlaylistView(
                         .weight(1f)
                         .testTag(VIDEO_TO_PLAYLIST_LIST_TEST_TAG)
                 ) {
-                    items(count = items.size, key = { items[it].id }) {
-                        val set = items[it]
+                    items(count = items.size, key = { items[it].id }) { index ->
+                        val set = items[index]
                         GenericTwoLineListItem(
                             title = set.title,
-                            onItemClicked = { onItemClicked(set) },
                             trailingIcons = {
                                 MegaCheckbox(
+                                    modifier = Modifier.testTag(
+                                        "$VIDEO_TO_PLAYLIST_ITEM_CHECK_BOX_TEST_TAG$index"
+                                    ),
                                     checked = set.isSelected,
                                     rounded = false,
                                     onCheckedChange = {
-                                        onItemClicked(set)
+                                        onItemClicked(index, set)
                                     }
                                 )
                             }
                         )
                         MegaDivider(
                             dividerType = DividerType.SmallStartPadding,
-                            modifier = Modifier.testTag("$VIDEO_TO_PLAYLIST_DIVIDER_TEST_TAG$it")
+                            modifier = Modifier.testTag("$VIDEO_TO_PLAYLIST_DIVIDER_TEST_TAG$index")
                         )
                     }
                 }
@@ -228,6 +230,11 @@ const val VIDEO_TO_PLAYLIST_LIST_TEST_TAG = "video_to_playlist_view:lazy_colum_l
  * Test tag for the divider of the video to playlist
  */
 const val VIDEO_TO_PLAYLIST_DIVIDER_TEST_TAG = "video_to_playlist_item:divider"
+
+/**
+ * Test tag for the check box of the video to playlist
+ */
+const val VIDEO_TO_PLAYLIST_ITEM_CHECK_BOX_TEST_TAG = "video_to_playlist_item:check_box"
 
 /**
  * Test tag for the done button of the video to playlist

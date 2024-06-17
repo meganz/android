@@ -200,6 +200,27 @@ class VideoToPlaylistViewModel @Inject constructor(
         }
     }
 
+    internal fun updateItemInSelectionState(index: Int, item: VideoPlaylistSetUiEntity) {
+        val isSelected = !item.isSelected
+        val updateItems =
+            _uiState.value.items.updateItemSelectedState(index, isSelected).updateOriginalData()
+        _uiState.update {
+            it.copy(
+                items = updateItems
+            )
+        }
+    }
+
+    private fun List<VideoPlaylistSetUiEntity>.updateItemSelectedState(
+        index: Int,
+        isSelected: Boolean,
+    ) =
+        if (index in indices) {
+            toMutableList().also { list ->
+                list[index] = list[index].copy(isSelected = isSelected)
+            }
+        } else this
+
     companion object {
         internal const val ERROR_MESSAGE_REPEATED_TITLE = 0
     }

@@ -31,7 +31,7 @@ internal fun VideoToPlaylistScreen(
         setDialogInputPlaceholder = viewModel::setPlaceholderTitle,
         searchState = uiState.searchState,
         query = uiState.query,
-        hasSelectedItems = uiState.selectedPlaylistIds.isNotEmpty(),
+        hasSelectedItems = uiState.items.any { it.isSelected },
         errorMessage = uiState.createDialogErrorMessage,
         onSearchClicked = viewModel::searchWidgetStateUpdate,
         onSearchTextChange = viewModel::searchQuery,
@@ -44,6 +44,7 @@ internal fun VideoToPlaylistScreen(
                 else ->
                     onBackPressedDispatcher?.onBackPressed()
             }
-        }
+        },
+        onItemClicked = viewModel::updateItemInSelectionState
     )
 }

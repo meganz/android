@@ -9,7 +9,6 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isLoading whether is in loading state
  * @property searchState SearchWidgetState
  * @property query search query
- * @property selectedPlaylistIds selected video playlist ids
  * @property isInputTitleValid true if the input title is valid
  * @property createVideoPlaylistPlaceholderTitle the create video playlist placeholder title
  * @property shouldCreateVideoPlaylist true if there is a need to create a video playlist
@@ -21,7 +20,6 @@ data class VideoToPlaylistUiState(
     val isLoading: Boolean = true,
     val searchState: SearchWidgetState = SearchWidgetState.COLLAPSED,
     val query: String? = null,
-    val selectedPlaylistIds: List<Long> = emptyList(),
     val isInputTitleValid: Boolean = true,
     val createVideoPlaylistPlaceholderTitle: String = "",
     val shouldCreateVideoPlaylist: Boolean = false,

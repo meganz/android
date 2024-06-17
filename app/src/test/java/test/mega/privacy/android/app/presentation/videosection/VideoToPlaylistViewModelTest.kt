@@ -136,9 +136,11 @@ class VideoToPlaylistViewModelTest {
         }
     }
 
-    private fun getMockUiEntity(expectedTitle: String) = mock<VideoPlaylistSetUiEntity> {
-        on { title }.thenReturn(expectedTitle)
-    }
+    private fun getMockUiEntity(expectedTitle: String, expectedSelected: Boolean = false) =
+        mock<VideoPlaylistSetUiEntity> {
+            on { title }.thenReturn(expectedTitle)
+            on { isSelected }.thenReturn(expectedSelected)
+        }
 
     @Test
     fun `test that the createVideoPlaylistPlaceholderTitle is correctly updated`() = runTest {
@@ -350,6 +352,49 @@ class VideoToPlaylistViewModelTest {
                 assertThat(it.items.size).isEqualTo(1)
                 assertThat(it.items[0].title).isEqualTo(expectedSetUiEntities[1].title)
             }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the state is updated correctly when the item is clicked`() = runTest {
+        val testIndex = 1
+        val expectedUserSets = (1..3L).map {
+            createUserSet(id = it, name = "Playlist$it")
+        }
+        val expectedSetUiEntities =
+            expectedUserSets.map { item ->
+                getMockUiEntity(expectedTitle = item.name)
+            }
+        val selectedSetUiEntity = getMockUiEntity(
+            expectedTitle = expectedSetUiEntities[testIndex].title,
+            expectedSelected = true
+        )
+        expectedUserSets.forEachIndexed { index, set ->
+            whenever(videoPlaylistSetUiEntityMapper(set)).thenReturn(expectedSetUiEntities[index])
+        }
+        whenever(getVideoPlaylistSetsUseCase()).thenReturn(expectedUserSets)
+        whenever(expectedSetUiEntities[testIndex].copy(isSelected = true)).thenReturn(
+            selectedSetUiEntity
+        )
+        whenever(selectedSetUiEntity.copy(isSelected = false)).thenReturn(
+            expectedSetUiEntities[testIndex]
+        )
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            awaitItem().let { result ->
+                assertThat(result.items.size).isEqualTo(3)
+                assertThat(result.items.any { it.isSelected }).isFalse()
+            }
+            underTest.updateItemInSelectionState(testIndex, expectedSetUiEntities[testIndex])
+            awaitItem().let { result ->
+                assertThat(result.items.any { it.isSelected }).isTrue()
+                assertThat(result.items.first { it.isSelected }).isEqualTo(selectedSetUiEntity)
+            }
+            underTest.updateItemInSelectionState(testIndex, selectedSetUiEntity)
+            assertThat(awaitItem().items.any { it.isSelected }).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
