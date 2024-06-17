@@ -58,7 +58,13 @@ internal class SyncFoldersViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            loadSyncs()
+            runCatching {
+                refreshSyncUseCase()
+            }.onSuccess {
+                loadSyncs()
+            }.onFailure {
+                Timber.e(it)
+            }
         }
         viewModelScope.launch {
             runCatching {
