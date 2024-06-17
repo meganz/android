@@ -172,6 +172,7 @@ internal fun VariantBOnboardingDialogColumn(
                     ),
                     testTag = ADDITIONAL_FEATURES_DESCRIPTION_ROW,
                     isLoading = isLoading,
+                    isBulletPointListUsed = true,
                 )
             }
         }

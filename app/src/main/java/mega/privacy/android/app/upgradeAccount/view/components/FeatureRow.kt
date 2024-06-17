@@ -16,7 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
@@ -40,6 +43,7 @@ internal fun FeatureRow(
     description: String,
     testTag: String,
     isLoading: Boolean = false,
+    isBulletPointListUsed: Boolean = false,
 ) {
     Row(
         modifier = Modifier
@@ -78,10 +82,13 @@ internal fun FeatureRow(
             MegaText(
                 text = description,
                 textColor = TextColor.Secondary,
-                style = MaterialTheme.typography.subtitle2,
+                style = MaterialTheme.typography.subtitle2.copy(textIndent = TextIndent(restLine = if (isBulletPointListUsed) 8.sp else 0.sp)),
                 modifier = Modifier
                     .testTag("$testTag:description")
-                    .padding(top = 2.dp)
+                    .padding(
+                        start = if (isBulletPointListUsed) 4.dp else 0.dp,
+                        top = 2.dp
+                    )
                     .placeholder(
                         color = MaterialTheme.colors.grey_020_grey_900,
                         shape = RoundedCornerShape(4.dp),
