@@ -3,6 +3,7 @@ import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.library.jacoco)
     alias(convention.plugins.mega.lint)
@@ -12,14 +13,6 @@ plugins {
 }
 
 android {
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = androidx.versions.compose.compiler.get()
-    }
-
     namespace = "mega.privacy.android.feature.devicecenter"
 }
 
@@ -63,14 +56,12 @@ dependencies {
     implementation(androidx.lifecycle.runtime.compose)
     implementation(androidx.compose.activity)
     implementation(androidx.compose.viewmodel)
-    implementation(platform(androidx.compose.bom))
     implementation(androidx.bundles.compose.bom)
     implementation(lib.compose.state.events)
     implementation(androidx.hilt.navigation)
     implementation(androidx.constraintlayout.compose)
     implementation(lib.compose.state.events)
 
-    testImplementation(testlib.compose.junit)
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
 

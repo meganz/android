@@ -2,6 +2,7 @@ import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.lint)
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
@@ -9,14 +10,6 @@ plugins {
 
 android {
     namespace = "mega.privacy.android.analytics"
-
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = androidx.versions.compose.compiler.get()
-    }
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
@@ -41,7 +34,6 @@ dependencies {
     implementation(google.hilt.android)
 
     // Framework
-    implementation(platform(androidx.compose.bom))
     implementation(androidx.bundles.compose.bom)
     implementation(lib.kotlin.ktx)
     implementation(androidx.appcompat)
@@ -58,7 +50,6 @@ dependencies {
 
     testImplementation(testlib.bundles.unit.test)
 
-    testImplementation(testlib.compose.junit)
     testImplementation(testlib.mockito)
     testImplementation(testlib.mockito.kotlin)
     testImplementation(testlib.mockito.android)

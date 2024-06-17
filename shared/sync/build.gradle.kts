@@ -2,6 +2,7 @@ import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.lint)
     id("kotlin-android")
@@ -12,19 +13,10 @@ plugins {
 android {
     namespace = "mega.privacy.android.shared.sync"
 
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = androidx.versions.compose.compiler.get()
-    }
-
     dependencies {
         lintChecks(project(":lint"))
         implementation(project(":shared:original-core-ui"))
 
-        implementation(platform(androidx.compose.bom))
         implementation(androidx.bundles.compose.bom)
     }
 }

@@ -27,7 +27,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
-                configureAndroidCompose(this)
 
                 buildFeatures {
                     dataBinding = true

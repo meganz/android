@@ -1,5 +1,6 @@
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.android.library.jacoco)
@@ -9,12 +10,7 @@ plugins {
 
 android {
     buildFeatures {
-        compose = true
         buildConfig = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = androidx.versions.compose.compiler.get()
     }
 
     defaultConfig {
@@ -30,7 +26,6 @@ dependencies {
     implementation(project(":icon-pack"))
     testImplementation(project(":core-ui-test"))
 
-    implementation(platform(androidx.compose.bom))
     implementation(androidx.constraintlayout.compose)
     implementation(androidx.bundles.compose.bom)
     implementation(lib.kotlin.ktx)
@@ -54,5 +49,4 @@ dependencies {
 
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
-    testImplementation(testlib.compose.junit)
 }

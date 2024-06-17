@@ -26,6 +26,7 @@ import mega.privacy.android.build.shouldUsePrebuiltSdk
 
 plugins {
     alias(convention.plugins.mega.android.app)
+    alias(convention.plugins.mega.android.application.compose)
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.application.jacoco)
     alias(convention.plugins.mega.android.application.firebase)
@@ -211,7 +212,6 @@ dependencies {
     implementation(androidx.sqlite.ktx)
 
     // Compose
-    implementation(platform(androidx.compose.bom))
     implementation(androidx.bundles.compose.bom)
     implementation(androidx.compose.activity)
     implementation(androidx.compose.viewmodel)
@@ -319,7 +319,6 @@ dependencies {
     }
     testImplementation(google.hilt.android.test)
     testImplementation(androidx.work.test)
-    testImplementation(testlib.compose.junit)
     testImplementation(androidx.navigation.testing)
     testImplementation(lib.rx.coroutines)
 

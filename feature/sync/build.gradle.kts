@@ -3,6 +3,7 @@ import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.library.jacoco)
@@ -14,14 +15,6 @@ plugins {
 
 android {
     namespace = "mega.privacy.android.feature.sync"
-
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = androidx.versions.compose.compiler.get()
-    }
 }
 
 dependencies {
@@ -65,11 +58,9 @@ dependencies {
     implementation(androidx.lifecycle.runtime.compose)
     implementation(androidx.lifecycle.service)
     implementation(androidx.compose.activity)
-    implementation(platform(androidx.compose.bom))
     implementation(androidx.bundles.compose.bom)
     implementation(lib.compose.state.events)
 
-    testImplementation(testlib.compose.junit)
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)

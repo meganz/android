@@ -79,5 +79,17 @@ gradlePlugin {
             implementationClass = "AndroidLintConventionPlugin"
         }
     }
+    plugins {
+        register("androidApplicationCompose") {
+            id = "mega.android.application.compose"
+            implementationClass = "AndroidApplicationComposeConventionPlugin"
+        }
+    }
+    plugins {
+        register("androidLibraryCompose") {
+            id = "mega.android.library.compose"
+            implementationClass = "AndroidLibraryComposeConventionPlugin"
+        }
+    }
 }
 
