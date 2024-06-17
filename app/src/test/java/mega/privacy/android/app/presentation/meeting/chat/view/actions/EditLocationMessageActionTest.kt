@@ -17,13 +17,12 @@ import mega.privacy.mobile.analytics.event.ChatConversationEditActionMenuItemEve
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.AnalyticsTestRule
+import mega.privacy.android.core.test.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class EditLocationMessageActionTest {

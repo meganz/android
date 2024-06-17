@@ -35,7 +35,7 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import test.mega.privacy.android.app.AnalyticsTestRule
+import mega.privacy.android.core.test.AnalyticsTestRule
 
 @OptIn(ExperimentalMaterialApi::class)
 @RunWith(AndroidJUnit4::class)

@@ -19,7 +19,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.AnalyticsTestRule
+import mega.privacy.android.core.test.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class ResumeTransfersMessageActionTest {

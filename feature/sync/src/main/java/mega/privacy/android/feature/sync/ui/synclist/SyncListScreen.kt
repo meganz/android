@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
@@ -62,6 +63,7 @@ import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnack
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.SyncListBannerUpgradeButtonPressedEvent
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -207,7 +209,10 @@ private fun SyncListScreenContent(
             ActionBanner(
                 mainText = stringResource(id = sharedR.string.sync_error_banner_free_user),
                 leftActionText = stringResource(sharedR.string.sync_error_storage_over_quota_banner_action),
-                leftActionClicked = onOpenUpgradeAccountClicked,
+                leftActionClicked = {
+                    Analytics.tracker.trackEvent(SyncListBannerUpgradeButtonPressedEvent)
+                    onOpenUpgradeAccountClicked()
+                },
                 modifier = Modifier.padding(top = 20.dp)
             )
             MegaDivider(

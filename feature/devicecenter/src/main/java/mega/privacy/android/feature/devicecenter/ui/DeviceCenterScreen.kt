@@ -73,6 +73,10 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDi
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.runtime.LaunchedEffect
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
+import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogUpgradeButtonPressedEvent
 
 /**
  * Test tags for the Device Center Screen
@@ -267,16 +271,21 @@ internal fun DeviceCenterScreen(
     )
 
     if (showUpgradeDialog) {
+        Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogDisplayedEvent)
         MegaAlertDialog(
             title = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_title),
             body = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message),
             confirmButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_confirm_button),
             cancelButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_cancel_button),
             onConfirm = {
+                Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogUpgradeButtonPressedEvent)
                 onOpenUpgradeAccountClicked()
                 showUpgradeDialog = false
             },
-            onDismiss = { showUpgradeDialog = false },
+            onDismiss = {
+                Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogCancelButtonPressedEvent)
+                showUpgradeDialog = false
+            },
             modifier = Modifier.testTag(TEST_TAG_DEVICE_CENTER_SCREEN_UPGRADE_DIALOG)
         )
     }

@@ -32,6 +32,9 @@ import mega.privacy.mobile.analytics.event.AndroidSyncMergeFoldersEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesAndRemoveRestEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncRenameAllItemsEvent
+import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
+import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogUpgradeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncOptionSelected
 import mega.privacy.mobile.analytics.event.SyncOptionSelectedEvent
 
@@ -163,16 +166,21 @@ internal fun SyncListRoute(
     }
 
     if (showUpgradeDialog) {
+        Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogDisplayedEvent)
         MegaAlertDialog(
             title = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_title),
             body = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message),
             confirmButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_confirm_button),
             cancelButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_cancel_button),
             onConfirm = {
+                Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogUpgradeButtonPressedEvent)
                 onOpenUpgradeAccountClicked()
                 showUpgradeDialog = false
             },
-            onDismiss = { showUpgradeDialog = false },
+            onDismiss = {
+                Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogCancelButtonPressedEvent)
+                showUpgradeDialog = false
+            },
             modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG)
         )
     }

@@ -6,8 +6,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -25,10 +27,16 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssu
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesState
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CANCEL_TAG
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CONFIRM_TAG
 import mega.privacy.android.shared.original.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
+import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
+import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogUpgradeButtonPressedEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
@@ -36,8 +44,11 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class SyncListRouteTest {
 
+    private val composeTestRule = createComposeRule()
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val viewModel: SyncListViewModel = mock()
     private val state: StateFlow<SyncListState> = mock()
@@ -124,5 +135,37 @@ class SyncListRouteTest {
             .performClick()
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG)
             .assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that display the upgrade dialog sends the right analytics tracker event`() {
+        setComposeContent()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG).assertIsDisplayed()
+        assertThat(analyticsRule.events).contains(SyncFeatureUpgradeDialogDisplayedEvent)
+
+        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
+        composeTestRule.onNodeWithTag(ADD_NEW_SYNC_ACTION_TEST_TAG).assertIsDisplayed()
+            .performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG).assertIsDisplayed()
+        assertThat(analyticsRule.events).contains(SyncFeatureUpgradeDialogDisplayedEvent)
+    }
+
+    @Test
+    fun `test that click the confirm button of the upgrade dialog sends the right analytics tracker event`() {
+        setComposeContent()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CONFIRM_TAG).assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncFeatureUpgradeDialogUpgradeButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that click the cancel button of the upgrade dialog sends the right analytics tracker event`() {
+        setComposeContent()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB).performClick()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CANCEL_TAG).assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncFeatureUpgradeDialogCancelButtonPressedEvent)
     }
 }

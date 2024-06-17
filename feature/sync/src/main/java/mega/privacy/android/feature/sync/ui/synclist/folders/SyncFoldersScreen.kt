@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -44,6 +45,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.mobile.analytics.event.SyncListEmptyStateUpgradeButtonPressedEvent
 
 @Composable
 internal fun SyncFoldersScreen(
@@ -173,7 +175,12 @@ private fun SyncFoldersScreenEmptyState(
         }
         RaisedDefaultMegaButton(
             textId = if (isFreeAccount) sharedResR.string.general_upgrade_now_label else sharedResR.string.device_center_sync_add_new_syn_button_option,
-            onClick = if (isFreeAccount) upgradeNowClicked else addFolderClicked,
+            onClick = if (isFreeAccount) {
+                Analytics.tracker.trackEvent(SyncListEmptyStateUpgradeButtonPressedEvent)
+                upgradeNowClicked
+            } else {
+                addFolderClicked
+            },
             modifier = Modifier
                 .padding(top = if (isFreeAccount) 108.dp else 162.dp)
                 .defaultMinSize(minWidth = 232.dp)
