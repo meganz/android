@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.lists
 
-import androidx.compose.material.Switch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -9,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,7 +42,7 @@ class MenuActionListTileTest {
                 text = "MenuListViewItem",
                 icon = painterResource(id = R.drawable.ic_favorite),
             ) {
-                Switch(
+                MegaSwitch(
                     modifier = Modifier.testTag(switchTag),
                     checked = true,
                     onCheckedChange = {}

@@ -22,8 +22,6 @@ import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
-import androidx.compose.material.Switch
-import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -56,21 +53,22 @@ import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
-import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_200_grey_700
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.legacy.core.ui.controls.chips.CallTextButtonChip
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_200_grey_700
+import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
 import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButtonEvent
 
 /**
@@ -297,12 +295,11 @@ fun BottomPanelView(
                                 Box(
                                     modifier = Modifier.wrapContentSize(Alignment.CenterEnd)
                                 ) {
-                                    Switch(
+                                    MegaSwitch(
                                         modifier = Modifier.align(Alignment.Center),
                                         checked = enabledAllowNonHostAddParticipantsOption,
                                         enabled = isAllowNonHostAddParticipantEnabled,
                                         onCheckedChange = null,
-                                        colors = switchColors()
                                     )
                                 }
                             }
@@ -580,17 +577,6 @@ private fun EmptyState(section: ParticipantsSection) {
         )
     }
 }
-
-/**
- * Control the colours of the switch depending on the status
- */
-@Composable
-private fun switchColors() = SwitchDefaults.colors(
-    checkedThumbColor = colorResource(id = R.color.teal_300_teal_200),
-    checkedTrackColor = colorResource(id = R.color.teal_100_teal_200_038),
-    uncheckedThumbColor = colorResource(id = R.color.grey_020_grey_100),
-    uncheckedTrackColor = colorResource(id = R.color.grey_700_grey_050_038),
-)
 
 /**
  * See all participants in the list button view
