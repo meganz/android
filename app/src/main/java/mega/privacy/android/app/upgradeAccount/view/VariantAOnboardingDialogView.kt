@@ -112,6 +112,7 @@ fun VariantAOnboardingDialogView(
                 ),
                 testTag = ADDITIONAL_FEATURES_DESCRIPTION_ROW,
                 isLoading = isLoading,
+                isBulletPointListUsed = true,
             )
             Spacer(modifier = Modifier.height(18.dp))
             ButtonsRow(
