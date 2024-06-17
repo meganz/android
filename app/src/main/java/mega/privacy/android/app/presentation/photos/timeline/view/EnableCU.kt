@@ -22,8 +22,6 @@ import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Switch
-import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
@@ -124,21 +123,9 @@ fun EnableCU(
                             color = colorResource(id = R.color.grey_087_white_087),
                             fontSize = 18.sp,
                         )
-                        Switch(
+                        MegaSwitch(
                             checked = timelineViewState.cuUploadsVideos,
                             onCheckedChange = onUploadVideosChanged,
-                            colors = if (MaterialTheme.colors.isLight) {
-                                SwitchDefaults.colors(
-                                    checkedThumbColor = colorResource(id = R.color.teal_300),
-                                    checkedTrackColor = colorResource(id = R.color.teal_100),
-                                    uncheckedThumbColor = colorResource(id = R.color.grey_010),
-                                    uncheckedTrackColor = colorResource(id = R.color.grey_alpha_038),
-                                )
-                            } else {
-                                SwitchDefaults.colors(
-                                    uncheckedThumbColor = colorResource(id = R.color.grey_200),
-                                )
-                            }
                         )
                     }
 
@@ -159,21 +146,9 @@ fun EnableCU(
                             color = colorResource(id = R.color.grey_087_white_087),
                             fontSize = 18.sp,
                         )
-                        Switch(
+                        MegaSwitch(
                             checked = timelineViewState.cuUseCellularConnection,
                             onCheckedChange = onUseCellularConnectionChanged,
-                            colors = if (MaterialTheme.colors.isLight) {
-                                SwitchDefaults.colors(
-                                    checkedThumbColor = colorResource(id = R.color.teal_300),
-                                    checkedTrackColor = colorResource(id = R.color.teal_100),
-                                    uncheckedThumbColor = colorResource(id = R.color.grey_010),
-                                    uncheckedTrackColor = colorResource(id = R.color.grey_alpha_038),
-                                )
-                            } else {
-                                SwitchDefaults.colors(
-                                    uncheckedThumbColor = colorResource(id = R.color.grey_200),
-                                )
-                            }
                         )
                     }
                 }

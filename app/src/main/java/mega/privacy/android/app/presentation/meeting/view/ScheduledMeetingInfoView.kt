@@ -30,8 +30,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Switch
-import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -49,7 +47,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -78,7 +75,16 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManag
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.WaitingRoomWarningDialog
+import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
+import mega.privacy.android.legacy.core.ui.controls.text.MarqueeText
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
@@ -89,14 +95,6 @@ import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
-import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
-import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
-import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
-import mega.privacy.android.legacy.core.ui.controls.text.MarqueeText
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -952,14 +950,13 @@ private fun ActionOption(
             Box(
                 modifier = Modifier
                     .wrapContentSize(Alignment.CenterEnd)
-                    .size(40.dp)
+                    .height(40.dp)
             ) {
-                Switch(
+                MegaSwitch(
                     modifier = Modifier.align(Alignment.Center),
                     checked = isChecked,
                     enabled = isEnabled,
                     onCheckedChange = null,
-                    colors = switchColors()
                 )
             }
 
@@ -980,17 +977,6 @@ private fun ActionSubtitleText(text: String) {
         text = text,
         color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054)
 }
-
-/**
- * Control the colours of the switch depending on the status
- */
-@Composable
-private fun switchColors() = SwitchDefaults.colors(
-    checkedThumbColor = colorResource(id = R.color.teal_300_teal_200),
-    checkedTrackColor = colorResource(id = R.color.teal_100_teal_200_038),
-    uncheckedThumbColor = colorResource(id = R.color.grey_020_grey_100),
-    uncheckedTrackColor = colorResource(id = R.color.grey_700_grey_050_038),
-)
 
 /**
  * Text of the available options

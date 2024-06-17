@@ -17,7 +17,6 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
-import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,6 +44,7 @@ import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_TITLE_TEST
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.OFFLINE_OPTION_TEST_TAG
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.io.File
@@ -219,7 +219,7 @@ fun AudioNodeInfoView(
                 color = colorResource(R.color.grey_087_white)
             )
 
-            Switch(
+            MegaSwitch(
                 checked = isEnabled ?: false,
                 onCheckedChange = null,
                 modifier = Modifier
