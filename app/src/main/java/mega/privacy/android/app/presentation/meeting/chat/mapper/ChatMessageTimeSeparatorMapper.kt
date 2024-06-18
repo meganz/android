@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.mapper
 
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.CallUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.HeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.TimeHeaderUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ManagementUiChatMessage
 import javax.inject.Inject
@@ -25,6 +26,7 @@ class ChatMessageTimeSeparatorMapper @Inject constructor() {
         firstMessage: UiChatMessage?,
         secondMessage: UiChatMessage?,
     ): UiChatMessage? {
+        if (secondMessage is HeaderMessage) return null
         val time = secondMessage?.timeSent ?: return null
         if (secondMessage is ManagementUiChatMessage || secondMessage is CallUiMessage) {
             // always show time header for management messages without user name

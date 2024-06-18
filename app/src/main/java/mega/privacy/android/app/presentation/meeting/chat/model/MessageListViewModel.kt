@@ -33,13 +33,13 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageTime
 import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.HeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.ChatArgs
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
+import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.room.update.MessageReceived
+import mega.privacy.android.domain.entity.chat.room.update.MessageUpdate
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
-import mega.privacy.android.domain.usecase.chat.message.GetLastMessageSeenIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorChatRoomMessageUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.SetMessageSeenUseCase
@@ -93,7 +93,8 @@ class MessageListViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(MessageListUiState())
 
-    private var lastNotSeenMessage : TypedMessage? = null
+    private var lastNotSeenMessage: TypedMessage? = null
+    private var hideUnreadCount: Boolean = false
 
     /**
      * State
@@ -140,6 +141,11 @@ class MessageListViewModel @Inject constructor(
                             )
                         }
                         setMessageSeen(it.message.messageId)
+                    } else if (it is MessageUpdate) {
+                        if (it.message.type == ChatMessageType.TRUNCATE) {
+                            lastNotSeenMessage = null
+                            hideUnreadCount = true
+                        }
                     }
                 }
             }.onFailure {
@@ -177,13 +183,25 @@ class MessageListViewModel @Inject constructor(
                 }
             ) { pagingData, pendingMessages ->
                 pagingData.map {
-                    if (it.status == ChatMessageStatus.NOT_SEEN
+                    if (!hideUnreadCount
+                        && it.status == ChatMessageStatus.NOT_SEEN
                         && (lastNotSeenMessage?.time ?: Long.MAX_VALUE) > it.time
                     ) {
                         lastNotSeenMessage = it
                     }
                     uiChatMessageMapper(it)
                 }
+                    .insertSeparators { before, _ ->
+                        if (unreadCount > 0
+                            && lastNotSeenMessage != null
+                            && before?.id == lastNotSeenMessage?.msgId
+                            && !hideUnreadCount
+                        ) {
+                            ChatUnreadHeaderMessage(unreadCount)
+                        } else {
+                            null
+                        }
+                    }
                     .insertSeparators { before, after: UiChatMessage? ->
                         chatMessageTimeSeparatorMapper(
                             firstMessage = after,
@@ -195,17 +213,6 @@ class MessageListViewModel @Inject constructor(
                             firstMessage = after,
                             secondMessage = before
                         ) //Messages are passed in reverse order as the list is reversed in the ui
-                    }
-                    .insertSeparators { before, _ ->
-                        if (unreadCount > 0
-                            && lastNotSeenMessage != null
-                            && before?.id == lastNotSeenMessage?.msgId
-                            && before !is HeaderMessage
-                        ) {
-                            ChatUnreadHeaderMessage(unreadCount)
-                        } else {
-                            null
-                        }
                     }.let { pagingDataWithoutPending ->
                         pendingMessages.fold(pagingDataWithoutPending) { pagingData, pendingMessage ->
                             //pending messages always at the end (header because list is reversed in the ui)
@@ -251,6 +258,7 @@ class MessageListViewModel @Inject constructor(
         if (lastMessage?.isMine == true) {
             // if user sent a message, reset the extraUnreadCount and remove unread header
             lastNotSeenMessage = null
+            hideUnreadCount = true
             _state.update { state -> state.copy(extraUnreadCount = 0) }
         }
     }

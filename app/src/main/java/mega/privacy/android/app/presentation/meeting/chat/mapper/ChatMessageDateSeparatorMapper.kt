@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.mapper
 
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.DateHeaderUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.HeaderMessage
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import javax.inject.Inject
@@ -23,6 +24,7 @@ class ChatMessageDateSeparatorMapper @Inject constructor() {
         firstMessage: UiChatMessage?,
         secondMessage: UiChatMessage?,
     ): UiChatMessage? {
+        if (secondMessage is HeaderMessage) return null
         val time = secondMessage?.timeSent ?: return null
         val firstMessageTime = firstMessage?.timeSent ?: return DateHeaderUiMessage(time)
 

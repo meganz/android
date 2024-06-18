@@ -5,15 +5,15 @@ import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.app.presentation.meeting.chat.view.message.TimeHeader
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 
 /**
  * Date header ui message
  *
  * @property timeSent
  */
-class TimeHeaderUiMessage(
+data class TimeHeaderUiMessage(
     override val id: Long,
     override val timeSent: Long,
     override val displayAsMine: Boolean,
@@ -40,5 +40,5 @@ class TimeHeaderUiMessage(
         )
     }
 
-    override fun key() = "time_header_$id"
+    override fun key() = "time_header_${id}_${userHandle}"
 }
