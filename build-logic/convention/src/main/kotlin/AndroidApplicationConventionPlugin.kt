@@ -7,6 +7,8 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.provideDelegate
+import java.io.FileInputStream
+import java.util.Properties
 
 /**
  * Convention plugin for Android application
@@ -46,7 +48,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-                    setupLanguageResources()
+                    setupLanguageResources(target)
                 }
                 setupSourceSet()
                 setupJniLibsPackaging()
@@ -105,26 +107,44 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         }
     }
 
-    private fun ApplicationDefaultConfig.setupLanguageResources() {
-        resourceConfigurations += listOf(
-            "en",
-            "ar",
-            "de",
-            "es",
-            "fr",
-            "in",
-            "it",
-            "ja",
-            "ko",
-            "nl",
-            "pl",
-            "pt",
-            "ro",
-            "ru",
-            "th",
-            "vi",
-            "zh-rCN",
-            "zh-rTW"
-        )
+    private fun ApplicationDefaultConfig.setupLanguageResources(project: Project) {
+        if (!shouldIncludeDevResOnly(project)) {
+            resourceConfigurations += listOf(
+                "en",
+                "ar",
+                "de",
+                "es",
+                "fr",
+                "in",
+                "it",
+                "ja",
+                "ko",
+                "nl",
+                "pl",
+                "pt",
+                "ro",
+                "ru",
+                "th",
+                "vi",
+                "zh-rCN",
+                "zh-rTW",
+            )
+        } else {
+            resourceConfigurations += listOf(
+                "en",
+                "xhdpi",
+            )
+        }
+    }
+
+    private fun shouldIncludeDevResOnly(project: Project): Boolean {
+        return project.rootProject
+            .file("local.properties")
+            .takeIf { it.exists() }
+            ?.let { file ->
+                Properties()
+                    .apply { load(FileInputStream(file)) }["include_dev_res_only"]
+                    ?.let { it == "true" }
+            } ?: false
     }
 }
