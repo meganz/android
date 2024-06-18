@@ -9,11 +9,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -246,48 +246,59 @@ class GetIntentToOpenFileMapper @Inject constructor(
             intentInternalIntentPair.first
 
         } else if (MimeTypeList.typeForName(fileNode.name).isImage) {
-            if (viewType == FILE_BROWSER_ADAPTER) {
-                val parentNodeHandle = fileNode.parentId.longValue
-                ImagePreviewActivity.createIntent(
-                    context = activity,
-                    imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
-                    menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
-                    anchorImageNodeId = fileNode.id,
-                    params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to parentNodeHandle),
-                )
-            } else if (viewType == INCOMING_SHARES_ADAPTER || viewType == OUTGOING_SHARES_ADAPTER) {
-                val parentNodeHandle = fileNode.parentId.longValue
-                ImagePreviewActivity.createIntent(
-                    context = activity,
-                    imageSource = ImagePreviewFetcherSource.SHARED_ITEMS,
-                    menuOptionsSource = ImagePreviewMenuSource.SHARED_ITEMS,
-                    anchorImageNodeId = fileNode.id,
-                    params = mapOf(SharedItemsImageNodeFetcher.PARENT_ID to parentNodeHandle),
-                )
-            } else if (viewType == LINKS_ADAPTER) {
-                val parentNodeHandle = fileNode.parentId.longValue
-                ImagePreviewActivity.createIntent(
-                    context = activity,
-                    imageSource = ImagePreviewFetcherSource.SHARED_ITEMS,
-                    menuOptionsSource = ImagePreviewMenuSource.LINKS,
-                    anchorImageNodeId = fileNode.id,
-                    params = mapOf(SharedItemsImageNodeFetcher.PARENT_ID to parentNodeHandle),
-                )
-            } else if (viewType == RUBBISH_BIN_ADAPTER) {
-                ImagePreviewActivity.createIntent(
-                    context = activity,
-                    imageSource = ImagePreviewFetcherSource.RUBBISH_BIN,
-                    menuOptionsSource = ImagePreviewMenuSource.RUBBISH_BIN,
-                    anchorImageNodeId = fileNode.id,
-                    params = mapOf(RubbishBinImageNodeFetcher.PARENT_ID to fileNode.parentId.longValue),
-                )
-            } else {
-                ImageViewerActivity.getIntentForParentNode(
-                    activity,
-                    fileNode.parentId.longValue,
-                    getCloudSortOrder(),
-                    fileNode.id.longValue
-                )
+            when (viewType) {
+                FILE_BROWSER_ADAPTER -> {
+                    val parentNodeHandle = fileNode.parentId.longValue
+                    ImagePreviewActivity.createIntent(
+                        context = activity,
+                        imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
+                        menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
+                        anchorImageNodeId = fileNode.id,
+                        params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to parentNodeHandle),
+                    )
+                }
+
+                INCOMING_SHARES_ADAPTER, OUTGOING_SHARES_ADAPTER -> {
+                    val parentNodeHandle = fileNode.parentId.longValue
+                    ImagePreviewActivity.createIntent(
+                        context = activity,
+                        imageSource = ImagePreviewFetcherSource.SHARED_ITEMS,
+                        menuOptionsSource = ImagePreviewMenuSource.SHARED_ITEMS,
+                        anchorImageNodeId = fileNode.id,
+                        params = mapOf(SharedItemsImageNodeFetcher.PARENT_ID to parentNodeHandle),
+                    )
+                }
+
+                LINKS_ADAPTER -> {
+                    val parentNodeHandle = fileNode.parentId.longValue
+                    ImagePreviewActivity.createIntent(
+                        context = activity,
+                        imageSource = ImagePreviewFetcherSource.SHARED_ITEMS,
+                        menuOptionsSource = ImagePreviewMenuSource.LINKS,
+                        anchorImageNodeId = fileNode.id,
+                        params = mapOf(SharedItemsImageNodeFetcher.PARENT_ID to parentNodeHandle),
+                    )
+                }
+
+                RUBBISH_BIN_ADAPTER -> {
+                    ImagePreviewActivity.createIntent(
+                        context = activity,
+                        imageSource = ImagePreviewFetcherSource.RUBBISH_BIN,
+                        menuOptionsSource = ImagePreviewMenuSource.RUBBISH_BIN,
+                        anchorImageNodeId = fileNode.id,
+                        params = mapOf(RubbishBinImageNodeFetcher.PARENT_ID to fileNode.parentId.longValue),
+                    )
+                }
+
+                else -> {
+                    ImagePreviewActivity.createIntent(
+                        context = activity,
+                        imageSource = ImagePreviewFetcherSource.DEFAULT,
+                        menuOptionsSource = ImagePreviewMenuSource.DEFAULT,
+                        anchorImageNodeId = fileNode.parentId,
+                        params = mapOf(DefaultImageNodeFetcher.NODE_IDS to longArrayOf(fileNode.parentId.longValue)),
+                    )
+                }
             }
         } else {
             if (viewType == Constants.FOLDER_LINK_ADAPTER) {

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.slideshow.view
+package mega.privacy.android.app.presentation.imagepreview.slideshow.view
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown

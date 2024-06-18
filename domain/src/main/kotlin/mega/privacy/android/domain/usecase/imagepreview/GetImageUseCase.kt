@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.imageviewer
+package mega.privacy.android.domain.usecase.imagepreview
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

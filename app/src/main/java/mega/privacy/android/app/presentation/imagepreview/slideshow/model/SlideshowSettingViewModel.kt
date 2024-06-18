@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.slideshow
+package mega.privacy.android.app.presentation.imagepreview.slideshow.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.slideshow.model.SlideshowSettingViewState
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase

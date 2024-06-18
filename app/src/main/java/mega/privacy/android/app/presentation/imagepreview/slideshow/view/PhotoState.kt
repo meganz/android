@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.slideshow.view
+package mega.privacy.android.app.presentation.imagepreview.slideshow.view
 
 import androidx.annotation.FloatRange
 import androidx.compose.animation.core.AnimationState

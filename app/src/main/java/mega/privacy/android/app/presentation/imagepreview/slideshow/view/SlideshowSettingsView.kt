@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.slideshow.view
+package mega.privacy.android.app.presentation.imagepreview.slideshow.view
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
@@ -36,7 +36,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.slideshow.SlideshowSettingViewModel
+import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowSettingViewModel
+import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
+import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
+import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
+import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.button
@@ -49,10 +53,6 @@ import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
-import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
-import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
-import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
-import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.mobile.analytics.event.SlideshowSettingOrderNewestButtonEvent
 import mega.privacy.mobile.analytics.event.SlideshowSettingOrderOldestButtonEvent
 import mega.privacy.mobile.analytics.event.SlideshowSettingOrderShuffleButtonEvent

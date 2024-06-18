@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.slideshow.model
+package mega.privacy.android.app.presentation.imagepreview.slideshow.model
 
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed

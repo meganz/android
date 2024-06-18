@@ -73,9 +73,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
-import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
-import mega.privacy.android.app.presentation.slideshow.view.PhotoState
-import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
+import mega.privacy.android.app.presentation.imagepreview.slideshow.view.PhotoBox
+import mega.privacy.android.app.presentation.imagepreview.slideshow.view.PhotoState
+import mega.privacy.android.app.presentation.imagepreview.slideshow.view.rememberPhotoState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsisText

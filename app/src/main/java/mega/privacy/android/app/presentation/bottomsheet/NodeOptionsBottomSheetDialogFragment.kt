@@ -37,7 +37,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileContactListActivity
@@ -85,7 +84,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ShareData
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -180,8 +178,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val optionMove = contentView.findViewById<TextView>(R.id.move_option)
         val optionCopy = contentView.findViewById<TextView>(R.id.copy_option)
         val optionRestoreFromRubbish = contentView.findViewById<TextView>(R.id.restore_option)
-        //      slideShow
-        val optionSlideshow = contentView.findViewById<TextView>(R.id.option_slideshow)
         //      counterOpen
         val optionOpenFolder = contentView.findViewById<TextView>(R.id.open_folder_option)
         val optionOpenWith = contentView.findViewById<TextView>(R.id.open_with_option)
@@ -303,7 +299,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
                 optionRemove.setOnClickListener { onClick { onDeleteClicked(node) } }
                 optionOpenFolder.setOnClickListener { onClick { onOpenFolderClicked(node) } }
-                optionSlideshow.setOnClickListener { onClick { onSlideShowClicked(node) } }
                 optionOpenWith.setOnClickListener {
                     onClick {
                         onOpenWithClicked(node)
@@ -328,8 +323,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     )
                 }
 
-                //Due to requirement change, not just hide slideshow entry in node context menu
-                optionSlideshow.visibility = View.GONE
                 if (state.isOnline) {
                     nodeName.setupNodeTitleText(
                         nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
@@ -1380,19 +1373,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 requireActivity().supportFragmentManager,
                 ConfirmMoveToRubbishBinDialogFragment.TAG
             )
-        setStateBottomSheetBehaviorHidden()
-    }
-
-    private fun onSlideShowClicked(node: MegaNode) {
-        val intent = getIntentForParentNode(
-            requireContext(),
-            megaApi.getParentNode(node)?.handle,
-            SortOrder.ORDER_DEFAULT_ASC,
-            node.handle,
-            true
-        )
-        startActivity(intent)
-        dismissAllowingStateLoss()
         setStateBottomSheetBehaviorHidden()
     }
 

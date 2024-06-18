@@ -53,9 +53,9 @@ import mega.privacy.android.app.R.drawable
 import mega.privacy.android.app.R.string
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowViewModel
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.SettingOptionsMenuAction
-import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
-import mega.privacy.android.app.presentation.slideshow.view.PhotoState
-import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
+import mega.privacy.android.app.presentation.imagepreview.slideshow.view.PhotoBox
+import mega.privacy.android.app.presentation.imagepreview.slideshow.view.PhotoState
+import mega.privacy.android.app.presentation.imagepreview.slideshow.view.rememberPhotoState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white

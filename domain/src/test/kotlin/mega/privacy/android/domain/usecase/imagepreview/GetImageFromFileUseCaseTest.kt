@@ -1,7 +1,6 @@
-package mega.privacy.android.domain.usecase.imageviewer
+package mega.privacy.android.domain.usecase.imagepreview
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -24,7 +23,6 @@ import java.io.File
 import java.util.stream.Stream
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetImageFromFileUseCaseTest {
     private lateinit var underTest: GetImageFromFileUseCase

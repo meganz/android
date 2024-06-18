@@ -3,12 +3,16 @@ package mega.privacy.android.app.utils
 import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
+import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -17,15 +21,15 @@ import javax.inject.Inject
  * The helper class for open file
  */
 class OpenFileHelper @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
-) : OpenFileWrapper{
+    @MegaApi private val megaApi: MegaApiAndroid,
+) : OpenFileWrapper {
 
     override fun getIntentForOpenFile(
         context: Context,
         node: MegaNode,
         isText: Boolean,
         availablePlaylist: Boolean,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ): Intent? {
         var intent: Intent? = null
         val localPath = FileUtil.getLocalFile(node)
@@ -34,6 +38,7 @@ class OpenFileHelper @Inject constructor(
                 isImage -> {
                     intent = getIntentForOpenImage(context, node)
                 }
+
                 isVideoMimeType || isAudio -> {
                     intent = getIntentForOpenMedia(
                         context = context,
@@ -44,6 +49,7 @@ class OpenFileHelper @Inject constructor(
                         snackbarShower = snackbarShower
                     )
                 }
+
                 isPdf -> {
                     intent = getIntentForOpenPdf(
                         context = context,
@@ -64,7 +70,13 @@ class OpenFileHelper @Inject constructor(
      * @param node MegaNode
      */
     private fun getIntentForOpenImage(context: Context, node: MegaNode): Intent {
-         return ImageViewerActivity.getIntentForSingleNode(context, node.handle)
+        return ImagePreviewActivity.createIntent(
+            context = context,
+            imageSource = ImagePreviewFetcherSource.DEFAULT,
+            menuOptionsSource = ImagePreviewMenuSource.DEFAULT,
+            anchorImageNodeId = NodeId(node.handle),
+            params = mapOf(DefaultImageNodeFetcher.NODE_IDS to longArrayOf(node.handle)),
+        )
     }
 
     /**
@@ -80,7 +92,7 @@ class OpenFileHelper @Inject constructor(
         node: MegaNode,
         localPath: String?,
         isText: Boolean,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ): Intent? {
         val intent = Intent(context, PdfViewerActivity::class.java).apply {
             putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
@@ -115,7 +127,7 @@ class OpenFileHelper @Inject constructor(
         localPath: String?,
         isText: Boolean,
         availablePlaylist: Boolean,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ): Intent? {
         val intent = if (FileUtil.isInternalIntent(node)) {
             Util.getMediaIntent(context, node.name)
@@ -164,7 +176,7 @@ class OpenFileHelper @Inject constructor(
         intent: Intent,
         localPath: String?,
         isText: Boolean,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ): Boolean {
         return if (FileUtil.isLocalFile(node, megaApi, localPath)) {
             FileUtil.setLocalIntentParams(context, node, intent, localPath, isText, snackbarShower)

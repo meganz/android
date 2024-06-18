@@ -51,8 +51,8 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
-import mega.privacy.android.domain.usecase.imageviewer.GetImageFromFileUseCase
-import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
+import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
+import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyTypedNodeUseCase

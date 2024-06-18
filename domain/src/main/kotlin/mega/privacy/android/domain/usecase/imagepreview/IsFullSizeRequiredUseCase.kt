@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.imageviewer
+package mega.privacy.android.domain.usecase.imagepreview
 
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode

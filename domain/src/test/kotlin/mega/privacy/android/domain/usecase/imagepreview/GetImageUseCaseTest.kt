@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.imageviewer
+package mega.privacy.android.domain.usecase.imagepreview
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -14,9 +14,8 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.node.TypedImageNode
-import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase.Companion.FILE
+import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase.Companion.FILE
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

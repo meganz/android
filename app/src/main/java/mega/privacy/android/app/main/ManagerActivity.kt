@@ -128,7 +128,6 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogH
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ChatManagementCallback
@@ -377,12 +376,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * True if any TabLayout is visible
      */
     private var mShowAnyTabLayout = false
-
-    /**
-     * Indicates that ManagerActivity was called from Image Viewer;
-     * Transfers tab should go back to [mega.privacy.android.app.imageviewer.ImageViewerActivity]
-     */
-    private var transfersToImageViewer = false
 
     internal val viewModel: ManagerViewModel by viewModels()
     internal val callRecordingViewModel: CallRecordingViewModel by viewModels()
@@ -4602,18 +4595,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     when (drawerItem) {
                         DrawerItem.SYNC, DrawerItem.RUBBISH_BIN, DrawerItem.TRANSFERS -> {
                             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-                            if (transfersToImageViewer) {
-                                switchImageViewerToFront()
-                            }
                         }
 
                         DrawerItem.DEVICE_CENTER -> handleDeviceCenterBackNavigation()
                         DrawerItem.NOTIFICATIONS -> {
                             handleSuperBackPressed()
                             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-                            if (transfersToImageViewer) {
-                                switchImageViewerToFront()
-                            }
                         }
 
                         else -> drawerLayout.openDrawer(navigationView)
@@ -4883,9 +4870,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
         } else if (drawerItem == DrawerItem.TRANSFERS) {
             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-            if (transfersToImageViewer) {
-                switchImageViewerToFront()
-            }
         } else if (drawerItem == DrawerItem.BACKUPS) {
             backupsFragment?.onBackPressed() ?: goBackToBottomNavigationItem(
                 bottomNavigationCurrentItem
@@ -5031,16 +5015,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
         }
-    }
-
-    /**
-     * This activity was called by [mega.privacy.android.app.imageviewer.ImageViewerActivity]
-     * by putting itself to the front of the history stack. Switching back to the image viewer requires
-     * the same process again (reordering and therefore putting the image viewer to the front).
-     */
-    private fun switchImageViewerToFront() {
-        transfersToImageViewer = false
-        startActivity(ImageViewerActivity.getIntentFromBackStack(this))
     }
 
     /**
@@ -5905,9 +5879,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         applicationContext.packageName
                     )
                 )
-            }
-            if (intent.getBooleanExtra(Constants.OPENED_FROM_IMAGE_VIEWER, false)) {
-                transfersToImageViewer = true
             }
             drawerItem = DrawerItem.TRANSFERS
             transferPageViewModel.setTransfersTab(

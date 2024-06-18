@@ -31,8 +31,8 @@ import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
-import mega.privacy.android.domain.usecase.imageviewer.GetImageFromFileUseCase
-import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
+import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
+import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import timber.log.Timber
 import java.io.File

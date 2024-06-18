@@ -1,27 +1,20 @@
 package test.mega.privacy.android.app.presentation.slideshow
 
 import app.cash.turbine.test
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.slideshow.LegacySlideshowViewModel
+import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowSettingViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
-import mega.privacy.android.domain.usecase.GetPhotosByIdsUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
-import mega.privacy.android.domain.usecase.imageviewer.GetImageByAlbumImportNodeUseCase
-import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandleUseCase
-import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodePublicLinkUseCase
-import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUseCase
-import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
-import mega.privacy.android.domain.usecase.slideshow.GetPhotoByAlbumImportNodeUseCase
-import mega.privacy.android.domain.usecase.slideshow.GetPhotoByPublicLinkUseCase
+import mega.privacy.android.domain.usecase.SaveSlideshowOrderSettingUseCase
+import mega.privacy.android.domain.usecase.SaveSlideshowRepeatSettingUseCase
+import mega.privacy.android.domain.usecase.SaveSlideshowSpeedSettingUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -29,21 +22,15 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
-@OptIn(ExperimentalCoroutinesApi::class)
-class LegacySlideshowViewModelTest {
-    private lateinit var underTest: LegacySlideshowViewModel
+class SlideshowViewModelTest {
+    private lateinit var underTest: SlideshowSettingViewModel
 
-    private val getPhotosByIdsUseCase: GetPhotosByIdsUseCase = mock()
     private val monitorSlideshowOrderSettingUseCase: MonitorSlideshowOrderSettingUseCase = mock()
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase = mock()
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase = mock()
-    private val getImageByNodeHandleUseCase: GetImageByNodeHandleUseCase = mock()
-    private val getImageForChatMessageUseCase: GetImageForChatMessageUseCase = mock()
-    private val getChatPhotoByMessageIdUseCase: GetChatPhotoByMessageIdUseCase = mock()
-    private val getImageByNodePublicLinkUseCase: GetImageByNodePublicLinkUseCase = mock()
-    private val getPhotoByPublicLinkUseCase: GetPhotoByPublicLinkUseCase = mock()
-    private val getImageByAlbumImportNodeUseCase: GetImageByAlbumImportNodeUseCase = mock()
-    private val getPhotoByAlbumImportNodeUseCase: GetPhotoByAlbumImportNodeUseCase = mock()
+    private val saveSlideshowOrderSettingUseCase: SaveSlideshowOrderSettingUseCase = mock()
+    private val saveSlideshowSpeedSettingUseCase: SaveSlideshowSpeedSettingUseCase = mock()
+    private val saveSlideshowRepeatSettingUseCase: SaveSlideshowRepeatSettingUseCase = mock()
 
     @BeforeEach
     fun setUp() {
@@ -57,19 +44,13 @@ class LegacySlideshowViewModelTest {
             .thenReturn(flowOf())
     }
 
-    private fun createSUT() = LegacySlideshowViewModel(
-        getPhotosByIdsUseCase = getPhotosByIdsUseCase,
+    private fun createSUT() = SlideshowSettingViewModel(
         monitorSlideshowOrderSettingUseCase = monitorSlideshowOrderSettingUseCase,
         monitorSlideshowSpeedSettingUseCase = monitorSlideshowSpeedSettingUseCase,
         monitorSlideshowRepeatSettingUseCase = monitorSlideshowRepeatSettingUseCase,
-        getImageByNodeHandleUseCase = getImageByNodeHandleUseCase,
-        getImageForChatMessageUseCase = getImageForChatMessageUseCase,
-        getChatPhotoByMessageIdUseCase = getChatPhotoByMessageIdUseCase,
-        getImageByNodePublicLinkUseCase = getImageByNodePublicLinkUseCase,
-        getPhotoByPublicLinkUseCase = getPhotoByPublicLinkUseCase,
-        getImageByAlbumImportNodeUseCase = getImageByAlbumImportNodeUseCase,
-        getPhotoByAlbumImportNodeUseCase = getPhotoByAlbumImportNodeUseCase,
-        ioDispatcher = UnconfinedTestDispatcher(),
+        saveSlideshowOrderSettingUseCase = saveSlideshowOrderSettingUseCase,
+        saveSlideshowSpeedSettingUseCase = saveSlideshowSpeedSettingUseCase,
+        saveSlideshowRepeatSettingUseCase = saveSlideshowRepeatSettingUseCase,
     )
 
     @Test
