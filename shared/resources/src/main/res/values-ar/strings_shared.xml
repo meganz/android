@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">لا تفقد البيانات مرة أخرى</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore files and folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">يمكنك الترجيع لاستعادة الملفات والمجلدات مرة أخرى إلى أي تاريخ يصل إلى 180 يومًا حتى تكون بياناتك مقاومة للحوادث والعبث.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -315,7 +315,7 @@
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">ترقية</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Upload paused, device is not charging</string>
+    <string name="camera_uploads_phone_not_charging_message">تم إيقاف الترفيع مؤقتًا الجهاز لا يشحن</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
     <string name="device_center_list_view_item_status_nothing_setup">لم يتم إعداد عمليات المزامنة</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
@@ -339,7 +339,7 @@
     <!-- Text for the Sync solved issues chip -->
     <string name="device_center_sync_solved_issues_chip_text">المشكلات التي تم حلها</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">This folder can’t be synced. Set it up to sync to MEGA using Camera uploads.</string>
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">لا يمكن مزامنة هذا المجلد. قم بإعداده للمزامنة مع ميغا MEGA باستخدام ترفيعات الكاميرا.</string>
     <!-- Label for the file info information screen description field -->
     <string name="file_info_information_description_label">الوصف</string>
     <!-- Placeholder for the file info information screen description field -->
@@ -401,27 +401,27 @@
     <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_title">قم بالترقية إلى برو Pro</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Unlock the power to sync your mobile device to the cloud with our Pro plans.</string>
+    <string name="device_center_sync_upgrade_dialog_message">أطلق العنان للطاقة لمزامنة جهازك المحمول مع السحابة من خلال باقات برو Pro الخاصة بنا.</string>
     <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_confirm_button">ترقية</string>
     <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_cancel_button">ليس الآن</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Uploads folder conflict</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">تعارض مجلد الترفيعات</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your Camera uploads folder and secondary media uploads folder cannot be related to each other. Choose a different folder.</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">لا يمكن ربط مجلد ترفيعات الكاميرا ومجلد ترفيعات الوسائط الثانوية ببعضهما البعض. اختر مجلدًا مختلفًا.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">حسناً، فهمت ذلك</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_no_picker_warning">This device doesn’t have an app to select folders</string>
+    <string name="general_no_picker_warning">لا يحتوي هذا الجهاز على تطبيق لتحديد المجلدات</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;قم بمزامنة المجلدات تلقائيًا على هاتفك المحمول</string>
     <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">Your syncs have been paused. Syncing is a Pro plan feature.</string>
+    <string name="sync_error_dialog_free_user">تم إيقاف عمليات المزامنة الخاصة بك مؤقتًا. المزامنة هي إحدى ميزات باقة برو Pro.</string>
     <!-- The error dialog confirm action text -->
     <string name="sync_error_dialog_free_user_confirm_action">موافق</string>
     <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">Syncing is paused because your MEGA Pro plan was cancelled. Upgrade to continue syncing.</string>
+    <string name="sync_error_banner_free_user">تم إيقاف المزامنة مؤقتًا بسبب إلغاء باقة ميغا برو MEGA Pro الخاصة بك. قم بالترقية لمتابعة المزامنة.</string>
     <!-- Hidden items -->
     <string name="hidden_items">عناصر مخفية</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -429,11 +429,11 @@
     <!-- Label for the file info information screen tags field -->
     <string name="file_info_information_tags_label">الوسمات</string>
     <!-- label for tags page tag description -->
-    <string name="add_tags_label_tag_description">Use tags to help you find and organise your data. Try tagging by year, location, project, or subject.</string>
+    <string name="add_tags_label_tag_description">استخدم العلامات لمساعدتك في العثور على بياناتك وتنظيمها. حاول وضع العلامات حسب السنة أو الموقع أو المشروع أو الموضوع.</string>
     <!-- label for tag text field in add tags page -->
-    <string name="add_tags_text_label_tag">Tag</string>
+    <string name="add_tags_text_label_tag">تاغ Tag</string>
     <!-- label for add tags page add button -->
-    <string name="add_tags_button_label_add">Add “#%1$s” tag</string>
+    <string name="add_tags_button_label_add">أضف تاغ Tag «#%1$s»</string>
     <!-- label for add tags page existing tags label -->
     <string name="add_tags_label_existing_tags">Existing tags</string>
     <!-- error label for add tags page when special characters added -->
@@ -457,7 +457,7 @@
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
     <string name="account_cancel_account_screen_plan_access_until_expiration">You’ll still have access to these features until your MEGA plan expires, then you’ll be moved to a free account.</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">You currently are using %1s of storage, you will be at risk of losing your files</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">You are currently using %1s of storage, which you will risk losing.</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">ميزة</string>
     <!-- Column header indicating features available with the free plan -->

@@ -5573,7 +5573,7 @@
         <item quantity="other">%1$s y otros %2$d han levantado la mano</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="hidden_nodes_sharing_album">Hay elementos ocultos en este álbum. Si compartes el álbum, los elementos ocultos estarán visibles para las personas con las que lo compartas. Los elementos seguirán ocultos en tu Nube.</string>
     <!-- Hidden nodes items -->
     <plurals name="hidden_nodes_items">
         <item quantity="one"></item>

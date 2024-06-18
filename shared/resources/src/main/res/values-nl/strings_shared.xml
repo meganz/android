@@ -425,7 +425,7 @@
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
     <string name="account_cancel_account_screen_plan_access_until_expiration">U heeft nog steeds toegang tot deze kenmerken tot uw MEGA-abonnement afloopt, dan word u overgezet naar een gratis account.</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">U gebruikt momenteel %1s van de opslag en loopt het risico uw bestanden kwijt te raken</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">U gebruikt momenteel %1s van de opslag, welke u het risico loopt te verliezen.</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Functie</string>
     <!-- Column header indicating features available with the free plan -->

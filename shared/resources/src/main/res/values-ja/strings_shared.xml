@@ -415,13 +415,13 @@
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">これらの機能をご利用いただけなくなります</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
-    <string name="account_cancel_account_screen_plan_access_until_expiration">You’ll still have access to these features until your MEGA plan expires, then you’ll be moved to a free account.</string>
+    <string name="account_cancel_account_screen_plan_access_until_expiration">MEGAプランの有効期限が切れるまでは、引き続きこれらの機能をご利用いただけます。有効期限が切れると、無料アカウントに移行します。</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">You currently are using %1s of storage, you will be at risk of losing your files</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">現在%1sのストレージをご利用中です。しかし、それが失われる危険性があります。</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">機能</string>
     <!-- Column header indicating features available with the free plan -->
-    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <string name="account_cancel_account_screen_plan_free_plan">無料</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">ストレージ</string>
     <!-- Storage amount available in the free plan -->
@@ -445,19 +445,19 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">通話とミーティング時間</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">最大1時間</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">無制限</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">通話とミーティングの参加者</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">最大100人</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
     <string name="account_cancel_account_pro_plan_call_meeting_participants">無制限</string>
     <!-- Button label to keep the current pro plan -->
-    <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
+    <string name="account_cancel_account_plan_keep_pro_plan">%1sを維持する</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">キャンセルを続ける</string>
 </resources>

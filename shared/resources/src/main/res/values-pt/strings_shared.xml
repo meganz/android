@@ -433,7 +433,7 @@
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
     <string name="account_cancel_account_screen_plan_access_until_expiration">Você vai continuar tendo acesso aos recursos até o seu plano do MEGA expirar, e então a sua conta passará a ser gratuita.</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">No momento, você está usando %1s de armazenamento, e portanto corre o risco de perder os seus arquivos</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">No momento, você está usando %1s de armazenamento, que você corre o risco de perder.</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Recurso</string>
     <!-- Column header indicating features available with the free plan -->

@@ -417,7 +417,7 @@
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
     <string name="account_cancel_account_screen_plan_access_until_expiration">Bạn vẫn có quyền truy&#160;cập vào các tính&#160;năng này cho đến khi gói MEGA của bạn hết hạn, sau đó bạn sẽ chuyển sang tài&#160;khoản miễn&#160;phí.</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">You currently are using %1s of storage, you will be at risk of losing your files</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">Bạn hiện đang sử&#160;dụng %1s không&#160;gian lưu&#160;trữ, bạn sẽ có nguy&#160;cơ mất dữ&#160;liệu của mình.</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Tính năng</string>
     <!-- Column header indicating features available with the free plan -->
