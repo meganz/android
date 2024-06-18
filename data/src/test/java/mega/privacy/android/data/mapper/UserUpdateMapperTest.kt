@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserVisibility
 import nz.mega.sdk.MegaUser
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -191,4 +191,32 @@ class UserUpdateMapperTest {
         Arguments.of(MegaUser.VISIBILITY_UNKNOWN, UserVisibility.Unknown),
         Arguments.of(MegaUser.VISIBILITY_INACTIVE, UserVisibility.Inactive),
     )
+
+    @Test
+    fun `test that email map includes all users`() {
+        val id1 = 1L
+        val id2 = 2L
+        val email1 = "email1"
+        val email2 = "email2"
+        val user1 = mock<MegaUser> {
+            on { handle }.thenReturn(id1)
+            on { changes }.thenReturn(
+                MegaUser.CHANGE_TYPE_ALIAS.toLong(), MegaUser.CHANGE_TYPE_AVATAR.toLong()
+            )
+            on { email }.thenReturn(email1)
+        }
+        val user2 = mock<MegaUser> {
+            on { handle }.thenReturn(id2)
+            on { changes }.thenReturn(MegaUser.CHANGE_TYPE_ALIAS.toLong())
+            on { email }.thenReturn(email2)
+        }
+
+        val userList = arrayListOf(user1, user2, user1)
+        val actual = underTest(userList).emailMap
+        assertThat(actual).containsExactlyEntriesIn(
+            mapOf(
+                UserId(id1) to email1, UserId(id2) to email2
+            )
+        )
+    }
 }

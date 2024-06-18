@@ -42,7 +42,7 @@ class ApplyContactUpdatesUseCaseTest {
 
     @Test
     fun `test that avatar is updated when avatar update is received`() = runTest {
-        userUpdate = UserUpdate(changes = mapOf(userId to listOf(UserChanges.Avatar)))
+        userUpdate = UserUpdate(changes = mapOf(userId to listOf(UserChanges.Avatar)), emailMap = emptyMap())
         whenever(repository.deleteAvatar(any())).thenReturn(null)
         whenever(repository.getAvatarUri(any())).thenReturn("FileUri")
         val contact = underTest(contactItem, userUpdate)
@@ -52,7 +52,7 @@ class ApplyContactUpdatesUseCaseTest {
 
     @Test
     fun `test that full name is updated when first name update is received`() = runTest {
-        userUpdate = UserUpdate(changes = mapOf(userId to listOf(UserChanges.Firstname)))
+        userUpdate = UserUpdate(changes = mapOf(userId to listOf(UserChanges.Firstname)), emailMap = emptyMap())
         whenever(repository.getUserFullName(any(), any())).thenReturn("Tony Stark New")
         val contact = underTest(contactItem, userUpdate)
         assertEquals(contact.email, contactItem.email)
@@ -61,7 +61,7 @@ class ApplyContactUpdatesUseCaseTest {
 
     @Test
     fun `test that full name is updated when last name update is received`() = runTest {
-        userUpdate = UserUpdate(changes = mapOf(userId to listOf(UserChanges.Lastname)))
+        userUpdate = UserUpdate(changes = mapOf(userId to listOf(UserChanges.Lastname)), emailMap = emptyMap())
         whenever(repository.getUserFullName(any(), any())).thenReturn("Tony Stark New")
         val contact = underTest(contactItem, userUpdate)
         assertEquals(contact.email, contactItem.email)
@@ -70,7 +70,7 @@ class ApplyContactUpdatesUseCaseTest {
 
     @Test
     fun `test that nick name is updated when nick name update is received`() = runTest {
-        userUpdate = UserUpdate(changes = mapOf(userId to listOf(UserChanges.Alias)))
+        userUpdate = UserUpdate(changes = mapOf(userId to listOf(UserChanges.Alias)), emailMap = emptyMap())
         whenever(repository.getUserAlias(any())).thenReturn("Nick Name")
         val contact = underTest(contactItem, userUpdate)
         assertEquals(contact.email, contactItem.email)
@@ -79,7 +79,7 @@ class ApplyContactUpdatesUseCaseTest {
 
     @Test
     fun `test that email is updated when email update is received`() = runTest {
-        userUpdate = UserUpdate(changes = mapOf(userId to listOf(UserChanges.Email)))
+        userUpdate = UserUpdate(changes = mapOf(userId to listOf(UserChanges.Email)), emailMap = emptyMap())
         whenever(repository.getUserEmail(any(), any())).thenReturn("updated@gmail.com")
         val contact = underTest(contactItem, userUpdate)
         assertEquals("updated@gmail.com", contact.email)

@@ -135,7 +135,10 @@ class DefaultAccountRepositoryTest {
     private val cookieSettingsIntMapper = mock<CookieSettingsIntMapper>()
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
     private val userUpdateMapper =
-        mock<UserUpdateMapper> { on { invoke(any()) } doReturn UserUpdate(emptyMap()) }
+        mock<UserUpdateMapper> { on { invoke(any()) } doReturn UserUpdate(
+            changes = emptyMap(),
+            emailMap = emptyMap()
+        ) }
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)

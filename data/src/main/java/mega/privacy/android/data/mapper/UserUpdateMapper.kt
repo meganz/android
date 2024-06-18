@@ -18,10 +18,11 @@ internal class UserUpdateMapper @Inject constructor() {
      * @param userList
      */
     operator fun invoke(userList: List<MegaUser>) = UserUpdate(
-        userList.groupBy { user -> UserId(user.handle) }
+        changes = userList.groupBy { user -> UserId(user.handle) }
             .mapValues { (_, users) ->
                 users.map { i -> fromMegaUserChangeFlags(i.changes, i.visibility) }.flatten()
-            }
+            },
+        emailMap = userList.associate { user -> UserId(user.handle) to user.email },
     )
 }
 

@@ -37,7 +37,8 @@ class DefaultMonitorUserUpdatesTest {
         whenever(accountRepository.monitorUserUpdates()).thenReturn(
             flowOf(
                 UserUpdate(
-                    mapOf(currentUserId to listOf(expected))
+                    changes = mapOf(currentUserId to listOf(expected)),
+                    emailMap = emptyMap()
                 )
             )
         )
@@ -54,7 +55,8 @@ class DefaultMonitorUserUpdatesTest {
         whenever(accountRepository.monitorUserUpdates()).thenReturn(
             flowOf(
                 UserUpdate(
-                    mapOf(UserId(currentUserId.id + 1) to listOf(expected))
+                    changes = mapOf(UserId(currentUserId.id + 1) to listOf(expected)),
+                    emailMap = emptyMap()
                 )
             )
         )
@@ -74,7 +76,8 @@ class DefaultMonitorUserUpdatesTest {
         whenever(accountRepository.monitorUserUpdates()).thenReturn(
             flowOf(
                 UserUpdate(
-                    mapOf(currentUserId to expected)
+                    changes = mapOf(currentUserId to expected),
+                    emailMap = emptyMap()
                 )
             )
         )
@@ -102,8 +105,8 @@ class DefaultMonitorUserUpdatesTest {
 
         whenever(accountRepository.monitorUserUpdates()).thenReturn(
             flowOf(
-                UserUpdate(mapOf(currentUserId to expected1)),
-                UserUpdate(mapOf(currentUserId to expected2)),
+                UserUpdate(changes = mapOf(currentUserId to expected1), emailMap = emptyMap()),
+                UserUpdate(changes = mapOf(currentUserId to expected2), emailMap = emptyMap()),
             )
         )
 

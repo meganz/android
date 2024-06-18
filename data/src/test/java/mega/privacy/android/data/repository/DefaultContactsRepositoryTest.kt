@@ -1393,7 +1393,8 @@ class DefaultContactsRepositoryTest {
             flowOf(GlobalUpdate.OnUsersUpdate(arrayListOf(user)))
         )
         val userUpdate = UserUpdate(
-            mapOf(UserId(otherUserHandle) to listOf(UserChanges.Avatar))
+            changes = mapOf(UserId(otherUserHandle) to listOf(UserChanges.Avatar)),
+            emailMap = emptyMap(),
         )
         whenever(userUpdateMapper(listOf(user))).thenReturn(userUpdate)
         whenever(megaApiGateway.getContact(anyOrNull())).thenReturn(user)
@@ -1461,7 +1462,8 @@ class DefaultContactsRepositoryTest {
         )
         whenever(megaApiGateway.myUserHandle).thenReturn(myUserHandle)
         val userUpdate = UserUpdate(
-            mapOf(UserId(otherUserHandle) to listOf(UserChanges.Firstname))
+            changes = mapOf(pair = UserId(otherUserHandle) to listOf(UserChanges.Firstname)),
+            emailMap = emptyMap(),
         )
         whenever(userUpdateMapper(listOf(user))).thenReturn(userUpdate)
         whenever(megaApiGateway.getUserAttribute(anyOrNull<String>(), any(), any())).thenAnswer {
@@ -1496,7 +1498,8 @@ class DefaultContactsRepositoryTest {
         )
         whenever(megaApiGateway.myUserHandle).thenReturn(myUserHandle)
         val userUpdate = UserUpdate(
-            mapOf(UserId(otherUserHandle) to listOf(UserChanges.Lastname))
+            changes = mapOf(UserId(otherUserHandle) to listOf(UserChanges.Lastname)),
+            emailMap = emptyMap(),
         )
         whenever(userUpdateMapper(listOf(user))).thenReturn(userUpdate)
         whenever(megaApiGateway.getUserAttribute(anyOrNull<String>(), any(), any())).thenAnswer {
