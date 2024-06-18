@@ -121,7 +121,7 @@ internal fun CameraCaptureScreen(
                     flashOptions.values.toList()
                 } else {
                     flashOptions[flashMode]?.let { listOf(it) }.orEmpty()
-                },
+                }.takeIf { !isRecording && camSelector == CamSelector.Back }, // hide flash options when recording and front camera is selected
                 onActionPressed = {
                     if (selectFlashMode) {
                         flashMode = when (it) {
