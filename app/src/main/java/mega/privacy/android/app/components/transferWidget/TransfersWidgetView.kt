@@ -135,32 +135,32 @@ private class TransfersWidgetPreviewProvider :
         get() = listOf(
             TransfersInfo(
                 status = Transferring,
-                totalSizeTransferred = 3,
-                totalSizePendingTransfer = 10,
+                totalSizeAlreadyTransferred = 3,
+                totalSizeToTransfer = 10,
                 uploading = true
             ),
             TransfersInfo(
                 status = Transferring,
-                totalSizeTransferred = 4,
-                totalSizePendingTransfer = 10,
+                totalSizeAlreadyTransferred = 4,
+                totalSizeToTransfer = 10,
                 uploading = false
             ),
             TransfersInfo(
                 status = Paused,
-                totalSizeTransferred = 5,
-                totalSizePendingTransfer = 10,
+                totalSizeAlreadyTransferred = 5,
+                totalSizeToTransfer = 10,
                 uploading = true
             ),
             TransfersInfo(
                 status = OverQuota,
-                totalSizeTransferred = 6,
-                totalSizePendingTransfer = 10,
+                totalSizeAlreadyTransferred = 6,
+                totalSizeToTransfer = 10,
                 uploading = false
             ),
             TransfersInfo(
                 status = TransferError,
-                totalSizeTransferred = 7,
-                totalSizePendingTransfer = 10,
+                totalSizeAlreadyTransferred = 7,
+                totalSizeToTransfer = 10,
                 uploading = true
             ),
         ).asSequence()

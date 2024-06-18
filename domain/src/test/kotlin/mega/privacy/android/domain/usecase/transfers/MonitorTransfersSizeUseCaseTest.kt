@@ -1,12 +1,16 @@
 package mega.privacy.android.domain.usecase.transfers
 
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.TransfersSizeInfo
+import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
@@ -14,14 +18,17 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.TransferRepository
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.math.BigInteger
-import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MonitorTransfersSizeUseCaseTest {
     private lateinit var underTest: MonitorTransfersSizeUseCase
     private val globalTransferFlow = MutableSharedFlow<TransferEvent>()
@@ -49,163 +56,172 @@ internal class MonitorTransfersSizeUseCaseTest {
         notificationNumber = 1L,
     )
 
-    @Before
-    fun setUp() {
-        whenever(transferRepository.monitorTransferEvents()).thenReturn(globalTransferFlow)
+    @Test
+    fun `test that value with correct values is emitted when a new active transfer total is received`() =
+        runTest {
+            val flowsMap =
+                TransferType.entries.filterNot { it == TransferType.NONE }.associateWith { type ->
+                    MutableStateFlow(
+                        ActiveTransferTotals(
+                            transfersType = type,
+                            totalTransfers = 0,
+                            totalFileTransfers = 0,
+                            pausedFileTransfers = 0,
+                            totalFinishedTransfers = 0,
+                            totalFinishedFileTransfers = 0,
+                            totalCompletedFileTransfers = 0,
+                            totalBytes = 0L,
+                            transferredBytes = 0L,
+                            totalAlreadyDownloadedFiles = 0,
+                        )
+                    ).also { flow ->
+                        whenever(transferRepository.getActiveTransferTotalsByType(type)) doReturn flow
+                    }
+                }
+            val expected = TransfersSizeInfo(
+                totalSizeToTransfer = 100L,
+                totalSizeTransferred = 200L,
+                pendingUploads = 3,
+                pendingDownloads = 4,
+            )
+            underTest = MonitorTransfersSizeUseCase(
+                repository = transferRepository
+            )
+            underTest().test {
+                awaitItem() //ignore initial
+                flowsMap[TransferType.DOWNLOAD]?.update {
+                    it.copy(
+                        transferredBytes = expected.totalSizeTransferred,
+                        totalBytes = expected.totalSizeToTransfer,
+                        totalFileTransfers = expected.pendingDownloads ?: -1,
+                        totalFinishedFileTransfers = 0,
+                    )
+                }
+                awaitItem() //ignore updated value
+                flowsMap[TransferType.GENERAL_UPLOAD]?.update {
+                    it.copy(
+                        totalFileTransfers = expected.pendingUploads ?: -1,
+                        totalFinishedFileTransfers = 0,
+                    )
+                }
+                val actual = awaitItem()
+
+                assertThat(actual).isEqualTo(expected)
+            }
+        }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class LegacyTests {
+
+        @BeforeEach
+        fun setUp() {
+            whenever(transferRepository.monitorTransferEvents()).thenReturn(globalTransferFlow)
+        }
+
+        @Test
+        fun `when monitorTransferEvents emit TransferStartEvent then the transfer size info equal to transfer size`() =
+            runTest {
+                val event = TransferEvent.TransferStartEvent(transfer)
+                underTest = MonitorTransfersSizeUseCase(
+                    repository = transferRepository
+                )
+                val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
+                val collectJob = launch(UnconfinedTestDispatcher()) {
+                    underTest.invokeLegacy().collect {
+                        transfersSizeInfo.value = it
+                    }
+                }
+                globalTransferFlow.emit(event)
+                assertThat(transfersSizeInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
+                assertThat(transfersSizeInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
+                collectJob.cancel()
+            }
+
+        @Test
+        fun `when monitorTransferEvents emit TransferDataEvent then the transfer size info equal to transfer size`() =
+            runTest {
+                val event = TransferEvent.TransferDataEvent(transfer, ByteArray(0))
+                underTest = MonitorTransfersSizeUseCase(
+                    repository = transferRepository
+                )
+                val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
+                val collectJob = launch(UnconfinedTestDispatcher()) {
+                    underTest.invokeLegacy().collect {
+                        transfersSizeInfo.value = it
+                    }
+                }
+                globalTransferFlow.emit(event)
+                assertThat(transfersSizeInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
+                assertThat(transfersSizeInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
+                collectJob.cancel()
+            }
+
+        @Test
+        fun `when monitorTransferEvents emit TransferFinishEvent then the transfer size info equal to transfer size`() =
+            runTest {
+                val event = TransferEvent.TransferFinishEvent(transfer, MegaException(-1, null))
+                underTest = MonitorTransfersSizeUseCase(
+                    repository = transferRepository
+                )
+                val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
+                val collectJob = launch(UnconfinedTestDispatcher()) {
+                    underTest.invokeLegacy().collect {
+                        transfersSizeInfo.value = it
+                    }
+                }
+                globalTransferFlow.emit(event)
+                assertThat(transfersSizeInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
+                assertThat(transfersSizeInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
+                collectJob.cancel()
+            }
+
+        @Test
+        fun `when monitorTransferEvents emit 3 same TransferUpdateEvent then the transfer size info equal to transfer size`() =
+            runTest {
+                val event =
+                    TransferEvent.TransferUpdateEvent(transfer)
+                underTest = MonitorTransfersSizeUseCase(
+                    repository = transferRepository
+                )
+                val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
+                val collectJob = launch(UnconfinedTestDispatcher()) {
+                    underTest.invokeLegacy().collect {
+                        transfersSizeInfo.value = it
+                    }
+                }
+                globalTransferFlow.emit(event)
+                globalTransferFlow.emit(event)
+                globalTransferFlow.emit(event)
+                assertThat(transfersSizeInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
+                assertThat(transfersSizeInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
+                collectJob.cancel()
+            }
+
+        @Test
+        fun `when monitorTransferEvents emit 3 differ TransferUpdateEvent then the transfer size info equal to transfer size multiple 3`() =
+            runTest {
+                val eventOne =
+                    TransferEvent.TransferUpdateEvent(transfer.copy(tag = 1))
+                val eventTwo =
+                    TransferEvent.TransferUpdateEvent(transfer.copy(tag = 2))
+                val eventThree =
+                    TransferEvent.TransferUpdateEvent(transfer.copy(tag = 3))
+                underTest = MonitorTransfersSizeUseCase(
+                    repository = transferRepository
+                )
+                val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
+                val collectJob = launch(UnconfinedTestDispatcher()) {
+                    underTest.invokeLegacy().collect {
+                        transfersSizeInfo.value = it
+                    }
+                }
+                globalTransferFlow.emit(eventOne)
+                globalTransferFlow.emit(eventTwo)
+                globalTransferFlow.emit(eventThree)
+                assertThat(transfersSizeInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes * 3)
+                assertThat(transfersSizeInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes * 3)
+                collectJob.cancel()
+            }
     }
-
-    @Test
-    fun `when monitorTransferEvents emit Upload TransferUpdateEvent then the transfer size info equal to transfer size and transferType is TYPE_GENERAL_UPLOAD`() =
-        runTest {
-            val event =
-                TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.GENERAL_UPLOAD))
-            underTest = MonitorTransfersSizeUseCase(
-                repository = transferRepository
-            )
-            val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
-            val collectJob = launch(UnconfinedTestDispatcher()) {
-                underTest().collect {
-                    transfersSizeInfo.value = it
-                }
-            }
-            globalTransferFlow.emit(event)
-            assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
-            assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, TransferType.GENERAL_UPLOAD)
-            collectJob.cancel()
-        }
-
-    @Test
-    fun `when monitorTransferEvents emit Download TransferUpdateEvent then the transfer size info equal to transfer size and transferType is TYPE_DOWNLOAD`() =
-        runTest {
-            val event =
-                TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.DOWNLOAD))
-            underTest = MonitorTransfersSizeUseCase(
-                repository = transferRepository
-            )
-            val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
-            val collectJob = launch(UnconfinedTestDispatcher()) {
-                underTest().collect {
-                    transfersSizeInfo.value = it
-                }
-            }
-            globalTransferFlow.emit(event)
-            assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
-            assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, TransferType.DOWNLOAD)
-            collectJob.cancel()
-        }
-
-    @Test
-    fun `when monitorTransferEvents emit TransferStartEvent then the transfer size info equal to transfer size`() =
-        runTest {
-            val event = TransferEvent.TransferStartEvent(transfer)
-            underTest = MonitorTransfersSizeUseCase(
-                repository = transferRepository
-            )
-            val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
-            val collectJob = launch(UnconfinedTestDispatcher()) {
-                underTest().collect {
-                    transfersSizeInfo.value = it
-                }
-            }
-            globalTransferFlow.emit(event)
-            assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
-            assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
-            collectJob.cancel()
-        }
-
-    @Test
-    fun `when monitorTransferEvents emit TransferDataEvent then the transfer size info equal to transfer size`() =
-        runTest {
-            val event = TransferEvent.TransferDataEvent(transfer, ByteArray(0))
-            underTest = MonitorTransfersSizeUseCase(
-                repository = transferRepository
-            )
-            val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
-            val collectJob = launch(UnconfinedTestDispatcher()) {
-                underTest().collect {
-                    transfersSizeInfo.value = it
-                }
-            }
-            globalTransferFlow.emit(event)
-            assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
-            assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
-            collectJob.cancel()
-        }
-
-    @Test
-    fun `when monitorTransferEvents emit TransferFinishEvent then the transfer size info equal to transfer size`() =
-        runTest {
-            val event = TransferEvent.TransferFinishEvent(transfer, MegaException(-1, null))
-            underTest = MonitorTransfersSizeUseCase(
-                repository = transferRepository
-            )
-            val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
-            val collectJob = launch(UnconfinedTestDispatcher()) {
-                underTest().collect {
-                    transfersSizeInfo.value = it
-                }
-            }
-            globalTransferFlow.emit(event)
-            assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
-            assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
-            collectJob.cancel()
-        }
-
-    @Test
-    fun `when monitorTransferEvents emit 3 same TransferUpdateEvent then the transfer size info equal to transfer size`() =
-        runTest {
-            val event =
-                TransferEvent.TransferUpdateEvent(transfer)
-            underTest = MonitorTransfersSizeUseCase(
-                repository = transferRepository
-            )
-            val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
-            val collectJob = launch(UnconfinedTestDispatcher()) {
-                underTest().collect {
-                    transfersSizeInfo.value = it
-                }
-            }
-            globalTransferFlow.emit(event)
-            globalTransferFlow.emit(event)
-            globalTransferFlow.emit(event)
-            assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
-            assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
-            collectJob.cancel()
-        }
-
-    @Test
-    fun `when monitorTransferEvents emit 3 differ TransferUpdateEvent then the transfer size info equal to transfer size multiple 3`() =
-        runTest {
-            val eventOne =
-                TransferEvent.TransferUpdateEvent(transfer.copy(tag = 1))
-            val eventTwo =
-                TransferEvent.TransferUpdateEvent(transfer.copy(tag = 2))
-            val eventThree =
-                TransferEvent.TransferUpdateEvent(transfer.copy(tag = 3))
-            underTest = MonitorTransfersSizeUseCase(
-                repository = transferRepository
-            )
-            val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
-            val collectJob = launch(UnconfinedTestDispatcher()) {
-                underTest().collect {
-                    transfersSizeInfo.value = it
-                }
-            }
-            globalTransferFlow.emit(eventOne)
-            globalTransferFlow.emit(eventTwo)
-            globalTransferFlow.emit(eventThree)
-            assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes * 3)
-            assertEquals(
-                transfersSizeInfo.value.totalSizeTransferred,
-                transfer.transferredBytes * 3
-            )
-            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
-            collectJob.cancel()
-        }
 }

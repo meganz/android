@@ -5,21 +5,21 @@ package mega.privacy.android.domain.entity
  * Transfers info.
  *
  * @property status                             the current status of transfers
- * @property totalSizeTransferred               total size transferred
- * @property totalSizePendingTransfer           total size pending transfer
+ * @property totalSizeAlreadyTransferred        total size already transferred
+ * @property totalSizeToTransfer                total size to transfer in the current transfer batch
  * @property uploading                          true if there are transfers uploading, false if not (downloading)
  */
 data class TransfersInfo(
     val status: TransfersStatus = TransfersStatus.NotTransferring,
-    val totalSizeTransferred: Long = 0L,
-    val totalSizePendingTransfer: Long = 0L,
+    val totalSizeAlreadyTransferred: Long = 0L,
+    val totalSizeToTransfer: Long = 0L,
     val uploading: Boolean = false,
 ) {
     /**
      * computed value of the completed progress (base 1)
      */
-    val completedProgress = if (totalSizePendingTransfer > 0) {
-        (totalSizeTransferred.toDouble() / totalSizePendingTransfer.toDouble()).toFloat()
+    val completedProgress = if (totalSizeToTransfer > 0) {
+        (totalSizeAlreadyTransferred.toDouble() / totalSizeToTransfer.toDouble()).toFloat()
     } else {
         0f
     }

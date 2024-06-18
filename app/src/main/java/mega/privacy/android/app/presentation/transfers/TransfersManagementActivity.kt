@@ -124,7 +124,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         }
 
         collectFlow(monitorTransferOverQuotaUseCase(), Lifecycle.State.CREATED) {
-            updateTransfersWidget(TransferType.NONE)
+            updateTransfersWidget()
         }
 
         collectFlow(
@@ -317,7 +317,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
         }
 
         transfersManagementViewModel.checkTransfersInfo(
-            transferType,
             isOnFileManagementManagerSection
         )
     }
@@ -414,10 +413,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      */
     fun updateTransfersWidget() {
         if (isOnFileManagementManagerSection) {
-            transfersManagementViewModel.checkTransfersInfo(
-                TransferType.NONE,
-                true
-            )
+            transfersManagementViewModel.checkTransfersInfo(true)
         } else {
             hideTransfersWidget()
         }

@@ -36,4 +36,9 @@ enum class TransferType {
         GENERAL_UPLOAD, CU_UPLOAD, CHAT_UPLOAD -> true
         else -> false
     }
+
+    /**
+     * @return true if transfer type is download type
+     */
+    fun isDownloadType() = this == DOWNLOAD
 }

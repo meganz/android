@@ -9,18 +9,18 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.TransfersSizeInfo
 import mega.privacy.android.domain.entity.TransfersStatus
-import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersSizeUseCase
@@ -52,6 +52,8 @@ class TransfersManagementViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorTransfersSize: MonitorTransfersSizeUseCase,
+    getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val samplePeriod: Long?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
@@ -67,13 +69,20 @@ class TransfersManagementViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            monitorTransfersSize()
-                .flowOn(ioDispatcher)
-                .sample(500L)
-                .collect { transfersInfo ->
-                    getPendingDownloadAndUpload(transfersInfo)
-                }
+        viewModelScope.launch(ioDispatcher) {
+            val flow = if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                monitorTransfersSize()
+            } else {
+                monitorTransfersSize.invokeLegacy()
+            }
+            val samplePeriodFinal = samplePeriod ?: DEFAULT_SAMPLE_PERIOD
+            if (samplePeriodFinal > 0) {
+                flow.sample(samplePeriodFinal)
+            } else {
+                flow
+            }.collect { transfersInfo ->
+                updateUiState(transfersInfo)
+            }
         }
         checkTransfersState()
     }
@@ -86,13 +95,12 @@ class TransfersManagementViewModel @Inject constructor(
     /**
      * Checks transfers info.
      */
-    fun checkTransfersInfo(transferType: TransferType, unHideWidget: Boolean) {
+    fun checkTransfersInfo(unHideWidget: Boolean) {
         val transfersInfo = _state.value.transfersInfo
-        getPendingDownloadAndUpload(
+        updateUiState(
             TransfersSizeInfo(
-                transferType = transferType,
-                totalSizeTransferred = transfersInfo.totalSizeTransferred,
-                totalSizePendingTransfer = transfersInfo.totalSizePendingTransfer,
+                totalSizeTransferred = transfersInfo.totalSizeAlreadyTransferred,
+                totalSizeToTransfer = transfersInfo.totalSizeToTransfer,
             ), unHideWidget
         )
     }
@@ -100,7 +108,7 @@ class TransfersManagementViewModel @Inject constructor(
     /**
      * get pending download and upload
      */
-    private fun getPendingDownloadAndUpload(
+    private fun updateUiState(
         transfersSizeInfo: TransfersSizeInfo,
         unHideWidget: Boolean = false,
     ) {
@@ -108,13 +116,14 @@ class TransfersManagementViewModel @Inject constructor(
             _state.update {
                 it.copy(hideTransfersWidget = if (unHideWidget) false else it.hideTransfersWidget)
             }
-            val numPendingDownloadsNonBackground = getNumPendingDownloadsNonBackgroundUseCase()
-            val numPendingUploads = getNumPendingUploadsUseCase()
+            val numPendingDownloadsNonBackground =
+                transfersSizeInfo.pendingDownloads ?: getNumPendingDownloadsNonBackgroundUseCase()
+            val numPendingUploads =
+                transfersSizeInfo.pendingUploads ?: getNumPendingUploadsUseCase()
             val areTransfersPaused = areAllTransfersPausedUseCase()
             _state.update {
                 it.copy(
                     transfersInfo = transfersInfoMapper(
-                        transferType = transfersSizeInfo.transferType,
                         numPendingDownloadsNonBackground = numPendingDownloadsNonBackground,
                         numPendingUploads = numPendingUploads,
                         isTransferError = transfersManagement.shouldShowNetworkWarning || transfersManagement.getAreFailedTransfers(),
@@ -122,7 +131,7 @@ class TransfersManagementViewModel @Inject constructor(
                         isStorageOverQuota = false,
                         areTransfersPaused = areTransfersPaused,
                         totalSizeTransferred = transfersSizeInfo.totalSizeTransferred,
-                        totalSizePendingTransfer = transfersSizeInfo.totalSizePendingTransfer,
+                        totalSizeToTransfer = transfersSizeInfo.totalSizeToTransfer,
                     )
                 )
             }
@@ -147,7 +156,7 @@ class TransfersManagementViewModel @Inject constructor(
             if (paused) {
                 _state.update { it.copy(transfersInfo = it.transfersInfo.copy(status = TransfersStatus.Paused)) }
             } else {
-                checkTransfersInfo(TransferType.NONE, false)
+                checkTransfersInfo(false)
             }
         }
     }
@@ -159,5 +168,9 @@ class TransfersManagementViewModel @Inject constructor(
         _state.update {
             it.copy(hideTransfersWidget = true)
         }
+    }
+
+    companion object {
+        private const val DEFAULT_SAMPLE_PERIOD = 500L
     }
 }

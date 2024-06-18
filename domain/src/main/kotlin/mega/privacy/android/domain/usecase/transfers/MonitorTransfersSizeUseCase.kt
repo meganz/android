@@ -1,10 +1,12 @@
 package mega.privacy.android.domain.usecase.transfers
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.TransfersSizeInfo
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
 
@@ -21,7 +23,25 @@ class MonitorTransfersSizeUseCase @Inject constructor(
      *
      * @return Flow of [TransfersSizeInfo]
      */
-    operator fun invoke(): Flow<TransfersSizeInfo> = repository.monitorTransferEvents()
+
+    operator fun invoke(): Flow<TransfersSizeInfo> =
+        combine(TransferType.entries.filterNot { it == TransferType.NONE }.map {
+            repository.getActiveTransferTotalsByType(it)
+        }) { activeTransferTotals ->
+            TransfersSizeInfo(
+                totalSizeToTransfer = activeTransferTotals.sumOf { it.totalBytes },
+                totalSizeTransferred = activeTransferTotals.sumOf { it.transferredBytes },
+                pendingUploads = activeTransferTotals
+                    .filter { it.transfersType.isUploadType() }
+                    .sumOf { it.pendingFileTransfers },
+                pendingDownloads = activeTransferTotals
+                    .filter { it.transfersType.isDownloadType() }
+                    .sumOf { it.pendingFileTransfers },
+            )
+        }
+
+    @Deprecated(message = "This will be deleted once AppFeatures.UploadWorker flag is deleted")
+    fun invokeLegacy(): Flow<TransfersSizeInfo> = repository.monitorTransferEvents()
         .map {
             val transfer = it.transfer
             transferMap[transfer.tag] = transfer
@@ -44,8 +64,7 @@ class MonitorTransfersSizeUseCase @Inject constructor(
                 transferMap.clear()
             }
             TransfersSizeInfo(
-                transferType = transfer.transferType,
-                totalSizePendingTransfer = totalBytes,
+                totalSizeToTransfer = totalBytes,
                 totalSizeTransferred = totalTransferred
             )
         }

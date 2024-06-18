@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.transfers.model.mapper
 
 import mega.privacy.android.domain.entity.TransfersInfo
 import mega.privacy.android.domain.entity.TransfersStatus
-import mega.privacy.android.domain.entity.transfer.TransferType
 import javax.inject.Inject
 
 /**
@@ -15,9 +14,8 @@ class TransfersInfoMapper @Inject constructor() {
     operator fun invoke(
         numPendingUploads: Int,
         numPendingDownloadsNonBackground: Int,
-        totalSizePendingTransfer: Long,
+        totalSizeToTransfer: Long,
         totalSizeTransferred: Long,
-        transferType: TransferType,
         areTransfersPaused: Boolean,
         isTransferError: Boolean,
         isTransferOverQuota: Boolean,
@@ -29,9 +27,7 @@ class TransfersInfoMapper @Inject constructor() {
         val pendingDownloads = numPendingDownloadsNonBackground > 0
         val pendingUploads = numPendingUploads > 0
 
-        val uploading = transferType.isUploadType() && pendingUploads
-                || (!(transferType == TransferType.DOWNLOAD && pendingDownloads)
-                && numPendingDownloadsNonBackground <= numPendingUploads)
+        val uploading = numPendingDownloadsNonBackground <= numPendingUploads
 
         val status = when {
             areTransfersPaused -> TransfersStatus.Paused
@@ -42,8 +38,8 @@ class TransfersInfoMapper @Inject constructor() {
             else -> TransfersStatus.Transferring
         }
         return TransfersInfo(
-            totalSizeTransferred = totalSizeTransferred,
-            totalSizePendingTransfer = totalSizePendingTransfer,
+            totalSizeAlreadyTransferred = totalSizeTransferred,
+            totalSizeToTransfer = totalSizeToTransfer,
             uploading = uploading,
             status = status
         )
