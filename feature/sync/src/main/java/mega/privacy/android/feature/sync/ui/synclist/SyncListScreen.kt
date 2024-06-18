@@ -2,7 +2,6 @@ package mega.privacy.android.feature.sync.ui.synclist
 
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,10 +24,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -61,8 +58,6 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.SyncListBannerUpgradeButtonPressedEvent
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -77,9 +72,9 @@ internal fun SyncListScreen(
     onActionPressed: (MenuAction) -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     title: String? = null,
-    syncFoldersViewModel: SyncFoldersViewModel = hiltViewModel(),
-    syncStalledIssuesViewModel: SyncStalledIssuesViewModel = hiltViewModel(),
-    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel = hiltViewModel(),
+    syncFoldersViewModel: SyncFoldersViewModel,
+    syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
+    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -185,9 +180,9 @@ private fun SyncListScreenContent(
     addFolderClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
     onOpenUpgradeAccountClicked: () -> Unit,
-    syncFoldersViewModel: SyncFoldersViewModel = hiltViewModel(),
-    syncStalledIssuesViewModel: SyncStalledIssuesViewModel = hiltViewModel(),
-    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel = hiltViewModel(),
+    syncFoldersViewModel: SyncFoldersViewModel,
+    syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
+    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
 ) {
     var checkedChip by rememberSaveable { mutableStateOf(SYNC_FOLDERS) }
 
@@ -339,22 +334,5 @@ private fun SelectedChipScreen(
         SOLVED_ISSUES -> {
             SyncSolvedIssuesRoute(viewModel = syncSolvedIssuesViewModel)
         }
-    }
-}
-
-@CombinedThemePreviews
-@Composable
-private fun SyncListScreenPreview() {
-    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        SyncListScreen(
-            stalledIssuesCount = 3,
-            addFolderClicked = {},
-            actionSelected = { _, _ -> },
-            snackBarHostState = SnackbarHostState(),
-            syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
-            actions = listOf(),
-            onActionPressed = {},
-            onOpenUpgradeAccountClicked = {}
-        )
     }
 }

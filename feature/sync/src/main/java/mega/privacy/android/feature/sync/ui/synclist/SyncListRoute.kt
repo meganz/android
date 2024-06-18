@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,10 +12,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
@@ -23,7 +22,7 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssu
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.feature.sync.ui.views.SyncOptionsDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLocalFileEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseRemoteFileEvent
@@ -45,9 +44,9 @@ internal fun SyncListRoute(
     addFolderClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     title: String? = null,
-    syncFoldersViewModel: SyncFoldersViewModel = hiltViewModel(),
-    syncStalledIssuesViewModel: SyncStalledIssuesViewModel = hiltViewModel(),
-    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel = hiltViewModel(),
+    syncFoldersViewModel: SyncFoldersViewModel,
+    syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
+    syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

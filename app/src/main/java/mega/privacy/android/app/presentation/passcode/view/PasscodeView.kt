@@ -47,7 +47,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.findFragmentActivity
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
@@ -58,8 +57,9 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaBut
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasscodeField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_100_alpha_060_dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_100_alpha_060_dark_grey
+import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
