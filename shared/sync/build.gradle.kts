@@ -5,8 +5,8 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.lint)
+    alias(convention.plugins.mega.android.hilt)
     id("kotlin-android")
-    id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
 }
 
@@ -23,14 +23,6 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":shared:resources"))
-    implementation(google.hilt.android)
-
-    if (shouldApplyDefaultConfiguration(project)) {
-        apply(plugin = "dagger.hilt.android.plugin")
-
-        kapt(google.hilt.android.compiler)
-        kapt(androidx.hilt.compiler)
-    }
 
     testImplementation(testlib.junit)
     testImplementation(testlib.junit.test.ktx)

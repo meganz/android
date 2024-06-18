@@ -18,7 +18,6 @@ import mega.privacy.android.build.readVersionNameChannel
 import mega.privacy.android.build.readVersionNameTag
 import mega.privacy.android.build.shouldActivateGreeter
 import mega.privacy.android.build.shouldActivateNocturn
-import mega.privacy.android.build.shouldActivateTestLite
 import mega.privacy.android.build.shouldApplyDefaultConfiguration
 import mega.privacy.android.build.shouldCombineLintReports
 import mega.privacy.android.build.shouldUsePrebuiltSdk
@@ -31,8 +30,8 @@ plugins {
     alias(convention.plugins.mega.android.application.jacoco)
     alias(convention.plugins.mega.android.application.firebase)
     alias(convention.plugins.mega.lint)
+    alias(convention.plugins.mega.android.hilt)
     id("kotlin-parcelize")
-    id("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.firebase.appdistribution")
     id("de.mannodermaus.android-junit5")
@@ -253,15 +252,10 @@ dependencies {
     implementation(google.protobuff)
 
     // Hilt
-    implementation(google.hilt.android)
     implementation(androidx.hilt.work)
     implementation(androidx.hilt.navigation)
 
     if (shouldApplyDefaultConfiguration(project)) {
-        apply(plugin = "dagger.hilt.android.plugin")
-
-        kapt(google.hilt.android.compiler)
-        kapt(androidx.hilt.compiler)
         kaptTest(google.hilt.android.compiler)
     }
 
@@ -424,7 +418,7 @@ fun applyTestLiteForTasks() {
         for (task in allTasks) {
             if (task.name.lowercase().startsWith("test")) {
                 tasks.matching { activeTask ->
-                    excludedTasks.any { it(activeTask) } && shouldActivateTestLite()
+                    excludedTasks.any { it(activeTask) }
                 }.configureEach {
                     enabled = false
                 }

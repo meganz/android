@@ -80,6 +80,18 @@ gradlePlugin {
         }
     }
     plugins {
+        register("androidHilt") {
+            id = "mega.android.hilt"
+            implementationClass = "AndroidHiltConventionPlugin"
+        }
+    }
+    plugins {
+        register("jvmHilt") {
+            id = "mega.jvm.hilt"
+            implementationClass = "JvmHiltConventionPlugin"
+        }
+    }
+    plugins {
         register("androidApplicationCompose") {
             id = "mega.android.application.compose"
             implementationClass = "AndroidApplicationComposeConventionPlugin"

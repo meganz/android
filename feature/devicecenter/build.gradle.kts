@@ -7,8 +7,8 @@ plugins {
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.library.jacoco)
     alias(convention.plugins.mega.lint)
+    alias(convention.plugins.mega.android.hilt)
     id("kotlin-android")
-    id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
 }
 
@@ -43,14 +43,6 @@ dependencies {
     implementation(google.material)
     implementation(androidx.lifecycle.viewmodel)
     implementation(androidx.lifecycle.service)
-    implementation(google.hilt.android)
-
-    if (shouldApplyDefaultConfiguration(project)) {
-        apply(plugin = "dagger.hilt.android.plugin")
-
-        kapt(google.hilt.android.compiler)
-        kapt(androidx.hilt.compiler)
-    }
 
     // Compose
     implementation(androidx.lifecycle.runtime.compose)

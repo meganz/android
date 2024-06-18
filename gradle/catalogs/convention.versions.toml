@@ -11,5 +11,7 @@ mega-jvm-jacoco = { id = "mega.jvm.jacoco", version = "unspecified" }
 mega-android-application-jacoco = { id = "mega.android.application.jacoco", version = "unspecified" }
 mega-android-application-firebase = { id = "mega.android.application.firebase", version = "unspecified" }
 mega-lint = { id = "mega.lint", version = "unspecified" }
+mega-android-hilt = { id = "mega.android.hilt", version = "unspecified" }
+mega-jvm-hilt = { id = "mega.jvm.hilt", version = "unspecified" }
 mega-android-application-compose = { id = "mega.android.application.compose", version = "unspecified" }
 mega-android-library-compose = { id = "mega.android.library.compose", version = "unspecified" }

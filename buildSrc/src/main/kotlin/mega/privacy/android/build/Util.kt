@@ -189,26 +189,14 @@ fun buildTypeMatches(type: String, taskList: List<String>): Boolean =
         .filter { it.contains("clean").not() }
         .any { name -> name.contains(type.lowercase(Locale.getDefault())) }
 
-
-/**
- * Get flag to activate test lite mode from local.properties file.
- */
-fun shouldActivateTestLite(): Boolean = true
-
 /**
  * Check whether to apply default configuration.
  *
  * @param project
  * @return
  */
-fun shouldApplyDefaultConfiguration(project: Project): Boolean {
-    for (taskName in project.gradle.startParameter.taskNames) {
-        if (taskName.contains(":test") && taskName.contains("UnitTest") && shouldActivateTestLite()) {
-            return false
-        }
-    }
-    return true
-}
+fun shouldApplyDefaultConfiguration(project: Project): Boolean =
+    !project.gradle.startParameter.taskNames.any { it.contains(":test") && it.contains("UnitTest") }
 
 /**
  * Ensure that the native libs folder exists and return its relative path.

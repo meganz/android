@@ -4,7 +4,7 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.lint)
-    id("kotlin-kapt")
+    alias(convention.plugins.mega.android.hilt)
     id("de.mannodermaus.android-junit5")
 }
 
@@ -25,13 +25,6 @@ dependencies {
 
     // DI
     implementation(lib.javax.inject)
-
-    if (shouldApplyDefaultConfiguration(project)) {
-        kapt(google.hilt.android.compiler)
-    }
-
-    implementation(google.hilt.core)
-    implementation(google.hilt.android)
 
     // Framework
     implementation(androidx.bundles.compose.bom)

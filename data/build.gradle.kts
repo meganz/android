@@ -7,8 +7,8 @@ plugins {
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.library.jacoco)
     alias(convention.plugins.mega.lint)
+    alias(convention.plugins.mega.android.hilt)
     id("kotlin-android")
-    id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
     kotlin("plugin.serialization") version "1.9.21"
 }
@@ -52,16 +52,11 @@ dependencies {
     implementation(androidx.lifecycle.process)
     implementation(androidx.work.ktx)
     implementation(androidx.hilt.work)
-    implementation(google.hilt.android)
     implementation(androidx.concurrent.futures)
     implementation(androidx.paging)
     implementation(androidx.documentfile)
 
     if (shouldApplyDefaultConfiguration(project)) {
-        apply(plugin = "dagger.hilt.android.plugin")
-
-        kapt(google.hilt.android.compiler)
-        kapt(androidx.hilt.compiler)
         kapt(google.autovalue)
     }
     implementation(google.autovalue.annotations)

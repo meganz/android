@@ -8,8 +8,8 @@ plugins {
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.library.jacoco)
     alias(convention.plugins.mega.lint)
+    alias(convention.plugins.mega.android.hilt)
     id("kotlin-android")
-    id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
 }
 
@@ -38,17 +38,9 @@ dependencies {
     implementation(lib.logging.timber)
     implementation(lib.mega.analytics)
 
-    implementation(google.hilt.android)
     implementation(google.gson)
     implementation(androidx.datastore.preferences)
     implementation(androidx.hilt.navigation)
-
-    if (shouldApplyDefaultConfiguration(project)) {
-        apply(plugin = "dagger.hilt.android.plugin")
-
-        kapt(google.hilt.android.compiler)
-        kapt(androidx.hilt.compiler)
-    }
 
     implementation(androidx.appcompat)
     implementation(androidx.fragment)
