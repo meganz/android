@@ -441,7 +441,7 @@
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
     <string name="account_cancel_account_screen_plan_access_until_expiration">Эти функции будут доступны, пока не истечёт срок действия подписки MEGA, после чего вы будете переведены на бесплатный план.</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">В настоящее время используется %1s хранилища, вы рискуете потерять свои файлы</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">В настоящее время вы используете %1s дискового пространства, которое рискуете потерять.</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Особенность</string>
     <!-- Column header indicating features available with the free plan -->

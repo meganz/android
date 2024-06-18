@@ -417,7 +417,7 @@
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
     <string name="account_cancel_account_screen_plan_access_until_expiration">在您的MEGA方案到期之前，您仍然可以使用這些功能，然後您將被轉移到免費帳戶。</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">您目前使用%1s儲存空間，您將面臨遺失檔案的風險</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">您目前使用%1s儲存空間，您將面臨檔案遺失的風險。</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">功能</string>
     <!-- Column header indicating features available with the free plan -->
