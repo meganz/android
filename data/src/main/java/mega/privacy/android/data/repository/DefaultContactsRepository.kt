@@ -154,19 +154,31 @@ internal class DefaultContactsRepository @Inject constructor(
             .map { usersList ->
                 val myUserHandle = megaApiGateway.myUserHandle
                 userUpdateMapper(usersList.filter { user ->
-                    (user.handle != myUserHandle &&
-                            (user.changes == 0L ||
-                                    (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) && user.isOwnChange == 0) ||
-                                    user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()) ||
-                                    user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME.toLong()) ||
-                                    user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL.toLong())) ||
-                            (user.handle == myUserHandle &&
-                                    (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS.toLong()) ||
-                                            user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING.toLong()))))
+                    filterForContactUpdates(user, myUserHandle)
                 })
             }
             .filter { it.changes.isNotEmpty() }
             .flowOn(ioDispatcher)
+
+    private fun filterForContactUpdates(user: MegaUser, myUserHandle: Long) =
+        contactChanges(user = user, myUserHandle = myUserHandle) ||
+                currentUserAuthOrAliasChange(
+                    user = user,
+                    myUserHandle = myUserHandle
+                )
+
+    private fun contactChanges(user: MegaUser, myUserHandle: Long) =
+        user.handle != myUserHandle &&
+                            (user.changes == 0L ||
+                                    (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) && user.isOwnChange == 0) ||
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()) ||
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME.toLong()) ||
+                        user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL.toLong()))
+
+    private fun currentUserAuthOrAliasChange(user: MegaUser, myUserHandle: Long) =
+                            (user.handle == myUserHandle &&
+                                    (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS.toLong()) ||
+                        user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING.toLong())))
 
     override suspend fun getVisibleContacts(): List<ContactItem> = withContext(ioDispatcher) {
         megaApiGateway.getContacts()

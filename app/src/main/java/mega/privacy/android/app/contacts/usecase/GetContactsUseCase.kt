@@ -12,10 +12,11 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.rx3.asFlowable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatConnectionStateUpdate
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate
@@ -24,12 +25,15 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
-import mega.privacy.android.app.utils.MegaUserUtils.isExternalChange
 import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.view.TextDrawable
 import mega.privacy.android.data.extensions.getDecodedAliases
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.USER_ATTR_ALIAS
 import nz.mega.sdk.MegaApiJava.USER_ATTR_AVATAR
@@ -49,24 +53,23 @@ import javax.inject.Inject
 /**
  * Get contacts use case
  *
- * @property getChatChangesUseCase
- * @property getGlobalChangesUseCase
- * @property megaContactsMapper
- * @property getContacts
- * @property getUserAttribute
- * @property getUserAlias
- * @property getContact
- * @property areCredentialsVerified
- * @property getUserFullnameFromCache
- * @property requestLastGreen
- * @property getChatRoomIdByUser
- * @property getUserAvatar
- * @property onlineString
- * @property getUnformattedLasSeenDate
+ * @property getChatChangesUseCase    Get chat changes use case
+ * @property megaContactsMapper       Mapper to convert MegaUser to ContactItem.Data
+ * @property getContacts              Get contacts
+ * @property getUserAttribute          Get user attribute
+ * @property getContact               Get contact
+ * @property areCredentialsVerified   Check if credentials are verified
+ *  @property getUserFullnameFromCache Get user full name from cache
+ *  @property requestLastGreen         Request last green
+ *  @property getChatRoomIdByUser      Get chat room id by user
+ *  @property getUserAvatar            Get user avatar
+ *  @property onlineString             Get online string
+ *  @property getUnformattedLastSeenDate Get unformatted last seen date
+ *  @property getAliasMap              Get alias map
+ *  @property getUserUpdates           Get user updates
  */
 class GetContactsUseCase(
     private val getChatChangesUseCase: GetChatChangesUseCase,
-    private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val megaContactsMapper: (MegaUser, File) -> ContactItem.Data,
     private val getContacts: () -> ArrayList<MegaUser>,
     private val getUserAttribute: (String, Int, MegaRequestListenerInterface) -> Unit,
@@ -79,6 +82,7 @@ class GetContactsUseCase(
     private val onlineString: () -> String,
     private val getUnformattedLastSeenDate: (Int) -> String,
     private val getAliasMap: (MegaRequest) -> Map<Long, String>,
+    private val getUserUpdates: () -> Flow<UserUpdate>,
 ) {
 
     @Inject
@@ -87,10 +91,9 @@ class GetContactsUseCase(
         @MegaApi megaApi: MegaApiAndroid,
         megaChatApi: MegaChatApiAndroid,
         getChatChangesUseCase: GetChatChangesUseCase,
-        getGlobalChangesUseCase: GetGlobalChangesUseCase,
+        contactsRepository: ContactsRepository,
     ) : this(
         getChatChangesUseCase = getChatChangesUseCase,
-        getGlobalChangesUseCase = getGlobalChangesUseCase,
         megaContactsMapper = { user, avatarFolder ->
             user.toContactItem(
                 avatarFolder = avatarFolder,
@@ -129,7 +132,9 @@ class GetContactsUseCase(
         },
         getAliasMap = { request ->
             request.megaStringMap.getDecodedAliases()
-        },
+        }, getUserUpdates = {
+            contactsRepository.monitorContactUpdates()
+        }
     )
 
 
@@ -140,10 +145,7 @@ class GetContactsUseCase(
      */
     fun get(avatarFolder: File): Flowable<List<ContactItem.Data>> = Flowable.create({ emitter ->
         val disposable = CompositeDisposable()
-        val contacts = getContacts()
-            .filter { it.visibility == VISIBILITY_VISIBLE }
-            .map { megaContactsMapper(it, avatarFolder) }
-            .toMutableList()
+        val contacts = getContactList(avatarFolder)
 
         emitter.onNext(contacts.sortedAlphabetically())
 
@@ -263,56 +265,69 @@ class GetContactsUseCase(
                 onError = { Timber.e(it) }
             ).addTo(disposable)
 
-        getUserUpdates()
+        getUserUpdates().asFlowable()
             .subscribeBy(
-                onNext = { users ->
+                onNext = { userUpdate ->
                     if (emitter.isCancelled) return@subscribeBy
 
-                    users.forEach { user ->
-                        val index = contacts.indexOfFirst { it.handle == user.handle }
+                    userUpdate.changesByEmail().forEach { (email, changes) ->
+                        val index = contacts.indexOfFirst { it.email == email }
                         when {
                             index != INVALID_POSITION -> {
                                 when {
-                                    user.isExternalChange() && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) ->
+                                    changes.contains(UserChanges.Avatar) -> email?.let {
                                         getUserAttribute(
-                                            user.email,
-                                            USER_ATTR_AVATAR, //Should be USER_ATTR_AVATAR instead
+                                            it, USER_ATTR_AVATAR,
                                             userAttrsListener
                                         )
+                                    }
 
-                                    user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()) ->
+                                    changes.contains(UserChanges.Firstname) -> email?.let {
                                         getUserAttribute(
-                                            user.email,
+                                            it,
                                             USER_ATTR_FIRSTNAME,
                                             userAttrsListener
                                         )
+                                    }
 
-                                    user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME.toLong()) ->
+                                    changes.contains(UserChanges.Lastname) -> email?.let {
                                         getUserAttribute(
-                                            user.email,
+                                            it,
                                             USER_ATTR_LASTNAME,
                                             userAttrsListener
                                         )
+                                    }
 
-                                    user.visibility != VISIBILITY_VISIBLE -> {
+                                    changes.any { it is UserChanges.Visibility && it.userVisibility != UserVisibility.Visible } -> {
                                         contacts.removeAt(index)
                                         emitter.onNext(contacts.sortedAlphabetically())
                                     }
                                 }
                             }
 
-                            user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS.toLong()) -> {
-                                getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
+                            changes.contains(UserChanges.Alias) -> {
+                                email?.let {
+                                    getUserAttribute(
+                                        it, USER_ATTR_ALIAS, userAttrsListener
+                                    )
+                                }
                             }
 
-                            user.visibility == VISIBILITY_VISIBLE -> { // New contact
-                                val contact = megaContactsMapper(user, avatarFolder)
-                                contacts.add(contact)
+                            changes.any { it is UserChanges.Visibility && it.userVisibility == UserVisibility.Visible } -> { // New contact
+                                val newContactsList = getContactList(avatarFolder)
+                                val currentContactIds = contacts.map { it.handle }
+                                val diff =
+                                    newContactsList.filter { it.handle !in currentContactIds }
+                                contacts.addAll(diff)
                                 emitter.onNext(contacts.sortedAlphabetically())
-                                contact.requestMissingFields(avatarFolder, userAttrsListener)
+                                diff.forEach {
+                                    it.requestMissingFields(
+                                        avatarFolder, userAttrsListener
+                                    )
+                                }
                             }
 
-                            user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING.toLong()) -> {
+                            changes.contains(UserChanges.AuthenticationInformation) -> {
                                 mutableListOf<ContactItem.Data>()
                                     .apply { addAll(contacts) }
                                     .forEachIndexed { i, _ ->
@@ -344,9 +359,11 @@ class GetContactsUseCase(
         emitter.setCancellable { disposable.clear() }
     }, BackpressureStrategy.LATEST)
 
-    private fun getUserUpdates() = getGlobalChangesUseCase()
-        .filter { it is GetGlobalChangesUseCase.Result.OnUsersUpdate }
-        .map { (it as GetGlobalChangesUseCase.Result.OnUsersUpdate).users ?: emptyList() }
+    private fun getContactList(avatarFolder: File) =
+        getContacts().filter { it.visibility == VISIBILITY_VISIBLE }
+            .map { megaContactsMapper(it, avatarFolder) }.toMutableList()
+
+
 
     /**
      * Request missing fields for current `ContactItem.Data`
