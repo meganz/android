@@ -232,6 +232,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     NodeWithTags(
         "Enable node with tags",
         false
+    ),
+
+    /**
+     * Enables Picture in Picture (Pip) in Meeting
+     */
+    PictureInPicture(
+        "Enable Picture in Picture in Meeting",
+        false
     );
 
     companion object : FeatureFlagValueProvider {

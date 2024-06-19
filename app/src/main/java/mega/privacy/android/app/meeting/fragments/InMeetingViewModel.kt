@@ -358,6 +358,20 @@ class InMeetingViewModel @Inject constructor(
             }
         }
 
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.PictureInPicture).let { flag ->
+                    _state.update { state ->
+                        state.copy(
+                            isPictureInPictureFeatureFlagEnabled = flag,
+                        )
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+
         getParticipantsChangesUseCase.getChangesFromParticipants()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -3424,6 +3438,17 @@ class InMeetingViewModel @Inject constructor(
                 _state.update { it.copy(isRaiseToHandSuggestionShown = value) }
             }.onFailure {
                 Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Update PiP mode value
+     */
+    fun updateIsInPipMode(isInPipMode: Boolean) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isInPipMode = isInPipMode)
             }
         }
     }

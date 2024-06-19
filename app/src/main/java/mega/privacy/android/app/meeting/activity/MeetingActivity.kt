@@ -1,8 +1,13 @@
 package mega.privacy.android.app.meeting.activity
 
+import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
+import android.util.Rational
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
@@ -112,6 +117,7 @@ class MeetingActivity : PasscodeActivity() {
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
 
     lateinit var binding: ActivityMeetingBinding
+    private lateinit var pipBuilderParams: PictureInPictureParams.Builder
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
     private val callRecordingViewModel: CallRecordingViewModel by viewModels()
@@ -126,6 +132,7 @@ class MeetingActivity : PasscodeActivity() {
 
     private val destinationChangedListener: NavController.OnDestinationChangedListener by lazy {
         NavController.OnDestinationChangedListener { _, destination, _ ->
+            updateAutoPiPModeParams(isAutoEnterEnabled = destination.id == R.id.inMeetingFragment)
             binding.bannerMute.elevation = when (destination.id) {
                 R.id.makeModeratorFragment -> 0f
                 else -> 1f
@@ -159,6 +166,7 @@ class MeetingActivity : PasscodeActivity() {
                 is InMeetingFragment -> {
                     // Prevent guest from quitting the call by pressing back
                     if (!isGuest) {
+                        if (enterPipModeIfPossible()) return
                         currentFragment.removeUI()
                     }
                 }
@@ -174,6 +182,64 @@ class MeetingActivity : PasscodeActivity() {
             }
         }
     }
+
+    private fun initializePictureInPictureParams() {
+        if (isSystemPipEnabledAndAvailable()) {
+            pipBuilderParams = PictureInPictureParams.Builder()
+            pipBuilderParams.setAspectRatio(Rational(PIP_WIDTH_RATIO, PIP_HEIGHT_RATIO))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                pipBuilderParams.setSeamlessResizeEnabled(false)
+            }
+        }
+    }
+
+    private fun updateAutoPiPModeParams(isAutoEnterEnabled: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            pipBuilderParams.setAutoEnterEnabled(isAutoEnterEnabled)
+        }
+    }
+
+    /**
+     * This method is triggered when the Picture-in-Picture mode is changed.
+     */
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration,
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        if (meetingViewModel.state.value.isPictureInPictureFeatureFlagEnabled) {
+            meetingViewModel.updateIsInPipMode(isInPipMode = isInPictureInPictureMode)
+        }
+    }
+
+    /**
+     * This method is triggered when Home button is pressed.
+     * Handle the case when the user leaves the app
+     */
+    override fun onUserLeaveHint() {
+        val currentFragment = getCurrentFragment()
+        if (currentFragment is InMeetingFragment) {
+            enterPipModeIfPossible()
+        }
+    }
+
+    private fun enterPipModeIfPossible(): Boolean {
+        if (isSystemPipEnabledAndAvailable() && meetingViewModel.state.value.isPictureInPictureFeatureFlagEnabled) {
+            return try {
+                enterPictureInPictureMode(pipBuilderParams.build())
+                true
+            } catch (e: Exception) {
+                Timber.w("Device lied to us about supporting PiP. $e")
+                false
+            }
+        }
+        return false
+    }
+
+    private fun isInPipMode(): Boolean {
+        return isSystemPipEnabledAndAvailable() && isInPictureInPictureMode
+    }
+
 
     private fun View.setMarginTop(marginTop: Int) {
         val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
@@ -192,6 +258,7 @@ class MeetingActivity : PasscodeActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initializePictureInPictureParams()
 
         // Setup the Back Press dispatcher to receive Back Press events
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
@@ -706,4 +773,11 @@ class MeetingActivity : PasscodeActivity() {
             )
         })
     }
+
+    private fun isSystemPipEnabledAndAvailable(): Boolean {
+        return packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
+    }
 }
+
+private const val PIP_WIDTH_RATIO = 9
+private const val PIP_HEIGHT_RATIO = 16

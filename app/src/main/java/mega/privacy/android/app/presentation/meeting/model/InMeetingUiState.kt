@@ -53,6 +53,8 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property isRaiseToHandSuggestionShown           True, if the Raise to Hand suggestion has been shown. False, otherwise.
  * @property shouldUpdateLocalAVFlags               True, if should update local av flag. False, if not
  * @property sessionOnHoldChanges                   [ChatSession] with changes
+ * @property isPictureInPictureFeatureFlagEnabled       True, if Picture in Picture feature flag enabled. False, otherwise.
+ * @property isInPipMode                                True, if is in Picture in Picture mode. False, otherwise.
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -93,7 +95,9 @@ data class InMeetingUiState(
     val userIdsWithChangesInRaisedHand: List<Long> = emptyList(),
     val isRaiseToHandSuggestionShown: Boolean = true,
     val shouldUpdateLocalAVFlags: Boolean = true,
-    val sessionOnHoldChanges: ChatSession? = null
+    val sessionOnHoldChanges: ChatSession? = null,
+    val isPictureInPictureFeatureFlagEnabled: Boolean = false,
+    val isInPipMode: Boolean = false,
 ) {
     /**
      * Is call on hold

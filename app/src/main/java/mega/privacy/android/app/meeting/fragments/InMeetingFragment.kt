@@ -1594,6 +1594,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         onPageClick()
     }
 
+    /**
+     * This method is triggered when the Picture-in-Picture mode is changed.
+     */
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode)
+        if (inMeetingViewModel.state.value.isPictureInPictureFeatureFlagEnabled) {
+            inMeetingViewModel.updateIsInPipMode(isInPipMode = isInPictureInPictureMode)
+            onPageClick()
+            Timber.d("Currently Picture in Picture Mode is $isInPictureInPictureMode")
+        }
+    }
+
     fun onPageClick() {
         // If the tips is showing or bottom is fully expanded, can not hide the toolbar and panel
         if (bottomFloatingPanelViewHolder?.isPopWindowShowing() == true
@@ -1610,7 +1622,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         floatingBottomSheet.fadeInOut(dy = FLOATING_BOTTOM_SHEET_DY, toTop = false)
-        
+
         @Suppress("DEPRECATION")
         if (toolbar.isVisible) {
             meetingActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)

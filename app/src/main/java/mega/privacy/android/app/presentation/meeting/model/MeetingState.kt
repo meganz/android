@@ -69,6 +69,8 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property isRaiseToSpeakFeatureFlagEnabled           True, if Raise to speak feature flag enabled. False, otherwise.
  * @property isWaitingForGroupHandRaisedSnackbars       Waiting for group hand raised snackbars.
  * @property showLowerHandButtonInSnackbar              True, show lower hand button. False, show view button.
+ * @property isPictureInPictureFeatureFlagEnabled       True, if Picture in Picture feature flag enabled. False, otherwise.
+ * @property isInPipMode                                True, if is in Picture in Picture mode. False, otherwise.
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -122,7 +124,9 @@ data class MeetingState(
     val isRaiseToSpeakFeatureFlagEnabled: Boolean = false,
     val userToShowInHandRaisedSnackbar: Map<Long, Boolean> = emptyMap(),
     val isWaitingForGroupHandRaisedSnackbars: Boolean = false,
-    val showLowerHandButtonInSnackbar: Boolean = false
+    val showLowerHandButtonInSnackbar: Boolean = false,
+    val isPictureInPictureFeatureFlagEnabled: Boolean = false,
+    val isInPipMode: Boolean = false,
 ) {
 
     /**

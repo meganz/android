@@ -373,6 +373,20 @@ class MeetingActivityViewModel @Inject constructor(
             }
         }
 
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.PictureInPicture).let { flag ->
+                    _state.update { state ->
+                        state.copy(
+                            isPictureInPictureFeatureFlagEnabled = flag,
+                        )
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+
         startMonitoringChatCallUpdates()
         startMonitorChatSessionUpdates()
         getMyFullName()
@@ -2319,6 +2333,17 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
+     * Update PiP mode value
+     */
+    fun updateIsInPipMode(isInPipMode: Boolean) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isInPipMode = isInPipMode)
+            }
+        }
+    }
+
+    /**
      * Update the status of a not in call participant
      *
      * @param userId    The not in call participant ID
@@ -2362,6 +2387,5 @@ class MeetingActivityViewModel @Inject constructor(
         private const val INVALID_POSITION = -1
         private const val DEFAULT_RING_TIMEOUT_SECONDS = 40L
         private const val DEFAULT_GROUP_SNACKBARS_TIMEOUT_MILLISECONDS = 500L
-
     }
 }
