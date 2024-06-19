@@ -2,7 +2,10 @@ package mega.privacy.android.app.presentation.tags
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.shared.resources.R
+import mega.privacy.mobile.analytics.event.NodeInfoTagsLengthErrorDisplayedEvent
+import mega.privacy.mobile.analytics.event.NodeInfoTagsLimitErrorDisplayedEvent
 import javax.inject.Inject
 
 /**
@@ -49,6 +52,7 @@ class TagsValidationMessageMapper @Inject constructor(@ApplicationContext privat
                     TagsActivity.MAX_CHARS_PER_TAG
                 )
                 isError = true
+                Analytics.tracker.trackEvent(NodeInfoTagsLengthErrorDisplayedEvent)
             }
 
             nodeTags.size >= TagsActivity.MAX_TAGS_PER_NODE
@@ -58,6 +62,7 @@ class TagsValidationMessageMapper @Inject constructor(@ApplicationContext privat
                     TagsActivity.MAX_TAGS_PER_NODE
                 )
                 isError = true
+                Analytics.tracker.trackEvent(NodeInfoTagsLimitErrorDisplayedEvent)
             }
 
             else -> {

@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
@@ -32,6 +33,8 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.mobile.analytics.event.NodeInfoTagsEnteredEvent
+import mega.privacy.mobile.analytics.event.NodeInfoTagsProOnlyEnteredEvent
 
 /**
  * Composable that represents the tags view in the file info screen.
@@ -51,7 +54,15 @@ fun FileInfoTagsView(
 ) {
     Column(
         modifier = modifier
-            .clickable { if (isProAccount) onAddTagClick() else onUpgradeAccountClick() }
+            .clickable {
+                if (isProAccount) {
+                    onAddTagClick()
+                    Analytics.tracker.trackEvent(NodeInfoTagsEnteredEvent)
+                } else {
+                    onUpgradeAccountClick()
+                    Analytics.tracker.trackEvent(NodeInfoTagsProOnlyEnteredEvent)
+                }
+            }
     ) {
         MenuActionListTile(
             text = stringResource(id = sharedR.string.file_info_information_tags_label),

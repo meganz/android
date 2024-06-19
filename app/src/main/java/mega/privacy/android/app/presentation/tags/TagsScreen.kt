@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -42,6 +43,8 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.transfor
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.mobile.analytics.event.NodeInfoTagsAddedEvent
+import mega.privacy.mobile.analytics.event.NodeInfoTagsRemovedEvent
 import java.util.Locale
 
 /**
@@ -101,6 +104,7 @@ private fun TagsContent(
         if (tag.isNotBlank() && uiState.isError.not()) {
             addNodeTag(tag)
             tag = ""
+            Analytics.tracker.trackEvent(NodeInfoTagsAddedEvent)
         }
     }
 
@@ -161,7 +165,10 @@ private fun TagsContent(
                     selected = true,
                     text = "#${uiState.tags[tag]}",
                     enabled = true,
-                    onClick = { removeTag(uiState.tags[tag]) },
+                    onClick = {
+                        removeTag(uiState.tags[tag])
+                        Analytics.tracker.trackEvent(NodeInfoTagsRemovedEvent)
+                    },
                     leadingIcon = CoreR.drawable.ic_filter_selected,
                 )
             }

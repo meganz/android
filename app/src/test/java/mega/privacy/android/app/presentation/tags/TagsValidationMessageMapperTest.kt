@@ -4,8 +4,12 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.shared.resources.R
+import mega.privacy.mobile.analytics.event.NodeInfoTagsLengthErrorDisplayedEvent
+import mega.privacy.mobile.analytics.event.NodeInfoTagsLimitErrorDisplayedEvent
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -18,6 +22,9 @@ class TagsValidationMessageMapperTest {
     private val nodeTagsFilled =
         listOf("tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10")
     private val userTags = listOf("tag14", "tag25", "tag36")
+
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule()
 
     @Before
     fun setUp() {
@@ -62,6 +69,7 @@ class TagsValidationMessageMapperTest {
                 )
             )
         assertThat(error).isEqualTo(true)
+        assertThat(analyticsRule.events).contains(NodeInfoTagsLengthErrorDisplayedEvent)
     }
 
     @Test
@@ -75,6 +83,7 @@ class TagsValidationMessageMapperTest {
                 )
             )
         assertThat(error).isEqualTo(true)
+        assertThat(analyticsRule.events).contains(NodeInfoTagsLimitErrorDisplayedEvent)
     }
 
     @Test

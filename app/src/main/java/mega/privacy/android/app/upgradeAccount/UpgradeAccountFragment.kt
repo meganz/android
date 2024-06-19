@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
@@ -37,6 +38,8 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.UpgradeAccountBuyButtonPressedEvent
+import mega.privacy.mobile.analytics.event.UpgradeAccountCancelledEvent
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -95,13 +98,17 @@ class UpgradeAccountFragment : Fragment() {
                     testTagsAsResourceId = true
                 },
                 state = uiState,
-                onBackPressed = upgradeAccountActivity.onBackPressedDispatcher::onBackPressed,
+                onBackPressed = {
+                    upgradeAccountActivity.onBackPressedDispatcher.onBackPressed()
+                    Analytics.tracker.trackEvent(UpgradeAccountCancelledEvent)
+                },
                 onBuyClicked = {
                     val chosenPlan = convertAccountTypeToInt(uiState.chosenPlan)
                     upgradeAccountViewModel.currentPaymentCheck(chosenPlan)
                     if (uiState.currentPayment == UpgradePayment()) {
                         startPurchase(uiState.isMonthlySelected, chosenPlan)
                     }
+                    Analytics.tracker.trackEvent(UpgradeAccountBuyButtonPressedEvent)
                 },
                 onPlayStoreLinkClicked = this::redirectToPlayStoreSubscription,
                 onPricingPageClicked = this::redirectToPricingPage,
