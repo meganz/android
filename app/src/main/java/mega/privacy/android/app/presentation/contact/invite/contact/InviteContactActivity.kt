@@ -141,11 +141,12 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
                     ContactInfoListDialog(
                         contactInfo = it,
                         currentSelectedContactInfo = uiState.selectedContactInformation,
-                        onConfirm = { selectedContactInfo ->
+                        onConfirm = { newListOfSelectedContact ->
                             shouldShowContactListWithContactInfo = null
-                            viewModel.updateSelectedContactInfo(selectedContactInfo)
-                            controlHighlighted(it.id)
-                            refreshComponents(true)
+                            viewModel.updateSelectedContactInfoByInfoWithMultipleContacts(
+                                newListOfSelectedContact = newListOfSelectedContact,
+                                contactInfo = it
+                            )
                         },
                         onCancel = {
                             shouldShowContactListWithContactInfo = null
@@ -372,6 +373,15 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         ) {
             initScanQR()
             viewModel.onQRScannerInitialized()
+        }
+
+        collectFlow(
+            viewModel
+                .uiState
+                .map { it.selectedContactInformation }
+                .distinctUntilChanged()
+        ) {
+            refreshComponents()
         }
     }
 
@@ -666,7 +676,14 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         }
     }
 
-    private fun refreshComponents(shouldScroll: Boolean) {
+    private var lastSelectedContactsSize = 0
+    private fun refreshComponents() {
+        val shouldScroll =
+            if (lastSelectedContactsSize > viewModel.uiState.value.selectedContactInformation.size) {
+                // If there are contact removals, don't scroll.
+                lastSelectedContactsSize = viewModel.uiState.value.selectedContactInformation.size
+                false
+            } else true
         refreshAddedContactsView(shouldScroll)
         refreshInviteContactButton()
         //clear input text view after selection
@@ -687,14 +704,10 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
                 shouldShowContactListWithContactInfo = contactInfo
             } else {
                 viewModel.toggleContactHighlightedInfo(contactInfo)
-                val singleInvitationContactInfo =
-                    viewModel.filterUiState.value.filteredContacts[position]
-                if (isContactAdded(singleInvitationContactInfo)) {
-                    viewModel.removeSelectedContactInformationByContact(singleInvitationContactInfo)
-                    refreshComponents(false)
+                if (isContactAdded(contactInfo)) {
+                    viewModel.removeSelectedContactInformation(contactInfo)
                 } else {
-                    viewModel.addSelectedContactInformation(singleInvitationContactInfo)
-                    refreshComponents(true)
+                    viewModel.addSelectedContactInformation(contactInfo)
                 }
             }
         }
@@ -741,13 +754,18 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
             isClickable = true
             setOnClickListener { v: View ->
                 val invitationContactInfo = viewModel.uiState.value.selectedContactInformation[v.id]
-                viewModel.removeSelectedContactInformationAt(viewId)
+                viewModel.removeSelectedContactInformation(invitationContactInfo)
                 if (invitationContactInfo.hasMultipleContactInfos()) {
-                    controlHighlighted(invitationContactInfo.id)
+                    viewModel.toggleContactHighlightedInfo(
+                        contactInfo = invitationContactInfo,
+                        value = viewModel.uiState.value.selectedContactInformation.any { it.id == invitationContactInfo.id }
+                    )
                 } else {
-                    viewModel.toggleContactHighlightedInfo(invitationContactInfo, false)
+                    viewModel.toggleContactHighlightedInfo(
+                        contactInfo = invitationContactInfo,
+                        value = false
+                    )
                 }
-                refreshAddedContactsView(false)
                 refreshInviteContactButton()
                 refreshList()
                 setTitleAB()
@@ -770,21 +788,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
             refreshHorizontalScrollView()
         } else {
             binding.scroller.clearFocus()
-        }
-    }
-
-    private fun controlHighlighted(id: Long) {
-        var shouldHighlighted = false
-        for ((addedId) in viewModel.uiState.value.selectedContactInformation) {
-            if (addedId == id) {
-                shouldHighlighted = true
-                break
-            }
-        }
-        invitationContactsAdapter?.data?.forEach {
-            if (it.id == id) {
-                viewModel.toggleContactHighlightedInfo(it, shouldHighlighted)
-            }
         }
     }
 

@@ -151,7 +151,7 @@ class InviteContactViewModel @Inject constructor(
         // therefore we have to update both
         allContacts = allContacts.toMutableList()
             .map { contact ->
-                if (isTheSameContact(contact, contactInfo)) {
+                if (contact.id == contactInfo.id) {
                     contact.copy(isHighlighted = value)
                 } else {
                     contact
@@ -162,7 +162,7 @@ class InviteContactViewModel @Inject constructor(
             it.copy(
                 filteredContacts = it.filteredContacts.toMutableList()
                     .map { contact ->
-                        if (isTheSameContact(contact, contactInfo)) {
+                        if (contact.id == contactInfo.id) {
                             contact.copy(isHighlighted = value)
                         } else {
                             contact
@@ -281,40 +281,44 @@ class InviteContactViewModel @Inject constructor(
         }
     }
 
-    internal fun updateSelectedContactInfo(contactInfo: List<InvitationContactInfo>) {
+    /**
+     * This method will update the list of selected contact info
+     * after updating the list from the contact info list dialog.
+     *
+     * Note: The contact info list dialog shows multiple contact info from the same contact.
+     */
+    internal fun updateSelectedContactInfoByInfoWithMultipleContacts(
+        newListOfSelectedContact: List<InvitationContactInfo>,
+        contactInfo: InvitationContactInfo,
+    ) {
         val selectedContactInfo = mutableListOf<InvitationContactInfo>().apply {
             addAll(_uiState.value.selectedContactInformation)
         }
         // Remove the unselected contact info
         _uiState.value.selectedContactInformation.forEachIndexed { index, info ->
-            if (!contactInfo.contains(info)) {
+            if (!newListOfSelectedContact.contains(info)) {
                 selectedContactInfo.removeAt(index)
             }
         }
 
         // Add the new selected contact info
-        contactInfo.forEach { selected ->
+        newListOfSelectedContact.forEach { selected ->
             val isContactAdded = selectedContactInfo.any { isTheSameContact(selected, it) }
             if (!isContactAdded) {
-                // Update the highlighted value as the contact is selected
-                selectedContactInfo.add(selected.copy(isHighlighted = true))
+                selectedContactInfo.add(selected)
             }
         }
 
         _uiState.update { it.copy(selectedContactInformation = selectedContactInfo) }
+
+        // Update the highlighted value of the contact
+        toggleContactHighlightedInfo(
+            contactInfo = contactInfo,
+            value = selectedContactInfo.any { it.id == contactInfo.id }
+        )
     }
 
-    internal fun removeSelectedContactInformationAt(index: Int) {
-        _uiState.update {
-            it.copy(
-                selectedContactInformation = it.selectedContactInformation.toMutableList().apply {
-                    removeAt(index)
-                }
-            )
-        }
-    }
-
-    internal fun removeSelectedContactInformationByContact(contact: InvitationContactInfo) {
+    internal fun removeSelectedContactInformation(contact: InvitationContactInfo) {
         _uiState.update { uiState ->
             uiState.copy(
                 selectedContactInformation = uiState.selectedContactInformation.filterNot {

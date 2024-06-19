@@ -376,49 +376,33 @@ class InviteContactViewModelTest {
         }
 
     @Test
-    fun `test that the selected contact information is updated correctly`() = runTest {
-        val contactId = 1L
-        val addedContactInfo = InvitationContactInfo(id = contactId, displayInfo = "(121)-234-567")
-        underTest.addSelectedContactInformation(addedContactInfo)
-        val updatedContactInfo = listOf(
-            InvitationContactInfo(
-                id = contactId,
-                displayInfo = "email@email.email",
-                isHighlighted = true
-            )
-        )
-
-        underTest.updateSelectedContactInfo(updatedContactInfo)
-
-        underTest.uiState.test {
-            assertThat(
-                expectMostRecentItem().selectedContactInformation
-            ).isEqualTo(updatedContactInfo)
-        }
-    }
-
-    @Test
-    fun `test that the de-selected contact information is successfully removed from the existing list by a specified index`() =
+    fun `test that the selected contact information is updated correctly based on a contact info with multiple contacts`() =
         runTest {
-            val contactInfoWithPhoneNumber = InvitationContactInfo(
-                id = 1L,
-                displayInfo = "(121)-234-567"
+            val contactId = 1L
+            val phoneNumber = "(121)-234-567"
+            val email = "email@email.email"
+            val contactInfo = InvitationContactInfo(
+                id = contactId,
+                name = "name",
+                displayInfo = phoneNumber,
+                filteredContactInfos = listOf(
+                    phoneNumber,
+                    email
+                )
             )
-            val contactInfoWithEmail = InvitationContactInfo(
-                id = 2L,
-                displayInfo = "email@email.email"
-            )
-            underTest.addSelectedContactInformation(contactInfoWithPhoneNumber)
-            underTest.addSelectedContactInformation(contactInfoWithEmail)
+            val addedInfo = contactInfo.copy(displayInfo = phoneNumber)
+            underTest.addSelectedContactInformation(addedInfo)
+            val newInfo = listOf(contactInfo.copy(displayInfo = email))
 
-            underTest.removeSelectedContactInformationAt(1)
+            underTest.updateSelectedContactInfoByInfoWithMultipleContacts(
+                newListOfSelectedContact = newInfo,
+                contactInfo = contactInfo
+            )
 
             underTest.uiState.test {
                 assertThat(
                     expectMostRecentItem().selectedContactInformation
-                ).isEqualTo(
-                    listOf(contactInfoWithPhoneNumber)
-                )
+                ).isEqualTo(newInfo)
             }
         }
 
@@ -436,7 +420,7 @@ class InviteContactViewModelTest {
             underTest.addSelectedContactInformation(contactInfoWithPhoneNumber)
             underTest.addSelectedContactInformation(contactInfoWithEmail)
 
-            underTest.removeSelectedContactInformationByContact(contactInfoWithEmail)
+            underTest.removeSelectedContactInformation(contactInfoWithEmail)
 
             underTest.uiState.test {
                 assertThat(
