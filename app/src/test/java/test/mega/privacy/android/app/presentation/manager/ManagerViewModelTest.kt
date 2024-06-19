@@ -127,7 +127,7 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
-import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
+import mega.privacy.android.shared.sync.featuretoggle.SyncABTestFeatures
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -1329,7 +1329,7 @@ class ManagerViewModelTest {
                 SyncStatus.SYNCING
             )
             testScheduler.advanceUntilIdle()
-            whenever(getFeatureFlagValueUseCase(SyncFeatures.AndroidSync)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(SyncABTestFeatures.asyc)).thenReturn(true)
             monitorSyncsUseCaseFakeFlow.emit(listOf(mockFolderPair))
             testScheduler.advanceUntilIdle()
             underTest
@@ -1342,7 +1342,7 @@ class ManagerViewModelTest {
     @Test
     fun `test that if Android Sync feature is on and syncs are empty Sync service is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(SyncFeatures.AndroidSync)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(SyncABTestFeatures.asyc)).thenReturn(true)
             monitorSyncsUseCaseFakeFlow.emit(listOf())
             testScheduler.advanceUntilIdle()
 
@@ -1356,7 +1356,7 @@ class ManagerViewModelTest {
     @Test
     fun `test that if Android Sync feature is off Sync service is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(SyncFeatures.AndroidSync)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(SyncABTestFeatures.asyc)).thenReturn(false)
             testScheduler.advanceUntilIdle()
 
             underTest

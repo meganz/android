@@ -15,6 +15,7 @@ import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
+import mega.privacy.android.shared.sync.featuretoggle.SyncABTestFeatures
 
 /**
  * Feature flag module
@@ -45,7 +46,7 @@ abstract class FeatureFlagModule {
         @Provides
         @ElementsIntoSet
         fun provideFeatures(): Set<@JvmSuppressWildcards Feature> =
-            AppFeatures.values().toSet()
+            AppFeatures.entries.toSet()
 
         /**
          * Provide remote features
@@ -55,8 +56,16 @@ abstract class FeatureFlagModule {
         @Provides
         @ElementsIntoSet
         fun provideRemoteFeatures(): Set<@JvmSuppressWildcards Feature> =
-            ABTestFeatures.values().toSet()
+            ABTestFeatures.entries.toSet()
 
+        /**
+         * Provide sync ab test features
+         *
+         */
+        @Provides
+        @ElementsIntoSet
+        fun provideSyncAbTestFeatures(): Set<@JvmSuppressWildcards Feature> =
+            SyncABTestFeatures.entries.toSet()
 
         /**
          * Provide api features
@@ -66,7 +75,7 @@ abstract class FeatureFlagModule {
         @Provides
         @ElementsIntoSet
         fun provideApiFeatures(): Set<@JvmSuppressWildcards Feature> =
-            ApiFeatures.values().toSet()
+            ApiFeatures.entries.toSet()
 
         /**
          * Provide feature flag value provider
@@ -106,6 +115,18 @@ abstract class FeatureFlagModule {
         )
         fun provideApiFeaturesFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             ApiFeatures.Companion
+
+        /**
+         * Provide sync feature flag default value provider
+         */
+        @Provides
+        @IntoMap
+        @FeatureFlagPriorityKey(
+            implementingClass = SyncABTestFeatures.Companion::class,
+            priority = FeatureFlagValuePriority.RemoteToggled
+        )
+        fun provideSyncFeaturesFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            SyncABTestFeatures.Companion
 
     }
 }

@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.GetEnabledNotificationsUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
-import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
+import mega.privacy.android.shared.sync.featuretoggle.SyncABTestFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -179,7 +179,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
 
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
-            SyncFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },
+            SyncABTestFeatures.asyc.takeIf { getFeatureFlagValueUseCase(it) },
         )
     }
 

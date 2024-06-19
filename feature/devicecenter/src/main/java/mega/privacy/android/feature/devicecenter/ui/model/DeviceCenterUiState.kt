@@ -4,7 +4,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
-import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
+import mega.privacy.android.shared.sync.featuretoggle.SyncABTestFeatures
 
 /**
  * Data class representing the state of the Device Center Screen
@@ -48,5 +48,5 @@ data class DeviceCenterUiState(
     val enabledFlags: Set<Feature> = emptySet(),
 ) {
     val itemsToDisplay: List<DeviceCenterUINode> = selectedDevice?.folders ?: devices
-    val isSyncFeatureFlagEnabled = enabledFlags.contains(SyncFeatures.AndroidSync)
+    val isSyncFeatureFlagEnabled = enabledFlags.contains(SyncABTestFeatures.asyc)
 }

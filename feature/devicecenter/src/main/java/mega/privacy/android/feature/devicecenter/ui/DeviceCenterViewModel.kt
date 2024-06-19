@@ -30,7 +30,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
-import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
+import mega.privacy.android.shared.sync.featuretoggle.SyncABTestFeatures
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -110,7 +110,7 @@ internal class DeviceCenterViewModel @Inject constructor(
         runCatching {
             val isCameraUploadsEnabled = isCameraUploadsEnabledUseCase()
             val isSyncFeatureFlagEnabled = runBlocking {
-                getEnabledFeatures().contains(SyncFeatures.AndroidSync)
+                getEnabledFeatures().contains(SyncABTestFeatures.asyc)
             }
             val devices = deviceUINodeListMapper(
                 deviceNodes = getDevicesUseCase(
@@ -163,7 +163,7 @@ internal class DeviceCenterViewModel @Inject constructor(
     }
 
     fun shouldNavigateToSyncs(deviceUINode: DeviceUINode) =
-        _state.value.enabledFlags.contains(SyncFeatures.AndroidSync) && deviceUINode is OwnDeviceUINode
+        _state.value.enabledFlags.contains(SyncABTestFeatures.asyc) && deviceUINode is OwnDeviceUINode
 
     /**
      * Handles specific Back Press behavior
@@ -292,7 +292,7 @@ internal class DeviceCenterViewModel @Inject constructor(
 
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
-            SyncFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },
+            SyncABTestFeatures.asyc.takeIf { getFeatureFlagValueUseCase(it) },
         )
     }
 

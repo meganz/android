@@ -117,7 +117,7 @@ import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
-import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
+import mega.privacy.android.shared.sync.featuretoggle.SyncABTestFeatures
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -483,7 +483,7 @@ class ManagerViewModel @Inject constructor(
 
         viewModelScope.launch {
             val androidSyncEnabled =
-                getFeatureFlagValueUseCase(SyncFeatures.AndroidSync)
+                getFeatureFlagValueUseCase(SyncABTestFeatures.asyc)
 
             if (androidSyncEnabled) {
                 monitorSyncsUseCase().catch { Timber.e(it) }.collect { syncFolders ->
@@ -491,9 +491,7 @@ class ManagerViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             androidSyncServiceEnabled = isServiceEnabled,
-                            isSyncFeatureFlagEnabled = getFeatureFlagValueUseCase(
-                                SyncFeatures.AndroidSync
-                            )
+                            isSyncFeatureFlagEnabled = true
                         )
                     }
                 }
