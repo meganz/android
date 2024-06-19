@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -50,6 +51,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
  */
 @Composable
 fun CameraBottomAppBar(
+    rotationDegree: Float,
     isCaptureVideo: Boolean,
     isRecording: Boolean,
     modifier: Modifier = Modifier,
@@ -75,6 +77,7 @@ fun CameraBottomAppBar(
             InternalAnimatedContent(visible = !isRecording) {
                 CameraButton(
                     modifier = Modifier.testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_GALLERY),
+                    rotationDegree = rotationDegree,
                     iconResId = R.drawable.ic_gallery,
                     onClick = onOpenGallery,
                 )
@@ -88,6 +91,7 @@ fun CameraBottomAppBar(
             InternalAnimatedContent(visible = !isRecording) {
                 CameraButton(
                     modifier = Modifier.testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_ROTATE),
+                    rotationDegree = rotationDegree,
                     iconResId = R.drawable.ic_camera_rotate,
                     onClick = onToggleCamera,
                 )
@@ -232,11 +236,13 @@ private fun CaptureIcon(
 @Composable
 private fun CameraButton(
     @DrawableRes iconResId: Int,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    rotationDegree: Float = 0f,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = modifier
+            .rotate(rotationDegree)
             .size(48.dp)
             .clip(CircleShape)
             .background(color = MegaOriginalTheme.colors.background.surface2, shape = CircleShape)
@@ -260,6 +266,7 @@ private fun CameraBottomAppBarPreview(
         CameraBottomAppBar(
             isCaptureVideo = isVideoSelected,
             isRecording = false,
+            rotationDegree = 0f,
         )
     }
 }
@@ -273,6 +280,7 @@ private fun RecordingCameraBottomAppBarPreview(
         CameraBottomAppBar(
             isCaptureVideo = isVideoSelected,
             isRecording = true,
+            rotationDegree = 0f,
         )
     }
 }

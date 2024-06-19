@@ -2,14 +2,19 @@ package mega.privacy.android.app.camera
 
 import android.Manifest
 import android.net.Uri
+import android.view.OrientationEventListener
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,6 +56,7 @@ internal fun CameraCaptureScreen(
     onFinish: (uri: Uri?) -> Unit = {},
     viewModel: CameraViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
     val cameraState = rememberCameraState()
     var flashMode by rememberSaveable { mutableStateOf(cameraState.flashMode) }
     var camSelector by rememberSaveableCamSelector(CamSelector.Back)
@@ -67,6 +74,8 @@ internal fun CameraCaptureScreen(
     }
 
     var selectFlashMode by rememberSaveable { mutableStateOf(false) }
+    var rotation by rememberSaveable { mutableIntStateOf(0) }
+    val animatedRotation = rememberAnimationRotation(rotation.toFloat())
 
     val flashOptions = remember {
         hashMapOf(
@@ -108,6 +117,29 @@ internal fun CameraCaptureScreen(
         uri?.let { onOpenVideoPreview(it) }
     }
 
+    DisposableEffect(Unit) {
+        val orientationEventListener = object : OrientationEventListener(context) {
+            override fun onOrientationChanged(orientation: Int) {
+                if (orientation == ORIENTATION_UNKNOWN) {
+                    return
+                }
+
+                // https://developer.android.com/media/camera/camerax/orientation-rotation#orientation-event-listener-setup
+                rotation = when (orientation) {
+                    in 45 until 135 -> 270
+                    in 135 until 225 -> 180
+                    in 225 until 315 -> 90
+                    else -> 0
+                }
+            }
+        }
+
+        orientationEventListener.enable()
+        onDispose {
+            orientationEventListener.disable()
+        }
+    }
+
     // force dark mode
     MegaScaffold(
         topBar = {
@@ -137,6 +169,7 @@ internal fun CameraCaptureScreen(
         },
         bottomBar = {
             CameraBottomAppBar(
+                rotationDegree = animatedRotation,
                 isCaptureVideo = cameraOption == CameraOption.Video,
                 isRecording = isRecording,
                 onToggleCamera = {
@@ -178,4 +211,18 @@ internal fun CameraCaptureScreen(
             }
         }
     }
+}
+
+@Composable
+private fun rememberAnimationRotation(rotation: Float): Float {
+    val targetRotation by animateFloatAsState(
+        targetValue = if (rotation > 360 - rotation) {
+            -(360 - rotation)
+        } else {
+            rotation
+        },
+        animationSpec = tween(500),
+        label = "rotation",
+    )
+    return targetRotation
 }

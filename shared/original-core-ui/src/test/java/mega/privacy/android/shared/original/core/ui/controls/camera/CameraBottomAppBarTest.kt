@@ -23,7 +23,8 @@ class CameraBottomAppBarTest {
         composeTestRule.setContent {
             CameraBottomAppBar(
                 isCaptureVideo = false,
-                isRecording = false
+                isRecording = false,
+                rotationDegree = 0f
             )
         }
 
@@ -39,7 +40,8 @@ class CameraBottomAppBarTest {
         composeTestRule.setContent {
             CameraBottomAppBar(
                 isCaptureVideo = true,
-                isRecording = true
+                isRecording = true,
+                rotationDegree = 0f
             )
         }
 
@@ -57,6 +59,7 @@ class CameraBottomAppBarTest {
             CameraBottomAppBar(
                 isCaptureVideo = false,
                 isRecording = false,
+                rotationDegree = 0f,
                 onCameraAction = onCameraAction
             )
         }
@@ -72,6 +75,7 @@ class CameraBottomAppBarTest {
             CameraBottomAppBar(
                 isCaptureVideo = true,
                 isRecording = false,
+                rotationDegree = 0f,
                 onToggleCaptureMode = onToggleCaptureMode
             )
         }
@@ -87,6 +91,7 @@ class CameraBottomAppBarTest {
             CameraBottomAppBar(
                 isCaptureVideo = false,
                 isRecording = false,
+                rotationDegree = 0f,
                 onToggleCaptureMode = onToggleCaptureMode
             )
         }
@@ -102,6 +107,7 @@ class CameraBottomAppBarTest {
             CameraBottomAppBar(
                 isCaptureVideo = false,
                 isRecording = false,
+                rotationDegree = 0f,
                 onToggleCaptureMode = onToggleCaptureMode
             )
         }
@@ -117,6 +123,7 @@ class CameraBottomAppBarTest {
             CameraBottomAppBar(
                 isCaptureVideo = true,
                 isRecording = false,
+                rotationDegree = 0f,
                 onToggleCaptureMode = onToggleCaptureMode
             )
         }
@@ -132,6 +139,7 @@ class CameraBottomAppBarTest {
             CameraBottomAppBar(
                 isCaptureVideo = false,
                 isRecording = false,
+                rotationDegree = 0f,
                 onOpenGallery = onOpenGallery
             )
         }
@@ -147,6 +155,7 @@ class CameraBottomAppBarTest {
             CameraBottomAppBar(
                 isCaptureVideo = false,
                 isRecording = false,
+                rotationDegree = 0f,
                 onToggleCamera = onToggleCamera
             )
         }
