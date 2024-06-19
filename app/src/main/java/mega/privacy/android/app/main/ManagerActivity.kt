@@ -192,7 +192,6 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
-import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
@@ -318,7 +317,6 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
@@ -338,13 +336,9 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
-import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatListItem
-import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaChatRequestListenerInterface
-import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFolderInfo
@@ -359,8 +353,7 @@ import javax.inject.Inject
 
 @Suppress("KDocMissingDocumentation")
 @AndroidEntryPoint
-class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterface,
-    MegaChatRequestListenerInterface, NavigationView.OnNavigationItemSelectedListener,
+class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterface, NavigationView.OnNavigationItemSelectedListener,
     View.OnClickListener,
     BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
     ChatManagementCallback, ActionNodeCallback, SnackbarShower,
@@ -378,7 +371,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var mShowAnyTabLayout = false
 
     internal val viewModel: ManagerViewModel by viewModels()
-    internal val callRecordingViewModel: CallRecordingViewModel by viewModels()
     internal val fileBrowserViewModel: FileBrowserViewModel by viewModels()
     internal val incomingSharesViewModel: IncomingSharesComposeViewModel by viewModels()
     internal val outgoingSharesViewModel: OutgoingSharesComposeViewModel by viewModels()
@@ -910,7 +902,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             showOfflineMode()
             credentials?.let {
                 val gSession = it.session
-                ChatUtil.initMegaChatApi(gSession, this)
+                ChatUtil.initMegaChatApi(gSession)
             }
             return
         }
@@ -6786,42 +6778,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
         }
-    }
-
-    override fun onRequestStart(api: MegaChatApiJava, request: MegaChatRequest) {
-        Timber.d("onRequestStart(CHAT): %s", request.requestString)
-    }
-
-    override fun onRequestUpdate(api: MegaChatApiJava, request: MegaChatRequest) {}
-    override fun onRequestFinish(api: MegaChatApiJava, request: MegaChatRequest, e: MegaChatError) {
-        Timber.d("onRequestFinish(CHAT): %s_%d", request.requestString, e.errorCode)
-        if (request.type == MegaChatRequest.TYPE_DISCONNECT) {
-            if (e.errorCode == MegaChatError.ERROR_OK) {
-                Timber.d("DISConnected from chat!")
-            } else {
-                Timber.e("ERROR WHEN DISCONNECTING %s", e.errorString)
-            }
-        } else if (request.type == MegaChatRequest.TYPE_LOGOUT) {
-            Timber.e("onRequestFinish(CHAT): %d", MegaChatRequest.TYPE_LOGOUT)
-            if (e.errorCode != MegaError.API_OK) {
-                Timber.e("MegaChatRequest.TYPE_LOGOUT:ERROR")
-            }
-            (application as MegaApplication).disableMegaChatApi()
-            loggingSettings.resetLoggerSDK()
-        } else if (request.type == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE) {
-            if (e.errorCode == MegaChatError.ERROR_OK) {
-                Timber.d("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: %s", request.flag)
-            } else {
-                Timber.e("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: %d", e.errorType)
-            }
-        }
-    }
-
-    override fun onRequestTemporaryError(
-        api: MegaChatApiJava,
-        request: MegaChatRequest,
-        e: MegaChatError,
-    ) {
     }
 
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {

@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
@@ -53,6 +54,7 @@ class MegaChatRequestHandler @Inject constructor(
     private val transfersManagement: TransfersManagement,
     private val broadcastFinishActivityUseCase: BroadcastFinishActivityUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
+    private val loggingSettings: LegacyLoggingSettings
 ) : MegaChatRequestListenerInterface {
     private var isLoggingRunning = false
 
@@ -93,6 +95,7 @@ class MegaChatRequestHandler @Inject constructor(
             Timber.d("CHAT_TYPE_LOGOUT: %d__%s", e.errorCode, e.errorString)
             resetDefaults()
             MegaApplication.getInstance().disableMegaChatApi()
+            loggingSettings.resetLoggerSDK()
             val loggedState: Int = megaApi.isLoggedIn
             Timber.d("Login status on %s", loggedState)
             if (loggedState == 0) {
@@ -136,6 +139,18 @@ class MegaChatRequestHandler @Inject constructor(
             chatManagement.removeJoiningChatId(request.chatHandle)
             chatManagement.removeJoiningChatId(request.userHandle)
             chatManagement.broadcastJoinedSuccessfully()
+        } else if (request.type == MegaChatRequest.TYPE_DISCONNECT) {
+            if (e.errorCode == MegaChatError.ERROR_OK) {
+                Timber.d("DISConnected from chat!")
+            } else {
+                Timber.e("ERROR WHEN DISCONNECTING %s", e.errorString)
+            }
+        } else if (request.type == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE) {
+            if (e.errorCode == MegaChatError.ERROR_OK) {
+                Timber.d("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: %s", request.flag)
+            } else {
+                Timber.e("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: %d", e.errorType)
+            }
         }
     }
 
