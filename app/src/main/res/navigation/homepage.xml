@@ -156,6 +156,14 @@
             android:name="rootFolderOnly"
             android:defaultValue="true"
             app:argType="boolean" />
+        <argument
+            android:name="parentId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <argument
+            android:name="title"
+            android:defaultValue=""
+            app:argType="string" />
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline_compose"
             app:destination="@id/offlineFragmentCompose" />

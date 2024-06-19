@@ -1,8 +1,11 @@
 package mega.privacy.android.app.presentation.offline.offlinecompose
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -30,6 +33,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class OfflineComposeViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
     private val monitorTransfersFinishedUseCase: MonitorTransfersFinishedUseCase,
     private val setOfflineWarningMessageVisibilityUseCase: SetOfflineWarningMessageVisibilityUseCase,
@@ -39,7 +43,12 @@ class OfflineComposeViewModel @Inject constructor(
     private val monitorViewType: MonitorViewType,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(OfflineUiState())
+    private val _uiState = MutableStateFlow(
+        OfflineUiState(
+            parentId = savedStateHandle["parentId"] ?: -1,
+            title = savedStateHandle["title"] ?: ""
+        )
+    )
     private val parentStack = ArrayDeque<Pair<Int, String>>()
 
     /**
@@ -129,8 +138,8 @@ class OfflineComposeViewModel @Inject constructor(
                     offlineNodes = offlineNodeList.map { item -> OfflineNodeUIItem(item) }
                 )
             }
-        }.onFailure {
-            Timber.e(it)
+        }.onFailure { throwable ->
+            Timber.e(throwable)
             _uiState.update {
                 it.copy(offlineNodes = emptyList())
             }
@@ -148,23 +157,36 @@ class OfflineComposeViewModel @Inject constructor(
 
     /**
      * Handle on clicked of item
+     *
+     * @param offlineNodeUIItem [OfflineNodeUIItem]
+     * @param rootFolderOnly [Boolean]
      */
-    fun onItemClicked(offlineNodeUIItem: OfflineNodeUIItem) {
+    fun onItemClicked(offlineNodeUIItem: OfflineNodeUIItem, rootFolderOnly: Boolean) {
         if (uiState.value.selectedNodeHandles.isEmpty()) {
             if (offlineNodeUIItem.offlineNode.isFolder) {
-                parentStack.push(
-                    Pair(
-                        offlineNodeUIItem.offlineNode.parentId,
-                        uiState.value.title
+                if (rootFolderOnly) {
+                    _uiState.update {
+                        it.copy(
+                            openFolderInPageEvent = triggered(offlineNodeUIItem)
+                        )
+                    }
+                } else {
+                    parentStack.push(
+                        Pair(
+                            offlineNodeUIItem.offlineNode.parentId,
+                            uiState.value.title ?: ""
+                        )
                     )
-                )
-                _uiState.update {
-                    it.copy(
-                        title = offlineNodeUIItem.offlineNode.name,
-                        parentId = offlineNodeUIItem.offlineNode.id,
-                    )
+                    _uiState.update {
+                        it.copy(
+                            title = offlineNodeUIItem.offlineNode.name,
+                            parentId = offlineNodeUIItem.offlineNode.id,
+                        )
+                    }
+                    refreshOfflineNodes()
                 }
-                refreshOfflineNodes()
+            } else {
+                // Open the file
             }
         } else {
             onLongItemClicked(offlineNodeUIItem)
@@ -246,6 +268,15 @@ class OfflineComposeViewModel @Inject constructor(
                     selectedNodeHandles = selectedListHandles
                 )
             }
+        }
+    }
+
+    /**
+     * On Open Folder In Page Event Consumed
+     */
+    fun onOpenFolderInPageEventConsumed() {
+        _uiState.update {
+            it.copy(openFolderInPageEvent = consumed())
         }
     }
 }

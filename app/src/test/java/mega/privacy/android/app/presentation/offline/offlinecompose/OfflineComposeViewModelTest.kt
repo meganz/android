@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.offline.offlinecompose
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -44,6 +46,7 @@ class OfflineComposeViewModelTest {
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase = mock()
     private val monitorViewType: MonitorViewType = mock()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val savedStateHandle = mock<SavedStateHandle>()
     private lateinit var underTest: OfflineComposeViewModel
 
     @BeforeEach
@@ -56,6 +59,7 @@ class OfflineComposeViewModelTest {
 
     private fun initViewModel() {
         underTest = OfflineComposeViewModel(
+            savedStateHandle = savedStateHandle,
             getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
             monitorTransfersFinishedUseCase = monitorTransfersFinishedUseCase,
             setOfflineWarningMessageVisibilityUseCase = setOfflineWarningMessageVisibilityUseCase,
@@ -115,13 +119,42 @@ class OfflineComposeViewModelTest {
                     path = ""
                 ),
                 isSelected = false
-            )
+            ),
+            rootFolderOnly = false
         )
         assertThat(underTest.uiState.value.offlineNodes).hasSize(2)
     }
 
     @Test
-    fun `test that when back clicked, it calls its parent id`() = runTest {
+    fun `test that navigation even is sent when folder is clicked from homepage`() = runTest {
+        val item = OfflineNodeUIItem(
+            offlineNode = OfflineFileInformation(
+                id = 1,
+                parentId = 0,
+                name = "Sample",
+                isFolder = true,
+                handle = "1234",
+                lastModifiedTime = 100000L,
+                path = ""
+            ),
+            isSelected = false
+        )
+
+        underTest.onItemClicked(
+            offlineNodeUIItem = item,
+            rootFolderOnly = true
+        )
+
+        underTest.uiState.test {
+            val newItem = awaitItem()
+            assertThat(((newItem.openFolderInPageEvent as? StateEventWithContentTriggered<*>)?.content as? OfflineNodeUIItem))
+                .isEqualTo(item)
+        }
+
+    }
+
+    @Test
+    fun `test that its parent id is called when back clicked`() = runTest {
         val parentId = 1
         val offlineList1 = mock<OfflineFileInformation>()
         whenever(offlineList1.isFolder).thenReturn(true)
@@ -149,7 +182,8 @@ class OfflineComposeViewModelTest {
                     path = ""
                 ),
                 isSelected = false
-            )
+            ),
+            rootFolderOnly = false
         )
 
         underTest.onBackClicked()
@@ -157,7 +191,7 @@ class OfflineComposeViewModelTest {
     }
 
     @Test
-    fun `test that when select all is clicked total selected node size is equal to total offline list size`() =
+    fun `test that the selected node size is equal to the total offline list size when select all is clicked`() =
         runTest {
             val parentId = 1
             val offlineList1 = mock<OfflineFileInformation>()
@@ -186,14 +220,15 @@ class OfflineComposeViewModelTest {
                         path = ""
                     ),
                     isSelected = false
-                )
+                ),
+                rootFolderOnly = false
             )
             underTest.selectAll()
             assertThat(underTest.uiState.value.offlineNodes.size).isEqualTo(underTest.uiState.value.selectedNodeHandles.size)
         }
 
     @Test
-    fun `test that when clear all is clicked total selected node size is empty`() =
+    fun `test that the total selected node size is empty when clear all is clicked`() =
         runTest {
             val parentId = 1
             val offlineList1 = mock<OfflineFileInformation>()
@@ -222,14 +257,15 @@ class OfflineComposeViewModelTest {
                         path = ""
                     ),
                     isSelected = false
-                )
+                ),
+                rootFolderOnly = false
             )
             underTest.clearSelection()
             assertThat(underTest.uiState.value.selectedNodeHandles.size).isEqualTo(0)
         }
 
     @Test
-    fun `test that when long clicked on offline item updates selected list`() = runTest {
+    fun `test that the list is updated when the offline item is long clicked`() = runTest {
         val parentId = 1
         val offlineList1 = mock<OfflineFileInformation>()
         whenever(offlineList1.isFolder).thenReturn(true)
@@ -257,7 +293,8 @@ class OfflineComposeViewModelTest {
                     path = ""
                 ),
                 isSelected = false
-            )
+            ),
+            rootFolderOnly = false
         )
         underTest.onLongItemClicked(
             offlineNodeUIItem = OfflineNodeUIItem(
@@ -285,6 +322,7 @@ class OfflineComposeViewModelTest {
     @AfterEach
     fun resetMocks() {
         reset(
+            savedStateHandle,
             getOfflineNodesByParentIdUseCase,
             monitorTransfersFinishedUseCase,
             monitorOfflineWarningMessageVisibilityUseCase,

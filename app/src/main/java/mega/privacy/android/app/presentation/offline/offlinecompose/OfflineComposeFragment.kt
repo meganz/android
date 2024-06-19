@@ -8,15 +8,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
@@ -55,7 +60,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
-    private val viewModel: OfflineComposeViewModel by activityViewModels()
+    private val viewModel: OfflineComposeViewModel by viewModels()
     private val offlineNodeActionsViewModel: OfflineNodeActionsViewModel by activityViewModels()
 
     private val args: OfflineComposeFragmentArgs by navArgs()
@@ -86,13 +91,17 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDarkMode = themeMode.isDarkMode()
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val defaultTitle = stringResource(id = R.string.section_saved_for_offline_new)
+
                 OriginalTempTheme(isDark = isDarkMode) {
                     OfflineFeatureScreen(
                         uiState = uiState,
-                        backgroundColor = backgroundColor,
+                        backgroundColor = if (args.rootFolderOnly) backgroundColor else MaterialTheme.colors.background,
                         fileTypeIconMapper = fileTypeIconMapper,
                         rootFolderOnly = args.rootFolderOnly,
-                        onOfflineItemClicked = viewModel::onItemClicked,
+                        onOfflineItemClicked = {
+                            viewModel.onItemClicked(it, args.rootFolderOnly)
+                        },
                         onItemLongClicked = {
                             if (args.rootFolderOnly.not()) {
                                 viewModel.onLongItemClicked(it)
@@ -103,22 +112,38 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                                         )
                                 }
                             } else {
-                                viewModel.onItemClicked(it)
+                                viewModel.onItemClicked(it, args.rootFolderOnly)
                             }
                         },
                         onOptionClicked = {
                             showOptionPanelBottomSheet(it.offlineNode.handle.toLong())
                         }
                     )
-                    (requireActivity() as? ManagerActivity)?.setToolbarTitleFromFullscreenOfflineFragment(
-                        title = uiState.title.ifEmpty { stringResource(id = R.string.section_saved_for_offline_new) },
-                        firstNavigationLevel = false,
-                        showSearch = true
-                    )
-                    updateActionModeTitle(
-                        selectedItemsCount = uiState.selectedNodeHandles.size
-                    )
+                    LaunchedEffect(uiState.title) {
+                        (requireActivity() as? ManagerActivity)?.setToolbarTitleFromFullscreenOfflineFragment(
+                            title = uiState.title.ifEmpty { defaultTitle },
+                            firstNavigationLevel = false,
+                            showSearch = true
+                        )
+                    }
+                    LaunchedEffect(uiState.selectedNodeHandles.size) {
+                        updateActionModeTitle(
+                            selectedItemsCount = uiState.selectedNodeHandles.size
+                        )
+                    }
                     HandleOfflineNodeActions(offlineNodeActionsViewModel)
+                    EventEffect(
+                        event = uiState.openFolderInPageEvent,
+                        onConsumed = viewModel::onOpenFolderInPageEventConsumed
+                    ) {
+                        findNavController().navigate(
+                            HomepageFragmentDirections.actionHomepageFragmentToOfflineFragmentCompose(
+                                rootFolderOnly = false,
+                                parentId = it.offlineNode.id,
+                                title = it.offlineNode.name
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -218,6 +243,11 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
 
         return false
     }
+
+    /**
+     * On back clicked
+     */
+    fun onBackClicked(): Int? = viewModel.onBackClicked()
 
     private fun showConfirmRemoveFromOfflineDialog(handles: List<Long>) {
         ConfirmRemoveFromOfflineDialogFragment.newInstance(handles)

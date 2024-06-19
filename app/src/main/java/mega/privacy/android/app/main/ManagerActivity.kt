@@ -3607,7 +3607,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             updateTransfersWidget()
             updatePsaViewVisibility()
-            appBarLayout.visibility = View.VISIBLE
+            if (destinationId != R.id.offlineFragmentCompose)
+                appBarLayout.visibility = View.VISIBLE
             showHideBottomNavigationView(true)
             hideAdsView()
             supportInvalidateOptionsMenu()
@@ -5024,7 +5025,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun handleBackPressIfFullscreenOfflineFragmentOpened() {
         if (enableOfflineCompose) {
-            offlineComposeViewModel.onBackClicked()?.let {
+            fullscreenOfflineComposeFragment?.onBackClicked()?.let {
                 handleOfflineBackClick()
             }
         } else {
