@@ -5097,7 +5097,7 @@
         <item quantity="other">%1$s和其他%2$d个人举起手</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="hidden_nodes_sharing_album">此相册包含隐藏的项目。共享相册意味着与您共享的人可以看到隐藏的项目。这些项目仍将隐藏在您的云盘中。</string>
     <!-- Hidden nodes items -->
     <plurals name="hidden_nodes_items">
         <item quantity="other"></item>

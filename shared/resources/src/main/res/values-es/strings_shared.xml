@@ -223,7 +223,7 @@
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
     <string name="general_size_giga_byte">%1$s&#160;GB</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
-    <string name="general_free_plan_name">Free</string>
+    <string name="general_free_plan_name">Gratis</string>
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
     <string name="dialog_onboarding_transfer_quota_free_limited">Limitado</string>
     <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
