@@ -13,7 +13,7 @@ import javax.inject.Inject
 /**
  * Raw app data [String] to a list of [TransferAppData] mapper
  */
-internal class TransferAppDataMapper @Inject constructor() {
+class TransferAppDataMapper @Inject constructor() {
     /**
      * Get a list of [TransferAppData] corresponding to raw appData [String]
      * @param appDataRaw the app data [String] as it is in MegaTransfer

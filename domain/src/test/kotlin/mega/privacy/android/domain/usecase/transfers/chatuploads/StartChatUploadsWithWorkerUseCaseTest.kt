@@ -19,7 +19,6 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
@@ -46,8 +45,8 @@ class StartChatUploadsWithWorkerUseCaseTest {
 
     private val uploadFilesUseCase = mock<UploadFilesUseCase>()
     private val cancelCancelTokenUseCase = mock<CancelCancelTokenUseCase>()
-    private val startChatUploadsWorkerAndWaitUntilIsStartedUseCase = mock<StartChatUploadsWorkerAndWaitUntilIsStartedUseCase>()
-    private val chatMessageRepository = mock<ChatMessageRepository>()
+    private val startChatUploadsWorkerAndWaitUntilIsStartedUseCase =
+        mock<StartChatUploadsWorkerAndWaitUntilIsStartedUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val handleChatUploadTransferEventUseCase = mock<HandleChatUploadTransferEventUseCase>()
     private val chatAttachmentNeedsCompressionUseCase =
@@ -61,7 +60,6 @@ class StartChatUploadsWithWorkerUseCaseTest {
             uploadFilesUseCase = uploadFilesUseCase,
             startChatUploadsWorkerAndWaitUntilIsStartedUseCase = startChatUploadsWorkerAndWaitUntilIsStartedUseCase,
             chatAttachmentNeedsCompressionUseCase = chatAttachmentNeedsCompressionUseCase,
-            chatMessageRepository = chatMessageRepository,
             fileSystemRepository = fileSystemRepository,
             handleChatUploadTransferEventUseCase = handleChatUploadTransferEventUseCase,
             updatePendingMessageUseCase = updatePendingMessageUseCase,
@@ -76,7 +74,6 @@ class StartChatUploadsWithWorkerUseCaseTest {
             uploadFilesUseCase,
             startChatUploadsWorkerAndWaitUntilIsStartedUseCase,
             chatAttachmentNeedsCompressionUseCase,
-            chatMessageRepository,
             fileSystemRepository,
             handleChatUploadTransferEventUseCase,
             updatePendingMessageUseCase,

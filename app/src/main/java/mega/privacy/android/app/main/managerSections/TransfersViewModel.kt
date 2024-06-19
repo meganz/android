@@ -20,14 +20,17 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
@@ -70,6 +73,8 @@ class TransfersViewModel @Inject constructor(
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val transferAppDataMapper: TransferAppDataMapper,
+    private val retryChatUploadUseCase: RetryChatUploadUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TransfersUiState())
 
@@ -475,33 +480,61 @@ class TransfersViewModel @Inject constructor(
      * trigger retry transfer event
      */
     suspend fun retryTransfer(transfer: CompletedTransfer) {
-        when (transfer.type) {
-            MegaTransfer.TYPE_DOWNLOAD -> {
-                getNodeByIdUseCase(NodeId(transfer.handle))?.let { typedNode ->
-                    if (transfer.isOffline == true) {
-                        TransferTriggerEvent.StartDownloadForOffline(typedNode)
-                    } else {
-                        TransferTriggerEvent.StartDownloadNode(listOf(typedNode))
+        with(transfer) {
+            when (type) {
+                MegaTransfer.TYPE_DOWNLOAD -> {
+                    getNodeByIdUseCase(NodeId(handle))?.let { typedNode ->
+                        if (isOffline == true) {
+                            TransferTriggerEvent.StartDownloadForOffline(typedNode)
+                        } else {
+                            TransferTriggerEvent.StartDownloadNode(listOf(typedNode))
+                        }
+                    } ?: run {
+                        Timber.e("Node not found for this transfer")
                     }
-                } ?: run {
-                    Timber.e("Node not found for this transfer")
+                }
+
+                MegaTransfer.TYPE_UPLOAD -> {
+                    val appData = appData?.let { transferAppDataMapper(it) }
+                    val isChatUpload =
+                        appData?.any { it is TransferAppData.ChatUpload } == true
+
+                    if (isChatUpload) {
+                        viewModelScope.launch {
+                            runCatching {
+                                retryChatUploadUseCase(appData?.mapNotNull { it as? TransferAppData.ChatUpload }
+                                    ?: emptyList())
+                            }.onFailure {
+                                //No uploads were retried, try general upload only.
+                                _uiState.update { state ->
+                                    state.copy(
+                                        startEvent = triggered(
+                                            getUploadTriggerEvent(originalPath, parentHandle)
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        getUploadTriggerEvent(originalPath, parentHandle)
+                    }
+                }
+
+                else -> throw IllegalArgumentException("This transfer type cannot be retried here for now")
+            }.let { event ->
+                if (event is TransferTriggerEvent) {
+                    _uiState.update { state -> state.copy(startEvent = triggered(event)) }
                 }
             }
-
-            MegaTransfer.TYPE_UPLOAD -> {
-                val file = File(transfer.originalPath)
-                TransferTriggerEvent.StartUpload.Files(
-                    mapOf(file.absolutePath to null),
-                    NodeId(transfer.parentHandle)
-                )
-            }
-
-            else -> throw IllegalArgumentException("This transfer type cannot be retried here for now")
-        }.let { event ->
-            if (event is TransferTriggerEvent) {
-                _uiState.update { state -> state.copy(startEvent = triggered(event)) }
-            }
         }
+    }
+
+    private fun getUploadTriggerEvent(path: String, parentHandle: Long): TransferTriggerEvent {
+        val file = File(path)
+        return TransferTriggerEvent.StartUpload.Files(
+            mapOf(file.absolutePath to null),
+            NodeId(parentHandle)
+        )
     }
 
     /**

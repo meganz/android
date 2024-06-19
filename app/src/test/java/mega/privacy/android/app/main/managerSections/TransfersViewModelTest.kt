@@ -15,12 +15,16 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
@@ -69,6 +73,8 @@ internal class TransfersViewModelTest {
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase = mock()
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase = mock()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val transferAppDataMapper = mock<TransferAppDataMapper>()
+    private val retryChatUploadUseCase = mock<RetryChatUploadUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -94,6 +100,8 @@ internal class TransfersViewModelTest {
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            transferAppDataMapper = transferAppDataMapper,
+            retryChatUploadUseCase = retryChatUploadUseCase,
         )
     }
 
@@ -339,7 +347,7 @@ internal class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that retryTransfer triggers a StartUpload event when it is an upload and UploadWorker is enabled`() =
+    fun `test that retryTransfer triggers a StartUpload event when it is an upload and is not a chat upload`() =
         runTest {
             val path = "path"
             val file = File(path)
@@ -386,6 +394,59 @@ internal class TransfersViewModelTest {
             underTest.activeTransfersSwap(0, 1)
         }
     }
+
+    @Test
+    fun `test that retryTransfer resend messages when it is an upload and is a chat upload`() =
+        runTest {
+            val appData = "appData"
+            val chatUpload = TransferAppData.ChatUpload(1L)
+            val chatUploadAppData = listOf(chatUpload)
+            val transfer = mock<CompletedTransfer> {
+                on { type } doReturn MegaTransfer.TYPE_UPLOAD
+                on { this.appData } doReturn appData
+            }
+
+            whenever(transferAppDataMapper(appData)).thenReturn(chatUploadAppData)
+
+            underTest.retryTransfer(transfer)
+            advanceUntilIdle()
+
+            verify(retryChatUploadUseCase).invoke(chatUploadAppData)
+        }
+
+    @Test
+    fun `test that retryTransfer updates state correctly when it is an upload, is a chat upload and RetryChatUploadUseCase throws ChatUploadNotRetriedException`() =
+        runTest {
+            val path = "path"
+            val file = File(path)
+            val parentHandle = 123L
+            val appData = "appData"
+            val transfer = mock<CompletedTransfer> {
+                on { type } doReturn MegaTransfer.TYPE_UPLOAD
+                on { this.appData } doReturn appData
+                on { this.parentHandle } doReturn parentHandle
+                on { originalPath } doReturn path
+            }
+            val chatUpload = TransferAppData.ChatUpload(1L)
+            val chatUploadAppData = listOf(chatUpload)
+            val expected = triggered(
+                TransferTriggerEvent.StartUpload.Files(
+                    mapOf(file.absolutePath to null),
+                    NodeId(parentHandle)
+                )
+            )
+
+            whenever(transferAppDataMapper(appData)).thenReturn(chatUploadAppData)
+            whenever(retryChatUploadUseCase(chatUploadAppData))
+                .thenThrow(ChatUploadNotRetriedException())
+
+            underTest.retryTransfer(transfer)
+            advanceUntilIdle()
+
+            underTest.uiState.map { it.startEvent }.test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
 
 
     companion object {

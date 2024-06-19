@@ -12,7 +12,6 @@ import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.exception.chat.FoldersNotAllowedAsChatUploadException
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
@@ -32,7 +31,6 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val uploadFilesUseCase: UploadFilesUseCase,
     private val startChatUploadsWorkerAndWaitUntilIsStartedUseCase: StartChatUploadsWorkerAndWaitUntilIsStartedUseCase,
     private val chatAttachmentNeedsCompressionUseCase: ChatAttachmentNeedsCompressionUseCase,
-    private val chatMessageRepository: ChatMessageRepository,
     private val fileSystemRepository: FileSystemRepository,
     private val handleChatUploadTransferEventUseCase: HandleChatUploadTransferEventUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
