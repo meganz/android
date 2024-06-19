@@ -13,11 +13,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.InvitationContactInfo
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
-import mega.privacy.android.app.main.model.InvitationStatusUiState
-import mega.privacy.android.app.main.model.InviteContactFilterUiState
 import mega.privacy.android.app.main.model.InviteContactUiState
 import mega.privacy.android.app.presentation.contact.invite.contact.mapper.InvitationContactInfoUiMapper
-import mega.privacy.android.domain.entity.contacts.InviteContactRequest.Sent
+import mega.privacy.android.app.presentation.contact.invite.contact.mapper.InvitationStatusMessageUiMapper
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
@@ -40,6 +38,7 @@ class InviteContactViewModel @Inject constructor(
     private val inviteContactWithEmailsUseCase: InviteContactWithEmailsUseCase,
     private val areThereOngoingVideoCallsUseCase: AreThereOngoingVideoCallsUseCase,
     private val invitationContactInfoUiMapper: InvitationContactInfoUiMapper,
+    private val invitationStatusMessageUiMapper: InvitationStatusMessageUiMapper,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -51,13 +50,6 @@ class InviteContactViewModel @Inject constructor(
      */
     val uiState = _uiState.asStateFlow()
 
-    private val _filterUiState = MutableStateFlow(InviteContactFilterUiState())
-
-    /**
-     * Filter specific UI state
-     */
-    val filterUiState = _filterUiState.asStateFlow()
-
     private var filterContactsJob: Job? = null
 
     /**
@@ -66,7 +58,7 @@ class InviteContactViewModel @Inject constructor(
     var allContacts: List<InvitationContactInfo> = emptyList()
         private set
 
-    internal val isFromAchievement = savedStateHandle.get<Boolean>(KEY_FROM) ?: false
+    private val isFromAchievement = savedStateHandle.get<Boolean>(KEY_FROM) ?: false
 
     private lateinit var currentSearchQuery: String
 
@@ -90,9 +82,13 @@ class InviteContactViewModel @Inject constructor(
     fun initializeContacts() = viewModelScope.launch {
         runCatching { getInvitationContactInfo() }
             .onSuccess { invitationContactInfo ->
-                initializeFilteredContacts(invitationContactInfo)
-                initializeAllContacts(_filterUiState.value.filteredContacts)
-                _uiState.update { it.copy(onContactsInitialized = true) }
+                allContacts = invitationContactInfo
+                _uiState.update {
+                    it.copy(
+                        onContactsInitialized = true,
+                        filteredContacts = invitationContactInfo
+                    )
+                }
             }.onFailure { throwable ->
                 _uiState.update { it.copy(onContactsInitialized = true) }
                 Timber.e("Failed to get local contacts", throwable)
@@ -111,24 +107,6 @@ class InviteContactViewModel @Inject constructor(
             filterPendingOrAcceptedLocalContactsByEmailUseCase(filteredMEGAContactList)
 
         return invitationContactInfoUiMapper(localContacts = filteredPendingMEGAContactList)
-    }
-
-    /**
-     * Initialize all available contacts. Keeping all contacts for records.
-     *
-     * @param contacts
-     */
-    fun initializeAllContacts(contacts: List<InvitationContactInfo>) {
-        allContacts = contacts
-    }
-
-    /**
-     * Initialize the filtered contacts
-     *
-     * @param contacts
-     */
-    fun initializeFilteredContacts(contacts: List<InvitationContactInfo>) {
-        _filterUiState.update { it.copy(filteredContacts = contacts) }
     }
 
     /**
@@ -158,7 +136,7 @@ class InviteContactViewModel @Inject constructor(
                 }
             }
 
-        _filterUiState.update {
+        _uiState.update {
             it.copy(
                 filteredContacts = it.filteredContacts.toMutableList()
                     .map { contact ->
@@ -192,14 +170,14 @@ class InviteContactViewModel @Inject constructor(
      *
      * @param query The user's input
      */
-    fun filterContacts(query: String?) {
+    internal fun filterContacts(query: String?) {
         filterContactsJob?.cancel()
         filterContactsJob = viewModelScope.launch(defaultDispatcher) {
             Timber.d("Filtering contact")
 
             if (query.isNullOrBlank()) {
                 // Reset the contact list
-                _filterUiState.update { it.copy(filteredContacts = allContacts) }
+                _uiState.update { it.copy(filteredContacts = allContacts) }
                 return@launch
             }
 
@@ -223,7 +201,7 @@ class InviteContactViewModel @Inject constructor(
                 }
             }
 
-            _filterUiState.update {
+            _uiState.update {
                 val newFilteredContacts = if (phoneContacts.isNotEmpty()) {
                     listOf(
                         // Header
@@ -259,25 +237,57 @@ class InviteContactViewModel @Inject constructor(
     /**
      * Reset the onContactsInitialized state
      */
-    fun resetOnContactsInitializedState() {
+    internal fun resetOnContactsInitializedState() {
         _uiState.update { it.copy(onContactsInitialized = false) }
     }
 
-    internal fun inviteContactsByEmail(emails: List<String>) {
+    /**
+     * Rules:
+     * - If the list of selected contacts contains both emails and phone numbers,
+     *   then we should invite the emails first then the phone number 2 seconds after the emails
+     *   are successfully invited.
+     * - If the list of selected contacts contains only phone numbers, only invite the phone numbers.
+     */
+    internal fun inviteContacts() {
+        val addedEmails = mutableListOf<String>()
+        val addedPhoneNumbers = mutableListOf<String>()
+        _uiState.value.selectedContactInformation.forEach { contact ->
+            if (contact.isEmailContact()) {
+                addedEmails.add(contact.displayInfo)
+            } else {
+                addedPhoneNumbers.add(contact.displayInfo)
+            }
+        }
+        if (addedEmails.isNotEmpty()) {
+            inviteEmailsAndPendingPhoneNumber(
+                emails = addedEmails,
+                pendingPhoneNumbers = addedPhoneNumbers
+            )
+        } else if (addedPhoneNumbers.isNotEmpty()) {
+            _uiState.update { it.copy(pendingPhoneNumberInvitations = addedPhoneNumbers) }
+        }
+    }
+
+    private fun inviteEmailsAndPendingPhoneNumber(
+        emails: List<String>,
+        pendingPhoneNumbers: List<String>,
+    ) {
         viewModelScope.launch {
             Timber.d("Inviting contacts by emails. Total email: ${emails.size}")
             runCatching { inviteContactWithEmailsUseCase(emails) }
-                .onSuccess {
+                .onSuccess { requests ->
                     _uiState.update { uiState ->
                         uiState.copy(
-                            invitationStatus = InvitationStatusUiState(
-                                emails = emails,
-                                totalInvitationSent = it.count { it == Sent }
-                            )
+                            invitationStatusResult = invitationStatusMessageUiMapper(
+                                isFromAchievement = isFromAchievement,
+                                requests = requests,
+                                emails = emails
+                            ),
+                            pendingPhoneNumberInvitations = pendingPhoneNumbers
                         )
                     }
                 }
-                .onFailure { Timber.e("Failed to invite contacts by email.") }
+                .onFailure { Timber.e("Failed to invite contacts by email.", it) }
         }
     }
 

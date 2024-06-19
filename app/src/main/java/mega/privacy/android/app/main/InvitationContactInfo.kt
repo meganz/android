@@ -20,7 +20,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class InvitationContactInfo @JvmOverloads constructor(
     val id: Long = 0L,
-    private val name: String = "",
+    val name: String = "",
     val type: Int = 0,
     val filteredContactInfos: List<String> = emptyList(),
     val displayInfo: String = "",

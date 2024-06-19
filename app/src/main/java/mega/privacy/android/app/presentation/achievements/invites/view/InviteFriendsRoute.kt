@@ -46,6 +46,7 @@ import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactViewModel.Companion.KEY_FROM
+import mega.privacy.android.app.presentation.contact.invite.contact.navigation.InviteContactScreenResult.Companion.KEY_SENT_NUMBER
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -100,7 +101,7 @@ internal fun InviteFriendsView(
     ) { result ->
         if (result.resultCode == AppCompatActivity.RESULT_OK) {
             result.data?.let { intent ->
-                numberOfInvites = intent.getIntExtra(InviteContactActivity.KEY_SENT_NUMBER, 1)
+                numberOfInvites = intent.getIntExtra(KEY_SENT_NUMBER, 1)
                 isDialogVisible = true
             }
         }

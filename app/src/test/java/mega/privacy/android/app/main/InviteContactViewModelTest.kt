@@ -7,10 +7,10 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
-import mega.privacy.android.app.main.model.InvitationStatusUiState
 import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactViewModel
 import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactViewModel.Companion.ID_PHONE_CONTACTS_HEADER
 import mega.privacy.android.app.presentation.contact.invite.contact.mapper.InvitationContactInfoUiMapper
+import mega.privacy.android.app.presentation.contact.invite.contact.mapper.InvitationStatusMessageUiMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
@@ -52,6 +52,7 @@ class InviteContactViewModelTest {
 
     private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var invitationContactInfoUiMapper: InvitationContactInfoUiMapper
+    private lateinit var invitationStatusMessageUiMapper: InvitationStatusMessageUiMapper
 
     @BeforeEach
     fun setup() = runTest {
@@ -61,6 +62,7 @@ class InviteContactViewModelTest {
         invitationContactInfoUiMapper = InvitationContactInfoUiMapper(
             defaultDispatcher = extension.testDispatcher
         )
+        invitationStatusMessageUiMapper = InvitationStatusMessageUiMapper()
         initializeViewModel()
     }
 
@@ -74,92 +76,124 @@ class InviteContactViewModelTest {
             inviteContactWithEmailsUseCase = inviteContactWithEmailsUseCase,
             areThereOngoingVideoCallsUseCase = areThereOngoingVideoCallsUseCase,
             invitationContactInfoUiMapper = invitationContactInfoUiMapper,
+            invitationStatusMessageUiMapper = invitationStatusMessageUiMapper,
             savedStateHandle = savedStateHandle
         )
     }
 
     @Test
-    fun `test that all contacts should be initialized when given a contact list`() {
-        val contacts = listOf(InvitationContactInfo())
+    fun `test that all contacts should be initialized when given a contact list`() = runTest {
+        val localContacts = listOf(LocalContact(id = 1L))
+        whenever(getLocalContactsUseCase()).thenReturn(localContacts)
+        whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
+        whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
+            localContacts
+        )
 
-        underTest.initializeAllContacts(contacts)
+        underTest.initializeContacts()
 
-        assertThat(underTest.allContacts).isEqualTo(contacts)
+        assertThat(underTest.allContacts).isEqualTo(invitationContactInfoUiMapper(localContacts))
     }
 
     @Test
     fun `test that filtered contacts list should be initialized when given a contact list`() =
         runTest {
-            val contacts = listOf(InvitationContactInfo())
+            val localContacts = listOf(LocalContact(id = 1L))
+            whenever(getLocalContactsUseCase()).thenReturn(localContacts)
+            whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
+            whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
+                localContacts
+            )
 
-            underTest.initializeFilteredContacts(contacts)
+            underTest.initializeContacts()
 
-            underTest.filterUiState.test {
-                assertThat(expectMostRecentItem().filteredContacts).isEqualTo(contacts)
+            underTest.uiState.test {
+                assertThat(
+                    expectMostRecentItem().filteredContacts
+                ).isEqualTo(
+                    invitationContactInfoUiMapper(localContacts)
+                )
             }
         }
 
-    @ParameterizedTest
-    @MethodSource("provideContactInfo")
-    fun `test that the highlighted value should be set correctly`(
-        contact: InvitationContactInfo,
-    ) = runTest {
-        underTest.initializeAllContacts(listOf(contact))
-        underTest.initializeFilteredContacts(listOf(contact))
-
-        underTest.toggleContactHighlightedInfo(contact)
-
-        val expected = listOf(InvitationContactInfo(isHighlighted = !contact.isHighlighted))
-        underTest.filterUiState.test {
-            assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)
-        }
-        assertThat(underTest.allContacts).isEqualTo(expected)
-    }
-
-    private fun provideContactInfo() = Stream.of(
-        Arguments.of(InvitationContactInfo(isHighlighted = true)),
-        Arguments.of(InvitationContactInfo(isHighlighted = false))
-    )
-
-    @ParameterizedTest(name = "should be set to {1}")
-    @MethodSource("provideContactInfoWithExpectedHighlightedValue")
-    fun `test that the highlighted value should be set correctly`(
-        contact: InvitationContactInfo,
-        isHighlighted: Boolean,
-    ) = runTest {
-        underTest.initializeAllContacts(listOf(contact))
-        underTest.initializeFilteredContacts(listOf(contact))
-
-        underTest.toggleContactHighlightedInfo(contact, isHighlighted)
-
-        val expected = listOf(InvitationContactInfo(isHighlighted = isHighlighted))
-        underTest.filterUiState.test {
-            assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)
-        }
-        assertThat(underTest.allContacts).isEqualTo(expected)
-    }
-
-    private fun provideContactInfoWithExpectedHighlightedValue() = Stream.of(
-        Arguments.of(
-            InvitationContactInfo(isHighlighted = true),
-            false
-        ),
-        Arguments.of(
-            InvitationContactInfo(isHighlighted = false),
-            true
+    @Test
+    fun `test that the highlighted value should be set correctly`() = runTest {
+        val localContacts = listOf(
+            LocalContact(id = 1L, name = "firstContact", phoneNumbers = listOf("123123123")),
+            LocalContact(id = 2L, name = "secondContact", phoneNumbers = listOf("321321321"))
         )
-    )
+        whenever(getLocalContactsUseCase()).thenReturn(localContacts)
+        whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
+        whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
+            localContacts
+        )
+        underTest.initializeContacts()
+        val mappedContacts = invitationContactInfoUiMapper(localContacts)
+
+        underTest.toggleContactHighlightedInfo(mappedContacts[1].copy(isHighlighted = true))
+        underTest.toggleContactHighlightedInfo(mappedContacts[2])
+
+        val expected = listOf(
+            mappedContacts[0], // Header item
+            mappedContacts[1].copy(isHighlighted = false),
+            mappedContacts[2].copy(isHighlighted = true)
+        )
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)
+        }
+        assertThat(underTest.allContacts).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that the highlighted value should be set based on a given value`() = runTest {
+        val localContacts = listOf(
+            LocalContact(id = 1L, name = "firstContact", phoneNumbers = listOf("123123123")),
+            LocalContact(id = 2L, name = "secondContact", phoneNumbers = listOf("321321321"))
+        )
+        whenever(getLocalContactsUseCase()).thenReturn(localContacts)
+        whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
+        whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
+            localContacts
+        )
+        underTest.initializeContacts()
+        val mappedContacts = invitationContactInfoUiMapper(localContacts)
+
+        underTest.toggleContactHighlightedInfo(mappedContacts[1], true)
+        underTest.toggleContactHighlightedInfo(mappedContacts[2].copy(isHighlighted = true), false)
+
+        val expected = listOf(
+            mappedContacts[0], // Header item
+            mappedContacts[1].copy(isHighlighted = true),
+            mappedContacts[2].copy(isHighlighted = false)
+        )
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)
+        }
+        assertThat(underTest.allContacts).isEqualTo(expected)
+    }
 
     @ParameterizedTest(name = "when the query is {0}")
     @NullAndEmptySource
     fun `test that the filtered contact list is reset`(query: String?) = runTest {
-        val contacts = listOf(InvitationContactInfo(id = 123L))
-        underTest.initializeAllContacts(contacts)
+        val localContacts = listOf(
+            LocalContact(id = 1L, name = "firstContact", phoneNumbers = listOf("123123123")),
+            LocalContact(id = 2L, name = "secondContact", phoneNumbers = listOf("321321321"))
+        )
+        whenever(getLocalContactsUseCase()).thenReturn(localContacts)
+        whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
+        whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
+            localContacts
+        )
+        underTest.initializeContacts()
 
         underTest.filterContacts(query)
 
-        underTest.filterUiState.test {
-            assertThat(expectMostRecentItem().filteredContacts).isEqualTo(contacts)
+        underTest.uiState.test {
+            assertThat(
+                expectMostRecentItem().filteredContacts
+            ).isEqualTo(
+                invitationContactInfoUiMapper(localContacts)
+            )
         }
     }
 
@@ -168,7 +202,7 @@ class InviteContactViewModelTest {
         runTest {
             underTest.filterContacts("query")
 
-            underTest.filterUiState.test {
+            underTest.uiState.test {
                 assertThat(expectMostRecentItem().filteredContacts).isEqualTo(emptyList<InvitationContactInfo>())
             }
         }
@@ -176,54 +210,41 @@ class InviteContactViewModelTest {
     @Test
     fun `test that the filtered contact list contains only a header item and valid phone contacts`() =
         runTest {
-            val contacts = listOf(
-                InvitationContactInfo(
+            val localContacts = listOf(
+                LocalContact(
                     id = 123L,
-                    type = TYPE_PHONE_CONTACT,
-                    name = "query"
+                    name = "query",
+                    phoneNumbers = listOf("123123123")
                 ),
-                InvitationContactInfo(
+                LocalContact(
                     id = 124L,
-                    type = TYPE_PHONE_CONTACT,
-                    displayInfo = "quer"
+                    name = "quer",
+                    phoneNumbers = listOf("321321321")
                 ),
-                InvitationContactInfo(
+                LocalContact(
                     id = 125L,
-                    type = 100,
-                    name = "query 1"
+                    name = "astaga",
+                    phoneNumbers = listOf("345345345")
                 ),
-                InvitationContactInfo(
+                LocalContact(
                     id = 126L,
-                    type = TYPE_PHONE_CONTACT,
-                    name = "query 1"
+                    name = "query 1",
+                    phoneNumbers = listOf("543534543")
                 )
             )
-            underTest.initializeAllContacts(contacts)
+            whenever(getLocalContactsUseCase()).thenReturn(localContacts)
+            whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
+            whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
+                localContacts
+            )
+            underTest.initializeContacts()
 
             underTest.filterContacts("que")
 
-            underTest.filterUiState.test {
-                val expected = listOf(
-                    InvitationContactInfo(
-                        id = ID_PHONE_CONTACTS_HEADER,
-                        type = TYPE_PHONE_CONTACT_HEADER
-                    ),
-                    InvitationContactInfo(
-                        id = 123L,
-                        type = TYPE_PHONE_CONTACT,
-                        name = "query"
-                    ),
-                    InvitationContactInfo(
-                        id = 124L,
-                        type = TYPE_PHONE_CONTACT,
-                        displayInfo = "quer"
-                    ),
-                    InvitationContactInfo(
-                        id = 126L,
-                        type = TYPE_PHONE_CONTACT,
-                        name = "query 1"
-                    )
-                )
+            underTest.uiState.test {
+                val expected = invitationContactInfoUiMapper(localContacts).filterNot {
+                    it.name == localContacts[2].name
+                }
                 assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)
             }
         }
@@ -235,7 +256,7 @@ class InviteContactViewModelTest {
 
             underTest.initializeContacts()
 
-            underTest.filterUiState.test {
+            underTest.uiState.test {
                 awaitItem() // Default value
                 expectNoEvents()
             }
@@ -254,7 +275,7 @@ class InviteContactViewModelTest {
 
         underTest.initializeContacts()
 
-        underTest.filterUiState.test {
+        underTest.uiState.test {
             val expected = mutableListOf<InvitationContactInfo>()
             localContacts.forEach {
                 val phoneNumberList = it.phoneNumbers + it.emails
@@ -333,13 +354,13 @@ class InviteContactViewModelTest {
         }
 
     @Test
-    fun `test that filter contacts is invoked when the search query is changed`() =
+    fun `test that list of filter contacts is updated when the search query is changed`() =
         runTest {
             val newSearchQuery = "newSearchQuery"
 
             underTest.onSearchQueryChange(newSearchQuery)
 
-            underTest.filterUiState.test {
+            underTest.uiState.test {
                 assertThat(expectMostRecentItem().filteredContacts).isEqualTo(emptyList<InvitationContactInfo>())
             }
         }
@@ -355,23 +376,66 @@ class InviteContactViewModelTest {
         }
 
     @Test
-    fun `test that the correct invitation status state is updated after successfully inviting contacts by email`() =
+    fun `test that the correct invitation status state is updated after successfully inviting contacts with email and a phone number`() =
         runTest {
-            val emails = listOf("email1@email.com", "email2@email.com", "email3@email.com")
-            whenever(inviteContactWithEmailsUseCase(emails)) doReturn listOf(
+            val emails = listOf(
+                "email1@email.com",
+                "email2@email.com",
+                "email3@email.com"
+            )
+            val requests = listOf(
                 InviteContactRequest.Sent,
                 InviteContactRequest.Resent,
                 InviteContactRequest.Sent
             )
+            whenever(inviteContactWithEmailsUseCase(emails)) doReturn requests
+            underTest.addSelectedContactInformation(
+                InvitationContactInfo(id = 1L, displayInfo = emails[0])
+            )
+            underTest.addSelectedContactInformation(
+                InvitationContactInfo(id = 2L, displayInfo = emails[1])
+            )
+            underTest.addSelectedContactInformation(
+                InvitationContactInfo(id = 3L, displayInfo = emails[2])
+            )
+            val phoneNumber = "123123123123"
+            underTest.addSelectedContactInformation(
+                InvitationContactInfo(id = 4L, displayInfo = phoneNumber)
+            )
 
-            underTest.inviteContactsByEmail(emails)
+            underTest.inviteContacts()
 
             underTest.uiState.test {
-                val expected = InvitationStatusUiState(
-                    emails = emails,
-                    totalInvitationSent = 2
+                val expectedStatus = invitationStatusMessageUiMapper(
+                    isFromAchievement = false,
+                    requests = requests,
+                    emails = emails
                 )
-                assertThat(expectMostRecentItem().invitationStatus).isEqualTo(expected)
+                val item = expectMostRecentItem()
+                assertThat(item.invitationStatusResult).isEqualTo(expectedStatus)
+                assertThat(item.pendingPhoneNumberInvitations).isEqualTo(listOf(phoneNumber))
+            }
+        }
+
+    @Test
+    fun `test that the pending phone numbers to be invited are set correctly when the invited contacts are only phone numbers`() =
+        runTest {
+            val phoneNumbers = listOf("123123123123", "3213123123")
+            underTest.addSelectedContactInformation(
+                InvitationContactInfo(id = 1L, displayInfo = phoneNumbers[0])
+            )
+            underTest.addSelectedContactInformation(
+                InvitationContactInfo(id = 2L, displayInfo = phoneNumbers[1])
+            )
+
+            underTest.inviteContacts()
+
+            underTest.uiState.test {
+                assertThat(
+                    expectMostRecentItem().pendingPhoneNumberInvitations
+                ).isEqualTo(
+                    phoneNumbers
+                )
             }
         }
 

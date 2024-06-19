@@ -49,7 +49,11 @@ import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_PHONE
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.createManualInput
 import mega.privacy.android.app.main.adapters.InvitationContactsAdapter
-import mega.privacy.android.app.main.model.InvitationStatusUiState
+import mega.privacy.android.app.main.model.InviteContactUiState.InvitationStatusMessageUiState
+import mega.privacy.android.app.main.model.InviteContactUiState.InvitationStatusMessageUiState.InvitationsSent
+import mega.privacy.android.app.main.model.InviteContactUiState.InvitationStatusMessageUiState.NavigateUpWithResult
+import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiState.Plural
+import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiState.Singular
 import mega.privacy.android.app.presentation.contact.invite.contact.component.ContactInfoListDialog
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.parcelable
@@ -87,9 +91,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
     private var displayMetrics: DisplayMetrics? = null
     private var actionBar: ActionBar? = null
     private var invitationContactsAdapter: InvitationContactsAdapter? = null
-
-    private var contactsEmailsSelected: MutableList<String> = mutableListOf()
-    private var contactsPhoneSelected: MutableList<String> = mutableListOf()
 
     private var isPermissionGranted = false
     private var isGetContactCompleted = false
@@ -176,7 +177,7 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
 
             invitationContactsAdapter = InvitationContactsAdapter(
                 this@InviteContactActivity,
-                viewModel.filterUiState.value.filteredContacts,
+                viewModel.uiState.value.filteredContacts,
                 this@InviteContactActivity,
                 megaApi
             )
@@ -226,7 +227,7 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         binding.fabButtonNext.setOnClickListener {
             enableFabButton(false)
             Timber.d("invite Contacts")
-            inviteContacts(viewModel.uiState.value.selectedContactInformation)
+            viewModel.inviteContacts()
             Util.hideKeyboard(this, 0)
         }
 
@@ -304,7 +305,7 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
                     if (viewModel.uiState.value.selectedContactInformation.isEmpty()) {
                         Util.hideKeyboard(this@InviteContactActivity, 0)
                     } else {
-                        inviteContacts(viewModel.uiState.value.selectedContactInformation)
+                        viewModel.inviteContacts()
                     }
                     return@setOnEditorActionListener true
                 }
@@ -349,7 +350,7 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
             }
         }
 
-        collectFlow(viewModel.filterUiState) {
+        collectFlow(viewModel.uiState.map { it.filteredContacts }.distinctUntilChanged()) {
             refreshList()
             visibilityFastScroller()
         }
@@ -357,11 +358,10 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         collectFlow(
             viewModel
                 .uiState
-                .map { it.invitationStatus }
-                .filter { it.emails.isNotEmpty() }
+                .map { it.invitationStatusResult }
                 .distinctUntilChanged()
         ) {
-            showInvitationsResult(it)
+            it?.let { showInvitationsResult(it) }
         }
 
         collectFlow(
@@ -378,6 +378,19 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         collectFlow(
             viewModel
                 .uiState
+                .map { it.pendingPhoneNumberInvitations }
+                .filter { it.isNotEmpty() }
+                .distinctUntilChanged()
+        ) {
+            if (viewModel.uiState.value.invitationStatusResult == null) {
+                invitePhoneContacts(it)
+                finish()
+            }
+        }
+
+        collectFlow(
+            viewModel
+                .uiState
                 .map { it.selectedContactInformation }
                 .distinctUntilChanged()
         ) {
@@ -385,47 +398,42 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         }
     }
 
-    private fun showInvitationsResult(status: InvitationStatusUiState) {
+    private fun showInvitationsResult(status: InvitationStatusMessageUiState) {
         val result = Intent()
-        // If the invitation is successful and the total number of invitations is one.
-        if (status.emails.size == 1 && status.totalInvitationSent == 1 && !viewModel.isFromAchievement) {
-            showSnackBar(getString(R.string.context_contact_request_sent, status.emails[0]))
-        } else {
-            val totalFailedInvitations = status.emails.size - status.totalInvitationSent
-            // There are failed invitations.
-            if (totalFailedInvitations > 0 && !viewModel.isFromAchievement) {
-                val requestsSent = resources.getQuantityString(
-                    R.plurals.contact_snackbar_invite_contact_requests_sent,
-                    status.totalInvitationSent,
-                    status.totalInvitationSent
-                )
-                val requestsNotSent = resources.getQuantityString(
-                    R.plurals.contact_snackbar_invite_contact_requests_not_sent,
-                    totalFailedInvitations,
-                    totalFailedInvitations
-                )
-                showSnackBar(requestsSent + requestsNotSent)
-            } else {
-                // All invitations are successfully sent.
-                if (!viewModel.isFromAchievement) {
-                    showSnackBar(
-                        resources.getQuantityString(
-                            R.plurals.number_correctly_invite_contact_request,
-                            status.emails.size,
-                            status.emails.size
-                        )
-                    )
-                } else {
-                    // Sent back the result to the InviteFriendsRoute.
-                    result.putExtra(KEY_SENT_NUMBER, status.totalInvitationSent)
+        when (status) {
+            is NavigateUpWithResult -> {
+                result.putExtra(status.result.key, status.result.totalInvitationsSent)
+            }
+
+            is InvitationsSent -> {
+                val message = status.messages.fold("") { acc, messageType ->
+                    acc + when (messageType) {
+                        is Plural -> {
+                            resources.getQuantityString(
+                                messageType.id,
+                                messageType.quantity,
+                                messageType.quantity
+                            )
+                        }
+
+                        is Singular -> {
+                            if (messageType.argument != null) {
+                                resources.getString(
+                                    messageType.id,
+                                    messageType.argument
+                                )
+                            } else resources.getString(messageType.id)
+                        }
+                    }
                 }
+                showSnackBar(message)
             }
         }
 
         Util.hideKeyboard(this@InviteContactActivity, 0)
         Handler(Looper.getMainLooper()).postDelayed({
-            if (contactsPhoneSelected.isNotEmpty()) {
-                invitePhoneContacts(ArrayList(contactsPhoneSelected))
+            if (viewModel.uiState.value.pendingPhoneNumberInvitations.isNotEmpty()) {
+                invitePhoneContacts(viewModel.uiState.value.pendingPhoneNumberInvitations)
             }
             setResult(RESULT_OK, result)
             finish()
@@ -803,7 +811,7 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
 
     private fun refreshList() {
         Timber.d("refresh list")
-        setPhoneAdapterContacts(viewModel.filterUiState.value.filteredContacts)
+        setPhoneAdapterContacts(viewModel.uiState.value.filteredContacts)
     }
 
     private fun refreshInviteContactButton() {
@@ -842,30 +850,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
             }
         }
         setTitleAB()
-    }
-
-    private fun inviteContacts(addedContacts: List<InvitationContactInfo>?) {
-        // Email/phone contacts to be invited
-        contactsEmailsSelected = mutableListOf()
-        contactsPhoneSelected = mutableListOf()
-
-        addedContacts?.forEach { contact ->
-            if (contact.isEmailContact()) {
-                contactsEmailsSelected.add(contact.displayInfo)
-            } else {
-                contactsPhoneSelected.add(contact.displayInfo)
-            }
-        }
-
-        if (contactsEmailsSelected.isNotEmpty()) {
-            //phone contact will be invited once email done
-            viewModel.inviteContactsByEmail(ArrayList(contactsEmailsSelected))
-        } else if (contactsPhoneSelected.isNotEmpty()) {
-            invitePhoneContacts(ArrayList(contactsPhoneSelected))
-            finish()
-        } else {
-            finish()
-        }
     }
 
     private fun invitePhoneContacts(phoneNumbers: List<String>) {
@@ -913,8 +897,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
     }
 
     companion object {
-        internal const val KEY_SENT_NUMBER = "sentNumber"
-
         private const val SCAN_QR_FOR_INVITE_CONTACTS = 1111
         private const val KEY_IS_PERMISSION_GRANTED = "KEY_IS_PERMISSION_GRANTED"
         private const val KEY_IS_GET_CONTACT_COMPLETED = "KEY_IS_GET_CONTACT_COMPLETED"
