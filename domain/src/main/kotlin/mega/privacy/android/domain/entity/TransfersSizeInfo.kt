@@ -11,6 +11,6 @@ package mega.privacy.android.domain.entity
 data class TransfersSizeInfo(
     val totalSizeToTransfer: Long = 0,
     val totalSizeTransferred: Long = 0,
-    val pendingUploads: Int? = null,
-    val pendingDownloads: Int? = null,
+    val pendingUploads: Int = 0,
+    val pendingDownloads: Int = 0,
 )

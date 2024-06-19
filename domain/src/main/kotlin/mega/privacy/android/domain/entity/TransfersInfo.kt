@@ -18,11 +18,7 @@ data class TransfersInfo(
     /**
      * computed value of the completed progress (base 1)
      */
-    val completedProgress = if (totalSizeToTransfer > 0) {
-        (totalSizeAlreadyTransferred.toDouble() / totalSizeToTransfer.toDouble()).toFloat()
-    } else {
-        0f
-    }
+    val completedProgress = Progress(totalSizeAlreadyTransferred, totalSizeToTransfer)
 }
 
 /**

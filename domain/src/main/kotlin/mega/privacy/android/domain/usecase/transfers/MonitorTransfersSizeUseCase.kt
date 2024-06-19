@@ -8,6 +8,8 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.GetNumPendingUploadsUseCase
 import javax.inject.Inject
 
 /**
@@ -15,6 +17,8 @@ import javax.inject.Inject
  */
 class MonitorTransfersSizeUseCase @Inject constructor(
     private val repository: TransferRepository,
+    private val getNumPendingDownloadsNonBackgroundUseCase: GetNumPendingDownloadsNonBackgroundUseCase,
+    private val getNumPendingUploadsUseCase: GetNumPendingUploadsUseCase,
 ) {
     private val transferMap: MutableMap<Int, Transfer> = hashMapOf()
 
@@ -65,7 +69,9 @@ class MonitorTransfersSizeUseCase @Inject constructor(
             }
             TransfersSizeInfo(
                 totalSizeToTransfer = totalBytes,
-                totalSizeTransferred = totalTransferred
+                totalSizeTransferred = totalTransferred,
+                pendingDownloads = getNumPendingDownloadsNonBackgroundUseCase(),
+                pendingUploads = getNumPendingUploadsUseCase(),
             )
         }
 }

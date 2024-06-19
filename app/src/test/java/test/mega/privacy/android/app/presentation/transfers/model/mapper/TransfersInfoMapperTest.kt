@@ -1,6 +1,6 @@
 package test.mega.privacy.android.app.presentation.transfers.model.mapper
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.domain.entity.TransfersStatus
 import org.junit.jupiter.api.DisplayName
@@ -14,7 +14,7 @@ class TransfersInfoMapperTest {
     @DisplayName("test that correct progress is returned")
     inner class CorrectProgress {
         @Test
-        fun `test that when transfer is in progress then correct progress is returned`() {
+        fun `test that the correct progress is returned when the transfer is in progress`() {
             val result = underTest(
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
@@ -25,11 +25,11 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
             )
-            Truth.assertThat(result.completedProgress).isEqualTo(0.5f)
+            assertThat(result.completedProgress.floatValue).isEqualTo(0.5f)
         }
 
         @Test
-        fun `test that if totalSizeToTransfer is 0 then completed Progress is 0`() {
+        fun `test that the completed Progress is 0 when totalSizeToTransfer is 0`() {
             val result = underTest(
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 1,
@@ -40,7 +40,7 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
             )
-            Truth.assertThat(result.completedProgress).isEqualTo(0)
+            assertThat(result.completedProgress.floatValue).isEqualTo(0)
         }
 
     }
@@ -61,11 +61,11 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
             )
-            Truth.assertThat(result.status).isEqualTo(TransfersStatus.NotTransferring)
+            assertThat(result.status).isEqualTo(TransfersStatus.NotTransferring)
         }
 
         @Test
-        fun `test that when transfer is paused then paused status is returned regardless of errors or over quota`() {
+        fun `test that paused status is returned regardless of errors or over quota when transfer is paused`() {
             val result = underTest(
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
@@ -76,11 +76,11 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = true,
                 isStorageOverQuota = true,
             )
-            Truth.assertThat(result.status).isEqualTo(TransfersStatus.Paused)
+            assertThat(result.status).isEqualTo(TransfersStatus.Paused)
         }
 
         @Test
-        fun `test that when transfer has error then transfer error status is returned`() {
+        fun `test that transfer error status is returned when transfer has error`() {
             val result = underTest(
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
@@ -91,11 +91,11 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
             )
-            Truth.assertThat(result.status).isEqualTo(TransfersStatus.TransferError)
+            assertThat(result.status).isEqualTo(TransfersStatus.TransferError)
         }
 
         @Test
-        fun `test that when there is storage over quota and pending uploads then transfer over quota status is returned`() {
+        fun `test that transfer over quota status is returned when there is storage over quota and pending uploads`() {
             val result = underTest(
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
@@ -106,11 +106,11 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = true,
             )
-            Truth.assertThat(result.status).isEqualTo(TransfersStatus.OverQuota)
+            assertThat(result.status).isEqualTo(TransfersStatus.OverQuota)
         }
 
         @Test
-        fun `test that when there is storage over quota but no pending uploads then Transferring status is returned`() {
+        fun `test that Transferring status is returned when there is storage over quota but no pending uploads`() {
             val result = underTest(
                 numPendingUploads = 0,
                 numPendingDownloadsNonBackground = 1,
@@ -121,11 +121,11 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = true,
             )
-            Truth.assertThat(result.status).isEqualTo(TransfersStatus.Transferring)
+            assertThat(result.status).isEqualTo(TransfersStatus.Transferring)
         }
 
         @Test
-        fun `test that when there is transfer over quota and pending downloads then transfer over quota status is returned`() {
+        fun `test that transfer over quota status is returned when there is transfer over quota and pending downloads`() {
             val result = underTest(
                 numPendingUploads = 0,
                 numPendingDownloadsNonBackground = 1,
@@ -136,11 +136,11 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = true,
                 isStorageOverQuota = false,
             )
-            Truth.assertThat(result.status).isEqualTo(TransfersStatus.OverQuota)
+            assertThat(result.status).isEqualTo(TransfersStatus.OverQuota)
         }
 
         @Test
-        fun `test that when there is transfer over quota but no pending downloads then Transferring status is returned`() {
+        fun `test that Transferring status is returned when there is transfer over quota but no pending downloads`() {
             val result = underTest(
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
@@ -151,7 +151,7 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = true,
                 isStorageOverQuota = false,
             )
-            Truth.assertThat(result.status).isEqualTo(TransfersStatus.Transferring)
+            assertThat(result.status).isEqualTo(TransfersStatus.Transferring)
         }
     }
 
@@ -160,7 +160,7 @@ class TransfersInfoMapperTest {
     inner class CorrectUpload {
 
         @Test
-        fun `test that when upload status is uploading and there are pending uploads then upload flag is true`() {
+        fun `test that the upload flag is true when upload status is uploading and there are pending uploads`() {
             val result = underTest(
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 0,
@@ -171,11 +171,11 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
             )
-            Truth.assertThat(result.uploading).isTrue()
+            assertThat(result.uploading).isTrue()
         }
 
         @Test
-        fun `test that when upload status is uploading but there are no pending uploads then upload flag is false`() {
+        fun `test that the upload flag is false when upload status is uploading but there are no pending uploads`() {
             val result = underTest(
                 numPendingUploads = 0,
                 numPendingDownloadsNonBackground = 0,
@@ -186,11 +186,11 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
             )
-            Truth.assertThat(result.uploading).isFalse()
+            assertThat(result.uploading).isFalse()
         }
 
         @Test
-        fun `test that when there are downloads then upload flag is false`() {
+        fun `test that the upload flag is false when there are downloads`() {
             val result = underTest(
                 numPendingUploads = 0,
                 numPendingDownloadsNonBackground = 1,
@@ -201,11 +201,11 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
             )
-            Truth.assertThat(result.uploading).isFalse()
+            assertThat(result.uploading).isFalse()
         }
 
         @Test
-        fun `test that when there are uploads and no downloads then upload flag is true`() {
+        fun `test that the upload flag is true when there are uploads and no downloads`() {
             val result = underTest(
                 numPendingUploads = 1,
                 numPendingDownloadsNonBackground = 1,
@@ -216,7 +216,7 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
             )
-            Truth.assertThat(result.uploading).isTrue()
+            assertThat(result.uploading).isTrue()
         }
     }
 }

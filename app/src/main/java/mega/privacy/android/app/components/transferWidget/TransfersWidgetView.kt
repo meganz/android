@@ -22,12 +22,15 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.domain.entity.TransfersInfo
+import mega.privacy.android.domain.entity.TransfersStatus.OverQuota
+import mega.privacy.android.domain.entity.TransfersStatus.Paused
+import mega.privacy.android.domain.entity.TransfersStatus.TransferError
+import mega.privacy.android.domain.entity.TransfersStatus.Transferring
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.amber_700_amber_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.domain.entity.TransfersInfo
-import mega.privacy.android.domain.entity.TransfersStatus.*
 
 @Composable
 internal fun TransfersWidgetView(
@@ -43,7 +46,7 @@ internal fun TransfersWidgetView(
 
         val progressBackgroundColor = MaterialTheme.colors.grey_alpha_012_white_alpha_012
         val progressColor = transfersData.progressColor()
-        val progressArc = transfersData.completedProgress * 360f
+        val progressArc = transfersData.completedProgress.floatValue * 360f
         Canvas(modifier = Modifier.size(diameter.dp)) {
             //background
             drawCircle(

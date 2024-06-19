@@ -16,9 +16,7 @@ import mega.privacy.android.domain.entity.TransfersSizeInfo
 import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersSizeUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.GetNumPendingUploadsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,25 +37,20 @@ class TransfersManagementViewModelTest {
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val areAllTransfersPausedUseCase = mock<AreAllTransfersPausedUseCase>()
     private val transfersInfoMapper = mock<TransfersInfoMapper>()
-    private val getNumPendingDownloadsNonBackgroundUseCase =
-        mock<GetNumPendingDownloadsNonBackgroundUseCase>()
-    private val getNumPendingUploadsUseCase = mock<GetNumPendingUploadsUseCase>()
     private val transfersManagement = mock<TransfersManagement>()
 
     private val monitorTransfersSizeFlow = MutableSharedFlow<TransfersSizeInfo>()
 
     @BeforeAll
     fun setup() = runTest {
-        //this mocks are used in viewmodel init only, so no need to reset
+        //this mocks are only used in viewmodel init, so no need to reset
         val monitorTransfersSize = mock<MonitorTransfersSizeUseCase>()
         val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
         whenever(monitorTransfersSize()) doReturn monitorTransfersSizeFlow
         whenever(getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) doReturn true
-        whenever(areAllTransfersPausedUseCase()) doReturn true //to don't trigger initial update
+        commonStub()
 
         underTest = TransfersManagementViewModel(
-            getNumPendingDownloadsNonBackgroundUseCase = getNumPendingDownloadsNonBackgroundUseCase,
-            getNumPendingUploadsUseCase = getNumPendingUploadsUseCase,
             getNumPendingTransfersUseCase = mock(),
             isCompletedTransfersEmptyUseCase = mock(),
             areAllTransfersPausedUseCase = areAllTransfersPausedUseCase,
@@ -72,19 +65,17 @@ class TransfersManagementViewModelTest {
     }
 
     @BeforeEach
-    fun resetMocks() {
+    fun resetMocks() = runTest {
         reset(
             areAllTransfersPausedUseCase,
             transfersInfoMapper,
-            getNumPendingDownloadsNonBackgroundUseCase,
-            getNumPendingUploadsUseCase,
         )
+        commonStub()
     }
 
     @Test
     fun `test ui state is updated with correct values when there's a new emission of monitorTransfersSize`() =
         runTest {
-            commonStub()
             val pendingDownloads = 5
             val pendingUploads = 4
             val totalSizeTransferred = 3L
@@ -121,9 +112,7 @@ class TransfersManagementViewModelTest {
             }
         }
 
-    private fun commonStub() = runTest {
-        whenever(getNumPendingDownloadsNonBackgroundUseCase()) doReturn 0
-        whenever(getNumPendingUploadsUseCase()) doReturn 0
+    private suspend fun commonStub() {
         whenever(areAllTransfersPausedUseCase()) doReturn false
         whenever(transfersManagement.getAreFailedTransfers()) doReturn false
         whenever(transfersManagement.shouldShowNetworkWarning) doReturn false

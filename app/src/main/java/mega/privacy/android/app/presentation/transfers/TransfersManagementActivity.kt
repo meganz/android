@@ -307,21 +307,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
     }
 
     /**
-     * Updates the state of the transfers widget.
-     *
-     * @param transferType Type of the transfer.
-     */
-    private fun updateTransfersWidget(transferType: TransferType) {
-        if (transfersManagement.isProcessingTransfers || transfersManagement.isProcessingFolders) {
-            return
-        }
-
-        transfersManagementViewModel.checkTransfersInfo(
-            isOnFileManagementManagerSection
-        )
-    }
-
-    /**
      * Shows a scanning transfers dialog.
      */
     private fun showScanningTransfersDialog() {
@@ -417,13 +402,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
         } else {
             hideTransfersWidget()
         }
-    }
-
-    /**
-     * Updates the state of the transfers widget.
-     */
-    fun updateTransfersWidgetState() {
-        transfersManagementViewModel.checkTransfersState()
     }
 
     /**

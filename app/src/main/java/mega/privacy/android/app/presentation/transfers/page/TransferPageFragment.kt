@@ -207,7 +207,7 @@ internal class TransferPageFragment : Fragment() {
                 pauseTransfersMenuIcon?.isVisible =
                     !isPause && uiState.transfersTab == TransfersTab.PENDING_TAB
                 transfersFragment?.refresh()
-                transfersManagementViewModel.checkTransfersState()
+                transfersManagementViewModel.checkTransfersInfo()
                 viewModel.markPauseOrResultResultConsumed()
             }
 

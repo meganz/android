@@ -9,6 +9,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -18,32 +19,27 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.TransfersSizeInfo
-import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersSizeUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.IsCompletedTransfersEmptyUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.GetNumPendingUploadsUseCase
 import javax.inject.Inject
 
 /**
  * ViewModel for managing transfers data.
  *
- * @property getNumPendingDownloadsNonBackgroundUseCase    [GetNumPendingDownloadsNonBackgroundUseCase]
- * @property getNumPendingUploadsUseCase                   [GetNumPendingUploadsUseCase]
- * @property getNumPendingTransfersUseCase                 [GetNumPendingTransfersUseCase]
- * @property isCompletedTransfersEmptyUseCase       [IsCompletedTransfersEmptyUseCase]
- * @property areAllTransfersPausedUseCase                  [AreAllTransfersPausedUseCase]
+ * @property getNumPendingTransfersUseCase      [GetNumPendingTransfersUseCase]
+ * @property isCompletedTransfersEmptyUseCase   [IsCompletedTransfersEmptyUseCase]
+ * @property areAllTransfersPausedUseCase       [AreAllTransfersPausedUseCase]
+ * @property transfersInfoMapper                [TransfersInfoMapper]
+ * @property transfersManagement                [TransfersManagement]
  */
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class TransfersManagementViewModel @Inject constructor(
-    private val getNumPendingDownloadsNonBackgroundUseCase: GetNumPendingDownloadsNonBackgroundUseCase,
-    private val getNumPendingUploadsUseCase: GetNumPendingUploadsUseCase,
     private val getNumPendingTransfersUseCase: GetNumPendingTransfersUseCase,
     private val isCompletedTransfersEmptyUseCase: IsCompletedTransfersEmptyUseCase,
     private val areAllTransfersPausedUseCase: AreAllTransfersPausedUseCase,
@@ -57,6 +53,7 @@ class TransfersManagementViewModel @Inject constructor(
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
+    private var lastTransfersSizeInfo = TransfersSizeInfo()
 
     /**
      * is network connected
@@ -74,6 +71,10 @@ class TransfersManagementViewModel @Inject constructor(
                 monitorTransfersSize()
             } else {
                 monitorTransfersSize.invokeLegacy()
+                    .onStart {
+                        //in invokeLegacy we only receive updates with transfer updates, so we need to force a first update
+                        emit(TransfersSizeInfo())
+                    }
             }
             val samplePeriodFinal = samplePeriod ?: DEFAULT_SAMPLE_PERIOD
             if (samplePeriodFinal > 0) {
@@ -81,10 +82,10 @@ class TransfersManagementViewModel @Inject constructor(
             } else {
                 flow
             }.collect { transfersInfo ->
+                lastTransfersSizeInfo = transfersInfo
                 updateUiState(transfersInfo)
             }
         }
-        checkTransfersState()
     }
 
     /**
@@ -95,46 +96,37 @@ class TransfersManagementViewModel @Inject constructor(
     /**
      * Checks transfers info.
      */
-    fun checkTransfersInfo(unHideWidget: Boolean) {
-        val transfersInfo = _state.value.transfersInfo
-        updateUiState(
-            TransfersSizeInfo(
-                totalSizeTransferred = transfersInfo.totalSizeAlreadyTransferred,
-                totalSizeToTransfer = transfersInfo.totalSizeToTransfer,
-            ), unHideWidget
-        )
+    fun checkTransfersInfo(unHideWidget: Boolean = false) {
+        if (unHideWidget) {
+            _state.update {
+                it.copy(hideTransfersWidget = false)
+            }
+        }
+        viewModelScope.launch {
+            updateUiState(lastTransfersSizeInfo)
+        }
     }
 
     /**
      * get pending download and upload
      */
-    private fun updateUiState(
+    private suspend fun updateUiState(
         transfersSizeInfo: TransfersSizeInfo,
-        unHideWidget: Boolean = false,
     ) {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(hideTransfersWidget = if (unHideWidget) false else it.hideTransfersWidget)
-            }
-            val numPendingDownloadsNonBackground =
-                transfersSizeInfo.pendingDownloads ?: getNumPendingDownloadsNonBackgroundUseCase()
-            val numPendingUploads =
-                transfersSizeInfo.pendingUploads ?: getNumPendingUploadsUseCase()
-            val areTransfersPaused = areAllTransfersPausedUseCase()
-            _state.update {
-                it.copy(
-                    transfersInfo = transfersInfoMapper(
-                        numPendingDownloadsNonBackground = numPendingDownloadsNonBackground,
-                        numPendingUploads = numPendingUploads,
-                        isTransferError = transfersManagement.shouldShowNetworkWarning || transfersManagement.getAreFailedTransfers(),
-                        isTransferOverQuota = false,
-                        isStorageOverQuota = false,
-                        areTransfersPaused = areTransfersPaused,
-                        totalSizeTransferred = transfersSizeInfo.totalSizeTransferred,
-                        totalSizeToTransfer = transfersSizeInfo.totalSizeToTransfer,
-                    )
+        val areTransfersPaused = areAllTransfersPausedUseCase()
+        _state.update {
+            it.copy(
+                transfersInfo = transfersInfoMapper(
+                    numPendingDownloadsNonBackground = transfersSizeInfo.pendingDownloads,
+                    numPendingUploads = transfersSizeInfo.pendingUploads,
+                    isTransferError = transfersManagement.shouldShowNetworkWarning || transfersManagement.getAreFailedTransfers(),
+                    isTransferOverQuota = false,
+                    isStorageOverQuota = false,
+                    areTransfersPaused = areTransfersPaused,
+                    totalSizeTransferred = transfersSizeInfo.totalSizeTransferred,
+                    totalSizeToTransfer = transfersSizeInfo.totalSizeToTransfer,
                 )
-            }
+            )
         }
     }
 
@@ -145,19 +137,6 @@ class TransfersManagementViewModel @Inject constructor(
         viewModelScope.launch {
             shouldShowCompletedTab.value =
                 !isCompletedTransfersEmptyUseCase() && getNumPendingTransfersUseCase() <= 0
-        }
-    }
-
-    /**
-     * Checks if transfers are paused.
-     */
-    fun checkTransfersState() = viewModelScope.launch {
-        areAllTransfersPausedUseCase().let { paused ->
-            if (paused) {
-                _state.update { it.copy(transfersInfo = it.transfersInfo.copy(status = TransfersStatus.Paused)) }
-            } else {
-                checkTransfersInfo(false)
-            }
         }
     }
 

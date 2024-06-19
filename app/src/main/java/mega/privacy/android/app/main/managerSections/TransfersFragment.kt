@@ -240,7 +240,7 @@ internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
         viewLifecycleOwner.collectFlow(viewModel.uiState) { uiState ->
             uiState.pauseOrResumeTransferResult?.let { result ->
                 if (result.isSuccess) {
-                    transfersManagementViewModel.checkTransfersState()
+                    transfersManagementViewModel.checkTransfersInfo()
                     viewModel.activeTransferChangeStatus(result.getOrThrow().tag)
                 } else {
                     (activity as? ManagerActivity)?.showSnackbar(
