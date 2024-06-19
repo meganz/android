@@ -223,7 +223,7 @@
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
     <string name="general_size_giga_byte">%1$s&#160;GB</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
-    <string name="general_free_plan_name">Free</string>
+    <string name="general_free_plan_name">Gratuit</string>
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
     <string name="dialog_onboarding_transfer_quota_free_limited">Limitat</string>
     <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
@@ -431,9 +431,9 @@
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">Nu veți beneficia de următoarele funcții</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
-    <string name="account_cancel_account_screen_plan_access_until_expiration">You’ll still have access to these features until your MEGA plan expires, then you’ll be moved to a free account.</string>
+    <string name="account_cancel_account_screen_plan_access_until_expiration">Veți avea în continuare acces la aceste funcții până la expirarea abonamentului MEGA, apoi veți fi mutat într-un cont gratuit.</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">You are currently using %1s of storage, which you will risk losing.</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">În prezent, utilizați %1s de spațiu de stocare, pe care riscați să îl pierdeți.</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Caracteristică</string>
     <!-- Column header indicating features available with the free plan -->
@@ -461,19 +461,19 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Durata apelului și întâlnirii</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Până la 1&#160;oră</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">NELIMITATĂ</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Participanții la apel și la întâlnire</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Până la 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
     <string name="account_cancel_account_pro_plan_call_meeting_participants">NELIMITATĂ</string>
     <!-- Button label to keep the current pro plan -->
-    <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
+    <string name="account_cancel_account_plan_keep_pro_plan">Păstrați %1s</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">Continua anularea</string>
 </resources>

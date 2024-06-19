@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">Nigdy więcej nie utrać danych</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore files and folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Przewiń do tyłu, aby przywróć plik i katalog z powrotem do dowolnej daty do 180 dni, aby Twoje dane były odporne na zmiany.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -227,7 +227,7 @@
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
     <string name="general_size_giga_byte">%1$s&#160; GB</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
-    <string name="general_free_plan_name">Free</string>
+    <string name="general_free_plan_name">Darmowe</string>
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
     <string name="dialog_onboarding_transfer_quota_free_limited">Ograniczony</string>
     <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
@@ -299,7 +299,7 @@
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">Zmień</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Upload paused, device is not charging</string>
+    <string name="camera_uploads_phone_not_charging_message">Wgraj wstrzymane, urządzenie się nie ładuje</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
     <string name="device_center_list_view_item_status_nothing_setup">Brak ustawień synchronizacji</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
@@ -323,7 +323,7 @@
     <!-- Text for the Sync solved issues chip -->
     <string name="device_center_sync_solved_issues_chip_text">Rozwiązane problemy</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">This folder can’t be synced. Set it up to sync to MEGA using Camera uploads.</string>
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">Tego katalogu nie można zsynchronizować. Skonfiguruj go tak, aby synchronizował się z MEGA za pomocą przesyłania z aparatu.</string>
     <!-- Label for the file info information screen description field -->
     <string name="file_info_information_description_label">Opis</string>
     <!-- Placeholder for the file info information screen description field -->
@@ -385,53 +385,53 @@
     <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_title">Zmień na wersję Pro</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Unlock the power to sync your mobile device to the cloud with our Pro plans.</string>
+    <string name="device_center_sync_upgrade_dialog_message">Odblokuj moc synchronizacji urządzenia mobilnego z chmurą dzięki naszym planom Pro.</string>
     <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_confirm_button">Zmień</string>
     <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_cancel_button">Nie teraz</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Uploads folder conflict</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Wgraj folder</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your Camera uploads folder and secondary media uploads folder cannot be related to each other. Choose a different folder.</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Katalogi przesyłanie z kamery i zastępczy katalog do wgrywania multimediów nie mogą być ze sobą powiązane. Wybierz inny katalog.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">OK, rozumiem</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_no_picker_warning">This device doesn’t have an app to select folders</string>
+    <string name="general_no_picker_warning">To urządzenie nie ma aplikacji do wybierania katalogu</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="account_upgrade_account_description_feature_sync">&#8226; &#160; Automatyczna synchronizacja katalogów na urządzeniu mobilnym</string>
     <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">Your syncs have been paused. Syncing is a Pro plan feature.</string>
+    <string name="sync_error_dialog_free_user">Twoje synchronizacje zostały wstrzymane. Synchronizacja jest funkcją w planie Pro.</string>
     <!-- The error dialog confirm action text -->
     <string name="sync_error_dialog_free_user_confirm_action">Ok</string>
     <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">Syncing is paused because your MEGA Pro plan was cancelled. Upgrade to continue syncing.</string>
+    <string name="sync_error_banner_free_user">Synchronizacja jest wstrzymana, ponieważ Twój plan MEGA Pro został anulowany. Uaktualnij, aby kontynuować synchronizację.</string>
     <!-- Hidden items -->
     <string name="hidden_items">Ukryte elementy</string>
     <!-- Label to indicate that is a Pro only feature -->
     <string name="general_pro_only_label">Tylko Pro</string>
     <!-- Label for the file info information screen tags field -->
-    <string name="file_info_information_tags_label">Tags</string>
+    <string name="file_info_information_tags_label">Tagi</string>
     <!-- label for tags page tag description -->
-    <string name="add_tags_label_tag_description">Use tags to help you find and organise your data. Try tagging by year, location, project, or subject.</string>
+    <string name="add_tags_label_tag_description">Użyj tagów, aby ułatwić wyszukiwanie i porządkowanie danych. Spróbuj oznaczać według roku, lokalizacji, projektu lub tematu.</string>
     <!-- label for tag text field in add tags page -->
     <string name="add_tags_text_label_tag">Tag</string>
     <!-- label for add tags page add button -->
-    <string name="add_tags_button_label_add">Add “#%1$s” tag</string>
+    <string name="add_tags_button_label_add">Dodaj tag „#%1$s”</string>
     <!-- label for add tags page existing tags label -->
-    <string name="add_tags_label_existing_tags">Existing tags</string>
+    <string name="add_tags_label_existing_tags">Istniejące tagi</string>
     <!-- error label for add tags page when special characters added -->
-    <string name="add_tags_error_special_characters">Tags can’t contain spaces or non-alphanumeric symbols. Tags written with capital letters will be displayed in lowercase.</string>
+    <string name="add_tags_error_special_characters">Tagi nie mogą zawierać spacji ani symboli niealfanumerycznych. Tagi napisane wielkimi literami będą wyświetlane małymi literami.</string>
     <!-- error label for add tags page when tag count is maximum -->
-    <string name="add_tags_error_max_tags">The maximum number of tags is %1$d</string>
+    <string name="add_tags_error_max_tags">Maksymalna liczba tagów wynosi %1$d</string>
     <!-- error label for add tags page when tag character limit reached -->
-    <string name="add_tags_error_max_characters">Tags must be %1$d characters or less</string>
+    <string name="add_tags_error_max_characters">Tagi muszą mieć %1$d znaków lub mniej</string>
     <!-- title label for tags page -->
-    <string name="add_tags_page_title_label">Tags</string>
+    <string name="add_tags_page_title_label">Tagi</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
     <string name="file_info_information_no_description_placeholder">Brak opisu</string>
     <!-- Top bar title of the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_top_bar_title">Add to playlist</string>
+    <string name="video_to_playlist_top_bar_title">Dodaj do listy odtwarzania</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">Nowa lista odtwarzania</string>
     <!-- Text of the done button in the page that adds the video to the video playlist -->
@@ -439,9 +439,9 @@
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">Przegapisz następujące funkcje</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
-    <string name="account_cancel_account_screen_plan_access_until_expiration">You’ll still have access to these features until your MEGA plan expires, then you’ll be moved to a free account.</string>
+    <string name="account_cancel_account_screen_plan_access_until_expiration">Nadal będziesz mieć dostęp do tych funkcja do czasu wygaśnięcia planu MEGA, a następnie zostaniesz przeniesiony na bezpłatne konto.</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">You are currently using %1s of storage, which you will risk losing.</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">Aktualnie używasz %1s pojemności, której ryzykujesz utratę.</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Funkcja</string>
     <!-- Column header indicating features available with the free plan -->
@@ -449,7 +449,7 @@
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Pojemności</string>
     <!-- Storage amount available in the free plan -->
-    <string name="account_cancel_account_screen_plan_free_storage">20&#160;GB</string>
+    <string name="account_cancel_account_screen_plan_free_storage">20 &#160; GB</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Przesyłanie</string>
     <!-- Transfer limit in the free plan -->
@@ -469,19 +469,19 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Czas trwania połączenia i spotkania</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Do 1 godziny</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">BEZ OGRANICZEŃ</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Uczestnicy połączeń i spotkań</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Do 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
     <string name="account_cancel_account_pro_plan_call_meeting_participants">BEZ OGRANICZEŃ</string>
     <!-- Button label to keep the current pro plan -->
-    <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
+    <string name="account_cancel_account_plan_keep_pro_plan">Zatrzymaj %1s</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">Kontynuuj anulowanie</string>
 </resources>

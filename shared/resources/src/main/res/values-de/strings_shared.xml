@@ -219,7 +219,7 @@
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
     <string name="general_size_giga_byte">%1$s&#160;GB</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
-    <string name="general_free_plan_name">Free</string>
+    <string name="general_free_plan_name">Kostenlos</string>
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
     <string name="dialog_onboarding_transfer_quota_free_limited">Begrenzt</string>
     <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
@@ -415,7 +415,7 @@
     <!-- The placeholder for read only files/folders with no description in info screen-->
     <string name="file_info_information_no_description_placeholder">Keine Beschreibung</string>
     <!-- Top bar title of the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_top_bar_title">Add to playlist</string>
+    <string name="video_to_playlist_top_bar_title">Zu Playlist hinzufügen</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">Neue Playlist</string>
     <!-- Text of the done button in the page that adds the video to the video playlist -->
@@ -423,9 +423,9 @@
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">Du verzichtest auf alle diese Vorteile</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
-    <string name="account_cancel_account_screen_plan_access_until_expiration">You’ll still have access to these features until your MEGA plan expires, then you’ll be moved to a free account.</string>
+    <string name="account_cancel_account_screen_plan_access_until_expiration">Bis Ihr MEGA-Paket abläuft, haben Sie weiterhin Zugriff auf diese Funktionen. Danach werden Sie auf einen kostenlosen Account umgestellt.</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">You are currently using %1s of storage, which you will risk losing.</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">Sie belegen derzeit %1s Speicherplatz, den Sie verlieren könnten.</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Funktion</string>
     <!-- Column header indicating features available with the free plan -->
@@ -453,19 +453,19 @@
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Anruf- und Meeting-Dauer</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Bis zu 1 Stunde</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">UNBEGRENZT</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Anruf- und Meeting-Teilnehmer</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Bis zu 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
     <string name="account_cancel_account_pro_plan_call_meeting_participants">UNBEGRENZT</string>
     <!-- Button label to keep the current pro plan -->
-    <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
+    <string name="account_cancel_account_plan_keep_pro_plan">%1s behalten</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">Mit Kündigung fortfahren</string>
 </resources>

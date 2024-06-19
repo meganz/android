@@ -5047,7 +5047,7 @@
     <!--Action text to start a conversation from Meeting List screen empty view-->
     <string name="meeting_list_empty_action">Empezar una reunión</string>
     <!--Description text from Meeting List screen empty view-->
-    <string name="meeting_list_empty_description">Habla de forma segura y privada en llamadas y videollamadas con amigos y colegas de todo el mundo.</string>
+    <string name="meeting_list_empty_description">Habla de forma segura y privada en llamadas y videollamadas con amigos y compañeros de todo el mundo.</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_dialog_title">¿Cancelar “%1$s”?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
