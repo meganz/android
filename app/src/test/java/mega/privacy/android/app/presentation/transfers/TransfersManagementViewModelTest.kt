@@ -12,10 +12,10 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.TransfersInfo
-import mega.privacy.android.domain.entity.TransfersSizeInfo
+import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransfersSizeUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -39,12 +39,12 @@ class TransfersManagementViewModelTest {
     private val transfersInfoMapper = mock<TransfersInfoMapper>()
     private val transfersManagement = mock<TransfersManagement>()
 
-    private val monitorTransfersSizeFlow = MutableSharedFlow<TransfersSizeInfo>()
+    private val monitorTransfersSizeFlow = MutableSharedFlow<TransfersStatusInfo>()
 
     @BeforeAll
     fun setup() = runTest {
         //this mocks are only used in viewmodel init, so no need to reset
-        val monitorTransfersSize = mock<MonitorTransfersSizeUseCase>()
+        val monitorTransfersSize = mock<MonitorTransfersStatusUseCase>()
         val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
         whenever(monitorTransfersSize()) doReturn monitorTransfersSizeFlow
         whenever(getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) doReturn true
@@ -53,7 +53,6 @@ class TransfersManagementViewModelTest {
         underTest = TransfersManagementViewModel(
             getNumPendingTransfersUseCase = mock(),
             isCompletedTransfersEmptyUseCase = mock(),
-            areAllTransfersPausedUseCase = areAllTransfersPausedUseCase,
             transfersInfoMapper = transfersInfoMapper,
             transfersManagement = transfersManagement,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
@@ -80,7 +79,7 @@ class TransfersManagementViewModelTest {
             val pendingUploads = 4
             val totalSizeTransferred = 3L
             val totalSizeToTransfer = 5L
-            val transfersSizeInfo = TransfersSizeInfo(
+            val transfersStatusInfo = TransfersStatusInfo(
                 totalSizeToTransfer,
                 totalSizeTransferred,
                 pendingUploads,
@@ -106,7 +105,7 @@ class TransfersManagementViewModelTest {
             ) doReturn expected
             underTest.state.test {
                 awaitItem() // Skip initial value
-                monitorTransfersSizeFlow.emit(transfersSizeInfo)
+                monitorTransfersSizeFlow.emit(transfersStatusInfo)
                 val actual = awaitItem().transfersInfo
                 assertThat(actual).isEqualTo(expected)
             }

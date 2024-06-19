@@ -9,8 +9,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.TransfersSizeInfo
+import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
@@ -18,7 +19,9 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetNumPendingUploadsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -32,13 +35,16 @@ import java.math.BigInteger
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class MonitorTransfersSizeUseCaseTest {
-    private lateinit var underTest: MonitorTransfersSizeUseCase
+internal class MonitorTransfersStatusUseCaseTest {
+    private lateinit var underTest: MonitorTransfersStatusUseCase
     private val globalTransferFlow = MutableSharedFlow<TransferEvent>()
     private val transferRepository = mock<TransferRepository>()
     private val getNumPendingDownloadsNonBackgroundUseCase =
         mock<GetNumPendingDownloadsNonBackgroundUseCase>()
     private val getNumPendingUploadsUseCase = mock<GetNumPendingUploadsUseCase>()
+    private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
+    private val areTransfersPaused = mock<AreAllTransfersPausedUseCase>()
+
     private val transfer = Transfer(
         transferType = TransferType.DOWNLOAD,
         transferredBytes = 2000L,
@@ -64,10 +70,12 @@ internal class MonitorTransfersSizeUseCaseTest {
 
     @BeforeAll
     fun setup() {
-        underTest = MonitorTransfersSizeUseCase(
+        underTest = MonitorTransfersStatusUseCase(
             repository = transferRepository,
             getNumPendingDownloadsNonBackgroundUseCase = getNumPendingDownloadsNonBackgroundUseCase,
             getNumPendingUploadsUseCase = getNumPendingUploadsUseCase,
+            monitorOngoingActiveTransfersUseCase,
+            areTransfersPaused,
         )
     }
 
@@ -77,43 +85,58 @@ internal class MonitorTransfersSizeUseCaseTest {
             val flowsMap =
                 TransferType.entries.filterNot { it == TransferType.NONE }.associateWith { type ->
                     MutableStateFlow(
-                        ActiveTransferTotals(
-                            transfersType = type,
-                            totalTransfers = 0,
-                            totalFileTransfers = 0,
-                            pausedFileTransfers = 0,
-                            totalFinishedTransfers = 0,
-                            totalFinishedFileTransfers = 0,
-                            totalCompletedFileTransfers = 0,
-                            totalBytes = 0L,
-                            transferredBytes = 0L,
-                            totalAlreadyDownloadedFiles = 0,
+                        MonitorOngoingActiveTransfersResult(
+                            activeTransferTotals = ActiveTransferTotals(
+                                transfersType = type,
+                                totalTransfers = 0,
+                                totalFileTransfers = 0,
+                                pausedFileTransfers = 0,
+                                totalFinishedTransfers = 0,
+                                totalFinishedFileTransfers = 0,
+                                totalCompletedFileTransfers = 0,
+                                totalBytes = 0L,
+                                transferredBytes = 0L,
+                                totalAlreadyDownloadedFiles = 0,
+                            ),
+                            paused = false,
+                            storageOverQuota = false,
+                            transfersOverQuota = false,
                         )
                     ).also { flow ->
-                        whenever(transferRepository.getActiveTransferTotalsByType(type)) doReturn flow
+                        whenever(monitorOngoingActiveTransfersUseCase(type)) doReturn flow
                     }
                 }
-            val expected = TransfersSizeInfo(
+            val expected = TransfersStatusInfo(
                 totalSizeToTransfer = 100L,
                 totalSizeTransferred = 200L,
                 pendingUploads = 3,
                 pendingDownloads = 4,
+                paused = true,
+                storageOverQuota = true,
+                transferOverQuota = true,
             )
             underTest().test {
                 awaitItem() //ignore initial
                 flowsMap[TransferType.DOWNLOAD]?.update {
                     it.copy(
-                        transferredBytes = expected.totalSizeTransferred,
-                        totalBytes = expected.totalSizeToTransfer,
-                        totalFileTransfers = expected.pendingDownloads ?: -1,
-                        totalFinishedFileTransfers = 0,
+                        activeTransferTotals = it.activeTransferTotals.copy(
+                            transferredBytes = expected.totalSizeTransferred,
+                            totalBytes = expected.totalSizeToTransfer,
+                            totalFileTransfers = expected.pendingDownloads,
+                            totalFinishedFileTransfers = 0,
+                        ),
+                        paused = true,
+                        transfersOverQuota = true,
                     )
                 }
                 awaitItem() //ignore updated value
                 flowsMap[TransferType.GENERAL_UPLOAD]?.update {
                     it.copy(
-                        totalFileTransfers = expected.pendingUploads ?: -1,
-                        totalFinishedFileTransfers = 0,
+                        activeTransferTotals = it.activeTransferTotals.copy(
+                            totalFileTransfers = expected.pendingUploads,
+                            totalFinishedFileTransfers = 0,
+                        ),
+                        storageOverQuota = true,
                     )
                 }
                 val actual = awaitItem()
@@ -131,21 +154,22 @@ internal class MonitorTransfersSizeUseCaseTest {
             whenever(transferRepository.monitorTransferEvents()).thenReturn(globalTransferFlow)
             whenever(getNumPendingDownloadsNonBackgroundUseCase()).thenReturn(0)
             whenever(getNumPendingUploadsUseCase()).thenReturn(0)
+            whenever(areTransfersPaused()).thenReturn(false)
         }
 
         @Test
         fun `when monitorTransferEvents emit TransferStartEvent then the transfer size info equal to transfer size`() =
             runTest {
                 val event = TransferEvent.TransferStartEvent(transfer)
-                val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
+                val transfersStatusInfo = MutableStateFlow(TransfersStatusInfo())
                 val collectJob = launch(UnconfinedTestDispatcher()) {
                     underTest.invokeLegacy().collect {
-                        transfersSizeInfo.value = it
+                        transfersStatusInfo.value = it
                     }
                 }
                 globalTransferFlow.emit(event)
-                assertThat(transfersSizeInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
-                assertThat(transfersSizeInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
+                assertThat(transfersStatusInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
+                assertThat(transfersStatusInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
                 collectJob.cancel()
             }
 
@@ -153,15 +177,15 @@ internal class MonitorTransfersSizeUseCaseTest {
         fun `when monitorTransferEvents emit TransferDataEvent then the transfer size info equal to transfer size`() =
             runTest {
                 val event = TransferEvent.TransferDataEvent(transfer, ByteArray(0))
-                val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
+                val transfersStatusInfo = MutableStateFlow(TransfersStatusInfo())
                 val collectJob = launch(UnconfinedTestDispatcher()) {
                     underTest.invokeLegacy().collect {
-                        transfersSizeInfo.value = it
+                        transfersStatusInfo.value = it
                     }
                 }
                 globalTransferFlow.emit(event)
-                assertThat(transfersSizeInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
-                assertThat(transfersSizeInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
+                assertThat(transfersStatusInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
+                assertThat(transfersStatusInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
                 collectJob.cancel()
             }
 
@@ -169,15 +193,15 @@ internal class MonitorTransfersSizeUseCaseTest {
         fun `when monitorTransferEvents emit TransferFinishEvent then the transfer size info equal to transfer size`() =
             runTest {
                 val event = TransferEvent.TransferFinishEvent(transfer, MegaException(-1, null))
-                val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
+                val transfersStatusInfo = MutableStateFlow(TransfersStatusInfo())
                 val collectJob = launch(UnconfinedTestDispatcher()) {
                     underTest.invokeLegacy().collect {
-                        transfersSizeInfo.value = it
+                        transfersStatusInfo.value = it
                     }
                 }
                 globalTransferFlow.emit(event)
-                assertThat(transfersSizeInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
-                assertThat(transfersSizeInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
+                assertThat(transfersStatusInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
+                assertThat(transfersStatusInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
                 collectJob.cancel()
             }
 
@@ -186,17 +210,17 @@ internal class MonitorTransfersSizeUseCaseTest {
             runTest {
                 val event =
                     TransferEvent.TransferUpdateEvent(transfer)
-                val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
+                val transfersStatusInfo = MutableStateFlow(TransfersStatusInfo())
                 val collectJob = launch(UnconfinedTestDispatcher()) {
                     underTest.invokeLegacy().collect {
-                        transfersSizeInfo.value = it
+                        transfersStatusInfo.value = it
                     }
                 }
                 globalTransferFlow.emit(event)
                 globalTransferFlow.emit(event)
                 globalTransferFlow.emit(event)
-                assertThat(transfersSizeInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
-                assertThat(transfersSizeInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
+                assertThat(transfersStatusInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes)
+                assertThat(transfersStatusInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes)
                 collectJob.cancel()
             }
 
@@ -209,17 +233,17 @@ internal class MonitorTransfersSizeUseCaseTest {
                     TransferEvent.TransferUpdateEvent(transfer.copy(tag = 2))
                 val eventThree =
                     TransferEvent.TransferUpdateEvent(transfer.copy(tag = 3))
-                val transfersSizeInfo = MutableStateFlow(TransfersSizeInfo())
+                val transfersStatusInfo = MutableStateFlow(TransfersStatusInfo())
                 val collectJob = launch(UnconfinedTestDispatcher()) {
                     underTest.invokeLegacy().collect {
-                        transfersSizeInfo.value = it
+                        transfersStatusInfo.value = it
                     }
                 }
                 globalTransferFlow.emit(eventOne)
                 globalTransferFlow.emit(eventTwo)
                 globalTransferFlow.emit(eventThree)
-                assertThat(transfersSizeInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes * 3)
-                assertThat(transfersSizeInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes * 3)
+                assertThat(transfersStatusInfo.value.totalSizeToTransfer).isEqualTo(transfer.totalBytes * 3)
+                assertThat(transfersStatusInfo.value.totalSizeTransferred).isEqualTo(transfer.transferredBytes * 3)
                 collectJob.cancel()
             }
 
@@ -237,7 +261,19 @@ internal class MonitorTransfersSizeUseCaseTest {
                     assertThat(actual.pendingDownloads).isEqualTo(expectedPendingDownloads)
                     assertThat(actual.pendingUploads).isEqualTo(expectedPendingUploads)
                 }
+            }
 
+        @Test
+        fun `test that paused are set correctly from the proper use case when a new event is emitted`() =
+            runTest {
+                val expected = true
+                whenever(areTransfersPaused()) doReturn expected
+                underTest.invokeLegacy().test {
+                    globalTransferFlow.emit(TransferEvent.TransferUpdateEvent(transfer))
+                    val actual = awaitItem()
+
+                    assertThat(actual.paused).isEqualTo(expected)
+                }
             }
     }
 }

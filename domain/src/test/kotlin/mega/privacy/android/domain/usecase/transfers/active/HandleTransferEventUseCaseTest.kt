@@ -10,8 +10,8 @@ import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.GetTransferDestinationUriUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
@@ -27,6 +27,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -63,6 +64,7 @@ class HandleTransferEventUseCaseTest {
             transferRepository,
             broadcastBusinessAccountExpiredUseCase,
             broadcastTransferOverQuotaUseCase,
+            broadcastStorageOverQuotaUseCase,
             handleAvailableOfflineEventUseCase,
             handleSDCardEventUseCase,
             getTransferDestinationUriUseCase,
@@ -108,6 +110,7 @@ class HandleTransferEventUseCaseTest {
             }
             underTest.invoke(transferEvent)
             verify(broadcastTransferOverQuotaUseCase).invoke(true)
+            verifyNoInteractions(broadcastStorageOverQuotaUseCase)
         }
 
     @ParameterizedTest
@@ -126,6 +129,71 @@ class HandleTransferEventUseCaseTest {
             }
             underTest.invoke(transferEvent)
             verify(broadcastStorageOverQuotaUseCase).invoke(true)
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+        }
+
+    @Test
+    fun `test that broadcastTransferOverQuotaUseCase is invoked with parameter equals to false when a Start event is received for download Event`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(TransferType.DOWNLOAD)
+            }
+            val transferEvent = mock<TransferEvent.TransferStartEvent> {
+                on { this.transfer }.thenReturn(transfer)
+            }
+            underTest.invoke(transferEvent)
+            verify(broadcastTransferOverQuotaUseCase).invoke(false)
+            verifyNoInteractions(broadcastStorageOverQuotaUseCase)
+        }
+
+    @Test
+    fun `test that broadcastTransferOverQuotaUseCase is invoked with parameter equals to false when a Update event is received for download Event`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(TransferType.DOWNLOAD)
+            }
+            val transferEvent = mock<TransferEvent.TransferUpdateEvent> {
+                on { this.transfer }.thenReturn(transfer)
+            }
+            underTest.invoke(transferEvent)
+            verify(broadcastTransferOverQuotaUseCase).invoke(false)
+            verifyNoInteractions(broadcastStorageOverQuotaUseCase)
+        }
+
+    @ParameterizedTest
+    @EnumSource(value = TransferType::class, names = ["GENERAL_UPLOAD", "CHAT_UPLOAD", "CU_UPLOAD"])
+    fun `test that broadcastStorageOverQuotaUseCase is invoked with parameter equals to false when a Start event is received for upload Event`(
+        type: TransferType
+    ) =
+        runTest {
+            reset(broadcastStorageOverQuotaUseCase)
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(type)
+            }
+            val transferEvent = mock<TransferEvent.TransferStartEvent> {
+                on { this.transfer }.thenReturn(transfer)
+            }
+            underTest.invoke(transferEvent)
+            verify(broadcastStorageOverQuotaUseCase).invoke(false)
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+        }
+
+    @ParameterizedTest
+    @EnumSource(value = TransferType::class, names = ["GENERAL_UPLOAD", "CHAT_UPLOAD", "CU_UPLOAD"])
+    fun `test that broadcastStorageOverQuotaUseCase is invoked with parameter equals to false when an Update event is received for upload Event`(
+        type: TransferType
+    ) =
+        runTest {
+            reset(broadcastStorageOverQuotaUseCase)
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(type)
+            }
+            val transferEvent = mock<TransferEvent.TransferUpdateEvent> {
+                on { this.transfer }.thenReturn(transfer)
+            }
+            underTest.invoke(transferEvent)
+            verify(broadcastStorageOverQuotaUseCase).invoke(false)
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
         }
 
     @ParameterizedTest

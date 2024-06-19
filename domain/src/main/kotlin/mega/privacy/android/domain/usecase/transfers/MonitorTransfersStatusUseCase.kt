@@ -3,49 +3,56 @@ package mega.privacy.android.domain.usecase.transfers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.domain.entity.TransfersSizeInfo
+import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetNumPendingUploadsUseCase
 import javax.inject.Inject
 
 /**
- * Default implementation of [MonitorTransfersSize]
+ * Monitor active transfers and emits [TransfersStatusInfo]
  */
-class MonitorTransfersSizeUseCase @Inject constructor(
+class MonitorTransfersStatusUseCase @Inject constructor(
     private val repository: TransferRepository,
     private val getNumPendingDownloadsNonBackgroundUseCase: GetNumPendingDownloadsNonBackgroundUseCase,
     private val getNumPendingUploadsUseCase: GetNumPendingUploadsUseCase,
+    private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
+    private val areTransfersPaused: AreAllTransfersPausedUseCase,
 ) {
     private val transferMap: MutableMap<Int, Transfer> = hashMapOf()
 
     /**
      * Invoke.
      *
-     * @return Flow of [TransfersSizeInfo]
+     * @return Flow of [TransfersStatusInfo]
      */
 
-    operator fun invoke(): Flow<TransfersSizeInfo> =
+    operator fun invoke(): Flow<TransfersStatusInfo> =
         combine(TransferType.entries.filterNot { it == TransferType.NONE }.map {
-            repository.getActiveTransferTotalsByType(it)
-        }) { activeTransferTotals ->
-            TransfersSizeInfo(
-                totalSizeToTransfer = activeTransferTotals.sumOf { it.totalBytes },
-                totalSizeTransferred = activeTransferTotals.sumOf { it.transferredBytes },
-                pendingUploads = activeTransferTotals
-                    .filter { it.transfersType.isUploadType() }
-                    .sumOf { it.pendingFileTransfers },
-                pendingDownloads = activeTransferTotals
-                    .filter { it.transfersType.isDownloadType() }
-                    .sumOf { it.pendingFileTransfers },
+            monitorOngoingActiveTransfersUseCase(it)
+        }) { monitorOngoingActiveTransfersResults ->
+            TransfersStatusInfo(
+                totalSizeToTransfer = monitorOngoingActiveTransfersResults.sumOf { it.activeTransferTotals.totalBytes },
+                totalSizeTransferred = monitorOngoingActiveTransfersResults.sumOf { it.activeTransferTotals.transferredBytes },
+                pendingUploads = monitorOngoingActiveTransfersResults
+                    .filter { it.activeTransferTotals.transfersType.isUploadType() }
+                    .sumOf { it.activeTransferTotals.pendingFileTransfers },
+                pendingDownloads = monitorOngoingActiveTransfersResults
+                    .filter { it.activeTransferTotals.transfersType.isDownloadType() }
+                    .sumOf { it.activeTransferTotals.pendingFileTransfers },
+                paused = monitorOngoingActiveTransfersResults.any { it.paused },
+                transferOverQuota = monitorOngoingActiveTransfersResults.any { it.transfersOverQuota },
+                storageOverQuota = monitorOngoingActiveTransfersResults.any { it.storageOverQuota },
             )
         }
 
     @Deprecated(message = "This will be deleted once AppFeatures.UploadWorker flag is deleted")
-    fun invokeLegacy(): Flow<TransfersSizeInfo> = repository.monitorTransferEvents()
+    fun invokeLegacy(): Flow<TransfersStatusInfo> = repository.monitorTransferEvents()
         .map {
             val transfer = it.transfer
             transferMap[transfer.tag] = transfer
@@ -67,11 +74,12 @@ class MonitorTransfersSizeUseCase @Inject constructor(
             if (megaTransfers.all { megaTransfer -> megaTransfer.isFinished }) {
                 transferMap.clear()
             }
-            TransfersSizeInfo(
+            TransfersStatusInfo(
                 totalSizeToTransfer = totalBytes,
                 totalSizeTransferred = totalTransferred,
                 pendingDownloads = getNumPendingDownloadsNonBackgroundUseCase(),
                 pendingUploads = getNumPendingUploadsUseCase(),
+                paused = areTransfersPaused(),
             )
         }
 }

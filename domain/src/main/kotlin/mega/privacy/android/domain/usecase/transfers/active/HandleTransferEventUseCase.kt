@@ -9,8 +9,8 @@ import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.GetTransferDestinationUriUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
@@ -39,10 +39,14 @@ class HandleTransferEventUseCase @Inject internal constructor(
         if (event.transfer.isVoiceClip() || event.transfer.isBackgroundTransfer() || event.transfer.isStreamingTransfer) {
             return
         }
-        if (event is TransferEvent.TransferStartEvent) {
+        if (event is TransferEvent.TransferStartEvent || event is TransferEvent.TransferUpdateEvent) {
             // this can be a retried transfer after upgrading or deleting some files to make space, so we set the overquota to false and it will be set to true again if corresponds
-            broadcastTransferOverQuotaUseCase(false)
-            broadcastStorageOverQuotaUseCase(false)
+            if (event.transfer.transferType.isDownloadType()) {
+                broadcastTransferOverQuotaUseCase(false)
+            }
+            if (event.transfer.transferType.isUploadType()) {
+                broadcastStorageOverQuotaUseCase(false)
+            }
         }
         val transferDestination: DestinationUriAndSubFolders? =
             if (event is TransferEvent.TransferStartEvent || event is TransferEvent.TransferFinishEvent) {

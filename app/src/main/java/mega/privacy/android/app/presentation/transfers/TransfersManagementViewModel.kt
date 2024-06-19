@@ -18,14 +18,13 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import mega.privacy.android.domain.entity.TransfersSizeInfo
+import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransfersSizeUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.IsCompletedTransfersEmptyUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
 import javax.inject.Inject
 
 /**
@@ -33,7 +32,6 @@ import javax.inject.Inject
  *
  * @property getNumPendingTransfersUseCase      [GetNumPendingTransfersUseCase]
  * @property isCompletedTransfersEmptyUseCase   [IsCompletedTransfersEmptyUseCase]
- * @property areAllTransfersPausedUseCase       [AreAllTransfersPausedUseCase]
  * @property transfersInfoMapper                [TransfersInfoMapper]
  * @property transfersManagement                [TransfersManagement]
  */
@@ -42,18 +40,17 @@ import javax.inject.Inject
 class TransfersManagementViewModel @Inject constructor(
     private val getNumPendingTransfersUseCase: GetNumPendingTransfersUseCase,
     private val isCompletedTransfersEmptyUseCase: IsCompletedTransfersEmptyUseCase,
-    private val areAllTransfersPausedUseCase: AreAllTransfersPausedUseCase,
     private val transfersInfoMapper: TransfersInfoMapper,
     private val transfersManagement: TransfersManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    monitorTransfersSize: MonitorTransfersSizeUseCase,
+    monitorTransfersSize: MonitorTransfersStatusUseCase,
     getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val samplePeriod: Long?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
-    private var lastTransfersSizeInfo = TransfersSizeInfo()
+    private var lastTransfersStatusInfo = TransfersStatusInfo()
 
     /**
      * is network connected
@@ -73,7 +70,7 @@ class TransfersManagementViewModel @Inject constructor(
                 monitorTransfersSize.invokeLegacy()
                     .onStart {
                         //in invokeLegacy we only receive updates with transfer updates, so we need to force a first update
-                        emit(TransfersSizeInfo())
+                        emit(TransfersStatusInfo())
                     }
             }
             val samplePeriodFinal = samplePeriod ?: DEFAULT_SAMPLE_PERIOD
@@ -82,7 +79,7 @@ class TransfersManagementViewModel @Inject constructor(
             } else {
                 flow
             }.collect { transfersInfo ->
-                lastTransfersSizeInfo = transfersInfo
+                lastTransfersStatusInfo = transfersInfo
                 updateUiState(transfersInfo)
             }
         }
@@ -102,29 +99,26 @@ class TransfersManagementViewModel @Inject constructor(
                 it.copy(hideTransfersWidget = false)
             }
         }
-        viewModelScope.launch {
-            updateUiState(lastTransfersSizeInfo)
-        }
+        updateUiState(lastTransfersStatusInfo)
     }
 
     /**
      * get pending download and upload
      */
-    private suspend fun updateUiState(
-        transfersSizeInfo: TransfersSizeInfo,
+    private fun updateUiState(
+        transfersStatusInfo: TransfersStatusInfo,
     ) {
-        val areTransfersPaused = areAllTransfersPausedUseCase()
         _state.update {
             it.copy(
                 transfersInfo = transfersInfoMapper(
-                    numPendingDownloadsNonBackground = transfersSizeInfo.pendingDownloads,
-                    numPendingUploads = transfersSizeInfo.pendingUploads,
+                    numPendingDownloadsNonBackground = transfersStatusInfo.pendingDownloads,
+                    numPendingUploads = transfersStatusInfo.pendingUploads,
                     isTransferError = transfersManagement.shouldShowNetworkWarning || transfersManagement.getAreFailedTransfers(),
-                    isTransferOverQuota = false,
-                    isStorageOverQuota = false,
-                    areTransfersPaused = areTransfersPaused,
-                    totalSizeTransferred = transfersSizeInfo.totalSizeTransferred,
-                    totalSizeToTransfer = transfersSizeInfo.totalSizeToTransfer,
+                    isTransferOverQuota = transfersStatusInfo.transferOverQuota,
+                    isStorageOverQuota = transfersStatusInfo.storageOverQuota,
+                    areTransfersPaused = transfersStatusInfo.paused,
+                    totalSizeTransferred = transfersStatusInfo.totalSizeTransferred,
+                    totalSizeToTransfer = transfersStatusInfo.totalSizeToTransfer,
                 )
             )
         }
