@@ -6,7 +6,6 @@ import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -37,12 +36,14 @@ fun setListItemThumbnail(
         when {
             selected -> {
                 hierarchy.setOverlayImage(null)
-                setActualImageResource(CoreUiR.drawable.ic_select_folder)
+                setImageResource(CoreUiR.drawable.ic_select_folder)
             }
+
             isFileAvailable(file) -> {
                 hierarchy.setOverlayImage(null)
                 setImageURI(Uri.fromFile(file))
             }
+
             else -> {
                 hierarchy.setOverlayImage(null)
                 hierarchy.setPlaceholderImage(defaultThumbnail)
@@ -117,7 +118,8 @@ fun getRoundingParams(context: Context): RoundingParams? {
 
     roundingParams?.apply {
         setBorder(
-            ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorSecondary), Util.dp2px(
+            ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorSecondary),
+            Util.dp2px(
                 context.resources.getDimension(R.dimen.photo_selected_border_width),
             ).toFloat()
         )
