@@ -4,7 +4,7 @@ import mega.privacy.android.domain.usecase.account.contactrequest.GetOutgoingCon
 import javax.inject.Inject
 
 /**
- * A use case to check if the given email exists in the visible contacts.
+ * A use case to check if the given email has been invited.
  *
  * @property isContactRequestByEmailInPendingOrAcceptedStateUseCase A use case to validate if the requested contact by email is in a pending or accepted state.
  * @property getOutgoingContactRequestsUseCase A use case to get the list of incoming contact requests.
