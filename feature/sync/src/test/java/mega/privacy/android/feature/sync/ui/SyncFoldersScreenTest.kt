@@ -19,10 +19,12 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersScreen
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS
+import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_SYNC_ITEM_VIEW
 import mega.privacy.mobile.analytics.event.SyncListEmptyStateUpgradeButtonPressedEvent
@@ -178,5 +180,26 @@ class SyncFoldersScreenTest {
 
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON).performClick()
         assertThat(analyticsRule.events).isEmpty()
+    }
+
+    @Test
+    fun `test that the loading screen is shown`() {
+        composeTestRule.setContent {
+            SyncFoldersScreen(
+                syncUiItems = emptyList(),
+                cardExpanded = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                addFolderClicked = {},
+                upgradeAccountClicked = {},
+                issuesInfoClicked = {},
+                isLowBatteryLevel = false,
+                isFreeAccount = false,
+                isLoading = true,
+                showSyncsPausedErrorDialog = false,
+                onShowSyncsPausedErrorDialogDismissed = {},
+            )
+        }
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE).assertIsDisplayed()
     }
 }

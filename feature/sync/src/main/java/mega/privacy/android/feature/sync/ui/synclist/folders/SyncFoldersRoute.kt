@@ -27,6 +27,7 @@ internal fun SyncFoldersRoute(
         issuesInfoClicked = issuesInfoClicked,
         isLowBatteryLevel = state.isLowBatteryLevel,
         isFreeAccount = state.isFreeAccount,
+        isLoading = state.isLoading,
         showSyncsPausedErrorDialog = state.showSyncsPausedErrorDialog,
         onShowSyncsPausedErrorDialogDismissed = {
             viewModel.handleAction(OnSyncsPausedErrorDialogDismissed)

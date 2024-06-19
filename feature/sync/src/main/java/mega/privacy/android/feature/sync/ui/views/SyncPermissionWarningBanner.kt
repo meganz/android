@@ -30,8 +30,8 @@ internal fun SyncPermissionWarningBanner(
 ) {
     val storagePermission =
         rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    var allFileAccess by rememberSaveable { mutableStateOf(false) }
-    var hasUnrestrictedBatteryUsage by rememberSaveable { mutableStateOf(false) }
+    var allFileAccess: Boolean? by rememberSaveable { mutableStateOf(null) }
+    var hasUnrestrictedBatteryUsage: Boolean? by rememberSaveable { mutableStateOf(null) }
 
     ComposableLifecycle { event ->
         if (event == Lifecycle.Event.ON_RESUME) {
@@ -44,30 +44,37 @@ internal fun SyncPermissionWarningBanner(
                 syncPermissionsManager.isDisableBatteryOptimizationGranted()
         }
     }
-    if (allFileAccess.not()) {
-        WarningBanner(
-            textString = stringResource(id = R.string.sync_storage_permission_banner),
-            onCloseClick = null,
-            modifier = Modifier.clickable {
-                if (syncPermissionsManager.isSDKAboveOrEqualToR()) {
-                    syncPermissionsManager.launchAppSettingFileStorageAccess()
-                } else {
-                    if (storagePermission.status.isGranted.not() && storagePermission.status.shouldShowRationale.not()) {
+    allFileAccess?.let { allFileAccessValue ->
+        if (allFileAccessValue.not()) {
+            WarningBanner(
+                textString = stringResource(id = R.string.sync_storage_permission_banner),
+                onCloseClick = null,
+                modifier = Modifier.clickable {
+                    if (syncPermissionsManager.isSDKAboveOrEqualToR()) {
                         syncPermissionsManager.launchAppSettingFileStorageAccess()
                     } else {
-                        storagePermission.launchPermissionRequest()
+                        if (storagePermission.status.isGranted.not() && storagePermission.status.shouldShowRationale.not()) {
+                            syncPermissionsManager.launchAppSettingFileStorageAccess()
+                        } else {
+                            storagePermission.launchPermissionRequest()
+                        }
                     }
                 }
+            )
+        }
+
+        if (allFileAccessValue) {
+            hasUnrestrictedBatteryUsage?.let { hasUnrestrictedBatteryUsageValue ->
+                if (hasUnrestrictedBatteryUsageValue.not()) {
+                    WarningBanner(
+                        textString = stringResource(id = R.string.sync_battery_optimisation_banner),
+                        onCloseClick = null,
+                        modifier = Modifier.clickable {
+                            syncPermissionsManager.launchAppSettingBatteryOptimisation()
+                        },
+                    )
+                }
             }
-        )
-    }
-    if (allFileAccess && hasUnrestrictedBatteryUsage.not()) {
-        WarningBanner(
-            textString = stringResource(id = R.string.sync_battery_optimisation_banner),
-            onCloseClick = null,
-            modifier = Modifier.clickable {
-                syncPermissionsManager.launchAppSettingBatteryOptimisation()
-            },
-        )
+        }
     }
 }

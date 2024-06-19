@@ -59,13 +59,23 @@ internal class SyncFoldersViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             runCatching {
+                _uiState.update { state -> state.copy(isLoading = true) }
                 refreshSyncUseCase()
             }.onSuccess {
-                loadSyncs()
+                runCatching {
+                    loadSyncs()
+                }.onSuccess {
+                    _uiState.update { state -> state.copy(isLoading = false) }
+                }.onFailure {
+                    _uiState.update { state -> state.copy(isLoading = false) }
+                    Timber.e(it)
+                }
             }.onFailure {
+                _uiState.update { state -> state.copy(isLoading = false) }
                 Timber.e(it)
             }
         }
+
         viewModelScope.launch {
             runCatching {
                 isStorageOverQuotaUseCase()
@@ -155,6 +165,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                         syncUiItems = syncs,
                         isRefreshing = false,
                         isFreeAccount = isProAccount.not(),
+                        isLoading = false,
                         showSyncsPausedErrorDialog = true
                     )
                 }
@@ -167,6 +178,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                         syncUiItems = syncs,
                         isRefreshing = false,
                         isFreeAccount = isProAccount.not(),
+                        isLoading = false,
                         showSyncsPausedErrorDialog = false
                     )
                 }
