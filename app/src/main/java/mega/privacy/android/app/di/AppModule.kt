@@ -48,7 +48,8 @@ class AppModule {
                 @Suppress("DEPRECATION")
                 context.packageManager.getPackageInfo(context.packageName, 0)
             }
-            path = packageInfo.applicationInfo.dataDir + "/"
+            path = (packageInfo.applicationInfo?.dataDir + "/")
+                ?: throw NullPointerException("Application info is null")
         } catch (e: NameNotFoundException) {
             e.printStackTrace()
         }
@@ -77,7 +78,7 @@ class AppModule {
                 @Suppress("DEPRECATION")
                 context.packageManager.getPackageInfo(context.packageName, 0)
             }
-            path = packageInfo.applicationInfo.dataDir + "/"
+            path = packageInfo.applicationInfo?.dataDir + "/"
         } catch (e: NameNotFoundException) {
             e.printStackTrace()
         }
