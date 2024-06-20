@@ -28,7 +28,7 @@ data class InvitationContactInfo @JvmOverloads constructor(
     val handle: String? = null,
     val isHighlighted: Boolean = false,
     val photoUri: String? = null,
-) : Parcelable, Cloneable {
+) : Parcelable {
 
     /**
      * Check if the selected contact has more than 1 info
@@ -38,7 +38,7 @@ data class InvitationContactInfo @JvmOverloads constructor(
     /**
      * Get the contact name
      */
-    fun getContactName(): String = name.ifEmpty { displayInfo }
+    fun getContactName(): String = name.ifBlank { displayInfo }
 
     /**
      * Check whether the contact is an email contact
@@ -67,20 +67,5 @@ data class InvitationContactInfo @JvmOverloads constructor(
         const val TYPE_MANUAL_INPUT_PHONE = 5
 
         private const val AT_SIGN = "@"
-
-        /**
-         * Create the invitation contact info model from the user input
-         */
-        @JvmStatic
-        fun createManualInput(
-            inputString: String,
-            type: Int,
-            @ColorRes avatarColorResId: Int,
-        ) = InvitationContactInfo(
-            id = inputString.hashCode().toLong(),
-            type = type,
-            displayInfo = inputString,
-            avatarColorResId = avatarColorResId
-        )
     }
 }

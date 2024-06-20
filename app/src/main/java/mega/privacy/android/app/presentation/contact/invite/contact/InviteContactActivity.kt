@@ -12,7 +12,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Html
 import android.util.DisplayMetrics
-import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -47,7 +46,6 @@ import mega.privacy.android.app.databinding.SelectedContactItemBinding
 import mega.privacy.android.app.main.InvitationContactInfo
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_EMAIL
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_PHONE
-import mega.privacy.android.app.main.InvitationContactInfo.Companion.createManualInput
 import mega.privacy.android.app.main.adapters.InvitationContactsAdapter
 import mega.privacy.android.app.main.model.InviteContactUiState.InvitationStatusMessageUiState
 import mega.privacy.android.app.main.model.InviteContactUiState.InvitationStatusMessageUiState.InvitationsSent
@@ -237,8 +235,8 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
             doOnTextChanged { text, start, before, count ->
                 Timber.d("onTextChanged: s is $text start: $start before: $before count: $count")
                 if (!text.isNullOrBlank()) {
-                    val last = text[text.length - 1]
-                    if (last == ' ') {
+                    val last = text.last()
+                    if (last.isWhitespace()) {
                         val processedString = text.toString().trim()
                         if (isValidEmail(processedString)) {
                             addContactInfo(processedString, TYPE_MANUAL_INPUT_EMAIL)
@@ -263,50 +261,42 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
 
             doAfterTextChanged { refreshKeyboard() }
 
-            setOnEditorActionListener { textView, actionId, event ->
+            setOnEditorActionListener { textView, actionId, _ ->
                 refreshKeyboard()
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     val processedStrong = textView.text.toString().trim()
                     if (processedStrong.isNotBlank()) {
                         binding.typeMailEditText.text.clear()
-                        val isEmailValid = isValidEmail(processedStrong)
-                        val isPhoneValid = isValidPhone(processedStrong)
-                        if (isEmailValid) {
-                            val result = checkInputEmail(processedStrong)
-                            if (result != null) {
+                        when {
+                            isValidEmail(processedStrong) -> {
+                                val result = checkInputEmail(processedStrong)
                                 Util.hideKeyboard(this@InviteContactActivity, 0)
-                                showSnackBar(result)
+                                if (result != null) {
+                                    showSnackBar(result)
+                                    return@setOnEditorActionListener true
+                                }
+                                addContactInfo(processedStrong, TYPE_MANUAL_INPUT_EMAIL)
+                                viewModel.filterContacts(binding.typeMailEditText.text.toString())
+                            }
+
+                            isValidPhone(processedStrong) -> {
+                                addContactInfo(processedStrong, TYPE_MANUAL_INPUT_PHONE)
+                                Util.hideKeyboard(this@InviteContactActivity, 0)
+                                viewModel.filterContacts(binding.typeMailEditText.text.toString())
+                            }
+
+                            else -> {
+                                Toast.makeText(
+                                    this@InviteContactActivity,
+                                    R.string.invalid_input,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 return@setOnEditorActionListener true
                             }
-                            addContactInfo(processedStrong, TYPE_MANUAL_INPUT_EMAIL)
-                        } else if (isPhoneValid) {
-                            addContactInfo(processedStrong, TYPE_MANUAL_INPUT_PHONE)
                         }
-                        if (isEmailValid || isPhoneValid) {
-                            Util.hideKeyboard(this@InviteContactActivity, 0)
-                        } else {
-                            Toast.makeText(
-                                this@InviteContactActivity,
-                                R.string.invalid_input,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            return@setOnEditorActionListener true
-                        }
-                        if (!Util.isScreenInPortrait(this@InviteContactActivity)) {
-                            Util.hideKeyboard(this@InviteContactActivity, 0)
-                        }
-                        viewModel.filterContacts(binding.typeMailEditText.text.toString())
                     }
                     Util.hideKeyboard(this@InviteContactActivity, 0)
                     refreshInviteContactButton()
-                    return@setOnEditorActionListener true
-                }
-                if ((event != null && (event.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_SEND)) {
-                    if (viewModel.uiState.value.selectedContactInformation.isEmpty()) {
-                        Util.hideKeyboard(this@InviteContactActivity, 0)
-                    } else {
-                        viewModel.inviteContacts()
-                    }
                     return@setOnEditorActionListener true
                 }
                 return@setOnEditorActionListener false
@@ -788,7 +778,7 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         Timber.d("refreshAddedContactsView")
         binding.labelContainer.removeAllViews()
         viewModel.uiState.value.selectedContactInformation.forEachIndexed { index, contact ->
-            val displayedLabel = contact.getContactName().ifBlank { contact.displayInfo }
+            val displayedLabel = contact.getContactName()
             binding.labelContainer.addView(createContactTextView(displayedLabel, index))
         }
         binding.labelContainer.invalidate()
@@ -825,29 +815,19 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
 
     private fun addContactInfo(inputString: String, type: Int) {
         Timber.d("addContactInfo inputString is %s type is %d", inputString, type)
-        var info: InvitationContactInfo? = null
-        if (type == TYPE_MANUAL_INPUT_EMAIL) {
-            info = createManualInput(
-                inputString,
-                TYPE_MANUAL_INPUT_EMAIL,
-                R.color.grey_500_grey_400
-            )
-        } else if (type == TYPE_MANUAL_INPUT_PHONE) {
-            info = createManualInput(
-                inputString,
-                TYPE_MANUAL_INPUT_PHONE,
-                R.color.grey_500_grey_400
-            )
-        }
-        if (info != null) {
-            val index = isUserEnteredContactExistInList(info)
-            val holder = binding.inviteContactList.findViewHolderForAdapterPosition(index)
-            if (index >= 0 && holder != null) {
-                holder.itemView.performClick()
-            } else if (!isContactAdded(info)) {
-                viewModel.addSelectedContactInformation(info)
-                refreshAddedContactsView(true)
-            }
+        val info = InvitationContactInfo(
+            id = inputString.hashCode().toLong(),
+            type = type,
+            displayInfo = inputString,
+            avatarColorResId = R.color.grey_500_grey_400
+        )
+        val index = isUserEnteredContactExistInList(info)
+        val holder = binding.inviteContactList.findViewHolderForAdapterPosition(index)
+        if (index >= 0 && holder != null) {
+            holder.itemView.performClick()
+        } else if (!isContactAdded(info)) {
+            viewModel.addSelectedContactInformation(info)
+            refreshAddedContactsView(true)
         }
         setTitleAB()
     }
