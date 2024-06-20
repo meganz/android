@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 
 
 /**
@@ -71,6 +72,7 @@ fun <T : TypedNode> NodesView(
     onEnterMediaDiscoveryClick: () -> Unit = {},
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     accountType: AccountType? = null,
+    nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
     val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
     val orientation = LocalConfiguration.current.orientation
@@ -103,6 +105,7 @@ fun <T : TypedNode> NodesView(
             fileTypeIconMapper = fileTypeIconMapper,
             inSelectionMode = inSelectionMode,
             accountType = accountType,
+            nodeSourceType = nodeSourceType,
         )
     } else {
         val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = span)
@@ -132,6 +135,7 @@ fun <T : TypedNode> NodesView(
             fileTypeIconMapper = fileTypeIconMapper,
             inSelectionMode = inSelectionMode,
             accountType = accountType,
+            nodeSourceType = nodeSourceType,
         )
     }
     if (takenDownDialog.value.first) {

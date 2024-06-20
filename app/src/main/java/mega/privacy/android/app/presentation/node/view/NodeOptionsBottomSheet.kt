@@ -29,6 +29,7 @@ import mega.privacy.android.app.presentation.view.extension.getIcon
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -49,6 +50,7 @@ internal fun NodeOptionsBottomSheetContent(
     navHostController: NavHostController,
     onDismiss: () -> Unit,
     nodeId: Long,
+    nodeSourceType: NodeSourceType,
     fileTypeIconMapper: FileTypeIconMapper,
     viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
 ) {
@@ -58,7 +60,7 @@ internal fun NodeOptionsBottomSheetContent(
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         keyboardController?.hide()
-        viewModel.getBottomSheetOptions(nodeId)
+        viewModel.getBottomSheetOptions(nodeId, nodeSourceType)
     }
 
     val sortedMap = remember(uiState.actions) {

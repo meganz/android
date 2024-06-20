@@ -20,6 +20,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -81,6 +82,7 @@ import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedD
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.CopyChatNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadBackgroundFile
@@ -139,6 +141,7 @@ class TextEditorViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -176,6 +179,14 @@ class TextEditorViewModel @Inject constructor(
     init {
         monitorAccountDetail()
         monitorIsHiddenNodesOnboarded()
+        monitorNodeUpdates()
+    }
+
+    private fun monitorNodeUpdates() {
+        monitorNodeUpdatesUseCase()
+            .onEach { updateNode() }
+            .catch { Timber.e(it) }
+            .launchIn(viewModelScope)
     }
 
     fun onTextFileEditorDataUpdate(): LiveData<TextEditorData> = textEditorData

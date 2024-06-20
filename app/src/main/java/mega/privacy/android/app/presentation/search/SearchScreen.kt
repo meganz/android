@@ -27,8 +27,8 @@ import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRoute
 import mega.privacy.android.app.presentation.search.navigation.searchFilterBottomSheetRoute
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
  * Search activity to search Nodes and display
@@ -85,6 +85,7 @@ fun SearchScreen(
             keyboardController?.hide()
             navHostController.navigate(
                 route = nodeBottomSheetRoute.plus("/${it.node.id.longValue}")
+                    .plus("/${searchActivityViewModel.state.value.nodeSourceType.name}")
             )
         },
         onDisputeTakeDownClicked = navigateToLink,
@@ -104,5 +105,6 @@ fun SearchScreen(
         navHostController = navHostController,
         nodeActionHandler = nodeActionHandler,
         fileTypeIconMapper = fileTypeIconMapper,
+        nodeSourceType = uiState.nodeSourceType,
     )
 }

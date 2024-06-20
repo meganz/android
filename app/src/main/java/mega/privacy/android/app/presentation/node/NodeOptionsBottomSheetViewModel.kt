@@ -10,13 +10,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.di.ui.toolbaritem.qualifier.Backups
+import mega.privacy.android.app.di.ui.toolbaritem.qualifier.CloudDrive
+import mega.privacy.android.app.di.ui.toolbaritem.qualifier.IncomingShares
+import mega.privacy.android.app.di.ui.toolbaritem.qualifier.Links
+import mega.privacy.android.app.di.ui.toolbaritem.qualifier.OutgoingShares
+import mega.privacy.android.app.di.ui.toolbaritem.qualifier.RubbishBin
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.NodeBottomSheetState
 import mega.privacy.android.app.presentation.node.model.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.app.presentation.node.model.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.NodeBottomSheetMenuItem
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -28,6 +34,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetOutShareByNodeIdUseCase
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -45,7 +52,6 @@ import javax.inject.Inject
 @HiltViewModel
 class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val nodeBottomSheetActionMapper: NodeBottomSheetActionMapper,
-    private val bottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
@@ -55,6 +61,12 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val getContactItemFromInShareFolder: DefaultGetContactItemFromInShareFolder,
     private val getOutShareByNodeIdUseCase: GetOutShareByNodeIdUseCase,
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
+    @CloudDrive private val cloudDriveBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
+    @RubbishBin private val rubbishBinBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
+    @IncomingShares private val incomingSharesBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
+    @OutgoingShares private val outgoingSharesBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
+    @Links private val linksBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
+    @Backups private val backupsBottomSheetOptions: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NodeBottomSheetState())
@@ -80,49 +92,52 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
      * @param nodeId [TypedNode]
      * @return state
      */
-    fun getBottomSheetOptions(nodeId: Long) = viewModelScope.launch {
-        _state.update {
-            it.copy(
-                actions = emptyList(),
-                node = null
-            )
-        }
-        val node = async { runCatching { getNodeByIdUseCase(NodeId(nodeId)) }.getOrNull() }
-        val isNodeInRubbish =
-            async { runCatching { isNodeInRubbishBinUseCase(NodeId(nodeId)) }.getOrDefault(false) }
-        val accessPermission =
-            async { runCatching { getNodeAccessPermission(NodeId(nodeId)) }.getOrNull() }
-        val isInBackUps =
-            async { runCatching { isNodeInBackupsUseCase(nodeId) }.getOrDefault(false) }
-        val typedNode = node.await()
-        val permission = accessPermission.await()
-        typedNode?.let {
-            val bottomSheetItems = nodeBottomSheetActionMapper(
-                toolbarOptions = bottomSheetOptions,
-                selectedNode = typedNode,
-                isNodeInRubbish = isNodeInRubbish.await(),
-                accessPermission = permission,
-                isInBackUps = isInBackUps.await(),
-                isConnected = state.value.isOnline,
-            )
-            val accessPermissionIcon =
-                getAccessPermissionIcon(permission ?: AccessPermission.UNKNOWN, typedNode)
+    fun getBottomSheetOptions(nodeId: Long, nodeSourceType: NodeSourceType) =
+        viewModelScope.launch {
+            val bottomSheetOptions = getOptionsForSourceType(nodeSourceType)
+
             _state.update {
                 it.copy(
-                    name = typedNode.name,
-                    actions = bottomSheetItems,
-                    node = typedNode,
-                    error = if (bottomSheetItems.isEmpty()) triggered(Exception("No actions available")) else consumed(),
-                    accessPermissionIcon = accessPermissionIcon,
+                    actions = emptyList(),
+                    node = null
                 )
             }
-            getShareInfo(typedNode)
-        } ?: run {
-            _state.update {
-                it.copy(error = triggered(Exception("Node is null")))
+            val node = async { runCatching { getNodeByIdUseCase(NodeId(nodeId)) }.getOrNull() }
+            val isNodeInRubbish =
+                async { runCatching { isNodeInRubbishBinUseCase(NodeId(nodeId)) }.getOrDefault(false) }
+            val accessPermission =
+                async { runCatching { getNodeAccessPermission(NodeId(nodeId)) }.getOrNull() }
+            val isInBackUps =
+                async { runCatching { isNodeInBackupsUseCase(nodeId) }.getOrDefault(false) }
+            val typedNode = node.await()
+            val permission = accessPermission.await()
+            typedNode?.let {
+                val bottomSheetItems = nodeBottomSheetActionMapper(
+                    toolbarOptions = bottomSheetOptions,
+                    selectedNode = typedNode,
+                    isNodeInRubbish = isNodeInRubbish.await(),
+                    accessPermission = permission,
+                    isInBackUps = isInBackUps.await(),
+                    isConnected = state.value.isOnline,
+                )
+                val accessPermissionIcon =
+                    getAccessPermissionIcon(permission ?: AccessPermission.UNKNOWN, typedNode)
+                _state.update {
+                    it.copy(
+                        name = typedNode.name,
+                        actions = bottomSheetItems,
+                        node = typedNode,
+                        error = if (bottomSheetItems.isEmpty()) triggered(Exception("No actions available")) else consumed(),
+                        accessPermissionIcon = accessPermissionIcon,
+                    )
+                }
+                getShareInfo(typedNode)
+            } ?: run {
+                _state.update {
+                    it.copy(error = triggered(Exception("Node is null")))
+                }
             }
         }
-    }
 
     private fun getShareInfo(typedNode: TypedNode) {
         if (typedNode.isIncomingShare && typedNode is TypedFolderNode) {
@@ -189,4 +204,15 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     fun onConsumeErrorState() {
         _state.update { it.copy(error = consumed()) }
     }
+
+    private fun getOptionsForSourceType(nodeSourceType: NodeSourceType): Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<*>> =
+        when (nodeSourceType) {
+            NodeSourceType.INCOMING_SHARES -> incomingSharesBottomSheetOptions
+            NodeSourceType.OUTGOING_SHARES -> outgoingSharesBottomSheetOptions
+            NodeSourceType.LINKS -> linksBottomSheetOptions
+            NodeSourceType.RUBBISH_BIN -> rubbishBinBottomSheetOptions
+            NodeSourceType.BACKUPS -> backupsBottomSheetOptions
+            else -> cloudDriveBottomSheetOptions
+        }
+
 }

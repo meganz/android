@@ -6,6 +6,7 @@ import mega.privacy.android.app.presentation.node.model.mapper.NodeAccessPermiss
 import mega.privacy.android.app.presentation.node.model.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
@@ -47,7 +48,12 @@ class NodeOptionsBottomSheetViewModelTest {
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
         viewModel = NodeOptionsBottomSheetViewModel(
             nodeBottomSheetActionMapper = NodeBottomSheetActionMapper(),
-            bottomSheetOptions = setOf(),
+            cloudDriveBottomSheetOptions = emptySet(),
+            rubbishBinBottomSheetOptions = emptySet(),
+            incomingSharesBottomSheetOptions = emptySet(),
+            outgoingSharesBottomSheetOptions = emptySet(),
+            linksBottomSheetOptions = emptySet(),
+            backupsBottomSheetOptions = emptySet(),
             getNodeAccessPermission = getNodeAccessPermission,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
@@ -63,7 +69,7 @@ class NodeOptionsBottomSheetViewModelTest {
     @Test
     fun `test that get bottom sheet option invokes getNodeByIdUseCase`() = runTest {
         initViewModel()
-        viewModel.getBottomSheetOptions(sampleNode.id.longValue)
+        viewModel.getBottomSheetOptions(sampleNode.id.longValue, NodeSourceType.CLOUD_DRIVE)
         verify(getNodeByIdUseCase).invoke(sampleNode.id)
         verify(isNodeInRubbishBinUseCase).invoke(sampleNode.id)
         verify(isNodeInBackupsUseCase).invoke(sampleNode.id.longValue)

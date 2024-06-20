@@ -15,15 +15,16 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.getIcon
-import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
+import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
 
 /**
 This method will show [NodeUIItem] in Grid manner based on span and getting thumbnail using [ThumbnailRequest]
@@ -65,6 +66,7 @@ fun <T : TypedNode> NodeGridView(
     inSelectionMode: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     accountType: AccountType? = null,
+    nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
     LazyVerticalGrid(
         state = gridState,
@@ -120,7 +122,10 @@ fun <T : TypedNode> NodeGridView(
                 isVideoNode = (nodeUIItems[it].node as? FileNode)?.type is VideoFileTypeInfo,
                 isFolderNode = nodeUIItems[it].node is TypedFolderNode,
                 inVisible = nodeUIItems[it].isInvisible,
-                isSensitive = accountType?.isPaid == true && (node.isMarkedSensitive || node.isSensitiveInherited),
+                isSensitive = nodeSourceType != NodeSourceType.INCOMING_SHARES
+                        && nodeSourceType != NodeSourceType.OUTGOING_SHARES
+                        && nodeSourceType != NodeSourceType.LINKS
+                        && accountType?.isPaid == true && (node.isMarkedSensitive || node.isSensitiveInherited),
             )
         }
     }

@@ -9,8 +9,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.model.NodeBottomSheetState
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -60,6 +61,7 @@ class NodeOptionsBottomSheetTest {
                 navHostController = navHostController,
                 nodeId = 1L,
                 onDismiss = {},
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 fileTypeIconMapper = fileTypeIconMapper
             )
         }
@@ -100,6 +102,7 @@ class NodeOptionsBottomSheetTest {
                 navHostController = navHostController,
                 nodeId = 1L,
                 onDismiss = {},
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 fileTypeIconMapper = fileTypeIconMapper
             )
         }

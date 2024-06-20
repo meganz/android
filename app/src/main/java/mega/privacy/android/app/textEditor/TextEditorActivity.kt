@@ -84,7 +84,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
-import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.Util.isOnline
@@ -317,15 +316,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     nodeId = NodeId(viewModel.getNode()?.handle ?: 0),
                     hide = false,
                 )
-
-                RunOnUIThreadUtils.runDelay(500L) {
-                    menu?.findItem(R.id.action_hide)?.apply {
-                        isVisible = true
-                    }
-                    menu?.findItem(R.id.action_unhide)?.apply {
-                        isVisible = false
-                    }
-                }
             }
 
             R.id.action_move -> selectFolderToMove(this, longArrayOf(viewModel.getNode()!!.handle))
@@ -1158,10 +1148,5 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 1,
             )
         Util.showSnackbar(this, message)
-
-        RunOnUIThreadUtils.runDelay(500L) {
-            menu?.findItem(R.id.pdf_viewer_hide)?.isVisible = false
-            menu?.findItem(R.id.pdf_viewer_unhide)?.isVisible = true
-        }
     }
 }

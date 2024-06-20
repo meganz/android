@@ -19,18 +19,19 @@ import mega.privacy.android.app.presentation.view.extension.getNodeLabel
 import mega.privacy.android.app.presentation.view.extension.getNodeTitle
 import mega.privacy.android.app.presentation.view.extension.getSharesIcon
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
-import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
-import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
-import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
@@ -75,6 +76,7 @@ fun <T : TypedNode> NodeListView(
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     inSelectionMode: Boolean = false,
     accountType: AccountType? = null,
+    nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
     LazyColumn(
         state = listState,
@@ -126,7 +128,10 @@ fun <T : TypedNode> NodeListView(
                 showIsVerified = nodeUiItem.isIncomingShare && (nodeUiItem.node as? ShareFolderNode)?.shareData?.isContactCredentialsVerified == true,
                 showVersion = nodeUiItem.hasVersion,
                 isTakenDown = nodeUiItem.isTakenDown,
-                isSensitive = accountType?.isPaid == true && (nodeUiItem.isMarkedSensitive || nodeUiItem.isSensitiveInherited),
+                isSensitive = nodeSourceType != NodeSourceType.INCOMING_SHARES
+                        && nodeSourceType != NodeSourceType.OUTGOING_SHARES
+                        && nodeSourceType != NodeSourceType.LINKS
+                        && accountType?.isPaid == true && (nodeUiItem.isMarkedSensitive || nodeUiItem.isSensitiveInherited),
             )
             MegaDivider(dividerType = DividerType.BigStartPadding)
         }
