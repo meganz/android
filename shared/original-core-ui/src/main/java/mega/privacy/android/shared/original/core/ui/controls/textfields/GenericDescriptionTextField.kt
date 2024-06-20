@@ -30,6 +30,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -53,9 +54,9 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  */
 @Composable
 fun GenericDescriptionTextField(
-    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
     initiallyFocused: Boolean = true,
     isEnabled: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
@@ -76,7 +77,7 @@ fun GenericDescriptionTextField(
 
 
 
-    Column(modifier = modifier) {
+    Column(modifier = modifier.testTag(GENERIC_DESCRIPTION_TEXT_FIELD_COLUMN)) {
         val textFieldColors = TextFieldDefaults.textFieldColors(
             textColor = if (isFocused) MegaOriginalTheme.colors.text.primary else MegaOriginalTheme.colors.text.onColorDisabled,
             backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
@@ -106,7 +107,8 @@ fun GenericDescriptionTextField(
                 Text(
                     modifier = modifier
                         .fillMaxWidth()
-                        .padding(top = 10.dp),
+                        .padding(top = 10.dp)
+                        .testTag(GENERIC_DESCRIPTION_TEXT_FIELD_TITLE_TEXT),
                     text = text,
                     style = MaterialTheme.typography.subtitle1.copy(
                         color = MegaOriginalTheme.colors.text.primary,
@@ -143,7 +145,8 @@ fun GenericDescriptionTextField(
                             onSizeChange()
                         }
                         size = newSize
-                    },
+                    }
+                    .testTag(GENERIC_DESCRIPTION_TEXT_FIELD_TEXT),
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.subtitle2.copy(
                     color = MegaOriginalTheme.colors.text.primary,
@@ -183,9 +186,13 @@ fun GenericDescriptionTextField(
 
         supportingText?.let { message ->
             if (showError) {
-                ErrorTextTextField(errorText = message)
+                ErrorTextTextField(
+                    errorText = message,
+                    modifier = Modifier.testTag(GENERIC_DESCRIPTION_TEXT_FIELD_ERROR_TEXT)
+                )
             } else {
                 MegaText(
+                    modifier = Modifier.testTag(GENERIC_DESCRIPTION_TEXT_FIELD_INFO_DESCRIPTION),
                     text = message,
                     textColor = TextColor.Secondary,
                     style = MaterialTheme.typography.body2,
@@ -217,3 +224,28 @@ private fun GenericDescriptionTextFieldPreview() {
     }
 }
 
+/**
+ * Generic description text field parent column
+ */
+const val GENERIC_DESCRIPTION_TEXT_FIELD_COLUMN = "generic_description_text_field:parent_column"
+
+/**
+ * Generic description text field text
+ */
+const val GENERIC_DESCRIPTION_TEXT_FIELD_TEXT = "generic_description_text_field:text"
+
+/**
+ * Generic description text field error text
+ */
+const val GENERIC_DESCRIPTION_TEXT_FIELD_ERROR_TEXT = "generic_description_text_field:error_text"
+
+/**
+ * Generic description text field title text
+ */
+const val GENERIC_DESCRIPTION_TEXT_FIELD_INFO_DESCRIPTION =
+    "generic_description_text_field:info_description"
+
+/**
+ * Generic description text field title text
+ */
+const val GENERIC_DESCRIPTION_TEXT_FIELD_TITLE_TEXT = "generic_description_text_field:title_text"

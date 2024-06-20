@@ -112,7 +112,7 @@ class TagsViewModel @Inject constructor(
         runCatching {
             manageNodeTagUseCase(nodeId, tag, null)
         }.onSuccess {
-            println("tags removed")
+            Timber.i("$tag removed from node $nodeId")
         }.onFailure {
             Timber.e(it)
         }

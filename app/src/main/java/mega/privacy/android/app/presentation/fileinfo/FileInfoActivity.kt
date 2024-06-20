@@ -208,6 +208,9 @@ class FileInfoActivity : BaseActivity() {
         )
     }
 
+    /**
+     * on restart callback
+     */
     override fun onRestart() {
         super.onRestart()
         viewModel.setNode(

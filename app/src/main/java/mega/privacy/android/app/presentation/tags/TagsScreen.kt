@@ -23,9 +23,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -50,6 +54,7 @@ import java.util.Locale
 /**
  * Tags screen composable.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TagsScreen(
     addNodeTag: (String) -> Unit,
@@ -68,10 +73,14 @@ fun TagsScreen(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .imePadding(),
+            .imePadding()
+            .semantics {
+                testTagsAsResourceId = true
+            },
         scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(
+                modifier = Modifier.testTag(tag = TAGS_SCREEN_APP_BAR),
                 appBarType = AppBarType.BACK_NAVIGATION,
                 title = stringResource(id = sharedR.string.add_tags_page_title_label),
                 elevation = 0.dp,
@@ -80,7 +89,9 @@ fun TagsScreen(
         },
     ) { paddingValues ->
         TagsContent(
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier
+                .padding(paddingValues)
+                .testTag(TAGS_SCREEN_CONTENTS_LABEL),
             addNodeTag = addNodeTag,
             validateTagName = validateTagName,
             removeTag = removeTag,
@@ -114,13 +125,15 @@ private fun TagsContent(
             .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
         MegaText(
+            modifier = Modifier.testTag(TAGS_SCREEN_ADD_TAGS_LABEL),
             text = stringResource(id = sharedR.string.add_tags_text_label_tag),
             textColor = if (uiState.isError) TextColor.Error else TextColor.Accent,
             style = MaterialTheme.typography.caption,
         )
         // Tags content
         GenericDescriptionTextField(
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier
+                .padding(bottom = 4.dp),
             visualTransformation = PrefixTransformation("#"),
             value = tag,
             imeAction = ImeAction.Done,
@@ -138,6 +151,7 @@ private fun TagsContent(
 
         if (tag.isNotBlank() && uiState.isError.not() && uiState.tags.contains(tag).not()) {
             TextMegaButton(
+                modifier = Modifier.testTag(TAGS_SCREEN_ADD_TAGS_BUTTON),
                 contentPadding = PaddingValues(vertical = 8.dp),
                 text = stringResource(id = sharedR.string.add_tags_button_label_add, tag),
                 onClick = ::addTag,
@@ -147,7 +161,9 @@ private fun TagsContent(
 
         if (uiState.tags.isNotEmpty()) {
             MegaText(
-                modifier = Modifier.padding(vertical = 12.dp),
+                modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .testTag(TAGS_SCREEN_EXISTING_TAGS_LABEL),
                 text = stringResource(id = sharedR.string.add_tags_label_existing_tags),
                 textColor = TextColor.Secondary,
                 style = MaterialTheme.typography.subtitle2,
@@ -162,6 +178,7 @@ private fun TagsContent(
         ) {
             repeat(uiState.tags.size) { tag ->
                 MegaChip(
+                    modifier = Modifier.testTag(TAGS_SCREEN_TAG_CHIP),
                     selected = true,
                     text = "#${uiState.tags[tag]}",
                     enabled = true,
@@ -190,3 +207,10 @@ private fun TagsScreenPreview() {
         )
     }
 }
+
+internal const val TAGS_SCREEN_APP_BAR = "tags_screen:tags_app_bar"
+internal const val TAGS_SCREEN_CONTENTS_LABEL = "tags_screen:contents_label_tag"
+internal const val TAGS_SCREEN_ADD_TAGS_LABEL = "tags_screen:add_tags_text_label_tag"
+internal const val TAGS_SCREEN_ADD_TAGS_BUTTON = "tags_screen:add_tags_button"
+internal const val TAGS_SCREEN_EXISTING_TAGS_LABEL = "tags_screen:existing_tags_label"
+internal const val TAGS_SCREEN_TAG_CHIP = "tags_screen:tag_chip"
