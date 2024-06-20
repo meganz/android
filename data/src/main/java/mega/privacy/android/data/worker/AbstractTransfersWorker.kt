@@ -134,7 +134,10 @@ abstract class AbstractTransfersWorker(
             }
             .onEachSampled(
                 notificationSamplePeriod ?: ON_TRANSFER_UPDATE_REFRESH_MILLIS
-            ) { (transferTotals, paused, _, _) ->
+            ) { (transferTotals, paused, transferOverQuota, storageOverQuota) ->
+                if (storageOverQuota || transferOverQuota) {
+                    showOverQuotaNotification(storageOverQuota = storageOverQuota)
+                }
                 //set progress percent as worker progress
                 setProgress(workDataOf(PROGRESS to transferTotals.transferProgress.floatValue))
                 //update the notification
@@ -151,9 +154,7 @@ abstract class AbstractTransfersWorker(
                 }
                 return@withContext Result.success()
             } else {
-                if (storageOverQuota || transferOverQuota) {
-                    showOverQuotaNotification(storageOverQuota = storageOverQuota)
-                } else {
+                if (!storageOverQuota && !transferOverQuota) {
                     showFinishNotification(lastActiveTransferTotals)
                 }
                 Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}finished Failure: $lastActiveTransferTotals")

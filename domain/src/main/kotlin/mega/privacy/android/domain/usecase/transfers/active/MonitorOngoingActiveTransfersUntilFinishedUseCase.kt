@@ -23,6 +23,6 @@ class MonitorOngoingActiveTransfersUntilFinishedUseCase @Inject constructor(
     operator fun invoke(transferType: TransferType): Flow<MonitorOngoingActiveTransfersResult> =
         monitorOngoingActiveTransfersUseCase(transferType).transformWhile {
             emit(it)
-            it.activeTransferTotals.hasOngoingTransfers() && !it.transfersOverQuota && !it.storageOverQuota
+            it.activeTransferTotals.hasOngoingTransfers()
         }
 }
