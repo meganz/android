@@ -82,7 +82,7 @@ class PermissionsViewModel @Inject constructor(
      * Sets next permission to show as the current one.
      */
     fun nextPermission() {
-        permissionScreens.removeFirst()
+        if (permissionScreens.isNotEmpty()) permissionScreens.removeAt(0)
         updateCurrentPermission()
     }
 
