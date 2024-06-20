@@ -16,7 +16,7 @@ import mega.privacy.android.domain.entity.AccountType
  * @property userSubscription user subscription to determine if user has current yearly or monthly subscription
  * @property isCrossAccountMatch boolean to determine if the account passed is the same as the one currently logged in
  * @property showNoAdsFeature boolean to determine if No Ads feature should be shown or hidden (part of the In-App Advertisement experiment)
- * @property showNewFeatures boolean to determine if New Features (meetings, VPN and Sync) should be shown or hidden (the strings for new features are under Feature flag until the features will be released)
+ * @property showAndroidSyncString boolean to determine if Sync string should be shown or hidden
  * @constructor Create default Upgrade Account state
  */
 data class UpgradeAccountState(
@@ -31,5 +31,5 @@ data class UpgradeAccountState(
     val userSubscription: UserSubscription = UserSubscription.NOT_SUBSCRIBED,
     val isCrossAccountMatch: Boolean = true,
     val showNoAdsFeature: Boolean = false,
-    val showNewFeatures: Boolean = false,
+    val showAndroidSyncString: Boolean = false,
 )

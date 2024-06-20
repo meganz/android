@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity.Companion.IS_CROSS_ACCOUNT_MATCH
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
@@ -32,6 +31,7 @@ import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.sync.featuretoggle.SyncABTestFeatures
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -166,11 +166,11 @@ class UpgradeAccountViewModel @Inject constructor(
         }
         viewModelScope.launch {
             runCatching {
-                val showStringsForNewFeatures =
-                    getFeatureFlagValueUseCase(AppFeatures.ShowStringsForNewFeatures)
+                val showAndroidSyncString =
+                    getFeatureFlagValueUseCase(SyncABTestFeatures.asyc)
                 _state.update { state ->
                     state.copy(
-                        showNewFeatures = showStringsForNewFeatures
+                        showAndroidSyncString = showAndroidSyncString
                     )
                 }
             }.onFailure {

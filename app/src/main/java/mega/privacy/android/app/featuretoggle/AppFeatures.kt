@@ -166,14 +166,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     PromoNotifications("Enable promotional notifications", true),
 
     /**
-     * To show strings for new features (meetings, VPN and Sync), strings should be hidden until the features are released
-     */
-    ShowStringsForNewFeatures(
-        "Show strings for new features (meetings, VPN and Sync)",
-        false
-    ),
-
-    /**
      * To enable the new add and manage description feature to node
      */
     NodeWithDescription(

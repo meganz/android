@@ -1,5 +1,6 @@
 package mega.privacy.android.app.upgradeAccount.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -71,12 +72,17 @@ import mega.privacy.android.app.upgradeAccount.view.components.SaveUpToLabel
 import mega.privacy.android.app.upgradeAccount.view.components.SubscriptionDetails
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.PRICING_PAGE_URL
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleNoTitleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.Typography
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_yellow_700
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_800
@@ -87,12 +93,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_te
 import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.Currency
-import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleNoTitleTopAppBar
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Screen is shown when user taps on Upgrade button
@@ -284,7 +284,7 @@ fun UpgradeAccountView(
 
                 FeaturesOfPlans(
                     showNoAdsFeature = state.showNoAdsFeature,
-                    showNewFeatures = state.showNewFeatures,
+                    showAndroidSyncString = state.showAndroidSyncString,
                 )
                 if (state.localisedSubscriptionsList.isNotEmpty()) {
                     SubscriptionDetails(
@@ -515,7 +515,7 @@ fun EmptySubscriptionPlansInfoCards(brush: Brush) {
 @Composable
 private fun FeaturesOfPlans(
     showNoAdsFeature: Boolean,
-    showNewFeatures: Boolean,
+    showAndroidSyncString: Boolean,
 ) {
     val modifier = Modifier.padding(
         start = 10.dp,
@@ -556,7 +556,7 @@ private fun FeaturesOfPlans(
                 style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
                 modifier = modifier
             )
-            if (showNewFeatures) {
+            if (showAndroidSyncString) {
                 MegaText(
                     text = stringResource(id = sharedR.string.account_upgrade_account_description_feature_sync),
                     textColor = TextColor.Primary,
