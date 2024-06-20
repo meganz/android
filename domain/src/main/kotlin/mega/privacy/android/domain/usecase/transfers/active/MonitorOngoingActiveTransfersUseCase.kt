@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfers
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.MonitorAllTransfersPausedByTypeUseCase
 import javax.inject.Inject
 
 /**
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class MonitorOngoingActiveTransfersUseCase @Inject constructor(
     private val monitorActiveTransferTotalsUseCase: MonitorActiveTransferTotalsUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
-    private val monitorDownloadTransfersPausedUseCase: MonitorDownloadTransfersPausedUseCase,
+    private val monitorAllTransfersPausedByTypeUseCase: MonitorAllTransfersPausedByTypeUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
 ) {
@@ -30,7 +30,7 @@ class MonitorOngoingActiveTransfersUseCase @Inject constructor(
     operator fun invoke(transferType: TransferType): Flow<MonitorOngoingActiveTransfersResult> {
         val transfersFlow = monitorActiveTransferTotalsUseCase(transferType)
             .onStart { emit(getActiveTransferTotalsUseCase(transferType)) }
-        val pausedFlow = monitorDownloadTransfersPausedUseCase()
+        val pausedFlow = monitorAllTransfersPausedByTypeUseCase(transferType)
         val transferOverQuotaFlow = monitorTransferOverQuotaUseCase().onStart { emit(false) }
         val storageOverQuotaFlow = monitorStorageOverQuotaUseCase().onStart { emit(false) }
 

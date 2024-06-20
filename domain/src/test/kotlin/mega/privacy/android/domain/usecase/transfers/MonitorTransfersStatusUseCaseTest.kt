@@ -82,36 +82,13 @@ internal class MonitorTransfersStatusUseCaseTest {
     @Test
     fun `test that value with correct values is emitted when a new active transfer total is received`() =
         runTest {
-            val flowsMap =
-                TransferType.entries.filterNot { it == TransferType.NONE }.associateWith { type ->
-                    MutableStateFlow(
-                        MonitorOngoingActiveTransfersResult(
-                            activeTransferTotals = ActiveTransferTotals(
-                                transfersType = type,
-                                totalTransfers = 0,
-                                totalFileTransfers = 0,
-                                pausedFileTransfers = 0,
-                                totalFinishedTransfers = 0,
-                                totalFinishedFileTransfers = 0,
-                                totalCompletedFileTransfers = 0,
-                                totalBytes = 0L,
-                                transferredBytes = 0L,
-                                totalAlreadyDownloadedFiles = 0,
-                            ),
-                            paused = false,
-                            storageOverQuota = false,
-                            transfersOverQuota = false,
-                        )
-                    ).also { flow ->
-                        whenever(monitorOngoingActiveTransfersUseCase(type)) doReturn flow
-                    }
-                }
+            val flowsMap = stubActiveTransfersFlows()
             val expected = TransfersStatusInfo(
                 totalSizeToTransfer = 100L,
                 totalSizeTransferred = 200L,
                 pendingUploads = 3,
                 pendingDownloads = 4,
-                paused = true,
+                paused = false,
                 storageOverQuota = true,
                 transferOverQuota = true,
             )
@@ -125,7 +102,6 @@ internal class MonitorTransfersStatusUseCaseTest {
                             totalFileTransfers = expected.pendingDownloads,
                             totalFinishedFileTransfers = 0,
                         ),
-                        paused = true,
                         transfersOverQuota = true,
                     )
                 }
@@ -142,6 +118,67 @@ internal class MonitorTransfersStatusUseCaseTest {
                 val actual = awaitItem()
 
                 assertThat(actual).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that a new status with pause set to false is emitted when a single transfer type is not paused`() =
+        runTest {
+            val flowsMap = stubActiveTransfersFlows(paused = true)
+            val expected = TransfersStatusInfo(paused = false)
+
+            underTest().test {
+                assertThat(awaitItem().paused).isTrue() // check initial is paused to validate the test is doing its job
+                flowsMap.values.first().update {
+                    it.copy(paused = false)
+                }
+                val actual = awaitItem()
+
+                assertThat(actual).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that a new status with pause set to true is emitted when a all transfer types are paused`() =
+        runTest {
+            val flowsMap = stubActiveTransfersFlows()
+            val expected = TransfersStatusInfo(paused = true)
+
+            underTest().test {
+                flowsMap.values.forEach { flow ->
+                    assertThat(awaitItem().paused).isFalse() // all but last should be false, including initial
+                    flow.update {
+                        it.copy(paused = true)
+                    }
+                }
+                val actual = awaitItem()
+
+                assertThat(actual).isEqualTo(expected)
+            }
+        }
+
+    private fun stubActiveTransfersFlows(paused: Boolean = false) =
+        TransferType.entries.filterNot { it == TransferType.NONE }.associateWith { type ->
+            MutableStateFlow(
+                MonitorOngoingActiveTransfersResult(
+                    activeTransferTotals = ActiveTransferTotals(
+                        transfersType = type,
+                        totalTransfers = 1,
+                        totalFileTransfers = 0,
+                        pausedFileTransfers = 0,
+                        totalFinishedTransfers = 0,
+                        totalFinishedFileTransfers = 0,
+                        totalCompletedFileTransfers = 0,
+                        totalBytes = 0L,
+                        transferredBytes = 0L,
+                        totalAlreadyDownloadedFiles = 0,
+                    ),
+                    paused = paused,
+                    storageOverQuota = false,
+                    transfersOverQuota = false,
+                )
+            ).also { flow ->
+                whenever(monitorOngoingActiveTransfersUseCase(type)) doReturn flow
             }
         }
 

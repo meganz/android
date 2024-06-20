@@ -45,9 +45,13 @@ class MonitorTransfersStatusUseCase @Inject constructor(
                 pendingDownloads = monitorOngoingActiveTransfersResults
                     .filter { it.activeTransferTotals.transfersType.isDownloadType() }
                     .sumOf { it.activeTransferTotals.pendingFileTransfers },
-                paused = monitorOngoingActiveTransfersResults.any { it.paused },
-                transferOverQuota = monitorOngoingActiveTransfersResults.any { it.transfersOverQuota },
-                storageOverQuota = monitorOngoingActiveTransfersResults.any { it.storageOverQuota },
+                paused = monitorOngoingActiveTransfersResults
+                    .filter { it.activeTransferTotals.hasOngoingTransfers() }
+                    .all { it.paused },
+                transferOverQuota =
+                monitorOngoingActiveTransfersResults.any { it.transfersOverQuota },
+                storageOverQuota =
+                monitorOngoingActiveTransfersResults.any { it.storageOverQuota },
             )
         }
 

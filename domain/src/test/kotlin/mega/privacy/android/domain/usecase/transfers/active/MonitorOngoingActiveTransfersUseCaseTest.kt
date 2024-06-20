@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfers
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.MonitorAllTransfersPausedByTypeUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -27,8 +27,8 @@ class MonitorOngoingActiveTransfersUseCaseTest {
 
     private val monitorActiveTransferTotalsUseCase = mock<MonitorActiveTransferTotalsUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
-    private val monitorDownloadTransfersPausedUseCase =
-        mock<MonitorDownloadTransfersPausedUseCase>()
+    private val monitorAllTransfersPausedByTypeUseCase =
+        mock<MonitorAllTransfersPausedByTypeUseCase>()
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
     private val monitorStorageOverQuotaUseCase = mock<MonitorStorageOverQuotaUseCase>()
 
@@ -38,7 +38,7 @@ class MonitorOngoingActiveTransfersUseCaseTest {
         underTest = MonitorOngoingActiveTransfersUseCase(
             monitorActiveTransferTotalsUseCase = monitorActiveTransferTotalsUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
-            monitorDownloadTransfersPausedUseCase = monitorDownloadTransfersPausedUseCase,
+            monitorAllTransfersPausedByTypeUseCase = monitorAllTransfersPausedByTypeUseCase,
             monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
             monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase
         )
@@ -49,7 +49,7 @@ class MonitorOngoingActiveTransfersUseCaseTest {
         reset(
             monitorActiveTransferTotalsUseCase,
             getActiveTransferTotalsUseCase,
-            monitorDownloadTransfersPausedUseCase,
+            monitorAllTransfersPausedByTypeUseCase,
             monitorTransferOverQuotaUseCase,
             monitorStorageOverQuotaUseCase,
         )
@@ -69,7 +69,7 @@ class MonitorOngoingActiveTransfersUseCaseTest {
         val activeTransferTotals = mockActiveTransfersTotals(true)
         whenever(monitorActiveTransferTotalsUseCase(transferType))
             .thenReturn(flowOf())
-        whenever(monitorDownloadTransfersPausedUseCase())
+        whenever(monitorAllTransfersPausedByTypeUseCase(transferType))
             .thenReturn(flowOf(false))
         whenever(getActiveTransferTotalsUseCase(transferType))
             .thenReturn(activeTransferTotals)
@@ -96,7 +96,7 @@ class MonitorOngoingActiveTransfersUseCaseTest {
         whenever(monitorActiveTransferTotalsUseCase(transferType))
             .thenReturn(flowOf())
         val pausedFlow = MutableStateFlow(false)
-        whenever(monitorDownloadTransfersPausedUseCase())
+        whenever(monitorAllTransfersPausedByTypeUseCase(transferType))
             .thenReturn(pausedFlow)
         whenever(getActiveTransferTotalsUseCase(transferType))
             .thenReturn(activeTransferTotals)
@@ -137,7 +137,7 @@ class MonitorOngoingActiveTransfersUseCaseTest {
             .thenReturn(overQuotaFlow)
         whenever(getActiveTransferTotalsUseCase(transferType))
             .thenReturn(activeTransferTotals)
-        whenever(monitorDownloadTransfersPausedUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAllTransfersPausedByTypeUseCase(transferType)).thenReturn(flowOf(false))
         underTest(transferType).test {
             assertThat(awaitItem())
                 .isEqualTo(
@@ -175,7 +175,7 @@ class MonitorOngoingActiveTransfersUseCaseTest {
             .thenReturn(overQuotaFlow)
         whenever(getActiveTransferTotalsUseCase(transferType))
             .thenReturn(activeTransferTotals)
-        whenever(monitorDownloadTransfersPausedUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAllTransfersPausedByTypeUseCase(transferType)).thenReturn(flowOf(false))
         underTest(transferType).test {
             assertThat(awaitItem())
                 .isEqualTo(
