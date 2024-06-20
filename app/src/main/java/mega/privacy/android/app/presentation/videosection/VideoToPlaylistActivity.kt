@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -49,11 +50,29 @@ class VideoToPlaylistActivity : ComponentActivity() {
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     PasscodeContainer(passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
-                            VideoToPlaylistScreen(viewModel = viewModel)
+                            VideoToPlaylistScreen(
+                                viewModel = viewModel,
+                                addedVideoFinished = { titles ->
+                                    setResult(
+                                        RESULT_OK,
+                                        Intent().putStringArrayListExtra(
+                                            INTENT_SUCCEED_ADDED_PLAYLIST_TITLES, ArrayList(titles)
+                                        )
+                                    )
+                                    finish()
+                                }
+                            )
                         }
                     )
                 }
             }
         }
+    }
+
+    companion object {
+        /**
+         * The intent key for succeed added playlist titles
+         */
+        const val INTENT_SUCCEED_ADDED_PLAYLIST_TITLES = "INTENT_SUCCEED_ADDED_PLAYLIST_TITLES"
     }
 }

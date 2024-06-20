@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.videosection
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -15,9 +16,11 @@ import mega.privacy.android.app.presentation.videosection.VideoToPlaylistViewMod
 import mega.privacy.android.app.presentation.videosection.VideoToPlaylistViewModel.Companion.ERROR_MESSAGE_REPEATED_TITLE
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistSetUiEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSetUiEntity
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
+import mega.privacy.android.domain.usecase.videosection.AddVideoToMultiplePlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistSetsUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -43,7 +46,11 @@ class VideoToPlaylistViewModelTest {
     private val videoPlaylistSetUiEntityMapper = mock<VideoPlaylistSetUiEntityMapper>()
     private val createVideoPlaylistUseCase = mock<CreateVideoPlaylistUseCase>()
     private val getNextDefaultAlbumNameUseCase = mock<GetNextDefaultAlbumNameUseCase>()
+    private val addVideoToMultiplePlaylistsUseCase = mock<AddVideoToMultiplePlaylistsUseCase>()
+    private val savedStateHandle = mock<SavedStateHandle>()
     private val testDispatcher = UnconfinedTestDispatcher()
+
+    private val testVideoHandle = 123L
 
     @BeforeEach
     fun setUp() {
@@ -57,7 +64,9 @@ class VideoToPlaylistViewModelTest {
             getVideoPlaylistSetsUseCase = getVideoPlaylistSetsUseCase,
             videoPlaylistSetUiEntityMapper = videoPlaylistSetUiEntityMapper,
             createVideoPlaylistUseCase = createVideoPlaylistUseCase,
-            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase
+            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
+            addVideoToMultiplePlaylistsUseCase = addVideoToMultiplePlaylistsUseCase,
+            savedStateHandle = savedStateHandle
         )
     }
 
@@ -67,7 +76,9 @@ class VideoToPlaylistViewModelTest {
             getVideoPlaylistSetsUseCase,
             videoPlaylistSetUiEntityMapper,
             createVideoPlaylistUseCase,
-            getNextDefaultAlbumNameUseCase
+            getNextDefaultAlbumNameUseCase,
+            addVideoToMultiplePlaylistsUseCase,
+            savedStateHandle
         )
     }
 
@@ -136,9 +147,14 @@ class VideoToPlaylistViewModelTest {
         }
     }
 
-    private fun getMockUiEntity(expectedTitle: String, expectedSelected: Boolean = false) =
+    private fun getMockUiEntity(
+        expectedTitle: String,
+        expectedId: Long = -1,
+        expectedSelected: Boolean = false,
+    ) =
         mock<VideoPlaylistSetUiEntity> {
             on { title }.thenReturn(expectedTitle)
+            on { id }.thenReturn(expectedId)
             on { isSelected }.thenReturn(expectedSelected)
         }
 
@@ -398,4 +414,39 @@ class VideoToPlaylistViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that succeedAddedPlaylistTitles is updated correctly after adding the video to playlists`() =
+        runTest {
+            whenever(savedStateHandle.get<Long>(INTENT_EXTRA_KEY_HANDLE)).thenReturn(testVideoHandle)
+            val expectedUserSets = (1..3L).map {
+                createUserSet(id = it, name = "Playlist$it")
+            }
+            val expectedSetUiEntities =
+                expectedUserSets.map { item ->
+                    getMockUiEntity(
+                        expectedTitle = item.name,
+                        expectedId = item.id,
+                        expectedSelected = true
+                    )
+                }
+            expectedUserSets.forEachIndexed { index, set ->
+                whenever(videoPlaylistSetUiEntityMapper(set)).thenReturn(expectedSetUiEntities[index])
+            }
+            whenever(getVideoPlaylistSetsUseCase()).thenReturn(expectedUserSets)
+            whenever(addVideoToMultiplePlaylistsUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                expectedUserSets.map { it.id })
+
+            initUnderTest()
+            underTest.addVideoToMultiplePlaylists()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.addedPlaylistTitles).isNotEmpty()
+                assertThat(actual.addedPlaylistTitles.size).isEqualTo(3)
+                actual.addedPlaylistTitles.forEachIndexed { index, title ->
+                    assertThat(title).isEqualTo(expectedUserSets[index].name)
+                }
+            }
+        }
 }

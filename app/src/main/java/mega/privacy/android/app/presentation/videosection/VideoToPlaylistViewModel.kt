@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +13,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistSetUiEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSetUiEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoToPlaylistUiState
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
+import mega.privacy.android.domain.usecase.videosection.AddVideoToMultiplePlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistSetsUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -27,8 +30,11 @@ class VideoToPlaylistViewModel @Inject constructor(
     private val getVideoPlaylistSetsUseCase: GetVideoPlaylistSetsUseCase,
     private val createVideoPlaylistUseCase: CreateVideoPlaylistUseCase,
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
+    private val addVideoToMultiplePlaylistsUseCase: AddVideoToMultiplePlaylistsUseCase,
     private val videoPlaylistSetUiEntityMapper: VideoPlaylistSetUiEntityMapper,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+    private val videoHandle: Long? = savedStateHandle[Constants.INTENT_EXTRA_KEY_HANDLE]
     private val _uiState = MutableStateFlow(VideoToPlaylistUiState())
     internal val uiState = _uiState.asStateFlow()
 
@@ -220,6 +226,26 @@ class VideoToPlaylistViewModel @Inject constructor(
                 list[index] = list[index].copy(isSelected = isSelected)
             }
         } else this
+
+    internal fun addVideoToMultiplePlaylists() = videoHandle?.let {
+        viewModelScope.launch {
+            val playlistIDs = _uiState.value.items.filter { it.isSelected }.map { it.id }
+            runCatching {
+                addVideoToMultiplePlaylistsUseCase(playlistIDs, videoHandle)
+            }.onSuccess { handles ->
+                val titles = handles.mapNotNull { handle ->
+                    _uiState.value.items.firstOrNull { it.id == handle }?.title
+                }
+                _uiState.update {
+                    it.copy(
+                        addedPlaylistTitles = titles
+                    )
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+    }
 
     companion object {
         internal const val ERROR_MESSAGE_REPEATED_TITLE = 0

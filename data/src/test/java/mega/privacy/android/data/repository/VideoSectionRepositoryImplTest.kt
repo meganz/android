@@ -595,4 +595,30 @@ class VideoSectionRepositoryImplTest {
         assertThat(actual.size).isEqualTo(1)
         assertThat(actual[0]).isEqualTo(userSet)
     }
+
+    @Test
+    fun `test that add video to multiple playlists returns the ids of added video playlists which added the video`() =
+        runTest {
+            val videoPlaylistIDs = listOf(1L, 2L, 3L)
+
+            val megaRequestError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+
+            whenever(megaApiGateway.createSetElement(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    megaRequestError,
+                )
+            }
+
+            initUnderTest()
+
+            val actual = underTest.addVideoToMultiplePlaylists(videoPlaylistIDs, 1L)
+            assertThat(actual.size).isEqualTo(videoPlaylistIDs.size)
+            actual.forEachIndexed { index, handle ->
+                assertThat(handle).isEqualTo(videoPlaylistIDs[index])
+            }
+        }
 }

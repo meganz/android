@@ -229,3 +229,35 @@ internal class RemoveSetsListenerInterface(
     ) {
     }
 }
+
+internal class AddElementToSetsListenerInterface(
+    private val target: List<Long>,
+    private val onCompletion: (success: List<Long>, failure: List<Long>) -> Unit,
+) : MegaRequestListenerInterface {
+    private var failure = mutableListOf<Long>()
+    private val success = mutableListOf<Long>()
+
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
+
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
+
+    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+        val index = success.size + failure.size
+        if (e.errorCode == MegaError.API_OK) {
+            success.add(target[index])
+        } else {
+            failure.add(target[index])
+        }
+
+        if ((success.size + failure.size) == target.size) {
+            onCompletion(success, failure)
+        }
+    }
+
+    override fun onRequestTemporaryError(
+        api: MegaApiJava,
+        request: MegaRequest,
+        e: MegaError,
+    ) {
+    }
+}

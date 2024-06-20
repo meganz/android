@@ -14,6 +14,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property shouldCreateVideoPlaylist true if there is a need to create a video playlist
  * @property createDialogErrorMessage the create dialog error message
  * @property isVideoPlaylistCreatedSuccessfully the video playlist created successfully state
+ * @property addedPlaylistTitles the titles of the video playlists that added video successfully
  */
 data class VideoToPlaylistUiState(
     val items: List<VideoPlaylistSetUiEntity> = emptyList(),
@@ -25,4 +26,5 @@ data class VideoToPlaylistUiState(
     val shouldCreateVideoPlaylist: Boolean = false,
     val createDialogErrorMessage: Int? = null,
     val isVideoPlaylistCreatedSuccessfully: Boolean = false,
+    val addedPlaylistTitles: List<String> = emptyList(),
 )

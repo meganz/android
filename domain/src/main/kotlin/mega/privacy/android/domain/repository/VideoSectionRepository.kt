@@ -96,4 +96,14 @@ interface VideoSectionRepository {
      * @return video playlist sets
      */
     suspend fun getVideoPlaylistSets(): List<UserSet>
+
+    /**
+     * Add video to the multiple video playlists
+     *
+     * @param playlistIDs playlist id list
+     * @param videoID added video id
+     *
+     * @return the ids of the added video playlist which added the video
+     */
+    suspend fun addVideoToMultiplePlaylists(playlistIDs: List<Long>, videoID: Long): List<Long>
 }
