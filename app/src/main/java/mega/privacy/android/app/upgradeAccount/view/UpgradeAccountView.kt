@@ -1,6 +1,7 @@
 package mega.privacy.android.app.upgradeAccount.view
 
 import mega.privacy.android.shared.resources.R as sharedR
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.FabPosition
@@ -75,7 +77,8 @@ import mega.privacy.android.app.utils.Constants.PRICING_PAGE_URL
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleNoTitleTopAppBar
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
@@ -100,7 +103,6 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  */
 @Composable
 fun UpgradeAccountView(
-    modifier: Modifier = Modifier,
     state: UpgradeAccountState,
     onBackPressed: () -> Unit,
     onBuyClicked: () -> Unit,
@@ -113,6 +115,7 @@ fun UpgradeAccountView(
     onDialogConfirmButtonClicked: (Int) -> Unit,
     onDialogDismissButtonClicked: () -> Unit,
     showUpgradeWarningBanner: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -127,12 +130,15 @@ fun UpgradeAccountView(
     val context = LocalContext.current
     var isUpgradeWarningBannerVisible by rememberSaveable { mutableStateOf(showUpgradeWarningBanner) }
 
+    BackHandler { onBackPressed() }
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-            SimpleNoTitleTopAppBar(
-                elevation = state.showBillingWarning,
-                onBackPressed = onBackPressed
+            MegaAppBar(
+                appBarType = AppBarType.BACK_NAVIGATION,
+                title = "",
+                onNavigationPressed = { onBackPressed() },
+                elevation = if (state.showBillingWarning) AppBarDefaults.TopAppBarElevation else 0.dp
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
