@@ -174,7 +174,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             if (!fileExplorerActivity.shouldReopenSearch()) {
                 fileExplorerActivity.hideTabs(false, INCOMING_FRAGMENT)
                 fileExplorerActivity.clearQuerySearch()
-                initOriginalData()
+                updateOriginalData()
                 updateNodesByAdapter(originalData)
             }
             clearSelections()
@@ -312,7 +312,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             }
         }
 
-        initOriginalData()
+        updateOriginalData()
 
         when {
             modeCloud == FileExplorerActivity.UPLOAD ->
@@ -416,7 +416,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     /**
      * Original data is initialized
      */
-    private fun initOriginalData() {
+    private fun updateOriginalData() {
         if (parentHandle == INVALID_HANDLE) {
             getNodesFromInShares()
         } else {
@@ -582,7 +582,8 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                     setParentHandle(node.handle)
                     fileExplorerActivity.invalidateOptionsMenu()
 
-                    updateNodesByAdapter(megaApi.getChildren(node, order))
+                    updateOriginalData()
+                    updateNodesByAdapter(originalData)
                     recyclerView.scrollToPosition(0)
 
                     if (modeCloud == COPY || modeCloud == MOVE) {
@@ -878,7 +879,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             searchNodes.clear()
         }
         if (shouldResetNodes) {
-            initOriginalData()
+            updateOriginalData()
             updateNodesByAdapter(nodes)
         }
     }
