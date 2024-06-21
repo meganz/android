@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -43,6 +44,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.logging.AreChatLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -84,6 +86,7 @@ class SettingsViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val setShowHiddenItemsUseCase: SetShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val setAudioBackgroundPlayEnabledUseCase: SetAudioBackgroundPlayEnabledUseCase,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -93,6 +96,8 @@ class SettingsViewModel @Inject constructor(
         areSdkLogsEnabledUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
     private val chatLogsEnabled =
         areChatLogsEnabledUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    private var toggleBackgroundPlayJob: Job? = null
 
     private fun initialiseState(): SettingsState {
         return SettingsState(
@@ -347,4 +352,11 @@ class SettingsViewModel @Inject constructor(
     }
 
     suspend fun fetchPasscodeEnabled() = refreshPasscodeLockPreference()
+
+    internal fun toggleBackgroundPlay(isEnable: Boolean) {
+        toggleBackgroundPlayJob?.cancel()
+        toggleBackgroundPlayJob = viewModelScope.launch {
+            setAudioBackgroundPlayEnabledUseCase(isEnable)
+        }
+    }
 }

@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.logging.AreChatLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -92,6 +93,7 @@ class SettingsViewModelTest {
     private val getSessionTransferURLUseCase = mock<GetSessionTransferURLUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val setAudioBackgroundPlayEnabledUseCase = mock<SetAudioBackgroundPlayEnabledUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -187,6 +189,7 @@ class SettingsViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             setShowHiddenItemsUseCase = mock(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            setAudioBackgroundPlayEnabledUseCase = setAudioBackgroundPlayEnabledUseCase
         )
     }
 
@@ -199,6 +202,7 @@ class SettingsViewModelTest {
             getAccountDetailsUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase,
             getSessionTransferURLUseCase,
+            setAudioBackgroundPlayEnabledUseCase
         )
     }
 
@@ -520,6 +524,14 @@ class SettingsViewModelTest {
             Arguments.of(true, null, null),
             Arguments.of(false, null, COOKIES_URI)
         )
+    }
+
+    @Test
+    fun `test that setAudioBackgroundPlayEnabledUseCase is invoked as expected`() = runTest {
+        val expected = false
+        underTest.toggleBackgroundPlay(expected)
+        advanceUntilIdle()
+        verify(setAudioBackgroundPlayEnabledUseCase).invoke(expected)
     }
 
     companion object {

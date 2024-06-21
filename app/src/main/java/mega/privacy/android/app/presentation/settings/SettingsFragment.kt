@@ -3,18 +3,13 @@ package mega.privacy.android.app.presentation.settings
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -70,9 +65,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_SUB_FOLDER_MEDIA
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.di.settings.ViewModelPreferenceDataStoreFactory
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
-import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
@@ -117,18 +109,6 @@ class SettingsFragment :
 
     private var cookiePolicyLink: String? = null
 
-    private var playerServiceViewModelGateway: AudioPlayerServiceViewModelGateway? = null
-    private val mediaServiceConnection: ServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            playerServiceViewModelGateway =
-                (service as? MediaPlayerServiceBinder)?.playerServiceViewModelGateway as? AudioPlayerServiceViewModelGateway
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            playerServiceViewModelGateway = null
-        }
-    }
-
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             viewModel.refreshAccount()
@@ -142,22 +122,6 @@ class SettingsFragment :
         additionalPreferences.forEach {
             addPreferencesFromResource(it.resource)
         }
-    }
-
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        val v = super.onCreateView(inflater, container, savedInstanceState)
-        val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
-        requireContext().bindService(
-            playerServiceIntent,
-            mediaServiceConnection,
-            Context.BIND_AUTO_CREATE
-        )
-        return v
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -449,7 +413,7 @@ class SettingsFragment :
                 val checked = findPreference<SwitchPreferenceCompat>(
                     KEY_AUDIO_BACKGROUND_PLAY_ENABLED
                 )?.isChecked == true
-                playerServiceViewModelGateway?.toggleBackgroundPlay(checked)
+                viewModel.toggleBackgroundPlay(checked)
             }
 
             KEY_START_SCREEN -> startActivity(
@@ -625,12 +589,6 @@ class SettingsFragment :
         if (key != KEY_ABOUT_KARERE_VERSION) {
             numberOfClicksKarere = 0
         }
-    }
-
-
-    override fun onDestroyView() {
-        requireContext().unbindService(mediaServiceConnection)
-        super.onDestroyView()
     }
 
     companion object {

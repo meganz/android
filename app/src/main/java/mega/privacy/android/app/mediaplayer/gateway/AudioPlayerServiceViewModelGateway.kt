@@ -9,15 +9,6 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
  * PlayerServiceViewModelGateway for visit AudioPlayerServiceViewModel from outside
  */
 interface AudioPlayerServiceViewModelGateway : PlayerServiceViewModelGateway {
-
-    /**
-     * Toggle backgroundPlayEnabled
-     *
-     * @param isEnable true is enable, otherwise is disable
-     * @return backgroundPlayEnabled after toggled
-     */
-    fun toggleBackgroundPlay(isEnable: Boolean): Boolean
-
     /**
      * Get background play if is enable
      *

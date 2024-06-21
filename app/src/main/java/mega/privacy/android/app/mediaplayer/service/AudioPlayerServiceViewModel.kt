@@ -121,7 +121,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudiosByPa
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioShuffleEnabledUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -175,7 +174,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val getAudioNodesByParentHandleUseCase: GetAudioNodesByParentHandleUseCase,
     private val getAudioNodesByHandlesUseCase: GetAudioNodesByHandlesUseCase,
     private val getFingerprintUseCase: GetFingerprintUseCase,
-    private val setAudioBackgroundPlayEnabledUseCase: SetAudioBackgroundPlayEnabledUseCase,
     private val setAudioShuffleEnabledUseCase: SetAudioShuffleEnabledUseCase,
     private val setAudioRepeatModeUseCase: SetAudioRepeatModeUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -1291,14 +1289,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun backgroundPlayEnabled() = backgroundPlayEnabled.value
 
-    override fun toggleBackgroundPlay(isEnable: Boolean): Boolean {
-        cancellableJobs[JOB_KEY_TOGGLE_BACKGROUND_PLAY]?.cancel()
-        cancellableJobs[JOB_KEY_TOGGLE_BACKGROUND_PLAY] = sharingScope.launch {
-            setAudioBackgroundPlayEnabledUseCase(isEnable)
-        }
-        return isEnable
-    }
-
     override fun shuffleEnabled(): Boolean = shuffleEnabled.value
 
     override fun getShuffleOrder() = shuffleOrder
@@ -1467,7 +1457,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
         private const val JOB_KEY_BUILD_PLAYER_SOURCES = "KEY_JOB_BUILD_PLAYER_SOURCES"
         private const val JOB_KEY_UPDATE_THUMBNAIL = "JOB_KEY_UPDATE_THUMBNAIL"
         private const val JOB_KEY_UPDATE_PLAYLIST = "KEY_JOB_UPDATE_PLAYLIST"
-        private const val JOB_KEY_TOGGLE_BACKGROUND_PLAY = "JOB_KEY_TOGGLE_BACKGROUND_PLAY"
         private const val JOB_KEY_SET_SHUFFLE = "JOB_KEY_SET_SHUFFLE"
         private const val JOB_KEY_SET_AUDIO_REPEAT_MODE = "JOB_KEY_SET_AUDIO_REPEAT_MODE"
         private const val JOB_KEY_MONITOR_TRANSFER = "JOB_KEY_MONITOR_TRANSFER"
