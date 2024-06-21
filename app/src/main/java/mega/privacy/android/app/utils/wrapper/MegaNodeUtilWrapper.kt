@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils.wrapper
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
@@ -551,6 +550,13 @@ interface MegaNodeUtilWrapper {
      * @return
      */
     fun containsMediaFile(handle: Long): Boolean
+
+    /**
+     * Setup streaming server
+     *
+     * @param megaApi
+     */
+    fun setupStreamingServer(megaApi: MegaApiAndroid)
 
 
 }

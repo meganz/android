@@ -46,10 +46,8 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmD
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
-import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
-import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -116,6 +114,9 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
     @SuppressWarnings("deprecation")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -683,7 +684,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         }
                         mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     } else {
-                        setupStreamingServer(megaApi)
+                        megaNodeUtilWrapper.setupStreamingServer(megaApi)
                         val url = megaApi.httpServerGetLocalLink(vNode)
                         if (url != null) {
                             val parsedUri = Uri.parse(url)
@@ -726,7 +727,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 mimetype.isURL -> {
-                    manageURLNode(this, megaApi, vNode)
+                    megaNodeUtilWrapper.manageURLNode(this, megaApi, vNode)
                 }
 
                 mimetype.isPdf -> {
@@ -755,7 +756,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         }
                         pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     } else {
-                        setupStreamingServer(megaApi)
+                        megaNodeUtilWrapper.setupStreamingServer(megaApi)
                         val url = megaApi.httpServerGetLocalLink(vNode)
                         if (url != null) {
                             val parsedUri = Uri.parse(url)
@@ -798,7 +799,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 mimetype.isOpenableTextFile(vNode.size) -> {
-                    manageTextFileIntent(this, vNode, Constants.VERSIONS_ADAPTER)
+                    megaNodeUtilWrapper.manageTextFileIntent(this, vNode, Constants.VERSIONS_ADAPTER)
                 }
 
                 else -> {

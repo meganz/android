@@ -2,8 +2,9 @@ package mega.privacy.android.app.utils.wrapper
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.res.Resources
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -11,6 +12,8 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener
+import mega.privacy.android.data.gateway.api.StreamingGateway
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import java.io.File
@@ -21,7 +24,10 @@ import javax.inject.Singleton
  * Mega node util facade
  */
 @Singleton
-class MegaNodeUtilFacade @Inject constructor() : MegaNodeUtilWrapper {
+class MegaNodeUtilFacade @Inject constructor(
+    private val streamingGateway: StreamingGateway,
+    @ApplicationScope private val coroutineScope: CoroutineScope,
+) : MegaNodeUtilWrapper {
     override fun getMyChatFilesFolder() = MegaNodeUtil.myChatFilesFolder
 
     override fun getCloudRootHandle() = MegaNodeUtil.cloudRootHandle
@@ -245,4 +251,10 @@ class MegaNodeUtilFacade @Inject constructor() : MegaNodeUtilWrapper {
         MegaNodeUtil.checkBackupNodeTypeByHandle(megaApi, node)
 
     override fun containsMediaFile(handle: Long) = MegaNodeUtil.containsMediaFile(handle)
+
+    override fun setupStreamingServer(megaApi: MegaApiAndroid) {
+        coroutineScope.launch {
+            streamingGateway.startServer()
+        }
+    }
 }
