@@ -21,16 +21,18 @@ internal class UserUpdateMapper @Inject constructor() {
         changes = userList.groupBy { user -> UserId(user.handle) }
             .mapValues { (_, users) ->
                 users.map { i -> fromMegaUserChangeFlags(i.changes, i.visibility) }.flatten()
+                    .distinct()
             },
         emailMap = userList.associate { user -> UserId(user.handle) to user.email },
     )
 }
 
 private fun fromMegaUserChangeFlags(changeFlags: Long, visibility: Int) =
-    if (changeFlags == 0L) visibilityMap(visibility)
-    else userChangesMap.filter { (it.key.toLong() and changeFlags) != 0L }.values.toList()
+    userChangesMap.filter { (it.key.toLong() and changeFlags) != 0L }.values.toList() + mapVisibility(
+        visibility
+    )
 
-private fun visibilityMap(visibility: Int): List<UserChanges> =
+private fun mapVisibility(visibility: Int): List<UserChanges> =
     listOf(
         UserChanges.Visibility(
             when (visibility) {

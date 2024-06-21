@@ -33,7 +33,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.entity.user.UserVisibility
-import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.USER_ATTR_ALIAS
 import nz.mega.sdk.MegaApiJava.USER_ATTR_AVATAR
@@ -91,7 +91,7 @@ class GetContactsUseCase(
         @MegaApi megaApi: MegaApiAndroid,
         megaChatApi: MegaChatApiAndroid,
         getChatChangesUseCase: GetChatChangesUseCase,
-        contactsRepository: ContactsRepository,
+        accountsRepository: AccountRepository,
     ) : this(
         getChatChangesUseCase = getChatChangesUseCase,
         megaContactsMapper = { user, avatarFolder ->
@@ -133,7 +133,7 @@ class GetContactsUseCase(
         getAliasMap = { request ->
             request.megaStringMap.getDecodedAliases()
         }, getUserUpdates = {
-            contactsRepository.monitorContactUpdates()
+            accountsRepository.monitorUserUpdates()
         }
     )
 

@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserVisibility
@@ -43,7 +44,7 @@ class UserUpdateMapperTest {
 
         val actual = underTest(listOf(user))
 
-        assertThat(actual.changes[UserId(id)]).containsExactly(UserChanges.Alias)
+        assertThat(actual.changes[UserId(id)]).contains(UserChanges.Alias)
 
     }
 
@@ -57,10 +58,12 @@ class UserUpdateMapperTest {
                 MegaUser.CHANGE_TYPE_ALIAS.toLong(),
                 MegaUser.CHANGE_TYPE_AVATAR.toLong()
             )
+            on { visibility }.thenReturn(MegaUser.VISIBILITY_VISIBLE)
         }
         val user2 = mock<MegaUser> {
             on { handle }.thenReturn(id2)
             on { changes }.thenReturn(MegaUser.CHANGE_TYPE_ALIAS.toLong())
+            on { visibility }.thenReturn(MegaUser.VISIBILITY_BLOCKED)
         }
 
         val userList = arrayListOf(user1, user2, user1)
@@ -69,54 +72,25 @@ class UserUpdateMapperTest {
         assertThat(actual.changes.size).isEqualTo(2)
         assertThat(actual.changes[UserId(id1)]).containsExactly(
             UserChanges.Alias,
-            UserChanges.Avatar
+            UserChanges.Avatar,
+            UserChanges.Visibility(UserVisibility.Visible)
         )
-        assertThat(actual.changes[UserId(id2)]).containsExactly(UserChanges.Alias)
+        assertThat(actual.changes[UserId(id2)]).containsExactly(
+            UserChanges.Alias,
+            UserChanges.Visibility(UserVisibility.Blocked)
+        )
     }
+
 
     @Test
     fun `test mapping all changes`() {
-        val allFlags = listOf(
-            MegaUser.CHANGE_TYPE_AUTHRING,
-            MegaUser.CHANGE_TYPE_LSTINT,
-            MegaUser.CHANGE_TYPE_AVATAR,
-            MegaUser.CHANGE_TYPE_FIRSTNAME,
-            MegaUser.CHANGE_TYPE_LASTNAME,
-            MegaUser.CHANGE_TYPE_EMAIL,
-            MegaUser.CHANGE_TYPE_KEYRING,
-            MegaUser.CHANGE_TYPE_COUNTRY,
-            MegaUser.CHANGE_TYPE_BIRTHDAY,
-            MegaUser.CHANGE_TYPE_PUBKEY_CU255,
-            MegaUser.CHANGE_TYPE_PUBKEY_ED255,
-            MegaUser.CHANGE_TYPE_SIG_PUBKEY_RSA,
-            MegaUser.CHANGE_TYPE_SIG_PUBKEY_CU255,
-            MegaUser.CHANGE_TYPE_LANGUAGE,
-            MegaUser.CHANGE_TYPE_PWD_REMINDER,
-            MegaUser.CHANGE_TYPE_DISABLE_VERSIONS,
-            MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION,
-            MegaUser.CHANGE_TYPE_RICH_PREVIEWS,
-            MegaUser.CHANGE_TYPE_RUBBISH_TIME,
-            MegaUser.CHANGE_TYPE_STORAGE_STATE,
-            MegaUser.CHANGE_TYPE_GEOLOCATION,
-            MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER,
-            MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER,
-            MegaUser.CHANGE_TYPE_PUSH_SETTINGS,
-            MegaUser.CHANGE_TYPE_ALIAS,
-            MegaUser.CHANGE_TYPE_UNSHAREABLE_KEY,
-            MegaUser.CHANGE_TYPE_DEVICE_NAMES,
-            MegaUser.CHANGE_TYPE_MY_BACKUPS_FOLDER,
-            MegaUser.CHANGE_TYPE_COOKIE_SETTINGS,
-            MegaUser.CHANGE_TYPE_NO_CALLKIT,
-        ).map { it.toLong() }
-            .fold(0L) { acc, value -> acc or value }
-
         val id = 1L
         val user = mock<MegaUser> { on { handle }.thenReturn(id) }
         whenever(user.changes).thenReturn(allFlags)
 
         val actual = underTest(listOf(user))
 
-        assertThat(actual.changes[UserId(id)]).containsExactlyElementsIn(
+        assertThat(actual.changes[UserId(id)]).containsAtLeastElementsIn(
             listOf(
                 UserChanges.AuthenticationInformation,
                 UserChanges.LastInteractionTimestamp,
@@ -219,4 +193,80 @@ class UserUpdateMapperTest {
             )
         )
     }
+
+    @ParameterizedTest(name = "changes should include visibility change of: {1}")
+    @MethodSource("visibilityChanges")
+    fun `test that all changes include visibility`(
+        megaVisibility: Int,
+        userVisibility: UserVisibility,
+    ) {
+        val allChangesId = 1L
+        val allChangesUser = mock<MegaUser> {
+            on { handle }.thenReturn(allChangesId)
+            on { visibility }.thenReturn(megaVisibility)
+        }
+        whenever(allChangesUser.changes).thenReturn(allFlags)
+
+        val noChangesId = 1L
+        val noChangesUser = mock<MegaUser> {
+            on { handle }.thenReturn(noChangesId)
+            on { visibility }.thenReturn(megaVisibility)
+        }
+        whenever(noChangesUser.changes).thenReturn(allFlags)
+
+        val actual = underTest(listOf(allChangesUser, noChangesUser))
+
+        assertWithMessage("User with other changes did not include visibility").that(
+            actual.changes[UserId(
+                allChangesId
+            )]
+        ).contains(
+            UserChanges.Visibility(
+                userVisibility
+            )
+        )
+        assertWithMessage("User with no other changes did not include visibility").that(
+            actual.changes[UserId(
+                noChangesId
+            )]
+        ).contains(
+            UserChanges.Visibility(
+                userVisibility
+            )
+        )
+    }
+
+    private val allFlags: Long = listOf(
+        MegaUser.CHANGE_TYPE_AUTHRING,
+        MegaUser.CHANGE_TYPE_LSTINT,
+        MegaUser.CHANGE_TYPE_AVATAR,
+        MegaUser.CHANGE_TYPE_FIRSTNAME,
+        MegaUser.CHANGE_TYPE_LASTNAME,
+        MegaUser.CHANGE_TYPE_EMAIL,
+        MegaUser.CHANGE_TYPE_KEYRING,
+        MegaUser.CHANGE_TYPE_COUNTRY,
+        MegaUser.CHANGE_TYPE_BIRTHDAY,
+        MegaUser.CHANGE_TYPE_PUBKEY_CU255,
+        MegaUser.CHANGE_TYPE_PUBKEY_ED255,
+        MegaUser.CHANGE_TYPE_SIG_PUBKEY_RSA,
+        MegaUser.CHANGE_TYPE_SIG_PUBKEY_CU255,
+        MegaUser.CHANGE_TYPE_LANGUAGE,
+        MegaUser.CHANGE_TYPE_PWD_REMINDER,
+        MegaUser.CHANGE_TYPE_DISABLE_VERSIONS,
+        MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION,
+        MegaUser.CHANGE_TYPE_RICH_PREVIEWS,
+        MegaUser.CHANGE_TYPE_RUBBISH_TIME,
+        MegaUser.CHANGE_TYPE_STORAGE_STATE,
+        MegaUser.CHANGE_TYPE_GEOLOCATION,
+        MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER,
+        MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER,
+        MegaUser.CHANGE_TYPE_PUSH_SETTINGS,
+        MegaUser.CHANGE_TYPE_ALIAS,
+        MegaUser.CHANGE_TYPE_UNSHAREABLE_KEY,
+        MegaUser.CHANGE_TYPE_DEVICE_NAMES,
+        MegaUser.CHANGE_TYPE_MY_BACKUPS_FOLDER,
+        MegaUser.CHANGE_TYPE_COOKIE_SETTINGS,
+        MegaUser.CHANGE_TYPE_NO_CALLKIT,
+    ).map { it.toLong() }
+        .fold(0L) { acc, value -> acc or value }
 }
