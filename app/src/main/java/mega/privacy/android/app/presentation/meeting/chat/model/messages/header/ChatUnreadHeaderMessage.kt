@@ -9,14 +9,17 @@ import androidx.navigation.NavHostController
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.core.R
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.shared.original.core.ui.controls.chat.ChatUnreadMessageView
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
  * Chat header message
  */
-class ChatUnreadHeaderMessage(private val unreadCount: Int) : HeaderMessage() {
+class ChatUnreadHeaderMessage(
+    private val unreadCount: Int,
+    override val message: TypedMessage?,
+) : HeaderMessage() {
 
     @Composable
     override fun MessageListItem(
@@ -41,6 +44,8 @@ class ChatUnreadHeaderMessage(private val unreadCount: Int) : HeaderMessage() {
             )
         )
     }
+
+    override val timeSent: Long? = message?.time
 
     override fun key(): String = "chat_unread_message_header"
 }

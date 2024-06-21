@@ -191,13 +191,13 @@ class MessageListViewModel @Inject constructor(
                     }
                     uiChatMessageMapper(it)
                 }
-                    .insertSeparators { before, _ ->
+                    .insertSeparators { before, after ->
                         if (unreadCount > 0
                             && lastNotSeenMessage != null
                             && before?.id == lastNotSeenMessage?.msgId
                             && !hideUnreadCount
                         ) {
-                            ChatUnreadHeaderMessage(unreadCount)
+                            ChatUnreadHeaderMessage(unreadCount, after?.message)
                         } else {
                             null
                         }

@@ -2,8 +2,8 @@ package mega.privacy.android.app.presentation.meeting.chat.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.DateHeaderUiMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.HeaderMessage
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import java.time.LocalDateTime
@@ -27,7 +27,7 @@ class ChatMessageDateSeparatorMapperTest {
         val firstMessage = mock<UiChatMessage> {
             on { timeSent }.thenReturn(123L)
         }
-        val secondMessage = mock<HeaderMessage>()
+        val secondMessage = mock<ChatUnreadHeaderMessage>()
         assertThat(underTest(firstMessage, secondMessage)).isNull()
     }
 

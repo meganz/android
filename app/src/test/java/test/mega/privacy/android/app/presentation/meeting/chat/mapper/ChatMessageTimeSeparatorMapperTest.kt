@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageTimeSeparatorMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.CallUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.HeaderMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.TimeHeaderUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ManagementUiChatMessage
 import org.junit.jupiter.api.Test
@@ -30,7 +30,7 @@ class ChatMessageTimeSeparatorMapperTest {
         val firstMessage = mock<UiChatMessage> {
             on { timeSent }.thenReturn(123L)
         }
-        val secondMessage = mock<HeaderMessage>()
+        val secondMessage = mock<ChatUnreadHeaderMessage>()
         assertThat(underTest(firstMessage, secondMessage)).isNull()
     }
 
