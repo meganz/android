@@ -20,9 +20,7 @@ import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
-import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -36,7 +34,6 @@ import javax.inject.Inject
 class SelectSubtitleFileViewModel @Inject constructor(
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
     private val subtitleFileInfoItemMapper: SubtitleFileInfoItemMapper,
-    private val sendStatisticsMediaPlayerUseCase: SendStatisticsMediaPlayerUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     savedStateHandle: SavedStateHandle,
@@ -166,7 +163,6 @@ class SelectSubtitleFileViewModel @Inject constructor(
      */
     fun searchWidgetStateUpdate() {
         searchState = if (searchState == SearchWidgetState.COLLAPSED) {
-            sendSearchModeEnabledEvent()
             Analytics.tracker.trackEvent(SearchModeEnablePressedEvent)
             SearchWidgetState.EXPANDED
         } else {
@@ -180,38 +176,6 @@ class SelectSubtitleFileViewModel @Inject constructor(
     fun closeSearch() {
         query.update { null }
         searchState = SearchWidgetState.COLLAPSED
-    }
-
-    /**
-     * Send SearchModeEnabledEvent
-     */
-    private fun sendSearchModeEnabledEvent() {
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SearchModeEnabledEvent())
-    }
-
-    /**
-     * Send AddSubtitleClickedEvent
-     */
-    fun sendAddSubtitleClickedEvent() {
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.AddSubtitleClickedEvent())
-    }
-
-    /**
-     * Send SelectSubtitleCancelledEvent
-     */
-    fun sendSelectSubtitleCancelledEvent() {
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SelectSubtitleCancelledEvent())
-    }
-
-    /**
-     * Send MediaPlayerStatisticsEvent
-     *
-     * @param event MediaPlayerStatisticsEvents
-     */
-    private fun sendMediaPlayerStatisticsEvent(event: MediaPlayerStatisticsEvents) {
-        viewModelScope.launch {
-            sendStatisticsMediaPlayerUseCase(event)
-        }
     }
 
     private fun filterNonSensitiveItems(

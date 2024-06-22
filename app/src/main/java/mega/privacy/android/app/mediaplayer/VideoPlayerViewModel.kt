@@ -112,7 +112,6 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
-import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
@@ -139,7 +138,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSt
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.DeletePlaybackInformationUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
@@ -181,7 +179,6 @@ class VideoPlayerViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     @VideoPlayer private val mediaPlayerGateway: MediaPlayerGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val sendStatisticsMediaPlayerUseCase: SendStatisticsMediaPlayerUseCase,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val playlistItemMapper: PlaylistItemMapper,
@@ -504,7 +501,6 @@ class VideoPlayerViewModel @Inject constructor(
         _isSubtitleShown.update { true }
         _addSubtitleState.update { false }
         _isSubtitleDialogShown.update { true }
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SubtitleDialogShownEvent())
     }
 
     /**
@@ -548,7 +544,6 @@ class VideoPlayerViewModel @Inject constructor(
     internal fun onOffItemClicked() {
         // Only when the subtitle file has been loaded and shown, send hide subtitle event if off item is clicked
         if (_currentSubtitleFileInfo.value != null && selectOptionState != SUBTITLE_SELECTED_STATE_OFF) {
-            sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.HideSubtitleEvent())
             Analytics.tracker.trackEvent(OffOptionForHideSubtitlePressedEvent)
         }
         _addSubtitleState.update { false }
@@ -1949,95 +1944,6 @@ class VideoPlayerViewModel @Inject constructor(
             String.format("%2d:%02d:%02d", hour, minutes, resultSeconds)
         } else {
             String.format("%02d:%02d", minutes, resultSeconds)
-        }
-    }
-
-    /**
-     * Send OpenSelectSubtitlePageEvent
-     */
-    fun sendOpenSelectSubtitlePageEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.OpenSelectSubtitlePageEvent())
-
-    /**
-     * Send LoopButtonEnabledEvent
-     */
-    fun sendLoopButtonEnabledEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.LoopButtonEnabledEvent())
-
-    /**
-     * Send ScreenLockedEvent
-     */
-    fun sendScreenLockedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.ScreenLockedEvent())
-
-    /**
-     * Send ScreenUnlockedEvent
-     */
-    fun sendScreenUnlockedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.ScreenUnlockedEvent())
-
-    /**
-     * Send SnapshotButtonClickedEvent
-     */
-    fun sendSnapshotButtonClickedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SnapshotButtonClickedEvent())
-
-    /**
-     * Send InfoButtonClickedEvent
-     */
-    fun sendInfoButtonClickedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.InfoButtonClickedEvent())
-
-    /**
-     * Send SaveToDeviceButtonClickedEvent
-     */
-    fun sendSaveToDeviceButtonClickedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SaveToDeviceButtonClickedEvent())
-
-    /**
-     * Send SendToChatButtonClickedEvent
-     */
-    fun sendSendToChatButtonClickedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SendToChatButtonClickedEvent())
-
-    /**
-     * Send ShareButtonClickedEvent
-     */
-    fun sendShareButtonClickedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.ShareButtonClickedEvent())
-
-    /**
-     * Send GetLinkButtonClickedEvent
-     */
-    fun sendGetLinkButtonClickedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.GetLinkButtonClickedEvent())
-
-    /**
-     * Send RemoveLinkButtonClickedEvent
-     */
-    fun sendRemoveLinkButtonClickedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.RemoveLinkButtonClickedEvent())
-
-    /**
-     * Send VideoPlayerActivatedEvent
-     */
-    fun sendVideoPlayerActivatedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.VideoPlayerActivatedEvent())
-
-    /**
-     * Send AutoMatchSubtitleClickedEvent
-     */
-    fun sendAutoMatchSubtitleClickedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.AutoMatchSubtitleClickedEvent())
-
-    /**
-     * Send MediaPlayerStatisticsEvent
-     *
-     * @param event MediaPlayerStatisticsEvents
-     */
-    private fun sendMediaPlayerStatisticsEvent(event: MediaPlayerStatisticsEvents) {
-        viewModelScope.launch {
-            sendStatisticsMediaPlayerUseCase(event)
         }
     }
 

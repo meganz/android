@@ -396,7 +396,6 @@ class VideoPlayerFragment : Fragment() {
                 viewModel.uiState.value.videoRepeatToggleMode.let { repeatToggleMode ->
                     if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
                         mediaPlayerGateway.setRepeatToggleMode(RepeatToggleMode.REPEAT_ONE)
-                        viewModel.sendLoopButtonEnabledEvent()
                         Analytics.tracker.trackEvent(LoopButtonPressedEvent)
                     } else {
                         mediaPlayerGateway.setRepeatToggleMode(RepeatToggleMode.REPEAT_NONE)
@@ -410,10 +409,8 @@ class VideoPlayerFragment : Fragment() {
         viewModel.updateLockStatus(isLock)
         if (isLock) {
             delayHideWhenLocked()
-            viewModel.sendScreenLockedEvent()
             Analytics.tracker.trackEvent(LockButtonPressedEvent)
         } else {
-            viewModel.sendScreenUnlockedEvent()
             Analytics.tracker.trackEvent(UnlockButtonPressedEvent)
         }
     }
@@ -440,7 +437,6 @@ class VideoPlayerFragment : Fragment() {
             getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
         binding.playerView.videoSurfaceView?.let { view ->
             viewModel.screenshotWhenVideoPlaying(rootPath, captureView = view) { bitmap ->
-                viewModel.sendSnapshotButtonClickedEvent()
                 Analytics.tracker.trackEvent(SnapshotButtonPressedEvent)
                 viewLifecycleOwner.lifecycleScope.launch {
                     showCaptureScreenshotAnimation(
@@ -741,12 +737,10 @@ class VideoPlayerFragment : Fragment() {
                         if (info.url == null) {
                             showAddingSubtitleFailedMessage()
                         }
-                        viewModel.sendAutoMatchSubtitleClickedEvent()
                         Analytics.tracker.trackEvent(AutoMatchSubtitleOptionPressedEvent)
                         viewModel.onAutoMatchItemClicked(info)
                     },
                     onToSelectSubtitle = {
-                        viewModel.sendOpenSelectSubtitlePageEvent()
                         Analytics.tracker.trackEvent(AddSubtitlesOptionPressedEvent)
                         selectSubtitleFileActivityLauncher.launch(
                             Intent(

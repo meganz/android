@@ -79,7 +79,6 @@ internal class VideoPlayerViewModelTest {
             context = mock(),
             mediaPlayerGateway = mock(),
             ioDispatcher = UnconfinedTestDispatcher(),
-            sendStatisticsMediaPlayerUseCase = mock(),
             offlineThumbnailFileWrapper = mock(),
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             playlistItemMapper = mock(),

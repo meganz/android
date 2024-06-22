@@ -57,7 +57,6 @@ internal class SelectSubtitleFileViewModelTest {
         underTest = SelectSubtitleFileViewModel(
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             subtitleFileInfoItemMapper = subtitleFileInfoItemMapper,
-            sendStatisticsMediaPlayerUseCase = mock(),
             savedStateHandle = SavedStateHandle(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
