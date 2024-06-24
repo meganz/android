@@ -10,8 +10,8 @@ import mega.privacy.android.app.presentation.node.model.menuaction.UnhideMenuAct
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import javax.inject.Inject
 
@@ -37,20 +37,17 @@ class UnhideDropdownMenuItem @Inject constructor(
         allFileNodes: Boolean,
         resultCount: Int,
     ): Boolean {
-        val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+        if (!hasNodeAccessPermission || !noNodeTakenDown) return false
 
-        if (!isHiddenNodesEnabled || !hasNodeAccessPermission || !noNodeTakenDown)
-            return false
-        val isPaid =
-            monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
-        if (!isPaid)
-            return false
-        val isHidingActionAllowed = selectedNodes.all {
-            isHidingActionAllowedUseCase(it.id)
-        }
-        if (!isHidingActionAllowed)
-            return false
-        return !selectedNodes.any { !it.isMarkedSensitive }
+        val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+        if (!isHiddenNodesEnabled) return false
+
+        val isPaid = monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
+        if (!isPaid) return false
+
+        if (selectedNodes.any { !isHidingActionAllowedUseCase(it.id) }) return false
+
+        return selectedNodes.all { it.isMarkedSensitive } && selectedNodes.none { it.isSensitiveInherited }
     }
 
     override fun getOnClick(

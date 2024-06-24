@@ -13,8 +13,10 @@ open class NodeItem(
     open var selected: Boolean = false,
     open var uiDirty: Boolean = true,   // Force refresh the newly created Node list item
     open var isSensitive: Boolean = false,
+    open var isMarkedSensitive: Boolean = false,
+    open var isSensitiveInherited: Boolean = false,
 ) {
     override fun toString(): String {
-        return "NodeItem(node=$node, index=$index, isVideo=$isVideo, modifiedDate='$modifiedDate', thumbnail=$thumbnail, selected=$selected, uiDirty=$uiDirty, isSensitive=$isSensitive)"
+        return "NodeItem(node=$node, index=$index, isVideo=$isVideo, modifiedDate='$modifiedDate', thumbnail=$thumbnail, selected=$selected, uiDirty=$uiDirty, isSensitive=$isSensitive, isMarkedSensitive=$isMarkedSensitive, isSensitiveInherited=$isSensitiveInherited)"
     }
 }

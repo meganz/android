@@ -61,6 +61,8 @@ class DefaultGetRecentActionNodes @Inject constructor(
                 isVideo = node.type is VideoFileTypeInfo,
                 modifiedDate = node.modificationTime.toString(),
                 isSensitive = accountType?.isPaid == true && (node.isMarkedSensitive || node.isSensitiveInherited),
+                isSensitiveInherited = node.isSensitiveInherited,
+                isMarkedSensitive = node.isMarkedSensitive,
             )
         }.onFailure {
             Timber.e(it)

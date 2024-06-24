@@ -59,10 +59,12 @@ internal class TimelineImagePreviewMenu @Inject constructor() : ImagePreviewMenu
 
     override suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean {
         return !imageNode.isMarkedSensitive
+                && !imageNode.isSensitiveInherited
     }
 
     override suspend fun isUnhideMenuVisible(imageNode: ImageNode): Boolean {
         return imageNode.isMarkedSensitive
+                && !imageNode.isSensitiveInherited
     }
 
     override suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {

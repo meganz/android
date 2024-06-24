@@ -165,7 +165,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     )
 
     // it's only used for enter animation
-    private val dragToExit = DragToExitSupport(this, lifecycleScope,null, null)
+    private val dragToExit = DragToExitSupport(this, lifecycleScope, null, null)
     private var nC: NodeController? = null
     private var handler: Handler? = null
     private var fromChat = false
@@ -1108,7 +1108,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         val saveForOfflineMenuItem = menu.findItem(R.id.chat_pdf_viewer_save_for_offline)
         val chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove)
         var node = megaApi.getNodeByHandle(handle)
-        val parentNode = node?.let { megaApi.getRootParentNode(it) }
+        val rootParentNode = node?.let { megaApi.getRootParentNode(it) }
         if (node == null) {
             getLinkMenuItem.isVisible = false
             removeLinkMenuItem.isVisible = false
@@ -1184,22 +1184,30 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             }
             downloadMenuItem.isVisible = true
         }
-        val shouldShowHideNode =
-            isHiddenNodesEnabled
-                    && !isInSharedItems
-                    && parentNode?.isInShare == false
-                    && node?.isMarkedSensitive == false
-                    || viewModel.uiState.value.accountType?.isPaid == false
 
-        val shouldShowUnhideNode =
-            isHiddenNodesEnabled
-                    && !isInSharedItems
-                    && parentNode?.isInShare == false
-                    && node?.isMarkedSensitive == true
-                    && viewModel.uiState.value.accountType?.isPaid == true
+        val currentParentNode = megaApi.getParentNode(node)
+        val isSensitiveInherited =
+            currentParentNode?.let { megaApi.isSensitiveInherited(it) } == true
+        val isInShare = rootParentNode?.isInShare == true
+        val isPaidAccount = viewModel.uiState.value.accountType?.isPaid == true
+        val isHiddenNodesEnabledAndNotInShare =
+            isHiddenNodesEnabled && !isInSharedItems && !isInShare
+
+        val shouldShowHideNode = node != null
+                && isHiddenNodesEnabledAndNotInShare
+                && !node.isMarkedSensitive
+                && !isSensitiveInherited
+                || !isPaidAccount
+
+        val shouldShowUnhideNode = node != null
+                && isHiddenNodesEnabledAndNotInShare
+                && node.isMarkedSensitive
+                && !isSensitiveInherited
+                && isPaidAccount
 
         hideMenuItem.isVisible = shouldShowHideNode
         unhideMenuItem.isVisible = shouldShowUnhideNode
+
         importMenuItem.isVisible = false
         saveForOfflineMenuItem.isVisible = false
         chatRemoveMenuItem.isVisible = false

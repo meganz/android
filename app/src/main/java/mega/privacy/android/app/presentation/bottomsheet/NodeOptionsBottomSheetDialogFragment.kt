@@ -403,10 +403,18 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLabel.visibility = if (isTakenDown) View.GONE else View.VISIBLE
                 optionFavourite.visibility = if (isTakenDown) View.GONE else View.VISIBLE
                 optionHideLayout.visibility =
-                    if (isHiddenNodesEnabled && mode != SHARED_ITEMS_MODE && accountType != null && isHiddenNodesOnboarded != null && state.isHidingActionAllowed)
+                    if (isHiddenNodesEnabled && mode != SHARED_ITEMS_MODE
+                        && accountType != null
+                        && isHiddenNodesOnboarded != null
+                        && state.isHidingActionAllowed
+                        && megaApi.getParentNode(node)?.let {
+                            megaApi.isSensitiveInherited(it)
+                        } != true
+                    ) {
                         View.VISIBLE
-                    else
+                    } else {
                         View.GONE
+                    }
                 optionHideProLabel.visibility =
                     if (accountType?.isPaid == false) View.VISIBLE else View.GONE
                 optionHideHelp.visibility =

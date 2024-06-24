@@ -415,7 +415,8 @@ internal class MegaApiFacade @Inject constructor(
     }
 
     override suspend fun isSensitiveInherited(node: MegaNode): Boolean {
-        return megaApi.isSensitiveInherited(node)
+        val parentNode = megaApi.getParentNode(node) ?: return false
+        return megaApi.isSensitiveInherited(parentNode)
     }
 
     override fun addLogger(logger: MegaLoggerInterface) = MegaApiAndroid.addLoggerObject(logger)

@@ -467,7 +467,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
                 else -> {
                     val node = viewModel.getNode()
-                    val parentNode = node?.let { megaApi.getRootParentNode(it) }
+                    val rootParentNode = node?.let { megaApi.getRootParentNode(it) }
                     val adapterType = viewModel.getAdapterType()
                     val isInSharedItems = adapterType in listOf(
                         INCOMING_SHARES_ADAPTER,
@@ -517,17 +517,31 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     menu.findItem(R.id.action_remove).isVisible = false
                     menu.findItem(R.id.chat_action_save_for_offline).isVisible = false
                     menu.findItem(R.id.chat_action_remove).isVisible = false
-                    val shouldShowHideNode =
-                        (isHiddenNodesEnabled
-                                && !isInSharedItems
-                                && parentNode?.isInShare == false) && !node.isMarkedSensitive || viewModel.uiState.value.accountType?.isPaid == false
 
-                    val shouldShowUnhideNode =
-                        (isHiddenNodesEnabled
-                                && !isInSharedItems
-                                && parentNode?.isInShare == false) && node.isMarkedSensitive && viewModel.uiState.value.accountType?.isPaid == true
-                    menu.findItem(R.id.action_hide).isVisible = shouldShowHideNode
-                    menu.findItem(R.id.action_unhide).isVisible = shouldShowUnhideNode
+                    val currentParentNode = megaApi.getParentNode(node)
+                    val isSensitiveInherited =
+                        currentParentNode?.let { megaApi.isSensitiveInherited(it) } == true
+                    val isInShare = rootParentNode?.isInShare == true
+                    val isPaidAccount = viewModel.uiState.value.accountType?.isPaid == true
+
+                    val isHiddenNodesEnabledAndNotInShare =
+                        isHiddenNodesEnabled && !isInSharedItems && !isInShare
+
+                    val shouldShowHideNode = node != null &&
+                            isHiddenNodesEnabledAndNotInShare &&
+                            !node.isMarkedSensitive &&
+                            !isSensitiveInherited
+                            || !isPaidAccount
+
+                    val shouldShowUnhideNode = node != null &&
+                            isHiddenNodesEnabledAndNotInShare &&
+                            node.isMarkedSensitive &&
+                            !isSensitiveInherited &&
+                            isPaidAccount
+
+                    menu.findItem(R.id.action_hide)?.isVisible = shouldShowHideNode
+                    menu.findItem(R.id.action_unhide)?.isVisible = shouldShowUnhideNode
+
                     menu.findItem(R.id.action_save).isVisible = false
                 }
             }

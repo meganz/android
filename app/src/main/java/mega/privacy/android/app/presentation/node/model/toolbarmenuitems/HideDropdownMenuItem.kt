@@ -11,8 +11,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import javax.inject.Inject
 
@@ -41,20 +41,20 @@ class HideDropdownMenuItem @Inject constructor(
         resultCount: Int,
     ): Boolean {
         val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
-
-        if (!isHiddenNodesEnabled || !hasNodeAccessPermission || !noNodeTakenDown)
+        if (!isHiddenNodesEnabled || !hasNodeAccessPermission || !noNodeTakenDown) {
             return false
-
-        this.isPaid =
-            monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
-        if (!isPaid)
-            return true
-        val isHidingActionAllowed = selectedNodes.all {
-            isHidingActionAllowedUseCase(it.id)
         }
-        if (!isHidingActionAllowed)
+
+        val isPaid = monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
+        if (!isPaid) {
+            return true
+        }
+
+        if (selectedNodes.any { !isHidingActionAllowedUseCase(it.id) }) {
             return false
-        return selectedNodes.any { !it.isMarkedSensitive }
+        }
+
+        return selectedNodes.all { it.isMarkedSensitive } && selectedNodes.none { it.isSensitiveInherited }
     }
 
     override fun getOnClick(

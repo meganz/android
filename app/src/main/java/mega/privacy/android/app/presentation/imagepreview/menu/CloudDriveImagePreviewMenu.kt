@@ -62,11 +62,15 @@ internal class CloudDriveImagePreviewMenu @Inject constructor(
     }
 
     override suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean {
-        return !imageNode.isMarkedSensitive && haveOwnerAccessPermission(imageNode)
+        return !imageNode.isMarkedSensitive
+                && !imageNode.isSensitiveInherited
+                && haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isUnhideMenuVisible(imageNode: ImageNode): Boolean {
-        return imageNode.isMarkedSensitive && haveOwnerAccessPermission(imageNode)
+        return imageNode.isMarkedSensitive
+                && !imageNode.isSensitiveInherited
+                && haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {

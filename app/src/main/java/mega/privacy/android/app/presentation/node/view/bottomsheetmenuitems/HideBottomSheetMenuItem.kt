@@ -100,7 +100,7 @@ class HideBottomSheetMenuItem @Inject constructor(
         if (!isPaid)
             return true
 
-        return isHidingActionAllowedUseCase(node.id) && !node.isMarkedSensitive
+        return isHidingActionAllowedUseCase(node.id) && !node.isMarkedSensitive && !node.isSensitiveInherited
     }
 
     override fun getOnClickFunction(

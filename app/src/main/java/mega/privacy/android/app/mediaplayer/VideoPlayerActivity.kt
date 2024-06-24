@@ -1177,25 +1177,36 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                                 menu.toggleAllMenuItemsVisibility(false)
                                 return
                             }
-                            val shouldShowHideNode =
-                                isHiddenNodesEnabled
-                                        && !isInSharedItems
-                                        && !megaApi.getRootParentNode(node).isInShare
-                                        && (!node.isMarkedSensitive || viewModel.state.value.accountType?.isPaid == false)
 
-                            val shouldShowUnhideNode =
-                                isHiddenNodesEnabled
-                                        && !isInSharedItems
-                                        && !megaApi.getRootParentNode(node).isInShare
-                                        && node.isMarkedSensitive
-                                        && viewModel.state.value.accountType?.isPaid == true
+                            val parentNode = megaApi.getParentNode(node)
+                            val isSensitiveInherited =
+                                parentNode?.let { megaApi.isSensitiveInherited(it) } == true
+                            val isRootParentInShare = megaApi.getRootParentNode(node).isInShare
+                            val accountType = viewModel.state.value.accountType
+                            val isPaidAccount = accountType?.isPaid == true
 
-                            menu.findItem(R.id.hide).isVisible = shouldShowHideNode
-                            menu.findItem(R.id.hide).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                            val shouldShowHideNode = isHiddenNodesEnabled &&
+                                    !isInSharedItems &&
+                                    !isRootParentInShare &&
+                                    (!node.isMarkedSensitive || !isPaidAccount) &&
+                                    !isSensitiveInherited
 
-                            menu.findItem(R.id.unhide).isVisible = shouldShowUnhideNode
-                            menu.findItem(R.id.unhide)
-                                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                            val shouldShowUnhideNode = isHiddenNodesEnabled &&
+                                    !isInSharedItems &&
+                                    !isRootParentInShare &&
+                                    node.isMarkedSensitive &&
+                                    isPaidAccount &&
+                                    !isSensitiveInherited
+
+                            menu.findItem(R.id.hide)?.apply {
+                                isVisible = shouldShowHideNode
+                                setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+                            }
+
+                            menu.findItem(R.id.unhide)?.apply {
+                                isVisible = shouldShowUnhideNode
+                                setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+                            }
                         }
 
                         else -> {
@@ -1219,22 +1230,35 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                             menu.findItem(R.id.properties).isVisible =
                                 currentFragmentId == R.id.video_main_player
 
-                            val shouldShowHideNode =
-                                isHiddenNodesEnabled
-                                        && !isInSharedItems
-                                        && !megaApi.getRootParentNode(node).isInShare
-                                        && (!node.isMarkedSensitive || viewModel.state.value.accountType?.isPaid == false)
+                            val parentNode = megaApi.getParentNode(node)
+                            val isSensitiveInherited =
+                                parentNode?.let { megaApi.isSensitiveInherited(it) } == true
+                            val isRootParentInShare = megaApi.getRootParentNode(node).isInShare
+                            val accountType = viewModel.state.value.accountType
+                            val isPaidAccount = accountType?.isPaid == true
 
-                            val shouldShowUnhideNode =
-                                isHiddenNodesEnabled
-                                        && !isInSharedItems
-                                        && !megaApi.getRootParentNode(node).isInShare
-                                        && node.isMarkedSensitive
-                                        && viewModel.state.value.accountType?.isPaid == true
+                            val shouldShowHideNode = isHiddenNodesEnabled &&
+                                    !isInSharedItems &&
+                                    !isRootParentInShare &&
+                                    (!node.isMarkedSensitive || !isPaidAccount) &&
+                                    !isSensitiveInherited
 
-                            menu.findItem(R.id.hide).isVisible = shouldShowHideNode
+                            val shouldShowUnhideNode = isHiddenNodesEnabled &&
+                                    !isInSharedItems &&
+                                    !isRootParentInShare &&
+                                    node.isMarkedSensitive &&
+                                    isPaidAccount &&
+                                    !isSensitiveInherited
 
-                            menu.findItem(R.id.unhide).isVisible = shouldShowUnhideNode
+                            menu.findItem(R.id.hide)?.apply {
+                                isVisible = shouldShowHideNode
+                                setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+                            }
+
+                            menu.findItem(R.id.unhide)?.apply {
+                                isVisible = shouldShowUnhideNode
+                                setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+                            }
 
                             menu.findItem(R.id.share).isVisible =
                                 currentFragmentId == R.id.video_main_player
