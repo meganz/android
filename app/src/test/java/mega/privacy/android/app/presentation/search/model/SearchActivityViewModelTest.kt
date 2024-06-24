@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 import mega.privacy.android.app.presentation.search.mapper.DateFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
+import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
@@ -33,20 +34,18 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchParameters
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.search.TypeFilterOption
-import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.jupiter.api.AfterEach
@@ -70,16 +69,13 @@ class SearchActivityViewModelTest {
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase = mock()
     private val searchFilterMapper: SearchFilterMapper = mock()
+    private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper = mock()
     private val typeFilterToSearchMapper: TypeFilterToSearchMapper = mock()
     private val emptySearchViewMapper: EmptySearchViewMapper = mock()
     private val stateHandle: SavedStateHandle = mock()
     private val setViewType: SetViewType = mock()
     private val monitorViewType: MonitorViewType = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
-    private val getRubbishNodeUseCase: GetRubbishNodeUseCase = mock()
-    private val getNodeAccessPermission: GetNodeAccessPermission = mock()
-    private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode = mock()
-    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val typeFilterStringMapper: TypeFilterOptionStringResMapper = mock()
     private val dateFilterStringMapper: DateFilterOptionStringResMapper = mock()
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase = mock()
@@ -113,6 +109,7 @@ class SearchActivityViewModelTest {
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
             getSearchCategoriesUseCase = getSearchCategoriesUseCase,
             searchFilterMapper = searchFilterMapper,
+            nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
             typeFilterToSearchMapper = typeFilterToSearchMapper,
             emptySearchViewMapper = emptySearchViewMapper,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
@@ -121,6 +118,49 @@ class SearchActivityViewModelTest {
             searchUseCase = searchUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+        )
+    }
+
+    private suspend fun stubCommon() {
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
+        whenever(monitorViewType()).thenReturn(emptyFlow())
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+        whenever(stateHandle.get<NodeSourceType>(SearchActivity.SEARCH_TYPE)).thenReturn(
+            NodeSourceType.CLOUD_DRIVE
+        )
+        whenever(stateHandle.get<Long>(SearchActivity.PARENT_HANDLE)).thenReturn(123456L)
+        whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
+            false
+        )
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
+        whenever(nodeSourceTypeToSearchTargetMapper(any())).thenReturn(SearchTarget.ROOT_NODES)
+    }
+
+    @AfterEach
+    fun tearDown() {
+        nodeList.clear()
+        reset(
+            getFeatureFlagValueUseCase,
+            monitorNodeUpdatesUseCase,
+            setViewType,
+            monitorViewType,
+            stateHandle,
+            getCloudSortOrder,
+            cancelCancelTokenUseCase,
+            getSearchCategoriesUseCase,
+            searchFilterMapper,
+            nodeSourceTypeToSearchTargetMapper,
+            typeFilterToSearchMapper,
+            emptySearchViewMapper,
+            monitorOfflineNodeUpdatesUseCase,
+            typeFilterStringMapper,
+            dateFilterStringMapper,
+            searchUseCase,
+            monitorAccountDetailUseCase,
+            monitorShowHiddenItemsUseCase,
         )
     }
 
@@ -133,7 +173,6 @@ class SearchActivityViewModelTest {
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             underTest.onSortOrderChanged()
             underTest.onLongItemClicked(
                 NodeUIItem(
@@ -192,7 +231,6 @@ class SearchActivityViewModelTest {
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             underTest.onSortOrderChanged()
             underTest.onLongItemClicked(
                 NodeUIItem(
@@ -298,10 +336,12 @@ class SearchActivityViewModelTest {
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             whenever(
                 searchUseCase(
-                    query = "",
                     parentHandle = NodeId(parentHandle),
                     nodeSourceType = nodeSourceType,
-                    searchCategory = filter.filter
+                    searchParameters = SearchParameters(
+                        query = "",
+                        searchCategory = filter.filter
+                    ),
                 )
             ).thenReturn(listOf(typedFileNode, typedFolderNode))
             underTest.updateFilter(filter)
@@ -337,9 +377,11 @@ class SearchActivityViewModelTest {
 
             whenever(
                 searchUseCase(
-                    query = query,
                     parentHandle = NodeId(parentHandle),
                     nodeSourceType = nodeSourceType,
+                    searchParameters = SearchParameters(
+                        query = query,
+                    ),
                 )
             ).thenReturn(nodeList)
             underTest.updateSearchQuery(query)
@@ -361,10 +403,12 @@ class SearchActivityViewModelTest {
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             whenever(
                 searchUseCase(
-                    query = "",
                     parentHandle = NodeId(parentHandle),
                     nodeSourceType = nodeSourceType,
-                    searchCategory = filter.filter
+                    searchParameters = SearchParameters(
+                        query = "",
+                        searchCategory = filter.filter
+                    ),
                 )
             ).thenThrow(IllegalStateException("Search exception"))
             underTest.updateFilter(filter)
@@ -408,9 +452,11 @@ class SearchActivityViewModelTest {
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             whenever(
                 searchUseCase(
-                    query = query,
                     parentHandle = NodeId(parentHandle),
                     nodeSourceType = nodeSourceType,
+                    searchParameters = SearchParameters(
+                        query = query,
+                    ),
                 )
             ).thenReturn(listOf(typedFileNode, typedFolderNode))
             underTest.updateSearchQuery(query)
@@ -460,9 +506,11 @@ class SearchActivityViewModelTest {
         whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
         whenever(
             searchUseCase(
-                query = query,
                 parentHandle = NodeId(parentHandle),
                 nodeSourceType = nodeSourceType,
+                searchParameters = SearchParameters(
+                    query = query,
+                ),
             )
         ).thenReturn(listOf(typedFileNode, typedFolderNode))
 
@@ -508,9 +556,11 @@ class SearchActivityViewModelTest {
         whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
         whenever(
             searchUseCase(
-                query = query,
                 parentHandle = NodeId(parentHandle),
                 nodeSourceType = nodeSourceType,
+                searchParameters = SearchParameters(
+                    query = query,
+                ),
             )
         ).thenReturn(listOf(typedFileNode, typedFolderNode))
 
@@ -522,23 +572,6 @@ class SearchActivityViewModelTest {
             val state = awaitItem()
             assertThat(state.searchItemList.size).isEqualTo(2)
         }
-    }
-
-    private suspend fun stubCommon() {
-        whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
-        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
-        whenever(monitorViewType()).thenReturn(emptyFlow())
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-
-        whenever(stateHandle.get<NodeSourceType>(SearchActivity.SEARCH_TYPE)).thenReturn(
-            NodeSourceType.CLOUD_DRIVE
-        )
-        whenever(stateHandle.get<Long>(SearchActivity.PARENT_HANDLE)).thenReturn(123456L)
-        whenever(stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL)).thenReturn(
-            false
-        )
-        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
     }
 
     @Test
@@ -562,27 +595,5 @@ class SearchActivityViewModelTest {
                 val state = awaitItem()
                 assertThat(state.navigationLevel.size).isEqualTo(0)
             }
-
         }
-
-    @AfterEach
-    fun tearDown() {
-        nodeList.clear()
-        reset(
-            monitorNodeUpdatesUseCase,
-            cancelCancelTokenUseCase,
-            getSearchCategoriesUseCase,
-            searchFilterMapper,
-            emptySearchViewMapper,
-            stateHandle,
-            setViewType,
-            monitorViewType,
-            getCloudSortOrder,
-            getRubbishNodeUseCase,
-            getNodeAccessPermission,
-            checkNodeCanBeMovedToTargetNode,
-            isNodeInBackupsUseCase,
-            monitorOfflineNodeUpdatesUseCase
-        )
-    }
 }

@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SearchRepository
@@ -49,14 +50,11 @@ internal class SearchRepositoryImpl @Inject constructor(
 
     override suspend fun search(
         nodeId: NodeId?,
-        query: String,
         order: SortOrder,
-        searchTarget: SearchTarget,
-        searchCategory: SearchCategory,
-        modificationDate: DateFilterOption?,
-        creationDate: DateFilterOption?,
+        parameters: SearchParameters,
     ): List<UnTypedNode> = withContext(ioDispatcher) {
         val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
+        val (query, searchTarget, searchCategory, modificationDate, creationDate) = parameters
         val filter = megaSearchFilterMapper(
             searchQuery = query,
             parentHandle = nodeId ?: NodeId(-1L),
@@ -75,14 +73,11 @@ internal class SearchRepositoryImpl @Inject constructor(
 
     override suspend fun getChildren(
         nodeId: NodeId?,
-        query: String,
         order: SortOrder,
-        searchTarget: SearchTarget,
-        searchCategory: SearchCategory,
-        modificationDate: DateFilterOption?,
-        creationDate: DateFilterOption?,
+        parameters: SearchParameters,
     ): List<UnTypedNode> = withContext(ioDispatcher) {
         val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
+        val (query, searchTarget, searchCategory, modificationDate, creationDate) = parameters
         val filter = megaSearchFilterMapper(
             searchQuery = query,
             parentHandle = nodeId ?: NodeId(-1),

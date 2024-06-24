@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
@@ -107,9 +108,10 @@ class SearchRepositoryImplTest {
         ).thenReturn(emptyList())
         val list = underTest.getChildren(
             nodeId = nodeId,
-            searchCategory = SearchCategory.ALL,
-            query = query,
-            order = SortOrder.ORDER_NONE
+            order = SortOrder.ORDER_NONE,
+            parameters = SearchParameters(
+                query = query,
+            ),
         )
         assertThat(list).isEmpty()
     }
@@ -144,9 +146,10 @@ class SearchRepositoryImplTest {
 
         underTest.search(
             nodeId = nodeID,
-            searchCategory = SearchCategory.ALL,
-            query = query,
-            order = order
+            order = order,
+            parameters = SearchParameters(
+                query = query,
+            ),
         )
         verify(megaApiGateway).searchWithFilter(
             filter,

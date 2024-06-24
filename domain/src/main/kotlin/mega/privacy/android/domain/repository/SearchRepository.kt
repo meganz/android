@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.SearchTarget
 
 /**
@@ -23,40 +24,26 @@ interface SearchRepository {
 
     /**
      * Search node and return list of [UnTypedNode]
-     * @param nodeId [NodeId] place where needed to be searched
-     * @param searchCategory Search Category for search
-     * @param query string to be search
-     * @param order oder in which result should be there
-     * @param modificationDate modified date filter if set [DateFilterOption]
-     * @param creationDate added date filter if set [DateFilterOption]
+     * @param nodeId [NodeId] place to be searched
+     * @param order [SortOrder] locally saved user selected sort order
+     * @param parameters [SearchParameters] additional search parameters
      */
     suspend fun search(
         nodeId: NodeId?,
-        query: String,
         order: SortOrder,
-        searchTarget: SearchTarget = SearchTarget.ROOT_NODES,
-        searchCategory: SearchCategory = SearchCategory.ALL,
-        modificationDate: DateFilterOption? = null,
-        creationDate: DateFilterOption? = null,
+        parameters: SearchParameters,
     ): List<UnTypedNode>
 
     /**
      * Get children of a node and return list of [UnTypedNode]
-     * @param nodeId [NodeId] place where needed to be searched
-     * @param query string to be search
-     * @param searchCategory Search Category for search
-     * @param order oder in which result should be there
-     * @param modificationDate modified date filter if set [DateFilterOption]
-     * @param creationDate added date filter if set [DateFilterOption]
+     * @param nodeId [NodeId] place to be searched
+     * @param order [SortOrder] locally saved user selected sort order
+     * @param parameters [SearchParameters] additional search parameters
      */
     suspend fun getChildren(
         nodeId: NodeId?,
-        query: String,
         order: SortOrder,
-        searchTarget: SearchTarget = SearchTarget.ROOT_NODES,
-        searchCategory: SearchCategory = SearchCategory.ALL,
-        modificationDate: DateFilterOption? = null,
-        creationDate: DateFilterOption? = null,
+        parameters: SearchParameters,
     ): List<UnTypedNode>
 
     /**

@@ -4,7 +4,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -25,7 +27,15 @@ class SearchUseCaseTest {
     fun `test that getInShares is called when query is empty and parentHandle is invalid and searchTarget is INCOMING_SHARE`() =
         runTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
-            underTest("", NodeId(-1), NodeSourceType.INCOMING_SHARES, SearchCategory.ALL)
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.INCOMING_SHARE,
+                    searchCategory = SearchCategory.ALL
+                )
+            )
             verify(searchRepository).getInShares()
         }
 
@@ -33,7 +43,15 @@ class SearchUseCaseTest {
     fun `test that getOutShares is called when query is empty and parentHandle is invalid and searchTarget is OUTGOING_SHARE`() =
         runTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
-            underTest("", NodeId(-1), NodeSourceType.OUTGOING_SHARES, SearchCategory.ALL)
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.OUTGOING_SHARES,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.OUTGOING_SHARE,
+                    searchCategory = SearchCategory.ALL
+                )
+            )
             verify(searchRepository).getOutShares()
         }
 
@@ -41,7 +59,15 @@ class SearchUseCaseTest {
     fun `test that getPublicLinks is called when query is empty and parentHandle is invalid and searchTarget is LINKS_SHARE`() =
         runTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
-            underTest("", NodeId(-1), NodeSourceType.LINKS, SearchCategory.ALL)
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.LINKS,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.LINKS_SHARE,
+                    searchCategory = SearchCategory.ALL
+                )
+            )
             verify(searchRepository).getPublicLinks()
         }
 
@@ -51,15 +77,22 @@ class SearchUseCaseTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(searchRepository.getRootNodeId()).thenReturn(NodeId(-1))
-            underTest("", NodeId(-1), NodeSourceType.CLOUD_DRIVE, SearchCategory.ALL)
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchCategory = SearchCategory.ALL
+                )
+            )
             verify(searchRepository).getChildren(
                 nodeId = NodeId(-1),
-                searchCategory = SearchCategory.ALL,
-                query = "",
-                searchTarget = SearchTarget.ROOT_NODES,
                 order = getCloudSortOrder(),
-                modificationDate = null,
-                creationDate = null
+                parameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL,
+                ),
             )
         }
 
@@ -69,15 +102,22 @@ class SearchUseCaseTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(searchRepository.getBackUpNodeId()).thenReturn(NodeId(-1))
-            underTest("", NodeId(-1), NodeSourceType.BACKUPS, SearchCategory.ALL)
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.BACKUPS,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchCategory = SearchCategory.ALL
+                )
+            )
             verify(searchRepository).getChildren(
                 nodeId = NodeId(-1),
-                searchCategory = SearchCategory.ALL,
-                query = "",
-                searchTarget = SearchTarget.ROOT_NODES,
                 order = getCloudSortOrder(),
-                modificationDate = null,
-                creationDate = null
+                parameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL,
+                ),
             )
         }
 
@@ -87,15 +127,22 @@ class SearchUseCaseTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(searchRepository.getRubbishNodeId()).thenReturn(NodeId(-1))
-            underTest("", NodeId(-1), NodeSourceType.RUBBISH_BIN, SearchCategory.ALL)
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchCategory = SearchCategory.ALL
+                )
+            )
             verify(searchRepository).getChildren(
                 nodeId = NodeId(-1),
-                searchCategory = SearchCategory.ALL,
-                query = "",
-                searchTarget = SearchTarget.ROOT_NODES,
                 order = getCloudSortOrder(),
-                modificationDate = null,
-                creationDate = null
+                parameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL,
+                ),
             )
         }
 
@@ -105,15 +152,22 @@ class SearchUseCaseTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(searchRepository.getRubbishNodeId()).thenReturn(NodeId(-1))
-            underTest("", NodeId(123456), NodeSourceType.RUBBISH_BIN, SearchCategory.ALL)
+            underTest(
+                parentHandle = NodeId(123456),
+                nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchCategory = SearchCategory.ALL
+                )
+            )
             verify(searchRepository).getChildren(
                 nodeId = NodeId(123456),
-                searchCategory = SearchCategory.ALL,
-                query = "",
-                searchTarget = SearchTarget.ROOT_NODES,
                 order = getCloudSortOrder(),
-                modificationDate = null,
-                creationDate = null
+                parameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL,
+                ),
             )
         }
 
@@ -123,17 +177,26 @@ class SearchUseCaseTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(searchRepository.getRubbishNodeId()).thenReturn(NodeId(-1))
-            underTest("test", NodeId(123456), NodeSourceType.RUBBISH_BIN, SearchCategory.ALL)
+            underTest(
+                parentHandle = NodeId(123456),
+                nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                searchParameters = SearchParameters(
+                    query = "test",
+                    searchCategory = SearchCategory.ALL,
+                    modificationDate = DateFilterOption.Today,
+                )
+            )
             verify(searchRepository).search(
                 nodeId = NodeId(123456),
-                searchCategory = SearchCategory.ALL,
-                query = "test",
-                searchTarget = SearchTarget.ROOT_NODES,
                 order = getCloudSortOrder(),
-                modificationDate = null,
-                creationDate = null
+                parameters = SearchParameters(
+                    query = "test",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL,
+                    modificationDate = DateFilterOption.Today,
+                    creationDate = null
+                ),
             )
         }
     }
-
 }

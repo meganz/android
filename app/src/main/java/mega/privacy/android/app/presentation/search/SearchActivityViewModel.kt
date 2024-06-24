@@ -20,6 +20,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.mapper.DateFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
+import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
@@ -38,9 +39,9 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -62,6 +63,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * @property monitorNodeUpdatesUseCase [MonitorNodeUpdatesUseCase]
  * @property getSearchCategoriesUseCase [GetSearchCategoriesUseCase]
  * @property searchFilterMapper [SearchFilterMapper]
+ * @property nodeSourceTypeToSearchTargetMapper [NodeSourceTypeToSearchTargetMapper]
  * @property typeFilterToSearchMapper [TypeFilterToSearchMapper]
  * @property emptySearchViewMapper [EmptySearchViewMapper]
  * @property cancelCancelTokenUseCase [CancelCancelTokenUseCase]
@@ -77,6 +79,7 @@ class SearchActivityViewModel @Inject constructor(
     private val searchUseCase: SearchUseCase,
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
     private val searchFilterMapper: SearchFilterMapper,
+    private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     private val typeFilterToSearchMapper: TypeFilterToSearchMapper,
     private val typeFilterOptionStringResMapper: TypeFilterOptionStringResMapper,
     private val dateFilterOptionStringResMapper: DateFilterOptionStringResMapper,
@@ -174,14 +177,17 @@ class SearchActivityViewModel @Inject constructor(
             runCatching {
                 cancelCancelTokenUseCase()
                 searchUseCase(
-                    query = getCurrentSearchQuery(),
                     parentHandle = NodeId(getCurrentParentHandle()),
                     nodeSourceType = nodeSourceType,
-                    searchCategory = state.value.typeSelectedFilterOption?.let {
-                        typeFilterToSearchMapper(it.type)
-                    } ?: state.value.selectedFilter?.filter ?: SearchCategory.ALL,
-                    modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
-                    creationDate = state.value.dateAddedSelectedFilterOption?.date,
+                    searchParameters = SearchParameters(
+                        query = getCurrentSearchQuery(),
+                        searchTarget = nodeSourceTypeToSearchTargetMapper(nodeSourceType),
+                        searchCategory = state.value.typeSelectedFilterOption?.let {
+                            typeFilterToSearchMapper(it.type)
+                        } ?: state.value.selectedFilter?.filter ?: SearchCategory.ALL,
+                        modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
+                        creationDate = state.value.dateAddedSelectedFilterOption?.date,
+                    )
                 )
             }.onSuccess {
                 onSearchSuccess(it)
