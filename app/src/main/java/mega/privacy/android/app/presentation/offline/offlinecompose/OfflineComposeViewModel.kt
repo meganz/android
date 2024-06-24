@@ -186,10 +186,23 @@ class OfflineComposeViewModel @Inject constructor(
                     refreshOfflineNodes()
                 }
             } else {
-                // Open the file
+                _uiState.update {
+                    it.copy(
+                        openOfflineNodeEvent = triggered(offlineNodeUIItem.offlineNode)
+                    )
+                }
             }
         } else {
             onLongItemClicked(offlineNodeUIItem)
+        }
+    }
+
+    /**
+     * On Open Offline Node Event Consumed
+     */
+    fun onOpenOfflineNodeEventConsumed() {
+        _uiState.update {
+            it.copy(openOfflineNodeEvent = consumed())
         }
     }
 

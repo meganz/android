@@ -16,7 +16,7 @@ import java.io.File
  */
 @Deprecated(
     message = "This class is deprecated",
-    replaceWith = ReplaceWith("FileTypeIconMapper")
+    replaceWith = ReplaceWith("FileTypeIconMapper or GetFileTypeInfoUseCase")
 )
 class MimeTypeList private constructor(val type: String, val extension: String) {
 

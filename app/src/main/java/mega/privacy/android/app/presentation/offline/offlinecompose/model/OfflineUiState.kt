@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param currentViewType ViewType [ViewType]
  * @param isOnline true if connected to network
  * @param openFolderInPageEvent Event to open folder in a new fragment
+ * @param openOfflineNodeEvent Event to open offline node
  */
 data class OfflineUiState(
     val isLoading: Boolean = false,
@@ -26,7 +27,8 @@ data class OfflineUiState(
     val title: String = "",
     val currentViewType: ViewType = ViewType.LIST,
     val isOnline: Boolean = false,
-    val openFolderInPageEvent: StateEventWithContent<OfflineNodeUIItem> = consumed()
+    val openFolderInPageEvent: StateEventWithContent<OfflineNodeUIItem> = consumed(),
+    val openOfflineNodeEvent: StateEventWithContent<OfflineFileInformation> = consumed()
 ) {
     /**
      * Get the selected offline nodes

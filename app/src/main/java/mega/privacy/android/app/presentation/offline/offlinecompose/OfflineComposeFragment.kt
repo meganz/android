@@ -9,8 +9,11 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
@@ -32,6 +35,7 @@ import mega.privacy.android.app.presentation.offline.action.OfflineNodeActionsVi
 import mega.privacy.android.app.presentation.offline.confirmremovedialog.ConfirmRemoveFromOfflineDialogFragment
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.OfflineOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.offline.view.OfflineFeatureScreen
+import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
@@ -92,6 +96,8 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                 val isDarkMode = themeMode.isDarkMode()
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 val defaultTitle = stringResource(id = R.string.section_saved_for_offline_new)
+                val snackbarHostState = remember { SnackbarHostState() }
+                val coroutineScope = rememberCoroutineScope()
 
                 OriginalTempTheme(isDark = isDarkMode) {
                     OfflineFeatureScreen(
@@ -131,7 +137,11 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                             selectedItemsCount = uiState.selectedNodeHandles.size
                         )
                     }
-                    HandleOfflineNodeActions(offlineNodeActionsViewModel)
+                    HandleOfflineNodeActions(
+                        viewModel = offlineNodeActionsViewModel,
+                        snackBarHostState = snackbarHostState,
+                        coroutineScope = coroutineScope
+                    )
                     EventEffect(
                         event = uiState.openFolderInPageEvent,
                         onConsumed = viewModel::onOpenFolderInPageEventConsumed
@@ -144,7 +154,15 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                             )
                         )
                     }
+                    EventEffect(
+                        event = uiState.openOfflineNodeEvent,
+                        onConsumed = viewModel::onOpenOfflineNodeEventConsumed
+                    ) {
+                        offlineNodeActionsViewModel.handleOpenOfflineFile(it)
+                    }
                 }
+
+                LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
             }
         }
     }
