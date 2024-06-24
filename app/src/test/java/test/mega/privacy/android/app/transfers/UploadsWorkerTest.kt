@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -44,6 +45,7 @@ import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTot
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -57,6 +59,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.io.File
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -85,9 +88,13 @@ class UploadsWorkerTest {
     private val clearActiveTransfersIfFinishedUseCase =
         mock<ClearActiveTransfersIfFinishedUseCase>()
     private val transfersFinishedNotificationMapper = mock<TransfersFinishedNotificationMapper>()
+    private val setNodeAttributesAfterUploadUseCase = mock<SetNodeAttributesAfterUploadUseCase>()
     private val workProgressUpdater = mock<ProgressUpdater>()
     private val setForeground = mock<ForegroundSetter>()
     private val crashReporter = mock<CrashReporter>()
+
+    private val nodeId = 1L
+    private val localPath = "localPath"
 
     @Before
     fun setup() {
@@ -129,6 +136,7 @@ class UploadsWorkerTest {
             correctActiveTransfersUseCase = correctActiveTransfersUseCase,
             clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
             transfersFinishedNotificationMapper = transfersFinishedNotificationMapper,
+            setNodeAttributesAfterUploadUseCase = setNodeAttributesAfterUploadUseCase,
             crashReporter = crashReporter,
             foregroundSetter = setForeground,
             notificationSamplePeriod = 0L,
@@ -323,12 +331,39 @@ class UploadsWorkerTest {
         verify(workProgressUpdater).updateProgress(eq(context), any(), eq(expectedData))
     }
 
+    @Test
+    fun `test that node attributes are set once upload is finished`() = runTest {
+        val finishEvent = commonStub()
+
+        underTest.onTransferEventReceived(finishEvent)
+
+        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, File(localPath))
+    }
+
+    @Test
+    fun `test that node attributes are not set once upload is finished with error`() = runTest {
+        val transfer: Transfer = mock {
+            on { this.nodeHandle }.thenReturn(nodeId)
+            on { this.localPath }.thenReturn(localPath)
+            on { this.state }.thenReturn(TransferState.STATE_FAILED)
+        }
+        val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
+        commonStub()
+
+        underTest.onTransferEventReceived(transferEvent)
+
+        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, File(localPath))
+    }
+
     private suspend fun commonStub(
         initialTransferTotals: ActiveTransferTotals = mockActiveTransferTotals(false),
         transferTotals: List<ActiveTransferTotals> = listOf(mockActiveTransferTotals(true)),
         storageOverQuota: Boolean = false,
-    ) = runTest {
-        val transfer: Transfer = mock()
+    ): TransferEvent.TransferFinishEvent {
+        val transfer: Transfer = mock {
+            on { this.nodeHandle }.thenReturn(nodeId)
+            on { this.localPath }.thenReturn(localPath)
+        }
         val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
         whenever(areTransfersPausedUseCase())
             .thenReturn(false)
@@ -361,6 +396,7 @@ class UploadsWorkerTest {
         whenever(workProgressUpdater.updateProgress(any(), any(), any()))
             .thenReturn(SettableFuture.create<Void?>().also { it.set(null) })
         whenever(transfersNotificationMapper(any(), any())).thenReturn(mock())
+        return transferEvent
     }
 
     private fun mockActiveTransferTotals(
