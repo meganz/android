@@ -482,7 +482,11 @@ class InviteContactViewModelTest {
 
             underTest.uiState.test {
                 val item = expectMostRecentItem()
-                assertThat(item.selectedContactInformation).isEqualTo(newInfo)
+                assertThat(
+                    item.selectedContactInformation
+                ).isEqualTo(
+                    newInfo.map { it.copy(isHighlighted = true) }
+                )
                 assertThat(item.query).isEmpty()
             }
         }
@@ -507,7 +511,7 @@ class InviteContactViewModelTest {
                 assertThat(
                     expectMostRecentItem().selectedContactInformation
                 ).isEqualTo(
-                    listOf(contactInfoWithPhoneNumber)
+                    listOf(contactInfoWithPhoneNumber.copy(isHighlighted = true))
                 )
             }
         }
@@ -562,7 +566,8 @@ class InviteContactViewModelTest {
                     InvitationContactInfo(
                         id = email.hashCode().toLong(),
                         type = TYPE_MANUAL_INPUT_EMAIL,
-                        displayInfo = email
+                        displayInfo = email,
+                        isHighlighted = true
                     )
                 )
             )
@@ -621,7 +626,8 @@ class InviteContactViewModelTest {
                         InvitationContactInfo(
                             id = displayInfo.hashCode().toLong(),
                             type = type,
-                            displayInfo = displayInfo
+                            displayInfo = displayInfo,
+                            isHighlighted = true
                         )
                     )
                 )
@@ -697,7 +703,7 @@ class InviteContactViewModelTest {
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().selectedContactInformation).isEqualTo(
                     listOf(
-                        invitationContactInfoUiMapper(localContacts)[1] // The 0 index is header item
+                        invitationContactInfoUiMapper(localContacts)[1].copy(isHighlighted = true) // The 0 index is header item
                     )
                 )
             }

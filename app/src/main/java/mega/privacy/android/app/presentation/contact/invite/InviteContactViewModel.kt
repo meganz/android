@@ -305,7 +305,13 @@ class InviteContactViewModel @Inject constructor(
     }
 
     internal fun addSelectedContactInformation(contact: InvitationContactInfo) {
-        _uiState.update { it.copy(selectedContactInformation = it.selectedContactInformation + contact) }
+        _uiState.update {
+            it.copy(
+                selectedContactInformation = it.selectedContactInformation + contact.copy(
+                    isHighlighted = true
+                )
+            )
+        }
     }
 
     /**
@@ -372,9 +378,9 @@ class InviteContactViewModel @Inject constructor(
             addAll(_uiState.value.selectedContactInformation)
         }
         // Remove the unselected contact info
-        _uiState.value.selectedContactInformation.forEachIndexed { index, info ->
+        _uiState.value.selectedContactInformation.forEach { info ->
             if (!newListOfSelectedContact.contains(info)) {
-                selectedContactInfo.removeAt(index)
+                selectedContactInfo.remove(info)
             }
         }
 
@@ -382,7 +388,7 @@ class InviteContactViewModel @Inject constructor(
         newListOfSelectedContact.forEach { selected ->
             val isContactAdded = selectedContactInfo.any { isTheSameContact(selected, it) }
             if (!isContactAdded) {
-                selectedContactInfo.add(selected)
+                selectedContactInfo.add(selected.copy(isHighlighted = true))
             }
         }
 
