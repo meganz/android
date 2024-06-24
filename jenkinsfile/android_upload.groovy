@@ -71,10 +71,10 @@ pipeline {
 
                 if (triggerByDeliverQaCmd()) {
                     if (common.hasGitLabMergeRequest()) {
-                        String jsonJenkinsLog = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
+                        String jsonJenkinsLog = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
 
                         String message = firebaseUploadFailureMessage("<br/>") +
-                                "<br/>Build Log:\t${jsonJenkinsLog}"
+                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jsonJenkinsLog})"
 
                         common.sendToMR(message)
                     } else {
@@ -85,21 +85,21 @@ pipeline {
                     slackSend color: 'danger', message: firebaseUploadFailureMessage("\n")
                     slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
                 } else if (triggerByPublishSdkCmd()) {
-                    String jsonJenkinsLog = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
+                    String jenkinsLog = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
 
                     // upload SDK build log if SDK build fails
                     String sdkBuildMessage = ""
                     if (BUILD_STEP == "Build SDK") {
                         if (fileExists(SDK_LOG_FILE_NAME)) {
-                            def jsonSdkLog = common.uploadFileToGitLab(SDK_LOG_FILE_NAME)
-                            sdkBuildMessage = "<br/>SDK BuildLog:\t${jsonSdkLog}"
+                            def sdkLog = common.uploadFileToArtifactory(SDK_LOG_FILE_NAME)
+                            sdkBuildMessage = "<br/>SDK BuildLog:\t[SDK build log](${sdkLog})"
                         } else {
                             sdkBuildMessage = "<br/>SDK Build log not available."
                         }
                     }
 
                     String message = publishSdkFailureMessage("<br/>") +
-                            "<br/>Build Log:\t${jsonJenkinsLog}" +
+                            "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})" +
                             sdkBuildMessage
 
                     common.sendToMR(message)

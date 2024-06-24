@@ -50,12 +50,12 @@ pipeline {
                 common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
                 if (hasGitLabMergeRequest()) {
-                    String link = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
+                    String jenkinsLog = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
 
                     def message = ""
                     if (triggeredByDeliverInternalAppSharing()) {
                         message = common.releaseFailureMessage("<br/>") +
-                                "<br/>Build Log:\t${link}"
+                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})"
                     }
                     common.sendToMR(message)
                 } else {
@@ -68,11 +68,11 @@ pipeline {
             script {
                 if (hasGitLabMergeRequest()) {
                     common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-                    String link = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
+                    String link = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
 
                     if (triggeredByDeliverInternalAppSharing()) {
                         def message = releaseSuccessMessage("<br/>", common) +
-                                "<br/>Build Log:\t${link}"
+                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${link})"
                         common.sendToMR(message)
 
                         common.sendToMR(getBuildVersionInfo(common))

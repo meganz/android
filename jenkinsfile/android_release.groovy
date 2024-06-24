@@ -74,15 +74,15 @@ pipeline {
                 common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
                 if (hasGitLabMergeRequest()) {
-                    String link = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
+                    String jenkinsLog = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
 
                     def message = ""
                     if (triggeredByDeliverAppStore()) {
                         message = common.releaseFailureMessage("<br/>") +
-                                "<br/>Build Log:\t${link}"
+                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})"
                     } else if (triggeredByUploadSymbol()) {
                         message = common.uploadSymbolFailureMessage("<br/>") +
-                                "<br/>Build Log:\t${link}"
+                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})"
                     }
                     common.sendToMR(message)
                 } else {
@@ -97,11 +97,11 @@ pipeline {
                     common.sendToMR(skipMessage("<br/>"))
                 } else if (hasGitLabMergeRequest()) {
                     common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-                    String link = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
+                    String link = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
 
                     if (triggeredByDeliverAppStore()) {
                         def message = releaseSuccessMessage("<br/>", common) +
-                                "<br/>Build Log:\t${link}"
+                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${link})"
                         common.sendToMR(message)
 
                         // send to android slack channel
@@ -158,7 +158,7 @@ pipeline {
                         slackSend color: "good", message: releaseSuccessMessage("\n", common)
                     } else if (triggeredByUploadSymbol()) {
                         def message = common.uploadSymbolSuccessMessage("<br/>") +
-                                "<br/>Build Log:\t${link}"
+                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${link})"
                         common.sendToMR(message)
 
                         slackSend color: "good", message: common.uploadSymbolSuccessMessage("\n")

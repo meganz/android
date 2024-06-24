@@ -3,8 +3,8 @@
  */
 
 
-import groovy.json.JsonSlurperClassic
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurperClassic
 
 /**
  * Check out mega chat SDK by commit ID
@@ -110,11 +110,7 @@ def getMrNumberInCD() {
 void sendToMR(String message) {
     println("####### Entering common.sendToMR() #######")
 
-    def mrNumber = getMrNumberInCD()
-    if (mrNumber == null) {
-        mrNumber = getMrNumberInCI()
-    }
-
+    def mrNumber = getMrNumber()
     if (mrNumber != null && !mrNumber.isEmpty()) {
         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
             env.MARKDOWN_LINK = message
@@ -651,6 +647,14 @@ void downloadFromArtifactory(String remoteUrl, String localTarget) {
     }
 }
 
+String getMrNumber() {
+    def mrNumber = getMrNumberInCD()
+    if (mrNumber == null) {
+        mrNumber = getMrNumberInCI()
+    }
+    return mrNumber
+}
+
 /**
  * Upload a localFile to a remoteTarget on Artifactory
  * @param remoteTarget
@@ -664,6 +668,33 @@ void uploadToArtifactory(String localFile, String remoteTarget) {
             ls   
         """
     }
+}
+
+/**
+ * Upload a file to Artifactory.
+ * The file will be uploaded to "android-mega/pipeline-uploads" folder in Artifactory.
+ * The file will be uploaded to a folder and named "MR-<MR_NUMBER>/<BUILD_NUMBER>-<FILE_NAME>".
+ * @param fileName the file to upload
+ * @return the URL of the uploaded file.
+ */
+String uploadFileToArtifactory(String fileName) {
+    def mrNumber = getMrNumber()
+    if (mrNumber == null || mrNumber.isEmpty()) {
+        return "NA"
+    }
+    String targetFolder = "artifactory/android-mega/pipeline-uploads"
+    String targetFile = "MR-${mrNumber}/${env.BUILD_NUMBER}-${fileName}"
+
+    useArtifactory() {
+        String remoteTargetPath = "${env.ARTIFACTORY_BASE_URL}/${targetFolder}/${targetFile}"
+        String uploadCmd = "curl -u ${env.ARTIFACTORY_USER}:${env.ARTIFACTORY_ACCESS_TOKEN} -T ${fileName} ${remoteTargetPath}"
+        sh """
+            cd ${WORKSPACE}
+            ${uploadCmd}
+            ls
+        """
+    }
+    return "${env.ARTIFACTORY_BASE_URL}:443/${targetFolder}/${targetFile}"
 }
 
 return this
