@@ -36,12 +36,12 @@ import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ScheduledMeetingCreateConfirmButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableMeetingLinkButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableOpenInviteButtonEvent
@@ -77,7 +77,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     private val viewModel by viewModels<CreateScheduledMeetingViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
 
-    private lateinit var addContactLauncher: ActivityResultLauncher<Intent?>
+    private lateinit var addContactLauncher: ActivityResultLauncher<Intent>
 
     private var materialTimePicker: MaterialTimePicker? = null
     private var materialDatePicker: MaterialDatePicker<Long>? = null

@@ -516,14 +516,9 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     }
 
     @SuppressLint("MissingSuperCall")
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         Timber.d("onNewIntent")
-        if (intent == null) {
-            Timber.w("intent null")
-            finish()
-            return
-        }
 
         handler = Handler(Looper.getMainLooper())
         if (intent.getBooleanExtra("inside", false)) {

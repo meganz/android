@@ -247,7 +247,7 @@ class MeetingActivity : PasscodeActivity() {
         this.layoutParams = menuLayoutParams
     }
 
-    override fun onNewIntent(newIntent: Intent?) {
+    override fun onNewIntent(newIntent: Intent) {
         super.onNewIntent(newIntent)
         intent = newIntent
 

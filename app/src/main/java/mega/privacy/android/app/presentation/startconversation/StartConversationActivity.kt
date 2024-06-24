@@ -49,8 +49,8 @@ class StartConversationActivity : ComponentActivity() {
 
     private val viewModel by viewModels<StartConversationViewModel>()
 
-    lateinit var resultLauncher: ActivityResultLauncher<Intent?>
-    private lateinit var addContactActivityLauncher: ActivityResultLauncher<Intent?>
+    lateinit var resultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var addContactActivityLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -86,12 +86,11 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
 
-        visibleFragment = intent?.getIntExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-            ?: Constants.LOGIN_FRAGMENT
+        visibleFragment = intent.getIntExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
 
         if (visibleFragment == Constants.LOGIN_FRAGMENT) {
             loginFragment = LoginFragment()

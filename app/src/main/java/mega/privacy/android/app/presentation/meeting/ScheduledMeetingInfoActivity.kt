@@ -98,9 +98,9 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
     private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
 
-    private lateinit var addContactLauncher: ActivityResultLauncher<Intent?>
+    private lateinit var addContactLauncher: ActivityResultLauncher<Intent>
     private lateinit var sendToChatLauncher: ActivityResultLauncher<Unit?>
-    private lateinit var editSchedMeetLauncher: ActivityResultLauncher<Intent?>
+    private lateinit var editSchedMeetLauncher: ActivityResultLauncher<Intent>
 
     private var bottomSheetDialogFragment: BaseBottomSheetDialogFragment? = null
 

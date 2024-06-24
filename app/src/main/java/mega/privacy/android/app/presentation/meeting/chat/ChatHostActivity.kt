@@ -33,12 +33,10 @@ class ChatHostActivity : AppCompatActivity() {
     /**
      * Handle the intent to open chat room
      */
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val chatId = intent?.getLongExtra(Constants.CHAT_ID, -1L)
-        val link = intent?.getStringExtra(EXTRA_LINK)
-        chatId?.let {
-            openChatFragment(this, chatId = it, chatLink = link)
-        }
+        val chatId = intent.getLongExtra(Constants.CHAT_ID, -1L)
+        val link = intent.getStringExtra(EXTRA_LINK)
+        openChatFragment(this, chatId = chatId, chatLink = link)
     }
 }

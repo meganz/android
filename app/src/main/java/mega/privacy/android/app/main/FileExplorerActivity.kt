@@ -255,7 +255,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
 
-    private lateinit var createChatLauncher: ActivityResultLauncher<Intent?>
+    private lateinit var createChatLauncher: ActivityResultLauncher<Intent>
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {

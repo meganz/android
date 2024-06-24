@@ -7,6 +7,7 @@ import androidx.datastore.preferences.PreferencesProto
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.floatPreferencesKey
@@ -102,6 +103,10 @@ internal object PreferencesSerializer : Serializer<Preferences> {
             PreferencesProto.Value.ValueCase.STRING_SET ->
                 mutablePreferences[stringSetPreferencesKey(name)] =
                     value.stringSet.stringsList.toSet()
+
+            PreferencesProto.Value.ValueCase.BYTES -> mutablePreferences[byteArrayPreferencesKey(
+                name
+            )] = value.bytes.toByteArray()
 
             PreferencesProto.Value.ValueCase.VALUE_NOT_SET ->
                 throw CorruptionException("Value not set.")
