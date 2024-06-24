@@ -5381,7 +5381,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">O upload foi pausado porque a bateria há menos de %1$d%% de bateria</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Os uploads da câmera pararam de funcionar - tente reativá-los. Se o problema persistir, entre em contato com o suporte.</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Uploads da câmera em andamento, %1$d arquivo pendente</item>

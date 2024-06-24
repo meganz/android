@@ -779,7 +779,7 @@
     <!-- Alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK">Chìa&#160;khóa bạn vừa nhập không phù&#160;hợp với tài&#160;khoản này. Xin kiểm&#160;tra lại cho chắc&#160;chắn là Chìa&#160;Khóa Phục&#160;Hồi chính&#160;xác và thử&#160;lại.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">Chìa&#160;Khóa Phục&#160;Hồi không hợp&#160;lệ</string>
+    <string name="incorrect_MK_title">Chìa&#160;khóa phục&#160;hồi không hợp&#160;lệ</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Đang lấy thông tin&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -4917,7 +4917,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Tải lên bị tạm dừng vì pin ở dưới %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Đăng tải camêra đã dừng hoạt&#160;động. Hãy thử bật lại đăng tải camêra để giải&#160;quyết. Nếu vấn&#160;đề tiếp diễn, vui lòng liên&#160;hệ với bộ&#160;phận hỗ&#160;trợ.</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">Việc đăng&#160;tải camêra đang được thực hiện, %1$d tệp đang chờ</item>

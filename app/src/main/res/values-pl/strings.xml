@@ -5613,7 +5613,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Przesyłanie wstrzymane, ponieważ bateria jest poniżej %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Przesyłanie wgraj kamery przestało działać. Spróbuj ponownie włączyć przesyłanie z kamery, aby rozwiązać ten problem. Jeśli problem nadal występuje, skontaktuj kontakt wsparcie.</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Trwa przesyłanie kamery, %1$d plików oczekuje na przesłanie</item>
