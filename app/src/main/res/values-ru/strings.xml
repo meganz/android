@@ -5613,7 +5613,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Загрузка приостановлена, так как заряд батареи ниже %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Загрузки из камеры перестали работать. Попробуйте повторно включить загрузки из камеры. Если проблема повторяется, обратитесь в поддержку.</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Выполняется загрузка из камеры, %1$d файл ожидает обработки</item>

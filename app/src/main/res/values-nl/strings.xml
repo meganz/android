@@ -5149,7 +5149,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Het uploaden is gepauzeerd omdat de batterij lager is dan %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera-uploads werken niet meer. Probeer camera-uploads opnieuw in te schakelen om het probleem op te lossen. Als het probleem zich blijft voordoen, neem contact op met de klantenservice.</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Camera uploads zijn in behandeling,%1$d bestand in wachtrij</item>

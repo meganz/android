@@ -5047,7 +5047,7 @@
     <!--Action text to start a conversation from Meeting List screen empty view-->
     <string name="meeting_list_empty_action">Commencer une réunion</string>
     <!--Description text from Meeting List screen empty view-->
-    <string name="meeting_list_empty_description">Parlez en toute sécurité et confidentialité lors d’appels vocaux ou vidéo avec vos amis et collègues partout dans le monde.</string>
+    <string name="meeting_list_empty_description">Parlez en toute sécurité et confidentialité lors d’appels vocaux ou vidéo avec vos amis et collègues de par le monde.</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_dialog_title">Annuler «&#160;%1$s&#160;» ?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
@@ -5381,7 +5381,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Le téléversement est en pause, car le niveau de la batterie est inférieur à %1$d&#160;%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Les téléversements de l’appareil photo ne fonctionnent plus. Essayez de les réactiver afin de résoudre la situation. Si le problème persiste, contactez l’assistance.</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Téléversements de l’appareil photo en cours, %1$d&#160;fichier en attente</item>

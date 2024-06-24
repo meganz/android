@@ -5149,7 +5149,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Upload pausiert, da Akkuladestand unter %1$d&#160;%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Kamera-Uploads funktionieren nicht mehr. Um das Problem zu lösen, versuchen Sie, die Kamera-Uploads wieder zu aktivieren. Wenn das Problem weiterhin besteht, wenden Sie sich an den Support.</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Kamera-Uploads aktiv, noch %1$d Datei</item>

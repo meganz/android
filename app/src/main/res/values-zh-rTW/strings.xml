@@ -4917,7 +4917,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">由於電池電量低於%1$d%%，上傳已暫停</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">相機上傳停止運作。嘗試重新啟用相機上傳來解決問題。如果問題仍然存在，聯繫客服。</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">相機上傳正在進行中，%1$d個檔案待處理</item>

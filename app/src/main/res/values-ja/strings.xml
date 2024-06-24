@@ -4917,7 +4917,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">バッテリーが%1$d%%を下回っているため、アップロードが一時停止されました</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">カメラアップロードが機能しなくなりました。これを解決するには、カメラアップロードを再度有効にしてみてください。問題が解決しない場合は、サポートにご連絡ください。</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">カメラアップロードが進行中です。%1$d個のファイルが保留中です。</item>

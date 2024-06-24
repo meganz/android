@@ -5381,7 +5381,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Caricamento sospeso perché la batteria è minore del %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">I Caricamenti da fotocamera hanno smesso di funzionare. Prova a riattivare i Caricamenti da fotocamera per risolvere il problema. Se il problema persiste, contatta il supporto.</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Caricamenti da fotocamera in corso, %1$d file in attesa</item>
