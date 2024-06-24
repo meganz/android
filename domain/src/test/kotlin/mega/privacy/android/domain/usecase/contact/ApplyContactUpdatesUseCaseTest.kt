@@ -78,6 +78,23 @@ class ApplyContactUpdatesUseCaseTest {
     }
 
     @Test
+    fun `test that nick name is updated when nick name update is received as part of a bigger list`() =
+        runTest {
+            userUpdate = UserUpdate(
+                changes = mapOf(
+                    userId to listOf(
+                        UserChanges.Alias,
+                        UserChanges.Visibility(UserVisibility.Visible)
+                    )
+                ), emailMap = emptyMap()
+            )
+            whenever(repository.getUserAlias(any())).thenReturn("Nick Name")
+            val contact = underTest(contactItem, userUpdate)
+            assertEquals(contact.email, contactItem.email)
+            assertEquals("Nick Name", contact.contactData.alias)
+        }
+
+    @Test
     fun `test that email is updated when email update is received`() = runTest {
         userUpdate = UserUpdate(changes = mapOf(userId to listOf(UserChanges.Email)), emailMap = emptyMap())
         whenever(repository.getUserEmail(any(), any())).thenReturn("updated@gmail.com")

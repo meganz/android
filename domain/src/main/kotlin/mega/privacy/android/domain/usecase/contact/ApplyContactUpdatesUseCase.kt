@@ -24,7 +24,7 @@ class ApplyContactUpdatesUseCase @Inject constructor(
     suspend operator fun invoke(contactItem: ContactItem, userUpdate: UserUpdate): ContactItem {
         val selectedUserChange = userUpdate.changes[UserId(contactItem.handle)] ?: emptyList()
         var updatedContact = contactItem
-        if (userUpdate.changes.containsValue(listOf(UserChanges.Alias))) {
+        if (userUpdate.changes.values.any { it.contains(UserChanges.Alias) }) {
             val alias = runCatching {
                 contactsRepository.getUserAlias(contactItem.handle)
             }.getOrNull()
