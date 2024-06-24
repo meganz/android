@@ -159,10 +159,10 @@ class AdsViewModel @Inject constructor(
         slotId: String = uiState.value.slotId,
         linkHandle: Long? = null,
     ) {
-        // Do not fetch ads if the job is already running, to avoid repeated SDK calls
-        if (fetchAdUrlJob?.isActive == true) return
+        if (fetchAdUrlJob?.isActive == true && slotId == _uiState.value.slotId) return
 
         if (isAdsFeatureEnabled && canConsumeAdSlot(slotId)) {
+            _uiState.update { it.copy(slotId = slotId) }
             val fetchAdDetailRequest = FetchAdDetailRequest(slotId, linkHandle)
             fetchAdUrlJob?.cancel()
             fetchAdUrlJob = viewModelScope.launch {

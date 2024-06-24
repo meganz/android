@@ -2636,7 +2636,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 //Check the tab to shown and the title of the actionBar
                 setToolbarTitle()
                 setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
-                handleShowingAds(TAB_CLOUD_SLOT_ID)
             }
 
             DrawerItem.SHARED_ITEMS -> {
@@ -2660,7 +2659,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             DrawerItem.PHOTOS -> {
                 setBottomNavigationMenuItemChecked(PHOTOS_BNV)
-                handleShowingAds(TAB_PHOTOS_SLOT_ID)
             }
 
             DrawerItem.NOTIFICATIONS -> {
@@ -2669,12 +2667,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             DrawerItem.HOMEPAGE -> {
                 setBottomNavigationMenuItemChecked(HOME_BNV)
-                handleShowingAds(TAB_HOME_SLOT_ID)
             }
 
             else -> {
                 setBottomNavigationMenuItemChecked(HOME_BNV)
-                handleShowingAds(TAB_HOME_SLOT_ID)
             }
         }
     }
@@ -3294,7 +3290,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         when (item) {
             DrawerItem.CLOUD_DRIVE -> {
                 setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
-                handleShowingAds(TAB_CLOUD_SLOT_ID)
             }
 
             DrawerItem.HOMEPAGE -> {
@@ -3302,12 +3297,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 if (isInMainHomePage) {
                     handleShowingAds(TAB_HOME_SLOT_ID)
                 }
-
             }
 
             DrawerItem.PHOTOS -> {
                 setBottomNavigationMenuItemChecked(PHOTOS_BNV)
-                handleShowingAds(TAB_PHOTOS_SLOT_ID)
             }
 
             DrawerItem.SHARED_ITEMS -> {
@@ -3730,7 +3723,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             fileBrowserViewModel.refreshNodes()
                         }
                     }
-                    handleShowingAds(TAB_CLOUD_SLOT_ID)
                 }
             }
 
@@ -3814,7 +3806,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 if (homepageScreen === HomepageScreen.HOMEPAGE) {
                     changeAppBarElevation(false)
                 }
-                handleShowingAds(TAB_HOME_SLOT_ID)
             }
 
             DrawerItem.PHOTOS -> {
@@ -3837,7 +3828,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         bottomNavigationCurrentItem = PHOTOS_BNV
                     }
                     setBottomNavigationMenuItemChecked(PHOTOS_BNV)
-                    handleShowingAds(TAB_PHOTOS_SLOT_ID)
                     changeAppBarElevation(false)
                 }
             }
