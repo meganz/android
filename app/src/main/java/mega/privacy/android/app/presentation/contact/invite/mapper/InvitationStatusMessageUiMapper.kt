@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.contact.invite.contact.mapper
+package mega.privacy.android.app.presentation.contact.invite.mapper
 
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.model.InviteContactUiState.InvitationStatusMessageUiState
@@ -7,7 +7,7 @@ import mega.privacy.android.app.main.model.InviteContactUiState.InvitationStatus
 import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiState.Plural
 import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiState.Singular
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsRoute
-import mega.privacy.android.app.presentation.contact.invite.contact.navigation.InviteContactScreenResult
+import mega.privacy.android.app.presentation.contact.invite.navigation.InviteContactScreenResult
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import javax.inject.Inject
 

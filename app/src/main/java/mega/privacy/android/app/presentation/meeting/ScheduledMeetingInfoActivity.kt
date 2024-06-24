@@ -39,7 +39,7 @@ import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactActivity
+import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction

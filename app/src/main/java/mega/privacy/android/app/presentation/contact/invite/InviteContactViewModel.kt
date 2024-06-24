@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.contact.invite.contact
+package mega.privacy.android.app.presentation.contact.invite
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -6,21 +6,27 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.InvitationContactInfo
+import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_EMAIL
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
 import mega.privacy.android.app.main.model.InviteContactUiState
-import mega.privacy.android.app.presentation.contact.invite.contact.mapper.InvitationContactInfoUiMapper
-import mega.privacy.android.app.presentation.contact.invite.contact.mapper.InvitationStatusMessageUiMapper
+import mega.privacy.android.app.presentation.contact.invite.mapper.EmailValidationResultMapper
+import mega.privacy.android.app.presentation.contact.invite.mapper.InvitationContactInfoUiMapper
+import mega.privacy.android.app.presentation.contact.invite.mapper.InvitationStatusMessageUiMapper
+import mega.privacy.android.app.presentation.contact.invite.model.EmailValidationResult.InvalidResult
+import mega.privacy.android.app.presentation.contact.invite.model.EmailValidationResult.ValidResult
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailsUseCase
+import mega.privacy.android.domain.usecase.contact.ValidateEmailInputForInvitationUseCase
 import mega.privacy.android.domain.usecase.meeting.AreThereOngoingVideoCallsUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import timber.log.Timber
@@ -37,8 +43,10 @@ class InviteContactViewModel @Inject constructor(
     private val createContactLinkUseCase: CreateContactLinkUseCase,
     private val inviteContactWithEmailsUseCase: InviteContactWithEmailsUseCase,
     private val areThereOngoingVideoCallsUseCase: AreThereOngoingVideoCallsUseCase,
+    private val validateEmailInputForInvitationUseCase: ValidateEmailInputForInvitationUseCase,
     private val invitationContactInfoUiMapper: InvitationContactInfoUiMapper,
     private val invitationStatusMessageUiMapper: InvitationStatusMessageUiMapper,
+    private val emailValidationResultMapper: EmailValidationResultMapper,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -60,10 +68,7 @@ class InviteContactViewModel @Inject constructor(
 
     private val isFromAchievement = savedStateHandle.get<Boolean>(KEY_FROM) ?: false
 
-    private lateinit var currentSearchQuery: String
-
     init {
-        updateCurrentSearchQuery()
         createContactLink()
     }
 
@@ -153,16 +158,13 @@ class InviteContactViewModel @Inject constructor(
     /**
      * Update current search query
      */
-    fun onSearchQueryChange(query: String?) {
-        if (query == currentSearchQuery) return
-
-        savedStateHandle[CONTACT_SEARCH_QUERY] = query.orEmpty()
-        updateCurrentSearchQuery()
-        filterContacts(query.orEmpty())
-    }
-
-    private fun updateCurrentSearchQuery() {
-        currentSearchQuery = savedStateHandle.get<String>(key = CONTACT_SEARCH_QUERY).orEmpty()
+    internal fun onSearchQueryChange(query: String) {
+        viewModelScope.launch {
+            updateCurrentSearchQuery(query)
+            // Debounce
+            delay(SEARCH_QUERY_DEBOUNCE_DURATION)
+            filterContacts(query)
+        }
     }
 
     /**
@@ -239,6 +241,71 @@ class InviteContactViewModel @Inject constructor(
      */
     internal fun resetOnContactsInitializedState() {
         _uiState.update { it.copy(onContactsInitialized = false) }
+    }
+
+    internal fun onDismissContactListContactInfo() {
+        _uiState.update { it.copy(invitationContactInfoWithMultipleContacts = null) }
+    }
+
+    internal fun validateEmailInput(email: String) {
+        viewModelScope.launch {
+            Timber.d("Validating the inputted email", email)
+            runCatching { validateEmailInputForInvitationUseCase(email) }
+                .onSuccess { validity ->
+                    when (val validationResult = emailValidationResultMapper(email, validity)) {
+                        ValidResult -> {
+                            addContactInfo(email, TYPE_MANUAL_INPUT_EMAIL)
+                            filterContacts(_uiState.value.query)
+                        }
+
+                        else -> {
+                            _uiState.update {
+                                it.copy(
+                                    emailValidationMessage = (validationResult as InvalidResult).message
+                                )
+                            }
+                        }
+                    }
+                }
+                .onFailure { Timber.e("Failed to validate input email", it) }
+        }
+    }
+
+    internal fun addContactInfo(displayInfo: String, type: Int) {
+        val existingContactInfo = allContacts.firstOrNull { availableContact ->
+            availableContact.displayInfo.equals(other = displayInfo, ignoreCase = true)
+        }
+        val info = InvitationContactInfo(
+            id = displayInfo.hashCode().toLong(),
+            type = type,
+            displayInfo = displayInfo
+        )
+        if (existingContactInfo != null) {
+            validateContactListItemClick(existingContactInfo)
+        } else if (!isContactAdded(info)) {
+            addSelectedContactInformation(info)
+        }
+    }
+
+    internal fun validateContactListItemClick(contactInfo: InvitationContactInfo) {
+        if (contactInfo.hasMultipleContactInfos()) {
+            _uiState.update { it.copy(invitationContactInfoWithMultipleContacts = contactInfo) }
+        } else {
+            updateContactListItemSelected(contactInfo)
+        }
+    }
+
+    private fun updateContactListItemSelected(contactInfo: InvitationContactInfo) {
+        toggleContactHighlightedInfo(contactInfo)
+        if (isContactAdded(contactInfo)) {
+            removeSelectedContactInformation(contactInfo)
+        } else {
+            addSelectedContactInformation(contactInfo)
+        }
+    }
+
+    internal fun addSelectedContactInformation(contact: InvitationContactInfo) {
+        _uiState.update { it.copy(selectedContactInformation = it.selectedContactInformation + contact) }
     }
 
     /**
@@ -326,7 +393,22 @@ class InviteContactViewModel @Inject constructor(
             contactInfo = contactInfo,
             value = selectedContactInfo.any { it.id == contactInfo.id }
         )
+
+        // Reset query
+        updateCurrentSearchQuery(query = "")
     }
+
+    private fun updateCurrentSearchQuery(query: String) {
+        savedStateHandle[CONTACT_SEARCH_QUERY] = query
+        _uiState.update {
+            it.copy(
+                query = savedStateHandle.get<String>(key = CONTACT_SEARCH_QUERY).orEmpty()
+            )
+        }
+    }
+
+    private fun isContactAdded(contactInfo: InvitationContactInfo): Boolean =
+        _uiState.value.selectedContactInformation.any { isTheSameContact(it, contactInfo) }
 
     internal fun removeSelectedContactInformation(contact: InvitationContactInfo) {
         _uiState.update { uiState ->
@@ -338,14 +420,10 @@ class InviteContactViewModel @Inject constructor(
         }
     }
 
-    internal fun isTheSameContact(
+    private fun isTheSameContact(
         first: InvitationContactInfo,
         second: InvitationContactInfo,
     ): Boolean = first.id == second.id && first.displayInfo.equals(second.displayInfo, true)
-
-    internal fun addSelectedContactInformation(contact: InvitationContactInfo) {
-        _uiState.update { it.copy(selectedContactInformation = it.selectedContactInformation + contact) }
-    }
 
     internal fun validateCameraAvailability() {
         viewModelScope.launch {
@@ -387,5 +465,7 @@ class InviteContactViewModel @Inject constructor(
         internal const val KEY_FROM = "fromAchievement"
 
         private const val CONTACT_SEARCH_QUERY = "CONTACT_SEARCH_QUERY"
+
+        private const val SEARCH_QUERY_DEBOUNCE_DURATION = 300L
     }
 }

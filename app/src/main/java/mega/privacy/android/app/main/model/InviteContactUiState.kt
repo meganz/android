@@ -4,7 +4,7 @@ import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import mega.privacy.android.app.main.InvitationContactInfo
-import mega.privacy.android.app.presentation.contact.invite.contact.navigation.InviteContactScreenResult
+import mega.privacy.android.app.presentation.contact.invite.navigation.InviteContactScreenResult
 
 /**
  * State for invite Contact
@@ -16,7 +16,10 @@ import mega.privacy.android.app.presentation.contact.invite.contact.navigation.I
  * @property shouldInitializeQR Whether we need to initialize the QR scanner.
  * @property filteredContacts List of filtered contacts based on user's query
  * @property pendingPhoneNumberInvitations The list of pending phone number invitations that should be invited via SMS.
+ * @property query The input query.
+ * @property invitationContactInfoWithMultipleContacts A contact info with multiple contacts.
  * @property invitationStatusResult The result of the invitations.
+ * @property emailValidationMessage The email validation result message.
  */
 @Immutable
 data class InviteContactUiState(
@@ -27,7 +30,10 @@ data class InviteContactUiState(
     val shouldInitializeQR: Boolean = false,
     val filteredContacts: List<InvitationContactInfo> = emptyList(),
     val pendingPhoneNumberInvitations: List<String> = emptyList(),
+    val query: String = "",
+    val invitationContactInfoWithMultipleContacts: InvitationContactInfo? = null,
     val invitationStatusResult: InvitationStatusMessageUiState? = null,
+    val emailValidationMessage: MessageTypeUiState? = null,
 ) {
     /**
      * A UI state represents the invitation status message

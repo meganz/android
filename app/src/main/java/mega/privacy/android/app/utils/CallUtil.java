@@ -79,7 +79,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
-import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactActivity;
+import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity;
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;

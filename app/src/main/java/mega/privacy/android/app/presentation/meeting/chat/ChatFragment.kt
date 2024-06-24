@@ -22,7 +22,7 @@ import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.components.session.SessionContainer
-import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactActivity
+import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK

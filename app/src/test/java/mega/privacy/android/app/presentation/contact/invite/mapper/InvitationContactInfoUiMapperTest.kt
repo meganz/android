@@ -1,13 +1,12 @@
-package mega.privacy.android.app.presentation.contact.invite.contact.mapper
+package mega.privacy.android.app.presentation.contact.invite.mapper
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InvitationContactInfo
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
-import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactViewModel
+import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeEach
@@ -74,7 +73,6 @@ class InvitationContactInfoUiMapperTest {
                     type = TYPE_PHONE_CONTACT,
                     filteredContactInfos = localContacts[0].phoneNumbers + localContacts[0].emails,
                     displayInfo = (localContacts[0].phoneNumbers + localContacts[0].emails)[0],
-                    avatarColorResId = R.color.grey_500_grey_400,
                     photoUri = photoUriPath?.value
                 ),
                 InvitationContactInfo(
@@ -82,8 +80,7 @@ class InvitationContactInfoUiMapperTest {
                     name = localContacts[1].name,
                     type = TYPE_PHONE_CONTACT,
                     filteredContactInfos = localContacts[1].phoneNumbers + localContacts[1].emails,
-                    displayInfo = (localContacts[1].phoneNumbers + localContacts[1].emails)[0],
-                    avatarColorResId = R.color.grey_500_grey_400
+                    displayInfo = (localContacts[1].phoneNumbers + localContacts[1].emails)[0]
                 ),
                 InvitationContactInfo(
                     id = localContacts[3].id,
@@ -91,7 +88,6 @@ class InvitationContactInfoUiMapperTest {
                     type = TYPE_PHONE_CONTACT,
                     filteredContactInfos = localContacts[3].phoneNumbers + localContacts[3].emails,
                     displayInfo = (localContacts[3].phoneNumbers + localContacts[3].emails)[0],
-                    avatarColorResId = R.color.grey_500_grey_400
                 )
             )
             assertThat(actual).isEqualTo(expected)

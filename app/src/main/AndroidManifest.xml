@@ -344,7 +344,7 @@
             android:name=".main.AddContactActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".presentation.contact.invite.contact.InviteContactActivity"
+            android:name=".presentation.contact.invite.InviteContactActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity
             android:name=".presentation.meeting.chat.ChatHostActivity"

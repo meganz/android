@@ -19,7 +19,6 @@ import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toUnitString
-import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactActivity
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteConfirmationDialog
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsView
@@ -34,6 +33,7 @@ import mega.privacy.android.app.presentation.achievements.invites.view.InviteFri
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsViewTestTags.IMAGE_MAIN
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsViewTestTags.INVITE_CONTACTS_BUTTON
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsViewTestTags.TOOLBAR
+import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.contact.invite.contact.component
+package mega.privacy.android.app.presentation.contact.invite.component
 
 import android.content.res.Configuration
 import android.telephony.PhoneNumberUtils

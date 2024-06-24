@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.contact.invite.contact.component
+package mega.privacy.android.app.presentation.contact.invite.component
 
 import android.telephony.PhoneNumberUtils
 import androidx.compose.ui.test.assertIsDisplayed

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.contact.invite.contact.navigation
+package mega.privacy.android.app.presentation.contact.invite.navigation
 
 /**
  * A model represents the result from this screen. Used for start activity for result.

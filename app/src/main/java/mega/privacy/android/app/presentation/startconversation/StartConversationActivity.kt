@@ -19,7 +19,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactActivity
+import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.security.PasscodeCheck

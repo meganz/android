@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.contact.invite.contact.mapper
+package mega.privacy.android.app.presentation.contact.invite.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
@@ -6,7 +6,7 @@ import mega.privacy.android.app.main.model.InviteContactUiState.InvitationStatus
 import mega.privacy.android.app.main.model.InviteContactUiState.InvitationStatusMessageUiState.NavigateUpWithResult
 import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiState.Plural
 import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiState.Singular
-import mega.privacy.android.app.presentation.contact.invite.contact.navigation.InviteContactScreenResult
+import mega.privacy.android.app.presentation.contact.invite.navigation.InviteContactScreenResult
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

@@ -5,19 +5,30 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_EMAIL
+import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_PHONE
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
-import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactViewModel
-import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactViewModel.Companion.ID_PHONE_CONTACTS_HEADER
-import mega.privacy.android.app.presentation.contact.invite.contact.mapper.InvitationContactInfoUiMapper
-import mega.privacy.android.app.presentation.contact.invite.contact.mapper.InvitationStatusMessageUiMapper
+import mega.privacy.android.app.main.model.InviteContactUiState
+import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiState.Singular
+import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
+import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel.Companion.ID_PHONE_CONTACTS_HEADER
+import mega.privacy.android.app.presentation.contact.invite.mapper.EmailValidationResultMapper
+import mega.privacy.android.app.presentation.contact.invite.mapper.InvitationContactInfoUiMapper
+import mega.privacy.android.app.presentation.contact.invite.mapper.InvitationStatusMessageUiMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.contacts.EmailInvitationsInputValidity
+import mega.privacy.android.domain.entity.contacts.EmailInvitationsInputValidity.AlreadyInContacts
+import mega.privacy.android.domain.entity.contacts.EmailInvitationsInputValidity.MyOwnEmail
+import mega.privacy.android.domain.entity.contacts.EmailInvitationsInputValidity.Pending
+import mega.privacy.android.domain.entity.contacts.EmailInvitationsInputValidity.Valid
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailsUseCase
+import mega.privacy.android.domain.usecase.contact.ValidateEmailInputForInvitationUseCase
 import mega.privacy.android.domain.usecase.meeting.AreThereOngoingVideoCallsUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import org.junit.jupiter.api.AfterEach
@@ -47,12 +58,16 @@ class InviteContactViewModelTest {
         mock()
     private val inviteContactWithEmailsUseCase: InviteContactWithEmailsUseCase = mock()
     private val areThereOngoingVideoCallsUseCase: AreThereOngoingVideoCallsUseCase = mock()
+    private val validateEmailInputForInvitationUseCase: ValidateEmailInputForInvitationUseCase =
+        mock()
     private val defaultQuery = "defaultQuery"
     private val defaultContactLink = "https://mega.nz/C!wf8jTYRB"
+    private val email = "email@email.com"
 
     private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var invitationContactInfoUiMapper: InvitationContactInfoUiMapper
     private lateinit var invitationStatusMessageUiMapper: InvitationStatusMessageUiMapper
+    private lateinit var emailValidationResultMapper: EmailValidationResultMapper
 
     @BeforeEach
     fun setup() = runTest {
@@ -63,6 +78,7 @@ class InviteContactViewModelTest {
             defaultDispatcher = extension.testDispatcher
         )
         invitationStatusMessageUiMapper = InvitationStatusMessageUiMapper()
+        emailValidationResultMapper = EmailValidationResultMapper()
         initializeViewModel()
     }
 
@@ -75,8 +91,10 @@ class InviteContactViewModelTest {
             createContactLinkUseCase = createContactLinkUseCase,
             inviteContactWithEmailsUseCase = inviteContactWithEmailsUseCase,
             areThereOngoingVideoCallsUseCase = areThereOngoingVideoCallsUseCase,
+            validateEmailInputForInvitationUseCase = validateEmailInputForInvitationUseCase,
             invitationContactInfoUiMapper = invitationContactInfoUiMapper,
             invitationStatusMessageUiMapper = invitationStatusMessageUiMapper,
+            emailValidationResultMapper = emailValidationResultMapper,
             savedStateHandle = savedStateHandle
         )
     }
@@ -286,8 +304,7 @@ class InviteContactViewModelTest {
                             name = it.name,
                             type = TYPE_PHONE_CONTACT,
                             filteredContactInfos = phoneNumberList,
-                            displayInfo = phoneNumberList[0],
-                            avatarColorResId = R.color.grey_500_grey_400
+                            displayInfo = phoneNumberList[0]
                         )
                     )
                 }
@@ -440,7 +457,7 @@ class InviteContactViewModelTest {
         }
 
     @Test
-    fun `test that the selected contact information is updated correctly based on a contact info with multiple contacts`() =
+    fun `test that the selected contact information is updated correctly and the query is reset based on a contact info with multiple contacts`() =
         runTest {
             val contactId = 1L
             val phoneNumber = "(121)-234-567"
@@ -464,9 +481,9 @@ class InviteContactViewModelTest {
             )
 
             underTest.uiState.test {
-                assertThat(
-                    expectMostRecentItem().selectedContactInformation
-                ).isEqualTo(newInfo)
+                val item = expectMostRecentItem()
+                assertThat(item.selectedContactInformation).isEqualTo(newInfo)
+                assertThat(item.query).isEmpty()
             }
         }
 
@@ -494,50 +511,6 @@ class InviteContactViewModelTest {
                 )
             }
         }
-
-    @ParameterizedTest
-    @MethodSource("provideSameContactInformation")
-    fun `test that true is returned when the contact ID and display information are the same`(
-        firstContact: InvitationContactInfo,
-        secondContact: InvitationContactInfo,
-    ) {
-        val actual = underTest.isTheSameContact(firstContact, secondContact)
-
-        assertThat(actual).isTrue()
-    }
-
-    private fun provideSameContactInformation() = Stream.of(
-        Arguments.of(
-            InvitationContactInfo(id = 1, displayInfo = "08123456789"),
-            InvitationContactInfo(id = 1, displayInfo = "08123456789")
-        ),
-        Arguments.of(
-            InvitationContactInfo(id = 1, displayInfo = "test@GMAIL.COM"),
-            InvitationContactInfo(id = 1, displayInfo = "test@gmail.com")
-        )
-    )
-
-    @ParameterizedTest
-    @MethodSource("provideDifferentContactInformation")
-    fun `test that false is returned when the contact ID and display information are different`(
-        firstContact: InvitationContactInfo,
-        secondContact: InvitationContactInfo,
-    ) {
-        val actual = underTest.isTheSameContact(firstContact, secondContact)
-
-        assertThat(actual).isFalse()
-    }
-
-    private fun provideDifferentContactInformation() = Stream.of(
-        Arguments.of(
-            InvitationContactInfo(id = 1, displayInfo = "08123456789"),
-            InvitationContactInfo(id = 2, displayInfo = "08123456789")
-        ),
-        Arguments.of(
-            InvitationContactInfo(id = 1, displayInfo = "tesst@GMAIL.COM"),
-            InvitationContactInfo(id = 1, displayInfo = "test@gmail.com")
-        )
-    )
 
     @Test
     fun `test that the open camera confirmation is shown when there are ongoing video calls`() =
@@ -577,6 +550,159 @@ class InviteContactViewModelTest {
             }
         }
 
+    @Test
+    fun `test that the new email is added to the selected contacts if it's valid`() = runTest {
+        whenever(validateEmailInputForInvitationUseCase(email)) doReturn Valid
+
+        underTest.validateEmailInput(email)
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().selectedContactInformation).isEqualTo(
+                listOf(
+                    InvitationContactInfo(
+                        id = email.hashCode().toLong(),
+                        type = TYPE_MANUAL_INPUT_EMAIL,
+                        displayInfo = email
+                    )
+                )
+            )
+        }
+    }
+
+    @ParameterizedTest(name = "{0} message is shown when the validity of the given email is {1}")
+    @MethodSource("provideMessageTypeUiStateAndEmailValidity")
+    fun `test that the `(
+        message: InviteContactUiState.MessageTypeUiState,
+        validity: EmailInvitationsInputValidity,
+    ) = runTest {
+        whenever(validateEmailInputForInvitationUseCase(email)) doReturn validity
+
+        underTest.validateEmailInput(email)
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().emailValidationMessage).isEqualTo(message)
+        }
+    }
+
+    private fun provideMessageTypeUiStateAndEmailValidity() = Stream.of(
+        Arguments.of(
+            Singular(
+                R.string.error_own_email_as_contact
+            ),
+            MyOwnEmail
+        ),
+        Arguments.of(
+            Singular(
+                id = R.string.context_contact_already_exists,
+                argument = email
+            ),
+            AlreadyInContacts
+        ),
+        Arguments.of(
+            Singular(
+                id = R.string.invite_not_sent_already_sent,
+                argument = email
+            ),
+            Pending
+        )
+    )
+
+    @Test
+    fun `test that a new contact is added to the selected contacts when the given contact's display info doesn't exist`() =
+        runTest {
+            val displayInfo = "display info"
+            val type = TYPE_MANUAL_INPUT_EMAIL
+
+            underTest.addContactInfo(displayInfo = displayInfo, type = type)
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().selectedContactInformation).isEqualTo(
+                    listOf(
+                        InvitationContactInfo(
+                            id = displayInfo.hashCode().toLong(),
+                            type = type,
+                            displayInfo = displayInfo
+                        )
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that the contact list with contact info is shown when adding an existing contact info with multiple contacts`() =
+        runTest {
+            val displayInfo = "display info"
+            val type = TYPE_MANUAL_INPUT_PHONE
+            val localContacts = listOf(
+                LocalContact(
+                    id = 1L,
+                    emails = listOf(displayInfo, displayInfo)
+                )
+            )
+            whenever(getLocalContactsUseCase()).thenReturn(localContacts)
+            whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
+            whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
+                localContacts
+            )
+            underTest.initializeContacts()
+
+            underTest.addContactInfo(displayInfo, type)
+
+            underTest.uiState.test {
+                val expected = invitationContactInfoUiMapper(localContacts)
+                assertThat(
+                    expectMostRecentItem().invitationContactInfoWithMultipleContacts
+                ).isEqualTo(expected[1]) // The 0 index is header item
+            }
+        }
+
+    @Test
+    fun `test that a contact info is removed from the selected contacts when adding an existing contact info that doesn't have multiple contacts`() =
+        runTest {
+            val displayInfo = "display info"
+            val type = TYPE_MANUAL_INPUT_EMAIL
+            val localContacts = listOf(LocalContact(id = 1L, emails = listOf(displayInfo)))
+            whenever(getLocalContactsUseCase()).thenReturn(localContacts)
+            whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
+            whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
+                localContacts
+            )
+            underTest.initializeContacts()
+            val contactInfo = invitationContactInfoUiMapper(localContacts)
+            underTest.addSelectedContactInformation(contactInfo[1]) // The 0 index is header item
+
+            underTest.addContactInfo(displayInfo, type)
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().selectedContactInformation).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that a contact info is added to the selected contacts when adding a new contact info that doesn't have multiple contacts`() =
+        runTest {
+            val contactId = 1L
+            val displayInfo = "display info"
+            val type = TYPE_MANUAL_INPUT_EMAIL
+            val localContacts = listOf(LocalContact(id = contactId, emails = listOf(displayInfo)))
+            whenever(getLocalContactsUseCase()).thenReturn(localContacts)
+            whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
+            whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
+                localContacts
+            )
+            underTest.initializeContacts()
+
+            underTest.addContactInfo(displayInfo, type)
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().selectedContactInformation).isEqualTo(
+                    listOf(
+                        invitationContactInfoUiMapper(localContacts)[1] // The 0 index is header item
+                    )
+                )
+            }
+        }
+
     @AfterEach
     fun tearDown() {
         reset(
@@ -585,7 +711,8 @@ class InviteContactViewModelTest {
             filterLocalContactsByEmailUseCase,
             filterPendingOrAcceptedLocalContactsByEmailUseCase,
             inviteContactWithEmailsUseCase,
-            areThereOngoingVideoCallsUseCase
+            areThereOngoingVideoCallsUseCase,
+            validateEmailInputForInvitationUseCase
         )
     }
 

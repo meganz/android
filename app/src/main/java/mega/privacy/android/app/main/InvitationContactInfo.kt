@@ -1,7 +1,6 @@
 package mega.privacy.android.app.main
 
 import android.os.Parcelable
-import androidx.annotation.ColorRes
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -12,7 +11,6 @@ import kotlinx.parcelize.Parcelize
  * @property type type of the contact info
  * @property filteredContactInfos Phone numbers and emails which don't exist on MEGA
  * @property displayInfo display info of the contact
- * @property avatarColorResId Contact's avatar color ID
  * @property handle the contact handle
  * @property isHighlighted indicates whether the contact is selected or not
  * @property photoUri The contact's photo Uri.
@@ -24,7 +22,6 @@ data class InvitationContactInfo @JvmOverloads constructor(
     val type: Int = 0,
     val filteredContactInfos: List<String> = emptyList(),
     val displayInfo: String = "",
-    @ColorRes val avatarColorResId: Int = 0,
     val handle: String? = null,
     val isHighlighted: Boolean = false,
     val photoUri: String? = null,

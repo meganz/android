@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.contact.invite.contact
+package mega.privacy.android.app.presentation.contact.invite
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -23,8 +23,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doBeforeTextChanged
 import androidx.core.widget.doOnTextChanged
@@ -52,18 +50,14 @@ import mega.privacy.android.app.main.model.InviteContactUiState.InvitationStatus
 import mega.privacy.android.app.main.model.InviteContactUiState.InvitationStatusMessageUiState.NavigateUpWithResult
 import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiState.Plural
 import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiState.Singular
-import mega.privacy.android.app.presentation.contact.invite.contact.component.ContactInfoListDialog
+import mega.privacy.android.app.presentation.contact.invite.component.ContactInfoListDialog
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.presentation.view.open.camera.confirmation.OpenCameraConfirmationDialogRoute
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUEST_READ_CONTACTS
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.contacts.ContactsFilter.isEmailInContacts
-import mega.privacy.android.app.utils.contacts.ContactsFilter.isEmailInPending
-import mega.privacy.android.app.utils.contacts.ContactsFilter.isMySelf
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.domain.entity.ThemeMode
@@ -92,8 +86,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
 
     private var isPermissionGranted = false
     private var isGetContactCompleted = false
-
-    private var shouldShowContactListWithContactInfo by mutableStateOf<InvitationContactInfo?>(null)
 
     private lateinit var binding: ActivityInviteContactBinding
 
@@ -136,20 +128,18 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
                     )
                 }
 
-                shouldShowContactListWithContactInfo?.let {
+                uiState.invitationContactInfoWithMultipleContacts?.let {
                     ContactInfoListDialog(
                         contactInfo = it,
                         currentSelectedContactInfo = uiState.selectedContactInformation,
                         onConfirm = { newListOfSelectedContact ->
-                            shouldShowContactListWithContactInfo = null
+                            viewModel.onDismissContactListContactInfo()
                             viewModel.updateSelectedContactInfoByInfoWithMultipleContacts(
                                 newListOfSelectedContact = newListOfSelectedContact,
                                 contactInfo = it
                             )
                         },
-                        onCancel = {
-                            shouldShowContactListWithContactInfo = null
-                        }
+                        onCancel = viewModel::onDismissContactListContactInfo
                     )
                 }
             }
@@ -197,7 +187,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         if (isGetContactCompleted) {
             savedInstanceState?.let {
                 isPermissionGranted = it.getBoolean(KEY_IS_PERMISSION_GRANTED, false)
-                shouldShowContactListWithContactInfo = it.parcelable(CURRENT_SELECTED_CONTACT)
             }
             refreshAddedContactsView(true)
             setRecyclersVisibility()
@@ -239,10 +228,10 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
                     if (last.isWhitespace()) {
                         val processedString = text.toString().trim()
                         if (isValidEmail(processedString)) {
-                            addContactInfo(processedString, TYPE_MANUAL_INPUT_EMAIL)
+                            viewModel.addContactInfo(processedString, TYPE_MANUAL_INPUT_EMAIL)
                             binding.typeMailEditText.text.clear()
                         } else if (isValidPhone(processedString)) {
-                            addContactInfo(processedString, TYPE_MANUAL_INPUT_PHONE)
+                            viewModel.addContactInfo(processedString, TYPE_MANUAL_INPUT_PHONE)
                             binding.typeMailEditText.text.clear()
                         }
 
@@ -267,20 +256,15 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
                     val processedStrong = textView.text.toString().trim()
                     if (processedStrong.isNotBlank()) {
                         binding.typeMailEditText.text.clear()
+                        viewModel.onSearchQueryChange("")
                         when {
                             isValidEmail(processedStrong) -> {
-                                val result = checkInputEmail(processedStrong)
+                                viewModel.validateEmailInput(processedStrong)
                                 Util.hideKeyboard(this@InviteContactActivity, 0)
-                                if (result != null) {
-                                    showSnackBar(result)
-                                    return@setOnEditorActionListener true
-                                }
-                                addContactInfo(processedStrong, TYPE_MANUAL_INPUT_EMAIL)
-                                viewModel.filterContacts(binding.typeMailEditText.text.toString())
                             }
 
                             isValidPhone(processedStrong) -> {
-                                addContactInfo(processedStrong, TYPE_MANUAL_INPUT_PHONE)
+                                viewModel.addContactInfo(processedStrong, TYPE_MANUAL_INPUT_PHONE)
                                 Util.hideKeyboard(this@InviteContactActivity, 0)
                                 viewModel.filterContacts(binding.typeMailEditText.text.toString())
                             }
@@ -386,6 +370,25 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         ) {
             refreshComponents()
         }
+
+        collectFlow(
+            viewModel
+                .uiState
+                .map { it.emailValidationMessage }
+                .distinctUntilChanged()
+        ) {
+            it?.let {
+                if (it is Singular) {
+                    val message = if (it.argument != null) {
+                        resources.getString(
+                            it.id,
+                            it.argument
+                        )
+                    } else resources.getString(it.id)
+                    showSnackBar(message)
+                }
+            }
+        }
     }
 
     private fun showInvitationsResult(status: InvitationStatusMessageUiState) {
@@ -474,7 +477,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
     override fun onSaveInstanceState(outState: Bundle) {
         Timber.d("onSaveInstanceState")
         super.onSaveInstanceState(outState)
-        outState.putParcelable(CURRENT_SELECTED_CONTACT, shouldShowContactListWithContactInfo)
         outState.putBoolean(KEY_IS_PERMISSION_GRANTED, isPermissionGranted)
         outState.putBoolean(KEY_IS_GET_CONTACT_COMPLETED, isGetContactCompleted)
     }
@@ -631,22 +633,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         return result
     }
 
-    private fun checkInputEmail(email: String): String? = when {
-        isMySelf(megaApi, email) -> {
-            getString(R.string.error_own_email_as_contact)
-        }
-
-        isEmailInContacts(megaApi, email) -> {
-            getString(R.string.context_contact_already_exists, email)
-        }
-
-        isEmailInPending(megaApi, email) -> {
-            getString(R.string.invite_not_sent_already_sent, email)
-        }
-
-        else -> null
-    }
-
     /**
      * Callback for the result from requesting permissions.
      */
@@ -698,16 +684,7 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         invitationContactsAdapter?.let {
             val contactInfo = it.getItem(position)
             Timber.d("on Item click at %d name is %s", position, contactInfo.getContactName())
-            if (contactInfo.hasMultipleContactInfos()) {
-                shouldShowContactListWithContactInfo = contactInfo
-            } else {
-                viewModel.toggleContactHighlightedInfo(contactInfo)
-                if (isContactAdded(contactInfo)) {
-                    viewModel.removeSelectedContactInformation(contactInfo)
-                } else {
-                    viewModel.addSelectedContactInformation(contactInfo)
-                }
-            }
+            viewModel.validateContactListItemClick(contactInfo)
         }
     }
 
@@ -789,16 +766,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         }
     }
 
-    private fun isContactAdded(invitationContactInfo: InvitationContactInfo): Boolean {
-        Timber.d("isContactAdded contact name is %s", invitationContactInfo.getContactName())
-        for (addedContact in viewModel.uiState.value.selectedContactInformation) {
-            if (viewModel.isTheSameContact(addedContact, invitationContactInfo)) {
-                return true
-            }
-        }
-        return false
-    }
-
     private fun refreshList() {
         Timber.d("refresh list")
         setPhoneAdapterContacts(viewModel.uiState.value.filteredContacts)
@@ -811,25 +778,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
                 || isValidEmail(stringInEditText)
                 || isValidPhone(stringInEditText))
         enableFabButton(viewModel.uiState.value.selectedContactInformation.isNotEmpty() && isStringValidNow)
-    }
-
-    private fun addContactInfo(inputString: String, type: Int) {
-        Timber.d("addContactInfo inputString is %s type is %d", inputString, type)
-        val info = InvitationContactInfo(
-            id = inputString.hashCode().toLong(),
-            type = type,
-            displayInfo = inputString,
-            avatarColorResId = R.color.grey_500_grey_400
-        )
-        val index = isUserEnteredContactExistInList(info)
-        val holder = binding.inviteContactList.findViewHolderForAdapterPosition(index)
-        if (index >= 0 && holder != null) {
-            holder.itemView.performClick()
-        } else if (!isContactAdded(info)) {
-            viewModel.addSelectedContactInformation(info)
-            refreshAddedContactsView(true)
-        }
-        setTitleAB()
     }
 
     private fun invitePhoneContacts(phoneNumbers: List<String>) {
@@ -858,19 +806,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         showSnackbar(Constants.SNACKBAR_TYPE, binding.scroller, message, -1)
     }
 
-    private fun isUserEnteredContactExistInList(userEnteredInfo: InvitationContactInfo): Int {
-        if (invitationContactsAdapter == null) return USER_INDEX_NONE_EXIST
-
-        val list = invitationContactsAdapter!!.data
-        for (i in list.indices) {
-            if (userEnteredInfo.displayInfo.equals(list[i].displayInfo, ignoreCase = true)) {
-                return i
-            }
-        }
-
-        return USER_INDEX_NONE_EXIST
-    }
-
     private fun enableFabButton(enableFabButton: Boolean) {
         Timber.d("enableFabButton: $enableFabButton")
         binding.fabButtonNext.isEnabled = enableFabButton
@@ -880,8 +815,6 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         private const val SCAN_QR_FOR_INVITE_CONTACTS = 1111
         private const val KEY_IS_PERMISSION_GRANTED = "KEY_IS_PERMISSION_GRANTED"
         private const val KEY_IS_GET_CONTACT_COMPLETED = "KEY_IS_GET_CONTACT_COMPLETED"
-        private const val CURRENT_SELECTED_CONTACT = "CURRENT_SELECTED_CONTACT"
-        private const val USER_INDEX_NONE_EXIST = -1
         private const val MIN_LIST_SIZE_FOR_FAST_SCROLLER = 20
         private const val ADDED_CONTACT_VIEW_MARGIN_LEFT = 10
     }

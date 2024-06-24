@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.invite.contact.InviteContactActivity
+import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme

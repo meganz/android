@@ -177,7 +177,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
             // create default one if unable to get user pre-set avatar
             if (bitmap == null) {
                 Timber.d("create default avatar as unable to get user pre-set one");
-                int avatarColor = ContextCompat.getColor(context, contact.getAvatarColorResId());
+                int avatarColor = ContextCompat.getColor(context, R.color.grey_500_grey_400);
                 bitmap = getDefaultAvatar(avatarColor, contact.getContactName(), AVATAR_SIZE, true, false);
             }
             holder.imageView.setImageBitmap(bitmap);
