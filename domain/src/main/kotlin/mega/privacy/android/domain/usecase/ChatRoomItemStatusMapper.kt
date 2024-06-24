@@ -1,8 +1,8 @@
 package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import javax.inject.Inject
 
 /**
@@ -21,11 +21,11 @@ class ChatRoomItemStatusMapper @Inject constructor() {
             ChatCallStatus.Connecting,
             ChatCallStatus.Joining,
             ChatCallStatus.InProgress,
-            -> ChatRoomItemStatus.Joined(chatCall.getStartTimestamp())
+            -> ChatRoomItemStatus.Joined
 
             ChatCallStatus.UserNoPresent,
             ChatCallStatus.WaitingRoom,
-            -> ChatRoomItemStatus.NotJoined(chatCall.getStartTimestamp())
+            -> ChatRoomItemStatus.NotJoined
 
             else -> ChatRoomItemStatus.NotStarted
         }

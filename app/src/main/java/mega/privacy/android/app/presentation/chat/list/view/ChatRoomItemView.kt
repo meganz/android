@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.chat.list.view
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,11 +19,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -39,22 +35,20 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import androidx.core.graphics.toColorInt
-import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.GroupChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
+import mega.privacy.android.shared.original.core.ui.controls.meetings.CallChronometer
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import java.util.concurrent.TimeUnit
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
 import kotlin.random.Random
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Chat room item view
@@ -66,6 +60,7 @@ import kotlin.time.Duration.Companion.seconds
  * @param onItemMoreClick
  * @param onItemSelected
  */
+@SuppressLint("UnrememberedMutableInteractionSource")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ChatRoomItemView(
@@ -80,7 +75,10 @@ internal fun ChatRoomItemView(
     val hapticFeedback = LocalHapticFeedback.current
     val hasOngoingCall = item.hasOngoingCall()
     val isLoading = item.lastTimestampFormatted.isNullOrBlank()
-    var callDuration by remember { mutableStateOf<Long>(0) }
+    val isPending = item is MeetingChatRoomItem && item.isPending
+    val callDurationFromInitialTimestamp = item.getDurationFromInitialTimestamp()
+    val shouldShownCallDuration =
+        item.hasCallInProgress() && callDurationFromInitialTimestamp != null
 
     ConstraintLayout(
         modifier = modifier
@@ -116,6 +114,7 @@ internal fun ChatRoomItemView(
             callIcon,
             lastMessageIcon,
             middleText,
+            durationChrono,
             bottomText,
             moreButton,
             unreadCountIcon,
@@ -269,7 +268,7 @@ internal fun ChatRoomItemView(
 
         MiddleTextView(
             modifier = Modifier
-                .testTag("chat_room_item:middle_text")
+                .testTag(TEST_TAG_MIDDLE_TEXT)
                 .constrainAs(middleText) {
                     linkTo(
                         start = lastMessageIcon.end,
@@ -287,18 +286,36 @@ internal fun ChatRoomItemView(
                 .padding(vertical = if (isLoading) 2.dp else 0.dp)
                 .shimmerEffect(isLoading, CircleShape),
             lastMessage = item.lastMessage,
-            isPending = item is MeetingChatRoomItem && item.isPending,
+            isPending = isPending,
             scheduledTimestamp = if (item is MeetingChatRoomItem) item.scheduledTimestampFormatted else null,
             highlight = item.highlight,
-            callDuration = callDuration,
+            shouldShownCallDuration = shouldShownCallDuration,
             isRecurringDaily = item is MeetingChatRoomItem && item.isRecurringDaily,
             isRecurringWeekly = item is MeetingChatRoomItem && item.isRecurringWeekly,
             isRecurringMonthly = item is MeetingChatRoomItem && item.isRecurringMonthly,
         )
 
+        if (shouldShownCallDuration) {
+            callDurationFromInitialTimestamp?.let { duration ->
+                CallChronometer(
+                    modifier = Modifier
+                        .testTag(if (isPending) TEST_TAG_BOTTOM_TEXT_CALL_CHRONOMETER else TEST_TAG_MIDDLE_TEXT_CALL_CHRONOMETER)
+                        .constrainAs(durationChrono) {
+                            start.linkTo(if (isPending) bottomText.end else middleText.end)
+                            top.linkTo(if (isPending) bottomText.top else middleText.top)
+                            bottom.linkTo(if (isPending) bottomText.bottom else middleText.bottom)
+                            width = Dimension.preferredWrapContent
+                        }
+                        .shimmerEffect(isLoading, CircleShape),
+                    duration = duration,
+                    textStyle = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.secondary)
+                )
+            }
+        }
+
         BottomTextView(
             modifier = Modifier
-                .testTag("chat_room_item:bottom_text")
+                .testTag(TEST_TAG_BOTTOM_TEXT)
                 .constrainAs(bottomText) {
                     linkTo(
                         start = parent.start,
@@ -315,10 +332,10 @@ internal fun ChatRoomItemView(
                 }
                 .shimmerEffect(isLoading, CircleShape),
             isRecurring = item is MeetingChatRoomItem && item.isRecurring(),
-            isPending = item is MeetingChatRoomItem && item.isPending,
+            isPending = isPending,
             highlight = item.highlight,
             lastTimestamp = item.lastTimestampFormatted,
-            callDuration = callDuration,
+            shouldShownCallDuration = shouldShownCallDuration,
             lastMessage = item.lastMessage,
         )
 
@@ -359,15 +376,6 @@ internal fun ChatRoomItemView(
                 },
         )
 
-        LaunchedEffect(hasOngoingCall) {
-            callDuration = item.currentCallStatus?.getDuration() ?: 0
-            while (hasOngoingCall) {
-                delay(1.seconds)
-                callDuration++
-            }
-            callDuration = 0
-        }
-
         createVerticalChain(
             titleText,
             middleText,
@@ -384,7 +392,7 @@ private fun MiddleTextView(
     isPending: Boolean,
     scheduledTimestamp: String?,
     highlight: Boolean,
-    callDuration: Long,
+    shouldShownCallDuration: Boolean,
     isRecurringDaily: Boolean,
     isRecurringWeekly: Boolean,
     isRecurringMonthly: Boolean,
@@ -410,8 +418,8 @@ private fun MiddleTextView(
                 else -> scheduledTimestamp
             }
 
-        !isPending && callDuration != 0L ->
-            "$lastMessage · ${callDuration.formatCallTime()}"
+        !isPending && shouldShownCallDuration ->
+            "$lastMessage · "
 
         else ->
             lastMessage
@@ -440,7 +448,7 @@ private fun BottomTextView(
     isPending: Boolean,
     highlight: Boolean,
     lastTimestamp: String?,
-    callDuration: Long,
+    shouldShownCallDuration: Boolean,
     lastMessage: String?,
 ) {
     val textColor: Color
@@ -466,8 +474,8 @@ private fun BottomTextView(
         }
     }
 
-    if (isPending && !textMessage.isNullOrBlank() && callDuration != 0L)
-        textMessage = "$textMessage · ${callDuration.formatCallTime()}"
+    if (isPending && !textMessage.isNullOrBlank() && shouldShownCallDuration)
+        textMessage = "$textMessage · "
 
     Text(
         text = textMessage ?: stringResource(R.string.error_message_unrecognizable),
@@ -478,13 +486,6 @@ private fun BottomTextView(
         modifier = modifier,
     )
 }
-
-private fun Long.formatCallTime() =
-    String.format(
-        "%02d:%02d",
-        TimeUnit.SECONDS.toMinutes(this) % 60,
-        TimeUnit.SECONDS.toSeconds(this) % 60
-    )
 
 @Preview
 @Composable
@@ -613,4 +614,26 @@ private fun PreviewLoadingState() {
         )
     }
 }
+
+/**
+ * Test tag for call chronometer in middle text
+ */
+const val TEST_TAG_MIDDLE_TEXT_CALL_CHRONOMETER = "chat_room_item:middle_text_call_chronometer"
+
+/**
+ * Test tag for call chronometer in bottom text
+ */
+const val TEST_TAG_BOTTOM_TEXT_CALL_CHRONOMETER = "chat_room_item:bottom_text_call_chronometer"
+
+/**
+ * Test tag for middle text
+ */
+const val TEST_TAG_MIDDLE_TEXT = "chat_room_item:middle_text"
+
+/**
+ * Test tag for bottom text
+ */
+const val TEST_TAG_BOTTOM_TEXT = "chat_room_item:bottom_text"
+
+
 

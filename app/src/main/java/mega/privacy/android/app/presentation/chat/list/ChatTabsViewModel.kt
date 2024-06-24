@@ -32,12 +32,12 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
-import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.entity.meeting.CallNotificationType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
+import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
@@ -269,7 +269,7 @@ class ChatTabsViewModel @Inject constructor(
                     ?.let { item ->
                         val meeting = item as MeetingChatRoomItem
                         when (meeting.currentCallStatus) {
-                            is ChatRoomItemStatus.NotJoined -> {
+                            ChatRoomItemStatus.NotJoined -> {
                                 if (meeting.isWaitingRoom && !meeting.hasPermissions) {
                                     state.update { it.copy(currentWaitingRoom = chatId) }
                                 } else {
@@ -287,7 +287,7 @@ class ChatTabsViewModel @Inject constructor(
                                 }
                             }
 
-                            is ChatRoomItemStatus.NotStarted -> {
+                            ChatRoomItemStatus.NotStarted -> {
                                 if (meeting.isWaitingRoom && !meeting.hasPermissions) {
                                     state.update { it.copy(currentWaitingRoom = chatId) }
                                 } else {

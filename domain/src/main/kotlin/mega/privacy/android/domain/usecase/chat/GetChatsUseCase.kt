@@ -20,14 +20,15 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.data.mapper.chat.ChatRoomItemMapper
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
-import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingData
 import mega.privacy.android.domain.repository.ChatRepository
@@ -186,7 +187,7 @@ class GetChatsUseCase @Inject constructor(
         val lastMessage = async { runCatching { getLastMessage(chatId) }.getOrNull() }
         val lastTimestampFormatted =
             async { runCatching { lastTimeMapper(lastTimestamp) }.getOrNull() }
-        val currentCall = async { getCurrentCall(chatId) }
+        val call = async { getCall(chatId) }
         val userStatus = async { getUserOnlineStatus() }
         val peerEmail = async { getUserEmail() }
 
@@ -195,7 +196,10 @@ class GetChatsUseCase @Inject constructor(
             isMuted = isMuted.await(),
             lastMessage = lastMessage.await(),
             lastTimestampFormatted = lastTimestampFormatted.await(),
-            currentCall = currentCall.await(),
+            currentCallStatus = call.await()?.let {
+                chatRoomItemStatusMapper(it)
+            } ?: ChatRoomItemStatus.NotStarted,
+            call = call.await(),
             userChatStatus = userStatus.await(),
             peerEmail = peerEmail.await(),
         )
@@ -259,7 +263,8 @@ class GetChatsUseCase @Inject constructor(
                         mutex.withLock {
                             get(chatCall.chatId)?.let { currentItem ->
                                 val updatedItem = currentItem.copyChatRoomItem(
-                                    currentCall = chatCallItem
+                                    call = chatCall,
+                                    currentCallStatus = chatCallItem
                                 )
 
                                 if (currentItem != updatedItem) {
@@ -443,9 +448,8 @@ class GetChatsUseCase @Inject constructor(
     private suspend fun isChatMuted(chatId: Long): Boolean =
         runCatching { !notificationsRepository.isChatEnabled(chatId) }.getOrNull() ?: false
 
-    private suspend fun getCurrentCall(chatId: Long): ChatRoomItemStatus =
-        runCatching { getChatCallUseCase(chatId)?.let(chatRoomItemStatusMapper::invoke) }.getOrNull()
-            ?: ChatRoomItemStatus.NotStarted
+    private suspend fun getCall(chatId: Long): ChatCall? =
+        runCatching { getChatCallUseCase(chatId) }.getOrNull()
 
     private suspend fun getMeetingScheduleData(
         chatId: Long,

@@ -44,8 +44,8 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSe
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
-import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import kotlin.random.Random
 
 /**
@@ -179,7 +179,7 @@ internal fun ChatRoomItemBottomSheetView(
                 )
             } else {
                 if (item is ChatRoomItem.MeetingChatRoomItem) {
-                    if (item.currentCallStatus is ChatRoomItemStatus.NotJoined) {
+                    if (item.currentCallStatus == ChatRoomItemStatus.NotJoined) {
                         MenuItem(
                             modifier = Modifier.testTag("join_meeting"),
                             res = R.drawable.join_sched_icon,
@@ -187,7 +187,7 @@ internal fun ChatRoomItemBottomSheetView(
                             description = "Join meeting",
                             onClick = onStartMeetingClick
                         )
-                    } else if (item.currentCallStatus is ChatRoomItemStatus.NotStarted) {
+                    } else if (item.currentCallStatus == ChatRoomItemStatus.NotStarted) {
                         MenuItem(
                             modifier = Modifier.testTag("start_meeting"),
                             res = R.drawable.start_sched_icon,

@@ -1,6 +1,12 @@
 package mega.privacy.android.domain.entity.chat
 
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
+import java.time.Instant
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * Chat room item
@@ -19,14 +25,16 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property lastTimestampFormatted
  * @property highlight
  * @property header
+ * @property call
  * @constructor Create empty chat room item
  */
 sealed class ChatRoomItem(
+    open val call: ChatCall? = null,
     open val chatId: Long,
     open val title: String,
     open val lastMessage: String? = null,
     open val isLastMessageVoiceClip: Boolean = false,
-    open val currentCallStatus: ChatRoomItemStatus? = null,
+    open val currentCallStatus: ChatRoomItemStatus = ChatRoomItemStatus.NotStarted,
     open val unreadCount: Int = 0,
     open val hasPermissions: Boolean = false,
     open val isActive: Boolean = false,
@@ -61,16 +69,17 @@ sealed class ChatRoomItem(
      * @property header
      * @constructor Create empty Individual chat room item
      */
-    data class IndividualChatRoomItem constructor(
+    data class IndividualChatRoomItem(
         val userChatStatus: UserChatStatus? = null,
         val avatar: ChatAvatarItem? = null,
         val peerHandle: Long? = null,
         val peerEmail: String? = null,
+        override val call: ChatCall? = null,
         override val chatId: Long,
         override val title: String,
         override val lastMessage: String? = null,
         override val isLastMessageVoiceClip: Boolean = false,
-        override val currentCallStatus: ChatRoomItemStatus? = null,
+        override val currentCallStatus: ChatRoomItemStatus = ChatRoomItemStatus.NotStarted,
         override val unreadCount: Int = 0,
         override val hasPermissions: Boolean = false,
         override val isActive: Boolean = false,
@@ -80,8 +89,7 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
-    ) : ChatRoomItem(
-        chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
+    ) : ChatRoomItem(call, chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
         lastTimestampFormatted, highlight, header
     )
@@ -107,14 +115,15 @@ sealed class ChatRoomItem(
      * @property header
      * @constructor Create empty Group chat room item
      */
-    data class GroupChatRoomItem constructor(
+    data class GroupChatRoomItem(
         val isPublic: Boolean = false,
         val avatars: List<ChatAvatarItem>? = null,
+        override val call: ChatCall? = null,
         override val chatId: Long,
         override val title: String,
         override val lastMessage: String? = null,
         override val isLastMessageVoiceClip: Boolean = false,
-        override val currentCallStatus: ChatRoomItemStatus? = null,
+        override val currentCallStatus: ChatRoomItemStatus = ChatRoomItemStatus.NotStarted,
         override val unreadCount: Int = 0,
         override val hasPermissions: Boolean = false,
         override val isActive: Boolean = false,
@@ -124,8 +133,7 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
-    ) : ChatRoomItem(
-        chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
+    ) : ChatRoomItem(call, chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
         lastTimestampFormatted, highlight, header
     )
@@ -158,9 +166,10 @@ sealed class ChatRoomItem(
      * @property lastTimestampFormatted
      * @property highlight
      * @property header
+     * @property call
      * @constructor Create empty Meeting chat room item
      */
-    data class MeetingChatRoomItem constructor(
+    data class MeetingChatRoomItem(
         val schedId: Long? = null,
         val isPending: Boolean = false,
         val isRecurringDaily: Boolean = false,
@@ -172,11 +181,12 @@ sealed class ChatRoomItem(
         val isWaitingRoom: Boolean = false,
         val isPublic: Boolean = false,
         val avatars: List<ChatAvatarItem>? = null,
+        override val call: ChatCall? = null,
         override val chatId: Long,
         override val title: String,
         override val lastMessage: String? = null,
         override val isLastMessageVoiceClip: Boolean = false,
-        override val currentCallStatus: ChatRoomItemStatus? = null,
+        override val currentCallStatus: ChatRoomItemStatus = ChatRoomItemStatus.NotStarted,
         override val unreadCount: Int = 0,
         override val hasPermissions: Boolean = false,
         override val isActive: Boolean = false,
@@ -186,8 +196,7 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
-    ) : ChatRoomItem(
-        chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
+    ) : ChatRoomItem(call, chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
         lastTimestampFormatted, highlight, header
     ) {
@@ -230,8 +239,27 @@ sealed class ChatRoomItem(
      *
      * @return  True if has an ongoing call, false otherwise.
      */
-    fun hasOngoingCall(): Boolean =
-        currentCallStatus != null && currentCallStatus !is ChatRoomItemStatus.NotStarted
+    fun hasOngoingCall(): Boolean = currentCallStatus != ChatRoomItemStatus.NotStarted
+
+    /**
+     * Check if chat has call in progress
+     *
+     * @return  True if has an ongoing call, false otherwise.
+     */
+    fun hasCallInProgress(): Boolean = currentCallStatus == ChatRoomItemStatus.Joined
+
+    /**
+     * Get duration based in the initial timestamp
+     *
+     * @return [Duration]
+     */
+    fun getDurationFromInitialTimestamp(): Duration? {
+        return call?.initialTimestamp?.takeIf { it != 0L }?.let {
+            val currentDuration = Instant.now().epochSecond.toDuration(DurationUnit.SECONDS)
+            val initialDuration = it.seconds
+            currentDuration.minus(initialDuration)
+        }
+    }
 
     /**
      * Get chat room item avatars
@@ -248,11 +276,12 @@ sealed class ChatRoomItem(
      * Returns a copy of this chat room item with the provided parameters.
      */
     fun copyChatRoomItem(
+        call: ChatCall? = this.call,
         chatId: Long = this.chatId,
         title: String = this.title,
         lastMessage: String? = this.lastMessage,
         isLastMessageVoiceClip: Boolean = this.isLastMessageVoiceClip,
-        currentCall: ChatRoomItemStatus? = this.currentCallStatus,
+        currentCallStatus: ChatRoomItemStatus = this.currentCallStatus,
         unreadCount: Int = this.unreadCount,
         hasPermissions: Boolean = this.hasPermissions,
         isActive: Boolean = this.isActive,
@@ -278,11 +307,12 @@ sealed class ChatRoomItem(
         isWaitingRoom: Boolean? = null,
     ): ChatRoomItem = when (this) {
         is IndividualChatRoomItem -> copy(
+            call = call,
             chatId = chatId,
             title = title,
             lastMessage = lastMessage,
             isLastMessageVoiceClip = isLastMessageVoiceClip,
-            currentCallStatus = currentCall,
+            currentCallStatus = currentCallStatus,
             unreadCount = unreadCount,
             hasPermissions = hasPermissions,
             isActive = isActive,
@@ -299,11 +329,12 @@ sealed class ChatRoomItem(
         )
 
         is GroupChatRoomItem -> copy(
+            call = call,
             chatId = chatId,
             title = title,
             lastMessage = lastMessage,
             isLastMessageVoiceClip = isLastMessageVoiceClip,
-            currentCallStatus = currentCall,
+            currentCallStatus = currentCallStatus,
             unreadCount = unreadCount,
             hasPermissions = hasPermissions,
             isActive = isActive,
@@ -318,11 +349,12 @@ sealed class ChatRoomItem(
         )
 
         is MeetingChatRoomItem -> copy(
+            call = call,
             chatId = chatId,
             title = title,
             lastMessage = lastMessage,
             isLastMessageVoiceClip = isLastMessageVoiceClip,
-            currentCallStatus = currentCall,
+            currentCallStatus = currentCallStatus,
             unreadCount = unreadCount,
             hasPermissions = hasPermissions,
             isActive = isActive,

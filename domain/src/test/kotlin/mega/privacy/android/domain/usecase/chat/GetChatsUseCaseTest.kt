@@ -13,8 +13,10 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.mapper.chat.ChatRoomItemMapper
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
+import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
@@ -227,12 +229,16 @@ internal class GetChatsUseCaseTest {
     }
 
     @Test
-    fun `test that getChatCall is called accordingly`() = runTest {
+    fun `test that getCall is called accordingly`() = runTest {
         val chatRoomType = GetChatsUseCase.ChatRoomType.NON_MEETINGS
-
         whenever(chatRoomItemMapper(any())).thenAnswer {
             val chatRoom = ((it.arguments[0]) as CombinedChatRoom)
-            ChatRoomItem.GroupChatRoomItem(chatId = chatRoom.chatId, title = chatRoom.title)
+            ChatRoomItem.GroupChatRoomItem(
+                chatId = chatRoom.chatId,
+                call = mock<ChatCall>(),
+                currentCallStatus = ChatRoomItemStatus.Joined,
+                title = chatRoom.title
+            )
         }
 
         underTest.invoke(

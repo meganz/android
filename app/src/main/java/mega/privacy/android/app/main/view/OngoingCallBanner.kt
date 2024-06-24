@@ -38,7 +38,7 @@ internal fun OngoingCallBannerContent(
             ReturnToCallBanner(
                 text = stringResource(id = R.string.call_in_progress_layout),
                 onBannerClicked = { startMeetingActivity(context, call.chatId) },
-                duration = call.duration
+                duration = uiState.getDurationFromInitialTimestamp()
             )
         }
     }

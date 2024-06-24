@@ -1177,7 +1177,6 @@ class ManagerViewModel @Inject constructor(
                 val call = getChatCallUseCase(chatId)
                 val scheduledMeetingStatus = when (call?.status) {
                     ChatCallStatus.UserNoPresent -> ScheduledMeetingStatus.NotJoined(call.duration)
-
                     ChatCallStatus.Connecting,
                     ChatCallStatus.Joining,
                     ChatCallStatus.InProgress,
