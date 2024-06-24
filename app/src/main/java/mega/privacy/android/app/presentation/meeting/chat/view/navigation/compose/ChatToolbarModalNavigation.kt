@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbar
 internal fun NavGraphBuilder.chatToolbarModal(
     navController: NavHostController,
     scaffoldState: ScaffoldState,
+    onCameraPermissionDenied: () -> Unit,
     closeBottomSheets: () -> Unit,
 ) {
     bottomSheet(route = "toolbarModal") { backStackEntry ->
@@ -41,6 +42,7 @@ internal fun NavGraphBuilder.chatToolbarModal(
             hideSheet = closeBottomSheets,
             navigateToFileModal = navController::navigateChatFileModal,
             isVisible = true,
+            onCameraPermissionDenied = onCameraPermissionDenied,
         )
     }
 }

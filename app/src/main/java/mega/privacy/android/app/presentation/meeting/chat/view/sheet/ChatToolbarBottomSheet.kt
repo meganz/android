@@ -39,7 +39,6 @@ import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
-import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AttachItem
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
@@ -75,6 +74,7 @@ fun ChatToolbarBottomSheet(
     modifier: Modifier = Modifier,
     navigateToFileModal: () -> Unit,
     onAttachFiles: (List<Uri>) -> Unit = {},
+    onCameraPermissionDenied: () -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -135,15 +135,6 @@ fun ChatToolbarBottomSheet(
         }
     }
 
-    val onCameraPermissionDenied: () -> Unit = {
-        showPermissionNotAllowedSnackbar(
-            context,
-            coroutineScope,
-            scaffoldState.snackbarHostState,
-            R.string.chat_attach_pick_from_camera_deny_permission
-        )
-    }
-
     val takePictureLauncher =
         rememberLauncherForActivityResult(
             contract = InAppCameraLauncher()
@@ -160,12 +151,7 @@ fun ChatToolbarBottomSheet(
         if (permissionsResult[Manifest.permission.CAMERA] == true) {
             takePictureLauncher.launch(CameraArg(uiState.title.orEmpty()))
         } else {
-            showPermissionNotAllowedSnackbar(
-                context,
-                coroutineScope,
-                scaffoldState.snackbarHostState,
-                R.string.chat_attach_pick_from_camera_deny_permission
-            )
+            onCameraPermissionDenied()
         }
     }
 

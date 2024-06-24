@@ -42,6 +42,7 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
     navigateToMeeting: (Long, Boolean, Boolean) -> Unit,
     navigateToWaitingRoom: (Long) -> Unit,
     onBackPress: () -> Unit,
+    onCameraPermissionDenied : () -> Unit,
 ) {
     navigation(
         startDestination = ConversationRoute,
@@ -132,6 +133,7 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
         chatToolbarModal(
             navController = navController,
             scaffoldState = scaffoldState,
+            onCameraPermissionDenied = onCameraPermissionDenied
         ) {
             navController.popBackStack(
                 ConversationRoute,

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -21,6 +22,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.R
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -33,6 +35,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openCo
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.showGroupOrContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startWaitingRoom
+import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
@@ -72,6 +75,7 @@ internal class ChatFragment : Fragment() {
                             val action = requireActivity().intent.getStringExtra(EXTRA_ACTION)
                                 ?: Constants.ACTION_CHAT_SHOW_MESSAGES
                             val chatLink = requireActivity().intent.getStringExtra(EXTRA_LINK)
+                            val coroutineScope = rememberCoroutineScope()
 
                             val scaffoldState = rememberScaffoldState()
 
@@ -127,7 +131,15 @@ internal class ChatFragment : Fragment() {
                                         )
                                     },
                                     navigateToWaitingRoom = { startWaitingRoom(context, it) },
-                                    onBackPress = { requireActivity().supportFinishAfterTransition() }
+                                    onBackPress = { requireActivity().supportFinishAfterTransition() },
+                                    onCameraPermissionDenied = {
+                                        showPermissionNotAllowedSnackbar(
+                                            context,
+                                            coroutineScope,
+                                            scaffoldState.snackbarHostState,
+                                            R.string.chat_attach_pick_from_camera_deny_permission
+                                        )
+                                    }
                                 )
                             }
                         }
