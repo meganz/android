@@ -345,6 +345,14 @@ interface FileSystemRepository {
     suspend fun isContentUri(uriString: String): Boolean
 
     /**
+     * Is document uri
+     *
+     * @param uri
+     * @return
+     */
+    suspend fun isDocumentUri(uri: UriPath): Boolean
+
+    /**
      * @return true if the [uriString] represents an external storage content Uri
      */
     suspend fun isExternalStorageContentUri(uriString: String): Boolean
@@ -414,6 +422,28 @@ interface FileSystemRepository {
      */
     fun searchFilesInDocumentFolderRecursive(
         folder: UriPath,
-        query: String
+        query: String,
     ): Flow<DocumentFolder>
+
+    /**
+     * Move files to document uri
+     *
+     * @param source
+     * @param destinationUri
+     */
+    suspend fun copyFilesToDocumentUri(
+        source: File,
+        destinationUri: UriPath,
+    )
+
+    /**
+     * Copy files
+     *
+     * @param source file or folder to copy
+     * @param destination destination folder
+     */
+    suspend fun copyFiles(
+        source: File,
+        destination: File,
+    )
 }

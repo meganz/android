@@ -121,6 +121,13 @@ interface FileGateway {
     @Throws(IOException::class)
     suspend fun copyFile(source: File, destination: File)
 
+    /**
+     * Copy files allow to copy files from source folder to destination
+     *
+     * @param source
+     * @param destination
+     */
+    suspend fun copyFileToFolder(source: File, destination: File)
 
     /**
      * creating a new temporary file in a root directory by copying the file from local path
@@ -280,6 +287,14 @@ interface FileGateway {
     suspend fun isContentUri(uriString: String): Boolean
 
     /**
+     * Is document uri
+     *
+     * @param uri
+     * @return
+     */
+    suspend fun isDocumentUri(uri: UriPath): Boolean
+
+    /**
      * @return true if the [uriString] represents an external storage content Uri
      */
     suspend fun isExternalStorageContentUri(uriString: String): Boolean
@@ -334,4 +349,15 @@ interface FileGateway {
         folder: UriPath,
         query: String,
     ): Flow<DocumentFolder>
+
+    /**
+     * Copy files to document uri
+     *
+     * @param source
+     * @param destination
+     */
+    suspend fun copyFilesToDocumentFolder(
+        source: File,
+        destination: DocumentFile,
+    )
 }

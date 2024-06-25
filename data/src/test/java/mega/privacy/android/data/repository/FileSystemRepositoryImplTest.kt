@@ -607,4 +607,12 @@ internal class FileSystemRepositoryImplTest {
             DocumentFolder(listOf(entity))
         )
     }
+
+    @Test
+    fun `test that copy files invokes gateway method`() = runTest {
+        val file = mock<File>()
+        val destination = mock<File>()
+        underTest.copyFiles(file, destination)
+        verify(fileGateway).copyFileToFolder(file, destination)
+    }
 }

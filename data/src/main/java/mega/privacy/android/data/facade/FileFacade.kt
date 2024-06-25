@@ -46,7 +46,6 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import nz.mega.sdk.AndroidGfxProcessor
 import timber.log.Timber
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
@@ -211,18 +210,16 @@ internal class FileFacade @Inject constructor(
 
     override suspend fun copyFile(source: File, destination: File) {
         if (source.absolutePath != destination.absolutePath) {
-            withContext(Dispatchers.IO) {
-                val inputStream = FileInputStream(source)
-                val outputStream = FileOutputStream(destination)
-                val inputChannel = inputStream.channel
-                val outputChannel = outputStream.channel
-                outputChannel.transferFrom(inputChannel, 0, inputChannel.size())
-                inputChannel.close()
-                outputChannel.close()
-                inputStream.close()
-                outputStream.close()
+            source.inputStream().use { input ->
+                destination.outputStream().use { output ->
+                    input.copyTo(output)
+                }
             }
         }
+    }
+
+    override suspend fun copyFileToFolder(source: File, destination: File) {
+        copyFilesToDocumentFolder(source, DocumentFile.fromFile(destination))
     }
 
     override suspend fun createTempFile(rootPath: String, localPath: String, newPath: String) {
@@ -379,6 +376,9 @@ internal class FileFacade @Inject constructor(
         uriString.toUri().toFile()
 
     override suspend fun isContentUri(uriString: String) = uriString.toUri().scheme == "content"
+
+    override suspend fun isDocumentUri(uri: UriPath): Boolean =
+        DocumentsContract.isDocumentUri(context, uri.value.toUri())
 
     override suspend fun isExternalStorageContentUri(uriString: String) =
         with(Uri.parse(uriString)) {
@@ -585,6 +585,46 @@ internal class FileFacade @Inject constructor(
         // CompressFormat.WEB_LOSSY and CompressFormat.WEB_LOSSLESS
         "webp" -> CompressFormat.WEBP
         else -> CompressFormat.JPEG
+    }
+
+    override suspend fun copyFilesToDocumentFolder(
+        source: File,
+        destination: DocumentFile,
+    ) {
+        if (!destination.isDirectory) throw IllegalArgumentException("Destination is not a directory")
+        if (source.isDirectory) {
+            val files = source.listFiles()
+            val newFolder = destination.createDirectory(source.name) ?: return
+            files?.forEach {
+                copyFilesToDocumentFolder(it, newFolder)
+            }
+        } else {
+            val fileName = getFileNameIfHasNameCollision(destination, source.name)
+            val newFile = destination.createFile(source.extension, fileName)
+            newFile?.uri?.let { newUri ->
+                context.contentResolver.openOutputStream(newUri)?.use { output ->
+                    source.inputStream().use { input ->
+                        input.copyTo(output)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getFileNameIfHasNameCollision(folder: DocumentFile, fileName: String): String {
+        val files = folder.listFiles()
+        if (files.find { it.name == fileName } == null) return fileName
+        val fileNameWithoutExtension = fileName.substringBeforeLast(".")
+        val extension = fileName.substringAfterLast(".", "")
+        for (i in 1..Int.MAX_VALUE) {
+            val newFileName = if (extension.isNotEmpty()) {
+                "$fileNameWithoutExtension ($i).${extension}"
+            } else {
+                "$fileNameWithoutExtension ($i)"
+            }
+            if (files.find { it.name == newFileName } == null) return newFileName
+        }
+        return fileName
     }
 
     private companion object {

@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import android.net.Uri
+import android.provider.DocumentsContract
 import android.webkit.MimeTypeMap
 import androidx.core.net.toFile
 import androidx.core.net.toUri
@@ -68,6 +69,7 @@ import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.URI
 import java.net.URLConnection
@@ -470,6 +472,24 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         sdCardGateway.isSDCardCachePath(localPath)
     }
 
+    override suspend fun copyFilesToDocumentUri(
+        source: File,
+        destinationUri: UriPath,
+    ) = withContext(ioDispatcher) {
+        val uri = destinationUri.value.toUri()
+        val isTreeUri = DocumentsContract.isTreeUri(uri)
+        val destination = if (isTreeUri) {
+            DocumentFile.fromTreeUri(context, uri)
+        } else {
+            DocumentFile.fromSingleUri(context, uri)
+        } ?: throw FileNotFoundException("Content uri doesn't exist: $destinationUri")
+        fileGateway.copyFilesToDocumentFolder(source, destination)
+    }
+
+    override suspend fun copyFiles(source: File, destination: File) = withContext(ioDispatcher) {
+        fileGateway.copyFileToFolder(source, destination)
+    }
+
     override suspend fun moveFileToSd(
         file: File,
         destinationUri: String,
@@ -546,6 +566,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun isContentUri(uriString: String): Boolean = withContext(ioDispatcher) {
         fileGateway.isContentUri(uriString)
+    }
+
+    override suspend fun isDocumentUri(uri: UriPath): Boolean = withContext(ioDispatcher) {
+        fileGateway.isDocumentUri(uri)
     }
 
     override suspend fun isExternalStorageContentUri(uriString: String): Boolean =
