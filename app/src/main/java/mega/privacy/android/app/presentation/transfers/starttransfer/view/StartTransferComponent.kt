@@ -209,13 +209,17 @@ private fun StartTransferComponent(
     var showAskDestinationDialog by remember {
         mutableStateOf<TransferTriggerEvent.StartDownloadNode?>(null)
     }
-    val folderPicker = launchFolderPicker { uri ->
-        showAskDestinationDialog?.let { event ->
-            onDestinationSet(event, uri)
+    val folderPicker = launchFolderPicker(
+        onCancel = {
             showAskDestinationDialog = null
-        }
-    }
-    val coroutineScope = rememberCoroutineScope()
+        },
+        onFolderSelected = { uri ->
+            showAskDestinationDialog?.let { event ->
+                onDestinationSet(event, uri)
+                showAskDestinationDialog = null
+            }
+        },
+    )
 
     EventEffect(
         event = uiState.oneOffViewEvent,
@@ -231,7 +235,7 @@ private fun StartTransferComponent(
                         transferTriggerEvent = it.triggerEvent,
                     )
                     onScanningFinished(it)
-                 }
+                }
 
                 is StartTransferEvent.FinishUploadProcessing -> {
                     val message = context.resources.getQuantityString(
@@ -325,11 +329,11 @@ private fun StartTransferComponent(
             onDismiss = { showConfirmLargeTransfer = null },
         )
     }
-    if (showAskDestinationDialog != null) {
-        runCatching {
-            folderPicker.launch(null)
-        }.onFailure {
-            coroutineScope.launch {
+    LaunchedEffect(showAskDestinationDialog) {
+        if (showAskDestinationDialog != null) {
+            runCatching {
+                folderPicker.launch(null)
+            }.onFailure {
                 snackBarHostState.showSnackbar(context.getString(R.string.general_warning_no_picker))
             }
         }

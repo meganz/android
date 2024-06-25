@@ -1,8 +1,8 @@
 package mega.privacy.android.shared.original.core.ui.navigation
 
 import android.net.Uri
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 
@@ -13,10 +13,11 @@ import androidx.compose.runtime.Composable
  */
 @Composable
 fun launchFolderPicker(
+    onCancel: () -> Unit = {},
     onFolderSelected: (Uri) -> Unit,
 ): ActivityResultLauncher<Uri?> =
     rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { directoryUri ->
         directoryUri?.let {
             onFolderSelected(it)
-        }
+        } ?: onCancel()
     }
