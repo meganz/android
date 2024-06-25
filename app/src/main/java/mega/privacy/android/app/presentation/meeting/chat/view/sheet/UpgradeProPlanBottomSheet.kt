@@ -23,15 +23,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.MaxCallDurationReachedModalEvent
 
 /**
  * Composable function to show the bottom sheet to upgrade to Pro plan.
@@ -88,6 +90,7 @@ fun UpgradeProPlanBottomSheet(
                 .fillMaxWidth(),
             textId = R.string.meetings_upgrade_pro_plan_button,
             onClick = {
+                Analytics.tracker.trackEvent(MaxCallDurationReachedModalEvent)
                 context.startActivity(
                     Intent(
                         context,

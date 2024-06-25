@@ -1,5 +1,8 @@
 package mega.privacy.android.app.presentation.meeting.view
 
+import mega.privacy.android.core.R as CoreUiR
+import android.text.format.DateFormat
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,9 +17,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
@@ -25,15 +30,18 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,28 +50,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mega.privacy.android.app.R
-import mega.privacy.android.core.R as CoreUiR
-import android.text.format.DateFormat
-import androidx.activity.compose.BackHandler
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getDateFormatted
 import mega.privacy.android.app.presentation.extensions.getEndTimeFormatted
 import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartTimeFormatted
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getTimeFormatted
-import mega.privacy.android.app.presentation.meeting.view.sheet.RecurringMeetingOccurrenceBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelOccurrenceAndMeetingDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelScheduledMeetingOccurrenceDialog
+import mega.privacy.android.app.presentation.meeting.view.sheet.RecurringMeetingOccurrenceBottomSheetView
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.legacy.core.ui.controls.dialogs.EditOccurrenceDialog
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
@@ -73,8 +75,6 @@ import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
-import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 
 /**
  * Recurring meeting info View
@@ -92,14 +92,15 @@ fun RecurringMeetingInfoView(
     onEditOccurrenceClicked: () -> Unit,
     onConsumeSelectOccurrenceEvent: () -> Unit,
     onResetSnackbarMessage: () -> Unit,
-    onCancelOccurrence: () -> Unit = {},
-    onCancelOccurrenceAndMeeting: () -> Unit = {},
-    onEditOccurrence: () -> Unit = {},
-    onDismissDialog: () -> Unit = {},
     onDateTap: () -> Unit,
     onStartTimeTap: () -> Unit,
     onEndTimeTap: () -> Unit,
     onUpgradeNowClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    onCancelOccurrence: () -> Unit = {},
+    onCancelOccurrenceAndMeeting: () -> Unit = {},
+    onEditOccurrence: () -> Unit = {},
+    onDismissDialog: () -> Unit = {},
 ) {
     val isLight = MaterialTheme.colors.isLight
     val listState = rememberLazyListState()
@@ -141,7 +142,7 @@ fun RecurringMeetingInfoView(
     ) { paddingValues ->
         LazyColumn(
             state = listState,
-            modifier = Modifier
+            modifier = modifier
                 .padding(paddingValues)
                 .testTag("Occurrence_list_view")
         ) {
@@ -188,7 +189,10 @@ fun RecurringMeetingInfoView(
                 startTimeText = it.getStartTimeFormatted(is24HourFormat),
                 endTimeText = it.getEndTimeFormatted(is24HourFormat),
                 freePlanLimitationWarningText = stringResource(id = R.string.meetings_edit_occurrence_free_plan_60_minute_limit_warning),
-                shouldShowFreePlanLimitWarning = managementState.shouldShowFreePlanLimitWarning(managementState.editedOccurrence.getStartZoneDateTime(), managementState.editedOccurrence.getEndZoneDateTime()),
+                shouldShowFreePlanLimitWarning = managementState.shouldShowFreePlanLimitWarning(
+                    managementState.editedOccurrence.getStartZoneDateTime(),
+                    managementState.editedOccurrence.getEndZoneDateTime()
+                ),
                 onConfirm = onEditOccurrence,
                 onDismiss = onDismissDialog,
                 isConfirmButtonEnabled = managementState.isEditionValid(),
@@ -299,10 +303,10 @@ private fun RecurringMeetingInfoAppBar(
  */
 @Composable
 private fun OccurrenceItemView(
-    modifier: Modifier = Modifier,
     state: RecurringMeetingInfoState,
     occurrence: ChatScheduledMeetingOccurr,
     onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val isLight = MaterialTheme.colors.isLight
     Column {

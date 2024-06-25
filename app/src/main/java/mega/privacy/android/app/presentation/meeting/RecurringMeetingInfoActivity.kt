@@ -13,6 +13,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -23,11 +24,13 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingInfoView
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.EditMeetingMaxDurationReachedEvent
+import mega.privacy.mobile.analytics.event.EditSingleOccurrenceMeetingMaxDurationReachedEvent
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import java.time.Instant
@@ -157,6 +160,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
      * Open upgrade account screen
      */
     private fun openUpgradeAccount() {
+        Analytics.tracker.trackEvent(EditSingleOccurrenceMeetingMaxDurationReachedEvent)
         startActivity(Intent(this, UpgradeAccountActivity::class.java))
     }
 

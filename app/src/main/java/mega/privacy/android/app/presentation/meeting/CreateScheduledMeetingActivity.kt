@@ -42,6 +42,8 @@ import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.CreateMeetingMaxDurationReachedEvent
+import mega.privacy.mobile.analytics.event.EditMeetingMaxDurationReachedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingCreateConfirmButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableMeetingLinkButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableOpenInviteButtonEvent
@@ -292,6 +294,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
      * Open upgrade account screen
      */
     private fun openUpgradeAccount() {
+        Analytics.tracker.trackEvent(if (viewModel.state.value.type == ScheduledMeetingType.Edition) EditMeetingMaxDurationReachedEvent else CreateMeetingMaxDurationReachedEvent)
         startActivity(Intent(this, UpgradeAccountActivity::class.java))
     }
 
