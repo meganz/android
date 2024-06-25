@@ -1,7 +1,6 @@
 package mega.privacy.android.app.upgradeAccount.view
 
 import mega.privacy.android.shared.resources.R as sharedR
-import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -130,7 +129,6 @@ fun UpgradeAccountView(
     val context = LocalContext.current
     var isUpgradeWarningBannerVisible by rememberSaveable { mutableStateOf(showUpgradeWarningBanner) }
 
-    BackHandler { onBackPressed() }
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {

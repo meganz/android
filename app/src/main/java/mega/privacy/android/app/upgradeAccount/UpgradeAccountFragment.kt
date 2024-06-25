@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -92,16 +93,14 @@ class UpgradeAccountFragment : Fragment() {
         val uiState by upgradeAccountViewModel.state.collectAsStateWithLifecycle()
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        BackHandler { trackAndFinish() }
         OriginalTempTheme(isDark = mode.isDarkMode()) {
             UpgradeAccountView(
                 modifier = Modifier.semantics {
                     testTagsAsResourceId = true
                 },
                 state = uiState,
-                onBackPressed = {
-                    upgradeAccountActivity.onBackPressedDispatcher.onBackPressed()
-                    Analytics.tracker.trackEvent(UpgradeAccountCancelledEvent)
-                },
+                onBackPressed = { trackAndFinish() },
                 onBuyClicked = {
                     val chosenPlan = convertAccountTypeToInt(uiState.chosenPlan)
                     upgradeAccountViewModel.currentPaymentCheck(chosenPlan)
@@ -142,6 +141,11 @@ class UpgradeAccountFragment : Fragment() {
                 showUpgradeWarningBanner = uiState.isCrossAccountMatch.not()
             )
         }
+    }
+
+    private fun trackAndFinish() {
+        Analytics.tracker.trackEvent(UpgradeAccountCancelledEvent)
+        upgradeAccountActivity.finish()
     }
 
     private fun startPurchase(
