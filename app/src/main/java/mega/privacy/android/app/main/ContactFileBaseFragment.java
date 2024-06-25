@@ -48,7 +48,7 @@ public class ContactFileBaseFragment extends RotatableFragment {
     protected Context context;
     protected String userEmail;
     protected MegaUser contact;
-    protected long parentHandle = -1;
+    protected long _parentHandle = -1;
     protected Stack<Integer> lastPositionStack;
     protected ArrayList<MegaNode> contactNodes;
     protected SortOrder orderGetChildren = SortOrder.ORDER_DEFAULT_ASC;

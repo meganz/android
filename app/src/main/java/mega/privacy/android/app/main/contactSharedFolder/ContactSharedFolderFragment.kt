@@ -1,5 +1,7 @@
 package mega.privacy.android.app.main.contactSharedFolder
 
+import mega.privacy.android.shared.resources.R as sharedR
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -16,8 +18,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
-import android.annotation.SuppressLint
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentContactSharedFolderListBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -183,7 +183,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
         var handle = parentHandle
         if (megaApi.getNodeByHandle(parentHandle) == null) {
             handle = -1
-            this.parentHandle = -1
+            this._parentHandle = -1
             viewModel.setParentHandle(handle)
             adapter.parentHandle = handle
             val fullList = megaApi.getInShares(contact)
@@ -207,7 +207,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
      * Set nodes to [MegaNodeAdapter]
      */
     fun setNodes() {
-        contactNodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle))
+        contactNodes = megaApi.getChildren(megaApi.getNodeByHandle(_parentHandle))
         adapter?.setNodes(contactNodes)
         listView.invalidate()
     }
