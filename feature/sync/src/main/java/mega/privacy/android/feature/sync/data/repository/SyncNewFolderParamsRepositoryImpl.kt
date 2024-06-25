@@ -17,4 +17,8 @@ internal class SyncNewFolderParamsRepositoryImpl @Inject constructor() :
 
     override fun monitorSelectedMegaFolder(): Flow<RemoteFolder?> =
         selectedMegaFolder
+
+    override fun clearSelectedMegaFolder() {
+        selectedMegaFolder.value = null
+    }
 }

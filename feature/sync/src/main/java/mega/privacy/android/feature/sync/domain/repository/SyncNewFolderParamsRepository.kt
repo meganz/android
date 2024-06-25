@@ -8,4 +8,6 @@ internal interface SyncNewFolderParamsRepository {
     fun setSelectedMegaFolder(megaFolder: RemoteFolder)
 
     fun monitorSelectedMegaFolder(): Flow<RemoteFolder?>
+
+    fun clearSelectedMegaFolder()
 }

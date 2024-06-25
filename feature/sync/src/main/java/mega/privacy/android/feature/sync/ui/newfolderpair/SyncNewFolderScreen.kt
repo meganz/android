@@ -36,6 +36,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.ui.megapicker.AllFilesAccessDialog
+import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
@@ -44,13 +49,8 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDi
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
-import mega.privacy.android.feature.sync.ui.megapicker.AllFilesAccessDialog
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
-import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 @Composable
 internal fun SyncNewFolderScreen(
@@ -139,10 +139,11 @@ private fun SyncNewFolderScreenContent(
     Column(
         modifier.verticalScroll(scrollState)
     ) {
-        val folderPicker = launchFolderPicker {
+        val folderPicker = launchFolderPicker(
+            Uri.parse(ROOT_FOLDER_URI_STRING)
+        ) {
             localFolderSelected(it)
         }
-
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
@@ -251,6 +252,8 @@ private fun SyncNewFolderScreenContent(
     }
 }
 
+private const val ROOT_FOLDER_URI_STRING =
+    "content://com.android.externalstorage.documents/root/primary"
 internal const val TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR = "sync_new_folder_screen_toolbar_test_tag"
 internal const val TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON =
     "sync_new_folder_screen_sync_button_test_tag"

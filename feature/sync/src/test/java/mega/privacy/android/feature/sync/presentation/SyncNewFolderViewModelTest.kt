@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.presentation
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -17,11 +18,11 @@ import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCa
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
-import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -41,6 +42,7 @@ internal class SyncNewFolderViewModelTest {
     private val syncFolderPairUseCase: SyncFolderPairUseCase = mock()
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase = mock()
     private val getLocalDCIMFolderPathUseCase: GetLocalDCIMFolderPathUseCase = mock()
+    private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase = mock()
     private lateinit var underTest: SyncNewFolderViewModel
 
     @AfterEach
@@ -51,6 +53,7 @@ internal class SyncNewFolderViewModelTest {
             syncFolderPairUseCase,
             isStorageOverQuotaUseCase,
             getLocalDCIMFolderPathUseCase,
+            clearSelectedMegaFolderUseCase
         )
     }
 
@@ -133,9 +136,7 @@ internal class SyncNewFolderViewModelTest {
         })
         whenever(
             syncFolderPairUseCase.invoke(
-                name = remoteFolder.name,
-                localPath = "",
-                remotePath = remoteFolder
+                name = remoteFolder.name, localPath = "", remotePath = remoteFolder
             )
         ).thenReturn(true)
         val state = SyncNewFolderState(
@@ -190,6 +191,17 @@ internal class SyncNewFolderViewModelTest {
         assertThat(underTest.state.value.openSyncListScreen).isEqualTo(consumed)
     }
 
+    @Test
+    fun `test that clear selected mega folder use case is called when view model is initiated`() {
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
+            awaitCancellation()
+        })
+
+        initViewModel()
+
+        verify(clearSelectedMegaFolderUseCase).invoke()
+    }
+
     private fun initViewModel() {
         underTest = SyncNewFolderViewModel(
             getExternalPathByContentUriUseCase,
@@ -197,6 +209,7 @@ internal class SyncNewFolderViewModelTest {
             syncFolderPairUseCase,
             isStorageOverQuotaUseCase,
             getLocalDCIMFolderPathUseCase,
+            clearSelectedMegaFolderUseCase
         )
     }
 }

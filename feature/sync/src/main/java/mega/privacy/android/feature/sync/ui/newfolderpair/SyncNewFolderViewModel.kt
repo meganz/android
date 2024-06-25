@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.newfolderpair
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,8 +16,8 @@ import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
-import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +27,7 @@ internal class SyncNewFolderViewModel @Inject constructor(
     private val syncFolderPairUseCase: SyncFolderPairUseCase,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
     private val getLocalDCIMFolderPathUseCase: GetLocalDCIMFolderPathUseCase,
+    private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncNewFolderState())
@@ -33,6 +35,7 @@ internal class SyncNewFolderViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            clearSelectedMegaFolderUseCase()
             monitorSelectedMegaFolderUseCase().collectLatest { folder ->
                 _state.update { state ->
                     state.copy(selectedMegaFolder = folder)
