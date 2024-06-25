@@ -44,8 +44,8 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.badge
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
@@ -129,7 +129,7 @@ fun MegaAppBar(
 fun MegaAppBar(
     appBarType: AppBarType,
     title: String,
-    subtitle: String,
+    subtitle: String?,
     modifier: Modifier = Modifier,
     onNavigationPressed: (() -> Unit)? = null,
     badgeCount: Int? = null,
@@ -155,10 +155,12 @@ fun MegaAppBar(
         badgeCount = badgeCount,
         titleIcons = titleIcons,
         subtitle = {
-            if (marqueeSubtitle) {
-                MegaAppBarMarqueeSubTitle(subtitle)
-            } else {
-                MegaAppBarSubTitle(subtitle)
+            subtitle?.let {
+                if (marqueeSubtitle) {
+                    MegaAppBarMarqueeSubTitle(it)
+                } else {
+                    MegaAppBarSubTitle(it)
+                }
             }
         },
         actions = actions,
@@ -279,7 +281,9 @@ internal fun BaseMegaAppBar(
 ) {
     TopAppBar(
         title = titleAndSubtitle,
-        backgroundColor = MegaOriginalTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha),
+        backgroundColor = MegaOriginalTheme.colors.background.pageBackground.copy(
+            LocalMegaAppBarColors.current.backgroundAlpha
+        ),
         modifier = modifier.testTag(TEST_TAG_APP_BAR),
         navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
             Box {
@@ -351,7 +355,9 @@ internal fun BaseMegaAppBar(
 ) {
     TopAppBar(
         title = titleAndSubtitle,
-        backgroundColor = MegaOriginalTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha),
+        backgroundColor = MegaOriginalTheme.colors.background.pageBackground.copy(
+            LocalMegaAppBarColors.current.backgroundAlpha
+        ),
         modifier = modifier.testTag(TEST_TAG_APP_BAR),
         navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
             Box {

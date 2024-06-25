@@ -84,18 +84,25 @@ class InviteContactViewModel @Inject constructor(
     /**
      * Initialize the list of contacts
      */
-    fun initializeContacts() = viewModelScope.launch {
+    internal fun initializeContacts() = viewModelScope.launch {
+        _uiState.update { it.copy(isLoading = true) }
         runCatching { getInvitationContactInfo() }
             .onSuccess { invitationContactInfo ->
                 allContacts = invitationContactInfo
                 _uiState.update {
                     it.copy(
+                        isLoading = false,
                         onContactsInitialized = true,
                         filteredContacts = invitationContactInfo
                     )
                 }
             }.onFailure { throwable ->
-                _uiState.update { it.copy(onContactsInitialized = true) }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        onContactsInitialized = true
+                    )
+                }
                 Timber.e("Failed to get local contacts", throwable)
             }
     }
@@ -112,47 +119,6 @@ class InviteContactViewModel @Inject constructor(
             filterPendingOrAcceptedLocalContactsByEmailUseCase(filteredMEGAContactList)
 
         return invitationContactInfoUiMapper(localContacts = filteredPendingMEGAContactList)
-    }
-
-    /**
-     * Update contact's highlighted or selected value
-     *
-     * @param contactInfo The selected contact info
-     */
-    fun toggleContactHighlightedInfo(contactInfo: InvitationContactInfo) {
-        toggleContactHighlightedInfo(contactInfo, !contactInfo.isHighlighted)
-    }
-
-    /**
-     * Update contact's highlighted or selected value
-     *
-     * @param contactInfo The selected contact info
-     * @param value The expected new value of the highlighted boolean property
-     */
-    fun toggleContactHighlightedInfo(contactInfo: InvitationContactInfo, value: Boolean) {
-        // Since stateflow will not re-emit the value if we use object reference
-        // therefore we have to update both
-        allContacts = allContacts.toMutableList()
-            .map { contact ->
-                if (contact.id == contactInfo.id) {
-                    contact.copy(isHighlighted = value)
-                } else {
-                    contact
-                }
-            }
-
-        _uiState.update {
-            it.copy(
-                filteredContacts = it.filteredContacts.toMutableList()
-                    .map { contact ->
-                        if (contact.id == contactInfo.id) {
-                            contact.copy(isHighlighted = value)
-                        } else {
-                            contact
-                        }
-                    }
-            )
-        }
     }
 
     /**
@@ -243,6 +209,14 @@ class InviteContactViewModel @Inject constructor(
         _uiState.update { it.copy(onContactsInitialized = false) }
     }
 
+    internal fun onOpenCameraConfirmationShown() {
+        _uiState.update { it.copy(showOpenCameraConfirmation = false) }
+    }
+
+    internal fun onQRScannerInitialized() {
+        _uiState.update { it.copy(shouldInitializeQR = false) }
+    }
+
     internal fun onDismissContactListContactInfo() {
         _uiState.update { it.copy(invitationContactInfoWithMultipleContacts = null) }
     }
@@ -304,6 +278,18 @@ class InviteContactViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Update contact's highlighted or selected value
+     *
+     * @param contactInfo The selected contact info
+     */
+    fun toggleContactHighlightedInfo(contactInfo: InvitationContactInfo) {
+        toggleContactHighlightedInfo(contactInfo, !contactInfo.isHighlighted)
+    }
+
+    private fun isContactAdded(contactInfo: InvitationContactInfo): Boolean =
+        _uiState.value.selectedContactInformation.any { isTheSameContact(it, contactInfo) }
+
     internal fun addSelectedContactInformation(contact: InvitationContactInfo) {
         _uiState.update {
             it.copy(
@@ -312,6 +298,29 @@ class InviteContactViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    internal fun validateCameraAvailability() {
+        viewModelScope.launch {
+            Timber.d("Checking if there are ongoing video calls")
+            runCatching { areThereOngoingVideoCallsUseCase() }
+                .onSuccess {
+                    if (it) {
+                        showOpenCameraConfirmation()
+                    } else {
+                        initializeQRScanner()
+                    }
+                }
+                .onFailure { Timber.e("Failed to check ongoing video calls", it) }
+        }
+    }
+
+    private fun showOpenCameraConfirmation() {
+        _uiState.update { it.copy(showOpenCameraConfirmation = true) }
+    }
+
+    private fun initializeQRScanner() {
+        _uiState.update { it.copy(shouldInitializeQR = true) }
     }
 
     /**
@@ -371,8 +380,8 @@ class InviteContactViewModel @Inject constructor(
      * Note: The contact info list dialog shows multiple contact info from the same contact.
      */
     internal fun updateSelectedContactInfoByInfoWithMultipleContacts(
-        newListOfSelectedContact: List<InvitationContactInfo>,
         contactInfo: InvitationContactInfo,
+        newListOfSelectedContact: List<InvitationContactInfo>,
     ) {
         val selectedContactInfo = mutableListOf<InvitationContactInfo>().apply {
             addAll(_uiState.value.selectedContactInformation)
@@ -413,8 +422,15 @@ class InviteContactViewModel @Inject constructor(
         }
     }
 
-    private fun isContactAdded(contactInfo: InvitationContactInfo): Boolean =
-        _uiState.value.selectedContactInformation.any { isTheSameContact(it, contactInfo) }
+    internal fun onContactChipClick(contactInfo: InvitationContactInfo) {
+        removeSelectedContactInformation(contactInfo)
+        toggleContactHighlightedInfo(
+            contactInfo = contactInfo,
+            value = if (contactInfo.hasMultipleContactInfos()) {
+                _uiState.value.selectedContactInformation.any { it.id == contactInfo.id }
+            } else false
+        )
+    }
 
     internal fun removeSelectedContactInformation(contact: InvitationContactInfo) {
         _uiState.update { uiState ->
@@ -426,41 +442,42 @@ class InviteContactViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Update contact's highlighted or selected value
+     *
+     * @param contactInfo The selected contact info
+     * @param value The expected new value of the highlighted boolean property
+     */
+    fun toggleContactHighlightedInfo(contactInfo: InvitationContactInfo, value: Boolean) {
+        // Since stateflow will not re-emit the value if we use object reference
+        // therefore we have to update both
+        allContacts = allContacts.toMutableList()
+            .map { contact ->
+                if (contact.id == contactInfo.id) {
+                    contact.copy(isHighlighted = value)
+                } else {
+                    contact
+                }
+            }
+
+        _uiState.update {
+            it.copy(
+                filteredContacts = it.filteredContacts.toMutableList()
+                    .map { contact ->
+                        if (contact.id == contactInfo.id) {
+                            contact.copy(isHighlighted = value)
+                        } else {
+                            contact
+                        }
+                    }
+            )
+        }
+    }
+
     private fun isTheSameContact(
         first: InvitationContactInfo,
         second: InvitationContactInfo,
     ): Boolean = first.id == second.id && first.displayInfo.equals(second.displayInfo, true)
-
-    internal fun validateCameraAvailability() {
-        viewModelScope.launch {
-            Timber.d("Checking if there are ongoing video calls")
-            runCatching { areThereOngoingVideoCallsUseCase() }
-                .onSuccess {
-                    if (it) {
-                        showOpenCameraConfirmation()
-                    } else {
-                        initializeQRScanner()
-                    }
-                }
-                .onFailure { Timber.e("Failed to check ongoing video calls", it) }
-        }
-    }
-
-    private fun showOpenCameraConfirmation() {
-        _uiState.update { it.copy(showOpenCameraConfirmation = true) }
-    }
-
-    internal fun onOpenCameraConfirmationShown() {
-        _uiState.update { it.copy(showOpenCameraConfirmation = false) }
-    }
-
-    private fun initializeQRScanner() {
-        _uiState.update { it.copy(shouldInitializeQR = true) }
-    }
-
-    internal fun onQRScannerInitialized() {
-        _uiState.update { it.copy(shouldInitializeQR = false) }
-    }
 
     companion object {
         /**

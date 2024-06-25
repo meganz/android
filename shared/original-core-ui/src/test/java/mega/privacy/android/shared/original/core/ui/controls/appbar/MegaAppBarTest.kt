@@ -6,6 +6,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -162,6 +163,31 @@ class MegaAppBarTest {
                     testTag = menuButtonFav
                 ) {})
         }
+    }
+
+    @Test
+    fun `test that subtitle is not displayed when it's NULL`() {
+        composeTestRule.setContent {
+            MegaAppBar(
+                appBarType = AppBarType.BACK_NAVIGATION,
+                title = "title",
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TEST_TAG_MEGA_APP_BAR_SUBTITLE).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that subtitle is displayed when it isn't NULL`() {
+        composeTestRule.setContent {
+            MegaAppBar(
+                appBarType = AppBarType.BACK_NAVIGATION,
+                title = "title",
+                subtitle = "subtitle"
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TEST_TAG_MEGA_APP_BAR_SUBTITLE).assertIsDisplayed()
     }
 
     val menuButtonCancel = "appbar:menu_button_cancel"

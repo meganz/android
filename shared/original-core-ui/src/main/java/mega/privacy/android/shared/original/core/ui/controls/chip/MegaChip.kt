@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.chip
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -43,8 +44,8 @@ fun MegaChip(
     style: ChipStyle = DefaultChipStyle,
     onClick: () -> Unit = {},
     enabled: Boolean = true,
-    leadingIcon: Int? = null,
-    trailingIcon: Int? = null,
+    @DrawableRes leadingIcon: Int? = null,
+    @DrawableRes trailingIcon: Int? = null,
 ) {
     FilterChip(
         modifier = modifier

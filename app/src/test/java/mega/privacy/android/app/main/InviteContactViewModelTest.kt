@@ -82,6 +82,19 @@ class InviteContactViewModelTest {
         initializeViewModel()
     }
 
+    @AfterEach
+    fun tearDown() {
+        reset(
+            createContactLinkUseCase,
+            getLocalContactsUseCase,
+            filterLocalContactsByEmailUseCase,
+            filterPendingOrAcceptedLocalContactsByEmailUseCase,
+            inviteContactWithEmailsUseCase,
+            areThereOngoingVideoCallsUseCase,
+            validateEmailInputForInvitationUseCase
+        )
+    }
+
     private fun initializeViewModel() {
         underTest = InviteContactViewModel(
             defaultDispatcher = extension.testDispatcher,
@@ -102,13 +115,8 @@ class InviteContactViewModelTest {
     @Test
     fun `test that all contacts should be initialized when given a contact list`() = runTest {
         val localContacts = listOf(LocalContact(id = 1L))
-        whenever(getLocalContactsUseCase()).thenReturn(localContacts)
-        whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
-        whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
-            localContacts
-        )
 
-        underTest.initializeContacts()
+        initializeContacts { localContacts }
 
         assertThat(underTest.allContacts).isEqualTo(invitationContactInfoUiMapper(localContacts))
     }
@@ -117,13 +125,8 @@ class InviteContactViewModelTest {
     fun `test that filtered contacts list should be initialized when given a contact list`() =
         runTest {
             val localContacts = listOf(LocalContact(id = 1L))
-            whenever(getLocalContactsUseCase()).thenReturn(localContacts)
-            whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
-            whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
-                localContacts
-            )
 
-            underTest.initializeContacts()
+            initializeContacts { localContacts }
 
             underTest.uiState.test {
                 assertThat(
@@ -140,12 +143,7 @@ class InviteContactViewModelTest {
             LocalContact(id = 1L, name = "firstContact", phoneNumbers = listOf("123123123")),
             LocalContact(id = 2L, name = "secondContact", phoneNumbers = listOf("321321321"))
         )
-        whenever(getLocalContactsUseCase()).thenReturn(localContacts)
-        whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
-        whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
-            localContacts
-        )
-        underTest.initializeContacts()
+        initializeContacts { localContacts }
         val mappedContacts = invitationContactInfoUiMapper(localContacts)
 
         underTest.toggleContactHighlightedInfo(mappedContacts[1].copy(isHighlighted = true))
@@ -168,12 +166,7 @@ class InviteContactViewModelTest {
             LocalContact(id = 1L, name = "firstContact", phoneNumbers = listOf("123123123")),
             LocalContact(id = 2L, name = "secondContact", phoneNumbers = listOf("321321321"))
         )
-        whenever(getLocalContactsUseCase()).thenReturn(localContacts)
-        whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
-        whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
-            localContacts
-        )
-        underTest.initializeContacts()
+        initializeContacts { localContacts }
         val mappedContacts = invitationContactInfoUiMapper(localContacts)
 
         underTest.toggleContactHighlightedInfo(mappedContacts[1], true)
@@ -197,12 +190,7 @@ class InviteContactViewModelTest {
             LocalContact(id = 1L, name = "firstContact", phoneNumbers = listOf("123123123")),
             LocalContact(id = 2L, name = "secondContact", phoneNumbers = listOf("321321321"))
         )
-        whenever(getLocalContactsUseCase()).thenReturn(localContacts)
-        whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
-        whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
-            localContacts
-        )
-        underTest.initializeContacts()
+        initializeContacts { localContacts }
 
         underTest.filterContacts(query)
 
@@ -250,12 +238,7 @@ class InviteContactViewModelTest {
                     phoneNumbers = listOf("543534543")
                 )
             )
-            whenever(getLocalContactsUseCase()).thenReturn(localContacts)
-            whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
-            whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
-                localContacts
-            )
-            underTest.initializeContacts()
+            initializeContacts { localContacts }
 
             underTest.filterContacts("que")
 
@@ -285,13 +268,7 @@ class InviteContactViewModelTest {
     fun `test that the right list of mapped contact information is returned`(
         localContacts: List<LocalContact>,
     ) = runTest {
-        whenever(getLocalContactsUseCase()).thenReturn(localContacts)
-        whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
-        whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
-            localContacts
-        )
-
-        underTest.initializeContacts()
+        initializeContacts { localContacts }
 
         underTest.uiState.test {
             val expected = mutableListOf<InvitationContactInfo>()
@@ -645,12 +622,7 @@ class InviteContactViewModelTest {
                     emails = listOf(displayInfo, displayInfo)
                 )
             )
-            whenever(getLocalContactsUseCase()).thenReturn(localContacts)
-            whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
-            whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
-                localContacts
-            )
-            underTest.initializeContacts()
+            initializeContacts { localContacts }
 
             underTest.addContactInfo(displayInfo, type)
 
@@ -668,12 +640,7 @@ class InviteContactViewModelTest {
             val displayInfo = "display info"
             val type = TYPE_MANUAL_INPUT_EMAIL
             val localContacts = listOf(LocalContact(id = 1L, emails = listOf(displayInfo)))
-            whenever(getLocalContactsUseCase()).thenReturn(localContacts)
-            whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
-            whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
-                localContacts
-            )
-            underTest.initializeContacts()
+            initializeContacts { localContacts }
             val contactInfo = invitationContactInfoUiMapper(localContacts)
             underTest.addSelectedContactInformation(contactInfo[1]) // The 0 index is header item
 
@@ -691,12 +658,7 @@ class InviteContactViewModelTest {
             val displayInfo = "display info"
             val type = TYPE_MANUAL_INPUT_EMAIL
             val localContacts = listOf(LocalContact(id = contactId, emails = listOf(displayInfo)))
-            whenever(getLocalContactsUseCase()).thenReturn(localContacts)
-            whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
-            whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
-                localContacts
-            )
-            underTest.initializeContacts()
+            initializeContacts { localContacts }
 
             underTest.addContactInfo(displayInfo, type)
 
@@ -709,17 +671,87 @@ class InviteContactViewModelTest {
             }
         }
 
-    @AfterEach
-    fun tearDown() {
-        reset(
-            createContactLinkUseCase,
-            getLocalContactsUseCase,
-            filterLocalContactsByEmailUseCase,
-            filterPendingOrAcceptedLocalContactsByEmailUseCase,
-            inviteContactWithEmailsUseCase,
-            areThereOngoingVideoCallsUseCase,
-            validateEmailInputForInvitationUseCase
+    @Test
+    fun `test that the selected contact chip is removed from the selected contacts when clicked`() =
+        runTest {
+            val email = "email1@email.com"
+            val contactInfo = InvitationContactInfo(
+                id = 1L,
+                displayInfo = email
+            )
+            underTest.addSelectedContactInformation(contactInfo)
+
+            underTest.onContactChipClick(contactInfo)
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().selectedContactInformation).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that a contact info with multiple contacts is highlighted when any of them are selected`() =
+        runTest {
+            val firstEmail = "email1@email.com"
+            val secondEmail = "email2@email.com"
+            val localContacts = listOf(
+                LocalContact(
+                    id = 1L,
+                    emails = listOf(firstEmail, secondEmail)
+                ),
+            )
+            initializeContacts { localContacts }
+            val mappedContacts = invitationContactInfoUiMapper(localContacts)
+            underTest.addSelectedContactInformation(mappedContacts[1].copy(displayInfo = firstEmail))
+            underTest.addSelectedContactInformation(mappedContacts[1].copy(displayInfo = secondEmail))
+
+            underTest.onContactChipClick(mappedContacts[1].copy(displayInfo = firstEmail))
+
+            underTest.uiState.test {
+                assertThat(
+                    expectMostRecentItem().filteredContacts
+                ).isEqualTo(
+                    listOf(
+                        mappedContacts[0], // Header item
+                        mappedContacts[1].copy(isHighlighted = true)
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that a contact info isn't highlighted when removed from the chip`() =
+        runTest {
+            val localContacts = listOf(
+                LocalContact(
+                    id = 1L,
+                    emails = listOf(email)
+                ),
+            )
+            initializeContacts { localContacts }
+            val mappedContacts = invitationContactInfoUiMapper(localContacts)
+            underTest.addSelectedContactInformation(mappedContacts[1].copy(displayInfo = email))
+
+            underTest.onContactChipClick(mappedContacts[1].copy(displayInfo = email))
+
+            underTest.uiState.test {
+                assertThat(
+                    expectMostRecentItem().filteredContacts
+                ).isEqualTo(
+                    listOf(
+                        mappedContacts[0], // Header item
+                        mappedContacts[1].copy(isHighlighted = false)
+                    )
+                )
+            }
+        }
+
+    private suspend fun initializeContacts(localContacts: () -> List<LocalContact>) {
+        whenever(getLocalContactsUseCase()).thenReturn(localContacts())
+        whenever(filterLocalContactsByEmailUseCase(localContacts())).thenReturn(localContacts())
+        whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts())).thenReturn(
+            localContacts()
         )
+        underTest.initializeContacts()
     }
 
     companion object {

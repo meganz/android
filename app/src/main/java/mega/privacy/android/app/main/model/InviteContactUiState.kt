@@ -9,6 +9,7 @@ import mega.privacy.android.app.presentation.contact.invite.navigation.InviteCon
 /**
  * State for invite Contact
  *
+ * @property isLoading Whether the contact list is initializing.
  * @property onContactsInitialized True if successfully initialized contacts, false otherwise
  * @property contactLink The generated contact link for the invitation
  * @property selectedContactInformation List of the selected contact information.
@@ -23,6 +24,7 @@ import mega.privacy.android.app.presentation.contact.invite.navigation.InviteCon
  */
 @Immutable
 data class InviteContactUiState(
+    val isLoading: Boolean = false,
     val onContactsInitialized: Boolean = false,
     val contactLink: String = "",
     val selectedContactInformation: List<InvitationContactInfo> = emptyList(),

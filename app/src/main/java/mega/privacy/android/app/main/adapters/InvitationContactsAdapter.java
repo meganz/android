@@ -170,7 +170,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
                             Uri.parse(contact.getPhotoUri())
                     );
                 } catch (IOException e) {
-                    Timber.e("Failed to convert contact's photo Uri to a Bitmap", e);
+                    Timber.e(e, "Failed to convert contact's photo Uri to a Bitmap");
                 }
             }
 
