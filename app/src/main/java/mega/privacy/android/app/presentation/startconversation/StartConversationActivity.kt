@@ -20,6 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
+import mega.privacy.android.app.presentation.contact.invite.InviteContactActivityV2
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.security.PasscodeCheck
@@ -74,7 +75,10 @@ class StartConversationActivity : ComponentActivity() {
                         title = data.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE),
                         isEkr = data.getBooleanExtra(AddContactActivity.EXTRA_EKR, false),
                         chatLink = data.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false),
-                        addParticipants = data.getBooleanExtra(AddContactActivity.ALLOW_ADD_PARTICIPANTS, false),
+                        addParticipants = data.getBooleanExtra(
+                            AddContactActivity.ALLOW_ADD_PARTICIPANTS,
+                            false
+                        ),
                         emails = data.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
                     )
                 } else {
@@ -92,8 +96,10 @@ class StartConversationActivity : ComponentActivity() {
                             finish()
                         }, Constants.LONG_SNACKBAR_DURATION)
                     } else if (state.result != null) {
-                        setResult(RESULT_OK,
-                            Intent().putExtra(EXTRA_NEW_CHAT_ID, state.result))
+                        setResult(
+                            RESULT_OK,
+                            Intent().putExtra(EXTRA_NEW_CHAT_ID, state.result)
+                        )
                         finish()
                     }
                 }
@@ -156,8 +162,15 @@ class StartConversationActivity : ComponentActivity() {
     }
 
     private fun onInviteContacts() {
-        resultLauncher.launch(Intent(this, InviteContactActivity::class.java)
-            .putExtra(Constants.INTENT_EXTRA_KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_DEVICE))
+        val activity = if (viewModel.state.value.isNewInviteContactActivityEnabled) {
+            InviteContactActivityV2::class.java
+        } else InviteContactActivity::class.java
+        resultLauncher.launch(
+            Intent(this, activity).putExtra(
+                Constants.INTENT_EXTRA_KEY_CONTACT_TYPE,
+                Constants.CONTACT_TYPE_DEVICE
+            )
+        )
     }
 
     companion object {

@@ -232,6 +232,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     PictureInPicture(
         "Enable Picture in Picture in Meeting",
         false
+    ),
+
+    /**
+     * Enables new invite contact compose page
+     */
+    NewInviteContactActivity(
+        "Enable new invite contact activity",
+        true
     );
 
     companion object : FeatureFlagValueProvider {

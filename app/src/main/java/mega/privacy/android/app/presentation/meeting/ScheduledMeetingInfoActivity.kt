@@ -39,7 +39,6 @@ import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
@@ -483,7 +482,10 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      * Open invite contacts
      */
     private fun openInviteContact() {
-        startActivity(Intent(this@ScheduledMeetingInfoActivity, InviteContactActivity::class.java))
+        navigator.openInviteContactActivity(
+            this,
+            false
+        )
     }
 
     @Composable

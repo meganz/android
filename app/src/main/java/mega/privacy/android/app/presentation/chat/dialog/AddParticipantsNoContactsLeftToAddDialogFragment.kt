@@ -12,9 +12,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContactsAddedDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
 
 /**
@@ -28,6 +29,12 @@ class AddParticipantsNoContactsLeftToAddDialogFragment : DialogFragment() {
     /** Current theme */
     lateinit var getThemeMode: GetThemeMode
 
+    /**
+     * The centralized navigator in the :app module
+     */
+    @Inject
+    lateinit var navigator: MegaNavigator
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,6 +47,12 @@ class AddParticipantsNoContactsLeftToAddDialogFragment : DialogFragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     AllContactsAddedDialog(
+                        onNavigateToInviteContact = {
+                            navigator.openInviteContactActivity(
+                                requireContext(),
+                                false
+                            )
+                        },
                         onDismiss = { dismissAllowingStateLoss() },
                     )
                 }

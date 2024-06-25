@@ -1,7 +1,6 @@
 package mega.privacy.android.app.contacts.list
 
 import android.Manifest
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -23,7 +22,6 @@ import mega.privacy.android.app.contacts.list.adapter.ContactActionsListAdapter
 import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFragment
 import mega.privacy.android.app.databinding.FragmentContactListBinding
-import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.createForceAppUpdateDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
@@ -166,7 +164,10 @@ class ContactListFragment : Fragment() {
         binding.listScroller.setRecyclerView(binding.list)
 
         binding.btnAddContact.setOnClickListener {
-            startActivity(Intent(requireContext(), InviteContactActivity::class.java))
+            navigator.openInviteContactActivity(
+                requireContext(),
+                false
+            )
         }
 
         binding.viewEmpty.text = binding.viewEmpty.text.toString()

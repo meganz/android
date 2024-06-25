@@ -29,6 +29,7 @@ import mega.privacy.android.domain.usecase.contact.AddNewContactsUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import org.junit.jupiter.api.BeforeEach
@@ -96,6 +97,7 @@ class StartConversationViewModelTest {
     private val addNewContactsUseCase = mock<AddNewContactsUseCase>()
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun resetMocks() {
@@ -106,7 +108,8 @@ class StartConversationViewModelTest {
             applyContactUpdates,
             addNewContactsUseCase,
             requestUserLastGreenUseCase,
-            createGroupChatRoomUseCase
+            createGroupChatRoomUseCase,
+            getFeatureFlagValueUseCase
         )
         savedStateHandle = SavedStateHandle(mapOf())
         wheneverBlocking { getVisibleContactsUseCase() }.thenReturn(emptyList())
@@ -133,6 +136,7 @@ class StartConversationViewModelTest {
             addNewContactsUseCase = addNewContactsUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             savedStateHandle = savedStateHandle,
         )
     }

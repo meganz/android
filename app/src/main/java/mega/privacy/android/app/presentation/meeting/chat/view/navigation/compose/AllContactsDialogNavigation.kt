@@ -8,9 +8,11 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContact
 
 internal fun NavGraphBuilder.allParticipantsDialog(
     navController: NavHostController,
+    onNavigateToInviteContact: () -> Unit,
 ) {
     dialog(route = "allContactsParticipate") {
         AllContactsAddedDialog(
+            onNavigateToInviteContact = onNavigateToInviteContact,
             onDismiss = { navController.popBackStack() },
         )
     }

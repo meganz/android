@@ -103,4 +103,12 @@ interface AppNavigator {
         nodeHandle: Long? = null,
         onError: () -> Unit,
     )
+
+    /**
+     * Navigates to the new [InviteContactActivityV2].
+     *
+     * @param context The context that call this method.
+     * @param isFromAchievement Whether the entry point is [InviteFriendsRoute].
+     */
+    fun openInviteContactActivity(context: Context, isFromAchievement: Boolean)
 }

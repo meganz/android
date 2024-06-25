@@ -160,7 +160,10 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
             navigateToInviteContact = navigateToInviteContact
         )
 
-        allParticipantsDialog(navController)
+        allParticipantsDialog(
+            navController = navController,
+            onNavigateToInviteContact = navigateToInviteContact
+        )
 
         clearChatConfirmationDialog(navController)
 

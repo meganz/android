@@ -79,7 +79,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
-import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity;
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
@@ -821,9 +820,6 @@ public class CallUtil {
                     }
                     if (activity instanceof AddContactActivity && action.equals(ACTION_OPEN_QR)) {
                         ((AddContactActivity) activity).initScanQR();
-                    }
-                    if (activity instanceof InviteContactActivity && action.equals(ACTION_OPEN_QR)) {
-                        ((InviteContactActivity) activity).initScanQR();
                     }
                     break;
 

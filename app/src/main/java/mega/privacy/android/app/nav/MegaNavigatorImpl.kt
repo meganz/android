@@ -7,6 +7,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
+import mega.privacy.android.app.presentation.contact.invite.InviteContactActivityV2
+import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
@@ -142,6 +145,21 @@ internal class MegaNavigatorImpl @Inject constructor(
             } ?: run {
                 onError()
             }
+        }
+    }
+
+    override fun openInviteContactActivity(context: Context, isFromAchievement: Boolean) {
+        applicationScope.launch {
+            val activity =
+                if (getFeatureFlagValueUseCase(AppFeatures.NewInviteContactActivity)) {
+                    InviteContactActivityV2::class.java
+                } else {
+                    InviteContactActivity::class.java
+                }
+            val intent = Intent(context, activity).apply {
+                putExtra(InviteContactViewModel.KEY_FROM, isFromAchievement)
+            }
+            context.startActivity(intent)
         }
     }
 }

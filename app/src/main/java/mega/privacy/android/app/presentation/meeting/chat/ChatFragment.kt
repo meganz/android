@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.session.SessionContainer
-import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
@@ -41,6 +39,7 @@ import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent
 import javax.inject.Inject
@@ -53,6 +52,12 @@ internal class ChatFragment : Fragment() {
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+
+    /**
+     * The centralized navigator in the :app module
+     */
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     @OptIn(ExperimentalMaterialNavigationApi::class)
     override fun onCreateView(
@@ -105,8 +110,9 @@ internal class ChatFragment : Fragment() {
                                     scaffoldState = scaffoldState,
                                     startMeeting = { startMeetingActivity(requireContext(), it) },
                                     navigateToInviteContact = {
-                                        requireContext().startActivity(
-                                            Intent(context, InviteContactActivity::class.java)
+                                        navigator.openInviteContactActivity(
+                                            requireContext(),
+                                            false
                                         )
                                     },
                                     showGroupOrContactInfoActivity = {

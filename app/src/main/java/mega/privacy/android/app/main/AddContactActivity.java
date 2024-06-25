@@ -121,7 +121,6 @@ import mega.privacy.android.app.main.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.tasks.AddContactViewModel;
-import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity;
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView;
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;
@@ -129,6 +128,7 @@ import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.domain.entity.Contact;
+import mega.privacy.android.navigation.MegaNavigator;
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -154,6 +154,9 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     GetChatChangesUseCase getChatChangesUseCase;
     @Inject
     DatabaseHandler dbH;
+
+    @Inject
+    MegaNavigator navigator;
 
     private AddContactViewModel viewModel;
     private static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
@@ -2794,9 +2797,10 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     }
 
     private void toInviteContact() {
-        Intent in = new Intent(this, InviteContactActivity.class);
-        in.putExtra("contactType", CONTACT_TYPE_DEVICE);
-        startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
+        navigator.openInviteContactActivity(
+                this,
+                false
+        );
     }
 
     @Override

@@ -1,14 +1,13 @@
 package mega.privacy.android.app.presentation.chat.dialog
 
 import android.app.Dialog
-import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
 
 /**
@@ -22,6 +21,12 @@ class AddParticipantsNoContactsDialogFragment : DialogFragment() {
     /** Current theme */
     lateinit var getThemeMode: GetThemeMode
 
+    /**
+     * The centralized navigator in the :app module
+     */
+    @Inject
+    lateinit var navigator: MegaNavigator
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
         MaterialAlertDialogBuilder(
             requireContext(),
@@ -34,7 +39,10 @@ class AddParticipantsNoContactsDialogFragment : DialogFragment() {
                     dismiss()
                 }
                 setPositiveButton(getString(R.string.contact_invite)) { _, _ ->
-                    startActivity(Intent(requireContext(), InviteContactActivity::class.java))
+                    navigator.openInviteContactActivity(
+                        requireContext(),
+                        false
+                    )
                     dismiss()
                 }
             }.create()
