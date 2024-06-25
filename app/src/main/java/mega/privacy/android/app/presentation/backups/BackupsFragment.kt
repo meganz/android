@@ -58,14 +58,10 @@ import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
-import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
-import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
-import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
-import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.displayMetrics
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -96,6 +92,9 @@ class BackupsFragment : RotatableFragment() {
      */
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
     /**
      * Retrieves the UI state from [BackupsViewModel]
@@ -278,7 +277,7 @@ class BackupsFragment : RotatableFragment() {
                 }
 
                 R.id.cab_menu_share_out -> {
-                    shareNodes(requireActivity(), selectedNodes)
+                    megaNodeUtilWrapper.shareNodes(requireActivity(), selectedNodes)
                     clearSelections()
                     hideMultipleSelect()
                 }
@@ -333,6 +332,16 @@ class BackupsFragment : RotatableFragment() {
         }
     }
 
+
+    private fun List<MegaNode?>.areAllNotTakenDown(): Boolean {
+        for (node in this) {
+            if (node?.isTakenDown == true) {
+                return false
+            }
+        }
+
+        return true
+    }
     /**
      * Establishes the Toolbar
      */
@@ -714,12 +723,12 @@ class BackupsFragment : RotatableFragment() {
             }
             (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
         } else if (MimeTypeList.typeForName(node.name).isURL) {
-            manageURLNode(requireActivity(), megaApi, node)
+            megaNodeUtilWrapper.manageURLNode(requireActivity(), megaApi, node)
         } else if (MimeTypeList.typeForName(node.name).isOpenableTextFile(node.size)) {
-            manageTextFileIntent(requireContext(), node, Constants.BACKUPS_ADAPTER)
+            megaNodeUtilWrapper.manageTextFileIntent(requireContext(), node, Constants.BACKUPS_ADAPTER)
         } else {
             megaNodeAdapter?.notifyDataSetChanged()
-            onNodeTapped(
+            megaNodeUtilWrapper.onNodeTapped(
                 context = requireActivity(),
                 node = node,
                 nodeDownloader = { nodeToDownload: MegaNode ->
