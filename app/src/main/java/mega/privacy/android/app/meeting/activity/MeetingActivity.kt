@@ -194,9 +194,11 @@ class MeetingActivity : PasscodeActivity() {
     }
 
     private fun updateAutoPiPModeParams(isAutoEnterEnabled: Boolean) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            pipBuilderParams.setAutoEnterEnabled(isAutoEnterEnabled)
-            setPictureInPictureParams(pipBuilderParams.build())
+        if (meetingViewModel.state.value.isPictureInPictureFeatureFlagEnabled) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                pipBuilderParams.setAutoEnterEnabled(isAutoEnterEnabled)
+                setPictureInPictureParams(pipBuilderParams.build())
+            }
         }
     }
 
