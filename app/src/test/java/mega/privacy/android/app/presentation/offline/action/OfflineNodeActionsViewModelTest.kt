@@ -26,7 +26,6 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
 import org.junit.jupiter.api.AfterEach
@@ -56,7 +55,6 @@ class OfflineNodeActionsViewModelTest {
     private val getOfflineFileUseCase: GetOfflineFileUseCase = mock()
     private val getOfflineFilesUseCase: GetOfflineFilesUseCase = mock()
     private val exportNodesUseCase: ExportNodesUseCase = mock()
-    private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase = mock()
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase = mock()
     private val snackBarHandler: SnackBarHandler = mock()
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
@@ -81,7 +79,6 @@ class OfflineNodeActionsViewModelTest {
             getOfflineFileUseCase = getOfflineFileUseCase,
             getOfflineFilesUseCase = getOfflineFilesUseCase,
             exportNodesUseCase = exportNodesUseCase,
-            getFileTypeInfoUseCase = getFileTypeInfoUseCase,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             snackBarHandler = snackBarHandler,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper
@@ -173,12 +170,12 @@ class OfflineNodeActionsViewModelTest {
             on { handle } doReturn "123"
             on { path } doReturn "path"
             on { name } doReturn "name"
+            on { fileTypeInfo } doReturn type
         }
 
         val file = File("path")
         val content = NodeContentUri.LocalContentUri(file)
         whenever(getOfflineFileUseCase(nodeInfo)).thenReturn(file)
-        whenever(getFileTypeInfoUseCase(file)).thenReturn(type)
 
         underTest.handleOpenOfflineFile(nodeInfo)
 
@@ -208,13 +205,13 @@ class OfflineNodeActionsViewModelTest {
                 on { handle } doReturn "123"
                 on { path } doReturn "path"
                 on { name } doReturn "name"
+                on { fileTypeInfo } doReturn TextFileTypeInfo("text/plain", "txt")
             }
 
             val file = mock<File> {
                 on { length() } doReturn TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE + 100L
             }
             whenever(getOfflineFileUseCase(nodeInfo)).thenReturn(file)
-            whenever(getFileTypeInfoUseCase(file)).thenReturn(TextFileTypeInfo("text/plain", "txt"))
 
             underTest.handleOpenOfflineFile(nodeInfo)
 
@@ -302,7 +299,6 @@ class OfflineNodeActionsViewModelTest {
             snackBarHandler,
             nodeContentUriIntentMapper,
             getOfflineFileUseCase,
-            getFileTypeInfoUseCase,
             getPathFromNodeContentUseCase
         )
     }

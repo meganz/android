@@ -11,12 +11,13 @@ class OfflineUiStateTest {
         val offlineNodeUIItem =
             OfflineNodeUIItem(
                 OfflineFileInformation(
-                    1L,
-                    OfflineFolderInfo(1, 1),
-                    "test",
-                    11,
-                    "123",
-                    678,
+                    totalSize = 1L,
+                    folderInfo = OfflineFolderInfo(1, 1),
+                    fileTypeInfo = null,
+                    thumbnail = "test",
+                    id = 11,
+                    handle = "123",
+                    parentId = 678,
                     path = "path",
                     lastModifiedTime = 123L,
                 ),
@@ -25,12 +26,13 @@ class OfflineUiStateTest {
         val offlineNodeUIItem2 =
             OfflineNodeUIItem(
                 OfflineFileInformation(
-                    1L,
-                    OfflineFolderInfo(1, 1),
-                    "test",
-                    12,
-                    "345",
-                    124,
+                    totalSize = 1L,
+                    folderInfo = OfflineFolderInfo(1, 1),
+                    fileTypeInfo = null,
+                    thumbnail = "test",
+                    id = 12,
+                    handle = "345",
+                    parentId = 124,
                     path = "path2",
                     lastModifiedTime = 123L,
                 ),

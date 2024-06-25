@@ -6,7 +6,7 @@ import java.io.File
 /**
  * Sealed class for offline file content
  */
-sealed class OfflineNodeActionUiEntity {
+sealed interface OfflineNodeActionUiEntity {
 
     /**
      * Image content
@@ -16,7 +16,7 @@ sealed class OfflineNodeActionUiEntity {
     data class Image(
         val nodeId: NodeId,
         val path: String,
-    ) : OfflineNodeActionUiEntity()
+    ) : OfflineNodeActionUiEntity
 
     /**
      * Audio or video content
@@ -36,7 +36,7 @@ sealed class OfflineNodeActionUiEntity {
         val mimeType: String,
         val extension: String,
         val file: File,
-    ) : OfflineNodeActionUiEntity()
+    ) : OfflineNodeActionUiEntity
 
     /**
      * Text content
@@ -44,7 +44,7 @@ sealed class OfflineNodeActionUiEntity {
      */
     data class Text(
         val file: File,
-    ) : OfflineNodeActionUiEntity()
+    ) : OfflineNodeActionUiEntity
 
     /**
      * Zip content
@@ -54,7 +54,7 @@ sealed class OfflineNodeActionUiEntity {
     data class Zip(
         val nodeId: NodeId,
         val file: File,
-    ) : OfflineNodeActionUiEntity()
+    ) : OfflineNodeActionUiEntity
 
     /**
      * Uri content
@@ -62,7 +62,7 @@ sealed class OfflineNodeActionUiEntity {
      */
     data class Uri(
         val path: String?,
-    ) : OfflineNodeActionUiEntity()
+    ) : OfflineNodeActionUiEntity
 
     /**
      * Pdf content
@@ -74,7 +74,7 @@ sealed class OfflineNodeActionUiEntity {
         val nodeId: NodeId,
         val file: File,
         val mimeType: String,
-    ) : OfflineNodeActionUiEntity()
+    ) : OfflineNodeActionUiEntity
 
     /**
      * Other content
@@ -84,5 +84,5 @@ sealed class OfflineNodeActionUiEntity {
     data class Other(
         val file: File,
         val mimeType: String,
-    ) : OfflineNodeActionUiEntity()
+    ) : OfflineNodeActionUiEntity
 }

@@ -27,7 +27,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
 import timber.log.Timber
@@ -42,7 +41,6 @@ class OfflineNodeActionsViewModel @Inject constructor(
     private val getOfflineFileUseCase: GetOfflineFileUseCase,
     private val getOfflineFilesUseCase: GetOfflineFilesUseCase,
     private val exportNodesUseCase: ExportNodesUseCase,
-    private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
     private val snackBarHandler: SnackBarHandler,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
@@ -130,7 +128,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val localFile = getOfflineFileUseCase(info)
-                val fileType = getFileTypeInfoUseCase(localFile)
+                val fileType = info.fileTypeInfo
                 val nodeId = NodeId(info.handle.toLong())
                 when {
                     fileType is PdfFileTypeInfo -> OfflineNodeActionUiEntity.Pdf(
@@ -176,7 +174,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
 
                     else -> OfflineNodeActionUiEntity.Other(
                         file = localFile,
-                        mimeType = fileType.mimeType
+                        mimeType = fileType?.mimeType ?: "*/*"
                     )
                 }
             }.onSuccess {

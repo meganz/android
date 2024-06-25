@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.offline
 
+import mega.privacy.android.domain.entity.FileTypeInfo
 import java.util.concurrent.TimeUnit
 
 /**
@@ -12,12 +13,14 @@ import java.util.concurrent.TimeUnit
  * @property totalSize Size of the node, for folder it will be the total size of its content
  * @property isFolder true if the node is a folder, false if it's a file
  * @property folderInfo number of files in a folder
+ * @property fileTypeInfo file type information
  * @property addedTime creation time of the node
  * @property thumbnail thumbnail of the node
  */
 data class OfflineFileInformation(
     val totalSize: Long = 0L,
     val folderInfo: OfflineFolderInfo? = null,
+    val fileTypeInfo: FileTypeInfo? = null,
     val thumbnail: String? = null,
     override val id: Int = 0,
     override val handle: String,

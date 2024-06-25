@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.offline
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import java.io.File
@@ -18,6 +19,7 @@ class GetOfflineFileInformationUseCase @Inject constructor(
     private val getOfflineFolderInformationUseCase: GetOfflineFolderInformationUseCase,
     private val getOfflineFileTotalSizeUseCase: GetOfflineFileTotalSizeUseCase,
     private val isImageFileUseCase: IsImageFileUseCase,
+    private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
 ) {
     /**
      * Invoke
@@ -32,6 +34,9 @@ class GetOfflineFileInformationUseCase @Inject constructor(
         val offlineFile = getOfflineFileUseCase(offlineNodeInformation)
         val totalSize = getOfflineFileTotalSizeUseCase(offlineFile)
         val folderInfo = getFolderInfoOrNull(offlineNodeInformation)
+        val fileTypeInfo = takeIf { !offlineNodeInformation.isFolder }?.let {
+            getFileTypeInfoUseCase(offlineFile)
+        }
         val thumbnail = getThumbnailPathOrNull(
             offlineFile = offlineFile,
             useOriginalImageAsThumbnail = useOriginalImageAsThumbnail,
@@ -50,6 +55,7 @@ class GetOfflineFileInformationUseCase @Inject constructor(
             thumbnail = thumbnail,
             path = offlineNodeInformation.path,
             lastModifiedTime = offlineNodeInformation.lastModifiedTime,
+            fileTypeInfo = fileTypeInfo
         )
     }
 
