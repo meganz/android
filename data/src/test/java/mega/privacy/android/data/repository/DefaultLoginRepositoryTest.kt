@@ -15,6 +15,7 @@ import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
 import mega.privacy.android.domain.entity.Progress
@@ -65,7 +66,7 @@ class DefaultLoginRepositoryTest {
     private val appEventGateway = mock<AppEventGateway>()
     private val fetchNodesUpdateMapper = mock<FetchNodesUpdateMapper>()
     private val setLogoutFlagWrapper = mock<SetLogoutFlagWrapper>()
-
+    private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -86,7 +87,8 @@ class DefaultLoginRepositoryTest {
             appEventGateway = appEventGateway,
             fetchNodesUpdateMapper = fetchNodesUpdateMapper,
             applicationScope = testScope,
-            setLogoutFlagWrapper = setLogoutFlagWrapper
+            setLogoutFlagWrapper = setLogoutFlagWrapper,
+            credentialsPreferencesGateway = credentialsPreferencesGateway
         )
     }
 
@@ -728,6 +730,22 @@ class DefaultLoginRepositoryTest {
 
         assertThat(actual).isEqualTo(email)
         verify(megaApiGateway).resendSignupLink(eq(email), eq(fullName), any())
+    }
+
+    @Test
+    fun `test that logout successfully then credentialsPreferencesGateway calls clear`() = runTest {
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        whenever(megaApiGateway.logout(any())).thenAnswer {
+            (it.arguments[0] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                error
+            )
+        }
+        underTest.logout()
+        verify(credentialsPreferencesGateway).clear()
     }
 
     companion object {

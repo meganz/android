@@ -21,6 +21,7 @@ import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.SessionTransferURLListenerInterface
 import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
@@ -69,6 +70,7 @@ internal class DefaultLoginRepository @Inject constructor(
     private val fetchNodesUpdateMapper: FetchNodesUpdateMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val setLogoutFlagWrapper: SetLogoutFlagWrapper,
+    private val credentialsPreferencesGateway: CredentialsPreferencesGateway
 ) : LoginRepository {
 
     override suspend fun initMegaChat(session: String) =
@@ -175,6 +177,7 @@ internal class DefaultLoginRepository @Inject constructor(
                 megaApiGateway.removeRequestListener(listener)
             }
         }
+        credentialsPreferencesGateway.clear()
     }
 
     override suspend fun chatLogout() = withContext(ioDispatcher) {
