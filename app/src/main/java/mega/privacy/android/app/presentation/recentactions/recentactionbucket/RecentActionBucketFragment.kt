@@ -62,20 +62,20 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECETS_BUCKET
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
-import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
-import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
-import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
-import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
+import mega.privacy.android.app.utils.MegaNodeUtil.isGif
+import mega.privacy.android.app.utils.MegaNodeUtil.isImage
+import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.mutateIconSecondary
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -93,6 +93,9 @@ class RecentActionBucketFragment : Fragment() {
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
     private val viewModel by viewModels<RecentActionBucketViewModel>()
 
@@ -284,6 +287,9 @@ class RecentActionBucketFragment : Fragment() {
             }
         }.map { it.node?.handle ?: 0L }.toLongArray()
 
+    private fun MegaNode.isValidForImageViewer(): Boolean =
+        isFile && (isImage() || isGif() || isVideo())
+
     fun openFile(
         index: Int,
         node: MegaNode,
@@ -304,7 +310,7 @@ class RecentActionBucketFragment : Fragment() {
             }
 
             mime.isURL -> {
-                manageURLNode(requireContext(), megaApi, node)
+                megaNodeUtilWrapper.manageURLNode(requireContext(), megaApi, node)
             }
 
             mime.isPdf -> {
@@ -312,11 +318,11 @@ class RecentActionBucketFragment : Fragment() {
             }
 
             mime.isOpenableTextFile(node.size) -> {
-                manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER)
+                megaNodeUtilWrapper.manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER)
             }
 
             else -> {
-                onNodeTapped(
+                megaNodeUtilWrapper.onNodeTapped(
                     requireActivity(),
                     node,
                     {
@@ -451,6 +457,14 @@ class RecentActionBucketFragment : Fragment() {
         )
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)
+    }
+
+    private fun MegaApiJava.getRootParentNode(node: MegaNode): MegaNode {
+        var rootParent = node
+        while (getParentNode(rootParent) != null) {
+            rootParent = getParentNode(rootParent)!!
+        }
+        return rootParent
     }
 
     private fun download(handle: Long) {

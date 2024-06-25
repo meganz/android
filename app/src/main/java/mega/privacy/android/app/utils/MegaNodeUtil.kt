@@ -2010,14 +2010,6 @@ object MegaNodeUtil {
             else -> INVALID_VALUE.toLong()
         }
 
-    /**
-     * Check if a specific MegaNode is valid for Image Viewer
-     *
-     * @return  True if it's valid, false otherwise
-     */
-    @JvmStatic
-    fun MegaNode.isValidForImageViewer(): Boolean =
-        isFile && (isImage() || isGif() || isVideo())
 
     /**
      * Check if a specific MegaOffline is valid for Image Viewer
