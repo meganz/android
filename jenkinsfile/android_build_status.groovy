@@ -13,6 +13,7 @@ LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
 LINT_REPORT_SUMMARY_MAP = [:]
 
+MERGE_REQUEST_FILE_CHANGES_MESSAGE = ""
 COVERAGE_SUMMARY = ""
 
 // key is module name, value is the link of the unit test html report uploaded to GitLab
@@ -151,12 +152,20 @@ pipeline {
                                 "<b>WIP:</b> from the beginning of MR title."
                         common.sendToMR(skipMessage)
                     } else {
-                        // Create the String to be posted as a comment in Gitlab
-                        String mergeRequestMessage = ":white_check_mark: Build Succeeded!(Build: ${env.BUILD_NUMBER})\n\n" +
+                        String buildMessage = ":white_check_mark: Build Succeeded!(Build: ${env.BUILD_NUMBER})\n\n" +
                                 "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
-                                "**Build Warnings:**\n" + getBuildWarnings() + "\n\n" +
-                                buildLintSummaryTable(JSON_LINT_REPORT_LINK) + "\n\n" +
+                                "**Build Warnings:**\n" + getBuildWarnings() + "\n\n"
+
+                        String coverageMessage = buildLintSummaryTable(JSON_LINT_REPORT_LINK) + "\n\n" +
                                 COVERAGE_SUMMARY
+
+                        // Create the String to be posted as a comment in Gitlab
+                        String mergeRequestMessage
+                        if (!MERGE_REQUEST_FILE_CHANGES_MESSAGE.isBlank()) {
+                            mergeRequestMessage = buildMessage + MERGE_REQUEST_FILE_CHANGES_MESSAGE + "\n\n" + coverageMessage
+                        } else {
+                            mergeRequestMessage = buildMessage + coverageMessage
+                        }
 
                         common.sendToMR(mergeRequestMessage)
                     }
@@ -229,6 +238,15 @@ pipeline {
                                     exit 1
                                 fi
                             """
+
+                                util.useGitLab() {
+                                    String htmlOutput = "mr-file-changes.html"
+                                    try {
+                                        sh "./gradlew checkMergeRequestFileChanges --html-output $htmlOutput"
+                                    } finally {
+                                        MERGE_REQUEST_FILE_CHANGES_MESSAGE = getHtmlReport(htmlOutput, "")
+                                    }
+                                }
                             }
                         }
                     }
@@ -302,7 +320,7 @@ pipeline {
 
                                     String htmlOutput = "coverage.html"
                                     sh "./gradlew collectCoverage --modules \"${MODULE_LIST.join(",")}\" --html-output ${htmlOutput}"
-                                    COVERAGE_SUMMARY = getCoverageHtmlReport(htmlOutput)
+                                    COVERAGE_SUMMARY = getHtmlReport(htmlOutput, "No coverage report found")
                                 }
                             }
                         }
@@ -404,14 +422,14 @@ String buildLintSummaryTable(String jsonLintReportLink) {
     lintSummary
 }
 
-String getCoverageHtmlReport(String reportPath) {
-    String coverageReport
+String getHtmlReport(String reportPath, String messageOnMissingFile) {
+    String htmlReport
     if (fileExists(reportPath)) {
-        coverageReport = readFile(reportPath)
+        htmlReport = readFile(reportPath)
     } else {
-        coverageReport = "No coverage report found"
+        htmlReport = messageOnMissingFile
     }
-    return coverageReport
+    return htmlReport
 }
 
 /**
