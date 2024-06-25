@@ -16,14 +16,14 @@ import mega.privacy.android.app.presentation.node.view.ToolbarMenuItem
 import mega.privacy.android.app.presentation.node.view.toolbar.NodeToolbarViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRoute
-import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.legacy.core.ui.controls.appbar.CollapsedSearchAppBar
 import mega.privacy.android.legacy.core.ui.controls.appbar.ExpandedSearchAppBar
+import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
@@ -71,6 +71,7 @@ fun SearchToolBar(
         handler = nodeActionHandler,
         clearSelection = clearSelection,
         navigationLevel = navigationLevel.lastOrNull(),
+        nodeSourceType = nodeSourceType,
     )
 }
 
@@ -85,6 +86,7 @@ private fun SearchToolbarBody(
     handler: NodeActionHandler,
     clearSelection: () -> Unit,
     navigationLevel: Pair<Long, String>?,
+    nodeSourceType: NodeSourceType,
 ) {
     val scope = rememberCoroutineScope()
     if (selectedNodes.isNotEmpty()) {
@@ -123,6 +125,7 @@ private fun SearchToolbarBody(
                 onActionPressed = {
                     navHostController.navigate(
                         route = nodeBottomSheetRoute.plus("/${navigationLevel.first}")
+                            .plus("/${nodeSourceType.name}")
                     )
                 }
             )
@@ -155,6 +158,7 @@ private fun PreviewSearchToolbarBody() {
             ),
             clearSelection = {},
             navigationLevel = null,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
         )
     }
 }

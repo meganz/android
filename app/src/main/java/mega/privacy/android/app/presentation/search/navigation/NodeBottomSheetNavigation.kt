@@ -28,6 +28,9 @@ internal fun NavGraphBuilder.nodeBottomSheetNavigation(
             navArgument(nodeBottomSheetRouteNodeIdArg) {
                 type = NavType.LongType
             },
+            navArgument(nodeBottomSheetRouteSourceTypeArg) {
+                type = NavType.StringType
+            }
         ),
     ) {
         val nodeId = it.arguments?.getLong(nodeBottomSheetRouteNodeIdArg)

@@ -107,6 +107,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private val nodeOptionsViewModel: NodeOptionsViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
+    private var tempNodeId: NodeId? = null
 
     /**
      * Inject [GetFeatureFlagValueUseCase] to the Fragment
@@ -1254,6 +1255,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             )
             setStateBottomSheetBehaviorHidden()
         } else {
+            tempNodeId = nodeOptionsViewModel.state.value.node?.handle?.let { NodeId(it) }
             showHiddenNodesOnboarding()
         }
     }
@@ -1561,10 +1563,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
         if (result.resultCode == Activity.RESULT_OK) {
-            val node = nodeOptionsViewModel.state.value.node ?: return
+            val nodeId = tempNodeId ?: return
 
             nodeOptionsViewModel.hideOrUnhideNode(
-                handle = node.handle,
+                handle = nodeId.longValue,
                 hidden = true,
             )
 
