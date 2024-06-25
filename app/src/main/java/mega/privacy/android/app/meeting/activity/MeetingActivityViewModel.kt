@@ -1319,7 +1319,10 @@ class MeetingActivityViewModel @Inject constructor(
             }.onSuccess {
                 when {
                     isChatCreatedAndIParticipating() -> enableVideo(enable = shouldVideoBeEnabled)
-                    else -> enableDeviceCamera(enable = shouldVideoBeEnabled)
+                    else -> enableDeviceCamera(
+                        enable = shouldVideoBeEnabled,
+                        isReleasingVideo = false
+                    )
                 }
             }
         }
@@ -1328,19 +1331,21 @@ class MeetingActivityViewModel @Inject constructor(
     /**
      * Enable device camera
      *
-     * @param enable    true to enable camera, false otherwise
+     * @param enable            True to enable camera, false otherwise
+     * @param isReleasingVideo  True, video is being released. False, only changes the camera status.
      */
-    private fun enableDeviceCamera(enable: Boolean) = viewModelScope.launch {
-        runCatching {
-            startVideoDeviceUseCase(enable)
-        }.onFailure { exception ->
-            Timber.e(exception)
-        }.onSuccess { chatRequest ->
-            chatRequest.apply {
-                updateCameraValueAndTips(flag)
+    private fun enableDeviceCamera(enable: Boolean, isReleasingVideo: Boolean) =
+        viewModelScope.launch {
+            runCatching {
+                startVideoDeviceUseCase(enable)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { chatRequest ->
+                if (!isReleasingVideo) {
+                    updateCameraValueAndTips(chatRequest.flag)
+                }
             }
         }
-    }
 
     /**
      * Enable video
@@ -1392,7 +1397,7 @@ class MeetingActivityViewModel @Inject constructor(
      * or the call is not yet established
      */
     fun releaseVideoDevice() {
-        enableDeviceCamera(enable = false)
+        enableDeviceCamera(enable = false, isReleasingVideo = true)
     }
 
     /**
