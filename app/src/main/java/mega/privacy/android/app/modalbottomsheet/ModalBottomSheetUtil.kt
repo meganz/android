@@ -16,10 +16,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
-import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -34,23 +33,13 @@ object ModalBottomSheetUtil {
      *
      * @param context           Required Context.
      * @param node              MegaNode to open.
-     */
-    @JvmStatic
-    fun openWith(context: Context, node: MegaNode?) {
-        (null).openWith(context, node, null)
-    }
-
-    /**
-     * Launches an intent to open a node in the apps installed in the device if any.
-     *
-     * @param context           Required Context.
-     * @param node              MegaNode to open.
      * @param nodeDownloader    Download action to perform if the file type is not supported.
      */
     @JvmStatic
     fun BottomSheetDialogFragment?.openWith(
         context: Context,
         node: MegaNode?,
+        megaNodeUtilWrapper: MegaNodeUtilWrapper,
         nodeDownloader: (() -> Unit)? = null,
     ): AlertDialog? {
         if (node == null) {
@@ -61,7 +50,7 @@ object ModalBottomSheetUtil {
         val megaApi = app.megaApi
         val mimeType = MimeTypeList.typeForName(node.name).type
         if (MimeTypeList.typeForName(node.name).isURL) {
-            manageURLNode(context, MegaApplication.getInstance().megaApi, node)
+            megaNodeUtilWrapper.manageURLNode(context, MegaApplication.getInstance().megaApi, node)
             return null
         }
         val mediaIntent = Intent(Intent.ACTION_VIEW)
@@ -77,7 +66,7 @@ object ModalBottomSheetUtil {
             )
             mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         } else {
-            setupStreamingServer(megaApi)
+            megaNodeUtilWrapper.setupStreamingServer(megaApi)
             val url = megaApi.httpServerGetLocalLink(node)
             if (url == null) {
                 Util.showSnackbar(

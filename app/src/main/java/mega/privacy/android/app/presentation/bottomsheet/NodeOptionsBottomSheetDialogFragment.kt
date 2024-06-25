@@ -82,6 +82,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncoming
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
@@ -114,6 +115,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      */
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
     private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
@@ -1396,7 +1400,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (nodeOptionsViewModel.isFilePreviewOnline(node = node)) {
             openWith(
                 context = requireActivity(),
-                node = node
+                megaNodeUtilWrapper = megaNodeUtilWrapper,
+                node = node,
             ) {
                 (requireActivity() as ManagerActivity).saveNodeByOpenWith(node)
             }
