@@ -117,6 +117,7 @@ import timber.log.Timber
 internal fun InviteContactRoute(
     isDarkMode: Boolean,
     onNavigateUp: (result: InviteContactScreenResult?) -> Unit,
+    onBackPressed: () -> Unit,
     onShareContactLink: (contactLink: String) -> Unit,
     onOpenPersonalQRCode: () -> Unit,
     onOpenQRScanner: () -> Unit,
@@ -216,7 +217,7 @@ internal fun InviteContactRoute(
             modifier = Modifier.fillMaxSize(),
             uiState = uiState,
             isDarkMode = isDarkMode,
-            onNavigateUp = { onNavigateUp(null) },
+            onBackPressed = onBackPressed,
             onInitializeContacts = viewModel::initializeContacts,
             onShareContactLink = onShareContactLink,
             onOpenPersonalQRCode = onOpenPersonalQRCode,
@@ -300,7 +301,7 @@ internal fun InviteContactRoute(
 internal fun InviteContactScreen(
     uiState: InviteContactUiState,
     isDarkMode: Boolean,
-    onNavigateUp: () -> Unit,
+    onBackPressed: () -> Unit,
     onInitializeContacts: () -> Unit,
     onShareContactLink: (contactLink: String) -> Unit,
     onOpenPersonalQRCode: () -> Unit,
@@ -350,7 +351,7 @@ internal fun InviteContactScreen(
             MegaAppBar(
                 modifier = Modifier.fillMaxWidth(),
                 appBarType = AppBarType.BACK_NAVIGATION,
-                onNavigationPressed = onNavigateUp,
+                onNavigationPressed = onBackPressed,
                 title = stringResource(id = R.string.invite_contacts),
                 subtitle = if (uiState.selectedContactInformation.isNotEmpty()) pluralStringResource(
                     R.plurals.general_selection_num_contacts,
@@ -850,7 +851,7 @@ private fun InviteContactScreenWithoutSelectedContactsPreview() {
         InviteContactScreen(
             uiState = InviteContactUiState(),
             isDarkMode = isSystemInDarkTheme(),
-            onNavigateUp = {},
+            onBackPressed = {},
             onInitializeContacts = {},
             onShareContactLink = {},
             onOpenPersonalQRCode = {},
@@ -890,7 +891,7 @@ private fun InviteContactScreenWithSelectedContactsPreview() {
                 )
             ),
             isDarkMode = isSystemInDarkTheme(),
-            onNavigateUp = {},
+            onBackPressed = {},
             onInitializeContacts = {},
             onShareContactLink = {},
             onOpenPersonalQRCode = {},

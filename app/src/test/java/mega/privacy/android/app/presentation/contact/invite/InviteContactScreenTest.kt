@@ -106,12 +106,12 @@ class InviteContactScreenTest {
     @Test
     fun `test that the user is navigated back when the toolbar's back navigation is clicked`() {
         with(composeRule) {
-            val onNavigateUp = mock<() -> Unit>()
-            setScreen(onNavigateUp = onNavigateUp)
+            val onBackPressed = mock<() -> Unit>()
+            setScreen(onBackPressed = onBackPressed)
 
             onNodeWithTag("appbar:button_back").performClick()
 
-            verify(onNavigateUp).invoke()
+            verify(onBackPressed).invoke()
         }
     }
 
@@ -278,7 +278,7 @@ class InviteContactScreenTest {
 
     private fun ComposeContentTestRule.setScreen(
         uiState: InviteContactUiState = InviteContactUiState(),
-        onNavigateUp: () -> Unit = {},
+        onBackPressed: () -> Unit = {},
         onInitializeContacts: () -> Unit = {},
         onShareContactLink: (contactLink: String) -> Unit = {},
         onOpenPersonalQRCode: () -> Unit = {},
@@ -294,7 +294,7 @@ class InviteContactScreenTest {
             InviteContactScreen(
                 uiState = uiState,
                 isDarkMode = false,
-                onNavigateUp = onNavigateUp,
+                onBackPressed = onBackPressed,
                 onInitializeContacts = onInitializeContacts,
                 onShareContactLink = onShareContactLink,
                 onOpenPersonalQRCode = onOpenPersonalQRCode,
