@@ -73,16 +73,16 @@ pipeline {
                     if (common.hasGitLabMergeRequest()) {
                         String jsonJenkinsLog = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
 
-                        String message = firebaseUploadFailureMessage("<br/>") +
+                        String message = firebaseUploadFailureMessage("<br/>", true) +
                                 "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jsonJenkinsLog})"
 
                         common.sendToMR(message)
                     } else {
-                        slackSend color: 'danger', message: firebaseUploadFailureMessage("\n")
+                        slackSend color: 'danger', message: firebaseUploadFailureMessage("\n", true)
                         slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
                     }
                 } else if (triggerByPushToDevelop()) {
-                    slackSend color: 'danger', message: firebaseUploadFailureMessage("\n")
+                    slackSend color: 'danger', message: firebaseUploadFailureMessage("\n", false)
                     slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
                 } else if (triggerByPublishSdkCmd()) {
                     String jenkinsLog = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
@@ -114,13 +114,13 @@ pipeline {
                 common = load('jenkinsfile/common.groovy')
 
                 if (triggerByDeliverQaCmd() || triggerByUploadCoverage()) {
-                    slackSend color: "good", message: firebaseUploadSuccessMessage("\n")
-                    common.sendToMR(firebaseUploadSuccessMessage("<br/>"))
+                    slackSend color: "good", message: firebaseUploadSuccessMessage("\n", true)
+                    common.sendToMR(firebaseUploadSuccessMessage("<br/>", true))
                 } else if (triggerByPushToDevelop()) {
-                    slackSend color: "good", message: firebaseUploadSuccessMessage("\n")
+                    slackSend color: "good", message: firebaseUploadSuccessMessage("\n", false)
                 } else if (triggerByPublishSdkCmd()) {
-                    slackSend color: "good", message: publishSdkSuccessMessage("\n")
-                    common.sendToMR(publishSdkSuccessMessage("<br/>"))
+                    slackSend color: "good", message: publishSdkSuccessMessage("\n", true)
+                    common.sendToMR(publishSdkSuccessMessage("<br/>", true))
                 }
             }
         }
@@ -397,7 +397,7 @@ pipeline {
                     script {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
-                                "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
+                                "RELEASE_NOTES_FOR_CD=${readReleaseNotes(triggerByDeliverQaCmd())}",
                                 "TESTERS_FOR_CD=${parseCommandParameter()["tester"]}",
                                 "TESTER_GROUP_FOR_CD=${parseCommandParameter()["tester-group"]}"
                         ]) {
@@ -439,7 +439,7 @@ pipeline {
                     script {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
-                                "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
+                                "RELEASE_NOTES_FOR_CD=${readReleaseNotes(triggerByDeliverQaCmd())}",
                                 "TESTERS_FOR_CD=${parseCommandParameter()["tester"]}",
                                 "TESTER_GROUP_FOR_CD=${parseCommandParameter()["tester-group"]}"
                         ]) {
@@ -476,17 +476,27 @@ pipeline {
 }
 
 /**
+ * Format comment author by adding @ at the beginning so that Gitlab auto links it
+ * @return author of the comment
+ */
+private String formattedCommentAuthor() {
+    return "@${gitlabCommentAuthor}"
+}
+
+/**
  * Create the build report of failed Firebase Upload
  *
  * @param lineBreak the line break used between the lines. For GitLab and Slack, different line break
  * can be provided. GitLab accepts HTML "<BR/>", and Slack accepts "\n"
+ * @param useCommenterAsAuthor True if author should be the name of user who initiated the build by comment
  * @return failure message
  */
-private String firebaseUploadFailureMessage(String lineBreak) {
+private String firebaseUploadFailureMessage(String lineBreak, boolean useCommenterAsAuthor) {
+    String author = useCommenterAsAuthor ? formattedCommentAuthor() : gitlabUserName
     String message = ":x: Android Firebase Upload Build Failed!(BuildNumber: ${env.BUILD_NUMBER})" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
-            "${lineBreak}Author:\t${gitlabUserName}" +
+            "${lineBreak}Author:\t${author}" +
             "${lineBreak}Commit:\t${GIT_COMMIT}"
     if (env.gitlabActionType == "PUSH") {
         message += "${lineBreak}Trigger Reason: git PUSH to ${gitlabTargetBranch}"
@@ -510,7 +520,7 @@ private String firebaseUploadFailureMessage(String lineBreak) {
  */
 private String publishSdkFailureMessage(String lineBreak) {
     String message = ":x: Prebuilt SDK Creation Failed!(BuildNumber: ${env.BUILD_NUMBER})" +
-            "${lineBreak}Author:\t${gitlabUserName}" +
+            "${lineBreak}Author:\t${formattedCommentAuthor()}" +
             "${lineBreak}Trigger Reason:\t${gitlabTriggerPhrase}"
     return message
 }
@@ -549,15 +559,17 @@ private boolean isDefined(String value) {
  * compose the success message, which might be used for Slack or GitLab MR.
  * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
  * while GitLab MR uses "<br/>".
+ * @param useCommenterAsAuthor True if author should be the user name of who initiated the build by comment
  * @return The success message to be sent
  */
-private String firebaseUploadSuccessMessage(String lineBreak) {
+private String firebaseUploadSuccessMessage(String lineBreak, boolean useCommenterAsAuthor) {
+    String author = useCommenterAsAuthor ? formattedCommentAuthor() : gitlabUserName
     return ":rocket: Android APK uploaded successfully to Firebase AppDistribution!(${env.BUILD_NUMBER})" +
             "${lineBreak}Version:\t${readAppVersion()}" +
             "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
-            "${lineBreak}Author:\t${gitlabUserName}" +
+            "${lineBreak}Author:\t${author}" +
             "${lineBreak}Commit:\t${GIT_COMMIT}" +
             "${lineBreak}Trigger Reason: ${getTriggerReason()}"
 }
@@ -566,12 +578,14 @@ private String firebaseUploadSuccessMessage(String lineBreak) {
  * compose the success message, which might be used for Slack or GitLab MR.
  * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
  * while GitLab MR uses "<br/>".
+ * @param useCommenterAsAuthor True if author should be the user name of who initiated the build by comment
  * @return The success message to be sent
  */
-private String publishSdkSuccessMessage(String lineBreak) {
+private String publishSdkSuccessMessage(String lineBreak, boolean useCommenterAsAuthor) {
+    String author = useCommenterAsAuthor ? formattedCommentAuthor() : gitlabUserName
     common = load('jenkinsfile/common.groovy')
     return ":rocket: Prebuilt SDK is published to Artifactory Successfully!(${env.BUILD_NUMBER})" +
-            "${lineBreak}Author:\t${gitlabUserName}" +
+            "${lineBreak}Author:\t${author}" +
             "${lineBreak}SDK Commit:\t${getSdkGitHash()}" +
             "${lineBreak}Chat SDK Commit:\t${getMegaChatSdkGitHash()}" +
             "${lineBreak}Version:\tnz.mega.sdk:sdk:${getSdkVersionText()}" +
@@ -731,8 +745,12 @@ def parseCommandParameter() {
     return result
 }
 
-String readReleaseNotes() {
-    String baseRelNotes = "Triggered by: $gitlabUserName" +
+/**
+ * @param useCommenterAsAuthor True if author should be the user name of who initiated the build by comment
+ */
+String readReleaseNotes(boolean useCommenterAsAuthor) {
+    String author = useCommenterAsAuthor ? formattedCommentAuthor() : gitlabUserName
+    String baseRelNotes = "Triggered by: $author" +
             "\nTrigger Reason: ${getTriggerReason()}" +
             "\nBranch: $gitlabSourceBranch " +
             "\nLast 10 git commits:\n${sh(script: "git log --pretty=format:\"(%h,%an)%x09%s\" -10", returnStdout: true).trim()}"
