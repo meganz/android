@@ -61,13 +61,7 @@ class TagsValidationMessageMapperTest {
             nodeTags,
             userTags
         )
-        assertThat(message)
-            .isEqualTo(
-                context.getString(
-                    R.string.add_tags_error_max_characters,
-                    TagsActivity.MAX_CHARS_PER_TAG
-                )
-            )
+        assertThat(message).isEqualTo(context.getString(R.string.add_tags_error_maximum_characters))
         assertThat(error).isEqualTo(true)
         assertThat(analyticsRule.events).contains(NodeInfoTagsLengthErrorDisplayedEvent)
     }

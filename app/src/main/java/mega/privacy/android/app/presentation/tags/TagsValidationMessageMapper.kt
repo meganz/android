@@ -47,10 +47,7 @@ class TagsValidationMessageMapper @Inject constructor(@ApplicationContext privat
             }
 
             tag.length > TagsActivity.MAX_CHARS_PER_TAG -> {
-                message = context.getString(
-                    R.string.add_tags_error_max_characters,
-                    TagsActivity.MAX_CHARS_PER_TAG
-                )
+                message = context.getString(R.string.add_tags_error_maximum_characters)
                 isError = true
                 Analytics.tracker.trackEvent(NodeInfoTagsLengthErrorDisplayedEvent)
             }
