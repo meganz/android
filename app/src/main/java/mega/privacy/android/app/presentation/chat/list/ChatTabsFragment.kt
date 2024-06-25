@@ -59,6 +59,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ChatScreenEvent
+import mega.privacy.mobile.analytics.event.ChatTabFABPressedEvent
 import mega.privacy.mobile.analytics.event.ChatsTabEvent
 import mega.privacy.mobile.analytics.event.MeetingsTabEvent
 import nz.mega.sdk.MegaApiJava
@@ -402,6 +403,7 @@ class ChatTabsFragment : Fragment() {
     }
 
     private fun startChatAction() {
+        Analytics.tracker.trackEvent(ChatTabFABPressedEvent)
         if (isMeetingTabShown()) {
             MeetingBottomSheetDialogFragment.newInstance(true).show(
                 childFragmentManager,

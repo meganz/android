@@ -2,6 +2,7 @@ package mega.privacy.android.app.main.listeners
 
 import android.content.Context
 import android.view.View
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.DrawerItem
@@ -9,6 +10,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
 import timber.log.Timber
 
 internal class FabButtonListener(val context: Context) : View.OnClickListener {
@@ -31,8 +33,9 @@ internal class FabButtonListener(val context: Context) : View.OnClickListener {
                                 return
                             }
                             context.showUploadPanel(
-                                UploadBottomSheetDialogFragment.GENERAL_UPLOAD
+                                UploadBottomSheetDialogFragment.CLOUD_DRIVE_UPLOAD
                             )
+                            Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
                         }
 
                         DrawerItem.SHARED_ITEMS -> {

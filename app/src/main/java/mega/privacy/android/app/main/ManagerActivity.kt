@@ -326,6 +326,8 @@ import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.ChatRoomsBottomNavigationItemEvent
+import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
 import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
@@ -353,7 +355,8 @@ import javax.inject.Inject
 
 @Suppress("KDocMissingDocumentation")
 @AndroidEntryPoint
-class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterface, NavigationView.OnNavigationItemSelectedListener,
+class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterface,
+    NavigationView.OnNavigationItemSelectedListener,
     View.OnClickListener,
     BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
     ChatManagementCallback, ActionNodeCallback, SnackbarShower,
@@ -3723,6 +3726,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             fileBrowserViewModel.refreshNodes()
                         }
                     }
+                    Analytics.tracker.trackEvent(CloudDriveBottomNavigationItemEvent)
                 }
             }
 
@@ -3883,6 +3887,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 hideFabButton()
                 hideAdsView()
                 changeAppBarElevation(false)
+                Analytics.tracker.trackEvent(ChatRoomsBottomNavigationItemEvent)
             }
 
             else -> {}
@@ -5775,7 +5780,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * - DOCUMENTS_UPLOAD if an upload from Documents section.
      */
     @JvmOverloads
-    fun showUploadPanel(uploadType: Int = if (drawerItem === DrawerItem.HOMEPAGE) UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD else UploadBottomSheetDialogFragment.GENERAL_UPLOAD) {
+    fun showUploadPanel(uploadType: Int = if (drawerItem === DrawerItem.HOMEPAGE) UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD else if (drawerItem === DrawerItem.CLOUD_DRIVE) UploadBottomSheetDialogFragment.CLOUD_DRIVE_UPLOAD else UploadBottomSheetDialogFragment.GENERAL_UPLOAD) {
         if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             val permissions = readAndWritePermissions
             requestPermission(this, Constants.REQUEST_READ_WRITE_STORAGE, *permissions)

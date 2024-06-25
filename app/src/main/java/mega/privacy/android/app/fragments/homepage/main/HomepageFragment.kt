@@ -60,11 +60,18 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.HomeFABClosedEvent
+import mega.privacy.mobile.analytics.event.HomeFABExpandedEvent
+import mega.privacy.mobile.analytics.event.HomeFABPressedEvent
+import mega.privacy.mobile.analytics.event.HomeNewChatFABPressedEvent
+import mega.privacy.mobile.analytics.event.HomeNewChatTextPressedEvent
 import mega.privacy.mobile.analytics.event.HomeScreenAudioTilePressedEvent
 import mega.privacy.mobile.analytics.event.HomeScreenDocsTilePressedEvent
 import mega.privacy.mobile.analytics.event.HomeScreenEvent
 import mega.privacy.mobile.analytics.event.HomeScreenSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeScreenVideosTilePressedEvent
+import mega.privacy.mobile.analytics.event.HomeUploadFABPressedEvent
+import mega.privacy.mobile.analytics.event.HomeUploadTextPressedEvent
 import mega.privacy.mobile.analytics.event.OfflineTabEvent
 import mega.privacy.mobile.analytics.event.RecentsTabEvent
 import nz.mega.sdk.MegaBanner
@@ -635,18 +642,22 @@ class HomepageFragment : Fragment() {
         fabMaskMain = fabMaskLayoutDataBinding.fabsInMask.fabMain
 
         fabMain.setOnClickListener {
+            Analytics.tracker.trackEvent(HomeFABPressedEvent)
             fabMainClickCallback()
         }
 
         fabMaskMain.setOnClickListener {
+            Analytics.tracker.trackEvent(HomeFABPressedEvent)
             fabMainClickCallback()
         }
 
         fabMaskLayoutDataBinding.root.setOnClickListener {
+            Analytics.tracker.trackEvent(HomeFABPressedEvent)
             fabMainClickCallback()
         }
 
         fabMaskLayoutDataBinding.fabsInMask.fabChat.setOnClickListener {
+            Analytics.tracker.trackEvent(HomeNewChatFABPressedEvent)
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 openNewChatActivity()
@@ -654,6 +665,7 @@ class HomepageFragment : Fragment() {
         }
 
         fabMaskLayoutDataBinding.fabsInMask.textChat.setOnClickListener {
+            Analytics.tracker.trackEvent(HomeNewChatTextPressedEvent)
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 openNewChatActivity()
@@ -661,6 +673,7 @@ class HomepageFragment : Fragment() {
         }
 
         fabMaskLayoutDataBinding.fabsInMask.fabUpload.setOnClickListener {
+            Analytics.tracker.trackEvent(HomeUploadFABPressedEvent)
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 showUploadPanel()
@@ -668,6 +681,7 @@ class HomepageFragment : Fragment() {
         }
 
         fabMaskLayoutDataBinding.fabsInMask.textUpload.setOnClickListener {
+            Analytics.tracker.trackEvent(HomeUploadTextPressedEvent)
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 showUploadPanel()
@@ -738,6 +752,7 @@ class HomepageFragment : Fragment() {
     }
 
     fun collapseFab() {
+        Analytics.tracker.trackEvent(HomeFABClosedEvent)
         rotateFab(false)
         showOut(
             fabMaskLayoutDataBinding.fabsInMask.fabChat,
@@ -754,6 +769,7 @@ class HomepageFragment : Fragment() {
     }
 
     private fun expandFab() {
+        Analytics.tracker.trackEvent(HomeFABExpandedEvent)
         fabMain.visibility = View.GONE
         if (fabMaskLayoutDataBinding.root.parent == null) {
             addMask()
