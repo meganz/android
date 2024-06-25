@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import mega.privacy.android.icon.pack.R as IconR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -26,7 +27,6 @@ import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
-import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.MEETING_BOTTOM_MARGIN
 import mega.privacy.android.app.utils.Constants.MEETING_BOTTOM_MARGIN_WITH_KEYBOARD
@@ -247,17 +247,19 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                         AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
                             binding.onOffFab.fabSpeaker.enable = true
                             binding.onOffFab.fabSpeaker.isOn = true
-                            binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                            binding.onOffFab.fabSpeaker.setOnIcon(IconR.drawable.ic_volume_max)
                             binding.onOffFab.fabSpeakerLabel.text =
                                 getString(R.string.general_speaker)
                         }
+
                         AppRTCAudioManager.AudioDevice.EARPIECE -> {
                             binding.onOffFab.fabSpeaker.enable = true
                             binding.onOffFab.fabSpeaker.isOn = false
-                            binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_speaker_off)
+                            binding.onOffFab.fabSpeaker.setOnIcon(IconR.drawable.ic_volume_off)
                             binding.onOffFab.fabSpeakerLabel.text =
                                 getString(R.string.general_speaker)
                         }
+
                         AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
                         AppRTCAudioManager.AudioDevice.BLUETOOTH,
                         -> {
@@ -267,10 +269,11 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                             binding.onOffFab.fabSpeakerLabel.text =
                                 getString(R.string.general_headphone)
                         }
+
                         else -> {
                             binding.onOffFab.fabSpeaker.enable = false
                             binding.onOffFab.fabSpeaker.isOn = true
-                            binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                            binding.onOffFab.fabSpeaker.setOnIcon(IconR.drawable.ic_volume_max)
                             binding.onOffFab.fabSpeakerLabel.text =
                                 getString(R.string.general_speaker)
                         }
@@ -510,6 +513,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                     }
                 }
             }
+
             !bEnable && bSync -> (view as OnOffFab).enable = false
             !bEnable && !bSync -> {
                 lifecycleScope.launch {

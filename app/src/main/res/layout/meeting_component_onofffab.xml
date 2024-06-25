@@ -14,24 +14,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <View
-            android:id="@+id/fab_mic_bk"
-            android:layout_width="49dp"
-            android:layout_height="49dp"
-            android:background="@drawable/fab_ring_background"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@+id/fab_mic"
-            app:layout_constraintEnd_toEndOf="@+id/fab_mic"
-            app:layout_constraintStart_toStartOf="@+id/fab_mic"
-            app:layout_constraintTop_toTopOf="@+id/fab_mic"/>
-
         <mega.privacy.android.app.components.OnOffFab
             android:id="@+id/fab_mic"
             android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
             android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
-            android:background="@null"
             android:onClick="@{() -> viewmodelFab.clickMic(!viewmodelFab.micLiveData)}"
             app:borderWidth="0dp"
+            app:disable_icon="@drawable/ic_mic"
             app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
             app:is_on="false"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -45,9 +34,9 @@
             app:on_background_tint="@color/color_button_secondary"
             app:on_icon="@drawable/ic_mic"
             app:on_icon_tint="@color/white"
-            app:disable_icon="@drawable/ic_mic"
             app:pressedTranslationZ="12dp"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"
+            tools:is_on="false" />
 
         <TextView
             android:id="@+id/fab_mic_label"
@@ -61,24 +50,13 @@
             app:layout_constraintStart_toStartOf="@id/fab_mic"
             app:layout_constraintTop_toBottomOf="@id/fab_mic" />
 
-        <View
-            android:id="@+id/fab_cam_bk"
-            android:layout_width="49dp"
-            android:layout_height="49dp"
-            android:background="@drawable/fab_ring_background"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@+id/fab_cam"
-            app:layout_constraintEnd_toEndOf="@+id/fab_cam"
-            app:layout_constraintStart_toStartOf="@+id/fab_cam"
-            app:layout_constraintTop_toTopOf="@+id/fab_cam"/>
-
         <mega.privacy.android.app.components.OnOffFab
             android:id="@+id/fab_cam"
             android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
             android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
-            android:background="@null"
             android:onClick="@{() -> viewmodelFab.clickCamera(!viewmodelFab.cameraLiveData)}"
             app:borderWidth="0dp"
+            app:disable_icon="@drawable/ic_video_on"
             app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
             app:is_on="false"
             app:layout_constraintEnd_toStartOf="@+id/fab_speaker"
@@ -91,9 +69,9 @@
             app:on_background_tint="@color/color_button_secondary"
             app:on_icon="@drawable/ic_video_on"
             app:on_icon_tint="@color/white"
-            app:disable_icon="@drawable/ic_video_on"
             app:pressedTranslationZ="12dp"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"
+            tools:is_on="false" />
 
         <TextView
             android:id="@+id/fab_cam_label"
@@ -104,28 +82,15 @@
             android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
             app:layout_constraintEnd_toEndOf="@id/fab_cam"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/fab_mic_label"
             app:layout_constraintStart_toStartOf="@id/fab_cam"
             app:layout_constraintTop_toBottomOf="@id/fab_cam" />
-
-        <View
-            android:id="@+id/fab_speaker_bk"
-            android:layout_width="49dp"
-            android:layout_height="49dp"
-            android:background="@drawable/fab_ring_background"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="@id/fab_speaker"
-            app:layout_constraintBottom_toBottomOf="@id/fab_speaker"
-            app:layout_constraintStart_toStartOf="@id/fab_speaker"
-            app:layout_constraintTop_toTopOf="@id/fab_speaker"/>
 
         <mega.privacy.android.app.components.OnOffFab
             android:id="@+id/fab_speaker"
             android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
             android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
-            android:background="@null"
             android:onClick="@{() -> viewmodelFab.clickSpeaker()}"
-            app:borderWidth="0dp"
+            app:disable_icon="@drawable/ic_volume_max"
             app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_chainStyle="spread"
@@ -137,7 +102,6 @@
             app:on_background_tint="@color/color_button_secondary"
             app:on_icon="@drawable/ic_volume_max"
             app:on_icon_tint="@color/white"
-            app:disable_icon="@drawable/ic_volume_max"
             app:pressedTranslationZ="12dp"
             tools:ignore="ContentDescription"
             tools:is_on="true" />
