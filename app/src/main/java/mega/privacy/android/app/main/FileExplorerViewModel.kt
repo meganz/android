@@ -1,7 +1,10 @@
 package mega.privacy.android.app.main
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.webkit.URLUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -81,12 +84,6 @@ class FileExplorerViewModel @Inject constructor(
     var latestMoveTargetPathTab: Int = 0
     private val _filesInfo = MutableLiveData<List<ShareInfo>>()
     private val _textInfo = MutableLiveData<ShareTextInfo>()
-    private val _fileNames = MutableLiveData<HashMap<String, String>>()
-
-    /**
-     * File names
-     */
-    val fileNames: LiveData<HashMap<String, String>> = _fileNames
 
     /**
      * Storage state
@@ -143,8 +140,8 @@ class FileExplorerViewModel @Inject constructor(
      *
      * @param fileNames
      */
-    fun setFileNames(fileNames: HashMap<String, String>) {
-        _fileNames.value = fileNames
+    fun setFileNames(fileNames: Map<String, String>) {
+        _uiState.update { uiState -> uiState.copy(fileNames = fileNames) }
     }
 
     /**
@@ -191,7 +188,7 @@ class FileExplorerViewModel @Inject constructor(
             context = context,
         )
 
-        _fileNames.postValue(hashMapOf(subject to subject))
+        setFileNames(mapOf(subject to subject))
         _textInfo.postValue(ShareTextInfo(isUrl, subject, fileContent, messageContent))
     }
 
@@ -205,12 +202,62 @@ class FileExplorerViewModel @Inject constructor(
         intent: Intent,
         context: Context?,
     ) {
+        context?.let { getPathsAndNames(intent, it) }
         val shareInfo: List<ShareInfo> =
             getShareInfoList(intent, context) ?: emptyList()
 
-        _fileNames.postValue(getShareInfoFileNamesMap(shareInfo))
+        setFileNames(getShareInfoFileNamesMap(shareInfo))
         _filesInfo.postValue(shareInfo)
     }
+
+    @SuppressLint("Recycle")
+    @Suppress("DEPRECATION")
+    private fun getPathsAndNames(intent: Intent, context: Context) {
+        viewModelScope.launch {
+            with(intent) {
+                (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                } else {
+                    getParcelableArrayListExtra(Intent.EXTRA_STREAM)
+                })?.let { uris ->
+                    Timber.d("Multiple files")
+                    setUrisAndNames(uris.associateWith { uri -> getFileName(uri, context) })
+                    uris
+                } ?: (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                } else {
+                    getParcelableExtra(Intent.EXTRA_STREAM)
+                })?.let { uri ->
+                    Timber.d("Single file")
+                    setUrisAndNames(mapOf(uri to getFileName(uri, context)))
+                }
+            }
+        }
+    }
+
+    internal fun setUrisAndNames(urisAndNames: Map<Uri, String?>) {
+        _uiState.update { uiState -> uiState.copy(urisAndNames = urisAndNames) }
+    }
+
+    private fun getFileName(uri: Uri, context: Context): String? = runCatching {
+        context.contentResolver?.acquireContentProviderClient(uri)
+            ?.let { client ->
+                client.query(uri, null, null, null, null)?.let { cursor ->
+                    if (cursor.count == 0) {
+                        cursor.close()
+                        client.close()
+                        null
+                    } else {
+                        cursor.moveToFirst()
+                        val columnIndex = cursor.getColumnIndex("_display_name")
+                        cursor.getString(columnIndex)
+                    }
+                } ?: run {
+                    client.close()
+                    null
+                }
+            }
+    }.getOrNull()
 
     /**
      * Get share info list
@@ -228,8 +275,8 @@ class FileExplorerViewModel @Inject constructor(
         shareInfo?.map { info ->
             info.getTitle().takeUnless {
                 it.isNullOrBlank()
-            } ?: info.originalFileName
-        }?.associateTo(hashMapOf()) { it to it }
+            } ?: info.originalFileName ?: ""
+        }?.associateWith { it } ?: emptyMap()
 
     /**
      * Builds file content from the shared text.
@@ -312,7 +359,7 @@ class FileExplorerViewModel @Inject constructor(
         get() {
             return _textInfo.value?.let {
                 """
-                ${fileNames.value?.get(it.subject) ?: it.subject}
+                ${uiState.value.fileNames[it.subject] ?: it.subject}
                 
                 ${it.messageContent}
                 """.trimIndent()
@@ -403,7 +450,7 @@ class FileExplorerViewModel @Inject constructor(
 
     private suspend fun attachFiles(chatIds: List<Long>, filePaths: List<String>) {
         val filePathsWithNames =
-            filePaths.associateWith { fileNames.value?.get(it.split(File.separator).last()) }
+            filePaths.associateWith { uiState.value.fileNames[it.split(File.separator).last()] }
         runCatching {
             sendChatAttachmentsUseCase(
                 filePathsWithNames, chatIds = chatIds.toLongArray()
@@ -435,7 +482,7 @@ class FileExplorerViewModel @Inject constructor(
         destination: Long,
     ) {
         uploadFiles(
-            mapOf(file.absolutePath to fileNames.value?.get(file.name)),
+            mapOf(file.absolutePath to uiState.value.fileNames[file.name]),
             NodeId(destination)
         )
     }
@@ -443,21 +490,16 @@ class FileExplorerViewModel @Inject constructor(
     /**
      * Uploads a list of files to the specified destination.
      *
-     * @param shareInfo The files as [ShareInfo] to upload.
      * @param destination The destination where the files will be uploaded.
      */
-    fun uploadShareInfo(
-        shareInfo: List<ShareInfo>,
-        destination: Long,
-    ) {
-        val pathsAndNames =
-            shareInfo.map { it.fileAbsolutePath }
-                .associateWith {
-                    runCatching { fileNames.value?.get(it.split(File.separator).last()) }
-                        .getOrNull()
-                }
-
-        uploadFiles(pathsAndNames, NodeId(destination))
+    fun uploadFiles(destination: Long) {
+        with(uiState.value) {
+            val pathsAndNames = urisAndNames.map { it.key }.associateWith {
+                runCatching { uiState.value.fileNames[urisAndNames.getValue(it)] }
+                    .getOrNull()
+            }.mapKeys { it.key.toString() }
+            uploadFiles(pathsAndNames, NodeId(destination))
+        }
     }
 
     private fun uploadFiles(

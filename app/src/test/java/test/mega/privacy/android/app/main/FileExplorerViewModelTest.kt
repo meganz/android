@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.main
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -9,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.main.FileExplorerViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants
@@ -190,23 +190,64 @@ class FileExplorerViewModelTest {
     }
 
     @Test
-    fun `test that state is updated correctly if upload a ShareInfo`() = runTest {
-        val file = File("path")
-        val path = file.absolutePath
-        val shareInfo = mock<ShareInfo> {
-            on { fileAbsolutePath } doReturn path
+    fun `test that state is updated correctly if upload files without renaming`() = runTest {
+        val fileName = "name"
+        val uri = mock<Uri> {
+            on { toString() } doReturn "/path/$fileName"
         }
+        val urisAndNames = mapOf(uri to fileName)
         val parentHandle = 123L
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
-                mapOf(path to null),
+                mapOf(uri.toString() to null),
                 NodeId(parentHandle)
             )
         )
 
-        underTest.uploadShareInfo(listOf(shareInfo), parentHandle)
-        underTest.uiState.map { it.uploadEvent }.test {
-            assertThat(awaitItem()).isEqualTo(expected)
+        with(underTest) {
+            setUrisAndNames(urisAndNames)
+            uiState.map { it.urisAndNames }.test {
+                assertThat(awaitItem()).isEqualTo(urisAndNames)
+            }
+            uploadFiles(parentHandle)
+            uiState.map { it.uploadEvent }.test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
+    }
+
+    @Test
+    fun `test that state is updated correctly if upload files renaming`() = runTest {
+        val fileName = "name"
+        val renamedName = "newName"
+        val uri = mock<Uri> {
+            on { toString() } doReturn "/path/$fileName"
+        }
+        val urisAndNames = mapOf(uri to fileName)
+        val parentHandle = 123L
+        val fileNames = mapOf(fileName to renamedName)
+        val expected = triggered(
+            TransferTriggerEvent.StartUpload.Files(
+                mapOf(uri.toString() to renamedName),
+                NodeId(parentHandle)
+            )
+        )
+
+        with(underTest) {
+            setUrisAndNames(urisAndNames)
+            uiState.map { it.urisAndNames }.test {
+                assertThat(awaitItem()).isEqualTo(urisAndNames)
+            }
+
+            setFileNames(fileNames)
+            uiState.map { it.fileNames }.test {
+                assertThat(awaitItem()).isEqualTo(fileNames)
+            }
+
+            uploadFiles(parentHandle)
+            uiState.map { it.uploadEvent }.test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
         }
     }
 }

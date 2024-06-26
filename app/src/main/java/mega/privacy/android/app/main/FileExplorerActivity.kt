@@ -1654,10 +1654,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         if (withoutCollisions.isNotEmpty()) {
                             lifecycleScope.launch {
                                 if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                                    viewModel.uploadShareInfo(
-                                        infos,
-                                        (parentNode ?: return@launch).handle
-                                    )
+                                    viewModel.uploadFiles((parentNode ?: return@launch).handle)
                                 } else {
                                     checkNotificationsPermission(this@FileExplorerActivity)
 
@@ -1671,7 +1668,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                                     uploadUseCase.uploadInfos(
                                         this@FileExplorerActivity,
                                         infos,
-                                        viewModel.fileNames.value,
+                                        HashMap(viewModel.uiState.value.fileNames),
                                         (parentNode ?: return@launch).handle
                                     )
                                         .subscribeOn(Schedulers.io())
@@ -1779,10 +1776,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 if (viewModel.isImportingText(intent)) {
                     val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
                     val info = viewModel.textInfoContent
-                    val names = viewModel.fileNames.value
+                    val names = viewModel.uiState.value.fileNames
 
                     if (info != null) {
-                        val name = if (names != null) names[info.subject] else info.subject
+                        val name = names[info.subject]
                         createFile(name, info.fileContent, parentNode, info.isUrl)
                     }
 
