@@ -1,5 +1,6 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.google.firebase.appdistribution.gradle.AppDistributionExtension
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import mega.privacy.android.build.buildTypeMatches
 import mega.privacy.android.build.getAppGitHash
 import mega.privacy.android.build.getChatGitHash
@@ -69,16 +70,6 @@ android {
         resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion, project)}\"")
 
         testInstrumentationRunner = "test.mega.privacy.android.app.HiltTestRunner"
-
-        withGroovyBuilder {
-            "firebaseCrashlytics" {
-                // Enable processing and uploading of native symbols to Crashlytics servers.
-                // This flag must be enabled to see properly-symbolicated native
-                // stack traces in the Crashlytics dashboard.
-                "nativeSymbolUploadEnabled"(true)
-                "unstrippedNativeLibsDir"(nativeLibsDir(project))
-            }
-        }
     }
 
     buildTypes {
@@ -94,6 +85,11 @@ android {
                 groups = readTesterGroupList()
                 testers = readTesters()
             }
+            configure<CrashlyticsExtension> {
+                nativeSymbolUploadEnabled = true
+                unstrippedNativeLibsDir = nativeLibsDir(project)
+            }
+
             buildConfigField("String", "ENVIRONMENT", "\"\"")
         }
 

@@ -1,9 +1,9 @@
 [versions]
-firebase-crashlytics = "2.9.9"
+firebase-crashlytics = "3.0.2"
 firebase-performance = "1.4.2"
-firebase-app-distribution = "4.2.0"
-gradle = "8.3.0"
-google-services = "4.4.1"
+firebase-app-distribution = "5.0.0"
+gradle = "8.5.0"
+google-services = "4.4.2"
 hilt = "2.51"
 jacoco = "0.8.11"
 jfrog = "5.2.0"
