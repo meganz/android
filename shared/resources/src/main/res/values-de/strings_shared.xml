@@ -468,4 +468,6 @@
     <string name="account_cancel_account_plan_keep_pro_plan">%1s behalten</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">Mit Kündigung fortfahren</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_maximum_characters">Max. 32 Zeichen</string>
 </resources>

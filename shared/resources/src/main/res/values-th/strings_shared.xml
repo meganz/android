@@ -91,7 +91,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">ไม่มีพลาดทุกข้อมูลสำคัญของคุณ</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore files and folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">ย้อนกลับไฟล์และโฟลเดอร์ไปยังวันที่ใดก็ได้ในช่วง 180 วันที่ผ่านมา ช่วยให้ข้อมูลของคุณปลอดภัยจากเหตุไม่คาดคิดและการแก้ไขโดยไม่ได้รับอนุญาต</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -275,7 +275,7 @@
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">อัปเกรด</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Upload paused, device is not charging</string>
+    <string name="camera_uploads_phone_not_charging_message">การอัปโหลดถูกหยุดชั่วคราว เนื่องจากอุปกรณ์ไม่ได้เสียบชาร์จ</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
     <string name="device_center_list_view_item_status_nothing_setup">ยังไม่ได้ตั้งค่าการซิงค์</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
@@ -299,7 +299,7 @@
     <!-- Text for the Sync solved issues chip -->
     <string name="device_center_sync_solved_issues_chip_text">แก้ไขปัญหาแล้ว</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">This folder can’t be synced. Set it up to sync to MEGA using Camera uploads.</string>
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">โฟลเดอร์นี้ไม่สามารถซิงค์ได้ ตั้งค่าให้มีการซิงค์กับ MEGA โดยใช้การอัปโหลดจากกล้อง</string>
     <!-- Label for the file info information screen description field -->
     <string name="file_info_information_description_label">รายละเอียด</string>
     <!-- Placeholder for the file info information screen description field -->
@@ -460,4 +460,6 @@
     <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">ดำเนินการยกเลิกต่อไป</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_maximum_characters">สูงสุด 32 ตัวอักษร</string>
 </resources>

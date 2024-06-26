@@ -4917,7 +4917,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">การอัปโหลดถูกหยุดชั่วคราว เนื่องจากแบตเตอรี่เหลือต่ำกว่า %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">การอัปโหลดจากกล้องหยุดทำงาน ลองเปิดใช้งานการอัปโหลดรูปภาพจากกล้องอีกครั้งเพื่อแก้ไข หากปัญหายังมีอยู่ให้ติดต่อ support&#64;mega.nz</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">การอัปโหลดจากกล้องกำลังอยู่ในระหว่างดำเนินการ มี %1$d ไฟล์รอดำเนินการ</item>
@@ -5097,7 +5097,7 @@
         <item quantity="other">%1$s และคนอื่น ๆ อีก %2$d คนได้ยกมือ</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="hidden_nodes_sharing_album">อัลบั้มนี้มีรายการบางอย่างที่ซ่อนไว้ การแชร์อัลบั้มนี้จะทำให้ผู้ที่คุณแชร์ด้วยสามารถเห็นเนื้อหาที่ซ่อนอยู่ได้ แต่เนื้อหาเหล่านี้จะยังคงซ่อนอยู่ในคลาวด์ไดร์ฟของคุณ</string>
     <!-- Hidden nodes items -->
     <plurals name="hidden_nodes_items">
         <item quantity="other"></item>

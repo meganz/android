@@ -463,4 +463,6 @@
     <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">Lanjutkan pembatalan</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_maximum_characters">Maksimal 32 karakter</string>
 </resources>

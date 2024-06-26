@@ -460,4 +460,6 @@
     <string name="account_cancel_account_plan_keep_pro_plan">保留%1s</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">仍要取消</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_maximum_characters">最多32個字元（16個中文字）</string>
 </resources>

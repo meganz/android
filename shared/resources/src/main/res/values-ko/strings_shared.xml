@@ -460,4 +460,6 @@
     <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">취소 진행</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_maximum_characters">최대 32자</string>
 </resources>

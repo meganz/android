@@ -5381,7 +5381,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Le téléversement est en pause, car le niveau de la batterie est inférieur à %1$d&#160;%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Les téléversements de l’appareil photo ont cessé de fonctionner. Essayez de les réactiver afin de résoudre la situation. Si le problème persiste, contactez support&#64;mega.nz par courriel.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Téléversements de l’appareil photo en cours, %1$d&#160;fichier en attente</item>

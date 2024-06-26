@@ -460,4 +460,6 @@
     <string name="account_cancel_account_plan_keep_pro_plan">Giữ %1s</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">Tiếp tục hủy</string>
+    <!-- error label for add tags page when tag character limit reached -->
+    <string name="add_tags_error_maximum_characters">Tối&#160;đa 32 ký&#160;tự</string>
 </resources>
