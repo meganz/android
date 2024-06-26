@@ -143,6 +143,7 @@ class MediaPlayerFacade @Inject constructor(
             exoPlayer.setShuffleOrder(it)
         }
         player = MediaMegaPlayer(exoPlayer)
+        playerNotificationManager?.setPlayer(player)
     }
 
     override fun createPlayerControlNotification(playerNotificationParams: PlayerNotificationCreatedParams) {
@@ -206,7 +207,7 @@ class MediaPlayerFacade @Inject constructor(
                     setUseChronometer(useChronometer)
                     setUseNextActionInCompactView(useNextActionInCompactView)
                     setUsePreviousActionInCompactView(usePreviousActionInCompactView)
-                    setPlayer(player)
+                    setPlayer(player ?: ExoPlayer.Builder(context).build())
                 }
         }
     }

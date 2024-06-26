@@ -159,13 +159,13 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     override fun onCreate() {
         super.onCreate()
-        audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
-        audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
-        createPlayer()
         if (!isNotificationCreated) {
             createPlayerControlNotification()
             isNotificationCreated = true
         }
+        createPlayer()
+        audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
+        audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
         observeData()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
