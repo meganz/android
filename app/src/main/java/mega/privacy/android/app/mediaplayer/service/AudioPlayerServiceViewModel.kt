@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
@@ -55,6 +56,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
@@ -79,6 +81,7 @@ import mega.privacy.android.app.utils.OfflineUtils.getOfflineFolderName
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.data.model.MimeTypeList
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.TypedAudioNode
@@ -94,6 +97,7 @@ import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApiUseCase
+import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -102,6 +106,7 @@ import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
@@ -124,11 +129,14 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioS
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import timber.log.Timber
 import java.io.File
+import java.net.URI
 import java.util.Collections
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -177,6 +185,10 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val setAudioShuffleEnabledUseCase: SetAudioShuffleEnabledUseCase,
     private val setAudioRepeatModeUseCase: SetAudioRepeatModeUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
+    private val getThumbnailUseCase: GetThumbnailUseCase,
+    private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
     monitorAudioBackgroundPlayEnabledUseCase: MonitorAudioBackgroundPlayEnabledUseCase,
     monitorAudioShuffleEnabledUseCase: MonitorAudioShuffleEnabledUseCase,
     monitorAudioRepeatModeUseCase: MonitorAudioRepeatModeUseCase,
@@ -349,6 +361,10 @@ class AudioPlayerServiceViewModel @Inject constructor(
             if (displayNodeNameFirst) firstPlayNodeName else null
         )
 
+        val isOfflineComposeEnabled = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
+        }.getOrDefault(false)
+
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
             if (type != OFFLINE_ADAPTER && type != ZIP_ADAPTER) {
                 needStopStreamingServer =
@@ -358,8 +374,25 @@ class AudioPlayerServiceViewModel @Inject constructor(
             val buildPlayerSourcesJob = sharingScope.launch(ioDispatcher) {
                 when (type) {
                     OFFLINE_ADAPTER -> {
-                        playlistTitle.postValue(getOfflineFolderName(context, firstPlayHandle))
-                        buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
+                        if (isOfflineComposeEnabled) {
+                            val parentId = intent.getIntExtra(INTENT_EXTRA_KEY_PARENT_ID, -1)
+                            playlistTitle.postValue(
+                                if (parentId == -1) {
+                                    context.getString(R.string.section_saved_for_offline_new)
+                                } else {
+                                    runCatching {
+                                        getOfflineNodeInformationByIdUseCase(parentId)
+                                    }.getOrNull()?.name ?: ""
+                                }
+                            )
+                            buildPlaylistFromOfflineNodes(
+                                parentId = parentId,
+                                firstPlayHandle = firstPlayHandle
+                            )
+                        } else {
+                            playlistTitle.postValue(getOfflineFolderName(context, firstPlayHandle))
+                            buildPlaylistFromLegacyOfflineNodes(intent, firstPlayHandle)
+                        }
                     }
 
                     AUDIO_BROWSE_ADAPTER -> {
@@ -544,10 +577,14 @@ class AudioPlayerServiceViewModel @Inject constructor(
             val node = getAudioNodeByHandleUseCase(firstPlayHandle)
             val thumbnail = when {
                 type == OFFLINE_ADAPTER -> {
-                    offlineThumbnailFileWrapper.getThumbnailFile(
-                        context,
-                        firstPlayHandle.toString()
-                    )
+                    if (isOfflineComposeEnabled) {
+                        getThumbnailUseCase(firstPlayHandle)
+                    } else {
+                        offlineThumbnailFileWrapper.getThumbnailFile(
+                            context,
+                            firstPlayHandle.toString()
+                        )
+                    }
                 }
 
                 node == null -> {
@@ -606,13 +643,64 @@ class AudioPlayerServiceViewModel @Inject constructor(
         return true
     }
 
+    private suspend fun buildPlaylistFromOfflineNodes(
+        parentId: Int,
+        firstPlayHandle: Long,
+    ) {
+        runCatching {
+            getOfflineNodesByParentIdUseCase(parentId)
+        }.onSuccess { list ->
+            playlistItems.clear()
+
+            val mediaItems = mutableListOf<MediaItem>()
+            var firstPlayIndex = 0
+
+            list.filter {
+                it.fileTypeInfo is AudioFileTypeInfo && it.fileTypeInfo?.isSupported == true
+            }.forEachIndexed { index, item ->
+                if (item.handle.toLong() == firstPlayHandle) {
+                    firstPlayIndex = index
+                }
+
+                runCatching { Uri.parse(item.absolutePath) }.onSuccess {
+                    mediaItems.add(
+                        MediaItem.Builder()
+                            .setUri(it)
+                            .setMediaId(item.handle)
+                            .build()
+                    )
+                }
+
+                val thumbnailFile = runCatching {
+                    item.thumbnail?.let { File(URI.create(it)) }
+                }.getOrNull()
+
+                playlistItemMapper(
+                    nodeHandle = item.handle.toLong(),
+                    nodeName = item.name,
+                    thumbnailFile = thumbnailFile,
+                    index = index,
+                    type = TYPE_NEXT,
+                    size = item.totalSize,
+                    duration = (item.fileTypeInfo as? AudioFileTypeInfo)?.duration ?: 0.seconds,
+                    fileExtension = item.fileTypeInfo?.extension
+                ).let { playlistItems.add(it) }
+            }
+
+            updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
+
     /**
      * Build play sources by node OfflineNodes
      *
      * @param intent Intent
      * @param firstPlayHandle the index of first playing item
      */
-    private fun buildPlaylistFromOfflineNodes(
+    @Deprecated("Should be removed when legacy Offline feature is removed")
+    private fun buildPlaylistFromLegacyOfflineNodes(
         intent: Intent,
         firstPlayHandle: Long,
     ) {
@@ -952,6 +1040,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }
     }
 
+    @Deprecated("Should be removed when legacy Offline feature is removed")
     private fun filterByNodeName(name: String): Boolean =
         MimeTypeList.typeForName(name).let { mime ->
             mime.isAudio && !mime.isAudioNotSupported

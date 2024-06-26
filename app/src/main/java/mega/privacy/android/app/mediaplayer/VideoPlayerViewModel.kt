@@ -758,7 +758,6 @@ class VideoPlayerViewModel @Inject constructor(
                                 }
                             }
                             buildPlaylistFromOfflineNodes(
-                                intent = intent,
                                 parentId = parentId,
                                 firstPlayHandle = firstPlayHandle
                             )
@@ -1023,7 +1022,6 @@ class VideoPlayerViewModel @Inject constructor(
 
 
     private suspend fun buildPlaylistFromOfflineNodes(
-        intent: Intent,
         parentId: Int,
         firstPlayHandle: Long,
     ) {

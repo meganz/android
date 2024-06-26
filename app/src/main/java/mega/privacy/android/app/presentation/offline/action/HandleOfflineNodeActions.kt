@@ -341,11 +341,6 @@ private suspend fun openVideoOrAudioFile(
         putExtra(Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, content.file.parent)
         putExtra(Constants.INTENT_EXTRA_KEY_PARENT_ID, content.parentId)
 
-//        Will be handled in subsequent MR
-//        putExtra(
-//            Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList((adapter ?: return).getOfflineNodes())
-//        )
-
         val mimeType = if (content.extension == "opus") "audio/*" else content.mimeType
         applyNodeContentUri(this, content.file, mimeType, content.isSupported)
     }
