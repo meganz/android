@@ -201,6 +201,7 @@ public class OfflineUtils {
      * @param context Android context
      * @param handle  handle of the offline node
      */
+    @Deprecated
     public static String getOfflineFolderName(Context context, long handle) {
         LegacyDatabaseHandler dbHandler = DbHandlerModuleKt.getDbHandler();
         MegaOffline node = dbHandler.findByHandle(handle);
@@ -228,6 +229,7 @@ public class OfflineUtils {
         }
     }
 
+    @Deprecated
     public static File getOfflineFile(Context context, MegaOffline offlineNode) {
         String path = context.getFilesDir().getAbsolutePath() + File.separator;
         if (offlineNode.isFolder()) {
@@ -237,10 +239,12 @@ public class OfflineUtils {
         return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
     }
 
+    @Deprecated
     public static File getThumbnailFile(Context context, MegaOffline node, MegaApiGateway megaApiGateway) {
         return getThumbnailFile(context, node.getHandle(), megaApiGateway);
     }
 
+    @Deprecated
     public static File getThumbnailFile(Context context, String handle, MegaApiGateway megaApiGateway) {
         File thumbDir = ThumbnailUtils.getThumbFolder(context);
         String thumbName = megaApiGateway.handleToBase64(Long.parseLong(handle));

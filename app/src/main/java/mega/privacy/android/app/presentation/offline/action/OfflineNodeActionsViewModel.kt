@@ -154,7 +154,8 @@ class OfflineNodeActionsViewModel @Inject constructor(
                             isVideo = fileType is VideoFileTypeInfo,
                             mimeType = fileType.mimeType,
                             extension = fileType.extension,
-                            file = localFile
+                            file = localFile,
+                            parentId = info.parentId
                         )
                     }
 

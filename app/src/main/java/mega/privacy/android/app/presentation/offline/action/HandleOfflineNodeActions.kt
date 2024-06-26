@@ -339,6 +339,7 @@ private suspend fun openVideoOrAudioFile(
         putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
         putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
         putExtra(Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, content.file.parent)
+        putExtra(Constants.INTENT_EXTRA_KEY_PARENT_ID, content.parentId)
 
 //        Will be handled in subsequent MR
 //        putExtra(

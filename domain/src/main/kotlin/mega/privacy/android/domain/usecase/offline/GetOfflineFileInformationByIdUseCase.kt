@@ -8,7 +8,7 @@ import javax.inject.Inject
  *
  */
 class GetOfflineFileInformationByIdUseCase @Inject constructor(
-    private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
+    private val getOfflineNodeInformationByNodeIdUseCase: GetOfflineNodeInformationByNodeIdUseCase,
     private val getOfflineFileInformationUseCase: GetOfflineFileInformationUseCase,
 ) {
     /**
@@ -19,7 +19,7 @@ class GetOfflineFileInformationByIdUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         nodeId: NodeId, useOriginalImageAsThumbnail: Boolean = false,
-    ) = getOfflineNodeInformationByIdUseCase(nodeId = nodeId)?.let {
+    ) = getOfflineNodeInformationByNodeIdUseCase(nodeId = nodeId)?.let {
         getOfflineFileInformationUseCase(
             offlineNodeInformation = it,
             useOriginalImageAsThumbnail = useOriginalImageAsThumbnail

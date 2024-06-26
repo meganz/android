@@ -22,9 +22,13 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.BeforeEach
@@ -52,6 +56,10 @@ internal class VideoPlayerViewModelTest {
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val savedStateHandle = SavedStateHandle(mapOf())
     private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getOfflineNodesByParentIdUseCase = mock<GetOfflineNodesByParentIdUseCase>()
+    private val getOfflineNodeInformationByIdUseCase = mock<GetOfflineNodeInformationByIdUseCase>()
+    private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -121,6 +129,10 @@ internal class VideoPlayerViewModelTest {
             monitorSubFolderMediaDiscoverySettingsUseCase = mock(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
+            getThumbnailUseCase = getThumbnailUseCase,
+            getOfflineNodeInformationByIdUseCase = getOfflineNodeInformationByIdUseCase,
         )
         savedStateHandle[underTest.subtitleDialogShowKey] = false
         savedStateHandle[underTest.subtitleShowKey] = false

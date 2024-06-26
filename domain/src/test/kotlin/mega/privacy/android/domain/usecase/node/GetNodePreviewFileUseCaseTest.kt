@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -24,13 +24,13 @@ import java.util.stream.Stream
 class GetNodePreviewFileUseCaseTest {
     private val fileSystemRepository: FileSystemRepository = mock()
     private val cacheRepository: CacheRepository = mock()
-    private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase = mock()
+    private val getOfflineNodeInformationByNodeIdUseCase: GetOfflineNodeInformationByNodeIdUseCase = mock()
     private val getOfflineFileUseCase: GetOfflineFileUseCase = mock()
 
     private val underTest = GetNodePreviewFileUseCase(
         fileSystemRepository = fileSystemRepository,
         cacheRepository = cacheRepository,
-        getOfflineNodeInformationByIdUseCase = getOfflineNodeInformationByIdUseCase,
+        getOfflineNodeInformationByNodeIdUseCase = getOfflineNodeInformationByNodeIdUseCase,
         getOfflineFileUseCase = getOfflineFileUseCase
     )
 
@@ -58,7 +58,7 @@ class GetNodePreviewFileUseCaseTest {
         }
         val file = mock<File>()
         val offlineNode = mock<OtherOfflineNodeInformation>()
-        whenever(getOfflineNodeInformationByIdUseCase(node.id)).thenReturn(offlineNode)
+        whenever(getOfflineNodeInformationByNodeIdUseCase(node.id)).thenReturn(offlineNode)
         whenever(getOfflineFileUseCase(offlineNode)).thenReturn(file)
         val actual = underTest(node)
         assertThat(actual).isEqualTo(file)

@@ -16,12 +16,14 @@ import java.util.concurrent.TimeUnit
  * @property fileTypeInfo file type information
  * @property addedTime creation time of the node
  * @property thumbnail thumbnail of the node
+ * @property absolutePath of the local file
  */
 data class OfflineFileInformation(
     val totalSize: Long = 0L,
     val folderInfo: OfflineFolderInfo? = null,
     val fileTypeInfo: FileTypeInfo? = null,
     val thumbnail: String? = null,
+    val absolutePath: String = "",
     override val id: Int = 0,
     override val handle: String,
     override val parentId: Int = -1,

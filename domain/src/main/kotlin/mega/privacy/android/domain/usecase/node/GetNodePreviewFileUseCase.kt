@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import java.io.File
 import javax.inject.Inject
 
@@ -18,7 +18,7 @@ import javax.inject.Inject
 class GetNodePreviewFileUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
     private val cacheRepository: CacheRepository,
-    private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
+    private val getOfflineNodeInformationByNodeIdUseCase: GetOfflineNodeInformationByNodeIdUseCase,
     private val getOfflineFileUseCase: GetOfflineFileUseCase,
 ) {
 
@@ -29,7 +29,7 @@ class GetNodePreviewFileUseCase @Inject constructor(
     suspend operator fun invoke(node: TypedFileNode): File? {
         var file: File? = null
         if (node.isAvailableOffline) {
-            getOfflineNodeInformationByIdUseCase(node.id)?.let {
+            getOfflineNodeInformationByNodeIdUseCase(node.id)?.let {
                 file = getOfflineFileUseCase(it)
             }
         }

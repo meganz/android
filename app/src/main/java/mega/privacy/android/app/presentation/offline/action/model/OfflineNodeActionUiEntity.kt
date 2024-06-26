@@ -27,6 +27,7 @@ sealed interface OfflineNodeActionUiEntity {
      * @property mimeType [String]
      * @property extension [String]
      * @property file [File]
+     * @property parentId [Int]
      */
     data class AudioOrVideo(
         val nodeId: NodeId,
@@ -36,6 +37,7 @@ sealed interface OfflineNodeActionUiEntity {
         val mimeType: String,
         val extension: String,
         val file: File,
+        val parentId: Int
     ) : OfflineNodeActionUiEntity
 
     /**

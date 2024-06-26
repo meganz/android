@@ -18,13 +18,13 @@ import org.mockito.kotlin.whenever
 class GetOfflineFileInformationByIdUseCaseTest {
     private lateinit var underTest: GetOfflineFileInformationByIdUseCase
 
-    private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase = mock()
+    private val getOfflineNodeInformationByNodeIdUseCase: GetOfflineNodeInformationByNodeIdUseCase = mock()
     private val getOfflineFileInformationUseCase: GetOfflineFileInformationUseCase = mock()
 
     @BeforeEach
     fun setUp() {
         underTest = GetOfflineFileInformationByIdUseCase(
-            getOfflineNodeInformationByIdUseCase,
+            getOfflineNodeInformationByNodeIdUseCase,
             getOfflineFileInformationUseCase
         )
     }
@@ -33,11 +33,11 @@ class GetOfflineFileInformationByIdUseCaseTest {
     fun `test that invoke with valid NodeId should call both use cases`() = runTest {
         val nodeId = NodeId(11)
         val offlineNodeInformation = mock<OtherOfflineNodeInformation>()
-        whenever(getOfflineNodeInformationByIdUseCase.invoke(nodeId)) doReturn offlineNodeInformation
+        whenever(getOfflineNodeInformationByNodeIdUseCase.invoke(nodeId)) doReturn offlineNodeInformation
 
         underTest.invoke(nodeId)
 
-        verify(getOfflineNodeInformationByIdUseCase).invoke(nodeId)
+        verify(getOfflineNodeInformationByNodeIdUseCase).invoke(nodeId)
         verify(getOfflineFileInformationUseCase).invoke(offlineNodeInformation)
     }
 
@@ -45,7 +45,7 @@ class GetOfflineFileInformationByIdUseCaseTest {
     fun `test that getOfflineFileInformationUseCase is not called when GetOfflineNodeInformationByIdUseCase returns null`() =
         runTest {
             val nodeId = NodeId(11)
-            whenever(getOfflineNodeInformationByIdUseCase.invoke(nodeId)) doReturn null
+            whenever(getOfflineNodeInformationByNodeIdUseCase.invoke(nodeId)) doReturn null
 
             underTest.invoke(nodeId)
 
@@ -55,7 +55,7 @@ class GetOfflineFileInformationByIdUseCaseTest {
     @AfterEach
     fun reset() {
         reset(
-            getOfflineNodeInformationByIdUseCase,
+            getOfflineNodeInformationByNodeIdUseCase,
             getOfflineFileInformationUseCase
         )
     }

@@ -1,20 +1,18 @@
 package mega.privacy.android.domain.usecase.offline
 
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
 /**
- * Get OfflineNodeInformation by Node Id
+ * Get OfflineNodeInformation by database row id
  *
  */
 class GetOfflineNodeInformationByIdUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
 ) {
     /**
-     * invoke
-     * @param nodeId [NodeId]
+     * Invoke
+     * @param id [Int] of database row
      */
-    suspend operator fun invoke(nodeId: NodeId) =
-        nodeRepository.getOfflineNodeInformation(nodeId)
+    suspend operator fun invoke(id: Int) = nodeRepository.getOfflineNodeById(id)
 }

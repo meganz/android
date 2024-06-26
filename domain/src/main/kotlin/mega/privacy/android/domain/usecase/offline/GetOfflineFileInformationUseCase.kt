@@ -55,7 +55,8 @@ class GetOfflineFileInformationUseCase @Inject constructor(
             thumbnail = thumbnail,
             path = offlineNodeInformation.path,
             lastModifiedTime = offlineNodeInformation.lastModifiedTime,
-            fileTypeInfo = fileTypeInfo
+            fileTypeInfo = fileTypeInfo,
+            absolutePath = offlineFile.absolutePath
         )
     }
 
