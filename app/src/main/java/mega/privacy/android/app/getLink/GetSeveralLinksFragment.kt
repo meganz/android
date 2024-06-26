@@ -1,5 +1,6 @@
 package mega.privacy.android.app.getLink
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
@@ -12,17 +13,25 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetSeveralLinksBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.getLink.adapter.LinksAdapter
 import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_DISABLED
 import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_ENABLED
 import mega.privacy.android.app.utils.Constants.EXTRA_SEVERAL_LINKS
@@ -30,7 +39,10 @@ import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import nz.mega.sdk.MegaApiJava
 import java.util.UUID
+import javax.inject.Inject
 
 /**
  * Fragment of [GetLinkActivity] to allow the creation of multiple links.
@@ -45,6 +57,13 @@ class GetSeveralLinksFragment : Fragment() {
     private var menu: Menu? = null
 
     private val linksAdapter by lazy { LinksAdapter() }
+
+    private val handles: LongArray? by lazy {
+        activity?.intent?.getLongArrayExtra(Constants.HANDLE_LIST)
+    }
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,8 +90,67 @@ class GetSeveralLinksFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setupView()
-        setupObservers()
+        initialize()
+    }
+
+    private fun initialize() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                checkSensitiveItems()
+            } else {
+                initNodes()
+
+                setupView()
+                setupObservers()
+            }
+        }
+    }
+
+    private fun checkSensitiveItems() {
+        val handles = handles ?: run {
+            activity?.finish()
+            return
+        }
+
+        viewModel.hasSensitiveItemsFlow
+            .filterNotNull()
+            .onEach { hasSensitiveItems ->
+                if (hasSensitiveItems) {
+                    showSharingSensitiveItemsWarningDialog()
+                } else {
+                    initNodes()
+
+                    setupView()
+                    setupObservers()
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.checkSensitiveItems(handles.toList())
+    }
+
+    private fun showSharingSensitiveItemsWarningDialog() {
+        val context = context ?: return
+        MaterialAlertDialogBuilder(context)
+            .setTitle(getString(sharedR.string.hidden_items))
+            .setMessage(getString(sharedR.string.share_hidden_item_links_description))
+            .setCancelable(false)
+            .setPositiveButton(R.string.button_continue) { _, _ ->
+                initNodes()
+
+                setupView()
+                setupObservers()
+            }
+            .setNegativeButton(R.string.general_cancel) { _, _ -> activity?.finish() }
+            .show()
+    }
+
+    private fun initNodes() {
+        val context = context ?: return
+        val handles = handles ?: run {
+            activity?.finish()
+            return
+        }
+        viewModel.initNodes(handles, context)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

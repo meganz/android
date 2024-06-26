@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -17,6 +19,9 @@ import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
+import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -38,6 +43,8 @@ class GetSeveralLinksViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val exportNodesUseCase: ExportNodesUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
+    private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
+    private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
 ) : ViewModel() {
 
     private val linkItemsList: MutableLiveData<List<LinkItem>> = MutableLiveData()
@@ -51,6 +58,9 @@ class GetSeveralLinksViewModel @Inject constructor(
     fun getLinksNumber(): Int = linksNumber
 
     private val thumbFolder by lazy { getThumbFolder(MegaApplication.getInstance()) }
+
+    private val _hasSensitiveItems: MutableStateFlow<Boolean?> = MutableStateFlow(null)
+    val hasSensitiveItemsFlow = _hasSensitiveItems.asStateFlow()
 
     /**
      * Initializes the nodes and all the available info.
@@ -231,4 +241,15 @@ class GetSeveralLinksViewModel @Inject constructor(
     fun getLinksString() = linkItemsList.value?.filterIsInstance<LinkItem.Data>()
         ?.mapNotNull { it.link }
         ?.joinToString(separator = "\n", postfix = "\n") ?: ""
+
+    fun checkSensitiveItems(handles: List<Long>) = viewModelScope.launch {
+        _hasSensitiveItems.value = handles.any { handle ->
+            val node = megaApi.getNodeByHandle(handle)
+            val nodeId = node?.let { NodeId(it.handle) }
+
+            node != null && nodeId != null && !node.isExported && (node.isMarkedSensitive
+                    || hasSensitiveInheritedUseCase(nodeId)
+                    || (node.isFolder && hasSensitiveDescendantUseCase(nodeId)))
+        }
+    }
 }

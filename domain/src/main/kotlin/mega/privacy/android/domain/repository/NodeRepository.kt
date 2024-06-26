@@ -759,4 +759,18 @@ interface NodeRepository {
      * @param tag [String]
      */
     suspend fun removeNodeTag(nodeHandle: NodeId, tag: String)
+
+    /**
+     * Check if parent node contains any sensitive descendant
+     *
+     * @param nodeId [NodeId]
+     */
+    suspend fun hasSensitiveDescendant(nodeId: NodeId): Boolean
+
+    /**
+     * Check if node is sensitive inherited
+     *
+     * @param nodeId [NodeId]
+     */
+    suspend fun hasSensitiveInherited(nodeId: NodeId): Boolean
 }

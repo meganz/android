@@ -1,6 +1,7 @@
 package mega.privacy.android.app.getLink
 
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
@@ -19,9 +20,15 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.datepicker.MaterialStyledDatePickerDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
@@ -29,6 +36,7 @@ import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -41,12 +49,16 @@ import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap
 import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Fragment of [GetLinkActivity] to get or manage a link of a node.
  */
+@AndroidEntryPoint
 class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollable {
 
     companion object {
@@ -63,6 +75,14 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     private lateinit var chatLauncher: ActivityResultLauncher<Unit?>
 
     private var passwordVisible = false
+
+    private val handle: Long? by lazy {
+        val handle = activity?.intent?.getLongExtra(HANDLE, INVALID_HANDLE)
+        handle?.takeIf { it != INVALID_HANDLE }
+    }
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,9 +110,29 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setupView()
-        setupObservers()
+        initialize()
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun initialize() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                checkSensitiveItems()
+            } else {
+                initNode()
+
+                setupView()
+                setupObservers()
+            }
+        }
+    }
+
+    private fun initNode() {
+        val handle = handle ?: run {
+            activity?.finish()
+            return
+        }
+        viewModel.initNode(handle)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -206,6 +246,28 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             binding.keyText.text = uiState.key
             updatePassword(uiState.password)
         }
+    }
+
+    private fun checkSensitiveItems() {
+        val handle = handle ?: run {
+            activity?.finish()
+            return
+        }
+
+        viewModel.hasSensitiveItemsFlow
+            .filterNotNull()
+            .onEach { hasSensitiveItems ->
+                if (hasSensitiveItems) {
+                    showSharingSensitiveItemsWarningDialog()
+                } else {
+                    initNode()
+
+                    setupView()
+                    setupObservers()
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.checkSensitiveItem(handle)
     }
 
     override fun onResume() {
@@ -600,6 +662,22 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
         val withElevation = binding.scrollViewGetLink.canScrollVertically(SCROLLING_UP_DIRECTION)
         viewModel.setElevation(withElevation)
+    }
+
+    private fun showSharingSensitiveItemsWarningDialog() {
+        val context = context ?: return
+        MaterialAlertDialogBuilder(context)
+            .setTitle(getString(sharedR.string.hidden_item))
+            .setMessage(getString(sharedR.string.share_hidden_item_link_description))
+            .setCancelable(false)
+            .setPositiveButton(R.string.button_continue) { _, _ ->
+                initNode()
+
+                setupView()
+                setupObservers()
+            }
+            .setNegativeButton(R.string.general_cancel) { _, _ -> activity?.finish() }
+            .show()
     }
 
     /**

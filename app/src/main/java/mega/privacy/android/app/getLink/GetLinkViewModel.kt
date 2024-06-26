@@ -22,6 +22,8 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
+import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
+import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -48,6 +50,8 @@ class GetLinkViewModel @Inject constructor(
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     @ApplicationContext private val context: Context,
+    private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
+    private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
 ) : ViewModel() {
 
     private val linkText: MutableLiveData<String> = MutableLiveData()
@@ -55,8 +59,10 @@ class GetLinkViewModel @Inject constructor(
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
     private val _linkCopied: MutableStateFlow<Pair<String, String>?> = MutableStateFlow(null)
     private val _copyrightAgreed: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _hasSensitiveItems: MutableStateFlow<Boolean?> = MutableStateFlow(null)
     val linkCopied = _linkCopied.asStateFlow()
     val copyrightAgreed = _copyrightAgreed.asStateFlow()
+    val hasSensitiveItemsFlow = _hasSensitiveItems.asStateFlow()
 
     private val _state = MutableStateFlow(GetLinkUiState())
 
@@ -423,5 +429,15 @@ class GetLinkViewModel @Inject constructor(
 
     fun agreeCopyrightTerms() {
         _copyrightAgreed.value = true
+    }
+
+    fun checkSensitiveItem(handle: Long) = viewModelScope.launch {
+        val node = megaApi.getNodeByHandle(handle)
+        val nodeId = node?.let { NodeId(it.handle) }
+
+        _hasSensitiveItems.value =
+            node != null && nodeId != null && !node.isExported && (node.isMarkedSensitive
+                    || hasSensitiveInheritedUseCase(nodeId)
+                    || (node.isFolder && hasSensitiveDescendantUseCase(nodeId)))
     }
 }

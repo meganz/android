@@ -48,10 +48,14 @@ import mega.privacy.android.domain.entity.node.TypedImageNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchTarget
+import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.repository.NodeRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
@@ -1338,6 +1342,45 @@ class NodeRepositoryImplTest {
             )
             verify(megaApiGateway).setNodeDescription(eq(megaNode), eq(description), any())
         }
+
+    @Test
+    fun `test that sensitive descendant is checked properly`() = runTest {
+        val node = mock<MegaNode>()
+        val nodeId = NodeId(node.handle)
+        val filter = mock<MegaSearchFilter>()
+        val token = mock<MegaCancelToken>()
+
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+        whenever(sortOrderIntMapper(SortOrder.ORDER_NONE)).thenReturn(MegaApiJava.ORDER_NONE)
+        whenever(
+            megaSearchFilterMapper(
+                parentHandle = nodeId,
+                sensitivityFilter = SensitivityFilterOption.SensitiveOnly,
+            )
+        ).thenReturn(filter)
+        whenever(
+            megaApiGateway.searchWithFilter(
+                filter,
+                sortOrderIntMapper(SortOrder.ORDER_NONE),
+                token,
+            )
+        ).thenReturn(listOf(node))
+
+        assertThat(underTest.hasSensitiveDescendant(nodeId)).isTrue()
+    }
+
+    @Test
+    fun `test that sensitive inheritance is checked properly`() = runTest {
+        val node = mock<MegaNode>()
+        val nodeId = NodeId(node.handle)
+
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue))
+            .thenReturn(node)
+        whenever(megaApiGateway.isSensitiveInherited(node))
+            .thenReturn(true)
+
+        assertThat(underTest.hasSensitiveInherited(nodeId)).isTrue()
+    }
 
     private fun provideNodeId() = Stream.of(
         Arguments.of(null),

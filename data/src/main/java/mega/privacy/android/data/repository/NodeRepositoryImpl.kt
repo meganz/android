@@ -56,6 +56,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.SynchronisationException
@@ -1131,4 +1132,25 @@ internal class NodeRepositoryImpl @Inject constructor(
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
+
+    override suspend fun hasSensitiveDescendant(nodeId: NodeId): Boolean =
+        withContext(ioDispatcher) {
+            val token = cancelTokenProvider.getOrCreateCancelToken()
+            val filter = megaSearchFilterMapper(
+                parentHandle = nodeId,
+                sensitivityFilter = SensitivityFilterOption.SensitiveOnly,
+            )
+            megaApiGateway.searchWithFilter(
+                filter,
+                sortOrderIntMapper(SortOrder.ORDER_NONE),
+                token,
+            ).isNotEmpty()
+        }
+
+    override suspend fun hasSensitiveInherited(nodeId: NodeId): Boolean =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
+                megaApiGateway.isSensitiveInherited(it)
+            } ?: false
+        }
 }

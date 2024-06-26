@@ -470,4 +470,10 @@
     <string name="account_cancel_account_plan_continue_cancellation">Continue cancellation</string>
     <!-- error label for add tags page when tag character limit reached -->
     <string name="add_tags_error_maximum_characters">Maximum 32 characters</string>
+    <!-- Hidden item -->
+    <string name="hidden_item">Hidden item</string>
+    <!-- Share hidden item link description -->
+    <string name="share_hidden_item_link_description">This item is set to hidden. Once you share the item, anyone with the link will be able to see it. It will still be hidden in your Cloud drive.</string>
+    <!-- Share hidden item links description -->
+    <string name="share_hidden_item_links_description">One or more of these items is set to hidden. Once you share the hidden items, anyone with the link will be able to see them. The items will still be hidden in your Cloud drive.</string>
 </resources>

@@ -103,10 +103,8 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         }
 
         if (handle != INVALID_HANDLE) {
-            viewModelNode.initNode(handle)
             viewType = TYPE_NODE
         } else if (handleList != null) {
-            viewModelList.initNodes(handleList, this)
             viewType = TYPE_LIST
         }
     }
