@@ -3680,6 +3680,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         if (item !== DrawerItem.PHOTOS) {
             resetCUFragment()
+            isInAlbumContent = false
         }
         if (item !== DrawerItem.TRANSFERS) {
             transferPageFragment?.destroyActionModeIfNeeded()
