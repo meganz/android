@@ -1,6 +1,8 @@
 package mega.privacy.android.app.service.scanner
 
 import android.content.Context
+import com.google.android.gms.common.moduleinstall.ModuleInstall
+import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanner
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
@@ -19,7 +21,7 @@ import javax.inject.Inject
  */
 class ScannerHandlerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ScannerHandler {
     private val scanner: GmsBarcodeScanner by lazy {
         val options = GmsBarcodeScannerOptions.Builder()
@@ -30,12 +32,27 @@ class ScannerHandlerImpl @Inject constructor(
 
     override suspend fun scan() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            scanner.startScan()
-                .addOnSuccessListener {
-                    continuation.resumeWith(Result.success(ScanResult.Success(it.rawValue)))
-                }
-                .addOnCanceledListener {
-                    continuation.resumeWith(Result.success(ScanResult.Cancel))
+            val moduleInstall = ModuleInstall.getClient(context)
+            val moduleInstallRequest = ModuleInstallRequest.newBuilder()
+                .addApi(GmsBarcodeScanning.getClient(context))
+                .build()
+            moduleInstall
+                .installModules(moduleInstallRequest)
+                .addOnSuccessListener { moduleResponse ->
+                    if (moduleResponse.areModulesAlreadyInstalled()) {
+                        scanner.startScan()
+                            .addOnSuccessListener {
+                                continuation.resumeWith(Result.success(ScanResult.Success(it.rawValue)))
+                            }
+                            .addOnCanceledListener {
+                                continuation.resumeWith(Result.success(ScanResult.Cancel))
+                            }
+                            .addOnFailureListener {
+                                continuation.resumeWith(Result.failure(it))
+                            }
+                    } else {
+                        continuation.resumeWith(Result.failure(BarcodeScannerModuleIsNotInstalled()))
+                    }
                 }
                 .addOnFailureListener {
                     continuation.resumeWith(Result.failure(it))
@@ -43,3 +60,8 @@ class ScannerHandlerImpl @Inject constructor(
         }
     }
 }
+
+/**
+ * An exception that should be thrown whenever the [GmsBarcodeScanning] module has not been installed.
+ */
+class BarcodeScannerModuleIsNotInstalled : Exception()

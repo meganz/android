@@ -24,6 +24,7 @@ import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.model.ScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.service.scanner.BarcodeScannerModuleIsNotInstalled
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
@@ -287,7 +288,12 @@ class QRCodeViewModel @Inject constructor(
                 }
                 .onFailure { error ->
                     Timber.e(error)
-                    setResultMessage(R.string.general_text_error)
+                    // When we receive the BarcodeModuleIsNotInstalled exception,
+                    // The module has not been installed, but it is currently installing.
+                    // Therefore, just let the user click the scan QR button again.
+                    if (error !is BarcodeScannerModuleIsNotInstalled) {
+                        setResultMessage(R.string.general_text_error)
+                    }
                 }
         }
     }
