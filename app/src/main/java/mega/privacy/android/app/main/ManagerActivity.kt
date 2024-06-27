@@ -993,7 +993,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun initialiseViews() {
         psaViewHolder = PsaViewHolder(
             psaLayout = findViewById(R.id.psa_layout),
-            dismissPsa = viewModel::dismissPsa
+            dismissPsa = { id ->
+                updateHomepageFabPosition()
+                viewModel.dismissPsa(id)
+            }
         )
         appBarLayout = findViewById(R.id.app_bar_layout)
         toolbar = findViewById(R.id.toolbar)
