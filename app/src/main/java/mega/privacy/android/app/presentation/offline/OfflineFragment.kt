@@ -65,6 +65,7 @@ import mega.privacy.android.app.presentation.offline.adapter.OfflineNodeListener
 import mega.privacy.android.app.presentation.offline.adapter.viewholder.OfflineListViewHolder
 import mega.privacy.android.app.presentation.offline.model.OfflineNode
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -95,6 +96,7 @@ import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.autoCleared
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -135,7 +137,7 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
     private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
-
+    private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
     private var recyclerView: RecyclerView? = null
     private var listDivider: PositionDividerItemDecoration? = null
     private var adapter: OfflineAdapter? = null
@@ -257,7 +259,12 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
 
         when (item!!.itemId) {
             R.id.cab_menu_download -> {
-                callManager { it.saveOfflineNodesToDevice(viewModel.getSelectedNodes()) }
+                val nodes = viewModel.getSelectedNodes()
+                if (nodes.isNotEmpty()) {
+                    startDownloadViewModel.onCopyOfflineNodeClicked(
+                        nodes.mapNotNull { it.handle.toLongOrNull() }.map { NodeId(it) }
+                    )
+                }
                 viewModel.clearSelection()
             }
 

@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
@@ -43,6 +44,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptTo
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -97,6 +99,7 @@ class StartTransfersComponentViewModelTest {
     private val setAskedResumeTransfersUseCase = mock<SetAskedResumeTransfersUseCase>()
     private val pauseAllTransfersUseCase = mock<PauseAllTransfersUseCase>()
     private val startUploadWithWorkerUseCase = mock<StartUploadsWithWorkerUseCase>()
+    private val saveOfflineNodesToDevice = mock<SaveOfflineNodesToDevice>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -142,6 +145,7 @@ class StartTransfersComponentViewModelTest {
             setAskedResumeTransfersUseCase = setAskedResumeTransfersUseCase,
             pauseAllTransfersUseCase = pauseAllTransfersUseCase,
             startUploadWithWorkerUseCase = startUploadWithWorkerUseCase,
+            saveOfflineNodesToDevice = saveOfflineNodesToDevice
         )
     }
 
@@ -173,6 +177,7 @@ class StartTransfersComponentViewModelTest {
             startUploadWithWorkerUseCase,
             node,
             parentNode,
+            saveOfflineNodesToDevice
         )
         initialStub()
     }
@@ -591,6 +596,35 @@ class StartTransfersComponentViewModelTest {
 
                 assertThat(actual).isEqualTo(expected)
             }
+        }
+
+    @Test
+    fun `test that start download with destination trigger save offline nodes to device when event is CopyOfflineNode`() =
+        runTest {
+            commonStub()
+            val uri = mock<Uri> {
+                on { toString() } doReturn DESTINATION
+            }
+            underTest.startDownloadWithDestination(
+                TransferTriggerEvent.CopyOfflineNode(nodes),
+                uri
+            )
+            verify(saveOfflineNodesToDevice).invoke(nodes, UriPath(DESTINATION))
+            verifyNoInteractions(startDownloadsWithWorkerUseCase)
+        }
+
+    @Test
+    fun `test that start download without confirmation trigger save offline nodes to device when event is CopyOfflineNode`() =
+        runTest {
+            commonStub()
+            whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
+            whenever(getOrCreateStorageDownloadLocationUseCase()).thenReturn(DESTINATION)
+            underTest.startDownloadWithoutConfirmation(
+                TransferTriggerEvent.CopyOfflineNode(nodes),
+                false
+            )
+            verify(saveOfflineNodesToDevice).invoke(nodes, UriPath(DESTINATION))
+            verifyNoInteractions(startDownloadsWithWorkerUseCase)
         }
 
     private fun provideDownloadNodeParameters() = listOf(

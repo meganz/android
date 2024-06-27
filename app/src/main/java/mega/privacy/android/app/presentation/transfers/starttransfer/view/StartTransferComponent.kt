@@ -190,7 +190,7 @@ private fun StartTransferComponent(
     onOneOffEventConsumed: () -> Unit,
     onCancelledConfirmed: () -> Unit,
     onDownloadConfirmed: (TransferTriggerEvent.DownloadTriggerEvent, saveDoNotAskAgain: Boolean) -> Unit,
-    onDestinationSet: (TransferTriggerEvent.StartDownloadNode, destination: Uri) -> Unit,
+    onDestinationSet: (TransferTriggerEvent, destination: Uri) -> Unit,
     onPromptSaveDestinationConsumed: () -> Unit,
     onSaveDestination: (String) -> Unit,
     onDoNotPromptToSaveDestinationAgain: () -> Unit,
@@ -207,7 +207,7 @@ private fun StartTransferComponent(
         mutableStateOf<StartTransferEvent.ConfirmLargeDownload?>(null)
     }
     var showAskDestinationDialog by remember {
-        mutableStateOf<TransferTriggerEvent.StartDownloadNode?>(null)
+        mutableStateOf<TransferTriggerEvent?>(null)
     }
     val folderPicker = launchFolderPicker(
         onCancel = {

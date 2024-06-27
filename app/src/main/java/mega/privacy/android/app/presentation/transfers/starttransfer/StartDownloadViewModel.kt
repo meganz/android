@@ -88,6 +88,20 @@ class StartDownloadViewModel @Inject constructor(
     }
 
     /**
+     * On copy offline node clicked
+     *
+     * @param nodeIds
+     */
+    fun onCopyOfflineNodeClicked(nodeIds: List<NodeId>) {
+        viewModelScope.launch {
+            val nodes = nodeIds.mapNotNull { getNodeByIdUseCase(it) }
+            _state.update {
+                triggered(TransferTriggerEvent.CopyOfflineNode(nodes))
+            }
+        }
+    }
+
+    /**
      * Triggers the event to download a folder link's child node with its [nodeId]
      * @param nodeId
      */

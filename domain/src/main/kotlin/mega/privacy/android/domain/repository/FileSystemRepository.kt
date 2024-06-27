@@ -434,7 +434,7 @@ interface FileSystemRepository {
     suspend fun copyFilesToDocumentUri(
         source: File,
         destinationUri: UriPath,
-    )
+    ): Int
 
     /**
      * Copy files
@@ -445,5 +445,5 @@ interface FileSystemRepository {
     suspend fun copyFiles(
         source: File,
         destination: File,
-    )
+    ): Int
 }

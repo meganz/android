@@ -10,18 +10,21 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
+import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.databinding.BottomSheetOfflineItemBinding
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.offline.adapter.OfflineNodeListener
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.domain.entity.node.NodeId
 import timber.log.Timber
 
 @Deprecated("Use OfflineOptionsBottomSheetDialogFragment")
@@ -30,6 +33,7 @@ internal class LegacyOfflineOptionsBottomSheetDialogFragment : BaseBottomSheetDi
     private val nodeOffline: MegaOffline by lazy(LazyThreadSafetyMode.NONE) {
         requireNotNull(requireArguments().parcelable(EXTRA_OFFLINE))
     }
+    private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
     private var _binding: BottomSheetOfflineItemBinding? = null
     val binding: BottomSheetOfflineItemBinding
         get() = _binding!!
@@ -132,7 +136,10 @@ internal class LegacyOfflineOptionsBottomSheetDialogFragment : BaseBottomSheetDi
             }
 
             R.id.option_download -> {
-                (requireActivity() as ManagerActivity).saveOfflineNodesToDevice(listOf(nodeOffline))
+                startDownloadViewModel.onCopyOfflineNodeClicked(
+                    listOf(nodeOffline.handle.toLong())
+                        .map { NodeId(it) }
+                )
             }
 
             R.id.option_properties -> {

@@ -25,10 +25,10 @@ class SaveOfflineNodesToDevice @Inject constructor(
     suspend operator fun invoke(
         nodes: List<TypedNode>,
         destinationUri: UriPath,
-    ) {
-        when {
+    ): Int {
+        return when {
             fileSystemRepository.isContentUri(destinationUri.value) -> {
-                nodes.forEach {
+                nodes.sumOf {
                     val file = getOfflineFileUseCase(getOfflineNodeInformationUseCase(it))
                     fileSystemRepository.copyFilesToDocumentUri(file, destinationUri)
                 }
@@ -36,15 +36,16 @@ class SaveOfflineNodesToDevice @Inject constructor(
 
             fileSystemRepository.isFileUri(destinationUri.value) -> {
                 val destination = fileSystemRepository.getFileFromFileUri(destinationUri.value)
-                nodes.forEach {
+                nodes.sumOf {
                     val file = getOfflineFileUseCase(getOfflineNodeInformationUseCase(it))
                     fileSystemRepository.copyFiles(file, destination)
                 }
             }
 
             fileSystemRepository.getFileByPath(destinationUri.value) != null -> {
-                val destination = fileSystemRepository.getFileByPath(destinationUri.value) ?: return
-                nodes.forEach {
+                val destination =
+                    fileSystemRepository.getFileByPath(destinationUri.value) ?: return 0
+                nodes.sumOf {
                     val file = getOfflineFileUseCase(getOfflineNodeInformationUseCase(it))
                     fileSystemRepository.copyFiles(file, destination)
                 }

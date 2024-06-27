@@ -384,7 +384,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val transferPageViewModel: TransferPageViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by viewModels()
-    private val offlineComposeViewModel: OfflineComposeViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
     private val searchResultLauncher =
@@ -480,12 +479,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     val nodeController: NodeController by lazy { NodeController(this) }
     private val contactController: ContactController by lazy { ContactController(this) }
     private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
-    private val nodeSaver: NodeSaver by lazy {
-        NodeSaver(
-            this, this, this,
-            AlertsAndWarnings.showSaveToDeviceConfirmDialog(this)
-        )
-    }
 
     private val badgeDrawable: BadgeDrawerArrowDrawable by lazy {
         BadgeDrawerArrowDrawable(
@@ -728,7 +721,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         refreshOfflineNodes()
                     }
                 }
-                nodeSaver.handleRequestPermissionsResult(requestCode)
             }
 
             PermissionsFragment.PERMISSIONS_FRAGMENT -> {
@@ -802,7 +794,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
         nodeAttacher.saveState(outState)
-        nodeSaver.saveState(outState)
         uploadBottomSheetDialogActionHandler.onSaveInstanceState(outState)
         outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog))
         outState.putBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, isInAlbumContent)
@@ -1830,7 +1821,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         isInFilterPage = savedInstanceState.getBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, false)
         nodeAttacher.restoreState(savedInstanceState)
-        nodeSaver.restoreState(savedInstanceState)
 
         //upload from device, progress dialog should show when screen orientation changes.
         if (savedInstanceState.getBoolean(PROCESS_FILE_DIALOG_SHOWN, false)) {
@@ -2720,7 +2710,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         composite.clear()
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
-        nodeSaver.destroy()
         cookieDialogHandler.onDestroy()
         super.onDestroy()
     }
@@ -5622,17 +5611,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
-     * Save offline nodes to device.
-     *
-     * @param nodes nodes to save
-     */
-    fun saveOfflineNodesToDevice(nodes: List<MegaOffline?>?) {
-        if (nodes == null) return
-        PermissionUtils.checkNotificationsPermission(this)
-        nodeSaver.saveOfflineNodes(nodes.filterNotNull(), false)
-    }
-
-    /**
      * Attach node to chats, only used by NodeOptionsBottomSheetDialogFragment.
      *
      * @param node node to attach
@@ -5952,9 +5930,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     @SuppressLint("CheckResult")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         Timber.d("Request code: %d, Result code:%d", requestCode, resultCode)
-        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
-            return
-        }
         if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
             return
         }
@@ -6217,9 +6192,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 }
                                 return
                             }
-
-                            // General download scenario
-                            nodeSaver.handleRequestPermissionsResult(requestCode)
                         }
 
                         Constants.REQUEST_READ_WRITE_STORAGE ->                         // Upload scenario

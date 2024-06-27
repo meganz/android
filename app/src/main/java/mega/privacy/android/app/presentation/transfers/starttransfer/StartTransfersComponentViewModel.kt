@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
@@ -54,6 +55,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptTo
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import timber.log.Timber
@@ -88,6 +90,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val setAskedResumeTransfersUseCase: SetAskedResumeTransfersUseCase,
     private val pauseAllTransfersUseCase: PauseAllTransfersUseCase,
     private val startUploadWithWorkerUseCase: StartUploadsWithWorkerUseCase,
+    private val saveOfflineNodesToDevice: SaveOfflineNodesToDevice,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var currentInProgressJob: Job? = null
@@ -176,7 +179,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     startDownloadForOffline(transferTriggerEvent)
                 }
 
-                is TransferTriggerEvent.StartDownloadNode -> {
+                is TransferTriggerEvent.StartDownloadNode, is TransferTriggerEvent.CopyOfflineNode -> {
                     viewModelScope.launch {
                         if (runCatching { shouldAskDownloadDestinationUseCase() }.getOrDefault(false)) {
                             _uiState.updateEventAndClearProgress(
@@ -188,10 +191,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                             runCatching { getOrCreateStorageDownloadLocationUseCase() }
                                 .onFailure { Timber.e(it) }
                                 .getOrNull()?.let { location ->
-                                    startDownloadNodes(
-                                        transferTriggerEvent,
-                                        location
-                                    )
+                                    startDownloadNodes(transferTriggerEvent, location)
                                 }
                         }
                     }
@@ -210,7 +210,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
      * @param destinationUri the chosen destination
      */
     fun startDownloadWithDestination(
-        startDownloadNode: TransferTriggerEvent.StartDownloadNode,
+        startDownloadNode: TransferTriggerEvent,
         destinationUri: Uri,
     ) {
         Timber.d("Selected destination $destinationUri")
@@ -220,6 +220,43 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(promptSaveDestination = triggered(destinationUri.toString()))
                 }
+            }
+        }
+    }
+
+    /**
+     * It starts downloading the nodes with the appropriate use case
+     * @param startDownloadNode the [TransferTriggerEvent] that starts this download
+     * @param destination the destination where to download the nodes
+     */
+    private suspend fun startDownloadNodes(
+        startDownloadNode: TransferTriggerEvent,
+        destination: String,
+    ) {
+        if (startDownloadNode is TransferTriggerEvent.StartDownloadNode) {
+            val nodes = startDownloadNode.nodes
+            if (nodes.isEmpty()) return
+            currentInProgressJob = viewModelScope.launch {
+                startDownloadNodes(
+                    nodes = nodes,
+                    isHighPriority = startDownloadNode.isHighPriority,
+                    getUri = {
+                        destination.ensureSuffix(File.separator)
+                    },
+                    transferTriggerEvent = startDownloadNode
+                )
+            }
+        } else if (startDownloadNode is TransferTriggerEvent.CopyOfflineNode) {
+            runCatching {
+                saveOfflineNodesToDevice(startDownloadNode.nodes, UriPath(destination))
+            }.onSuccess { totalFiles ->
+                _uiState.updateEventAndClearProgress(
+                    StartTransferEvent.MessagePlural.FinishDownloading(
+                        totalFiles
+                    )
+                )
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }
@@ -242,29 +279,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         .getOrNull()
                 },
                 transferTriggerEvent = event
-            )
-        }
-    }
-
-    /**
-     * It starts downloading the nodes with the appropriate use case
-     * @param startDownloadNode the [TransferTriggerEvent] that starts this download
-     * @param destination the destination where to download the nodes
-     */
-    private fun startDownloadNodes(
-        startDownloadNode: TransferTriggerEvent.StartDownloadNode,
-        destination: String?,
-    ) {
-        val nodes = startDownloadNode.nodes
-        if (nodes.isEmpty()) return
-        currentInProgressJob = viewModelScope.launch {
-            startDownloadNodes(
-                nodes = nodes,
-                isHighPriority = startDownloadNode.isHighPriority,
-                getUri = {
-                    destination?.ensureSuffix(File.separator)
-                },
-                transferTriggerEvent = startDownloadNode
             )
         }
     }

@@ -63,7 +63,7 @@ sealed interface StartTransferEvent {
      * Depending on Android version and user settings, download destination should be asked for each new download
      * @param originalEvent original [TransferTriggerEvent.StartDownloadNode] event that triggered this event
      */
-    data class AskDestination(val originalEvent: TransferTriggerEvent.StartDownloadNode) :
+    data class AskDestination(val originalEvent: TransferTriggerEvent) :
         StartTransferEvent
 
     /**

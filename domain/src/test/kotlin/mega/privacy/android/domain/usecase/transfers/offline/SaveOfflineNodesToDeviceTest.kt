@@ -49,6 +49,12 @@ class SaveOfflineNodesToDeviceTest {
             whenever(getOfflineNodeInformationUseCase(node)).thenReturn(offlineInfo)
             whenever(getOfflineFileUseCase(offlineInfo)).thenReturn(file)
             whenever(fileSystemRepository.isContentUri(destinationUri.value)).thenReturn(true)
+            whenever(
+                fileSystemRepository.copyFilesToDocumentUri(
+                    file,
+                    destinationUri
+                )
+            ).thenReturn(1)
             underTest(listOf(node), destinationUri)
             verify(fileSystemRepository).copyFilesToDocumentUri(file, destinationUri)
         }
@@ -68,6 +74,7 @@ class SaveOfflineNodesToDeviceTest {
             whenever(fileSystemRepository.getFileFromFileUri(destinationUri.value)).thenReturn(
                 destination
             )
+            whenever(fileSystemRepository.copyFiles(file, destination)).thenReturn(1)
             underTest(listOf(node), destinationUri)
             verify(fileSystemRepository).copyFiles(file, destination)
         }
@@ -88,6 +95,7 @@ class SaveOfflineNodesToDeviceTest {
             whenever(fileSystemRepository.getFileByPath(destinationUri.value)).thenReturn(
                 destination
             )
+            whenever(fileSystemRepository.copyFiles(file, destination)).thenReturn(1)
             underTest(listOf(node), destinationUri)
             verify(fileSystemRepository).copyFiles(file, destination)
         }
