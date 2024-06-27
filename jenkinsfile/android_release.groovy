@@ -534,7 +534,12 @@ private String getSlackBuildVersionInfo(Object common) {
 
     String appBranch = env.gitlabSourceBranch
     def (versionName, versionNameChannel, versionCode, appGitHash) = common.readAppVersion()
-    def packageLink = "https://jira.developers.mega.co.nz/issues/?jql=fixVersion%20%3D%20%22Android%20${versionName}%22%20%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC"
+    def packageLink = ""
+    withCredentials([
+            string(credentialsId: 'JIRA_BASE_URL', variable: 'JIRA_BASE_URL'),
+    ]) {
+        packageLink = "${env.JIRA_BASE_URL}/issues/?jql=fixVersion%20%3D%20%22Android%20${versionName}%22%20%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC"
+    }
     def appVersionNameAndVersionCode = versionName + versionNameChannel + "(" + versionCode + ")"
     String releaseNote = new JsonSlurperClassic().parseText(RELEASE_NOTES_CONTENT)['en-US']
     def message = """
