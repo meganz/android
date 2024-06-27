@@ -51,6 +51,7 @@ internal class CameraActivity : AppCompatActivity() {
 
     private fun setResult(uri: Uri?) {
         uri?.let {
+            contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             setResult(RESULT_OK, Intent().apply { putExtra(EXTRA_URI, uri) })
         }
         finish()
