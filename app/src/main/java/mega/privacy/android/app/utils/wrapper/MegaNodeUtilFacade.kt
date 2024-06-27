@@ -2,21 +2,34 @@ package mega.privacy.android.app.utils.wrapper
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
+import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.utils.Constants.URL_INDICATOR
+import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.LocationInfo
+import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener
+import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -226,7 +239,64 @@ class MegaNodeUtilFacade @Inject constructor(
     }
 
     override fun manageURLNode(context: Context, megaApi: MegaApiAndroid, node: MegaNode) {
-        MegaNodeUtil.manageURLNode(context, megaApi, node)
+
+        val progressDialog = android.app.ProgressDialog(context)
+        progressDialog.apply {
+            setMessage(context.getString(R.string.link_request_status))
+            setCancelable(false)
+            setCanceledOnTouchOutside(false)
+            show()
+        }
+
+        coroutineScope.launch {
+            var shouldStopServer = false
+            try {
+                val localPath = getLocalFile(node)
+                val bufferedReader = if (localPath != null) {
+                    //Read local file
+                    val localFile = File(localPath)
+                    BufferedReader(FileReader(localFile))
+                } else {
+                    //Read streaming file
+                    shouldStopServer = launchStreamingServer()
+                    val uri = megaApi.httpServerGetLocalLink(node)
+
+                    if (uri.isNullOrEmpty()) {
+                        showSnackbar(context, context.getString(R.string.error_open_file_with))
+                        throw Throwable("Error getting URL")
+                    }
+                    val nodeURL = URL(uri)
+                    val connection = nodeURL.openConnection() as HttpURLConnection
+                    BufferedReader(InputStreamReader(connection.inputStream))
+                }
+
+                var line = bufferedReader.readLine()
+
+                if (line != null) {
+                    line = bufferedReader.readLine()
+                    val url = line.replace(URL_INDICATOR, "")
+                    val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(url))
+
+                    if (isIntentAvailable(context, intent)) {
+                        context.startActivity(intent)
+                    } else {
+                        showSnackbar(
+                            context,
+                            context.getString(R.string.intent_not_available_file)
+                        )
+                    }
+                    return@launch
+                } else {
+                    Timber.d("Not expected format: Exception on processing url file")
+                }
+
+            } catch (e: Exception) {
+                Timber.e(e)
+            } finally {
+                if (shouldStopServer) stopStreamingServer()
+                progressDialog.dismiss()
+            }
+        }
     }
 
     override fun onNodeTapped(
@@ -254,7 +324,10 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun setupStreamingServer(megaApi: MegaApiAndroid) {
         coroutineScope.launch {
-            streamingGateway.startServer()
+            launchStreamingServer()
         }
     }
+
+    private suspend fun launchStreamingServer() = streamingGateway.startServer()
+    private suspend fun stopStreamingServer() = streamingGateway.stopServer()
 }
