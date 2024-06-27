@@ -21,11 +21,6 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -73,7 +68,6 @@ import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MO
 import mega.privacy.android.app.utils.Constants.SEPARATOR
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
-import mega.privacy.android.app.utils.Constants.URL_INDICATOR
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
@@ -102,12 +96,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.contracts.ExperimentalContracts
@@ -1690,82 +1679,6 @@ object MegaNodeUtil {
         textFileIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
             .putExtra(MODE, mode)
         context.startActivity(textFileIntent)
-    }
-
-    /**
-     * Opens an URL node.
-     *
-     * @param context Current context.
-     * @param megaApi MegaApiAndroid instance to use.
-     * @param node    MegaNode which contains an URL to open.
-     */
-    @JvmStatic
-    @Suppress("DEPRECATION")
-    fun manageURLNode(context: Context, megaApi: MegaApiAndroid, node: MegaNode): Disposable {
-        val progressDialog = android.app.ProgressDialog(context)
-        progressDialog.apply {
-            setMessage(context.getString(R.string.link_request_status))
-            setCancelable(false)
-            setCanceledOnTouchOutside(false)
-            show()
-        }
-
-        return Completable.create { emitter ->
-            val localPath = getLocalFile(node)
-            var br: BufferedReader? = null
-            var shouldStopServer = false
-
-            if (localPath != null) {
-                //Read local file
-                val localFile = File(localPath)
-                br = BufferedReader(FileReader(localFile))
-            } else {
-                //Read streaming file
-                shouldStopServer = setupStreamingServer(megaApi)
-                val uri = megaApi.httpServerGetLocalLink(node)
-
-                if (!uri.isNullOrEmpty()) {
-                    val nodeURL = URL(uri)
-                    val connection = nodeURL.openConnection() as HttpURLConnection
-                    br = BufferedReader(InputStreamReader(connection.inputStream))
-                }
-            }
-
-            if (br != null) {
-                var line = br.readLine()
-
-                if (line != null) {
-                    line = br.readLine()
-                    val url = line.replace(URL_INDICATOR, "")
-                    val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(url))
-
-                    if (isIntentAvailable(context, intent)) {
-                        context.startActivity(intent)
-                    } else {
-                        showSnackbar(context, context.getString(R.string.intent_not_available_file))
-                    }
-
-                    stopStreamingServerIfNeeded(shouldStopServer, megaApi)
-                    emitter.onComplete()
-                    return@create
-                } else {
-                    Timber.d("Not expected format: Exception on processing url file")
-                }
-            }
-
-            emitter.onError(Throwable("Error getting URL"))
-            stopStreamingServerIfNeeded(shouldStopServer, megaApi)
-            showSnackbar(context, context.getString(R.string.error_open_file_with))
-        }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = { progressDialog.dismiss() },
-                onError = { error ->
-                    progressDialog.dismiss()
-                    Timber.e(error.message)
-                }
-            )
     }
 
     /**
