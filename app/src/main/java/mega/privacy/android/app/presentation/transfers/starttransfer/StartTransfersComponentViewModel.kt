@@ -708,7 +708,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                                 )
                             }
 
-                            is TransferTriggerEvent.StartUpload.Files -> {
+                            is TransferTriggerEvent.StartUpload.Files,
+                            is TransferTriggerEvent.StartUpload.CollidedFiles,
+                            -> {
                                 StartTransferEvent.MessagePlural.FinishUploading(totalFiles)
                             }
 
