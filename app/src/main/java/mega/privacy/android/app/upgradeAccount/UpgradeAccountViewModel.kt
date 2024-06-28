@@ -20,6 +20,7 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptio
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.PaymentPlatformType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
@@ -189,7 +190,7 @@ class UpgradeAccountViewModel @Inject constructor(
             currentPayment?.let {
                 _state.update {
                     it.copy(
-                        showBuyNewSubscriptionDialog = upgradeType != Constants.INVALID_VALUE,
+                        showBuyNewSubscriptionDialog = upgradeType != Constants.INVALID_VALUE && currentPayment.platformType != PaymentPlatformType.SUBSCRIPTION_FROM_GOOGLE_PLATFORM,
                         currentPayment = UpgradePayment(
                             upgradeType = upgradeType,
                             currentPayment = currentPayment

@@ -33,6 +33,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.billing.PaymentUtils
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.PaymentPlatformType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
@@ -104,7 +105,9 @@ class UpgradeAccountFragment : Fragment() {
                 onBuyClicked = {
                     val chosenPlan = convertAccountTypeToInt(uiState.chosenPlan)
                     upgradeAccountViewModel.currentPaymentCheck(chosenPlan)
-                    if (uiState.currentPayment == UpgradePayment()) {
+                    if (uiState.currentPayment == UpgradePayment() ||
+                        PaymentPlatformType.SUBSCRIPTION_FROM_GOOGLE_PLATFORM == uiState.currentPayment.currentPayment?.platformType
+                    ) {
                         startPurchase(uiState.isMonthlySelected, chosenPlan)
                     }
                     Analytics.tracker.trackEvent(UpgradeAccountBuyButtonPressedEvent)

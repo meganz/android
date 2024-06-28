@@ -71,7 +71,6 @@ import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaPurchase
 import mega.privacy.android.data.mapper.toMegaSku
 import mega.privacy.android.data.mapper.toPaymentMethodType
-import mega.privacy.android.data.mapper.toPaymentPlatformType
 import mega.privacy.android.data.mapper.toPricing
 import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toSubscriptionStatus
@@ -281,13 +280,6 @@ internal abstract class MapperModule {
         @Provides
         fun provideChatFilesFolderUserAttributeMapper(): ChatFilesFolderUserAttributeMapper =
             ::toChatFilesFolderUserAttribute
-
-        /**
-         * Provide subscription platform type mapper
-         */
-        @Provides
-        fun provideSubscriptionPlatformTypeMapper(): PaymentPlatformTypeMapper =
-            ::toPaymentPlatformType
 
         /**
          * Provide account transfer detail mapper

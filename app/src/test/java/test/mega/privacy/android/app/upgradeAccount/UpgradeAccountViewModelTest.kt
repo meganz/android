@@ -335,9 +335,9 @@ class UpgradeAccountViewModelTest {
     private val expectedCurrentPlan = AccountType.PRO_I
     private val expectedShowBuyNewSubscriptionDialog = true
     private val expectedCurrentPayment =
-        UpgradePayment(Constants.INVALID_VALUE, PaymentMethod.GOOGLE_WALLET)
+        UpgradePayment(Constants.INVALID_VALUE, PaymentMethod.ITUNES)
     private val expectedCurrentPaymentUpdated =
-        UpgradePayment(Constants.PRO_II, PaymentMethod.GOOGLE_WALLET)
+        UpgradePayment(Constants.PRO_II, PaymentMethod.ITUNES)
     private val expectedAccountDetailWithMonthlySubscription = AccountDetail(
         storageDetail = null,
         sessionDetail = null,

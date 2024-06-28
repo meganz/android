@@ -477,7 +477,7 @@ class UpgradeAccountViewTest {
         composeRule.setContent {
             BuyNewSubscriptionDialog(
                 upgradeTypeInt = 2,
-                paymentMethod = PaymentMethod.GOOGLE_WALLET,
+                paymentMethod = PaymentMethod.HUAWEI_WALLET,
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 onDialogDismissButtonClicked = org.mockito.kotlin.mock(),
             )
@@ -495,7 +495,7 @@ class UpgradeAccountViewTest {
         composeRule.setContent {
             BuyNewSubscriptionDialog(
                 upgradeTypeInt = 2,
-                paymentMethod = PaymentMethod.GOOGLE_WALLET,
+                paymentMethod = PaymentMethod.ITUNES,
                 onDialogPositiveButtonClicked = org.mockito.kotlin.mock(),
                 onDialogDismissButtonClicked = onDialogDismissButtonClicked,
             )

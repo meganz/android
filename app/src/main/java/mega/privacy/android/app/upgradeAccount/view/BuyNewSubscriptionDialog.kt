@@ -26,7 +26,7 @@ fun BuyNewSubscriptionDialog(
 @Composable
 private fun chooseCorrectBodyString(paymentMethod: PaymentMethod) =
     when (paymentMethod.platformType) {
-        PaymentPlatformType.SUBSCRIPTION_FROM_ANDROID_PLATFORM -> {
+        PaymentPlatformType.SUBSCRIPTION_FROM_HUAWEI_PLATFORM -> {
             stringResource(
                 R.string.message_subscription_from_android_platform,
                 paymentMethod.methodName

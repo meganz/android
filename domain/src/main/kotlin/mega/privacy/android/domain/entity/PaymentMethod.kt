@@ -22,7 +22,7 @@ enum class PaymentMethod(
     GOOGLE_WALLET(
         PaymentMethodType.GOOGLE_WALLET,
         "Google Play",
-        PaymentPlatformType.SUBSCRIPTION_FROM_ANDROID_PLATFORM
+        PaymentPlatformType.SUBSCRIPTION_FROM_GOOGLE_PLATFORM
     ),
     STRIPE(
         PaymentMethodType.STRIPE,
@@ -42,6 +42,6 @@ enum class PaymentMethod(
     HUAWEI_WALLET(
         PaymentMethodType.HUAWEI_WALLET,
         "Huawei AppGallery",
-        PaymentPlatformType.SUBSCRIPTION_FROM_ANDROID_PLATFORM
+        PaymentPlatformType.SUBSCRIPTION_FROM_HUAWEI_PLATFORM
     )
 }

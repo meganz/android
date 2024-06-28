@@ -11,9 +11,14 @@ enum class PaymentPlatformType {
     SUBSCRIPTION_FROM_ITUNES,
 
     /**
-     * Payment from Android platform
+     * Payment from Google platform
      */
-    SUBSCRIPTION_FROM_ANDROID_PLATFORM,
+    SUBSCRIPTION_FROM_GOOGLE_PLATFORM,
+
+    /**
+     * Payment from Huawei platform
+     */
+    SUBSCRIPTION_FROM_HUAWEI_PLATFORM,
 
     /**
      * Payment from other platforms
