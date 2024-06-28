@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,11 +14,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.components.twemoji.EmojiTextView
-import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.databinding.SpeakerViewCallFragmentBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
@@ -31,7 +31,6 @@ import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatSession
 import timber.log.Timber
 
 class SpeakerViewCallFragment : MeetingBaseFragment(),
@@ -58,27 +57,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     private var participants: MutableList<Participant> = mutableListOf()
 
     private var isFirsTime = true
-
-    private val remoteAudioLevelObserver = Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-        val callId = callAndSession.first
-        val session = callAndSession.second
-
-        if (inMeetingViewModel.isSameCall(callId) && inMeetingViewModel.state.value.isSpeakerSelectionAutomatic) {
-            val currentSpeaker = inMeetingViewModel.getCurrentSpeakerParticipant()
-            if (currentSpeaker == null || currentSpeaker.peerId != session.peerid || currentSpeaker.clientId != session.clientid) {
-                Timber.d("Received remote audio level with clientId ${session.clientid}")
-
-                selectSpeaker(
-                    session.peerid,
-                    session.clientid
-                )
-            } else {
-                Timber.d("Received remote audio level with clientId ${session.clientid}, same current speaker")
-            }
-        }
-
-        updateRemoteAudioVideo(TypeRemoteAVFlagChange.Audio, session)
-    }
 
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
@@ -179,7 +157,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         listView.adapter = adapter
 
         observeViewModel()
-        initLiveEventBus()
+        collectFlows()
 
         inMeetingViewModel.getCurrentSpeakerParticipant()?.let { currentSpeaker ->
             updateSpeakerTextViewName(currentSpeaker.name, currentSpeaker.isPresenting)
@@ -209,9 +187,27 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         }
     }
 
-    private fun initLiveEventBus() {
-        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AUDIO_LEVEL_CHANGE)
-            .observeSticky(this, remoteAudioLevelObserver)
+    private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInAudioLevelInSession }
+            .distinctUntilChanged()) {
+            it?.let { chatSession ->
+                if (inMeetingViewModel.state.value.isSpeakerSelectionAutomatic) {
+                    val currentSpeaker = inMeetingViewModel.getCurrentSpeakerParticipant()
+                    if (currentSpeaker == null || currentSpeaker.peerId != chatSession.peerId || currentSpeaker.clientId != chatSession.clientId) {
+                        Timber.d("Received remote audio level with clientId ${chatSession.clientId}")
+
+                        selectSpeaker(
+                            chatSession.peerId,
+                            chatSession.clientId
+                        )
+                    } else {
+                        Timber.d("Received remote audio level with clientId ${chatSession.clientId}, same current speaker")
+                    }
+                }
+
+                updateRemoteAudioVideo(TypeRemoteAVFlagChange.Audio, chatSession)
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -608,7 +604,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 peer.isScreenShared
             )?.let { participant ->
                 Timber.d("Update the peer selected")
-                inMeetingViewModel.getSession(participant.clientId)?.let { session ->
+                inMeetingViewModel.getSessionByClientId(participant.clientId)?.let { session ->
                     updateRemoteAudioVideo(TypeRemoteAVFlagChange.Audio, session)
                 }
                 adapter.updatePeerSelected(participant)
@@ -633,15 +629,15 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * Check changes in remote A/V flags
      *
      * @param type [TypeRemoteAVFlagChange]
-     * @param session MegaChatSession of a participant
+     * @param session [ChatSession] of a participant
      */
-    fun updateRemoteAudioVideo(type: TypeRemoteAVFlagChange, session: MegaChatSession) {
+    fun updateRemoteAudioVideo(type: TypeRemoteAVFlagChange, session: ChatSession) {
         //Speaker
         inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
-            if (session.peerid == speaker.peerId && session.clientid == speaker.clientId) {
+            if (session.peerId == speaker.peerId && session.clientId == speaker.clientId) {
 
-                speaker.isAudioOn = session.hasAudio()
-                speaker.isVideoOn = session.hasVideo()
+                speaker.isAudioOn = session.hasAudio
+                speaker.isVideoOn = session.hasVideo
                 speaker.isAudioDetected = session.isAudioDetected
 
                 when (type) {
@@ -665,16 +661,16 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
         //Participant in list
         inMeetingViewModel.getParticipant(
-            session.peerid,
-            session.clientid
+            session.peerId,
+            session.clientId
         )?.let {
             Timber.d("Update remote A/V")
             adapter.updateParticipantAudioVideo(type, it)
         }
 
         inMeetingViewModel.getScreenShared(
-            session.peerid,
-            session.clientid
+            session.peerId,
+            session.clientId
         )?.let {
             Timber.d("Update remote A/V")
             adapter.updateParticipantAudioVideo(type, it)

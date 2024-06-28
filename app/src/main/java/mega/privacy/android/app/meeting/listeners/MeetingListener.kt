@@ -8,8 +8,6 @@ import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
@@ -93,12 +91,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             sendSessionEvent(session, call)
         }
 
-        // Remote audio/video flags has changed
-        if (session.hasChanged(MegaChatSession.CHANGE_TYPE_REMOTE_AVFLAGS)) {
-            Timber.d("Changes in remote av flags. Client ID  ${session.clientid}")
-            sendSessionEvent(EVENT_REMOTE_AVFLAGS_CHANGE, session, callid)
-        }
-
         // Hi-Res video received
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_ON_HIRES)) {
             Timber.d("Session on high resolution changed. Client ID  ${session.clientid}")
@@ -109,12 +101,6 @@ class MeetingListener : MegaChatCallListenerInterface {
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_ON_LOWRES)) {
             Timber.d("Session on low resolution changed. Client ID  ${session.clientid}")
             sendSessionEvent(EVENT_SESSION_ON_LOWRES_CHANGE, session, callid)
-        }
-
-        // Indicates if peer is speaking
-        if (session.hasChanged(MegaChatSession.CHANGE_TYPE_AUDIO_LEVEL)) {
-            Timber.d("Remote audio level changed. Client ID  ${session.clientid}")
-            sendSessionEvent(EVENT_REMOTE_AUDIO_LEVEL_CHANGE, session, callid)
         }
     }
 

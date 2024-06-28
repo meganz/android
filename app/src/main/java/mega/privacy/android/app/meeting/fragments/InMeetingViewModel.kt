@@ -72,6 +72,7 @@ import mega.privacy.android.domain.entity.meeting.CallOnHoldType
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
@@ -537,9 +538,22 @@ class InMeetingViewModel @Inject constructor(
                         result.session?.let { session ->
                             session.changes?.apply {
                                 when {
-                                    contains(ChatSessionChanges.SessionOnHold) -> {
-                                        _state.update { it.copy(sessionOnHoldChanges = session) }
+                                    contains(ChatSessionChanges.SessionOnHold) -> _state.update {
+                                        it.copy(
+                                            sessionOnHoldChanges = session
+                                        )
+                                    }
 
+                                    contains(ChatSessionChanges.RemoteAvFlags) -> _state.update {
+                                        it.copy(
+                                            changesInAVFlagsInSession = session
+                                        )
+                                    }
+
+                                    contains(ChatSessionChanges.AudioLevel) -> _state.update {
+                                        it.copy(
+                                            changesInAudioLevelInSession = session
+                                        )
                                     }
                                 }
                             }
@@ -1109,6 +1123,16 @@ class InMeetingViewModel @Inject constructor(
      */
     fun getSession(clientId: Long): MegaChatSession? =
         if (clientId != MEGACHAT_INVALID_HANDLE) _callLiveData.value?.getMegaChatSession(clientId)
+        else null
+
+    /**
+     * Get the [ChatSession] of a participant
+     *
+     * @param clientId client ID of a participant
+     * @return ChatSession of a participant
+     */
+    fun getSessionByClientId(clientId: Long): ChatSession? =
+        if (clientId != MEGACHAT_INVALID_HANDLE) state.value.getSessionByClientId(clientId)
         else null
 
     /**
@@ -2172,25 +2196,25 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method for updating participant video
      *
-     * @param session of a participant
+     * @param session [ChatSession] of a participant
      * @return True, if there have been changes. False, otherwise
      */
-    fun changesInRemoteVideoFlag(session: MegaChatSession): Boolean {
+    fun changesInRemoteVideoFlag(session: ChatSession): Boolean {
         var hasChanged = false
         participants.value = participants.value?.map { participant ->
             return@map when {
-                participant.peerId == session.peerid && participant.clientId == session.clientid -> {
-                    if (participant.isVideoOn != session.hasVideo() ||
-                        participant.isCameraOn != session.hasCamera() ||
-                        participant.isScreenShareOn != session.hasScreenShare()
+                participant.peerId == session.peerId && participant.clientId == session.clientId -> {
+                    if (participant.isVideoOn != session.hasVideo ||
+                        participant.isCameraOn != session.hasCamera ||
+                        participant.isScreenShareOn != session.hasScreenShare
                     ) {
                         hasChanged = true
                     }
 
                     return@map participant.copy(
-                        isVideoOn = session.hasVideo(),
-                        isCameraOn = session.hasCamera(),
-                        isScreenShareOn = session.hasScreenShare()
+                        isVideoOn = session.hasVideo,
+                        isCameraOn = session.hasCamera,
+                        isScreenShareOn = session.hasScreenShare
                     )
                 }
 
@@ -2200,9 +2224,9 @@ class InMeetingViewModel @Inject constructor(
 
         speakerParticipants.value = speakerParticipants.value?.map { participant ->
             return@map when {
-                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isVideoOn != session.hasVideo() -> {
+                participant.peerId == session.peerId && participant.clientId == session.clientId && participant.isVideoOn != session.hasVideo -> {
                     hasChanged = true
-                    participant.copy(isVideoOn = session.hasVideo())
+                    participant.copy(isVideoOn = session.hasVideo)
                 }
 
                 else -> participant
@@ -2219,23 +2243,23 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method for updating participant screen sharing
      *
-     * @param session of a participant
+     * @param session [ChatSession] of a participant
      * @return True, if there have been changes. False, otherwise
      */
-    fun changesInScreenSharing(session: MegaChatSession): Boolean {
+    fun changesInScreenSharing(session: ChatSession): Boolean {
         var hasChanged = false
         var participantSharingScreen: Participant? = null
         var participantSharingScreenForSpeaker: Participant? = null
 
         participants.value = participants.value?.map { participant ->
             return@map when {
-                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isPresenting != session.hasScreenShare() -> {
+                participant.peerId == session.peerId && participant.clientId == session.clientId && participant.isPresenting != session.hasScreenShare -> {
                     hasChanged = true
-                    if (session.hasScreenShare()) {
+                    if (session.hasScreenShare) {
                         participantSharingScreen = participant
                     }
 
-                    participant.copy(isPresenting = session.hasScreenShare())
+                    participant.copy(isPresenting = session.hasScreenShare)
 
                 }
 
@@ -2250,15 +2274,15 @@ class InMeetingViewModel @Inject constructor(
         } ?: run {
             speakerParticipants.value = speakerParticipants.value?.map { speakerParticipant ->
                 return@map when {
-                    speakerParticipant.peerId == session.peerid && speakerParticipant.clientId == session.clientid && speakerParticipant.isPresenting != session.hasScreenShare() -> {
-                        if (!session.hasScreenShare()) {
+                    speakerParticipant.peerId == session.peerId && speakerParticipant.clientId == session.clientId && speakerParticipant.isPresenting != session.hasScreenShare -> {
+                        if (!session.hasScreenShare) {
                             getAnotherParticipantWhoIsPresenting(speakerParticipant)?.let { newSpeaker ->
                                 participantSharingScreenForSpeaker = newSpeaker
                             }
                         }
 
                         hasChanged = true
-                        speakerParticipant.copy(isPresenting = session.hasScreenShare())
+                        speakerParticipant.copy(isPresenting = session.hasScreenShare)
                     }
 
                     else -> speakerParticipant
@@ -2297,17 +2321,17 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method for updating participant audio
      *
-     * @param session of a participant
+     * @param session [ChatSession] of a participant
      * @return True, if there have been changes. False, otherwise
      */
-    fun changesInRemoteAudioFlag(session: MegaChatSession): Boolean {
+    fun changesInRemoteAudioFlag(session: ChatSession): Boolean {
         var hasChanged = false
         participants.value = participants.value?.map { participant ->
             return@map when {
-                participant.peerId == session.peerid && participant.clientId == session.clientid &&
-                        (participant.isAudioOn != session.hasAudio() || participant.isAudioDetected != session.isAudioDetected) -> {
+                participant.peerId == session.peerId && participant.clientId == session.clientId &&
+                        (participant.isAudioOn != session.hasAudio || participant.isAudioDetected != session.isAudioDetected) -> {
                     hasChanged = true
-                    participant.copy(isAudioOn = session.hasAudio())
+                    participant.copy(isAudioOn = session.hasAudio)
                 }
 
                 else -> participant

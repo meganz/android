@@ -52,9 +52,11 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property userIdsWithChangesInRaisedHand         User identifiers with changes in the raised hand
  * @property isRaiseToHandSuggestionShown           True, if the Raise to Hand suggestion has been shown. False, otherwise.
  * @property shouldUpdateLocalAVFlags               True, if should update local av flag. False, if not
- * @property sessionOnHoldChanges                   [ChatSession] with changes
+ * @property sessionOnHoldChanges                   [ChatSession] with changes in session on hold
  * @property isPictureInPictureFeatureFlagEnabled       True, if Picture in Picture feature flag enabled. False, otherwise.
  * @property isInPipMode                                True, if is in Picture in Picture mode. False, otherwise.
+ * @property changesInAVFlagsInSession              [ChatSession] with changes in remote audio video flags
+ * @property changesInAudioLevelInSession           [ChatSession] with changes in audio level
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -98,6 +100,8 @@ data class InMeetingUiState(
     val sessionOnHoldChanges: ChatSession? = null,
     val isPictureInPictureFeatureFlagEnabled: Boolean = false,
     val isInPipMode: Boolean = false,
+    val changesInAVFlagsInSession: ChatSession? = null,
+    val changesInAudioLevelInSession: ChatSession? = null
 ) {
     /**
      * Is call on hold
@@ -134,6 +138,19 @@ data class InMeetingUiState(
 
             return null
         }
+
+    /**
+     * Get session by client Id
+     *
+     * @param clientId
+     * @return [ChatSession]
+     */
+    fun getSessionByClientId(clientId: Long): ChatSession? {
+        call?.apply {
+            return sessionByClientId[clientId]
+        }
+        return null
+    }
 
     /**
      * Get the button to be displayed depending on the type of call on hold you have

@@ -21,7 +21,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
@@ -29,6 +28,7 @@ import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getCurrentOrientation
+import mega.privacy.android.domain.entity.meeting.ChatSessionStatus
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
@@ -61,30 +61,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private lateinit var inMeetingViewModel: InMeetingViewModel
 
     private var videoListener: IndividualCallVideoListener? = null
-
-    private val remoteAVFlagsObserver = Observer<Pair<Long, MegaChatSession>> {
-        val callId = it.first
-        val session = it.second
-
-        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId) && isAdded) {
-            Timber.d("Check changes in remote AVFlags")
-            when {
-                isFloatingWindow -> checkItIsOnlyAudio()
-
-                session.hasVideo() && session.status == SESSION_STATUS_IN_PROGRESS -> {
-                    Timber.d("Check if video should be on")
-                    checkVideoOn(
-                        session.peerid, session.clientid
-                    )
-                }
-
-                else -> {
-                    Timber.d("Video should be off")
-                    videoOffUI(peerId, clientId)
-                }
-            }
-        }
-    }
 
     private val sessionHiResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
@@ -146,9 +122,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
     }
 
     private fun initLiveEventBus() {
-        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AVFLAGS_CHANGE)
-            .observeSticky(this, remoteAVFlagsObserver)
-
         LiveEventBus.get<Pair<Long, MegaChatSession>>(EventConstants.EVENT_SESSION_ON_HIRES_CHANGE)
             .observe(this, sessionHiResObserver)
     }
@@ -244,6 +217,30 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 if (inMeetingViewModel.state.value.isOneToOneCall && isAdded) {
                     Timber.d("Check changes in session on hold")
                     checkChangesInOnHold(isOnHold)
+                }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInAVFlagsInSession }
+            .distinctUntilChanged()) {
+            it?.let { chatSession ->
+                if (inMeetingViewModel.isOneToOneCall()) {
+                    Timber.d("Check changes in remote AVFlags")
+                    when {
+                        isFloatingWindow -> checkItIsOnlyAudio()
+
+                        chatSession.hasVideo && chatSession.status == ChatSessionStatus.Progress -> {
+                            Timber.d("Check if video should be on")
+                            checkVideoOn(
+                                chatSession.peerId, chatSession.clientId
+                            )
+                        }
+
+                        else -> {
+                            Timber.d("Video should be off")
+                            videoOffUI(peerId, clientId)
+                        }
+                    }
                 }
             }
         }

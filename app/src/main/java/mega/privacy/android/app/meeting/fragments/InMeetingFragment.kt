@@ -57,8 +57,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
@@ -397,29 +395,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
 
             showMuteBanner()
-        }
-
-    private val remoteAVFlagsObserver =
-        Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            //As the session has been established, I am no longer in the Request sent state
-            if (inMeetingViewModel.isSameCall(callAndSession.first)) {
-                showMuteBanner()
-                if (!inMeetingViewModel.isOneToOneCall()) {
-                    val isAudioChange =
-                        inMeetingViewModel.changesInRemoteAudioFlag(callAndSession.second)
-                    val isVideoChange =
-                        inMeetingViewModel.changesInRemoteVideoFlag(callAndSession.second)
-                    val isPresentingChange =
-                        inMeetingViewModel.changesInScreenSharing(callAndSession.second)
-                    Timber.d("Changes in AV flags. audio change $isAudioChange, video change $isVideoChange, is screen share change $isPresentingChange")
-                    updateRemoteAVFlags(
-                        callAndSession.second,
-                        isAudioChange,
-                        isVideoChange,
-                        isPresentingChange
-                    )
-                }
-            }
         }
 
     private val chatConnectionStatusObserver =
@@ -867,10 +842,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         //Sessions Level
         LiveEventBus.get<Pair<MegaChatCall, MegaChatSession>>(EVENT_SESSION_STATUS_CHANGE)
             .observe(this, sessionStatusObserver)
-        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AVFLAGS_CHANGE)
-            .observe(this, remoteAVFlagsObserver)
-        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AUDIO_LEVEL_CHANGE)
-            .observe(this, remoteAVFlagsObserver)
         LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_SESSION_ON_HIRES_CHANGE)
             .observe(this, sessionHiResObserver)
         LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_SESSION_ON_LOWRES_CHANGE)
@@ -958,6 +929,30 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     tag
                 )
             }
+    }
+
+    /**
+     * Checks updates in remote AV flags
+     *
+     * @param chatSession   [ChatSession]
+     */
+    private fun updatesInRemoteAVFlags(chatSession: ChatSession) {
+        showMuteBanner()
+        if (!inMeetingViewModel.isOneToOneCall()) {
+            val isAudioChange =
+                inMeetingViewModel.changesInRemoteAudioFlag(chatSession)
+            val isVideoChange =
+                inMeetingViewModel.changesInRemoteVideoFlag(chatSession)
+            val isPresentingChange =
+                inMeetingViewModel.changesInScreenSharing(chatSession)
+            Timber.d("Changes in AV flags. audio change $isAudioChange, video change $isVideoChange, is screen share change $isPresentingChange")
+            updateRemoteAVFlags(
+                chatSession,
+                isAudioChange,
+                isVideoChange,
+                isPresentingChange
+            )
+        }
     }
 
     private fun collectFlows() {
@@ -1124,6 +1119,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .distinctUntilChanged()) {
             if (it.isNotEmpty()) {
                 updateParticipantsWithHandRaised(it)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInAVFlagsInSession }
+            .distinctUntilChanged()) {
+            it?.let { chatSession ->
+                updatesInRemoteAVFlags(chatSession)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInAudioLevelInSession }
+            .distinctUntilChanged()) {
+            it?.let { chatSession ->
+                updatesInRemoteAVFlags(chatSession)
             }
         }
 
@@ -2565,7 +2574,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method that checks if the remote video/audio has changed and updates the UI.
      */
     private fun updateRemoteAVFlags(
-        session: MegaChatSession,
+        session: ChatSession,
         isAudioChange: Boolean,
         isVideoChange: Boolean,
         isPresentingChange: Boolean,

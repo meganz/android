@@ -1,8 +1,6 @@
 package mega.privacy.android.app.constants
 
 object EventConstants {
-    const val EVENT_TEXT_FILE_UPLOADED = "EVENT_TEXT_FILE_UPLOADED"
-
     const val EVENT_CHAT_TITLE_CHANGE = "chat_title_change"
     const val EVENT_CONTACT_NAME_CHANGE = "contact_name_change"
     const val EVENT_MEETING_AVATAR_CHANGE = "meeting_avatar_change"
@@ -26,10 +24,8 @@ object EventConstants {
 
     /** Event Keys related to sessions*/
     const val EVENT_SESSION_STATUS_CHANGE = "session_status_change"
-    const val EVENT_REMOTE_AVFLAGS_CHANGE = "remote_avflags_change"
     const val EVENT_SESSION_ON_HIRES_CHANGE = "session_on_hires_change"
     const val EVENT_SESSION_ON_LOWRES_CHANGE = "session_on_lowres_change"
-    const val EVENT_REMOTE_AUDIO_LEVEL_CHANGE = "remote_audio_level_change"
     const val EVENT_PRIVILEGES_CHANGE = "privileges_in_char_change"
     const val EVENT_USER_VISIBILITY_CHANGE = "user_visibility_change"
     const val EVENT_CHAT_CONNECTION_STATUS = "chat_connection_status_change"
