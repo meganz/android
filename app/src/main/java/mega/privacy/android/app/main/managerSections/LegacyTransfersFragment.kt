@@ -41,7 +41,7 @@ import timber.log.Timber
  * The Fragment is used for displaying the transfer list.
  */
 @AndroidEntryPoint
-internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
+internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     TransfersActionBarCallBack.TransfersActionCallback {
 
     private var adapter: MegaTransfersAdapter? = null
@@ -406,11 +406,11 @@ internal class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     companion object {
 
         /**
-         * Generate a new instance for [TransfersFragment]
+         * Generate a new instance for [LegacyTransfersFragment]
          *
-         * @return new [TransfersFragment] instance
+         * @return new [LegacyTransfersFragment] instance
          */
         @JvmStatic
-        fun newInstance(): TransfersFragment = TransfersFragment()
+        fun newInstance(): LegacyTransfersFragment = LegacyTransfersFragment()
     }
 }

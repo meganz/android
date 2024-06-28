@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment;
-import mega.privacy.android.app.main.managerSections.TransfersFragment;
+import mega.privacy.android.app.main.managerSections.LegacyTransfersFragment;
 import timber.log.Timber;
 
 public class TransfersPageAdapter extends FragmentPagerAdapter {
@@ -26,7 +26,7 @@ public class TransfersPageAdapter extends FragmentPagerAdapter {
         Timber.d("Position: %s", position);
         switch (position) {
             case 0: {
-                return TransfersFragment.newInstance();
+                return LegacyTransfersFragment.newInstance();
             }
             case 1: {
                 return CompletedTransfersFragment.newInstance();

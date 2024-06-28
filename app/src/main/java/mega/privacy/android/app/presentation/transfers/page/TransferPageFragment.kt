@@ -32,7 +32,7 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
-import mega.privacy.android.app.main.managerSections.TransfersFragment
+import mega.privacy.android.app.main.managerSections.LegacyTransfersFragment
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
@@ -88,8 +88,8 @@ internal class TransferPageFragment : Fragment() {
     private val completedTransfersFragment: CompletedTransfersFragment?
         get() = childFragmentManager.findFragmentByTag(COMPLETED_TRANSFERS_TAG) as? CompletedTransfersFragment
 
-    private val transfersFragment: TransfersFragment?
-        get() = childFragmentManager.findFragmentByTag(TRANSFERS_TAG) as? TransfersFragment
+    private val legacyTransfersFragment: LegacyTransfersFragment?
+        get() = childFragmentManager.findFragmentByTag(TRANSFERS_TAG) as? LegacyTransfersFragment
 
     private val composite = CompositeDisposable()
 
@@ -206,7 +206,7 @@ internal class TransferPageFragment : Fragment() {
                     isPause && uiState.transfersTab == TransfersTab.PENDING_TAB
                 pauseTransfersMenuIcon?.isVisible =
                     !isPause && uiState.transfersTab == TransfersTab.PENDING_TAB
-                transfersFragment?.refresh()
+                legacyTransfersFragment?.refresh()
                 transfersManagementViewModel.checkTransfersInfo()
                 viewModel.markPauseOrResultResultConsumed()
             }
@@ -276,10 +276,10 @@ internal class TransferPageFragment : Fragment() {
                 requireActivity().invalidateOptionsMenu()
                 updateElevation()
                 if (selectedTab === TransfersTab.PENDING_TAB) {
-                    transfersFragment?.setGetMoreQuotaViewVisibility()
+                    legacyTransfersFragment?.setGetMoreQuotaViewVisibility()
                 } else if (selectedTab === TransfersTab.COMPLETED_TAB) {
                     completedTransfersFragment?.setGetMoreQuotaViewVisibility()
-                    transfersFragment?.destroyActionModeIfNeed()
+                    legacyTransfersFragment?.destroyActionModeIfNeed()
                 }
                 handleMenuOptionsVisible(selectedTab)
             }
@@ -290,7 +290,7 @@ internal class TransferPageFragment : Fragment() {
 
     fun updateElevation() {
         if (viewModel.transferTab == TransfersTab.PENDING_TAB) {
-            transfersFragment?.updateElevation()
+            legacyTransfersFragment?.updateElevation()
         } else if (viewModel.transferTab == TransfersTab.COMPLETED_TAB) {
             completedTransfersFragment?.updateElevation()
         }
@@ -344,15 +344,15 @@ internal class TransferPageFragment : Fragment() {
     }
 
     fun destroyActionModeIfNeeded() {
-        transfersFragment?.destroyActionModeIfNeed()
+        legacyTransfersFragment?.destroyActionModeIfNeed()
     }
 
     fun destroyActionMode() {
-        transfersFragment?.destroyActionMode()
+        legacyTransfersFragment?.destroyActionMode()
     }
 
     fun activateActionMode() {
-        transfersFragment?.activateActionMode()
+        legacyTransfersFragment?.activateActionMode()
     }
 
     private fun showConfirmationCancelAllTransfers() {
