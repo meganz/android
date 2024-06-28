@@ -240,6 +240,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     NewInviteContactActivity(
         "Enable new invite contact activity",
         true
+    ),
+
+    /**
+     * Enables new transfers section
+     */
+    TransfersSection(
+        "Enable new transfers fragment",
+        false
     );
 
     companion object : FeatureFlagValueProvider {
