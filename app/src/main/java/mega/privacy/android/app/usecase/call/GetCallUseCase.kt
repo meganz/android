@@ -12,9 +12,17 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatListItemUpdate
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatCall.*
+import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_CONNECTING
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_DESTROYED
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_INITIAL
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_JOINING
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION
+import nz.mega.sdk.MegaChatListItem
+import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -113,67 +121,6 @@ class GetCallUseCase @Inject constructor(
                     .removeObserver(callStatusObserver)
             }
         }, BackpressureStrategy.LATEST)
-
-    /**
-     * Method to get if there is currently a call in progress, joining or connecting
-     *
-     * @return              Flowable containing True, if there is a ongoing call. False, if not.
-     */
-    fun isThereAnOngoingCall(): Flowable<Boolean> =
-        Flowable.create({ emitter ->
-            val callStatusObserver = Observer<MegaChatCall> { call ->
-                when (call.status) {
-                    CALL_STATUS_USER_NO_PRESENT, CALL_STATUS_DESTROYED -> {
-                        val result: Boolean = getCallInProgress() != null
-                        emitter.onNext(result)
-                    }
-                    CALL_STATUS_CONNECTING, CALL_STATUS_JOINING, CALL_STATUS_IN_PROGRESS -> {
-                        emitter.onNext(true)
-                    }
-                }
-            }
-
-            LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                .observeForever(callStatusObserver)
-
-            emitter.setCancellable {
-                LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                    .removeObserver(callStatusObserver)
-            }
-        }, BackpressureStrategy.LATEST)
-
-    /**
-     * Method to get if the call associated a chat ID is in progress or in other status
-     *
-     * @return Flowable containing True, if there call is in progress. False, if the call is in another state.
-     */
-    fun isThereAnInProgressCall(chatId: Long): Flowable<Boolean> =
-        Flowable.create({ emitter ->
-            val callStatusObserver = Observer<MegaChatCall> { call ->
-                if (chatId == call.chatid) {
-                    when (call.status) {
-                        CALL_STATUS_IN_PROGRESS -> emitter.onNext(true)
-                        else -> emitter.onNext(false)
-                    }
-                }
-            }
-
-            LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                .observeForever(callStatusObserver)
-
-            emitter.setCancellable {
-                LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                    .removeObserver(callStatusObserver)
-            }
-        }, BackpressureStrategy.LATEST)
-
-    /**
-     * Method to get the call in progress
-     *
-     * @return The ongoing call
-     */
-    private fun getCallInProgress(): MegaChatCall? =
-        getCallsInProgressAndOnHold().firstOrNull { call -> !call.isOnHold }
 
     /**
      * Method to get the all calls with status connecting, joining and in progress

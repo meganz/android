@@ -45,6 +45,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.view.OngoingCallViewModel
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldShowStartScreenDialog
@@ -104,6 +105,7 @@ class HomepageFragment : Fragment() {
 
     private val viewModel: HomePageViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by activityViewModels()
+    private val callInProgressViewModel: OngoingCallViewModel by activityViewModels()
 
     private lateinit var viewDataBinding: FragmentHomepageBinding
 
@@ -323,8 +325,8 @@ class HomepageFragment : Fragment() {
             searchInputView.setAvatar(it.avatarContent)
         }
 
-        viewModel.onShowCallIcon().observe(viewLifecycleOwner) {
-            searchInputView.setOngoingCallVisibility(it)
+        viewLifecycleOwner.collectFlow(callInProgressViewModel.state) {
+            searchInputView.setOngoingCallVisibility(it.currentCall != null)
         }
 
         viewModel.chatStatus.observe(viewLifecycleOwner) {

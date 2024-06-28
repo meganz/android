@@ -7,35 +7,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorHomeBadgeCountUseCase
 import nz.mega.sdk.MegaBanner
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class HomePageViewModel @Inject constructor(
     private val repository: HomepageRepository,
-    getCallUseCase: GetCallUseCase,
     isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorLogoutUseCase: MonitorLogoutUseCase,
     private val monitorHomeBadgeCountUseCase: MonitorHomeBadgeCountUseCase,
 ) : ViewModel() {
-
-    private val composite = CompositeDisposable()
-
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatus = MutableLiveData<Int>()
@@ -45,7 +34,6 @@ class HomePageViewModel @Inject constructor(
     val notificationCount: LiveData<Int> = _notificationCount
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = _chatStatus
-    private val showCallIcon: MutableLiveData<Boolean> = MutableLiveData()
     val bannerList: LiveData<MutableList<MegaBanner>?> = _bannerList
 
     /**
@@ -66,17 +54,6 @@ class HomePageViewModel @Inject constructor(
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .observeForever(chatOnlineStatusObserver)
 
-        getCallUseCase.isThereAnOngoingCall()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    showCallIcon.value = it
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
-
         viewModelScope.launch {
             monitorHomeBadgeCountUseCase().conflate().collect {
                 _notificationCount.value = it
@@ -88,13 +65,9 @@ class HomePageViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
 
-        composite.clear()
-
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .removeObserver(chatOnlineStatusObserver)
     }
-
-    fun onShowCallIcon(): LiveData<Boolean> = showCallIcon
 
     fun isRootNodeNull() = repository.isRootNodeNull()
 
