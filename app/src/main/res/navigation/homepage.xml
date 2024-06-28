@@ -40,9 +40,6 @@
             android:id="@+id/action_homepageFragment_to_favouritesFolderFragment"
             app:destination="@id/favouritesFolderFragment"
             app:popUpTo="@id/homepageFragment" />
-        <action
-            android:id="@+id/action_homepageFragment_to_offlineFragmentCompose"
-            app:destination="@id/offlineFragmentCompose" />
     </fragment>
     <fragment
         android:id="@+id/recentBucketFragment"

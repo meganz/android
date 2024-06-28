@@ -78,10 +78,10 @@ class RemoveOfflineNodeUseCaseTest {
         whenever(nodeRepository.getOfflineNodeInformation(nodeId1)).thenReturn(
             offlineRootFolderNodeInformation1
         )
-        whenever(nodeRepository.getOfflineNodeByParentId(nodeId1.longValue.toInt())).thenReturn(
+        whenever(nodeRepository.getOfflineNodesByParentId(nodeId1.longValue.toInt())).thenReturn(
             listOf(offlineFileNodeInformation1, offlineFolderNodeInformation1)
         )
-        whenever(nodeRepository.getOfflineNodeByParentId(nodeId3.longValue.toInt())).thenReturn(
+        whenever(nodeRepository.getOfflineNodesByParentId(nodeId3.longValue.toInt())).thenReturn(
             listOf(offlineFileNodeInformation2)
         )
         whenever(fileRepository.getOfflinePath()).thenReturn(offlinePath)

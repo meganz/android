@@ -374,7 +374,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
 
     override suspend fun getAllOfflineInfo() =
-        offlineDao.getOfflineFiles()?.map { offlineModelMapper(it) }
+        offlineDao.getOfflineFiles()?.map { offlineModelMapper(it) } ?: emptyList()
 
     override suspend fun removeOfflineInformation(nodeId: String) {
         encryptData(nodeId)?.let {
@@ -382,10 +382,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
         }
     }
 
-    override suspend fun getOfflineInfoByParentId(parentId: Int): List<Offline>? =
+    override suspend fun getOfflineInfoByParentId(parentId: Int): List<Offline> =
         offlineDao.getOfflineByParentId(parentId)?.map {
             offlineModelMapper(it)
-        }
+        } ?: emptyList()
 
     override suspend fun getOfflineLineById(id: Int): Offline? =
         offlineDao.getOfflineById(id)?.let {
@@ -406,18 +406,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
         chatPendingChangesDao.upsertChatPendingChanges(
             chatRoomPendingChangesEntityMapper(chatPendingChanges)
         )
-    }
-
-    override suspend fun getOfflineNodesByQuery(
-        query: String,
-    ): List<Offline> {
-        val encryptedQuery = encryptData(query)
-        return encryptedQuery?.let { searchQuery ->
-            offlineDao.getOfflineByQuery(searchQuery)
-                .map { offlineModelMapper(it) }
-        } ?: run {
-            emptyList()
-        }
     }
 
     override fun monitorChatPendingChanges(chatId: Long): Flow<ChatPendingChanges?> =

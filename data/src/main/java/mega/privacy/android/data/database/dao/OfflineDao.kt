@@ -44,11 +44,4 @@ internal interface OfflineDao {
 
     @Query("DELETE FROM offline where id = :id")
     suspend fun deleteOfflineById(id: Int)
-
-    @Query(
-        "SELECT * FROM offline WHERE name like :searchQuery"
-    )
-    suspend fun getOfflineByQuery(
-        searchQuery: String,
-    ): List<OfflineEntity>
 }

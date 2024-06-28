@@ -68,6 +68,7 @@ import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
 
@@ -891,8 +892,8 @@ internal class NodeRepositoryImpl @Inject constructor(
         } ?: false
     }
 
-    override suspend fun getOfflineNodeByParentId(parentId: Int): List<OfflineNodeInformation>? =
-        megaLocalRoomGateway.getOfflineInfoByParentId(parentId)?.map {
+    override suspend fun getOfflineNodesByParentId(parentId: Int): List<OfflineNodeInformation> =
+        megaLocalRoomGateway.getOfflineInfoByParentId(parentId).map {
             offlineNodeInformationMapper(it)
         }
 
@@ -1096,12 +1097,21 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getOfflineByQuery(query: String): List<OfflineNodeInformation>? =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getOfflineNodesByQuery(query)?.map {
-                offlineNodeInformationMapper(it)
-            }
+    override suspend fun getOfflineNodesByQuery(
+        query: String,
+        parentId: Int,
+    ): List<OfflineNodeInformation> = withContext(ioDispatcher) {
+        // Database fields are encrypted, so we need to filter by name in memory
+        if (parentId == -1) {
+            megaLocalRoomGateway.getAllOfflineInfo()
+        } else {
+            megaLocalRoomGateway.getOfflineInfoByParentId(parentId)
+        }.filter {
+            it.name.lowercase(Locale.ROOT).contains(query.lowercase(Locale.ROOT))
+        }.map {
+            offlineNodeInformationMapper(it)
         }
+    }
 
     override suspend fun addNodeTag(nodeHandle: NodeId, tag: String) {
         val node = megaApiGateway.getMegaNodeByHandle(nodeHandle.longValue)

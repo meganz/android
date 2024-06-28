@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.offline.offlinecompose.model
 
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
@@ -15,6 +16,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param title Title of screen
  * @param currentViewType ViewType [ViewType]
  * @param isOnline true if connected to network
+ * @param searchQuery Search query
+ * @param closeSearchViewEvent Event to close search view
  * @param openFolderInPageEvent Event to open folder in a new fragment
  * @param openOfflineNodeEvent Event to open offline node
  */
@@ -27,7 +30,9 @@ data class OfflineUiState(
     val title: String = "",
     val currentViewType: ViewType = ViewType.LIST,
     val isOnline: Boolean = false,
-    val openFolderInPageEvent: StateEventWithContent<OfflineNodeUIItem> = consumed(),
+    val searchQuery: String? = null,
+    val closeSearchViewEvent: StateEvent = consumed,
+    val openFolderInPageEvent: StateEventWithContent<OfflineFileInformation> = consumed(),
     val openOfflineNodeEvent: StateEventWithContent<OfflineFileInformation> = consumed()
 ) {
     /**

@@ -391,7 +391,7 @@ interface MegaLocalRoomGateway {
     /**
      * Get all offline files
      */
-    suspend fun getAllOfflineInfo(): List<Offline>?
+    suspend fun getAllOfflineInfo(): List<Offline>
 
     /**
      * Remove offline node
@@ -401,7 +401,7 @@ interface MegaLocalRoomGateway {
     /**
      * Get offline node by parent id
      */
-    suspend fun getOfflineInfoByParentId(parentId: Int): List<Offline>?
+    suspend fun getOfflineInfoByParentId(parentId: Int): List<Offline>
 
     /**
      * Get offline node by ID
@@ -427,12 +427,4 @@ interface MegaLocalRoomGateway {
      * @param chatPendingChanges [ChatPendingChanges]
      */
     suspend fun setChatPendingChanges(chatPendingChanges: ChatPendingChanges)
-
-    /**
-     * Get Offline nodes by search query sorted in ascending order with folders on top
-     * @param query
-     */
-    suspend fun getOfflineNodesByQuery(
-        query: String,
-    ): List<Offline>?
 }

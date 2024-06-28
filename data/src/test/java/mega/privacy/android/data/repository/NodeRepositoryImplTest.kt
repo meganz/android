@@ -48,8 +48,6 @@ import mega.privacy.android.domain.entity.node.TypedImageNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import mega.privacy.android.domain.entity.search.SearchCategory
-import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.MegaException
@@ -1381,6 +1379,60 @@ class NodeRepositoryImplTest {
 
         assertThat(underTest.hasSensitiveInherited(nodeId)).isTrue()
     }
+
+    @Test
+    fun `test that all offline nodes are fetched when getOfflineNodesByQuery is called with parent id -1`() =
+        runTest {
+            val query = "test"
+            val parentId = -1
+            val firstNodeName = "TeSt file name"
+
+            val offlineNode1 = mock<Offline> {
+                on { name }.thenReturn(firstNodeName)
+            }
+            val offlineNodeInformation1 = mock<OtherOfflineNodeInformation> {
+                on { name }.thenReturn(firstNodeName)
+
+            }
+            whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(
+                listOf(offlineNode1)
+            )
+            whenever(offlineNodeInformationMapper(offlineNode1)).thenReturn(offlineNodeInformation1)
+
+            val result = underTest.getOfflineNodesByQuery(query, parentId)
+            assertThat(result.size).isEqualTo(1)
+            assertThat(result.first().name).isEqualTo(firstNodeName)
+        }
+
+    @Test
+    fun `test that getOfflineNodesByQuery filters nodes by case-insensitive name when invoked with query`() =
+        runTest {
+            val query = "test"
+            val parentId = 123
+            val firstNodeName = "TeSt file name"
+
+            val offlineNode1 = mock<Offline> {
+                on { name }.thenReturn(firstNodeName)
+            }
+            val offlineNodeInformation1 = mock<OtherOfflineNodeInformation> {
+                on { name }.thenReturn(firstNodeName)
+
+            }
+            val offlineNode2 = mock<Offline> {
+                on { name }.thenReturn("file name")
+            }
+            whenever(megaLocalRoomGateway.getOfflineInfoByParentId(parentId)).thenReturn(
+                listOf(
+                    offlineNode1,
+                    offlineNode2
+                )
+            )
+            whenever(offlineNodeInformationMapper(offlineNode1)).thenReturn(offlineNodeInformation1)
+
+            val result = underTest.getOfflineNodesByQuery(query, parentId)
+            assertThat(result.size).isEqualTo(1)
+            assertThat(result.first().name).isEqualTo(firstNodeName)
+        }
 
     private fun provideNodeId() = Stream.of(
         Arguments.of(null),

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class GetOfflineNodesByParentIdUseCaseTest {
@@ -29,20 +29,25 @@ class GetOfflineNodesByParentIdUseCaseTest {
     fun `test that invoke returns empty list when getOfflineNodeByParentId returns empty list`() =
         runTest {
             val parentId = 1
-            whenever(nodeRepository.getOfflineNodeByParentId(parentId)).thenReturn(emptyList())
+            whenever(nodeRepository.getOfflineNodesByParentId(parentId)).thenReturn(emptyList())
             val result = underTest.invoke(parentId)
             assertThat(result).isEmpty()
+            verify(nodeRepository).getOfflineNodesByParentId(parentId)
         }
 
     @Test
-    fun `test that getOfflineFileInformationUseCase is not invoked when getOfflineNodeByParentId returns null`() =
-        runTest {
-            val parentId = 1
-            whenever(nodeRepository.getOfflineNodeByParentId(parentId)).thenReturn(null)
-            underTest.invoke(parentId)
-            verifyNoInteractions(sortOfflineInfoUseCase)
-            verifyNoInteractions(getOfflineFileInformationUseCase)
-        }
+    fun `test that getOfflineNodesByQuery is called when searchQuery is given`() = runTest {
+        val parentId = 1
+        val searchQuery = "searchQuery"
+        whenever(
+            nodeRepository.getOfflineNodesByQuery(
+                searchQuery,
+                parentId
+            )
+        ).thenReturn(emptyList())
+        underTest.invoke(parentId, searchQuery)
+        verify(nodeRepository).getOfflineNodesByQuery(searchQuery, parentId)
+    }
 
     @Test
     fun `test that invoke returns list of offline file information when getOfflineNodeByParentId returns list of offline nodes`() =
@@ -50,7 +55,7 @@ class GetOfflineNodesByParentIdUseCaseTest {
             val parentId = 1
             val list = listOf(mock<OtherOfflineNodeInformation>())
             val expected = listOf(mock<OfflineFileInformation>())
-            whenever(nodeRepository.getOfflineNodeByParentId(parentId)).thenReturn(list)
+            whenever(nodeRepository.getOfflineNodesByParentId(parentId)).thenReturn(list)
             whenever(sortOfflineInfoUseCase.invoke(any())).thenReturn(list)
             whenever(getOfflineFileInformationUseCase.invoke(any(), any())).thenReturn(expected[0])
             val result = underTest.invoke(parentId)

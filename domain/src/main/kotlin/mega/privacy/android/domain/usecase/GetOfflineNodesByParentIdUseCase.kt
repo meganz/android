@@ -19,19 +19,29 @@ class GetOfflineNodesByParentIdUseCase @Inject constructor(
 ) {
     /**
      * Invoke
+     *
+     * If parentId is -1 and searchQuery is set, the search in entire table is performed
+     *
      * @param parentId Int
+     * @param searchQuery String
      */
-    suspend operator fun invoke(parentId: Int) = coroutineScope {
+    suspend operator fun invoke(
+        parentId: Int,
+        searchQuery: String? = null,
+    ) = coroutineScope {
         val semaphore = Semaphore(8)
-        nodeRepository.getOfflineNodeByParentId(parentId = parentId)
-            ?.let {
-                sortOfflineInfoUseCase(it)
-            }?.map {
-                async {
-                    semaphore.withPermit {
-                        getOfflineFileInformationUseCase(it, false)
-                    }
+        if (searchQuery.isNullOrBlank()) {
+            nodeRepository.getOfflineNodesByParentId(parentId)
+        } else {
+            nodeRepository.getOfflineNodesByQuery(searchQuery, parentId)
+        }.let {
+            sortOfflineInfoUseCase(it)
+        }.map {
+            async {
+                semaphore.withPermit {
+                    getOfflineFileInformationUseCase(it, false)
                 }
-            }?.awaitAll() ?: emptyList()
+            }
+        }.awaitAll()
     }
 }

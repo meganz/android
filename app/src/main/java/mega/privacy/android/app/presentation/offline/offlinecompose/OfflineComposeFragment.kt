@@ -74,7 +74,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
         super.onCreate(savedInstanceState)
         if (arguments == null) {
             arguments =
-                HomepageFragmentDirections.actionHomepageFragmentToOfflineFragmentCompose().arguments
+                HomepageFragmentDirections.actionHomepageToFullscreenOfflineCompose().arguments
         }
     }
 
@@ -125,7 +125,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                             showOptionPanelBottomSheet(it.offlineNode.handle.toLong())
                         }
                     )
-                    LaunchedEffect(uiState.title) {
+                    LaunchedEffect(uiState.title, uiState.offlineNodes) {
                         (requireActivity() as? ManagerActivity)?.setToolbarTitleFromFullscreenOfflineFragment(
                             title = uiState.title.ifEmpty { defaultTitle },
                             firstNavigationLevel = false,
@@ -147,10 +147,10 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                         onConsumed = viewModel::onOpenFolderInPageEventConsumed
                     ) {
                         findNavController().navigate(
-                            HomepageFragmentDirections.actionHomepageFragmentToOfflineFragmentCompose(
+                            HomepageFragmentDirections.actionHomepageToFullscreenOfflineCompose(
                                 rootFolderOnly = false,
-                                parentId = it.offlineNode.id,
-                                title = it.offlineNode.name
+                                parentId = it.id,
+                                title = it.name
                             )
                         )
                     }
@@ -160,11 +160,35 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                     ) {
                         offlineNodeActionsViewModel.handleOpenOfflineFile(it)
                     }
+                    EventEffect(
+                        event = uiState.closeSearchViewEvent,
+                        onConsumed = viewModel::onCloseSearchViewEventConsumed
+                    ) {
+                        callManager {
+                            it.closeSearchView()
+                        }
+                    }
                 }
 
                 LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
             }
         }
+    }
+
+    /**
+     * Checks if the fragment is in search mode
+     */
+    fun isInSearchMode() = with(viewModel.uiState.value) {
+        !searchQuery.isNullOrBlank() && offlineNodes.isNotEmpty()
+    }
+
+    /**
+     * Sets the Search Query. This function is only being used by [ManagerActivity]
+     *
+     * @param query The text to find items. It may be nullable
+     */
+    fun setSearchQuery(query: String?) {
+        viewModel.setSearchQuery(query)
     }
 
     private fun showOptionPanelBottomSheet(nodeHandle: Long) {

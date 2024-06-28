@@ -28,6 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -135,7 +136,8 @@ class OfflineComposeViewModelTest {
                 isFolder = true,
                 handle = "1234",
                 lastModifiedTime = 100000L,
-                path = ""
+                path = "",
+                absolutePath = ""
             ),
             isSelected = false
         )
@@ -147,8 +149,8 @@ class OfflineComposeViewModelTest {
 
         underTest.uiState.test {
             val newItem = awaitItem()
-            assertThat(((newItem.openFolderInPageEvent as? StateEventWithContentTriggered<*>)?.content as? OfflineNodeUIItem))
-                .isEqualTo(item)
+            assertThat(((newItem.openFolderInPageEvent as? StateEventWithContentTriggered<*>)?.content as? OfflineFileInformation))
+                .isEqualTo(item.offlineNode)
         }
 
     }
@@ -169,7 +171,7 @@ class OfflineComposeViewModelTest {
         whenever(offlineList2.addedTime).thenReturn(100000L)
 
         val list = listOf(offlineList1, offlineList2)
-        whenever(getOfflineNodesByParentIdUseCase(any())).thenReturn(list)
+        whenever(getOfflineNodesByParentIdUseCase(any(), anyOrNull())).thenReturn(list)
         underTest.onItemClicked(
             offlineNodeUIItem = OfflineNodeUIItem(
                 offlineNode = OfflineFileInformation(
@@ -187,7 +189,7 @@ class OfflineComposeViewModelTest {
         )
 
         underTest.onBackClicked()
-        verify(getOfflineNodesByParentIdUseCase).invoke(parentId)
+        verify(getOfflineNodesByParentIdUseCase).invoke(parentId, null)
     }
 
     @Test

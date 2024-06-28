@@ -590,11 +590,11 @@ interface NodeRepository {
     ): Boolean
 
     /**
-     * Get offline Node from parent id
+     * Get offline Nodes from parent id
      * @param parentId
      * @return list of [OfflineNodeInformation]
      */
-    suspend fun getOfflineNodeByParentId(parentId: Int): List<OfflineNodeInformation>?
+    suspend fun getOfflineNodesByParentId(parentId: Int): List<OfflineNodeInformation>
 
     /**
      * Get offline folder info
@@ -730,10 +730,13 @@ interface NodeRepository {
     /**
      * Get offline node information by query
      *
+     * When parentId is -1 and searchQuery is set, the search in entire table is performed
+     *
      * @param query
+     * @param parentId
      * @return list of offline nodes information
      */
-    suspend fun getOfflineByQuery(query: String): List<OfflineNodeInformation>?
+    suspend fun getOfflineNodesByQuery(query: String, parentId: Int): List<OfflineNodeInformation>
 
     /**
      * Update node tag

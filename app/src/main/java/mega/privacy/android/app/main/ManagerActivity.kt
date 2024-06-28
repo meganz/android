@@ -206,7 +206,6 @@ import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
 import mega.privacy.android.app.presentation.offline.OfflineFragment
 import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment
-import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeViewModel
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
@@ -3971,11 +3970,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         path?.let {
             navController?.navigate(
                 if (enableOfflineCompose) {
-                    HomepageFragmentDirections.actionHomepageFragmentToOfflineFragmentCompose(
-                        it, false
+                    HomepageFragmentDirections.actionHomepageToFullscreenOfflineCompose(
+                        path = it,
+                        rootFolderOnly = false
                     )
                 } else {
-                    HomepageFragmentDirections.actionHomepageToFullscreenOffline(it, false)
+                    HomepageFragmentDirections.actionHomepageToFullscreenOffline(
+                        path = it,
+                        rootFolderOnly = false
+                    )
                 },
                 NavOptions.Builder().setLaunchSingleTop(true).build()
             )
@@ -4371,11 +4374,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Util.hideKeyboard(this@ManagerActivity, 0)
                 } else if (drawerItem === DrawerItem.HOMEPAGE) {
                     if (homepageScreen === HomepageScreen.FULLSCREEN_OFFLINE) {
-                        searchExpand = false
-                        Util.hideKeyboard(this@ManagerActivity, 0)
-                        fullscreenOfflineFragment?.onSearchQuerySubmitted()
-                        setToolbarTitle()
-                        supportInvalidateOptionsMenu()
+                        if (!enableOfflineCompose) {
+                            searchExpand = false
+                            Util.hideKeyboard(this@ManagerActivity, 0)
+                            fullscreenOfflineFragment?.onSearchQuerySubmitted()
+                            setToolbarTitle()
+                            supportInvalidateOptionsMenu()
+                        }
                     } else {
                         Util.hideKeyboard(this@ManagerActivity)
                     }
@@ -4516,27 +4521,44 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun setFullscreenOfflineFragmentSearchQuery(searchQuery: String?) {
-        fullscreenOfflineFragment?.setSearchQuery(searchQuery)
+        if (enableOfflineCompose) {
+            fullscreenOfflineComposeFragment?.setSearchQuery(searchQuery)
+        } else {
+            fullscreenOfflineFragment?.setSearchQuery(searchQuery)
+        }
     }
 
     fun updateFullscreenOfflineFragmentOptionMenu(openSearchView: Boolean) {
-        if (fullscreenOfflineFragment == null) {
-            return
-        }
-        if (searchExpand && openSearchView) {
-            openSearchView()
-        } else if (!searchExpand) {
-            if (viewModel.isConnected) {
-                if (((fullscreenOfflineFragment?.getItemCount() ?: 0) > 0) &&
-                    (fullscreenOfflineFragment?.searchMode() == false) &&
-                    (searchMenuItem != null)
-                ) {
-                    searchMenuItem?.isVisible = true
+        if (enableOfflineCompose) {
+            if (fullscreenOfflineComposeFragment == null) return
+            if (searchExpand && openSearchView) {
+                openSearchView()
+            } else if (!searchExpand) {
+                if (viewModel.isConnected) {
+                    if (fullscreenOfflineComposeFragment?.isInSearchMode() == false) {
+                        searchMenuItem?.isVisible = true
+                    }
+                } else {
+                    supportInvalidateOptionsMenu()
                 }
-            } else {
-                supportInvalidateOptionsMenu()
             }
-            fullscreenOfflineFragment?.refreshActionBarTitle()
+        } else {
+            if (fullscreenOfflineFragment == null) return
+            if (searchExpand && openSearchView) {
+                openSearchView()
+            } else if (!searchExpand) {
+                if (viewModel.isConnected) {
+                    if (((fullscreenOfflineFragment?.getItemCount() ?: 0) > 0) &&
+                        fullscreenOfflineFragment?.searchMode() == false &&
+                        searchMenuItem != null
+                    ) {
+                        searchMenuItem?.isVisible = true
+                    }
+                } else {
+                    supportInvalidateOptionsMenu()
+                }
+                fullscreenOfflineFragment?.refreshActionBarTitle()
+            }
         }
     }
 
