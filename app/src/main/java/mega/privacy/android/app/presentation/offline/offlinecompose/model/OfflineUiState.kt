@@ -22,7 +22,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param openOfflineNodeEvent Event to open offline node
  */
 data class OfflineUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val showOfflineWarning: Boolean = false,
     val offlineNodes: List<OfflineNodeUIItem> = emptyList(),
     val selectedNodeHandles: List<Long> = emptyList(),

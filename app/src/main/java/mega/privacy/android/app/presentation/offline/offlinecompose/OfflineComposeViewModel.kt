@@ -134,13 +134,17 @@ class OfflineComposeViewModel @Inject constructor(
         }.onSuccess { offlineNodeList ->
             _uiState.update {
                 it.copy(
+                    isLoading = false,
                     offlineNodes = offlineNodeList.map { item -> OfflineNodeUIItem(item) }
                 )
             }
         }.onFailure { throwable ->
             Timber.e(throwable)
             _uiState.update {
-                it.copy(offlineNodes = emptyList())
+                it.copy(
+                    isLoading = false,
+                    offlineNodes = emptyList()
+                )
             }
         }
     }
