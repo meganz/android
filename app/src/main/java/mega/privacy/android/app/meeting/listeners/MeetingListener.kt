@@ -11,7 +11,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANG
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.utils.CallUtil.callStatusToString
 import mega.privacy.android.app.utils.CallUtil.sessionStatusToString
@@ -37,8 +36,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             Timber.w("Logging out")
             return
         }
-
-        sendCallEvent(EVENT_UPDATE_CALL, call)
 
         // Call status has changed
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
@@ -81,9 +78,6 @@ class MeetingListener : MegaChatCallListenerInterface {
         }
 
         val call = api.getChatCallByCallId(callid)
-        call?.let {
-            sendCallEvent(EVENT_UPDATE_CALL, it)
-        }
 
         // Session status has changed
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_STATUS)) {

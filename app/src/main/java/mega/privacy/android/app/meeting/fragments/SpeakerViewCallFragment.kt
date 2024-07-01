@@ -83,7 +83,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
         } else {
             inMeetingViewModel.getSession(newSpeaker.clientId)?.apply {
-                if (!hasVideo() || inMeetingViewModel.isSessionOnHold(newSpeaker.clientId)) {
+                if (!hasVideo || inMeetingViewModel.isSessionOnHold(newSpeaker.clientId)) {
                     removeTextureViewOfPreviousSpeaker(newSpeaker.peerId, newSpeaker.clientId)
                     inMeetingViewModel.removePreviousSpeakers()
                 }
@@ -281,7 +281,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             }
             updateAudioIcon(speaker)
             inMeetingViewModel.getSession(speaker.clientId)?.let {
-                if (it.hasVideo()) {
+                if (it.hasVideo) {
                     checkVideoOn(speaker)
                 } else {
                     videoOffUI(speaker)
@@ -389,7 +389,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         if (isSpeakerInvalid(speaker)) return
 
         inMeetingViewModel.getSession(speaker.clientId)?.let {
-            if (it.hasVideo() && (!inMeetingViewModel.isCallOrSessionOnHold(
+            if (it.hasVideo && (!inMeetingViewModel.isCallOrSessionOnHold(
                     speaker.clientId
                 ))
             ) {
@@ -437,7 +437,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      */
     private fun addSpeakerVideoListener(speaker: Participant) {
         inMeetingViewModel.getSession(speaker.clientId)?.apply {
-            if (hasVideo() && !inMeetingViewModel.isCallOrSessionOnHold(speaker.clientId)) {
+            if (hasVideo && !inMeetingViewModel.isCallOrSessionOnHold(speaker.clientId)) {
                 if (speaker.videoListener == null) {
                     speaker.videoListener =
                         inMeetingViewModel.createVideoListener(
@@ -531,7 +531,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
             inMeetingViewModel.getSession(speaker.clientId)?.let { session ->
                 if (speaker.hasHiRes) {
-                    if (!session.canRecvVideoHiRes() && session.isHiResVideo) {
+                    if (!session.canReceiveVideoHiRes && session.isHiResVideo) {
                         inMeetingViewModel.requestHiResVideo(
                             session,
                             inMeetingViewModel.getChatId()

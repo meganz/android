@@ -55,6 +55,7 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property sessionOnHoldChanges                   [ChatSession] with changes in session on hold
  * @property isPictureInPictureFeatureFlagEnabled       True, if Picture in Picture feature flag enabled. False, otherwise.
  * @property isInPipMode                                True, if is in Picture in Picture mode. False, otherwise.
+ * @property myUserHandle                               My user handle
  * @property changesInAVFlagsInSession              [ChatSession] with changes in remote audio video flags
  * @property changesInAudioLevelInSession           [ChatSession] with changes in audio level
  */
@@ -100,6 +101,7 @@ data class InMeetingUiState(
     val sessionOnHoldChanges: ChatSession? = null,
     val isPictureInPictureFeatureFlagEnabled: Boolean = false,
     val isInPipMode: Boolean = false,
+    val myUserHandle: Long? = null,
     val changesInAVFlagsInSession: ChatSession? = null,
     val changesInAudioLevelInSession: ChatSession? = null
 ) {
@@ -126,12 +128,18 @@ data class InMeetingUiState(
      */
     val isSessionOnHold
         get(): Boolean? {
+            return getSession?.isOnHold
+        }
+
+    /**
+     * Get session in one to one call
+     */
+    val getSession
+        get(): ChatSession? {
             call?.apply {
                 sessionsClientId?.takeIf { it.isNotEmpty() }?.let {
                     it.first().let { clientId ->
-                        sessionByClientId[clientId]?.let { session ->
-                            return session.isOnHold
-                        }
+                        return sessionByClientId[clientId]
                     }
                 }
             }
@@ -149,6 +157,7 @@ data class InMeetingUiState(
         call?.apply {
             return sessionByClientId[clientId]
         }
+
         return null
     }
 

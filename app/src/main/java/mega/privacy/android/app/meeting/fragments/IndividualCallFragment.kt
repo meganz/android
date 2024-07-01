@@ -295,9 +295,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     videoOffUI(peerId, clientId)
                 }
             } else {
-                val session = inMeetingViewModel.getSession(clientId)
-                session?.let { participant ->
-                    if (session.status == SESSION_STATUS_IN_PROGRESS && participant.hasVideo()) {
+                    inMeetingViewModel.getSession(clientId)?.let { chatSession ->
+                    if (chatSession.status == ChatSessionStatus.Progress && chatSession.hasVideo) {
                         Timber.d("Check if remote video should be on")
                         checkVideoOn(peerId, clientId)
                     } else {
@@ -509,15 +508,15 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 Timber.d("Participant $clientId video listener created")
 
                 inMeetingViewModel.getSession(clientId)?.let {
-                    if (!it.canRecvVideoHiRes() && it.isHiResVideo) {
+                    if (!it.canReceiveVideoHiRes && it.isHiResVideo) {
                         Timber.d("Asking for HiRes video of client ID $clientId")
                         inMeetingViewModel.requestHiResVideo(it, this.chatId)
                     } else {
                         Timber.d("I am already receiving the HiRes video")
                         when {
-                            inMeetingViewModel.sessionHasVideo(it.clientid) -> {
+                            inMeetingViewModel.sessionHasVideo(it.clientId) -> {
                                 Timber.d("Session has video")
-                                addListener(it.clientid)
+                                addListener(it.clientId)
                             }
 
                             else -> {}
@@ -628,7 +627,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         } else {
             inMeetingViewModel.getSession(clientId)?.let { session ->
                 videoListener?.let {
-                    if (session.canRecvVideoHiRes()) {
+                    if (session.canReceiveVideoHiRes) {
                         Timber.d("Removing HiRes video of client ID $clientId")
                         inMeetingViewModel.stopHiResVideo(session, chatId)
                     }

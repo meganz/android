@@ -1122,6 +1122,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call }
+            .distinctUntilChanged()) {
+            if (it != null && isWaitingForAnswerCall) {
+                answerCallAfterJoin()
+            }
+        }
+
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInAVFlagsInSession }
             .distinctUntilChanged()) {
             it?.let { chatSession ->
@@ -1333,12 +1340,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun initViewModel() {
         collectFlows()
-
-        inMeetingViewModel.callLiveData.observe(viewLifecycleOwner) {
-            if (it != null && isWaitingForAnswerCall) {
-                answerCallAfterJoin()
-            }
-        }
 
         sharedModel.micLiveData.observe(viewLifecycleOwner) {
             if (micIsEnable != it) {
@@ -2580,6 +2581,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         isPresentingChange: Boolean,
     ) {
         Timber.d("Remote changes detected")
+
         gridViewCallFragment?.let {
             if (it.isAdded) {
                 if (isAudioChange) {

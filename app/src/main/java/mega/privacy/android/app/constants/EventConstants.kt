@@ -8,7 +8,6 @@ object EventConstants {
     const val EVENT_CHAT_OPEN_INVITE = "chat_open_invite"
 
     /** Event Keys related to calls*/
-    const val EVENT_UPDATE_CALL = "update_call"
     const val EVENT_CALL_STATUS_CHANGE = "call_status_change"
     const val EVENT_CALL_COMPOSITION_CHANGE = "call_composition_change"
     const val EVENT_NOT_OUTGOING_CALL = "not_outgoing_call"
