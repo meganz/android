@@ -151,6 +151,19 @@ class ZipBrowserViewModelTest {
         }
 
     @Test
+    fun `test that the state is updated correctly when getZipTreeMapUseCase throws an exception`() =
+        runTest {
+            whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
+            whenever(getZipTreeMapUseCase(anyOrNull())).thenThrow(IllegalArgumentException())
+
+            initUnderTest()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showAlertDialog).isTrue()
+            }
+        }
+
+    @Test
     fun `test that state is updated correctly when folder item is clicked`() = runTest {
         whenever(savedStateHandle.get<String>(EXTRA_PATH_ZIP)).thenReturn(testZipFullPath)
         whenever(getZipTreeMapUseCase(anyOrNull())).thenReturn(testZipNodeTree)

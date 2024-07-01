@@ -33,7 +33,7 @@ class ZipBrowserViewModel @Inject constructor(
     private val unzipFileUseCase: UnzipFileUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private lateinit var zipNodeTree: Map<String, ZipTreeNode>
+    private var zipNodeTree: Map<String, ZipTreeNode>? = null
     private val zipFullPath: String? = savedStateHandle[EXTRA_PATH_ZIP]
     private var unzipRootPath: String? = null
     private var zipFile: ZipFile? = null
@@ -62,33 +62,42 @@ class ZipBrowserViewModel @Inject constructor(
                 }.getOrNull()
             }.getOrNull()
 
-            zipNodeTree = getZipTreeMapUseCase(zipFile = zipFile)
+            zipNodeTree = runCatching {
+                getZipTreeMapUseCase(zipFile = zipFile)
+            }.recover { e ->
+                Timber.e(e)
+                updateShowAlertDialog(true)
+                null
+            }.getOrNull() ?: return
+
             dataUpdated()
         }
     }
 
     private fun dataUpdated(zipFolderPath: String? = null, folderDepth: Int = 0) {
-        if (zipNodeTree.isNotEmpty()) {
-            var currentZipTreeNode: ZipTreeNode? = null
-            val entities = if (zipFolderPath == null) {
-                zipNodeTree.values.filter { it.parentPath == null }
-            } else {
-                currentZipTreeNode = zipNodeTree[zipFolderPath]
-                currentZipTreeNode?.children?.map {
-                    zipNodeTree[it.path]
-                }
-            }?.mapNotNull { zipTreeNode ->
-                zipTreeNode?.let { zipInfoUiEntityMapper(it) }
-            } ?: emptyList()
+        zipNodeTree?.let { nodeTree ->
+            if (nodeTree.isNotEmpty()) {
+                var currentZipTreeNode: ZipTreeNode? = null
+                val entities = if (zipFolderPath == null) {
+                    nodeTree.values.filter { it.parentPath == null }
+                } else {
+                    currentZipTreeNode = nodeTree[zipFolderPath]
+                    currentZipTreeNode?.children?.map {
+                        nodeTree[it.path]
+                    }
+                }?.mapNotNull { zipTreeNode ->
+                    zipTreeNode?.let { zipInfoUiEntityMapper(it) }
+                } ?: emptyList()
 
-            val parentFolderName = getTitle(zipFolderPath)
-            _uiState.update {
-                it.copy(
-                    items = entities,
-                    parentFolderName = parentFolderName,
-                    currentZipTreeNode = currentZipTreeNode,
-                    folderDepth = folderDepth
-                )
+                val parentFolderName = getTitle(zipFolderPath)
+                _uiState.update {
+                    it.copy(
+                        items = entities,
+                        parentFolderName = parentFolderName,
+                        currentZipTreeNode = currentZipTreeNode,
+                        folderDepth = folderDepth
+                    )
+                }
             }
         }
     }
