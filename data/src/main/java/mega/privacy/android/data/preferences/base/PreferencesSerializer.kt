@@ -1,5 +1,6 @@
 package mega.privacy.android.data.preferences.base
 
+import android.annotation.SuppressLint
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import androidx.datastore.preferences.PreferencesMapCompat
@@ -26,10 +27,9 @@ import java.io.OutputStream
  */
 internal object PreferencesSerializer : Serializer<Preferences> {
     override val defaultValue: Preferences
-        get() {
-            return emptyPreferences()
-        }
+        get() = emptyPreferences()
 
+    @SuppressLint("RestrictedApi")
     @Throws(IOException::class, CorruptionException::class)
     override suspend fun readFrom(input: InputStream): Preferences {
         val preferencesProto = PreferencesMapCompat.readFrom(input)
