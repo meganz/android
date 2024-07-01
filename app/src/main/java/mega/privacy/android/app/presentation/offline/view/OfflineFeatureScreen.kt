@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.offline.view
 import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,6 +34,7 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
@@ -51,6 +52,7 @@ fun OfflineFeatureScreen(
     fileTypeIconMapper: FileTypeIconMapper,
     rootFolderOnly: Boolean = true,
     spanCount: Int = 2,
+    onCloseWarningClick: () -> Unit,
     onOfflineItemClicked: (OfflineNodeUIItem) -> Unit,
     onItemLongClicked: (OfflineNodeUIItem) -> Unit,
     onOptionClicked: (OfflineNodeUIItem) -> Unit,
@@ -60,11 +62,17 @@ fun OfflineFeatureScreen(
         scaffoldState = rememberScaffoldState(),
         backgroundColor = backgroundColor
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
+            if (uiState.showOfflineWarning && !uiState.isLoading) {
+                WarningBanner(
+                    textString = stringResource(R.string.offline_warning),
+                    onCloseClick = onCloseWarningClick
+                )
+            }
             when {
                 uiState.isLoading -> OfflineLoadingView()
                 uiState.offlineNodes.isEmpty() -> OfflineEmptyView()
@@ -93,7 +101,6 @@ private fun OfflineListContent(
     onItemLongClicked: (OfflineNodeUIItem) -> Unit,
     onOptionClicked: (OfflineNodeUIItem) -> Unit,
 ) {
-
     if (uiState.currentViewType == ViewType.LIST || isRootFolderOnly) {
         LazyColumn {
             items(uiState.offlineNodes) {
@@ -245,6 +252,7 @@ private fun OfflineFeatureScreenPreview() {
         OfflineFeatureScreen(
             uiState = OfflineUiState(
                 isLoading = false,
+                showOfflineWarning = true,
                 offlineNodes = listOf(
                     OfflineNodeUIItem(
                         offlineNode = OfflineFileInformation(
@@ -278,9 +286,48 @@ private fun OfflineFeatureScreenPreview() {
                 )
             ),
             fileTypeIconMapper = FileTypeIconMapper(),
+            onCloseWarningClick = {},
             onOfflineItemClicked = {},
             onItemLongClicked = {},
-            onOptionClicked = {}
+            onOptionClicked = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun OfflineFeatureEmptyScreenPreview() {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        OfflineFeatureScreen(
+            uiState = OfflineUiState(
+                isLoading = false,
+                showOfflineWarning = true,
+                offlineNodes = emptyList()
+            ),
+            fileTypeIconMapper = FileTypeIconMapper(),
+            onCloseWarningClick = {},
+            onOfflineItemClicked = {},
+            onItemLongClicked = {},
+            onOptionClicked = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun OfflineFeatureLoadingScreenPreview() {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        OfflineFeatureScreen(
+            uiState = OfflineUiState(
+                isLoading = true,
+                showOfflineWarning = true,
+                offlineNodes = emptyList()
+            ),
+            fileTypeIconMapper = FileTypeIconMapper(),
+            onCloseWarningClick = {},
+            onOfflineItemClicked = {},
+            onItemLongClicked = {},
+            onOptionClicked = {},
         )
     }
 }

@@ -105,20 +105,19 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                         backgroundColor = if (args.rootFolderOnly) backgroundColor else MaterialTheme.colors.background,
                         fileTypeIconMapper = fileTypeIconMapper,
                         rootFolderOnly = args.rootFolderOnly,
+                        onCloseWarningClick = viewModel::dismissOfflineWarning,
                         onOfflineItemClicked = {
                             viewModel.onItemClicked(it, args.rootFolderOnly)
                         },
                         onItemLongClicked = {
-                            if (args.rootFolderOnly.not()) {
+                            if (args.rootFolderOnly) {
+                                viewModel.onItemClicked(it, args.rootFolderOnly)
+                            } else {
                                 viewModel.onLongItemClicked(it)
                                 if (actionMode == null) {
-                                    actionMode =
-                                        (requireActivity() as AppCompatActivity).startSupportActionMode(
-                                            this@OfflineComposeFragment
-                                        )
+                                    actionMode = (requireActivity() as AppCompatActivity)
+                                        .startSupportActionMode(this@OfflineComposeFragment)
                                 }
-                            } else {
-                                viewModel.onItemClicked(it, args.rootFolderOnly)
                             }
                         },
                         onOptionClicked = {
