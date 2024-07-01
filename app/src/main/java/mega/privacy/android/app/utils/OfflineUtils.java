@@ -701,6 +701,7 @@ public class OfflineUtils {
      * @param context    Required to build the intent
      * @param nodeHandle Offline node handle to be open with
      */
+    @Deprecated
     public static void openWithOffline(Context context, Long nodeHandle) {
         LegacyDatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
         MegaOffline node = dbH.findByHandle(nodeHandle);

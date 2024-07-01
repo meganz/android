@@ -224,6 +224,29 @@ class OfflineNodeActionsViewModelTest {
             }
         }
 
+    @Test
+    fun `test that URL file type is handled when handleOpenOfflineFile is invoked`() =
+        runTest {
+            val nodeInfo = mock<OfflineFileInformation>().stub {
+                on { handle } doReturn "123"
+                on { path } doReturn "path"
+                on { name } doReturn "name"
+                on { fileTypeInfo } doReturn UrlFileTypeInfo
+            }
+            val file = mock<File>()
+            whenever(getOfflineFileUseCase(nodeInfo)).thenReturn(file)
+
+            underTest.handleOpenOfflineFile(nodeInfo)
+
+            verify(getPathFromNodeContentUseCase).invoke(NodeContentUri.LocalContentUri(file))
+            underTest.uiState.test {
+                val res = awaitItem()
+                assertThat(res.openFileEvent)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((res.openFileEvent as StateEventWithContentTriggered).content)
+                    .isInstanceOf(OfflineNodeActionUiEntity.Uri::class.java)
+            }
+        }
 
     private fun provideOfflineNodeType() = Stream.of(
         Arguments.of(

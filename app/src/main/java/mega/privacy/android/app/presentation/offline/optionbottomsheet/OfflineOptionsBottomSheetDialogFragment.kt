@@ -22,7 +22,6 @@ import mega.privacy.android.app.presentation.offline.confirmremovedialog.Confirm
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.OfflineOptionsViewModel.Companion.NODE_HANDLE
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.view.OfflineOptionsContent
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
@@ -62,7 +61,7 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
                         fileTypeIconMapper = fileTypeIconMapper,
                         onRemoveFromOfflineClicked = { showConfirmationRemoveOfflineNode(uiState.nodeId) },
                         onOpenInfoClicked = { openInfo(uiState.nodeId) },
-                        onOpenWithClicked = { openWith(uiState.nodeId) },
+                        onOpenWithClicked = { openWith(it) },
                         onSaveToDeviceClicked = { saveToDevice(uiState.nodeId) },
                         onShareNodeClicked = {
                             shareOfflineNode(
@@ -99,11 +98,8 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
         dismissAllowingStateLoss()
     }
 
-    private fun openWith(nodeId: NodeId) {
-        OfflineUtils.openWithOffline(
-            requireContext(),
-            nodeId.longValue
-        )
+    private fun openWith(offlineFileInformation: OfflineFileInformation) {
+        offlineNodeActionsViewModel.handleOpenWithIntent(offlineFileInformation)
         dismissAllowingStateLoss()
     }
 

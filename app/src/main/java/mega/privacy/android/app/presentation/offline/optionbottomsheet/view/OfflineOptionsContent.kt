@@ -29,7 +29,7 @@ internal fun OfflineOptionsContent(
     fileTypeIconMapper: FileTypeIconMapper,
     onRemoveFromOfflineClicked: () -> Unit,
     onOpenInfoClicked: () -> Unit,
-    onOpenWithClicked: () -> Unit,
+    onOpenWithClicked: (OfflineFileInformation) -> Unit,
     onSaveToDeviceClicked: () -> Unit,
     onShareNodeClicked: (OfflineFileInformation) -> Unit,
 ) {
@@ -67,7 +67,7 @@ internal fun OfflineOptionsContent(
                         icon = painterResource(id = R.drawable.ic_external_link_medium_regular_outline),
                         dividerType = DividerType.BigStartPadding,
                         onActionClicked = {
-                            onOpenWithClicked()
+                            onOpenWithClicked(this@with)
                         },
                     )
                 }

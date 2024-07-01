@@ -163,9 +163,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
                         val path = getPathFromNodeContentUseCase(
                             NodeContentUri.LocalContentUri(localFile)
                         )
-                        OfflineNodeActionUiEntity.Uri(
-                            path = path
-                        )
+                        OfflineNodeActionUiEntity.Uri(path)
                     }
 
                     fileType is ZipFileTypeInfo -> OfflineNodeActionUiEntity.Zip(
@@ -178,6 +176,39 @@ class OfflineNodeActionsViewModel @Inject constructor(
                         mimeType = fileType?.mimeType ?: "*/*"
                     )
                 }
+            }.onSuccess {
+                _uiState.update { state ->
+                    state.copy(openFileEvent = triggered(it))
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+
+    /**
+     * Handle Open With intent
+     * This emits event to open the file in third-party app on device
+     */
+    fun handleOpenWithIntent(info: OfflineFileInformation) {
+        viewModelScope.launch {
+            runCatching {
+                val localFile = getOfflineFileUseCase(info)
+                when (info.fileTypeInfo) {
+                    is UrlFileTypeInfo -> {
+                        val path = getPathFromNodeContentUseCase(
+                            NodeContentUri.LocalContentUri(localFile)
+                        )
+                        OfflineNodeActionUiEntity.Uri(path)
+                    }
+
+                    else -> OfflineNodeActionUiEntity.Other(
+                        file = localFile,
+                        mimeType = info.fileTypeInfo?.mimeType ?: "*/*"
+                    )
+                }
+
             }.onSuccess {
                 _uiState.update { state ->
                     state.copy(openFileEvent = triggered(it))
