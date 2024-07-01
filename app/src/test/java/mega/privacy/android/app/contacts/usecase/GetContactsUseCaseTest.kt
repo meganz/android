@@ -2,7 +2,6 @@ package mega.privacy.android.app.contacts.usecase
 
 import android.net.Uri
 import androidx.core.net.toUri
-import io.reactivex.rxjava3.core.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
@@ -10,14 +9,18 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.contacts.list.data.ContactItem
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.chat.ChatConnectionState
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.contacts.OnlineStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.entity.user.UserVisibility
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaChatApi.STATUS_ONLINE
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -45,7 +48,6 @@ import java.io.File
 class GetContactsUseCaseTest {
     private lateinit var underTest: GetContactsUseCase
 
-    private val getChatChangesUseCase = mock<GetChatChangesUseCase>()
     private val megaContactsMapper = mock<(MegaUser, File) -> ContactItem.Data>()
     private val getContacts = mock<() -> ArrayList<MegaUser>>()
     private val getUserAttribute = mock<(String, Int, MegaRequestListenerInterface) -> Unit>()
@@ -59,6 +61,9 @@ class GetContactsUseCaseTest {
     private val getUnformattedLastSeenDate = mock<(Int) -> String>()
     private val getAliasMap = mock<(MegaRequest) -> Map<Long, String>>()
     private val getUserUpdates = mock<() -> Flow<UserUpdate>>()
+    private val monitorChatLastGreen = mock<() -> Flow<UserLastGreen>>()
+    private val monitorChatOnlineStatus = mock<() -> Flow<OnlineStatus>>()
+    private val monitorChatConnectionStatus = mock<() -> Flow<ChatConnectionState>>()
 
     @TempDir
     lateinit var tempDir: File
@@ -66,7 +71,6 @@ class GetContactsUseCaseTest {
     @BeforeEach
     fun setUp() {
         reset(
-            getChatChangesUseCase,
             megaContactsMapper,
             getContacts,
             getUserAttribute,
@@ -78,24 +82,31 @@ class GetContactsUseCaseTest {
             getUserAvatar,
             onlineString,
             getUnformattedLastSeenDate,
-            getUserUpdates
+            getUserUpdates,
+            monitorChatLastGreen,
+            monitorChatOnlineStatus,
+            monitorChatConnectionStatus,
         )
-
-        getChatChangesUseCase.stub {
-            on { get() } doReturn Flowable.empty()
-        }
-
 
         getUserUpdates.stub {
             on { invoke() } doReturn emptyFlow()
         }
+
+        monitorChatLastGreen.stub {
+            on { invoke() } doReturn emptyFlow()
+        }
+
+        monitorChatOnlineStatus.stub {
+            on { invoke() } doReturn emptyFlow()
+        }
+
+        monitorChatConnectionStatus.stub {
+            on { invoke() } doReturn emptyFlow()
+        }
     }
-
-
 
     internal fun initUnderTest() {
         underTest = GetContactsUseCase(
-            getChatChangesUseCase = getChatChangesUseCase,
             megaContactsMapper = megaContactsMapper,
             getContacts = getContacts,
             getUserAttribute = getUserAttribute,
@@ -110,6 +121,9 @@ class GetContactsUseCaseTest {
             getUnformattedLastSeenDate = getUnformattedLastSeenDate,
             getAliasMap = getAliasMap,
             getUserUpdates = getUserUpdates,
+            monitorChatLastGreen = monitorChatLastGreen,
+            monitorChatOnlineStatus = monitorChatOnlineStatus,
+            monitorChatConnectionStatus = monitorChatConnectionStatus,
         )
     }
 
@@ -293,6 +307,127 @@ class GetContactsUseCaseTest {
         underTest.get(tempDir).test().assertValues(emptyList(), listOf(expected))
     }
 
+    @Test
+    fun `test that chat online update with online status updates the contact status`() {
+        val userHandle = 1
+        stubContact(userHandle = userHandle.toLong(), userEmail = "email")
+
+        val expectedStatus = MegaChatApi.STATUS_ONLINE
+        val expectedLastSeenString = "Online"
+        stubOnlineStatusUpdate(userHandle = userHandle, status = expectedStatus)
+
+        onlineString.stub {
+            on { invoke() } doReturn expectedLastSeenString
+        }
+
+        initUnderTest()
+
+        underTest.get(tempDir).test().assertValueAt(1) {
+            it.first().status == expectedStatus && it.first().lastSeen == expectedLastSeenString
+        }
+    }
+
+    @Test
+    fun `test that last green updates update the last seen field`() {
+        val userHandle = 1
+        stubContact(userHandle = userHandle.toLong(), userEmail = "email")
+
+        val expectedLastGreen = 123456
+        val expectedLastSeenString = "Last seen"
+        stubLastGreenUpdate(userHandle = userHandle, lastGreen = expectedLastGreen)
+
+        getUnformattedLastSeenDate.stub {
+            on { invoke(expectedLastGreen) } doReturn expectedLastSeenString
+        }
+
+        initUnderTest()
+
+        underTest.get(tempDir).test().assertValueAt(1) {
+            it.first().lastSeen == expectedLastSeenString
+        }
+    }
+
+    @Test
+    fun `test that chat connection update sets contact is new status to false`() {
+        val userHandle = 1
+        stubContact(userHandle = userHandle.toLong(), userEmail = "email", isNew = true)
+
+        val expectedChatId = 123L
+        val expectedState = MegaChatApi.CHAT_CONNECTION_ONLINE
+
+        getChatRoomIdByUser.stub {
+            on { invoke(userHandle.toLong()) } doReturn expectedChatId
+        }
+
+        stubChatConnectionUpdate(expectedChatId, expectedState)
+
+        initUnderTest()
+
+        underTest.get(tempDir).test().assertValueAt(1) {
+            it.first().isNew.not()
+        }
+    }
+
+    private fun stubChatConnectionUpdate(expectedChatId: Long, expectedState: Int) {
+        monitorChatConnectionStatus.stub {
+            on { invoke() } doReturn flow {
+                emit(
+                    ChatConnectionState(
+                        chatId = expectedChatId,
+                        chatConnectionStatus = getConnectedStatusFromInt(expectedState)
+                    )
+                )
+                awaitCancellation()
+            }
+        }
+    }
+
+    private fun getConnectedStatusFromInt(expectedState: Int) = when (expectedState) {
+        MegaChatApi.CHAT_CONNECTION_OFFLINE -> ChatConnectionStatus.Offline
+        MegaChatApi.CHAT_CONNECTION_IN_PROGRESS -> ChatConnectionStatus.InProgress
+        MegaChatApi.CHAT_CONNECTION_ONLINE -> ChatConnectionStatus.Online
+        else -> ChatConnectionStatus.Unknown
+    }
+
+    private fun stubLastGreenUpdate(userHandle: Int, lastGreen: Int) {
+        monitorChatLastGreen.stub {
+            on { invoke() } doReturn flow {
+                emit(
+                    UserLastGreen(
+                        handle = userHandle.toLong(), lastGreen = lastGreen
+                    )
+                )
+                awaitCancellation()
+            }
+        }
+    }
+
+    private fun stubOnlineStatusUpdate(userHandle: Int, status: Int) {
+        monitorChatOnlineStatus.stub {
+            on { invoke() } doReturn flow {
+                emit(
+                    OnlineStatus(
+                        userHandle = userHandle.toLong(),
+                        status = getStatusFromInt(status),
+                        inProgress = false
+                    )
+                )
+                awaitCancellation()
+            }
+        }
+    }
+
+    private fun getStatusFromInt(status: Int): UserChatStatus {
+        return when (status) {
+            MegaChatApi.STATUS_ONLINE -> UserChatStatus.Online
+            MegaChatApi.STATUS_AWAY -> UserChatStatus.Away
+            MegaChatApi.STATUS_BUSY -> UserChatStatus.Busy
+            MegaChatApi.STATUS_OFFLINE -> UserChatStatus.Offline
+            MegaChatApi.STATUS_INVALID -> UserChatStatus.Invalid
+            else -> UserChatStatus.Invalid
+        }
+    }
+
     private fun stubGlobalUpdate(
         userEmail: String,
         userHandle: Long,
@@ -374,6 +509,7 @@ class GetContactsUseCaseTest {
         userEmail: String,
         fullName: String? = "name",
         alias: String = "alias",
+        isNew: Boolean = false,
     ) {
         val megaUser = mock<MegaUser> {
             on { visibility }.thenReturn(MegaUser.VISIBILITY_VISIBLE)
@@ -386,7 +522,8 @@ class GetContactsUseCaseTest {
             fullName = fullName,
             avatarUri = Uri.EMPTY,
             alias = alias,
-            status = STATUS_ONLINE,
+            status = MegaChatApi.STATUS_ONLINE,
+            isNew = isNew,
         )
         megaContactsMapper.stub {
             on { invoke(any(), any()) } doReturn item

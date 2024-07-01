@@ -17,10 +17,6 @@ import kotlinx.coroutines.rx3.asFlowable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatConnectionStateUpdate
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatPresenceLastGreen
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
@@ -30,15 +26,21 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.view.TextDrawable
 import mega.privacy.android.data.extensions.getDecodedAliases
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.chat.ChatConnectionState
+import mega.privacy.android.domain.entity.contacts.OnlineStatus
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.USER_ATTR_ALIAS
 import nz.mega.sdk.MegaApiJava.USER_ATTR_AVATAR
 import nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME
 import nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApi.STATUS_ONLINE
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
@@ -69,7 +71,6 @@ import javax.inject.Inject
  *  @property getUserUpdates           Get user updates
  */
 class GetContactsUseCase(
-    private val getChatChangesUseCase: GetChatChangesUseCase,
     private val megaContactsMapper: (MegaUser, File) -> ContactItem.Data,
     private val getContacts: () -> ArrayList<MegaUser>,
     private val getUserAttribute: (String, Int, MegaRequestListenerInterface) -> Unit,
@@ -83,6 +84,9 @@ class GetContactsUseCase(
     private val getUnformattedLastSeenDate: (Int) -> String,
     private val getAliasMap: (MegaRequest) -> Map<Long, String>,
     private val getUserUpdates: () -> Flow<UserUpdate>,
+    private val monitorChatLastGreen: () -> Flow<UserLastGreen>,
+    private val monitorChatOnlineStatus: () -> Flow<OnlineStatus>,
+    private val monitorChatConnectionStatus: () -> Flow<ChatConnectionState>,
 ) {
 
     @Inject
@@ -90,10 +94,9 @@ class GetContactsUseCase(
         @ApplicationContext context: Context,
         @MegaApi megaApi: MegaApiAndroid,
         megaChatApi: MegaChatApiAndroid,
-        getChatChangesUseCase: GetChatChangesUseCase,
         accountsRepository: AccountRepository,
+        contactsRepository: ContactsRepository,
     ) : this(
-        getChatChangesUseCase = getChatChangesUseCase,
         megaContactsMapper = { user, avatarFolder ->
             user.toContactItem(
                 avatarFolder = avatarFolder,
@@ -132,9 +135,19 @@ class GetContactsUseCase(
         },
         getAliasMap = { request ->
             request.megaStringMap.getDecodedAliases()
-        }, getUserUpdates = {
+        },
+        getUserUpdates = {
             accountsRepository.monitorUserUpdates()
-        }
+        },
+        monitorChatLastGreen = {
+            contactsRepository.monitorChatPresenceLastGreenUpdates()
+        },
+        monitorChatOnlineStatus = {
+            contactsRepository.monitorChatOnlineStatusUpdates()
+        },
+        monitorChatConnectionStatus = {
+            contactsRepository.monitorChatConnectionStateUpdates()
+        },
     )
 
 
@@ -203,67 +216,56 @@ class GetContactsUseCase(
             }
         )
 
-        getChatChangesUseCase.get()
-            .filter { it is OnChatOnlineStatusUpdate || it is OnChatPresenceLastGreen || it is OnChatConnectionStateUpdate }
-            .subscribeBy(
-                onNext = { change ->
-                    if (emitter.isCancelled) return@subscribeBy
+        monitorChatLastGreen().asFlowable().subscribeBy(onNext = { change ->
+            val index = contacts.indexOfFirst { it.handle == change.handle }
+            if (index != INVALID_POSITION) {
+                val currentContact = contacts[index]
+                contacts[index] = currentContact.copy(
+                    lastSeen = getUnformattedLastSeenDate(change.lastGreen)
+                )
 
-                    when (change) {
-                        is OnChatOnlineStatusUpdate -> {
-                            val index = contacts.indexOfFirst { it.handle == change.userHandle }
-                            if (index != INVALID_POSITION) {
-                                val currentContact = contacts[index]
-                                contacts[index] = currentContact.copy(
-                                    status = change.status,
-                                    statusColor = getUserStatusColor(change.status),
-                                    lastSeen = if (change.status == STATUS_ONLINE) {
-                                        onlineString()
-                                    } else {
-                                        requestLastGreen(change.userHandle)
-                                        currentContact.lastSeen
-                                    }
-                                )
+                emitter.onNext(contacts.sortedAlphabetically())
+            }
 
-                                emitter.onNext(contacts.sortedAlphabetically())
-                            }
-                        }
+        }, onError = { Timber.e(it) })
+            .addTo(disposable)
 
-                        is OnChatPresenceLastGreen -> {
-                            val index = contacts.indexOfFirst { it.handle == change.userHandle }
-                            if (index != INVALID_POSITION) {
-                                val currentContact = contacts[index]
-                                contacts[index] = currentContact.copy(
-                                    lastSeen = getUnformattedLastSeenDate(
-                                        change.lastGreen
-                                    )
-                                )
-
-                                emitter.onNext(contacts.sortedAlphabetically())
-                            }
-                        }
-
-                        is OnChatConnectionStateUpdate -> {
-                            val index = contacts.indexOfFirst {
-                                it.isNew && change.chatid == getChatRoomIdByUser(it.handle)
-                            }
-                            if (index != INVALID_POSITION) {
-                                val currentContact = contacts[index]
-                                contacts[index] = currentContact.copy(
-                                    isNew = false
-                                )
-
-                                emitter.onNext(contacts.sortedAlphabetically())
-                            }
-                        }
-
-                        else -> {
-                            // Nothing to do
-                        }
+        monitorChatOnlineStatus().asFlowable().subscribeBy(onNext = { change ->
+            val index = contacts.indexOfFirst { it.handle == change.userHandle }
+            if (index != INVALID_POSITION) {
+                val currentContact = contacts[index]
+                val statusInt = getStatusInt(change.status)
+                contacts[index] = currentContact.copy(
+                    status = statusInt,
+                    statusColor = getUserStatusColor(statusInt),
+                    lastSeen = if (change.status == UserChatStatus.Online) {
+                        onlineString()
+                    } else {
+                        requestLastGreen(change.userHandle)
+                        currentContact.lastSeen
                     }
-                },
-                onError = { Timber.e(it) }
-            ).addTo(disposable)
+                )
+
+                emitter.onNext(contacts.sortedAlphabetically())
+            }
+        }, onError = { Timber.e(it) })
+            .addTo(disposable)
+
+        monitorChatConnectionStatus().asFlowable().subscribeBy(onNext = { change ->
+            val index = contacts.indexOfFirst {
+                it.isNew && change.chatId == getChatRoomIdByUser(it.handle)
+            }
+            if (index != INVALID_POSITION) {
+                val currentContact = contacts[index]
+                contacts[index] = currentContact.copy(
+                    isNew = false
+                )
+
+                emitter.onNext(contacts.sortedAlphabetically())
+            }
+        }, onError = { Timber.e(it) })
+            .addTo(disposable)
+
 
         getUserUpdates().asFlowable()
             .subscribeBy(
@@ -359,11 +361,19 @@ class GetContactsUseCase(
         emitter.setCancellable { disposable.clear() }
     }, BackpressureStrategy.LATEST)
 
+    private fun getStatusInt(status: UserChatStatus): Int {
+        return when (status) {
+            UserChatStatus.Online -> STATUS_ONLINE
+            UserChatStatus.Away -> MegaChatApi.STATUS_AWAY
+            UserChatStatus.Busy -> MegaChatApi.STATUS_BUSY
+            UserChatStatus.Offline -> MegaChatApi.STATUS_OFFLINE
+            UserChatStatus.Invalid -> MegaChatApi.STATUS_INVALID
+        }
+    }
+
     private fun getContactList(avatarFolder: File) =
         getContacts().filter { it.visibility == VISIBILITY_VISIBLE }
             .map { megaContactsMapper(it, avatarFolder) }.toMutableList()
-
-
 
     /**
      * Request missing fields for current `ContactItem.Data`
