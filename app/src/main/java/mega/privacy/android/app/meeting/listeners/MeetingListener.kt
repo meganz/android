@@ -6,7 +6,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES_CHANGE
@@ -45,11 +44,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             if (call.status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION || call.status == MegaChatCall.CALL_STATUS_DESTROYED) {
                 stopCountDown()
             }
-        }
-
-        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_OUTGOING_RINGING_STOP)) {
-            Timber.d("Changes in outgoing ringing")
-            sendCallEvent(EVENT_CALL_OUTGOING_RINGING_CHANGE, call)
         }
 
         // Call composition has changed (User added or removed from call)

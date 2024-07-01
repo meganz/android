@@ -46,7 +46,6 @@ import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatCall
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -101,20 +100,6 @@ class GetCallSoundsUseCase @Inject constructor(
      */
     fun get(): Flowable<CallSoundType> =
         Flowable.create({ emitter ->
-
-            val outgoingRingingStatusObserver = Observer<MegaChatCall> { call ->
-                if (MegaApplication.getChatManagement()
-                        .isRequestSent(call.callId) && call.numParticipants == ONE_PARTICIPANT
-                ) {
-                    sharingScope.launch {
-                        runCatching {
-                            hangChatCallUseCase(call.callId)
-                        }.onFailure {
-                            Timber.e(it.stackTraceToString())
-                        }
-                    }
-                }
-            }
 
             rxFlowable<Boolean> { monitorCallsReconnectingStatusUseCase() }
                 .subscribeBy(
@@ -269,6 +254,14 @@ class GetCallSoundsUseCase @Inject constructor(
                                 if (contains(ChatCallChanges.WaitingRoomUsersLeave)) {
                                     shouldPlaySoundWhenShowWaitingRoomDialog = false
                                 }
+
+                                if (contains(ChatCallChanges.OutgoingRingingStop)) {
+                                    if (MegaApplication.getChatManagement()
+                                            .isRequestSent(call.callId) && call.numParticipants == ONE_PARTICIPANT
+                                    ) {
+                                        hangCall(call.callId)
+                                    }
+                                }
                             }
                         }
                     }
@@ -300,24 +293,29 @@ class GetCallSoundsUseCase @Inject constructor(
                 )
                 .addTo(disposable)
 
-            LiveEventBus.get(
-                EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE,
-                MegaChatCall::class.java
-            )
-                .observeForever(outgoingRingingStatusObserver)
-
             emitter.setCancellable {
-                LiveEventBus.get(
-                    EventConstants.EVENT_CALL_OUTGOING_RINGING_CHANGE,
-                    MegaChatCall::class.java
-                )
-                    .removeObserver(outgoingRingingStatusObserver)
-
                 removeWaitingForOthersCountDownTimer()
                 disposable.clear()
             }
 
         }, BackpressureStrategy.LATEST)
+
+    /**
+     * Hang call
+     *
+     * @param callId    Call id
+     */
+    private fun hangCall(callId: Long) {
+        sharingScope.launch {
+            runCatching {
+                hangChatCallUseCase(callId)
+            }.onSuccess {
+                removeFinishCallCountDownTimer()
+            }.onFailure {
+                Timber.e(it.stackTraceToString())
+            }
+        }
+    }
 
     /**
      * Method to start the countdown to hang up the call
@@ -340,15 +338,7 @@ class GetCallSoundsUseCase @Inject constructor(
                     counterState?.let { isFinished ->
                         if (isFinished) {
                             Timber.d("Count down timer ends. Hang call")
-                            sharingScope.launch {
-                                runCatching {
-                                    hangChatCallUseCase(callId)
-                                }.onSuccess {
-                                    removeFinishCallCountDownTimer()
-                                }.onFailure {
-                                    Timber.e(it.stackTraceToString())
-                                }
-                            }
+                            hangCall(callId)
                         }
                     }
                 }
