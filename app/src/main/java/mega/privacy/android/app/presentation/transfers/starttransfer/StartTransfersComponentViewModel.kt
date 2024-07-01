@@ -693,6 +693,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             monitorActiveTransferFinishedUseCase(TransferType.GENERAL_UPLOAD)
                 .catch { Timber.e(it) }
                 .collect { totalFiles ->
+                    if (!lastTransferStartedHere) {
+                        yield() //wait for others to listen the event to try to show the snackbar in the same component that started the transfer
+                    }
                     if (active) {
                         when (lastUpload) {
                             is TransferTriggerEvent.StartUpload.TextFile -> {
@@ -720,6 +723,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         }
                         lastUpload = null
                     }
+                    lastTransferStartedHere = false
                 }
         }
     }
