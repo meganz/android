@@ -216,6 +216,7 @@ dependencies {
     implementation(lib.coil.video)
     implementation(lib.coil.compose)
     implementation(androidx.paging.compose)
+    implementation(lib.kotlinx.collections.immutable)
 
     // Google
     implementation(google.gson)
