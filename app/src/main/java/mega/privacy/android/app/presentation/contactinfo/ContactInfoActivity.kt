@@ -191,8 +191,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private lateinit var selectFolderToCopyLauncher: ActivityResultLauncher<LongArray>
     private val manageShareReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            sharedFoldersFragment?.clearSelections()
-            sharedFoldersFragment?.hideMultipleSelect()
+            hideSelectMode()
             statusDialog?.dismiss()
         }
     }
@@ -214,8 +213,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == BROADCAST_ACTION_DESTROY_ACTION_MODE) {
                 if (sharedFoldersFragment?.isVisible == true) {
-                    sharedFoldersFragment?.clearSelections()
-                    sharedFoldersFragment?.hideMultipleSelect()
+                    hideSelectMode()
                 }
             }
         }
@@ -260,8 +258,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             Timber.d("Status dialogue dismiss exception $ex")
         }
         if (sharedFoldersFragment?.isVisible == true) {
-            sharedFoldersFragment?.clearSelections()
-            sharedFoldersFragment?.hideMultipleSelect()
+            hideSelectMode()
         }
         if (error.errorCode == MegaError.API_EOVERQUOTA && api.isForeignNode(request.parentHandle)) {
             showForeignStorageOverQuotaWarningDialog(this@ContactInfoActivity)
@@ -323,10 +320,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     override fun actionConfirmed() {
-        if (sharedFoldersFragment?.isVisible == true) {
-            sharedFoldersFragment?.clearSelections()
-            sharedFoldersFragment?.hideMultipleSelect()
-        }
+        hideSelectMode()
     }
 
     override fun createFolder(folderName: String) {
@@ -1448,6 +1442,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             nodeIds = nodes.map { NodeId(it.handle) },
             isHighPriority = true
         )
+        hideSelectMode()
     }
 
     /**
@@ -1577,4 +1572,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         showSnackbar(type, activityChatContactBinding.fragmentContainer, content, chatId)
     }
 
+    private fun hideSelectMode() {
+        sharedFoldersFragment?.takeIf { it.isVisible }?.apply {
+            clearSelections()
+            hideMultipleSelect()
+        }
+    }
 }
