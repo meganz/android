@@ -21,7 +21,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -43,9 +42,7 @@ import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocationForPreviewingFiles
 import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
-import mega.privacy.android.app.utils.FileUtil.getTotalSize
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
-import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.Util
@@ -82,41 +79,6 @@ class NodeSaver(
     private val dbHandler = getDbHandler()
 
     private var saving: Saving = Saving.Companion.NOTHING
-
-    /**
-     * Save an offline node into device.
-     *
-     * @param handle handle of the offline node to save
-     * @param fromMediaViewer whether this download is from media viewer
-     */
-    @JvmOverloads
-    fun saveOfflineNode(
-        handle: Long,
-        fromMediaViewer: Boolean = false,
-    ) {
-        val node = dbHandler.findByHandle(handle) ?: return
-        saveOfflineNodes(listOf(node), fromMediaViewer)
-    }
-
-    /**
-     * Save offline nodes into device.
-     *
-     * @param nodes the offline nodes to save
-     * @param fromMediaViewer whether this download is from media viewer
-     */
-    @JvmOverloads
-    fun saveOfflineNodes(
-        nodes: List<MegaOffline>,
-        fromMediaViewer: Boolean = false,
-    ) {
-        save(app) {
-            var totalSize = 0L
-            for (node in nodes) {
-                totalSize += getTotalSize(getOfflineFile(app, node))
-            }
-            OfflineSaving(totalSize, nodes, fromMediaViewer)
-        }
-    }
 
     /**
      * Save an Uri into device.

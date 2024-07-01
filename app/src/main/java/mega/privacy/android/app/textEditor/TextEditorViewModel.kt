@@ -914,7 +914,6 @@ class TextEditorViewModel @Inject constructor(
      */
     fun downloadFile(nodeSaver: NodeSaver) {
         when (getAdapterType()) {
-            OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(getNode()!!.handle, true)
             ZIP_ADAPTER -> nodeSaver.saveUri(
                 getFileUri()!!,
                 getNameOfFile(),

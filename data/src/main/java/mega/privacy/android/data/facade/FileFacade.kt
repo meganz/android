@@ -602,9 +602,10 @@ internal class FileFacade @Inject constructor(
             }
         } else {
             val fileName = getFileNameIfHasNameCollision(destination, source.name)
+            val fileNameWithoutExtension = fileName.substringBeforeLast(".")
             val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(source.extension)
                 ?: "application/octet-stream"
-            val newFile = destination.createFile(mimeType, fileName)
+            val newFile = destination.createFile(mimeType, fileNameWithoutExtension)
             newFile?.uri?.let { newUri ->
                 context.contentResolver.openOutputStream(newUri)?.use { output ->
                     source.inputStream().use { input ->

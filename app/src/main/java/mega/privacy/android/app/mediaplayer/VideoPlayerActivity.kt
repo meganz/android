@@ -482,11 +482,6 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 R.id.save_to_device -> {
                     Analytics.tracker.trackEvent(VideoPlayerSaveToDeviceMenuToolbarEvent)
                     when (adapterType) {
-                        OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(
-                            handle = playingHandle,
-                            fromMediaViewer = true
-                        )
-
                         ZIP_ADAPTER -> {
                             val mediaItem = mediaPlayerGateway.getCurrentMediaItem()
                             mediaItem?.localConfiguration?.uri?.let { uri ->

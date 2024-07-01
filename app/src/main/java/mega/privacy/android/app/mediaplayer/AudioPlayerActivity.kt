@@ -302,11 +302,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             when (menuId) {
                 R.id.save_to_device -> {
                     when (adapterType) {
-                        OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(
-                            handle = playingHandle,
-                            fromMediaViewer = true
-                        )
-
                         ZIP_ADAPTER -> {
                             val mediaItem = serviceGateway?.getCurrentMediaItem()
                             mediaItem?.localConfiguration?.uri?.let { uri ->
