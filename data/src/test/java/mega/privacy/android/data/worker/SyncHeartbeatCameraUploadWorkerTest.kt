@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.camerauploads
+package mega.privacy.android.data.worker
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -16,7 +16,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.usecase.camerauploads.SendCameraUploadsBackupHeartBeatUseCase
@@ -37,7 +36,7 @@ import java.util.concurrent.Executors
  */
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-class SyncHeartbeatCameraUploadWorkerTest {
+internal class SyncHeartbeatCameraUploadWorkerTest {
     private lateinit var underTest: SyncHeartbeatCameraUploadWorker
 
     private lateinit var context: Context
@@ -74,8 +73,9 @@ class SyncHeartbeatCameraUploadWorkerTest {
                 workExecutor,
                 WorkerFactory.getDefaultWorkerFactory(),
                 WorkProgressUpdater(workDatabase, workExecutor),
-                WorkForegroundUpdater(workDatabase,
-                    { _, _ -> }, workExecutor
+                WorkForegroundUpdater(
+                    workDatabase,
+                    { _, _ -> }, workExecutor,
                 )
             ),
             applicationWrapper = applicationWrapper,
