@@ -6,7 +6,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
@@ -39,7 +38,6 @@ class MeetingListener : MegaChatCallListenerInterface {
         // Call status has changed
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
             Timber.d("Call status changed, current status is ${callStatusToString(call.status)}, call id is ${call.callId}. Call is Ringing ${call.isRinging}")
-            sendCallEvent(EVENT_CALL_STATUS_CHANGE, call)
             checkFirstParticipant(api, call)
             if (call.status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION || call.status == MegaChatCall.CALL_STATUS_DESTROYED) {
                 stopCountDown()

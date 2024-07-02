@@ -27,6 +27,7 @@ internal class LeftMeetingViewModelTest {
     private lateinit var underTest: LeftMeetingViewModel
     private val savedStateHandle: SavedStateHandle = mock {
         on { get<Boolean>(MeetingActivity.MEETING_FREE_PLAN_USERS_LIMIT) } doReturn true
+        on { get<Boolean>(MeetingActivity.MEETING_PARTICIPANTS_LIMIT) } doReturn true
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -41,6 +42,9 @@ internal class LeftMeetingViewModelTest {
             savedStateHandle,
         )
         whenever(savedStateHandle.get<Boolean>(MeetingActivity.MEETING_FREE_PLAN_USERS_LIMIT)).thenReturn(
+            true
+        )
+        whenever(savedStateHandle.get<Boolean>(MeetingActivity.MEETING_PARTICIPANTS_LIMIT)).thenReturn(
             true
         )
     }
@@ -59,6 +63,18 @@ internal class LeftMeetingViewModelTest {
         initTestClass()
         underTest.state.test {
             Truth.assertThat(awaitItem().callEndedDueToFreePlanLimits).isEqualTo(callEndedDueLimit)
+        }
+    }
+
+    @Test
+    fun `test that state update when we passing the callParticipantsLimit `() = runTest {
+        whenever(savedStateHandle.get<Boolean>(MeetingActivity.MEETING_PARTICIPANTS_LIMIT)).thenReturn(
+            callEndedDueLimit
+        )
+        initTestClass()
+        underTest.state.test {
+            Truth.assertThat(awaitItem().callEndedDueToTooManyParticipants)
+                .isEqualTo(callEndedDueLimit)
         }
     }
 }
