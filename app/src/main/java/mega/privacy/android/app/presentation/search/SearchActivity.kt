@@ -331,6 +331,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             )
                         }
                     }
+
+                    StartTransferComponent(
+                        event = nodeActionState.downloadEvent,
+                        onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
+                        snackBarHostState = snackbarHostState,
+                    )
                 }
 
                 EventEffect(
@@ -364,11 +370,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 .plus("/${nodeHandles}")
                         )
                     },
-                )
-                StartTransferComponent(
-                    event = nodeActionState.downloadEvent,
-                    onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
-                    snackBarHostState = snackbarHostState,
                 )
                 EventEffect(
                     event = nodeActionState.selectAll,
