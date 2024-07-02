@@ -1,7 +1,5 @@
 package mega.privacy.android.app.usecase.call
 
-import androidx.lifecycle.Observer
-import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
@@ -9,9 +7,21 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import mega.privacy.android.app.constants.EventConstants
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatListItemUpdate
+import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
@@ -35,6 +45,10 @@ import javax.inject.Inject
 class GetCallUseCase @Inject constructor(
     private val getChatChangesUseCase: GetChatChangesUseCase,
     private val megaChatApi: MegaChatApiAndroid,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
+    @ApplicationScope private val sharingScope: CoroutineScope,
+    @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
 
     /**
@@ -79,20 +93,29 @@ class GetCallUseCase @Inject constructor(
         Flowable.create({ emitter ->
             emitter.onNext(getChatIdOfAnotherCallInProgress(currentChatId).blockingGet())
 
-            val callStatusObserver = Observer<MegaChatCall> { call ->
-                when (call.status) {
-                    CALL_STATUS_DESTROYED -> {
-                        emitter.onNext(getChatIdOfAnotherCallInProgress(currentChatId).blockingGet())
+            sharingScope.launch {
+                monitorChatCallUpdatesUseCase()
+                    .collectLatest { call ->
+                        withContext(mainImmediateDispatcher) {
+                            call.changes?.apply {
+                                Timber.d("Monitor chat call updated, changes $this")
+                                if (contains(ChatCallChanges.Status)) {
+                                    when (call.status) {
+                                        ChatCallStatus.Destroyed -> {
+                                            Timber.d("Terminating user participation")
+                                            emitter.onNext(
+                                                getChatIdOfAnotherCallInProgress(
+                                                    currentChatId
+                                                ).blockingGet()
+                                            )
+                                        }
+
+                                        else -> {}
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
-            }
-
-            LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                .observeForever(callStatusObserver)
-
-            emitter.setCancellable {
-                LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                    .removeObserver(callStatusObserver)
             }
         }, BackpressureStrategy.LATEST)
 
@@ -103,22 +126,25 @@ class GetCallUseCase @Inject constructor(
      */
     fun getCallEnded(): Flowable<Long> =
         Flowable.create({ emitter ->
-            val callStatusObserver = Observer<MegaChatCall> { call ->
-                when (call.status) {
-                    CALL_STATUS_TERMINATING_USER_PARTICIPATION,
-                    CALL_STATUS_DESTROYED,
-                    -> {
-                        emitter.onNext(call.chatid)
+            sharingScope.launch {
+                monitorChatCallUpdatesUseCase()
+                    .collectLatest { call ->
+                        withContext(mainImmediateDispatcher) {
+                            call.changes?.apply {
+                                Timber.d("Monitor chat call updated, changes $this")
+                                if (contains(ChatCallChanges.Status)) {
+                                    when (call.status) {
+                                        ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.Destroyed -> {
+                                            Timber.d("Terminating user participation")
+                                            emitter.onNext(call.chatId)
+                                        }
+
+                                        else -> {}
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
-            }
-
-            LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                .observeForever(callStatusObserver)
-
-            emitter.setCancellable {
-                LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                    .removeObserver(callStatusObserver)
             }
         }, BackpressureStrategy.LATEST)
 
@@ -161,15 +187,27 @@ class GetCallUseCase @Inject constructor(
                 }
             }
 
-            val callStatusObserver = Observer<MegaChatCall> { call ->
-                if (chatId == call.chatid) {
-                    val chat = megaChatApi.getChatRoom(chatId)
-                    if (chat == null) {
-                        emitter.onNext(false)
-                    } else {
-                        emitter.checkCallAndPrivileges(call, chat)
+            sharingScope.launch {
+                monitorChatCallUpdatesUseCase()
+                    .filter { it.chatId == chatId }
+                    .collectLatest { call ->
+                        withContext(mainImmediateDispatcher) {
+                            call.changes?.apply {
+                                Timber.d("Monitor chat call updated, changes $this")
+                                if (contains(ChatCallChanges.Status)) {
+                                    getChatRoomUseCase(chatId)?.let { chat ->
+                                        val result: Boolean =
+                                            call.status != ChatCallStatus.Initial && call.status != ChatCallStatus.TerminatingUserParticipation && call.status != ChatCallStatus.Destroyed && chat.ownPrivilege == ChatRoomPermission.Moderator
+
+                                        emitter.onNext(result)
+
+                                    } ?: run {
+                                        emitter.onNext(false)
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
             }
 
             getChatChangesUseCase.get()
@@ -195,15 +233,6 @@ class GetCallUseCase @Inject constructor(
                         Timber.e(error.stackTraceToString())
                     }
                 ).addTo(disposable)
-
-            LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                .observeForever(callStatusObserver)
-
-            emitter.setCancellable {
-                disposable.clear()
-                LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-                    .removeObserver(callStatusObserver)
-            }
 
         }, BackpressureStrategy.LATEST)
 

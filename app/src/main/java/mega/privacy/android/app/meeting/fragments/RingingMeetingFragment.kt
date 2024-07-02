@@ -13,18 +13,18 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.databinding.MeetingRingingFragmentBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
-import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor
 import mega.privacy.android.app.utils.CallUtil.getDefaultAvatarCall
@@ -35,8 +35,8 @@ import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatCall
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -123,7 +123,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
         }
 
-        sharedModel.answerCall(enableVideo, audio, video)
+        sharedModel.answerCall(enableVideo = enableVideo, enableAudio = true, speakerAudio = video)
             .observe(viewLifecycleOwner) { (chatHandle, enableVideo, _) ->
                 val actionString = if (enableVideo) {
                     Timber.d("Call answered with video ON and audio ON")
@@ -149,12 +149,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             sharedModel.updateChatRoomId(chatId)
             inMeetingViewModel.setChatId(chatId)
         }
-
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
-            if (state.chatTitle.isNotEmpty()) {
-                toolbarTitle.text = state.chatTitle
-            }
-        }
+        collectFlows()
 
         var bitmap: Bitmap?
 
@@ -183,14 +178,6 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
             .observe(this) {
                 if (chatId == it) {
-                    requireActivity().finish()
-                }
-            }
-
-        // Caller cancelled the call.
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observeSticky(this) {
-                if (it.status == MegaChatCall.CALL_STATUS_DESTROYED) {
                     requireActivity().finish()
                 }
             }
@@ -230,6 +217,24 @@ class RingingMeetingFragment : MeetingBaseFragment() {
                     .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
                     .build()
                 permissionsRequester.launch(false)
+            }
+        }
+    }
+
+    private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.chatTitle }
+            .distinctUntilChanged()) {
+            if (it.isNotBlank()) {
+                toolbarTitle.text = it
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.status }
+            .distinctUntilChanged()) {
+            it?.let { callStatus ->
+                if (callStatus == ChatCallStatus.Destroyed) {
+                    requireActivity().finish()
+                }
             }
         }
     }

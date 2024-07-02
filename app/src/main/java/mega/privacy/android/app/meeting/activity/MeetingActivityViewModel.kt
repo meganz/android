@@ -965,13 +965,24 @@ class MeetingActivityViewModel @Inject constructor(
 
                                     ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification -> {
                                         Timber.d("Chat call termCode: ${call.termCode}")
-                                        if (call.termCode == ChatCallTermCodeType.CallUsersLimit) {
-                                            _state.update { state ->
+                                        when (call.termCode) {
+                                            ChatCallTermCodeType.CallUsersLimit -> _state.update { state ->
                                                 state.copy(
                                                     callEndedDueToFreePlanLimits = true
                                                 )
                                             }
+
+                                            ChatCallTermCodeType.TooManyParticipants,
+                                            ChatCallTermCodeType.TooManyClients,
+                                            -> _state.update { state ->
+                                                state.copy(
+                                                    callEndedDueToTooManyParticipants = true
+                                                )
+                                            }
+
+                                            else -> {}
                                         }
+
                                     }
 
                                     else -> {}

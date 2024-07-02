@@ -94,7 +94,7 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_BOTTOM_PANEL_EXPANDED = "meeting_bottom_panel_expanded"
         const val MEETING_IS_RINGIN_ALL = "meeting_is_ringing_all"
         const val MEETING_FREE_PLAN_USERS_LIMIT = "meeting_free_plan_users_limit"
-
+        const val MEETING_PARTICIPANTS_LIMIT = "meeting_participants_limit"
 
         fun getIntentOngoingCall(context: Context, chatId: Long): Intent {
             return Intent(context, MeetingActivity::class.java).apply {
@@ -345,6 +345,10 @@ class MeetingActivity : PasscodeActivity() {
                     Intent(this, LeftMeetingActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         .putExtra(MEETING_FREE_PLAN_USERS_LIMIT, state.callEndedDueToFreePlanLimits)
+                        .putExtra(
+                            MEETING_PARTICIPANTS_LIMIT,
+                            state.callEndedDueToTooManyParticipants
+                        )
                 )
                 finish()
             }

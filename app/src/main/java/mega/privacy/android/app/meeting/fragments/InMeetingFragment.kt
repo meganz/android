@@ -50,7 +50,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
@@ -137,6 +136,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_INITIAL
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
@@ -291,42 +291,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         Timber.d("Change in the privileges of a participant")
                         inMeetingViewModel.updateParticipantsPrivileges()
                     }
-                }
-            }
-        }
-    }
-
-    private val callStatusObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId)) {
-            updatePanel()
-
-            when (it.status) {
-                MegaChatCall.CALL_STATUS_INITIAL -> {
-                    bottomFloatingPanelViewHolder?.disableEnableButtons(
-                        false
-                    )
-                }
-
-                MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
-                MegaChatCall.CALL_STATUS_DESTROYED,
-                -> {
-                    disableCamera()
-                    removeUI()
-                }
-
-                MegaChatCall.CALL_STATUS_CONNECTING -> {
-                    bottomFloatingPanelViewHolder?.disableEnableButtons(
-                        false
-                    )
-
-                    checkMenuItemsVisibility()
-                }
-
-                MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
-                    bottomFloatingPanelViewHolder?.disableEnableButtons(true)
-                    checkMenuItemsVisibility()
-                    checkChildFragments()
-                    controlVideoLocalOneToOneCall(it.hasLocalVideo())
                 }
             }
         }
@@ -832,10 +796,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long::class.java)
             .observe(this, avatarChangeObserver)
 
-        //Calls level
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observe(this, callStatusObserver)
-
         LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
             .observe(this, callCompositionObserver)
 
@@ -1119,6 +1079,42 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .distinctUntilChanged()) {
             if (it.isNotEmpty()) {
                 updateParticipantsWithHandRaised(it)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.status }
+            .distinctUntilChanged()) { callStatus ->
+            callStatus?.let { status ->
+                when (status) {
+                    ChatCallStatus.Initial -> bottomFloatingPanelViewHolder?.disableEnableButtons(
+                        false
+                    )
+
+                    ChatCallStatus.Connecting -> {
+                        bottomFloatingPanelViewHolder?.disableEnableButtons(
+                            false
+                        )
+
+                        checkMenuItemsVisibility()
+                    }
+
+                    ChatCallStatus.InProgress -> {
+                        updatePanel()
+                        bottomFloatingPanelViewHolder?.disableEnableButtons(true)
+                        checkMenuItemsVisibility()
+                        checkChildFragments()
+                        controlVideoLocalOneToOneCall(
+                            inMeetingViewModel.state.value.call?.hasLocalVideo ?: false
+                        )
+                    }
+
+                    ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.Destroyed -> {
+                        disableCamera()
+                        removeUI()
+                    }
+
+                    else -> {}
+                }
             }
         }
 
@@ -3009,6 +3005,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 SECONDS_TO_WAIT_ALONE_ON_THE_CALL
             )
         )
+        changeToGridView()
         showOnlyMeInTheCallDialog()
     }
 

@@ -16,8 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.MaterialToolbar
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants
@@ -29,6 +32,7 @@ import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatRoom
@@ -57,19 +61,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
-
-    private val callStatusObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId)) {
-            when (it.status) {
-                MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
-                MegaChatCall.CALL_STATUS_DESTROYED,
-                -> {
-                    disableLocalCamera()
-                    finishActivity()
-                }
-            }
-        }
-    }
 
     private val sessionStatusObserver =
         Observer<Pair<MegaChatCall?, MegaChatSession>> { callAndSession ->
@@ -112,6 +103,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
         setupView()
         initLiveEvent()
+        collectFlows()
 
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
             participants?.let {
@@ -129,9 +121,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         //Sessions Level
         LiveEventBus.get<Pair<MegaChatCall?, MegaChatSession>>(EventConstants.EVENT_SESSION_STATUS_CHANGE)
             .observe(this, sessionStatusObserver)
-
-        LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observe(this, callStatusObserver)
     }
 
     /**
@@ -211,6 +200,18 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         }
 
         participantsAdapter.submitList(participants.toList())
+    }
+
+    private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.status }
+            .distinctUntilChanged()) {
+            it?.let { callStatus ->
+                if (callStatus == ChatCallStatus.TerminatingUserParticipation || callStatus == ChatCallStatus.Destroyed) {
+                    disableLocalCamera()
+                    finishActivity()
+                }
+            }
+        }
     }
 
     /**

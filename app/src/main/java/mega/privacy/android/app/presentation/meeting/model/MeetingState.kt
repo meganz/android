@@ -127,7 +127,8 @@ data class MeetingState(
     val showLowerHandButtonInSnackbar: Boolean = false,
     val isPictureInPictureFeatureFlagEnabled: Boolean = false,
     val isInPipMode: Boolean = false,
-) {
+    val callEndedDueToTooManyParticipants:Boolean = false,
+    ) {
 
     /**
      * Check if waiting room is opened

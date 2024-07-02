@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
@@ -10,12 +11,16 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.ActivityGuestLeaveMeetingBinding
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.meeting.LeftMeetingViewModel
+import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
@@ -26,25 +31,13 @@ class LeftMeetingActivity : BaseActivity() {
     private lateinit var binding: ActivityGuestLeaveMeetingBinding
     private val viewModel by viewModels<LeftMeetingViewModel>()
 
-    private val callStatusObserver = Observer<MegaChatCall> {
-        if (it.status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION &&
-            it.termCode == MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS
-        ) {
-            Util.showSnackbar(
-                this,
-                getString(R.string.call_error_too_many_participants)
-            )
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observeSticky(this, callStatusObserver)
-
         binding = ActivityGuestLeaveMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        collectFlows()
 
         binding.btCreateAccount.setOnClickListener {
             createAccount()
@@ -69,6 +62,19 @@ class LeftMeetingActivity : BaseActivity() {
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private fun collectFlows() {
+        collectFlow(viewModel.state.map { it.callEndedDueToTooManyParticipants }
+            .distinctUntilChanged()) { showSnackbar ->
+            Util.showSnackbar(
+                this,
+                getString(R.string.call_error_too_many_participants)
+            )
+            if (showSnackbar) {
+                viewModel.onConsumeShowParticipantsLimitSnackbarEvent()
             }
         }
     }

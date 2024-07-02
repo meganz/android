@@ -23,6 +23,8 @@ class LeftMeetingViewModel @Inject constructor(
     private val _state = MutableStateFlow(
         LeftMeetingState(
             callEndedDueToFreePlanLimits = savedStateHandle[MeetingActivity.MEETING_FREE_PLAN_USERS_LIMIT]
+                ?: false,
+            callEndedDueToTooManyParticipants = savedStateHandle[MeetingActivity.MEETING_PARTICIPANTS_LIMIT]
                 ?: false
         )
     )
@@ -34,5 +36,13 @@ class LeftMeetingViewModel @Inject constructor(
      */
     fun onConsumeShowFreePlanParticipantsLimitDialogEvent() {
         _state.update { state -> state.copy(callEndedDueToFreePlanLimits = false) }
+    }
+
+    /**
+     * Consume show participants limit snackbar event
+     *
+     */
+    fun onConsumeShowParticipantsLimitSnackbarEvent() {
+        _state.update { state -> state.copy(callEndedDueToTooManyParticipants = false) }
     }
 }
