@@ -28,6 +28,7 @@ import mega.privacy.android.app.databinding.NavigationViewLayoutBinding
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.NavigationDrawerManager
+import mega.privacy.android.app.main.mapper.UserChatStatusIconMapper
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
@@ -59,6 +60,9 @@ import javax.inject.Inject
 internal class ManagerDrawerFragment : Fragment() {
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
+
+    @Inject
+    lateinit var userChatStatusIconMapper: UserChatStatusIconMapper
 
     @Inject
     @MegaApi
@@ -297,13 +301,7 @@ internal class ManagerDrawerFragment : Fragment() {
 
     private fun setContactStatus(status: UserChatStatus) {
         val isDarkTheme = Util.isDarkMode(requireContext())
-        val resId = when (status) {
-            UserChatStatus.Offline -> if (isDarkTheme) R.drawable.ic_offline_dark_drawer else R.drawable.ic_offline_light
-            UserChatStatus.Away -> if (isDarkTheme) R.drawable.ic_away_dark_drawer else R.drawable.ic_away_light
-            UserChatStatus.Online -> if (isDarkTheme) R.drawable.ic_online_dark_drawer else R.drawable.ic_online_light
-            UserChatStatus.Busy -> if (isDarkTheme) R.drawable.ic_busy_dark_drawer else R.drawable.ic_busy_light
-            UserChatStatus.Invalid -> 0
-        }
+        val resId = userChatStatusIconMapper(status, isDarkTheme)
         binding.contactState.isVisible = resId != 0
         if (resId != 0) {
             binding.contactState.setImageResource(resId)

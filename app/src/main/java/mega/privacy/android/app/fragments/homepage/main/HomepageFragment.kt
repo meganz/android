@@ -45,6 +45,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.mapper.UserChatStatusIconMapper
 import mega.privacy.android.app.main.view.OngoingCallViewModel
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
@@ -76,7 +77,6 @@ import mega.privacy.mobile.analytics.event.HomeUploadTextPressedEvent
 import mega.privacy.mobile.analytics.event.OfflineTabEvent
 import mega.privacy.mobile.analytics.event.RecentsTabEvent
 import nz.mega.sdk.MegaBanner
-import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
 
@@ -102,6 +102,9 @@ class HomepageFragment : Fragment() {
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var userChatStatusIconMapper: UserChatStatusIconMapper
 
     private val viewModel: HomePageViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by activityViewModels()
@@ -329,25 +332,8 @@ class HomepageFragment : Fragment() {
             searchInputView.setOngoingCallVisibility(it.currentCall != null)
         }
 
-        viewModel.chatStatus.observe(viewLifecycleOwner) {
-            val iconRes = if (Util.isDarkMode(requireContext())) {
-                when (it) {
-                    MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online_dark_drawer
-                    MegaChatApi.STATUS_AWAY -> R.drawable.ic_away_dark_drawer
-                    MegaChatApi.STATUS_BUSY -> R.drawable.ic_busy_dark_drawer
-                    MegaChatApi.STATUS_OFFLINE -> R.drawable.ic_offline_dark_drawer
-                    else -> 0
-                }
-            } else {
-                when (it) {
-                    MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online_light
-                    MegaChatApi.STATUS_AWAY -> R.drawable.ic_away_light
-                    MegaChatApi.STATUS_BUSY -> R.drawable.ic_busy_light
-                    MegaChatApi.STATUS_OFFLINE -> R.drawable.ic_offline_light
-                    else -> 0
-                }
-            }
-
+        viewLifecycleOwner.collectFlow(viewModel.uiState) {
+            val iconRes = userChatStatusIconMapper(it.userChatStatus, Util.isDarkMode(requireContext()))
             searchInputView.setChatStatus(iconRes != 0, iconRes)
         }
 
