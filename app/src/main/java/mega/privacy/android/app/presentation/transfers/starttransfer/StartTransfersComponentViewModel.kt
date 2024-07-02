@@ -666,7 +666,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 MultiTransferEvent.InsufficientSpace -> StartTransferEvent.Message.NotSufficientSpace
                 is MultiTransferEvent.SingleTransferEvent -> {
                     //show start message as soon as an event with all transfers updated is received
-                    if (!startMessageShown && event.allTransfersUpdated) {
+                    if (!startMessageShown && event.scanningFinished) {
                         startMessageShown = true
                         StartTransferEvent.FinishUploadProcessing(
                             totalFiles = event.startedFiles,

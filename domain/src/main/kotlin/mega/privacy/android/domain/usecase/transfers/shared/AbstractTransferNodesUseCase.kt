@@ -209,7 +209,7 @@ abstract class AbstractTransferNodesUseCase<T, R>(
 
     private val TransferEvent.isTransferUpdated: Boolean
         get() = when {
-            isFileTransfer -> true
+            isFileTransfer && this !is TransferEvent.TransferStartEvent -> true
             isFolderTransfer && isFinishScanningEvent -> true
             else -> false
         }
