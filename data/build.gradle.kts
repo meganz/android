@@ -80,6 +80,8 @@ dependencies {
     testImplementation(lib.bundles.unit.test)
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.junit5.api)
+    testImplementation(testlib.bundles.ui.test)
+    testImplementation(testlib.junit.test.ktx)
     testRuntimeOnly(testlib.junit.jupiter.engine)
 
     androidTestImplementation(testlib.bundles.unit.test)

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.camerauploads
+package mega.privacy.android.data.worker
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -49,7 +49,6 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
-import mega.privacy.android.data.worker.CameraUploadsWorker
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BackupState
