@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.cancelaccountplan.model.UIAccountDetails
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
@@ -14,6 +15,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.CancelSubscriptionContinueCancellationButtonPressedEvent
+import mega.privacy.mobile.analytics.event.CancelSubscriptionKeepPlanButtonPressedEvent
 import org.jetbrains.anko.toast
 import javax.inject.Inject
 
@@ -50,9 +53,16 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                         storageQuotaSize = storageQuota,
                         transferQuotaSize = transferQuota,
                     ),
-                    onKeepPlanButtonClicked = { finish() }) {
-                    toast("Cancel button clicked")
-                }
+                    onKeepPlanButtonClicked = {
+                        Analytics.tracker.trackEvent(CancelSubscriptionKeepPlanButtonPressedEvent)
+                        finish()
+                    },
+                    onContinueCancellationButtonClicked = {
+                        Analytics.tracker.trackEvent(
+                            CancelSubscriptionContinueCancellationButtonPressedEvent
+                        )
+                        toast("Cancel button clicked")
+                    })
             }
         }
     }

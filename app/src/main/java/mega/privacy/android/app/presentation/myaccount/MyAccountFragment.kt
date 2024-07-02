@@ -12,7 +12,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
@@ -27,6 +30,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.AccountScreenEvent
 import javax.inject.Inject
 
 /**
@@ -96,6 +100,8 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
      */
     override fun onResume() {
         super.onResume()
+        Analytics.tracker.trackEvent(AccountScreenEvent)
+        Firebase.crashlytics.log("Screen: ${AccountScreenEvent.eventName}")
         viewModel.refreshAccountInfo()
     }
 

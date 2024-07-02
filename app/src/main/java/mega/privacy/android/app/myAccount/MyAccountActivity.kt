@@ -26,6 +26,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -63,6 +64,8 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import mega.privacy.mobile.analytics.event.CancelSubscriptionMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ToolbarOverflowMenuItemEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError.API_OK
 import timber.log.Timber
@@ -301,6 +304,7 @@ class MyAccountActivity : PasscodeActivity(),
      */
     private fun handleShowCancelSubscription() {
         if (viewModel.isNewCancelSubscriptionFeatureEnabled()) {
+            Analytics.tracker.trackEvent(CancelSubscriptionMenuToolbarEvent)
             navigateToCancelAccountPlan()
         } else {
             showCancelSubscriptions()
@@ -308,6 +312,7 @@ class MyAccountActivity : PasscodeActivity(),
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        Analytics.tracker.trackEvent(ToolbarOverflowMenuItemEvent)
         menuInflater.inflate(R.menu.activity_my_account, menu)
         this.menu = menu
 
