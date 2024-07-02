@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.camerauploads
+package mega.privacy.android.data.worker
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -13,7 +13,6 @@ import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import org.junit.Before
