@@ -19,6 +19,7 @@ import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.icon.pack.R as IconPackR
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -147,7 +148,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             context,
             NOTIFICATION_CHANNEL_ID
         ).apply {
-            setSmallIcon(R.drawable.ic_stat_camera_sync)
+            setSmallIcon(IconPackR.drawable.ic_stat_camera_uploads_running)
             setOngoing(isOngoing)
             setContentTitle(title)
             setStyle(NotificationCompat.BigTextStyle().bigText(content))
