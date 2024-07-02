@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.recentactions.LegacyGetRecentActionsUseCase
+import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -15,7 +15,7 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultUpdateRecentActionTest {
     private lateinit var underTest: UpdateRecentAction
-    private val getRecentActionsUseCase = mock<LegacyGetRecentActionsUseCase>()
+    private val getRecentActionsUseCase = mock<GetRecentActionsUseCase>()
 
     @Before
     fun setUp() {

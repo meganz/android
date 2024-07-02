@@ -38,7 +38,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentActionBucketBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
@@ -48,7 +47,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.recentactions.RecentActionsComposeViewModel
-import mega.privacy.android.app.presentation.recentactions.RecentActionsViewModel
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -99,7 +97,6 @@ class RecentActionBucketFragment : Fragment() {
 
     private val viewModel by viewModels<RecentActionBucketViewModel>()
 
-    private val recentActionsViewModel: RecentActionsViewModel by activityViewModels()
     private val recentActionsComposeViewModel: RecentActionsComposeViewModel by activityViewModels()
 
     private lateinit var binding: FragmentRecentActionBucketBinding
@@ -135,18 +132,10 @@ class RecentActionBucketFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val enableRecentActionsCompose =
-                getFeatureFlagValueUseCase(AppFeatures.RecentActionsCompose)
-            if (enableRecentActionsCompose) {
-                if (!viewModel.isCurrentBucketSet()) {
-                    viewModel.setBucket(recentActionsComposeViewModel.selectedBucket)
-                    viewModel.setCachedActionList(recentActionsComposeViewModel.getAllRecentBuckets())
-                }
-            } else {
-                viewModel.setBucket(recentActionsViewModel.selected)
-                viewModel.setCachedActionList(recentActionsViewModel.snapshotActionList)
+            if (!viewModel.isCurrentBucketSet()) {
+                viewModel.setBucket(recentActionsComposeViewModel.selectedBucket)
+                viewModel.setCachedActionList(recentActionsComposeViewModel.getAllRecentBuckets())
             }
-
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.items.collectLatest {
                     setupListView(it)
