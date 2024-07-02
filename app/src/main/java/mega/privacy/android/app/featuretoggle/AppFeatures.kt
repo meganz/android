@@ -199,7 +199,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     UploadWorker(
         "Enables UploadWorker for download files, instead of UploadService. This is a work in progress feature.",
-        false,
+        true,
     ),
 
     /**

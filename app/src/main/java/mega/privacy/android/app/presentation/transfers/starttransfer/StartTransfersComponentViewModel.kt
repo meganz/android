@@ -669,7 +669,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     if (!startMessageShown && event.scanningFinished) {
                         startMessageShown = true
                         StartTransferEvent.FinishUploadProcessing(
-                            totalFiles = event.startedFiles,
+                            totalFiles = pathsAndNames.size,
                             triggerEvent = transferTriggerEvent,
                         )
                     } else {
