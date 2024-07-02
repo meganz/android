@@ -174,6 +174,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     * To enable search by node description
+     */
+    SearchWithDescription(
+        "Enable search with description",
+        false
+    ),
+
+    /**
      * To enable the new cancel subscription feature
      */
     CancelSubscription(

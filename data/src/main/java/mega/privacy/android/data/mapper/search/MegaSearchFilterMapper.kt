@@ -29,6 +29,7 @@ class MegaSearchFilterMapper @Inject constructor(
      * @param searchCategory [SearchCategory]
      * @param modificationDate [DateFilterOption]
      * @param creationDate [DateFilterOption]
+     * @param description [String]
      */
     operator fun invoke(
         parentHandle: NodeId? = null,
@@ -37,6 +38,7 @@ class MegaSearchFilterMapper @Inject constructor(
         searchCategory: SearchCategory? = SearchCategory.ALL,
         modificationDate: DateFilterOption? = null,
         creationDate: DateFilterOption? = null,
+        description: String? = null,
         sensitivityFilter: SensitivityFilterOption? = null,
     ): MegaSearchFilter = MegaSearchFilter.createInstance().apply {
 
@@ -74,6 +76,10 @@ class MegaSearchFilterMapper @Inject constructor(
             dateFilterOptionLongMapper(creationDate).apply {
                 byCreationTime(first, second)
             }
+        }
+
+        description?.let {
+            byDescription(description)
         }
 
         sensitivityFilter?.let {

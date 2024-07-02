@@ -1,13 +1,14 @@
 package mega.privacy.android.domain.entity.search
 
 /**
- * Class representing possible search parameters
+ * Class representing possible search parameters used for searching via MegaSearchFilterMapper
  *
  * @property query user input
  * @property searchTarget place to search
  * @property searchCategory search filter for file types
  * @property modificationDate last modified date
  * @property creationDate added date
+ * @property description description
  */
 data class SearchParameters(
     val query: String,
@@ -15,4 +16,5 @@ data class SearchParameters(
     val searchCategory: SearchCategory = SearchCategory.ALL,
     val modificationDate: DateFilterOption? = null,
     val creationDate: DateFilterOption? = null,
+    val description: String? = null,
 )

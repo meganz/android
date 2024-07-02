@@ -10,10 +10,8 @@ import mega.privacy.android.data.mapper.search.SearchCategoryMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchParameters
-import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -54,14 +52,15 @@ internal class SearchRepositoryImpl @Inject constructor(
         parameters: SearchParameters,
     ): List<UnTypedNode> = withContext(ioDispatcher) {
         val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
-        val (query, searchTarget, searchCategory, modificationDate, creationDate) = parameters
+        val (query, searchTarget, searchCategory, modificationDate, creationDate, description) = parameters
         val filter = megaSearchFilterMapper(
             searchQuery = query,
             parentHandle = nodeId ?: NodeId(-1L),
             searchTarget = searchTarget,
             searchCategory = searchCategory,
             modificationDate = modificationDate,
-            creationDate = creationDate
+            creationDate = creationDate,
+            description = description,
         )
         val searchList = megaApiGateway.searchWithFilter(
             filter = filter,
@@ -77,14 +76,15 @@ internal class SearchRepositoryImpl @Inject constructor(
         parameters: SearchParameters,
     ): List<UnTypedNode> = withContext(ioDispatcher) {
         val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
-        val (query, searchTarget, searchCategory, modificationDate, creationDate) = parameters
+        val (query, searchTarget, searchCategory, modificationDate, creationDate, description) = parameters
         val filter = megaSearchFilterMapper(
             searchQuery = query,
             parentHandle = nodeId ?: NodeId(-1),
             searchTarget = searchTarget,
             searchCategory = searchCategory,
             modificationDate = modificationDate,
-            creationDate = creationDate
+            creationDate = creationDate,
+            description = description,
         )
         val searchList = megaApiGateway.getChildren(
             filter = filter,
