@@ -46,8 +46,8 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
@@ -69,6 +69,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.HANDLE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
@@ -1374,35 +1375,31 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     }
 
     private fun showPropertiesActivity() {
-        val i = Intent(this, FileInfoActivity::class.java)
-        if (isOffLine) {
-            i.putExtra(Constants.NAME, pdfFileName)
-            i.putExtra("adapterType", Constants.OFFLINE_ADAPTER)
-            i.putExtra("path", path)
-            if (pathNavigation != null) {
-                i.putExtra("pathNavigation", pathNavigation)
+        val intent = if (isOffLine) {
+            Intent(this, OfflineFileInfoActivity::class.java).apply {
+                putExtra(HANDLE, handle.toString())
             }
-            i.setDataAndType(uri, typeForName(pdfFileName).type)
-            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         } else {
-            val node = megaApi.getNodeByHandle(handle)
-            i.putExtra("handle", node?.handle)
-            i.putExtra(Constants.NAME, node?.name)
-            if (nC == null) {
-                nC = NodeController(this)
-            }
-            var fromIncoming = false
-            if (type == Constants.SEARCH_ADAPTER || type == Constants.RECENTS_ADAPTER) {
-                fromIncoming = nC?.nodeComesFromIncoming(node) ?: false
-            }
-            if (type == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
-                i.putExtra("from", Constants.FROM_INCOMING_SHARES)
-                i.putExtra(Constants.INTENT_EXTRA_KEY_FIRST_LEVEL, false)
-            } else if (type == Constants.BACKUPS_ADAPTER) {
-                i.putExtra("from", Constants.FROM_BACKUPS)
+            Intent(this, FileInfoActivity::class.java).also { i ->
+                val node = megaApi.getNodeByHandle(handle)
+                i.putExtra("handle", node?.handle)
+                i.putExtra(Constants.NAME, node?.name)
+                if (nC == null) {
+                    nC = NodeController(this)
+                }
+                var fromIncoming = false
+                if (type == Constants.SEARCH_ADAPTER || type == Constants.RECENTS_ADAPTER) {
+                    fromIncoming = nC?.nodeComesFromIncoming(node) ?: false
+                }
+                if (type == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
+                    i.putExtra("from", Constants.FROM_INCOMING_SHARES)
+                    i.putExtra(Constants.INTENT_EXTRA_KEY_FIRST_LEVEL, false)
+                } else if (type == Constants.BACKUPS_ADAPTER) {
+                    i.putExtra("from", Constants.FROM_BACKUPS)
+                }
             }
         }
-        startActivity(i)
+        startActivity(intent)
         renamed = false
     }
 
