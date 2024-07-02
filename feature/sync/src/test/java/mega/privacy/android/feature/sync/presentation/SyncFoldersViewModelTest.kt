@@ -25,7 +25,7 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
-import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.GetSyncStalledIssuesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.RefreshSyncUseCase
@@ -57,7 +57,7 @@ class SyncFoldersViewModelTest {
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
     private val resumeSyncUseCase: ResumeSyncUseCase = mock()
     private val pauseSyncUseCase: PauseSyncUseCase = mock()
-    private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase = mock()
+    private val monitorStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
     private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase = mock()
     private val refreshSyncUseCase: RefreshSyncUseCase = mock()
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
@@ -117,6 +117,7 @@ class SyncFoldersViewModelTest {
         )
 
         whenever(isProAccountUseCase()).thenReturn(true)
+        whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
     }
 
     @AfterEach
@@ -127,7 +128,7 @@ class SyncFoldersViewModelTest {
             removeFolderPairUseCase,
             resumeSyncUseCase,
             pauseSyncUseCase,
-            getSyncStalledIssuesUseCase,
+            monitorStalledIssuesUseCase,
             setUserPausedSyncsUseCase,
             isStorageOverQuotaUseCase,
             monitorAccountDetailUseCase,
@@ -138,7 +139,6 @@ class SyncFoldersViewModelTest {
     @Test
     fun `test that viewmodel fetches all folder pairs upon initialization`() = runTest {
         whenever(isStorageOverQuotaUseCase()).thenReturn(false)
-        whenever(getSyncStalledIssuesUseCase()).thenReturn(emptyList())
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val expectedState = SyncFoldersState(syncUiItems, isFreeAccount = false)
 
@@ -152,7 +152,7 @@ class SyncFoldersViewModelTest {
     @Test
     fun `test that card click change the state to expanded`() = runTest {
         whenever(isStorageOverQuotaUseCase()).thenReturn(false)
-        whenever(getSyncStalledIssuesUseCase()).thenReturn(emptyList())
+        whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val expectedState =
             SyncFoldersState(syncUiItems.map { it.copy(expanded = true) }, isFreeAccount = false)
@@ -172,7 +172,7 @@ class SyncFoldersViewModelTest {
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val folderPairId = 9999L
         whenever(removeFolderPairUseCase(folderPairId)).thenReturn(Unit)
-        whenever(getSyncStalledIssuesUseCase()).thenReturn(stalledIssues)
+        whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(stalledIssues))
         initViewModel()
         underTest.handleAction(
             SyncFoldersAction.RemoveFolderClicked(folderPairId)
@@ -207,7 +207,7 @@ class SyncFoldersViewModelTest {
     fun `test that the folder is in error status when the stalled issues are not empty`() =
         runTest {
             whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-            whenever(getSyncStalledIssuesUseCase()).thenReturn(stalledIssues)
+            whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(stalledIssues))
             val expectedState =
                 SyncFoldersState(
                     syncUiItems.map { it.copy(hasStalledIssues = true) },
@@ -240,7 +240,6 @@ class SyncFoldersViewModelTest {
     @Test
     fun `test that if user is a free user and has syncs need to show dialog`() = runTest {
         whenever(isStorageOverQuotaUseCase()).thenReturn(false)
-        whenever(getSyncStalledIssuesUseCase()).thenReturn(emptyList())
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         whenever(isProAccountUseCase()).thenReturn(false)
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf())
@@ -270,7 +269,7 @@ class SyncFoldersViewModelTest {
             monitorSyncsUseCase = monitorSyncsUseCase,
             resumeSyncUseCase = resumeSyncUseCase,
             pauseSyncUseCase = pauseSyncUseCase,
-            getSyncStalledIssuesUseCase = getSyncStalledIssuesUseCase,
+            monitorStalledIssuesUseCase = monitorStalledIssuesUseCase,
             setUserPausedSyncsUseCase = setUserPausedSyncsUseCase,
             refreshSyncUseCase = refreshSyncUseCase,
             monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,

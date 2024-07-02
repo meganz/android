@@ -6,7 +6,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.AccountType
@@ -19,7 +23,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.feature.sync.data.service.SyncBackgroundService
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
-import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.GetSyncStalledIssuesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.RefreshSyncUseCase
@@ -40,7 +44,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
     private val resumeSyncUseCase: ResumeSyncUseCase,
     private val pauseSyncUseCase: PauseSyncUseCase,
-    private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase,
+    private val monitorStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
     private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase,
     private val refreshSyncUseCase: RefreshSyncUseCase,
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
@@ -62,14 +66,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                 _uiState.update { state -> state.copy(isLoading = true) }
                 refreshSyncUseCase()
             }.onSuccess {
-                runCatching {
-                    loadSyncs()
-                }.onSuccess {
-                    _uiState.update { state -> state.copy(isLoading = false) }
-                }.onFailure {
-                    _uiState.update { state -> state.copy(isLoading = false) }
-                    Timber.e(it)
-                }
+                loadSyncs()
             }.onFailure {
                 _uiState.update { state -> state.copy(isLoading = false) }
                 Timber.e(it)
@@ -107,9 +104,9 @@ internal class SyncFoldersViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadSyncs() {
-        monitorSyncsUseCase().map(syncUiItemMapper::invoke).map { syncs ->
-            val stalledIssues = getSyncStalledIssuesUseCase()
+    private fun loadSyncs() {
+        monitorSyncsUseCase().catch { Timber.e(it) }.map(syncUiItemMapper::invoke).map { syncs ->
+            val stalledIssues = monitorStalledIssuesUseCase().first()
             var numOfFiles = 0
             var numOfFolders = 0
             var totalSizeInBytes = 0L
@@ -149,9 +146,11 @@ internal class SyncFoldersViewModel @Inject constructor(
                     creationTime = creationTime,
                 )
             }
-        }.collect { syncs ->
-            updateSyncsState(syncs)
         }
+            .onEach {
+                updateSyncsState(it)
+            }
+            .launchIn(viewModelScope)
     }
 
     private suspend fun updateSyncsState(

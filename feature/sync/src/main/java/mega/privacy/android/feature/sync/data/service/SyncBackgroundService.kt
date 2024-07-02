@@ -23,8 +23,6 @@ import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.domain.entity.FolderPair
-import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
@@ -50,9 +48,6 @@ internal class SyncBackgroundService : LifecycleService() {
 
     @Inject
     internal lateinit var monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase
-
-    @Inject
-    internal lateinit var monitorSyncsUseCase: MonitorSyncsUseCase
 
     @Inject
     internal lateinit var pauseSyncUseCase: PauseSyncUseCase
@@ -127,10 +122,9 @@ internal class SyncBackgroundService : LifecycleService() {
             combine(
                 monitorConnectivityUseCase(),
                 monitorSyncByWiFiUseCase(),
-                monitorSyncsUseCase(),
                 monitorBatteryInfoUseCase(),
                 monitorAccountDetailUseCase()
-            ) { connectedToInternet: Boolean, syncByWifi: Boolean, _: List<FolderPair>, batteryInfo: BatteryInfo, accountDetail: AccountDetail ->
+            ) { connectedToInternet: Boolean, syncByWifi: Boolean, batteryInfo: BatteryInfo, accountDetail: AccountDetail ->
                 Triple(
                     batteryInfo,
                     Pair(

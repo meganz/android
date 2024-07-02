@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.domain.usecase.sync
 
+import kotlinx.coroutines.flow.first
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.feature.sync.data.service.SyncBackgroundService
@@ -12,14 +13,14 @@ import javax.inject.Inject
  * @param isOnWifiNetworkUseCase        [IsOnWifiNetworkUseCase]
  * @param pauseSyncUseCase              [PauseSyncUseCase]
  * @param resumeSyncUseCase             [ResumeSyncUseCase]
- * @param getFolderPairsUseCase         [GetFolderPairsUseCase]
+ * @param monitorSyncsUseCase         [MonitorSyncsUseCase]
  * @param isSyncPausedByTheUserUseCase  [IsSyncPausedByTheUserUseCase]
  */
 internal class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
     private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase,
     private val pauseSyncUseCase: PauseSyncUseCase,
     private val resumeSyncUseCase: ResumeSyncUseCase,
-    private val getFolderPairsUseCase: GetFolderPairsUseCase,
+    private val monitorSyncsUseCase: MonitorSyncsUseCase,
     private val isSyncPausedByTheUserUseCase: IsSyncPausedByTheUserUseCase,
 ) {
 
@@ -38,7 +39,8 @@ internal class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
     ) {
         val internetNotAvailable = !connectedToInternet
         val userNotOnWifi = !isOnWifiNetworkUseCase()
-        val activeSyncs = getFolderPairsUseCase().filter { !isSyncPausedByTheUserUseCase(it.id) }
+        val activeSyncs =
+            monitorSyncsUseCase().first().filter { !isSyncPausedByTheUserUseCase(it.id) }
         val isLowBatteryLevel =
             batteryInfo.level < SyncBackgroundService.LOW_BATTERY_LEVEL && !batteryInfo.isCharging
 

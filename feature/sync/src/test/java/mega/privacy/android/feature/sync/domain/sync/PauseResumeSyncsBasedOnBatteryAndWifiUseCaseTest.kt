@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.domain.sync
 
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
@@ -7,7 +8,7 @@ import mega.privacy.android.feature.sync.data.service.SyncBackgroundService
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
-import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
@@ -30,7 +31,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
     private val isOnWifiNetworkUseCase = mock<IsOnWifiNetworkUseCase>()
     private val pauseSyncUseCase = mock<PauseSyncUseCase>()
     private val resumeSyncUseCase = mock<ResumeSyncUseCase>()
-    private val getFolderPairsUseCase = mock<GetFolderPairsUseCase>()
+    private val monitorSyncsUseCase = mock<MonitorSyncsUseCase>()
     private val isSyncPausedByTheUserUseCase = mock<IsSyncPausedByTheUserUseCase>()
 
     private val firstSyncId = 1L
@@ -58,7 +59,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             isOnWifiNetworkUseCase,
             pauseSyncUseCase,
             resumeSyncUseCase,
-            getFolderPairsUseCase,
+            monitorSyncsUseCase,
             isSyncPausedByTheUserUseCase
         )
     }
@@ -69,14 +70,14 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             isOnWifiNetworkUseCase,
             pauseSyncUseCase,
             resumeSyncUseCase,
-            getFolderPairsUseCase,
+            monitorSyncsUseCase,
             isSyncPausedByTheUserUseCase
         )
     }
 
     @Test
     fun `test that sync is paused when not connected to internet`() = runTest {
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
         whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
         whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
@@ -93,7 +94,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
 
     @Test
     fun `test that sync is resumed when connected to internet and not only on wifi`() = runTest {
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
         whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
         whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
@@ -110,7 +111,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
 
     @Test
     fun `test that sync is paused when device has low battery level and not charging`() = runTest {
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
         whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
         whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
@@ -128,7 +129,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
     @Test
     fun `test that sync is resumed when device has low battery level but device is charging`() =
         runTest {
-            whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+            whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
             whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
             whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
@@ -145,7 +146,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
 
     @Test
     fun `test that sync is paused when user account is not pro`() = runTest {
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
         whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
         whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
@@ -162,7 +163,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
 
     @Test
     fun `test that sync is resumed when user account is pro`() = runTest {
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
         whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
         whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 

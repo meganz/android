@@ -25,7 +25,6 @@ import nz.mega.sdk.MegaSyncStats
 import nz.mega.sdk.StalledIssuesReceiver
 import javax.inject.Inject
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Gateway implementation to access Sync API
@@ -118,7 +117,7 @@ internal class SyncGatewayImpl @Inject constructor(
 
     override suspend fun getSyncStalledIssues(): MegaSyncStallList? {
         if (megaApi.isSyncStalled) {
-            return suspendCoroutine { continuation ->
+            return suspendCancellableCoroutine { continuation ->
                 stalledIssuesListener = StalledIssuesReceiver { megaSyncStallList ->
                     megaApi.removeRequestListener(stalledIssuesListener)
                     stalledIssuesListener = null

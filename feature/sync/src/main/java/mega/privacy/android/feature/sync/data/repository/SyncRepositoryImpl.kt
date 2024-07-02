@@ -30,6 +30,7 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaSyncList
+import timber.log.Timber
 import javax.inject.Inject
 
 internal class SyncRepositoryImpl @Inject constructor(
@@ -62,7 +63,11 @@ internal class SyncRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getFolderPairs(): List<FolderPair> = withContext(ioDispatcher) {
-        mapToDomain(syncGateway.getFolderPairs())
+        runCatching {
+            mapToDomain(syncGateway.getFolderPairs())
+        }
+            .onFailure { Timber.e("Syncs fetching error: $it") }
+            .getOrElse { emptyList() }
     }
 
     private suspend fun mapToDomain(model: MegaSyncList): List<FolderPair> =
@@ -104,7 +109,11 @@ internal class SyncRepositoryImpl @Inject constructor(
     override val syncChanges: Flow<MegaSyncListenerEvent> = _syncChanges
 
     override suspend fun getSyncStalledIssues(): List<StalledIssue> = withContext(ioDispatcher) {
-        syncGateway.getSyncStalledIssues()?.let { stalledIssuesMapper(it) }.orEmpty()
+        runCatching {
+            syncGateway.getSyncStalledIssues()?.let { stalledIssuesMapper(it) }.orEmpty()
+        }
+            .onFailure { Timber.e("Stalled Issues fetching error: $it") }
+            .getOrElse { emptyList() }
     }
 
     private val _syncStalledIssues by lazy {
