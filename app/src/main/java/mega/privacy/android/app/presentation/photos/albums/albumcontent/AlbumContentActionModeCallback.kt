@@ -115,18 +115,25 @@ class AlbumContentActionModeCallback(
             fragment.lifecycleScope.launch {
                 val isHiddenNodesEnabled =
                     fragment.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
-                val hasNonSensitiveNode =
-                    fragment.albumContentViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
-                val accountType =
-                    fragment.albumContentViewModel.state.value.accountType
-                val isHiddenNodesOnboarded =
-                    fragment.albumContentViewModel.state.value.isHiddenNodesOnboarded
+                val selectedPhotos = fragment.albumContentViewModel.getSelectedPhotos()
+                val includeSensitiveInheritedNode = selectedPhotos.any { it.isSensitiveInherited }
 
-                menu.findItem(R.id.cab_menu_hide)?.isVisible =
-                    isHiddenNodesEnabled && accountType != null && (!accountType.isPaid || hasNonSensitiveNode && isHiddenNodesOnboarded != null)
+                if (isHiddenNodesEnabled && !includeSensitiveInheritedNode) {
+                    val hasNonSensitiveNode = selectedPhotos.any { !it.isSensitive }
+                    val accountType =
+                        fragment.albumContentViewModel.state.value.accountType
+                    val isHiddenNodesOnboarded =
+                        fragment.albumContentViewModel.state.value.isHiddenNodesOnboarded
 
-                menu.findItem(R.id.cab_menu_unhide)?.isVisible =
-                    isHiddenNodesEnabled && accountType?.isPaid == true && !hasNonSensitiveNode
+                    menu.findItem(R.id.cab_menu_hide)?.isVisible =
+                        accountType != null && (!accountType.isPaid || hasNonSensitiveNode && isHiddenNodesOnboarded != null)
+
+                    menu.findItem(R.id.cab_menu_unhide)?.isVisible =
+                        accountType?.isPaid == true && !hasNonSensitiveNode
+                } else {
+                    menu.findItem(R.id.cab_menu_hide)?.isVisible = false
+                    menu.findItem(R.id.cab_menu_unhide)?.isVisible = false
+                }
             }
         }
     }

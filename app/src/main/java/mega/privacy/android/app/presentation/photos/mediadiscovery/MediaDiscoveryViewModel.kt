@@ -49,6 +49,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -422,7 +423,13 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
 
 
-    suspend fun getSelectedNodes() = getNodesByIds(_state.value.selectedPhotoIds.toList())
+    suspend fun getSelectedNodes(): List<MegaNode> =
+        getNodesByIds(_state.value.selectedPhotoIds.toList())
+
+    suspend fun getSelectedTypedNodes(): List<TypedNode> =
+        _state.value.selectedPhotoIds.mapNotNull {
+            getNodeByIdUseCase(NodeId(it))
+        }
 
     private suspend fun getNodesByIds(ids: List<Long>) = runCatching {
         if (fromFolderLink == true) {

@@ -464,6 +464,8 @@ internal class AlbumContentViewModel @Inject constructor(
         }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
     }
 
+    suspend fun getSelectedPhotos() = _state.value.selectedPhotos
+
     fun updateAlbumName(title: String, albumNames: List<String>) = viewModelScope.launch {
         runCatching {
             val finalTitle = title.trim()

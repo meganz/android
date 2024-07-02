@@ -49,19 +49,26 @@ internal class VideoSectionActionModeCallback(
             )
             CloudStorageOptionControlUtil.applyControl(menu, control)
 
+            val selectedNodes = videoSectionViewModel.getSelectedNodes()
             val isHiddenNodesEnabled =
                 managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
-            val hasNonSensitiveNode =
-                videoSectionViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
-            val isPaid =
-                videoSectionViewModel.state.value.accountDetail?.levelDetail?.accountType?.isPaid
-                    ?: false
+            val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
 
-            menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                isHiddenNodesEnabled && (hasNonSensitiveNode || !isPaid)
+            if (isHiddenNodesEnabled && !includeSensitiveInheritedNode) {
+                val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
+                val isPaid =
+                    videoSectionViewModel.state.value.accountDetail?.levelDetail?.accountType?.isPaid
+                        ?: false
 
-            menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
-                isHiddenNodesEnabled && !hasNonSensitiveNode && isPaid
+                menu?.findItem(R.id.cab_menu_hide)?.isVisible =
+                    (hasNonSensitiveNode || !isPaid)
+
+                menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
+                    !hasNonSensitiveNode && isPaid
+            } else {
+                menu?.findItem(R.id.cab_menu_hide)?.isVisible = false
+                menu?.findItem(R.id.cab_menu_unhide)?.isVisible = false
+            }
         }
         return true
     }

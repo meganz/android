@@ -43,19 +43,21 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedRea
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
+import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -101,6 +103,7 @@ class TimelineViewModel @Inject constructor(
     val setInitialCUPreferences: SetInitialCUPreferences,
     private val enableCameraUploadsInPhotosUseCase: EnableCameraUploadsInPhotosUseCase,
     val getNodeListByIds: GetNodeListByIds,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher val mainDispatcher: CoroutineDispatcher,
@@ -558,6 +561,11 @@ class TimelineViewModel @Inject constructor(
         getNodeListByIds(selectedPhotosIds.toList())
     }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
 
+    suspend fun getSelectedTypedNodes(): List<TypedNode> = runCatching {
+        selectedPhotosIds.mapNotNull {
+            getNodeByIdUseCase(NodeId(it))
+        }
+    }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
 
     /**
      * Establishes the initial Camera Uploads preferences
