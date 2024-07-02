@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property areCredentialsVerified True if user credentials are verified, false otherwise.
  * @property status                 [UserChatStatus].
  * @property lastSeen               User last seen.
+ * @property chatroomId         Id of chatroom with this user if it exists
  */
 data class ContactItem(
     val handle: Long,
@@ -28,4 +29,5 @@ data class ContactItem(
     val areCredentialsVerified: Boolean,
     val status: UserChatStatus,
     val lastSeen: Int? = null,
+    val chatroomId: Long?,
 )

@@ -81,6 +81,7 @@ internal class ContactMessageViewModelTest {
             defaultAvatarColor = null,
             timestamp = userHandle,
             areCredentialsVerified = true,
+            chatroomId = null,
         )
         whenever(getContactFromEmailUseCase.invoke(email, false)).thenReturn(contactItem)
         Truth.assertThat(underTest.loadContactInfo(email)).isEqualTo(contactItem)
@@ -101,6 +102,7 @@ internal class ContactMessageViewModelTest {
             defaultAvatarColor = null,
             timestamp = userHandle,
             areCredentialsVerified = true,
+            chatroomId = null,
         )
         val newContactItem = ContactItem(
             contactData = ContactData(
@@ -115,6 +117,7 @@ internal class ContactMessageViewModelTest {
             defaultAvatarColor = null,
             timestamp = userHandle,
             areCredentialsVerified = true,
+            chatroomId = null,
         )
         whenever(getContactFromEmailUseCase.invoke(email, false)).thenReturn(cacheContactItem)
         whenever(getContactFromEmailUseCase.invoke(email, true)).thenReturn(newContactItem)

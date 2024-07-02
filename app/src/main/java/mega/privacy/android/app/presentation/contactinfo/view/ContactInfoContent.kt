@@ -19,9 +19,6 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
-import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactData
@@ -29,7 +26,10 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -125,6 +125,7 @@ private fun PreviewContactInfoContent() {
                     areCredentialsVerified = true,
                     status = UserChatStatus.Online,
                     lastSeen = 0,
+                    chatroomId = null,
                 )
             ),
             coroutineScope = coroutineScope,
@@ -187,6 +188,7 @@ private fun PreviewContactInfoContentWithChatRoom() {
                     areCredentialsVerified = true,
                     status = UserChatStatus.Online,
                     lastSeen = 0,
+                    chatroomId = null,
                 ),
                 chatRoom = chatRoom,
             ),

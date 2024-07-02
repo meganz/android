@@ -40,7 +40,8 @@ class ReferralBonusesViewModelTest {
         visibility = UserVisibility.Visible,
         timestamp = 0,
         areCredentialsVerified = true,
-        status = UserChatStatus.Online
+        status = UserChatStatus.Online,
+        chatroomId = null,
     )
 
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase = mock {
@@ -53,7 +54,8 @@ class ReferralBonusesViewModelTest {
                 visibility = UserVisibility.Visible,
                 timestamp = 0,
                 areCredentialsVerified = true,
-                status = UserChatStatus.Online
+                status = UserChatStatus.Online,
+                chatroomId = null,
             )
         )
     }

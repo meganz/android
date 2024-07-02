@@ -36,6 +36,7 @@ class ApplyContactUpdatesUseCaseTest {
         areCredentialsVerified = true,
         status = UserChatStatus.Online,
         lastSeen = 0,
+        chatroomId = null,
     )
     private val underTest = ApplyContactUpdatesUseCase(repository)
 

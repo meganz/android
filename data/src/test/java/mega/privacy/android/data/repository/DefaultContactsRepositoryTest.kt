@@ -1014,7 +1014,8 @@ class DefaultContactsRepositoryTest {
             expectedColor,
             expectedCredentials,
             expectedStatus,
-            null
+            null,
+            null,
         )
     }
 
@@ -1090,7 +1091,8 @@ class DefaultContactsRepositoryTest {
             expectedColor,
             expectedCredentials,
             expectedStatus,
-            null
+            null,
+            null,
         )
 
         val contact = underTest.getContactItemFromUserEmail(userEmail, skipCache = true)

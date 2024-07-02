@@ -1,11 +1,13 @@
 package mega.privacy.android.app.presentation.contact.view
 
 
+import mega.privacy.android.icon.pack.R as IconR
 import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -29,19 +31,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.R as IconR
-import androidx.compose.animation.togetherWith
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.text
+import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.domain.entity.contacts.ContactData
-import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.user.UserVisibility
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -265,5 +265,6 @@ internal fun contactItemForPreviews(id: Int) = ContactItem(
     timestamp = 2345262L,
     areCredentialsVerified = false,
     status = UserChatStatus.Online,
-    lastSeen = null
+    lastSeen = null,
+    chatroomId = null,
 )

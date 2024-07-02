@@ -44,7 +44,8 @@ class ContactItemMapperTest {
             defaultAvatarColor = avatarColor,
             areCredentialsVerified = true,
             status = status,
-            lastSeen = null
+            lastSeen = null,
+            chatRoomId = null,
         )
         Truth.assertThat(actual.handle).isEqualTo(userHandle)
     }
@@ -57,7 +58,8 @@ class ContactItemMapperTest {
             defaultAvatarColor = avatarColor,
             areCredentialsVerified = true,
             status = status,
-            lastSeen = null
+            lastSeen = null,
+            chatRoomId = null,
         )
         Truth.assertThat(actual.email).isEqualTo(userEmail)
     }
@@ -70,7 +72,8 @@ class ContactItemMapperTest {
             defaultAvatarColor = avatarColor,
             areCredentialsVerified = true,
             status = status,
-            lastSeen = null
+            lastSeen = null,
+            chatRoomId = null,
         )
         Truth.assertThat(actual.timestamp).isEqualTo(userTimestamp)
     }
@@ -88,7 +91,8 @@ class ContactItemMapperTest {
                     defaultAvatarColor = avatarColor,
                     areCredentialsVerified = true,
                     status = status,
-                    lastSeen = null
+                    lastSeen = null,
+                    chatRoomId = null,
                 )
             Truth.assertThat(actual.visibility).isEqualTo(visibility)
         }
@@ -104,7 +108,8 @@ class ContactItemMapperTest {
                 defaultAvatarColor = avatarColor,
                 areCredentialsVerified = true,
                 status = status,
-                lastSeen = null
+                lastSeen = null,
+                chatRoomId = null,
             )
         Truth.assertThat(actual.visibility).isEqualTo(UserVisibility.Unknown)
     }
@@ -124,7 +129,8 @@ class ContactItemMapperTest {
                 defaultAvatarColor = avatarColor,
                 areCredentialsVerified = true,
                 status = status,
-                lastSeen = null
+                lastSeen = null,
+                chatRoomId = null,
             )
             val expectedUserChatStatus = userChatStatusMapper(status)
 

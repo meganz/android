@@ -135,6 +135,7 @@ class ContactInfoViewModelTest {
         areCredentialsVerified = true,
         status = UserChatStatus.Online,
         lastSeen = 0,
+        chatroomId = null,
     )
     private val chatRoom = mock<ChatRoom> {
         on { chatId }.thenReturn(123456L)

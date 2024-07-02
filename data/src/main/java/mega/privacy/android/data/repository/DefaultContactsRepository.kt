@@ -449,13 +449,16 @@ internal class DefaultContactsRepository @Inject constructor(
             avatarUri
         )
 
+        val chatRoom = megaChatApiGateway.getChatRoomByUser(megaUser.handle)
+
         return contactItemMapper(
-            megaUser,
-            contactData,
-            megaApiGateway.getUserAvatarColor(megaUser),
-            megaApiGateway.areCredentialsVerified(megaUser),
-            status,
-            null
+            megaUser = megaUser,
+            contactData = contactData,
+            defaultAvatarColor = megaApiGateway.getUserAvatarColor(megaUser),
+            areCredentialsVerified = megaApiGateway.areCredentialsVerified(megaUser),
+            status = status,
+            lastSeen = null,
+            chatRoomId = chatRoom?.chatId,
         )
     }
 

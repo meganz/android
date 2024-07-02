@@ -137,7 +137,8 @@ class ReferralBonusViewTest {
                 visibility = UserVisibility.Visible,
                 timestamp = 0,
                 areCredentialsVerified = true,
-                status = UserChatStatus.Online
+                status = UserChatStatus.Online,
+                chatroomId = null,
             ),
             expirationInDays = expirationInDays,
             awardId = 1,

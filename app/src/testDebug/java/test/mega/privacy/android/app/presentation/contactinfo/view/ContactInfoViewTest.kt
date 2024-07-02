@@ -42,6 +42,7 @@ class ContactInfoViewTest {
         areCredentialsVerified = false,
         status = UserChatStatus.Online,
         lastSeen = 0,
+        chatroomId = null,
     )
     private val contactItemWithVerifiedCredentials = ContactItem(
         handle = testHandle,
@@ -53,6 +54,7 @@ class ContactInfoViewTest {
         areCredentialsVerified = true,
         status = UserChatStatus.Online,
         lastSeen = 0,
+        chatroomId = null,
     )
     private val chatRoom = mock<ChatRoom> {
         on { chatId }.thenReturn(123456L)

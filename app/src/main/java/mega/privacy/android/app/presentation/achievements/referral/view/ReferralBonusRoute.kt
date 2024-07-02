@@ -35,20 +35,20 @@ import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
-import mega.privacy.android.shared.original.core.ui.theme.extensions.dark_blue_500_dark_blue_200
-import mega.privacy.android.shared.original.core.ui.theme.extensions.green_500_green_300
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.shared.original.core.ui.theme.grey_500
-import mega.privacy.android.shared.original.core.ui.theme.red_800
 import mega.privacy.android.domain.entity.achievement.ReferralBonusAchievements
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.theme.extensions.dark_blue_500_dark_blue_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.green_500_green_300
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.grey_500
+import mega.privacy.android.shared.original.core.ui.theme.red_800
 
 internal object TestTags {
     private const val REFERRAL_BONUS_VIEW = "referral_bonus_view"
@@ -259,7 +259,8 @@ private fun ReferralBonusViewPreview() {
                             1231231,
                             true,
                             UserChatStatus.Online,
-                            null
+                            null,
+                            null,
                         ),
                         expirationInDays = 1,
                         awardId = 1,

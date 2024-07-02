@@ -31,6 +31,7 @@ internal class ContactItemMapper @Inject constructor(
         areCredentialsVerified: Boolean,
         status: Int,
         lastSeen: Int?,
+        chatRoomId: Long?,
     ) = ContactItem(
         handle = megaUser.handle,
         email = megaUser.email,
@@ -40,7 +41,8 @@ internal class ContactItemMapper @Inject constructor(
         timestamp = megaUser.timestamp,
         areCredentialsVerified = areCredentialsVerified,
         status = userChatStatusMapper(status),
-        lastSeen = lastSeen
+        lastSeen = lastSeen,
+        chatroomId = chatRoomId,
     )
 
     companion object {

@@ -172,6 +172,7 @@ private fun ContactInfoPreview() {
                 areCredentialsVerified = true,
                 status = UserChatStatus.Online,
                 lastSeen = 0,
+                chatroomId = null,
             ),
         ),
         onBackPress = {},

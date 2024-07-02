@@ -62,6 +62,7 @@ class StartConversationViewModelTest {
         timestamp = 12346L,
         areCredentialsVerified = false,
         status = UserChatStatus.Online,
+        chatroomId = null,
     )
     private val testContactList = buildList {
         for (i in 0 until 10) {
@@ -78,6 +79,7 @@ class StartConversationViewModelTest {
         timestamp = 654321L,
         areCredentialsVerified = false,
         status = UserChatStatus.Online,
+        chatroomId = null,
     )
 
     private val invalidHandle = -1L

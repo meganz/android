@@ -54,7 +54,8 @@ class AddNewContactsUseCaseTest {
                 timestamp = 1231231,
                 areCredentialsVerified = true,
                 status = UserChatStatus.Online,
-                lastSeen = null
+                lastSeen = null,
+                chatroomId = null,
             )
         )
         val newContacts = listOf(
@@ -84,7 +85,8 @@ class AddNewContactsUseCaseTest {
                 timestamp = 1231231,
                 areCredentialsVerified = true,
                 status = UserChatStatus.Online,
-                lastSeen = null
+                lastSeen = null,
+                chatroomId = null,
             ),
             ContactItem(
                 handle = 2,
@@ -99,7 +101,8 @@ class AddNewContactsUseCaseTest {
                 timestamp = 1231231,
                 areCredentialsVerified = true,
                 status = UserChatStatus.Online,
-                lastSeen = null
+                lastSeen = null,
+                chatroomId = null,
             )
         )
         whenever(
