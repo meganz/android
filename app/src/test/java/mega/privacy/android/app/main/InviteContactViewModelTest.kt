@@ -43,6 +43,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
@@ -744,6 +745,16 @@ class InviteContactViewModelTest {
                 )
             }
         }
+
+    @Test
+    fun `test that the contact list is not reinitialized after initialized`() = runTest {
+        initializeContacts { listOf(LocalContact(id = 1L)) }
+
+        underTest.initializeContacts()
+
+        // This use case should only be called once.
+        verify(getLocalContactsUseCase).invoke()
+    }
 
     private suspend fun initializeContacts(localContacts: () -> List<LocalContact>) {
         whenever(getLocalContactsUseCase()).thenReturn(localContacts())

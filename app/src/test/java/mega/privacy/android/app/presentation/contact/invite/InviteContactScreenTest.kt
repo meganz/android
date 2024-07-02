@@ -215,7 +215,7 @@ class InviteContactScreenTest {
     @Test
     fun `test that the empty result body is displayed when the list of contacts is empty`() {
         with(composeRule) {
-            setScreen(uiState = InviteContactUiState(onContactsInitialized = true))
+            setScreen(uiState = InviteContactUiState(areContactsInitialized = true))
 
             onNodeWithTag(NO_CONTACTS_TEXT_TAG).assertIsDisplayed()
         }
@@ -239,7 +239,7 @@ class InviteContactScreenTest {
         with(composeRule) {
             setScreen(
                 uiState = InviteContactUiState(
-                    onContactsInitialized = true,
+                    areContactsInitialized = true,
                     filteredContacts = listOf(
                         header,
                         firstContact,

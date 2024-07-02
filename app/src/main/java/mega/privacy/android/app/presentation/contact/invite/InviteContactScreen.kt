@@ -440,7 +440,10 @@ internal fun InviteContactScreen(
             Divider()
 
             when {
-                showDefaultBody -> DefaultContactListBody(
+                // rememberSaveable won't work in a fragment because the fragment itself will be destroyed.
+                // The workaround is to add !uiState.isContactsInitialized until we fully migrate
+                // to a single activity.
+                showDefaultBody && !uiState.areContactsInitialized -> DefaultContactListBody(
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -449,7 +452,7 @@ internal fun InviteContactScreen(
                     isDarkMode = isDarkMode
                 )
 
-                uiState.onContactsInitialized -> {
+                uiState.areContactsInitialized -> {
                     if (uiState.filteredContacts.isEmpty()) {
                         EmptyContactResultBody(
                             modifier = Modifier.fillMaxWidth(),
@@ -872,7 +875,7 @@ private fun InviteContactScreenWithSelectedContactsPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         InviteContactScreen(
             uiState = InviteContactUiState(
-                onContactsInitialized = true,
+                areContactsInitialized = true,
                 filteredContacts = listOf(
                     InvitationContactInfo(name = "Abc"),
                     InvitationContactInfo(name = "Abc ss", displayInfo = "(021) 232-3232"),

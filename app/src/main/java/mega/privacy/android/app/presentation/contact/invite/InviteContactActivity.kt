@@ -314,7 +314,7 @@ class InviteContactActivity : PasscodeActivity(), InvitationContactsAdapter.OnIt
         collectFlow(
             viewModel
                 .uiState
-                .map { it.onContactsInitialized }
+                .map { it.areContactsInitialized }
                 .distinctUntilChanged()
         ) { isContactsInitialized ->
             if (isContactsInitialized) {

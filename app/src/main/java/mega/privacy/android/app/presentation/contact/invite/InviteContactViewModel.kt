@@ -85,6 +85,8 @@ class InviteContactViewModel @Inject constructor(
      * Initialize the list of contacts
      */
     internal fun initializeContacts() = viewModelScope.launch {
+        if (_uiState.value.areContactsInitialized) return@launch
+
         _uiState.update { it.copy(isLoading = true) }
         runCatching { getInvitationContactInfo() }
             .onSuccess { invitationContactInfo ->
@@ -92,7 +94,7 @@ class InviteContactViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        onContactsInitialized = true,
+                        areContactsInitialized = true,
                         filteredContacts = invitationContactInfo
                     )
                 }
@@ -100,7 +102,7 @@ class InviteContactViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        onContactsInitialized = true
+                        areContactsInitialized = true
                     )
                 }
                 Timber.e("Failed to get local contacts", throwable)
@@ -206,7 +208,7 @@ class InviteContactViewModel @Inject constructor(
      * Reset the onContactsInitialized state
      */
     internal fun resetOnContactsInitializedState() {
-        _uiState.update { it.copy(onContactsInitialized = false) }
+        _uiState.update { it.copy(areContactsInitialized = false) }
     }
 
     internal fun onOpenCameraConfirmationShown() {
