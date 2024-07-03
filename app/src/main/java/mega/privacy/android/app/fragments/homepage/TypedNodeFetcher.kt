@@ -14,6 +14,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaSearchFilter
 import java.io.File
 import java.time.format.DateTimeFormatter.ofPattern
 
@@ -140,7 +141,14 @@ open class TypedNodesFetcher(
      * @param type          Type of nodes.
      */
     fun getMegaNodes(cancelToken: MegaCancelToken, order: Int, type: Int): List<MegaNode> =
-        megaApi.searchByType(cancelToken, order, type, MegaApiJava.SEARCH_TARGET_ROOTNODE)
+        megaApi.search(
+            MegaSearchFilter.createInstance().apply {
+                byCategory(type)
+                byLocation(MegaApiAndroid.SEARCH_TARGET_ROOTNODE)
+            },
+            order,
+            cancelToken,
+        )
 
     companion object {
         const val UPDATE_DATA_THROTTLE_TIME =
