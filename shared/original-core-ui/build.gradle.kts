@@ -43,6 +43,7 @@ dependencies {
     implementation(lib.balloon)
     implementation(google.accompanist.placeholder)
     implementation(lib.mega.core.ui.tokens)
+    implementation(lib.kotlinx.collections.immutable)
 
     debugImplementation(google.gson)
     debugImplementation(lib.kotlinpoet)
