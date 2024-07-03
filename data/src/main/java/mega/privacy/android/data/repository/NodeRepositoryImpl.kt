@@ -70,7 +70,6 @@ import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Default implementation of [NodeRepository]
@@ -309,7 +308,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
 
     private suspend fun getFolderTreeInfo(megaNode: MegaNode?) =
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
             megaApiGateway.getFolderInfo(
                 megaNode,
                 continuation.getRequestListener("getFolderTreeInfo") {
@@ -327,7 +326,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
 
     private suspend fun getPublicLinkFolderTreeInfo(megaNode: MegaNode?) =
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
             megaApiFolderGateway.getFolderInfo(
                 megaNode,
                 continuation.getRequestListener("getFolderTreeInfo") {
@@ -444,9 +443,6 @@ internal class NodeRepositoryImpl @Inject constructor(
                     }
 
                     megaApiGateway.openShareDialog(megaNode, listener)
-                    continuation.invokeOnCancellation {
-                        megaApiGateway.removeRequestListener(listener)
-                    }
                 }
             }
         }
@@ -540,9 +536,6 @@ internal class NodeRepositoryImpl @Inject constructor(
                 newNodeName = newNodeName,
                 listener = listener
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -563,9 +556,6 @@ internal class NodeRepositoryImpl @Inject constructor(
                 newNodeName = newNodeName,
                 listener = listener
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -586,9 +576,6 @@ internal class NodeRepositoryImpl @Inject constructor(
                 newNodeName = newNodeName,
                 listener = listener
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -622,9 +609,6 @@ internal class NodeRepositoryImpl @Inject constructor(
                 newNodeName = newNodeName,
                 listener = listener
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
         return when {
             result.second.errorCode == MegaError.API_OK -> NodeId(result.first.nodeHandle)
@@ -724,9 +708,6 @@ internal class NodeRepositoryImpl @Inject constructor(
                     originalFingerprint = originalFingerprint,
                     listener = listener
                 )
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -824,7 +805,6 @@ internal class NodeRepositoryImpl @Inject constructor(
                 node = node,
                 listener = listener
             )
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -848,7 +828,6 @@ internal class NodeRepositoryImpl @Inject constructor(
         return suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("exportNode") { it.link.orEmpty() }
             megaApiGateway.exportNode(node, expireTime, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -864,7 +843,6 @@ internal class NodeRepositoryImpl @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("disableExport") { }
             megaApiGateway.disableExport(node, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -984,7 +962,6 @@ internal class NodeRepositoryImpl @Inject constructor(
                 node = node,
                 listener = listener
             )
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -1004,7 +981,6 @@ internal class NodeRepositoryImpl @Inject constructor(
                     email = email,
                     listener = listener
                 )
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
     }
@@ -1053,9 +1029,6 @@ internal class NodeRepositoryImpl @Inject constructor(
                     NodeId(it.nodeHandle)
                 }
                 megaApiGateway.createFolder(name, parentMegaNode, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -1093,7 +1066,6 @@ internal class NodeRepositoryImpl @Inject constructor(
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getRequestListener("setNodeDescription") {}
                 megaApiGateway.setNodeDescription(node, description, listener)
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -1119,7 +1091,6 @@ internal class NodeRepositoryImpl @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("addNodeTag") {}
             megaApiGateway.addNodeTag(node, tag, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -1129,7 +1100,6 @@ internal class NodeRepositoryImpl @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("removeNodeTag") {}
             megaApiGateway.removeNodeTag(node, tag, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -1139,7 +1109,6 @@ internal class NodeRepositoryImpl @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("updateNodeTag") {}
             megaApiGateway.updateNodeTag(node, oldTag, newTag, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
