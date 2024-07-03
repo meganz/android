@@ -30,9 +30,7 @@ class RemoveOfflineNodeUseCase @Inject constructor(
         nodeRepository.getOfflineNodeInformation(nodeId)?.let {
             if (it.isFolder) {
                 val childNodes = nodeRepository.getOfflineNodesByParentId(it.id)
-                childNodes?.let { childNode ->
-                    deleteChildrenInDb(childNode)
-                }
+                deleteChildrenInDb(childNodes)
             }
             //remove red arrow from current item
             val parentId = it.parentId

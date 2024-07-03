@@ -44,4 +44,7 @@ internal interface OfflineDao {
 
     @Query("DELETE FROM offline where id = :id")
     suspend fun deleteOfflineById(id: Int)
+
+    @Query("DELETE FROM offline where id IN (:ids)")
+    suspend fun deleteOfflineByIds(ids: List<Int>)
 }

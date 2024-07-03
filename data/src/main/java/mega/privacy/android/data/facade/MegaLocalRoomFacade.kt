@@ -396,6 +396,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
         offlineDao.deleteOfflineById(id)
     }
 
+    override suspend fun removeOfflineInformationByIds(ids: List<Int>) {
+        offlineDao.deleteOfflineByIds(ids)
+    }
+
     private suspend fun deleteCompletedTransferBatch(ids: List<Int>) {
         ids.chunked(50).forEach {
             completedTransferDao.deleteCompletedTransferByIds(it)

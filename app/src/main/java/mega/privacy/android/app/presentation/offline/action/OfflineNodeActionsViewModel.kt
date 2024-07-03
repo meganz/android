@@ -73,7 +73,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
 
     private suspend fun shareFiles(nodes: List<OfflineFileInformation>) {
         runCatching {
-            getOfflineFilesUseCase(nodes)
+            getOfflineFilesUseCase(nodes).map { it.value }
         }.onSuccess { files ->
             _uiState.update {
                 it.copy(shareFilesEvent = triggered(files))

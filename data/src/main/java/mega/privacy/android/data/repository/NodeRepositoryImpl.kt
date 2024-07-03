@@ -870,6 +870,11 @@ internal class NodeRepositoryImpl @Inject constructor(
         } ?: false
     }
 
+    override suspend fun getAllOfflineNodes(): List<OfflineNodeInformation> =
+        megaLocalRoomGateway.getAllOfflineInfo().map {
+            offlineNodeInformationMapper(it)
+        }
+
     override suspend fun getOfflineNodesByParentId(parentId: Int): List<OfflineNodeInformation> =
         megaLocalRoomGateway.getOfflineInfoByParentId(parentId).map {
             offlineNodeInformationMapper(it)
@@ -888,6 +893,10 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun removeOfflineNodeById(id: Int) {
         megaLocalRoomGateway.removeOfflineInformationById(id)
+    }
+
+    override suspend fun removeOfflineNodeByIds(ids: List<Int>) {
+        megaLocalRoomGateway.removeOfflineInformationByIds(ids)
     }
 
     override suspend fun setNodeLabel(nodeId: NodeId, label: NodeLabel): Unit =

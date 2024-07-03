@@ -5,10 +5,12 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -24,20 +26,29 @@ internal class GetOfflineFilesUseCaseTest {
         underTest = GetOfflineFilesUseCase(getOfflineFileUseCase)
     }
 
+    @BeforeEach
+    fun resetMocks() {
+        reset(getOfflineFileUseCase)
+    }
+
     @Test
     fun `test that correct files are returned when invoke is called`() = runTest {
-        val offlineInformation: OfflineFileInformation = mock()
+        val offlineInformation: OfflineFileInformation = mock {
+            on { id }.thenReturn(1)
+        }
         val file = mock<File>()
         whenever(getOfflineFileUseCase(offlineInformation)).thenReturn(file)
 
         val result = underTest(listOf(offlineInformation))
 
-        assertThat(result).containsExactly(file)
+        assertThat(result.values).containsExactly(file)
     }
 
     @Test
     fun `test that IllegalStateException is thrown when all async operation fails`() = runTest {
-        val offlineInformation: OfflineFileInformation = mock()
+        val offlineInformation: OfflineFileInformation = mock {
+            on { id }.thenReturn(1)
+        }
 
         whenever(getOfflineFileUseCase(offlineInformation)).thenThrow(IllegalStateException::class.java)
 
@@ -48,15 +59,19 @@ internal class GetOfflineFilesUseCaseTest {
 
     @Test
     fun `test that usecase returns files if at least one operation is successful`() = runTest {
-        val offlineInformation: OfflineFileInformation = mock()
+        val offlineInformation: OfflineFileInformation = mock {
+            on { id }.thenReturn(1)
+        }
         val file = mock<File>()
         whenever(getOfflineFileUseCase(offlineInformation)).thenReturn(file)
 
-        val offlineInformation2: OfflineFileInformation = mock()
+        val offlineInformation2: OfflineFileInformation = mock {
+            on { id }.thenReturn(2)
+        }
         whenever(getOfflineFileUseCase(offlineInformation2)).thenThrow(IllegalStateException::class.java)
 
         val result = underTest(listOf(offlineInformation, offlineInformation2))
 
-        assertThat(result).containsExactly(file)
+        assertThat(result.values).containsExactly(file)
     }
 }

@@ -590,6 +590,12 @@ interface NodeRepository {
     ): Boolean
 
     /**
+     * Get all offline Node stored in database
+     * @return list of [OfflineNodeInformation]
+     */
+    suspend fun getAllOfflineNodes(): List<OfflineNodeInformation>
+
+    /**
      * Get offline Nodes from parent id
      * @param parentId
      * @return list of [OfflineNodeInformation]
@@ -614,6 +620,11 @@ interface NodeRepository {
      * Remove offline Node by ID
      */
     suspend fun removeOfflineNodeById(id: Int)
+
+    /**
+     * Remove offline Node by IDs
+     */
+    suspend fun removeOfflineNodeByIds(ids: List<Int>)
 
     /**
      * Set label for node

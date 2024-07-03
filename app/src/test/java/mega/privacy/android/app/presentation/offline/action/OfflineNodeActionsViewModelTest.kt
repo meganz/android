@@ -70,7 +70,7 @@ class OfflineNodeActionsViewModelTest {
     }
 
     private suspend fun stubCommon() {
-        whenever(getOfflineFilesUseCase(any())).thenReturn(listOf())
+        whenever(getOfflineFilesUseCase(any())).thenReturn(mapOf())
         whenever(exportNodesUseCase(any())).thenReturn(mapOf())
     }
 
@@ -89,9 +89,13 @@ class OfflineNodeActionsViewModelTest {
     fun `test that handleShareOfflineNodes emits shareFilesEvent when all nodes are files`() =
         runTest {
             val file = mock<File>()
-            val offlineFileInformation: OfflineFileInformation = mock()
-            whenever(offlineFileInformation.isFolder).thenReturn(false)
-            whenever(getOfflineFilesUseCase(listOf(offlineFileInformation))).thenReturn(listOf(file))
+            val offlineFileInformation: OfflineFileInformation = mock {
+                on { id } doReturn 123
+                on { isFolder } doReturn false
+            }
+            whenever(getOfflineFilesUseCase(listOf(offlineFileInformation))).thenReturn(
+                mapOf(123 to file)
+            )
 
             underTest.handleShareOfflineNodes(listOf(offlineFileInformation), true)
             verify(getOfflineFilesUseCase).invoke(any())

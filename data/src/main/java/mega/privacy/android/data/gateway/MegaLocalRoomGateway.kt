@@ -414,6 +414,11 @@ interface MegaLocalRoomGateway {
     suspend fun removeOfflineInformationById(id: Int)
 
     /**
+     * Remove offline info by IDs
+     */
+    suspend fun removeOfflineInformationByIds(ids: List<Int>)
+
+    /**
      * monitor chat pending changes
      *
      * @param chatId

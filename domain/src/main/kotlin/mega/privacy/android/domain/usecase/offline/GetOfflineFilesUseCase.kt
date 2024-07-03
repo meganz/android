@@ -18,22 +18,25 @@ class GetOfflineFilesUseCase @Inject constructor(
     /**
      * Invoke
      * @param nodes List<OfflineNodeInformation>
+     *
+     * @return Map<Int, File> map of offline node id to file
      */
-    suspend operator fun invoke(nodes: List<OfflineNodeInformation>) = coroutineScope {
-        val semaphore = Semaphore(8)
-        val results = nodes.map {
-            async {
-                semaphore.withPermit {
-                    runCatching { getOfflineFileUseCase(it) }
+    suspend operator fun invoke(nodes: List<OfflineNodeInformation>) =
+        coroutineScope {
+            val semaphore = Semaphore(8)
+            val results = nodes.associateBy { it.id }.map {
+                async {
+                    semaphore.withPermit {
+                        runCatching { it.key to getOfflineFileUseCase(it.value) }
+                    }
                 }
-            }
-        }.awaitAll()
+            }.awaitAll()
 
-        if (results.any { it.isSuccess }) {
-            results.mapNotNull { it.getOrNull() }
-        } else {
-            throw results.first { it.isFailure }.exceptionOrNull()
-                ?: IllegalStateException("Unable to get offline files")
+            if (results.any { it.isSuccess }) {
+                results.mapNotNull { it.getOrNull() }.toMap()
+            } else {
+                throw results.first { it.isFailure }.exceptionOrNull()
+                    ?: IllegalStateException("Unable to get offline files")
+            }
         }
-    }
 }

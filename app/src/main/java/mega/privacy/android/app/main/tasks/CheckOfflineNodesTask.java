@@ -10,7 +10,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.LegacyDatabaseHandler;
@@ -21,6 +20,7 @@ import timber.log.Timber;
 /**
  * Background task to verify the offline nodes
  */
+@Deprecated
 public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
     Context context;
     LegacyDatabaseHandler dbH;

@@ -51,6 +51,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import timber.log.Timber;
 
+@Deprecated
 public class OfflineUtils {
 
     public static final String OFFLINE_DIR = "MEGA Offline";
@@ -181,6 +182,7 @@ public class OfflineUtils {
         }
     }
 
+    @Deprecated
     public static File getOfflineFolder(Context context, String path) {
         File offlineFolder = new File(context.getFilesDir() + File.separator + path);
 
@@ -251,6 +253,7 @@ public class OfflineUtils {
         return new File(thumbDir, thumbName + JPG_EXTENSION);
     }
 
+    @Deprecated
     private static String getOfflinePath(String path, MegaOffline offlineNode) {
         switch (offlineNode.getOrigin()) {
             case MegaOffline.INCOMING: {
@@ -380,6 +383,7 @@ public class OfflineUtils {
         return MegaOffline.OTHER;
     }
 
+    @Deprecated
     private static void insertDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, ArrayList<MegaNode> nodesToDB, boolean fromBackups) {
         Timber.d("insertDB");
 
