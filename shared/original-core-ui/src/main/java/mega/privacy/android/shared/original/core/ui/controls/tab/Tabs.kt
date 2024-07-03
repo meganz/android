@@ -10,10 +10,7 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,6 +21,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 
 /**
  *
@@ -36,9 +34,8 @@ fun Tabs(
     selectedIndex: Int = 0,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val selectedTabIndex by rememberSaveable { mutableIntStateOf(selectedIndex) }
     val pagerState =
-        rememberPagerState(initialPage = selectedTabIndex, initialPageOffsetFraction = 0f) {
+        rememberPagerState(initialPage = selectedIndex, initialPageOffsetFraction = 0f) {
             cells.size
         }
 
@@ -51,7 +48,7 @@ fun Tabs(
         cells.forEachIndexed { index, cell ->
             TabCell(
                 text = cell.text,
-                selected = selectedTabIndex == index,
+                selected = pagerState.currentPage == index,
                 onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
                 modifier = Modifier.testTag(cell.tag)
             )
@@ -76,8 +73,9 @@ private fun TabCell(
     text = {
         Text(
             text = text,
-            color = MegaOriginalTheme.colors.components.interactive,
-            style = MaterialTheme.typography.subtitle2,
+            color = if (selected) MegaOriginalTheme.colors.components.interactive
+            else MegaOriginalTheme.colors.text.secondary,
+            style = MaterialTheme.typography.subtitle2medium,
         )
     },
     selected = selected,

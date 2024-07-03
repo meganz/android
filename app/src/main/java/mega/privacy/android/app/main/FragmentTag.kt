@@ -9,6 +9,7 @@ internal enum class FragmentTag {
     OUTGOING_SHARES,
     SEARCH,
     TRANSFERS_PAGE,
+    TRANSFERS,
     RECENT_CHAT,
     SYNC,
     NOTIFICATIONS,
@@ -33,6 +34,7 @@ internal enum class FragmentTag {
             OUTGOING_SHARES -> "outgoingSharesFragment"
             SEARCH -> "searchFragment"
             TRANSFERS_PAGE -> "transferPageFragment"
+            TRANSFERS -> "transfersFragment"
             RECENT_CHAT -> "chatTabsFragment"
             NOTIFICATIONS -> "notificationsFragment"
             TURN_ON_NOTIFICATIONS -> "turnOnNotificationsFragment"

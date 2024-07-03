@@ -5,9 +5,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.transfers.view.CONFIRM_CANCEL_TAG
-import mega.privacy.android.app.presentation.transfers.view.PROGRESS_TAG
-import mega.privacy.android.app.presentation.transfers.view.TransferInProgressDialog
+import mega.privacy.android.app.presentation.transfers.view.dialog.CONFIRM_CANCEL_TAG
+import mega.privacy.android.app.presentation.transfers.view.dialog.PROGRESS_TAG
+import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

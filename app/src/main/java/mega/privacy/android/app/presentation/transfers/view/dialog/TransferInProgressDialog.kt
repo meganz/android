@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.transfers.view
+package mega.privacy.android.app.presentation.transfers.view.dialog
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
@@ -10,10 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.legacy.core.ui.controls.dialogs.ProgressDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.legacy.core.ui.controls.dialogs.ProgressDialog
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * [ProgressDialog] for showing transfer processing in progress, it handles cancel confirmation showing a [ConfirmationDialog]

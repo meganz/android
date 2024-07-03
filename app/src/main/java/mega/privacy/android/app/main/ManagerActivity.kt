@@ -107,13 +107,11 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
@@ -240,6 +238,7 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesCompo
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
+import mega.privacy.android.app.presentation.transfers.TransfersFragment
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
@@ -258,7 +257,6 @@ import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
-import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
@@ -3377,10 +3375,19 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         drawerItem = DrawerItem.TRANSFERS
         setBottomNavigationMenuItemChecked(NO_BNV)
         transfersManagementViewModel.checkIfShouldShowCompletedTab()
-        replaceFragment(
-            transferPageFragment ?: TransferPageFragment.newInstance(),
-            FragmentTag.TRANSFERS_PAGE.tag
-        )
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+                replaceFragment(
+                    transfersFragment ?: TransfersFragment(),
+                    FragmentTag.TRANSFERS.tag
+                )
+            } else {
+                replaceFragment(
+                    transferPageFragment ?: TransferPageFragment.newInstance(),
+                    FragmentTag.TRANSFERS_PAGE.tag
+                )
+            }
+        }
         setToolbarTitle()
         showFabButton()
         closeDrawer()
@@ -4138,6 +4145,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private val transferPageFragment: TransferPageFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.TRANSFERS_PAGE.tag) as? TransferPageFragment
+
+    private val transfersFragment: TransfersFragment?
+        get() = supportFragmentManager.findFragmentByTag(FragmentTag.TRANSFERS.tag) as? TransfersFragment
 
     private val deviceCenterFragment: DeviceCenterFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.DEVICE_CENTER.tag) as? DeviceCenterFragment
