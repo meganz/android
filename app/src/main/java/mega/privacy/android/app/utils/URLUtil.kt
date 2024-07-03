@@ -14,6 +14,11 @@ const val PLAY_STORE_SUBSCRIPTION_URL =
     "https://play.google.com/store/account/subscriptions"
 
 /**
+ * Apple Support URL for canceling subscription
+ */
+const val APPLE_SUPPORT_URL = "https://support.apple.com/118428"
+
+/**
  * Landing Page / Download URL for MEGA app in Apple App Store
  */
 const val APP_STORE_URL = "https://apps.apple.com/app/mega/id706857885"
