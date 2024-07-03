@@ -113,6 +113,7 @@ class SearchActivityViewModel @Inject constructor(
 
     init {
         checkDropdownChipsFlag()
+        checkSearchDescriptionFlag()
         monitorNodeUpdatesForSearch()
         initializeSearch()
         checkViewType()
@@ -127,6 +128,20 @@ class SearchActivityViewModel @Inject constructor(
             }.onSuccess { flag ->
                 _state.update {
                     it.copy(dropdownChipsEnabled = flag)
+                }
+            }.onFailure {
+                Timber.e("Get feature flag failed $it")
+            }
+        }
+    }
+
+    private fun checkSearchDescriptionFlag() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.SearchWithDescription)
+            }.onSuccess { flag ->
+                _state.update {
+                    it.copy(searchDescriptionEnabled = flag)
                 }
             }.onFailure {
                 Timber.e("Get feature flag failed $it")
@@ -187,6 +202,7 @@ class SearchActivityViewModel @Inject constructor(
                         } ?: state.value.selectedFilter?.filter ?: SearchCategory.ALL,
                         modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
                         creationDate = state.value.dateAddedSelectedFilterOption?.date,
+                        description = if (state.value.searchDescriptionEnabled == true) getCurrentSearchQuery() else null,
                     )
                 )
             }.onSuccess {
