@@ -13,28 +13,33 @@ import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
-import nz.mega.sdk.MegaNode
+import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Map node to file type info
+ * Get FileTypeInfo by filename and duration
  */
-typealias FileTypeInfoMapper = (@JvmSuppressWildcards MegaNode) -> @JvmSuppressWildcards FileTypeInfo
+class FileTypeInfoMapper @Inject constructor(private val mimeTypeMapper: MimeTypeMapper) {
 
-/**
- * Map node to file type info
- */
-internal fun getFileTypeInfo(node: MegaNode, mimeTypeMapper: MimeTypeMapper): FileTypeInfo =
-    with(getFileExtension(node)) {
-        getFileTypeInfoForExtension(
-            mimeType = mimeTypeMapper(this),
-            extension = this,
-            duration = node.duration
+    /**
+     * Get FileTypeInfo by filename and duration
+     *
+     * @param fileName file name
+     * @param duration the duration of media item
+     */
+    operator fun invoke(
+        fileName: String,
+        duration: Int = 0,
+    ): FileTypeInfo {
+        val extension = fileName.substringAfterLast('.', "")
+        val mimeType = mimeTypeMapper(extension)
+        return getFileTypeInfoForExtension(
+            mimeType = mimeType,
+            extension = extension,
+            duration = duration
         )
     }
-
-private fun getFileExtension(node: MegaNode) =
-    node.name.substringAfterLast('.', "")
+}
 
 internal fun getFileTypeInfoForExtension(
     mimeType: String,

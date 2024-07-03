@@ -134,8 +134,7 @@ internal class FileSystemRepositoryImplTest {
             deviceGateway = deviceGateway,
             sdCardGateway = sdCardGateway,
             fileAttributeGateway = fileAttributeGateway,
-            sharingScope = TestScope(),
-            mimeTypeMapper = mimeTypeMapper
+            sharingScope = TestScope()
         )
     }
 

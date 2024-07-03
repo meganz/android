@@ -13,51 +13,61 @@ import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
-import nz.mega.sdk.MegaNode
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-class FileTypeInfoMapperTest {
-    private val underTest = ::getFileTypeInfo
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class FileTypeInfoMapperTest @Inject constructor() {
+    private lateinit var underTest: FileTypeInfoMapper
+    private val mimeTypeMapper = mock<MimeTypeMapper>()
+
+    @BeforeAll
+    fun setUp() {
+        underTest = FileTypeInfoMapper(mimeTypeMapper)
+    }
 
     @Test
     fun `test that a node with no extension returns UnMappedFileTypeInfo`() {
         val expectedMimeType = "a mime type"
-        val node = mock<MegaNode> { on { name }.thenReturn("NoExtension.") }
+        val name = "NoExtension."
+        whenever(mimeTypeMapper(anyOrNull())).thenReturn(expectedMimeType)
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
-            UnMappedFileTypeInfo(
-                ""
-            )
-        )
+        assertThat(underTest(name, 0)).isEqualTo(UnMappedFileTypeInfo(""))
     }
 
     @Test
     fun `test that extension is mapped if present`() {
+        val expectedMimeType = "type"
         val expectedExtension = "txt"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val name = "withExtension.$expectedExtension"
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
 
-        assertThat(underTest(node) { "type" }.extension).isEqualTo(expectedExtension)
+        assertThat(underTest(name, 0).extension).isEqualTo(expectedExtension)
     }
 
     @Test
     fun `test that a pdf is mapped correctly`() {
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.pdf") }
-
-        assertThat(underTest(node) { "application/pdf" }).isEqualTo(
-            PdfFileTypeInfo
-        )
+        val expectedMimeType = "application/pdf"
+        val expectedExtension = "pdf"
+        val name = "withExtension.pdf"
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(PdfFileTypeInfo)
     }
 
     @Test
     fun `test that a zip file is mapped correctly`() {
         val expectedExtension = "zip"
         val expectedMimeType = "application/zip"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
             ZipFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension
@@ -69,9 +79,10 @@ class FileTypeInfoMapperTest {
     fun `test that a multipart zip file is mapped correctly`() {
         val expectedExtension = "zip"
         val expectedMimeType = "multipart/x-zip"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
             ZipFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension
@@ -83,9 +94,10 @@ class FileTypeInfoMapperTest {
     fun `test that a url is mapped correctly`() {
         val expectedExtension = "some web extension?"
         val expectedMimeType = "web/url "
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
             UrlFileTypeInfo
         )
     }
@@ -94,9 +106,10 @@ class FileTypeInfoMapperTest {
     fun `test that an image file is mapped correctly`() {
         val expectedExtension = "jpg"
         val expectedMimeType = "image/jpeg"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
             StaticImageFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension
@@ -109,12 +122,10 @@ class FileTypeInfoMapperTest {
         val expectedExtension = "mp3"
         val expectedMimeType = "audio/"
         val expectedDuration = 120
-        val node = mock<MegaNode> {
-            on { name }.thenReturn("withExtension.$expectedExtension")
-            on { duration }.thenReturn(expectedDuration)
-        }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, expectedDuration)).isEqualTo(
             AudioFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension,
@@ -128,12 +139,10 @@ class FileTypeInfoMapperTest {
         val expectedExtension = "opus"
         val expectedMimeType = "opus type"
         val expectedDuration = 120
-        val node = mock<MegaNode> {
-            on { name }.thenReturn("withExtension.$expectedExtension")
-            on { duration }.thenReturn(expectedDuration)
-        }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, expectedDuration)).isEqualTo(
             AudioFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension,
@@ -147,12 +156,10 @@ class FileTypeInfoMapperTest {
         val expectedExtension = "weba"
         val expectedMimeType = "weba type"
         val expectedDuration = 120
-        val node = mock<MegaNode> {
-            on { name }.thenReturn("withExtension.$expectedExtension")
-            on { duration }.thenReturn(expectedDuration)
-        }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, expectedDuration)).isEqualTo(
             AudioFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension,
@@ -165,9 +172,10 @@ class FileTypeInfoMapperTest {
     fun `test that a file with gif extension is mapped correctly`() {
         val expectedExtension = "gif"
         val expectedMimeType = "image/gif"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
             GifFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension
@@ -179,10 +187,10 @@ class FileTypeInfoMapperTest {
     fun `test that a file with capital gif  extension is mapped correctly`() {
         val expectedExtension = "GIF"
         val expectedMimeType = "image/gif"
-        val node =
-            mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
             GifFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension
@@ -193,7 +201,6 @@ class FileTypeInfoMapperTest {
     @Test
     fun `test that a file with raw extension is mapped correctly`() {
         val expectedMimeType = "expected"
-        val node = mock<MegaNode>()
         listOf(
             //Raw
             "3fr", "arw", "cr2",
@@ -207,8 +214,10 @@ class FileTypeInfoMapperTest {
             "srf", "srw", "x3f",
         ).forEach {
             val expectedExtension = it
-            whenever(node.name).thenReturn("withExtension.$expectedExtension")
-            assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+            val name = "withExtension.$expectedExtension"
+
+            whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+            assertThat(underTest(name, 0)).isEqualTo(
                 RawFileTypeInfo(
                     mimeType = expectedMimeType,
                     extension = expectedExtension
@@ -220,7 +229,6 @@ class FileTypeInfoMapperTest {
     @Test
     fun `test that a file with capital raw extension is mapped correctly`() {
         val expectedMimeType = "expected"
-        val node = mock<MegaNode>()
         listOf(
             //Raw
             "3fr", "arw", "cr2",
@@ -234,8 +242,10 @@ class FileTypeInfoMapperTest {
             "srf", "srw", "x3f",
         ).forEach {
             val expectedExtension = it.uppercase()
-            whenever(node.name).thenReturn("withExtension.$expectedExtension")
-            assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+            val name = "withExtension.$expectedExtension"
+
+            whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+            assertThat(underTest(name, 0)).isEqualTo(
                 RawFileTypeInfo(
                     mimeType = expectedMimeType,
                     extension = expectedExtension
@@ -248,9 +258,10 @@ class FileTypeInfoMapperTest {
     fun `test that a file with text type is mapped correctly`() {
         val expectedExtension = "a text extension"
         val expectedMimeType = "text/any type of text"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
             TextFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension
@@ -261,7 +272,6 @@ class FileTypeInfoMapperTest {
     @Test
     fun `test all text extensions are mapped correctly`() {
         val expectedMimeType = "expected"
-        val node = mock<MegaNode>()
         listOf( //Text
             "txt",
             "ans",
@@ -304,8 +314,10 @@ class FileTypeInfoMapperTest {
             "swift"
         ).forEach {
             val expectedExtension = it
-            whenever(node.name).thenReturn("withExtension.$expectedExtension")
-            assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+            val name = "withExtension.$expectedExtension"
+
+            whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+            assertThat(underTest(name, 0)).isEqualTo(
                 TextFileTypeInfo(
                     mimeType = expectedMimeType,
                     extension = expectedExtension
@@ -318,9 +330,10 @@ class FileTypeInfoMapperTest {
     fun `test that unmapped types returns the unmapped type`() {
         val expectedExtension = "an extension"
         val expectedMimeType = "application/octet-stream"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
             UnMappedFileTypeInfo(
                 extension = expectedExtension,
             )
@@ -331,9 +344,10 @@ class FileTypeInfoMapperTest {
     fun `test that other files are mapped as unknown types`() {
         val expectedExtension = "an extension"
         val expectedMimeType = "a mime type"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
             UnknownFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension
@@ -346,12 +360,10 @@ class FileTypeInfoMapperTest {
         val expectedExtension = "mp4"
         val expectedMimeType = "video/mp4"
         val expectedDuration = 120
-        val node = mock<MegaNode> {
-            on { name }.thenReturn("withExtension.$expectedExtension")
-            on { duration }.thenReturn(expectedDuration)
-        }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, expectedDuration)).isEqualTo(
             VideoFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension,
@@ -365,12 +377,10 @@ class FileTypeInfoMapperTest {
         val expectedExtension = "vob"
         val expectedMimeType = "unknown type"
         val expectedDuration = 120
-        val node = mock<MegaNode> {
-            on { name }.thenReturn("withExtension.$expectedExtension")
-            on { duration }.thenReturn(expectedDuration)
-        }
+        val name = "withExtension.$expectedExtension"
 
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, expectedDuration)).isEqualTo(
             VideoFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension,
@@ -382,10 +392,11 @@ class FileTypeInfoMapperTest {
     @Test
     fun `test that a file with svg extension is mapped correctly`() {
         val expectedMimeType = "expected"
-        val node = mock<MegaNode>()
         val expectedExtension = "svg"
-        whenever(node.name).thenReturn("withExtension.$expectedExtension")
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        val name = "withExtension.$expectedExtension"
+
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
             SvgFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension
@@ -397,10 +408,11 @@ class FileTypeInfoMapperTest {
     @Test
     fun `test that a file with capital svg extension is mapped correctly`() {
         val expectedMimeType = "expected"
-        val node = mock<MegaNode>()
         val expectedExtension = "SVG"
-        whenever(node.name).thenReturn("withExtension.$expectedExtension")
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+        val name = "withExtension.$expectedExtension"
+
+        whenever(mimeTypeMapper(expectedExtension)).thenReturn(expectedMimeType)
+        assertThat(underTest(name, 0)).isEqualTo(
             SvgFileTypeInfo(
                 mimeType = expectedMimeType,
                 extension = expectedExtension

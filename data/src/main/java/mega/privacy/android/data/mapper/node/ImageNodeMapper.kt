@@ -49,7 +49,7 @@ internal class ImageNodeMapper @Inject constructor(
             override val thumbnailPath = null
             override val previewPath = null
             override val fullSizePath = null
-            override val type = fileTypeInfoMapper(megaNode)
+            override val type = fileTypeInfoMapper(megaNode.name, megaNode.duration)
             override val isFavourite = megaNode.isFavourite
             override val isMarkedSensitive = megaNode.isMarkedSensitive
             override val isSensitiveInherited = isSensitiveInherited

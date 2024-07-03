@@ -198,7 +198,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         filterSvg: Boolean = true,
         includeRubbishBin: Boolean = false,
     ): Boolean {
-        val fileType = fileTypeInfoMapper(node)
+        val fileType = fileTypeInfoMapper(node.name, node.duration)
         return node.isFile
                 && fileType is ImageFileTypeInfo
                 && (fileType !is SvgFileTypeInfo || !filterSvg)
@@ -210,7 +210,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         node: MegaNode,
         includeRubbishBin: Boolean = false,
     ): Boolean {
-        val fileType = fileTypeInfoMapper(node)
+        val fileType = fileTypeInfoMapper(node.name, node.duration)
         return node.isFile
                 && fileType is VideoFileTypeInfo
                 && (!nodeRepository.isNodeInRubbishBin(NodeId(node.handle)) || includeRubbishBin)
@@ -507,7 +507,7 @@ internal class DefaultPhotosRepository @Inject constructor(
      * Map megaNode to Photo.
      */
     private suspend fun mapMegaNodeToPhoto(megaNode: MegaNode, filterSvg: Boolean = true): Photo? {
-        val fileType = fileTypeInfoMapper(megaNode)
+        val fileType = fileTypeInfoMapper(megaNode.name, megaNode.duration)
         val isValid = megaNode.isFile
                 && (fileType is VideoFileTypeInfo
                 || (fileType is ImageFileTypeInfo && checkSvg(filterSvg, fileType))
@@ -538,7 +538,10 @@ internal class DefaultPhotosRepository @Inject constructor(
             megaNodes.map { megaNode ->
                 async {
                     runCatching {
-                        (fileTypeInfoMapper(megaNode) !is SvgFileTypeInfo && megaNode.isValidPhotoNode())
+                        (fileTypeInfoMapper(
+                            megaNode.name,
+                            megaNode.duration
+                        ) !is SvgFileTypeInfo && megaNode.isValidPhotoNode())
                             .takeIf { it }
                             ?.let { mapMegaNodeToImage(megaNode) }
                     }.getOrNull()
@@ -556,7 +559,10 @@ internal class DefaultPhotosRepository @Inject constructor(
             megaNodes.map { megaNode ->
                 async {
                     runCatching {
-                        (fileTypeInfoMapper(megaNode) is VideoFileTypeInfo && megaNode.isValidPhotoNode())
+                        (fileTypeInfoMapper(
+                            megaNode.name,
+                            megaNode.duration
+                        ) is VideoFileTypeInfo && megaNode.isValidPhotoNode())
                             .takeIf { it }
                             ?.let { mapMegaNodeToVideo(megaNode) }
                     }.getOrNull()
@@ -586,7 +592,7 @@ internal class DefaultPhotosRepository @Inject constructor(
             dateUtilFacade.fromEpoch(megaNode.modificationTime),
             getThumbnailCacheFilePath(megaNode),
             getPreviewCacheFilePath(megaNode),
-            fileTypeInfoMapper(megaNode),
+            fileTypeInfoMapper(megaNode.name, megaNode.duration),
             megaNode.size,
             megaNode.isTakenDown,
             megaNode.isMarkedSensitive,
@@ -609,7 +615,7 @@ internal class DefaultPhotosRepository @Inject constructor(
             dateUtilFacade.fromEpoch(megaNode.modificationTime),
             getThumbnailCacheFilePath(megaNode),
             getPreviewCacheFilePath(megaNode),
-            fileTypeInfoMapper(megaNode),
+            fileTypeInfoMapper(megaNode.name, megaNode.duration),
             megaNode.size,
             megaNode.isTakenDown,
             megaNode.isMarkedSensitive,

@@ -29,7 +29,6 @@ import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
-import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -72,7 +71,7 @@ class DefaultPhotosRepositoryTest {
     }
     private val imageMapper: ImageMapper = ::createImage
     private val videoMapper: VideoMapper = ::createVideo
-    private val fileTypeInfoMapper: FileTypeInfoMapper = ::mapFileTypeInfo
+    private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val imageNodeFileMapper: ImageNodeFileMapper = mock()
     private val megaNodeMapper: MegaNodeMapper = mock()
     private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper = mock()
@@ -111,6 +110,10 @@ class DefaultPhotosRepositoryTest {
         whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
 
+        whenever(fileTypeInfoMapper(megaNode.name, megaNode.duration)).thenReturn(
+            StaticImageFileTypeInfo(mimeType = "", extension = "image")
+        )
+
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo)
@@ -131,6 +134,10 @@ class DefaultPhotosRepositoryTest {
         whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
 
+        whenever(fileTypeInfoMapper(megaNode.name, megaNode.duration)).thenReturn(
+            GifFileTypeInfo(mimeType = "", extension = "gif")
+        )
+
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo).isInstanceOf(GifFileTypeInfo::class.java)
@@ -146,6 +153,10 @@ class DefaultPhotosRepositoryTest {
 
         whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
+
+        whenever(fileTypeInfoMapper(megaNode.name, megaNode.duration)).thenReturn(
+            RawFileTypeInfo(mimeType = "", extension = "raw")
+        )
 
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -165,6 +176,10 @@ class DefaultPhotosRepositoryTest {
 
         whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
+
+        whenever(fileTypeInfoMapper(megaNode.name, megaNode.duration)).thenReturn(
+            VideoFileTypeInfo(mimeType = "", extension = "video", duration = 120.seconds)
+        )
 
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -385,21 +400,6 @@ class DefaultPhotosRepositoryTest {
         isSensitiveInherited,
     )
 
-    private fun mapFileTypeInfo(megaNode: MegaNode): FileTypeInfo {
-        val name = megaNode.name
-        return if (name.contains("image")) {
-            StaticImageFileTypeInfo(mimeType = "", extension = "image")
-        } else if (name.contains("gif")) {
-            GifFileTypeInfo(mimeType = "", extension = "gif")
-        } else if (name.contains("raw")) {
-            return RawFileTypeInfo(mimeType = "", extension = "raw")
-        } else if (name.contains("video")) {
-            return VideoFileTypeInfo(mimeType = "", extension = "video", duration = 120.seconds)
-        } else {
-            return UnknownFileTypeInfo(mimeType = "", extension = "")
-        }
-    }
-
     @Test
     fun `test that getPhotosByFolderId returns list of photos when it is opened from cloud drive recursively`() =
         runTest {
@@ -449,10 +449,20 @@ class DefaultPhotosRepositoryTest {
                     megaCancelToken = token
                 ),
             ).thenReturn(listOf(videoNode))
+            initFileTypeInfoMapperReturnedValue(imageNode, videoNode)
             underTest = createUnderTest(this)
             val actualPhotos = underTest.getPhotosByFolderId(NodeId(-1L), recursive = true)
             assertThat(actualPhotos).isNotEmpty()
         }
+
+    private fun initFileTypeInfoMapperReturnedValue(imageNode: MegaNode, videoNode: MegaNode) {
+        whenever(fileTypeInfoMapper(videoNode.name, videoNode.duration)).thenReturn(
+            VideoFileTypeInfo(mimeType = "", extension = "video", duration = 120.seconds)
+        )
+        whenever(fileTypeInfoMapper(imageNode.name, imageNode.duration)).thenReturn(
+            StaticImageFileTypeInfo(mimeType = "", extension = "image")
+        )
+    }
 
     @Test
     fun `test that getPhotosByFolderId returns list of photos when it is opened from cloud drive non recursively`() =
@@ -503,6 +513,7 @@ class DefaultPhotosRepositoryTest {
                     megaCancelToken = token
                 ),
             ).thenReturn(listOf(videoNode))
+            initFileTypeInfoMapperReturnedValue(imageNode, videoNode)
             underTest = createUnderTest(this)
             val actualPhotos = underTest.getPhotosByFolderId(NodeId(-1L), recursive = false)
             assertThat(actualPhotos).isNotEmpty()
@@ -558,6 +569,7 @@ class DefaultPhotosRepositoryTest {
                     megaCancelToken = token
                 ),
             ).thenReturn(listOf(videoNode))
+            initFileTypeInfoMapperReturnedValue(imageNode, videoNode)
             underTest = createUnderTest(this)
             val actualPhotos = underTest.getPhotosByFolderId(
                 NodeId(-1L),
@@ -616,6 +628,7 @@ class DefaultPhotosRepositoryTest {
                     megaCancelToken = token
                 ),
             ).thenReturn(listOf(videoNode))
+            initFileTypeInfoMapperReturnedValue(imageNode, videoNode)
             underTest = createUnderTest(this)
             val actualPhotos = underTest.getPhotosByFolderId(
                 NodeId(-1L),

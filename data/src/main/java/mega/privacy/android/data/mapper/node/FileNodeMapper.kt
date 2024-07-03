@@ -69,7 +69,7 @@ internal class FileNodeMapper @Inject constructor(
             megaNode,
             cacheGateway.getFullSizeCacheFolder()
         ),
-        type = fileTypeInfoMapper(megaNode),
+        type = fileTypeInfoMapper(megaNode.name, megaNode.duration),
         isFavourite = megaNode.isFavourite,
         isMarkedSensitive = megaNode.isMarkedSensitive,
         isSensitiveInherited = megaApiGateway.isSensitiveInherited(megaNode),

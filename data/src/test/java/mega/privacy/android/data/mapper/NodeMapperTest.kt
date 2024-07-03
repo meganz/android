@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
@@ -60,14 +61,16 @@ class NodeMapperTest {
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper = mock()
     private val stringListMapper: StringListMapper = mock()
+    private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
 
     @BeforeEach
     internal fun setUp() {
+        whenever(fileTypeInfoMapper(anyOrNull(), anyOrNull())).thenReturn(PdfFileTypeInfo)
         underTest = NodeMapper(
             fileNodeMapper = FileNodeMapper(
                 cacheGateway = mock(),
                 megaApiGateway = megaApiGateway,
-                fileTypeInfoMapper = { PdfFileTypeInfo },
+                fileTypeInfoMapper = fileTypeInfoMapper,
                 offlineAvailabilityMapper = offlineAvailabilityMapper,
                 stringListMapper = stringListMapper,
             ),

@@ -128,7 +128,7 @@ class PhotoMapper @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
 ) {
     suspend operator fun invoke(node: MegaNode, albumPhotoId: AlbumPhotoId?): Photo? {
-        return when (val fileType = fileTypeInfoMapper(node)) {
+        return when (val fileType = fileTypeInfoMapper(node.name, node.duration)) {
             is ImageFileTypeInfo -> {
                 imageMapper(
                     node.handle,

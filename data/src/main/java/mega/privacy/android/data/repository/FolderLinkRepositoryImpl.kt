@@ -168,7 +168,7 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
         }
 
     private suspend fun convertToImageNode(node: MegaNode): ImageNode? {
-        val fileTypeInfo = fileTypeInfoMapper(node)
+        val fileTypeInfo = fileTypeInfoMapper(node.name, node.duration)
         val isImageNode = fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo
         return if (isImageNode) {
             imageNodeMapper(
