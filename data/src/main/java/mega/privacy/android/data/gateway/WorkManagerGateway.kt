@@ -77,4 +77,9 @@ interface WorkManagerGateway {
      * Get UploadsWorker Info
      */
     fun monitorUploadsStatusInfo(): Flow<List<WorkInfo>>
+
+    /**
+     * Queue an one time work request of offline sync immediately
+     */
+    suspend fun startOfflineSync()
 }

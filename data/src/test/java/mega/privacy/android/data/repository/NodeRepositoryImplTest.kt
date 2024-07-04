@@ -12,6 +12,7 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -124,6 +125,7 @@ class NodeRepositoryImplTest {
     private val cancelTokenProvider = mock<CancelTokenProvider>()
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
     private val stringListMapper = mock<StringListMapper>()
+    private val workManagerGateway = mock<WorkManagerGateway>()
     private val fileNodeMapper = FileNodeMapper(
         cacheGateway = cacheGateway,
         megaApiGateway = megaApiGateway,
@@ -176,6 +178,7 @@ class NodeRepositoryImplTest {
             nodeLabelIntMapper = nodeLabelIntMapper,
             cancelTokenProvider = cancelTokenProvider,
             megaSearchFilterMapper = megaSearchFilterMapper,
+            workManagerGateway = workManagerGateway,
         )
     }
 
@@ -206,6 +209,7 @@ class NodeRepositoryImplTest {
             accessPermissionMapper,
             megaLocalStorageGateway,
             megaNodeMapper,
+            workManagerGateway
         )
     }
 

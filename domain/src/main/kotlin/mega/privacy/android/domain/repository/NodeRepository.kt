@@ -217,6 +217,11 @@ interface NodeRepository {
     suspend fun getOfflineNodeInformation(nodeHandle: Long): OfflineNodeInformation?
 
     /**
+     * Start offline files sync worker
+     */
+    suspend fun startOfflineSyncWorker()
+
+    /**
      * Get the [UserId] of the owner of the node with [nodeId] if it's a inShare node
      * @param nodeId [NodeId]
      * @param recursive  if true it checks the root of the node with [nodeId],

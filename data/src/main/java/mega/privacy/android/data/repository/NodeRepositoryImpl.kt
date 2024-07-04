@@ -19,6 +19,7 @@ import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -118,6 +119,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val nodeLabelIntMapper: NodeLabelIntMapper,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
     private val cancelTokenProvider: CancelTokenProvider,
+    private val workManagerGateway: WorkManagerGateway,
 ) : NodeRepository {
 
     override suspend fun getNodeOutgoingShares(nodeId: NodeId) =
@@ -401,6 +403,10 @@ internal class NodeRepositoryImpl @Inject constructor(
             getOfflineNode(nodeHandle)
                 ?.let { offlineNodeInformationMapper(it) }
         }
+
+    override suspend fun startOfflineSyncWorker() = withContext(ioDispatcher) {
+        workManagerGateway.startOfflineSync()
+    }
 
     override suspend fun getOwnerIdFromInShare(nodeId: NodeId, recursive: Boolean): UserId? =
         withContext(ioDispatcher) {

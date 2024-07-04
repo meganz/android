@@ -23,6 +23,7 @@ import mega.privacy.android.data.worker.ChatUploadsWorker
 import mega.privacy.android.data.worker.DeleteOldestCompletedTransfersWorker
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.data.worker.NewMediaWorker
+import mega.privacy.android.data.worker.OfflineSyncWorker.Companion.OFFLINE_SYNC_WORKER_TAG
 import mega.privacy.android.data.worker.UploadsWorker
 import mega.privacy.android.domain.monitoring.CrashReporter
 import timber.log.Timber
@@ -321,6 +322,20 @@ class WorkManagerGatewayImpl @Inject constructor(
 
     override fun monitorUploadsStatusInfo() =
         workManager.getWorkInfosByTagFlow(UploadsWorker.SINGLE_UPLOAD_TAG)
+
+    override suspend fun startOfflineSync() {
+        workManager.debugWorkInfo(crashReporter)
+        val request =
+            OneTimeWorkRequest.Builder(workerClassGateway.offlineSyncWorkerClass)
+                .addTag(OFFLINE_SYNC_WORKER_TAG)
+                .build()
+        workManager
+            .enqueueUniqueWork(
+                OFFLINE_SYNC_WORKER_TAG,
+                ExistingWorkPolicy.KEEP,
+                request
+            )
+    }
 }
 
 /**

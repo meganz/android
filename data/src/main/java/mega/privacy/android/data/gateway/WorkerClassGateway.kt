@@ -41,4 +41,9 @@ interface WorkerClassGateway {
      * Provide the uploads worker class
      */
     val uploadsWorkerClass: Class<out CoroutineWorker>
+
+    /**
+     * Provide the offline sync worker class
+     */
+    val offlineSyncWorkerClass: Class<out CoroutineWorker>
 }
