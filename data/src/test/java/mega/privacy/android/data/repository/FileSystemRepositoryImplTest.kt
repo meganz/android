@@ -34,6 +34,7 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.NodeId
@@ -613,5 +614,13 @@ internal class FileSystemRepositoryImplTest {
         val destination = mock<File>()
         underTest.copyFiles(file, destination)
         verify(fileGateway).copyFileToFolder(file, destination)
+    }
+
+    @Test
+    fun `test that getFileInfoType function returns the correct value`() = runTest {
+        val name = "name"
+        val expectedFileInfoType = UnMappedFileTypeInfo("")
+        whenever(fileTypeInfoMapper(name)).thenReturn(expectedFileInfoType)
+        assertThat(underTest.getFileTypeInfoByName(name)).isEqualTo(expectedFileInfoType)
     }
 }

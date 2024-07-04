@@ -46,6 +46,7 @@ import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.FileVersionsOption
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
@@ -486,6 +487,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun copyFiles(source: File, destination: File) = withContext(ioDispatcher) {
         fileGateway.copyFileToFolder(source, destination)
     }
+
+    override fun getFileTypeInfoByName(name: String, duration: Int): FileTypeInfo =
+        fileTypeInfoMapper(name, duration)
 
     override suspend fun moveFileToSd(
         file: File,

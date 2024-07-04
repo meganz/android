@@ -446,4 +446,13 @@ interface FileSystemRepository {
         source: File,
         destination: File,
     ): Int
+
+    /**
+     * Get file type info for a given name
+     *
+     * @param name file name
+     * @param duration duration of the file
+     * @return [FileTypeInfo] object
+     */
+    fun getFileTypeInfoByName(name: String, duration: Int = 0): FileTypeInfo
 }
