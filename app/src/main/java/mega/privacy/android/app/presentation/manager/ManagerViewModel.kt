@@ -106,6 +106,7 @@ import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.domain.usecase.notifications.GetNumUnreadPromoNotificationsUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodesUseCase
+import mega.privacy.android.domain.usecase.offline.StartOfflineSyncWorkerUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -257,6 +258,7 @@ class ManagerViewModel @Inject constructor(
     private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
     private val monitorUpgradeDialogClosedUseCase: MonitorUpgradeDialogClosedUseCase,
     private val monitorDevicePowerConnectionStateUseCase: MonitorDevicePowerConnectionStateUseCase,
+    private val startOfflineSyncWorkerUseCase: StartOfflineSyncWorkerUseCase,
 ) : ViewModel() {
 
     /**
@@ -530,6 +532,16 @@ class ManagerViewModel @Inject constructor(
                     startCameraUploadUseCase()
                 }
             }
+        }
+    }
+
+    /**
+     * Start offline sync worker
+     * It syncs offline local files with database entries
+     */
+    fun startOfflineSyncWorker() {
+        viewModelScope.launch {
+            startOfflineSyncWorkerUseCase()
         }
     }
 

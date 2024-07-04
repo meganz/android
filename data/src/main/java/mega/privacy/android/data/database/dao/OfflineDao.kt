@@ -24,13 +24,13 @@ internal interface OfflineDao {
     @Query("DELETE FROM offline")
     suspend fun deleteAllOffline()
 
-    @Query("SELECT * FROM offline where path = :path")
+    @Query("SELECT * FROM offline WHERE path = :path")
     fun getOfflineByPath(path: String): Flow<List<OfflineEntity>>
 
-    @Query("SELECT * FROM offline where name = :name")
+    @Query("SELECT * FROM offline WHERE name = :name")
     fun getOfflineByName(name: String): Flow<List<OfflineEntity>>
 
-    @Query("SELECT * FROM offline where path = :path AND name = :name")
+    @Query("SELECT * FROM offline WHERE path = :path AND name = :name")
     fun getOfflineByNameAndPath(path: String, name: String): Flow<List<OfflineEntity>>
 
     @Query("DELETE FROM offline WHERE handle = :handle")
@@ -42,9 +42,9 @@ internal interface OfflineDao {
     @Query("SELECT * FROM offline WHERE id = :id")
     suspend fun getOfflineById(id: Int): OfflineEntity?
 
-    @Query("DELETE FROM offline where id = :id")
+    @Query("DELETE FROM offline WHERE id = :id")
     suspend fun deleteOfflineById(id: Int)
 
-    @Query("DELETE FROM offline where id IN (:ids)")
+    @Query("DELETE FROM offline WHERE id IN (:ids)")
     suspend fun deleteOfflineByIds(ids: List<Int>)
 }

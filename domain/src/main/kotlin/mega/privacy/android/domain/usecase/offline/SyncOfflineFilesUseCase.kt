@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.offline
 
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
@@ -10,7 +9,6 @@ import javax.inject.Inject
  */
 class SyncOfflineFilesUseCase @Inject constructor(
     private val clearOfflineUseCase: ClearOfflineUseCase,
-    private val removeOfflineNodesUseCase: RemoveOfflineNodesUseCase,
     private val getOfflineFilesUseCase: GetOfflineFilesUseCase,
     private val nodeRepository: NodeRepository,
     private val fileSystemRepository: FileSystemRepository,
@@ -21,17 +19,28 @@ class SyncOfflineFilesUseCase @Inject constructor(
     suspend operator fun invoke() {
         val offlineNodes = nodeRepository.getAllOfflineNodes()
         if (fileSystemRepository.getOfflineFolder().exists()) {
-            // Delete offline info from database if file doesn't exist
             getOfflineFilesUseCase(offlineNodes)
-                .filter { !it.value.exists() }
-                .map { it.key }
-                .let { nodeRepository.removeOfflineNodeByIds(it) }
+                .asSequence()
+                .partition { it.value.exists() }
+                .let { (existingFiles, removedFiles) ->
+                    // Delete offline info from database if files don't exist
+                    removedFiles
+                        .map { it.key }
+                        .takeIf { it.isNotEmpty() }
+                        ?.let { nodeRepository.removeOfflineNodeByIds(it) }
 
-            // Delete empty folders
-            offlineNodes
-                .filter { it.isFolder && nodeRepository.getOfflineNodesByParentId(it.id).isEmpty() }
-                .map { NodeId(it.handle.toLong()) }
-                .let { removeOfflineNodesUseCase(it) }
+                    // Delete empty folders and database entries
+                    existingFiles
+                        .filter { it.value.isDirectory }
+                        .sortedByDescending { it.key } // To delete child folders first
+                        .mapNotNull { (id, file) ->
+                            takeIf { file.listFiles().isNullOrEmpty() }?.let {
+                                file.delete()
+                                id
+                            }
+                        }.takeIf { it.isNotEmpty() }
+                        ?.let { nodeRepository.removeOfflineNodeByIds(it) }
+                }
         } else if (offlineNodes.isNotEmpty()) {
             clearOfflineUseCase()
         }

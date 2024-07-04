@@ -114,6 +114,7 @@ import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.domain.usecase.notifications.GetNumUnreadPromoNotificationsUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodesUseCase
+import mega.privacy.android.domain.usecase.offline.StartOfflineSyncWorkerUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -316,6 +317,7 @@ class ManagerViewModelTest {
     private lateinit var monitorSyncsUseCaseFakeFlow: MutableSharedFlow<List<FolderPair>>
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
+    private val startOfflineSyncWorkerUseCase: StartOfflineSyncWorkerUseCase = mock()
     private val fakeCallUpdatesFlow = MutableSharedFlow<ChatCall>()
     private var monitorDevicePowerConnectionFakeFlow =
         MutableSharedFlow<DevicePowerConnectionState>()
@@ -413,6 +415,7 @@ class ManagerViewModelTest {
             monitorDevicePowerConnectionStateUseCase = mock {
                 on { invoke() }.thenReturn(monitorDevicePowerConnectionFakeFlow)
             },
+            startOfflineSyncWorkerUseCase = startOfflineSyncWorkerUseCase
         )
     }
 
@@ -462,6 +465,7 @@ class ManagerViewModelTest {
             broadcastHomeBadgeCountUseCase,
             monitorUpgradeDialogClosedUseCase,
             monitorContactRequestUpdatesUseCase,
+            startOfflineSyncWorkerUseCase
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())

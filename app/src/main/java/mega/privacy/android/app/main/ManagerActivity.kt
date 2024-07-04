@@ -146,7 +146,6 @@ import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDia
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
 import mega.privacy.android.app.main.mapper.ManagerRedirectIntentMapper
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
-import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask
 import mega.privacy.android.app.main.view.OngoingCallBanner
 import mega.privacy.android.app.main.view.OngoingCallViewModel
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
@@ -1375,10 +1374,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             preloadPayment()
             megaApi.isGeolocationEnabled(this)
             if (savedInstanceState == null) {
-                Timber.d("Run async task to check offline files")
-                //Check the consistency of the offline nodes in the DB
-                val checkOfflineNodesTask = CheckOfflineNodesTask(this)
-                checkOfflineNodesTask.execute()
+                // Check the consistency of the offline nodes in the database and sync files
+                viewModel.startOfflineSyncWorker()
             }
             if (intent != null) {
                 if (intent.action != null) {
