@@ -509,34 +509,6 @@ String releaseNotes(releaseNoteFile) {
 }
 
 /**
- * Get the SDK branch name for report. If build is specified by tag
- *
- * @return If SDK is specified by <code>SDK_BRANCH</code>, return the branch name. If SDK is specified
- *         by <code>SDK_TAG</code>, return the tag name.
- */
-String sdkBranchName() {
-    if (isDefined(SDK_TAG)) {
-        return SDK_TAG
-    } else {
-        return SDK_BRANCH
-    }
-}
-
-/**
- * Get the MEGAChat SDK branch name for report. If build is specified by tag
- *
- * @return If SDK is specified by <code>MEGACHAT_BRANCH</code>, return the branch name. If SDK is specified
- *         by <code>MEGACHAT_TAG</code>, return the tag name.
- */
-String megaChatBranchName() {
-    if (isDefined(MEGACHAT_TAG)) {
-        return MEGACHAT_TAG
-    } else {
-        return MEGACHAT_BRANCH
-    }
-}
-
-/**
  * check if a certain value is defined by checking the tag value
  * @param value value of tag
  * @return true if tag has a value. false if tag is null or zero length

@@ -1,4 +1,15 @@
+/**
+ * This script is to build and upload Android AAB to Google Play Store
+ */
+
+@Library('jenkins-android-shared-lib') _
+
 import groovy.json.JsonSlurperClassic
+import mega.privacy.android.pipeline.DefaultParserWrapper
+import org.apache.commons.cli.CommandLine
+import org.apache.commons.cli.CommandLineParser
+import org.apache.commons.cli.Option
+import org.apache.commons.cli.Options
 
 /**
  * This script is to build and upload Android AAB to Google Play Store
@@ -6,25 +17,8 @@ import groovy.json.JsonSlurperClassic
 
 BUILD_STEP = ''
 
-// Below values will be read from MR description and are used to decide SDK versions
-SDK_BRANCH = 'develop'
-MEGACHAT_BRANCH = 'develop'
-SDK_TAG = ""
-MEGACHAT_TAG = ""
-
 /**
- * Flag to decide whether we do clean before build SDK.
- * Possible values: yes|no
- */
-REBUILD_SDK = "no"
-
-/**
- * Flag to decide whether do clean up for SDK and Android code
- */
-DO_CLEANUP = true
-
-/**
- * Folder to contain build outputs, including APK, AAG and symbol files
+ * Folder to contain build outputs, including APK, AAB and symbol files
  */
 ARCHIVE_FOLDER = "archive"
 NATIVE_SYMBOLS_FILE = "symbols.zip"
@@ -82,6 +76,9 @@ pipeline {
                                 "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})"
                     } else if (triggeredByUploadSymbol()) {
                         message = common.uploadSymbolFailureMessage("<br/>") +
+                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})"
+                    } else if (triggeredByCreateJiraVersion()) {
+                        message = createJiraVersionFailureMessage() +
                                 "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})"
                     }
                     common.sendToMR(message)
@@ -162,6 +159,13 @@ pipeline {
                         common.sendToMR(message)
 
                         slackSend color: "good", message: common.uploadSymbolSuccessMessage("\n")
+                    } else if (triggeredByCreateJiraVersion()) {
+                        def message = createJiraVersionSuccessMessage() +
+                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${link})"
+                        common.sendToMR(message)
+
+                        slackSend color: "good", message: ":white_check_mark: Create Jira Version succeeded!"
+
                     }
                 }
             }
@@ -179,10 +183,14 @@ pipeline {
 
                     // load the common library script
                     common = load('jenkinsfile/common.groovy')
+                    util.printEnv()
                 }
             }
         }
         stage('Clone transifex') {
+            when {
+                expression { triggeredByDeliverAppStore() || triggeredByDeleteOldString() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Clone transifex'
@@ -206,8 +214,6 @@ pipeline {
                     common.sendToMR(":runner: Android CD Release pipeline has started!!!" +
                             "<br/><b>Command</b>: ${env.gitlabTriggerPhrase}"
                     )
-
-                    REBUILD_SDK = common.getValueInMRDescriptionBy("REBUILD_SDK")
 
                     sh("rm -frv $ARCHIVE_FOLDER")
                     sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")
@@ -457,12 +463,33 @@ pipeline {
                 }
             }
         }
+        stage("Create Jira Version") {
+            when {
+                expression { triggeredByCreateJiraVersion() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Create Jira Version'
+
+                    def parameters = parseCreateJiraVersionParameters(env.gitlabTriggerPhrase)
+                    def releaseVersion = parameters[0]
+                    def releaseDate = parameters[1]
+                    withCredentials([
+                            string(credentialsId: 'JIRA_TOKEN', variable: 'JIRA_TOKEN'),
+                            string(credentialsId: 'JIRA_API_URL', variable: 'JIRA_API_URL'),
+                            string(credentialsId: 'JIRA_PROJECT_NAME_AND_ID_TABLE', variable: 'JIRA_PROJECTS'),
+                    ]) {
+                        sh("./gradlew createJiraVersion --rv ${releaseVersion} --rd ${releaseDate}")
+                    }
+                }
+            }
+        }
     }
 }
 
 /**
  * Check if this build is triggered by a GitLab Merge Request.
- * @return true if this build is triggerd by a GitLab MR. False if this build is triggerd
+ * @return true if this build is triggered by a GitLab MR. False if this build is triggered
  * by a plain git push.
  */
 private boolean hasGitLabMergeRequest() {
@@ -557,6 +584,49 @@ private String getSlackBuildVersionInfo(Object common) {
     return message
 }
 
+private String createJiraVersionFailureMessage() {
+    return ":x: Create Jira Version failed!(${env.BUILD_NUMBER})"
+}
+
+private String createJiraVersionSuccessMessage() {
+    return ":white_check_mark: Create Jira Version succeeded!(${env.BUILD_NUMBER})"
+}
+
+
+private def parseCreateJiraVersionParameters(String fullCommand) {
+    println("Parsing createJiraVersion parameters")
+    String[] parameters = fullCommand.split("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*\$)")
+
+    Options options = new Options()
+    Option releaseVersionOption = Option
+            .builder("rv")
+            .longOpt("release-version")
+            .argName("Release Version")
+            .hasArg()
+            .desc("Release version to be created in Jira")
+            .build()
+    Option releaseDateOption = Option
+            .builder("rd")
+            .longOpt("release-date")
+            .argName("Release Date")
+            .hasArg()
+            .desc("Expected date of release which is to create in Jira")
+            .build()
+    options.addOption(releaseVersionOption)
+    options.addOption(releaseDateOption)
+
+    CommandLineParser commandLineParser = new DefaultParserWrapper()
+    CommandLine commandLine = commandLineParser.parse(options, parameters)
+
+    String releaseVersion = commandLine.getOptionValue("rv")
+    String releaseDate = commandLine.getOptionValue("rd")
+
+    println("releaseVersion: $releaseVersion")
+    println("releaseDate: $releaseDate")
+
+    return [releaseVersion, releaseDate]
+}
+
 private String skipMessage(String lineBreak) {
     return ":raising_hand: Android Release Upload skipped!" +
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
@@ -606,4 +676,13 @@ private boolean triggeredByDeleteOldString() {
     return isOnReleaseBranch() &&
             env.gitlabTriggerPhrase != null &&
             env.gitlabTriggerPhrase == "delete_oldStrings"
+}
+
+/**
+ * Check if build is triggered by 'upload_symbol' command.
+ * @return true if build is triggered by 'upload_symbol' command. Otherwise return false.
+ */
+private boolean triggeredByCreateJiraVersion() {
+    return env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase.trim().startsWith("create_jira_version")
 }
