@@ -112,7 +112,6 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.isPortrait
@@ -237,13 +236,14 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesCompo
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
-import mega.privacy.android.app.presentation.transfers.TransfersFragment
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
+import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
@@ -314,12 +314,10 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ChatRoomsBottomNavigationItemEvent
@@ -420,9 +418,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
 
     @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
-    @Inject
     lateinit var monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase
 
     @Inject
@@ -443,9 +438,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var nodeSourceTypeMapper: NodeSourceTypeMapper
-
-    @Inject
-    lateinit var navigator: MegaNavigator
 
     @Inject
     lateinit var isFirstLaunchUseCase: IsFirstLaunchUseCase
@@ -1705,20 +1697,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                     if (intent?.action != null) {
                         if (intent.action == Constants.ACTION_SHOW_TRANSFERS) {
-                            if (intent.getBooleanExtra(Constants.OPENED_FROM_CHAT, false)) {
-                                sendBroadcast(
-                                    Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(
-                                        applicationContext.packageName
-                                    )
-                                )
-                            }
-                            drawerItem = DrawerItem.TRANSFERS
-                            transferPageViewModel.setTransfersTab(
-                                intent.serializable(
-                                    TRANSFERS_TAB
-                                ) ?: TransfersTab.NONE
-                            )
-                            intent = null
+                            selectDrawerItemPending = false
+                            openTransfers()
                         } else if (intent.action == Constants.ACTION_REFRESH_AFTER_BLOCKED) {
                             drawerItem = DrawerItem.CLOUD_DRIVE
                             intent = null
@@ -1735,6 +1715,27 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
         return false
+    }
+
+    private fun openTransfers() {
+        val openTab = intent.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+                val tab = openTab.let { tab ->
+                    if (tab == TransfersTab.NONE) {
+                        COMPLETED_TAB_INDEX
+                    } else {
+                        IN_PROGRESS_TAB_INDEX
+                    }
+                }
+                navigator.openTransfers(this@ManagerActivity, tab)
+            } else {
+                drawerItem = DrawerItem.TRANSFERS
+                transferPageViewModel.setTransfersTab(openTab)
+                selectDrawerItem(drawerItem)
+            }
+            intent = null
+        }
     }
 
     private fun handleRedirectIntentActions(intent: Intent?): Boolean {
@@ -2513,18 +2514,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
 
                 Constants.ACTION_SHOW_TRANSFERS -> {
-                    if (intent.getBooleanExtra(Constants.OPENED_FROM_CHAT, false)) {
-                        sendBroadcast(
-                            Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(
-                                applicationContext.packageName
-                            )
-                        )
-                    }
-                    drawerItem = DrawerItem.TRANSFERS
-                    transferPageViewModel.setTransfersTab(
-                        intent.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE
-                    )
-                    selectDrawerItem(drawerItem)
+                    openTransfers()
                 }
 
                 Constants.ACTION_TAKE_SELFIE -> {
@@ -3367,27 +3357,24 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun selectDrawerItemTransfers() {
         Timber.d("selectDrawerItemTransfers")
-        appBarLayout.visibility = View.VISIBLE
-        hideTransfersWidget()
-        drawerItem = DrawerItem.TRANSFERS
-        setBottomNavigationMenuItemChecked(NO_BNV)
-        transfersManagementViewModel.checkIfShouldShowCompletedTab()
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                replaceFragment(
-                    transfersFragment ?: TransfersFragment(),
-                    FragmentTag.TRANSFERS.tag
-                )
+                navigator.openTransfers(this@ManagerActivity, IN_PROGRESS_TAB_INDEX)
             } else {
+                appBarLayout.visibility = View.VISIBLE
+                hideTransfersWidget()
+                drawerItem = DrawerItem.TRANSFERS
+                setBottomNavigationMenuItemChecked(NO_BNV)
+                transfersManagementViewModel.checkIfShouldShowCompletedTab()
                 replaceFragment(
                     transferPageFragment ?: TransferPageFragment.newInstance(),
                     FragmentTag.TRANSFERS_PAGE.tag
                 )
+                setToolbarTitle()
+                showFabButton()
+                closeDrawer()
             }
         }
-        setToolbarTitle()
-        showFabButton()
-        closeDrawer()
     }
 
     /**
@@ -4142,9 +4129,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private val transferPageFragment: TransferPageFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.TRANSFERS_PAGE.tag) as? TransferPageFragment
-
-    private val transfersFragment: TransfersFragment?
-        get() = supportFragmentManager.findFragmentByTag(FragmentTag.TRANSFERS.tag) as? TransfersFragment
 
     private val deviceCenterFragment: DeviceCenterFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.DEVICE_CENTER.tag) as? DeviceCenterFragment
@@ -5872,18 +5856,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             navigateToUpgradeAccount()
             return
         } else if (Constants.ACTION_SHOW_TRANSFERS == intent.action) {
-            if (intent.getBooleanExtra(Constants.OPENED_FROM_CHAT, false)) {
-                sendBroadcast(
-                    Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS).setPackage(
-                        applicationContext.packageName
-                    )
-                )
-            }
-            drawerItem = DrawerItem.TRANSFERS
-            transferPageViewModel.setTransfersTab(
-                intent.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE
-            )
-            selectDrawerItem(drawerItem)
+            openTransfers()
             return
         }
         setIntent(intent)

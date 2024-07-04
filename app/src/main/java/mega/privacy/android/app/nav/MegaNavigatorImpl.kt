@@ -15,6 +15,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivityV2
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
+import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
+import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
@@ -161,5 +163,11 @@ internal class MegaNavigatorImpl @Inject constructor(
             }
             context.startActivity(intent)
         }
+    }
+
+    override fun openTransfers(context: Context, tab: Int) {
+        Intent(context, TransfersActivity::class.java).apply {
+            putExtra(EXTRA_TAB, tab)
+        }.let(context::startActivity)
     }
 }

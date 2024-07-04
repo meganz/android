@@ -178,9 +178,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     lateinit var copyNodeUseCase: CopyNodeUseCase
 
     @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
-    @Inject
     @LoginMutex
     lateinit var loginMutex: Mutex
 

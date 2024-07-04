@@ -111,4 +111,9 @@ interface AppNavigator {
      * @param isFromAchievement Whether the entry point is [InviteFriendsRoute].
      */
     fun openInviteContactActivity(context: Context, isFromAchievement: Boolean)
+
+    /**
+     * Navigate to [TransfersActivity]
+     */
+    fun openTransfers(context: Context, tab: Int)
 }

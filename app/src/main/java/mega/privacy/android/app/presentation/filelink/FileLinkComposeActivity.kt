@@ -48,10 +48,8 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * FileLinkActivity with compose view
@@ -59,9 +57,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FileLinkComposeActivity : TransfersManagementActivity(),
     DecryptAlertDialog.DecryptDialogListener {
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val viewModel: FileLinkViewModel by viewModels()
 

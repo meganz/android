@@ -32,12 +32,14 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
@@ -49,6 +51,8 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -83,6 +87,18 @@ open class TransfersManagementActivity : PasscodeActivity() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * [GetFeatureFlagValueUseCase]
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    /**
+     * [MegaNavigator]
+     */
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     private val showScanTransferDialogObserver = Observer<Boolean> { show ->
         onShowScanningTransfersDialog(show)
@@ -295,15 +311,21 @@ open class TransfersManagementActivity : PasscodeActivity() {
             return@launch
         }
 
-        startActivity(
-            Intent(this@TransfersManagementActivity, ManagerActivity::class.java)
-                .setAction(ACTION_SHOW_TRANSFERS)
-                .putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        )
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+                navigator.openTransfers(this@TransfersManagementActivity, IN_PROGRESS_TAB_INDEX)
+            } else {
+                startActivity(
+                    Intent(this@TransfersManagementActivity, ManagerActivity::class.java)
+                        .setAction(ACTION_SHOW_TRANSFERS)
+                        .putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+            }
 
-        finish()
+            finish()
+        }
     }
 
     /**

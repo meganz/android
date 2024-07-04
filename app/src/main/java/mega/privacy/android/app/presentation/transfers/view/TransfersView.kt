@@ -20,6 +20,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 @Composable
 internal fun TransfersView(
     modifier: Modifier = Modifier,
+    tabIndex: Int = IN_PROGRESS_TAB_INDEX,
 ) = Column(modifier = modifier.semantics {
     testTagsAsResourceId = true
 }) {
@@ -33,7 +34,8 @@ internal fun TransfersView(
                 text = stringResource(id = R.string.title_tab_completed_transfers),
                 tag = TEST_TAG_COMPLETED_TAB,
             ) { CompletedTransfersView() }
-        )
+        ),
+        selectedIndex = tabIndex,
     )
 }
 
@@ -60,10 +62,18 @@ private fun TransfersViewPreview() {
  * Tag for the in progress tab
  */
 const val TEST_TAG_IN_PROGRESS_TAB = "transfers_view:tab_in_progress"
-private const val IN_PROGRESS_TAB_INDEX = 0
+
+/**
+ * Index for the in progress tab
+ */
+const val IN_PROGRESS_TAB_INDEX = 0
 
 /**
  * Tag for the completed tab
  */
 const val TEST_TAG_COMPLETED_TAB = "transfers_view:tab_completed"
-private const val COMPLETED_TAB_INDEX = 1
+
+/**
+ * Index for the completed tab
+ */
+const val COMPLETED_TAB_INDEX = 1

@@ -48,6 +48,7 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
@@ -85,6 +86,7 @@ import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
@@ -102,6 +104,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -155,6 +158,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
      */
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    /**
+     * [GetFeatureFlagValueUseCase]
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val nameCollisionActivityContract =
         registerForActivityResult(NameCollisionActivityContract()) { result: String? ->
@@ -754,13 +763,19 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
     private fun transfersWidgetClicked() {
         transfersManagement.setAreFailedTransfers(false)
-        startActivity(
-            Intent(this, ManagerActivity::class.java)
-                .setAction(Constants.ACTION_SHOW_TRANSFERS)
-                .putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        )
-        finish()
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+                megaNavigator.openTransfers(this@SearchActivity, IN_PROGRESS_TAB_INDEX)
+            } else {
+                startActivity(
+                    Intent(this@SearchActivity, ManagerActivity::class.java)
+                        .setAction(Constants.ACTION_SHOW_TRANSFERS)
+                        .putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                )
+            }
+            finish()
+        }
         if (transfersManagement.isOnTransferOverQuota()) {
             transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
         }
