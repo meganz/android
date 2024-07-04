@@ -88,7 +88,6 @@ import mega.privacy.android.app.utils.Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TY
 import mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
-import mega.privacy.android.app.utils.Constants.RESUME_TRANSFERS_TYPE
 import mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
@@ -950,14 +949,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     setAction(
                         R.string.tab_sent_requests,
                         SnackbarNavigateOption(view.context, type, userEmail)
-                    )
-                    show()
-                }
-
-                RESUME_TRANSFERS_TYPE -> {
-                    setAction(
-                        R.string.button_resume_individual_transfer,
-                        SnackbarNavigateOption(view.context, type)
                     )
                     show()
                 }

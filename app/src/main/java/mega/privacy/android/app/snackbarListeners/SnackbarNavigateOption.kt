@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.view.View
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
-import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants
 
 class SnackbarNavigateOption @JvmOverloads constructor(
@@ -31,8 +29,6 @@ class SnackbarNavigateOption @JvmOverloads constructor(
                     Constants.NOTIFICATIONS_ENABLED,
                     null
                 )
-            } else if (type == Constants.RESUME_TRANSFERS_TYPE) {
-                context.selectDrawerItem(DrawerItem.TRANSFERS)
             } else if (isSentAsMessageSnackbar) {
                 idChat?.let { context.moveToChatSection(it) }
             } else {
@@ -46,17 +42,11 @@ class SnackbarNavigateOption @JvmOverloads constructor(
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             intent.putExtra(Constants.CHAT_ID, idChat)
             intent.putExtra(Constants.EXTRA_MOVE_TO_CHAT_SECTION, true)
-        } else if (type == Constants.RESUME_TRANSFERS_TYPE) {
-            intent.action = Constants.ACTION_SHOW_TRANSFERS
-            intent.putExtra(Constants.OPENED_FROM_IMAGE_VIEWER, true)
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-            intent.putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
         } else {
             intent.action = Constants.ACTION_SHOW_SETTINGS_STORAGE
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
         context.startActivity(intent)
-        if (type == Constants.RESUME_TRANSFERS_TYPE) return
         (context as? Activity)?.finish()
     }
 }
