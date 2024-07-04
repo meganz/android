@@ -1,17 +1,12 @@
 package mega.privacy.android.app.meeting.listeners
 
-import android.util.Pair
 import androidx.lifecycle.MutableLiveData
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
+
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.utils.CallUtil.callStatusToString
-import mega.privacy.android.app.utils.CallUtil.sessionStatusToString
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_MINUTE
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
@@ -47,7 +42,6 @@ class MeetingListener : MegaChatCallListenerInterface {
         // Call composition has changed (User added or removed from call)
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION) && call.callCompositionChange != 0) {
             Timber.d("Call composition changed. Call status is ${callStatusToString(call.status)}. Num of participants is ${call.numParticipants}")
-            sendCallEvent(EVENT_CALL_COMPOSITION_CHANGE, call)
             stopCountDown()
         }
 
@@ -68,26 +62,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             Timber.w("Logging out")
             return
         }
-
-        val call = api.getChatCallByCallId(callid)
-
-        // Session status has changed
-        if (session.hasChanged(MegaChatSession.CHANGE_TYPE_STATUS)) {
-            Timber.d("Session status changed, current status is ${sessionStatusToString(session.status)}, of participant with clientID ${session.clientid}")
-            sendSessionEvent(session, call)
-        }
-
-        // Hi-Res video received
-        if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_ON_HIRES)) {
-            Timber.d("Session on high resolution changed. Client ID  ${session.clientid}")
-            sendSessionEvent(EVENT_SESSION_ON_HIRES_CHANGE, session, callid)
-        }
-
-        // Low-Res video received
-        if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_ON_LOWRES)) {
-            Timber.d("Session on low resolution changed. Client ID  ${session.clientid}")
-            sendSessionEvent(EVENT_SESSION_ON_LOWRES_CHANGE, session, callid)
-        }
     }
 
     private fun sendCallEvent(type: String, call: MegaChatCall) {
@@ -95,28 +69,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             type,
             MegaChatCall::class.java
         ).post(call)
-    }
-
-    private fun sendSessionEvent(type: String, session: MegaChatSession, callId: Long) {
-        val sessionAndCall = Pair.create(callId, session)
-        LiveEventBus.get(
-            type,
-            Pair::class.java
-        ).post(sessionAndCall)
-    }
-
-    /**
-     * Method to post a LiveEventBus with MegaChatCall and MegaChatSession
-     *
-     * @param session MegaChatSession
-     * @param call MegaChatCall
-     */
-    private fun sendSessionEvent(session: MegaChatSession, call: MegaChatCall?) {
-        val sessionAndCall = Pair.create(call, session)
-        LiveEventBus.get(
-            EVENT_SESSION_STATUS_CHANGE,
-            Pair::class.java
-        ).post(sessionAndCall)
     }
 
     /**

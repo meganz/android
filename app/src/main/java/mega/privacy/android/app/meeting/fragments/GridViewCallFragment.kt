@@ -13,7 +13,6 @@ import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
-import nz.mega.sdk.MegaChatSession
 import timber.log.Timber
 
 class GridViewCallFragment : MeetingBaseFragment() {

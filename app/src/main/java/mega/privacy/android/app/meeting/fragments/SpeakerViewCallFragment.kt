@@ -82,8 +82,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             }
 
         } else {
-            inMeetingViewModel.getSession(newSpeaker.clientId)?.apply {
-                if (!hasVideo || inMeetingViewModel.isSessionOnHold(newSpeaker.clientId)) {
+            inMeetingViewModel.getSessionByClientId(newSpeaker.clientId)?.apply {
+                if (!hasVideo || inMeetingViewModel.isSessionOnHoldByClientId(newSpeaker.clientId)) {
                     removeTextureViewOfPreviousSpeaker(newSpeaker.peerId, newSpeaker.clientId)
                     inMeetingViewModel.removePreviousSpeakers()
                 }
@@ -280,7 +280,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 speakerAvatar.setImageBitmap(bitmap)
             }
             updateAudioIcon(speaker)
-            inMeetingViewModel.getSession(speaker.clientId)?.let {
+            inMeetingViewModel.getSessionByClientId(speaker.clientId)?.let {
                 if (it.hasVideo) {
                     checkVideoOn(speaker)
                 } else {
@@ -353,7 +353,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         surfaceContainer.isVisible = false
 
         if (speaker.videoListener != null) {
-            Timber.d("Close remote video")
             inMeetingViewModel.removeRemoteVideoResolution(speaker)
         }
     }
@@ -366,9 +365,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     private fun checkOnHold(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
 
-        val isCallOnHold = inMeetingViewModel.isCallOnHold()
-        val isSessionOnHold = inMeetingViewModel.isSessionOnHold(speaker.clientId)
-        if (isSessionOnHold) {
+        if (inMeetingViewModel.isSessionOnHoldByClientId(speaker.clientId)) {
             Timber.d("Session is on hold ")
             speakerOnHoldIcon.isVisible = true
             speakerAvatar.alpha = 0.5f
@@ -377,7 +374,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
         Timber.d("Session is in progress")
         speakerOnHoldIcon.isVisible = false
-        speakerAvatar.alpha = if (isCallOnHold) 0.5f else 1f
+        speakerAvatar.alpha = if (inMeetingViewModel.isCallOnHold()) 0.5f else 1f
     }
 
     /**
@@ -388,7 +385,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     private fun checkVideoOn(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
 
-        inMeetingViewModel.getSession(speaker.clientId)?.let {
+        inMeetingViewModel.getSessionByClientId(speaker.clientId)?.let {
             if (it.hasVideo && (!inMeetingViewModel.isCallOrSessionOnHold(
                     speaker.clientId
                 ))
@@ -436,7 +433,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * @param speaker The speaker participant
      */
     private fun addSpeakerVideoListener(speaker: Participant) {
-        inMeetingViewModel.getSession(speaker.clientId)?.apply {
+        inMeetingViewModel.getSessionByClientId(speaker.clientId)?.apply {
             if (hasVideo && !inMeetingViewModel.isCallOrSessionOnHold(speaker.clientId)) {
                 if (speaker.videoListener == null) {
                     speaker.videoListener =
@@ -529,7 +526,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 surfaceContainer.addView(listener.textureView)
             }
 
-            inMeetingViewModel.getSession(speaker.clientId)?.let { session ->
+            inMeetingViewModel.getSessionByClientId(speaker.clientId)?.let { session ->
                 if (speaker.hasHiRes) {
                     if (!session.canReceiveVideoHiRes && session.isHiResVideo) {
                         inMeetingViewModel.requestHiResVideo(
@@ -537,7 +534,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                             inMeetingViewModel.getChatId()
                         )
                     } else {
-                        Timber
                         Timber.d("Already have LowRes/HiRes video, clientId ${speaker.clientId}")
                         updateListenerSpeaker(speaker.peerId, speaker.clientId, true)
                     }
@@ -762,6 +758,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
             if (speaker.peerId == participant.peerId && speaker.clientId == participant.clientId && isHiRes) {
                 Timber.d("Update listener in speaker, should the listener be added? $shouldAddListener")
+
                 updateListenerSpeaker(speaker.peerId, speaker.clientId, shouldAddListener)
             }
         }

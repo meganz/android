@@ -1,18 +1,29 @@
 package mega.privacy.android.app.usecase.call
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
+import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -21,6 +32,9 @@ import javax.inject.Inject
 class GetParticipantsChangesUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getCallUseCase: GetCallUseCase,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    @ApplicationScope private val sharingScope: CoroutineScope,
+    @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
 
     companion object {
@@ -79,29 +93,31 @@ class GetParticipantsChangesUseCase @Inject constructor(
                 }
             }
 
-            val callCompositionObserver = Observer<MegaChatCall> { call ->
-                call?.let {
-                    if (it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS || it.status == MegaChatCall.CALL_STATUS_JOINING) {
-                        emitter.onNext(checkIfIAmAloneOnSpecificCall(it))
-                    } else if (it.status != MegaChatCall.CALL_STATUS_DESTROYED && it.status != MegaChatCall.CALL_STATUS_USER_NO_PRESENT && it.status != MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
-                        emitter.onNext(NumParticipantsChangesResult(it.chatid,
-                            onlyMeInTheCall = false,
-                            waitingForOthers = false,
-                            isReceivedChange = true))
+            sharingScope.launch {
+                monitorChatCallUpdatesUseCase()
+                    .catch { Timber.e(it) }
+                    .collectLatest { call ->
+                        withContext(mainImmediateDispatcher) {
+                            call.changes?.apply {
+                                Timber.d("Monitor chat call updated, changes $this")
+                                if (contains(ChatCallChanges.CallComposition)) {
+                                    if (call.status == ChatCallStatus.InProgress || call.status == ChatCallStatus.Joining) {
+                                        emitter.onNext(checkIfIAmAloneOnSpecificCall(call))
+                                    } else if (call.status != ChatCallStatus.Destroyed && call.status != ChatCallStatus.UserNoPresent && call.status != ChatCallStatus.TerminatingUserParticipation) {
+                                        emitter.onNext(
+                                            NumParticipantsChangesResult(
+                                                call.chatId,
+                                                onlyMeInTheCall = false,
+                                                waitingForOthers = false,
+                                                isReceivedChange = true
+                                            )
+                                        )
 
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
-            }
-
-            LiveEventBus.get(EventConstants.EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
-                .observeForever(callCompositionObserver)
-
-            emitter.setCancellable {
-                LiveEventBus.get(
-                    EventConstants.EVENT_CALL_COMPOSITION_CHANGE,
-                    MegaChatCall::class.java
-                )
-                    .removeObserver(callCompositionObserver)
             }
         }, BackpressureStrategy.LATEST)
 
@@ -134,29 +150,60 @@ class GetParticipantsChangesUseCase @Inject constructor(
     }
 
     /**
+     * Method to check if I am alone on a specific call and whether it is because I am waiting for others or because everyone has dropped out of the call
+     *
+     * @param call MegaChatCall
+     * @return NumParticipantsChangesResult
+     */
+    private fun checkIfIAmAloneOnSpecificCall(call: ChatCall): NumParticipantsChangesResult {
+        var waitingForOthers = false
+        var onlyMeInTheCall = false
+        runCatching {
+            megaChatApi.getChatRoom(call.chatId)?.let { chat ->
+                val isOneToOneCall = !chat.isGroup && !chat.isMeeting
+                if (!isOneToOneCall) {
+                    call.peerIdParticipants?.let { list ->
+                        onlyMeInTheCall =
+                            list.size == 1 && list[0] == megaChatApi.myUserHandle
+
+                        waitingForOthers = onlyMeInTheCall &&
+                                MegaApplication.getChatManagement().isRequestSent(call.callId)
+                    }
+                }
+            }
+        }
+
+        return NumParticipantsChangesResult(
+            call.chatId,
+            onlyMeInTheCall,
+            waitingForOthers,
+            isReceivedChange = true
+        )
+    }
+
+    /**
      * Method to get local audio changes
      *
      * @return Flowable containing True, if audio is enabled. False, if audio is disabled.
      */
     fun getChangesFromParticipants(): Flowable<ParticipantsChangesResult> =
         Flowable.create({ emitter ->
-            val callCompositionObserver = Observer<MegaChatCall> { call ->
-                megaChatApi.getChatRoom(call.chatid)?.let { chat ->
-                    if (chat.isGroup || chat.isMeeting)
-                        emitter.checkParticipantsChanges(call)
-                }
-            }
-
-            LiveEventBus.get(EventConstants.EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
-                .observeForever(callCompositionObserver)
-
-            emitter.setCancellable {
-                removeCountDown()
-                LiveEventBus.get(
-                    EventConstants.EVENT_CALL_COMPOSITION_CHANGE,
-                    MegaChatCall::class.java
-                )
-                    .removeObserver(callCompositionObserver)
+            sharingScope.launch {
+                monitorChatCallUpdatesUseCase()
+                    .catch { Timber.e(it) }
+                    .collectLatest { call ->
+                        withContext(mainImmediateDispatcher) {
+                            call.changes?.apply {
+                                Timber.d("Monitor chat call updated, changes $this")
+                                if (contains(ChatCallChanges.CallComposition)) {
+                                    megaChatApi.getChatRoom(call.chatId)?.let { chat ->
+                                        if (chat.isGroup || chat.isMeeting)
+                                            emitter.checkParticipantsChanges(call)
+                                    }
+                                }
+                            }
+                        }
+                    }
             }
         }, BackpressureStrategy.LATEST)
 
@@ -165,76 +212,81 @@ class GetParticipantsChangesUseCase @Inject constructor(
      *
      * @param call MegaChatCall
      */
-    private fun FlowableEmitter<ParticipantsChangesResult>.checkParticipantsChanges(call: MegaChatCall) {
-        if (call.status != MegaChatCall.CALL_STATUS_IN_PROGRESS || call.peeridCallCompositionChange == megaChatApi.myUserHandle || call.callCompositionChange == 0)
+    private fun FlowableEmitter<ParticipantsChangesResult>.checkParticipantsChanges(call: ChatCall) {
+        if (call.status != ChatCallStatus.InProgress || call.peerIdCallCompositionChange == megaChatApi.myUserHandle || call.callCompositionChange == CallCompositionChanges.NoChange)
             return
 
-        when (call.callCompositionChange) {
-            TYPE_JOIN -> {
-                peerIdsJoined.add(call.peeridCallCompositionChange)
-                if (numberOfShiftsToWaitToJoin > 0) {
-                    numberOfShiftsToWaitToJoin--
+        call.peerIdCallCompositionChange?.let { peerId ->
+            when (call.callCompositionChange) {
+                CallCompositionChanges.Added -> {
+                    peerIdsJoined.add(peerId)
+                    if (numberOfShiftsToWaitToJoin > 0) {
+                        numberOfShiftsToWaitToJoin--
 
-                    if (joinedCountDownTimer == null) {
-                        joinedCountDownTimer = CustomCountDownTimer(joinedParticipantLiveData)
-                        joinedCountDownTimer?.mutableLiveData?.observeForever { counterState ->
-                            counterState?.let { isFinished ->
-                                if (isFinished) {
-                                    joinedCountDownTimer?.stop()
-                                    numberOfShiftsToWaitToJoin = MAX_NUM_OF_WAITING_SHIFTS
+                        if (joinedCountDownTimer == null) {
+                            joinedCountDownTimer = CustomCountDownTimer(joinedParticipantLiveData)
+                            joinedCountDownTimer?.mutableLiveData?.observeForever { counterState ->
+                                counterState?.let { isFinished ->
+                                    if (isFinished) {
+                                        joinedCountDownTimer?.stop()
+                                        numberOfShiftsToWaitToJoin = MAX_NUM_OF_WAITING_SHIFTS
 
-                                    val listOfPeers = ArrayList<Long>()
-                                    listOfPeers.addAll(peerIdsJoined)
-                                    val result = ParticipantsChangesResult(
-                                        chatId = call.chatid,
-                                        typeChange = TYPE_JOIN,
-                                        listOfPeers
-                                    )
-                                    this.onNext(result)
-                                    peerIdsJoined.clear()
+                                        val listOfPeers = ArrayList<Long>()
+                                        listOfPeers.addAll(peerIdsJoined)
+                                        val result = ParticipantsChangesResult(
+                                            chatId = call.chatId,
+                                            typeChange = TYPE_JOIN,
+                                            listOfPeers
+                                        )
+                                        this.onNext(result)
+                                        peerIdsJoined.clear()
+                                    }
                                 }
                             }
+
+                        } else {
+                            joinedCountDownTimer?.stop()
                         }
 
-                    } else {
-                        joinedCountDownTimer?.stop()
+                        joinedCountDownTimer?.start(NUM_OF_SECONDS_TO_WAIT)
                     }
-
-                    joinedCountDownTimer?.start(NUM_OF_SECONDS_TO_WAIT)
                 }
-            }
-            TYPE_LEFT -> {
-                peerIdsLeft.add(call.peeridCallCompositionChange)
-                if (numberOfShiftsToWaitToLeft > 0) {
-                    numberOfShiftsToWaitToLeft--
 
-                    if (leftCountDownTimer == null) {
-                        leftCountDownTimer = CustomCountDownTimer(leftParticipantLiveData)
-                        leftCountDownTimer?.mutableLiveData?.observeForever { counterState ->
-                            counterState?.let { isFinished ->
-                                if (isFinished) {
-                                    leftCountDownTimer?.stop()
-                                    numberOfShiftsToWaitToLeft = MAX_NUM_OF_WAITING_SHIFTS
+                CallCompositionChanges.Removed -> {
+                    peerIdsLeft.add(peerId)
+                    if (numberOfShiftsToWaitToLeft > 0) {
+                        numberOfShiftsToWaitToLeft--
 
-                                    val listOfPeers = ArrayList<Long>()
-                                    listOfPeers.addAll(peerIdsLeft)
-                                    val result = ParticipantsChangesResult(
-                                        chatId = call.chatid,
-                                        typeChange = TYPE_LEFT,
-                                        listOfPeers
-                                    )
+                        if (leftCountDownTimer == null) {
+                            leftCountDownTimer = CustomCountDownTimer(leftParticipantLiveData)
+                            leftCountDownTimer?.mutableLiveData?.observeForever { counterState ->
+                                counterState?.let { isFinished ->
+                                    if (isFinished) {
+                                        leftCountDownTimer?.stop()
+                                        numberOfShiftsToWaitToLeft = MAX_NUM_OF_WAITING_SHIFTS
 
-                                    this.onNext(result)
-                                    peerIdsLeft.clear()
+                                        val listOfPeers = ArrayList<Long>()
+                                        listOfPeers.addAll(peerIdsLeft)
+                                        val result = ParticipantsChangesResult(
+                                            chatId = call.chatId,
+                                            typeChange = TYPE_LEFT,
+                                            listOfPeers
+                                        )
+
+                                        this.onNext(result)
+                                        peerIdsLeft.clear()
+                                    }
                                 }
                             }
+                        } else {
+                            leftCountDownTimer?.stop()
                         }
-                    } else {
-                        leftCountDownTimer?.stop()
-                    }
 
-                    leftCountDownTimer?.start(NUM_OF_SECONDS_TO_WAIT)
+                        leftCountDownTimer?.start(NUM_OF_SECONDS_TO_WAIT)
+                    }
                 }
+
+                else -> {}
             }
         }
     }

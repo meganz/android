@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,11 +31,11 @@ import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.meeting.ChatSessionStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaChatSession
 import org.jetbrains.anko.displayMetrics
 import timber.log.Timber
 import javax.inject.Inject
@@ -62,27 +61,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
 
-    private val sessionStatusObserver =
-        Observer<Pair<MegaChatCall?, MegaChatSession>> { callAndSession ->
-            val call = callAndSession.first ?: return@Observer
-
-            if (inMeetingViewModel.isSameCall(call.callId) && !inMeetingViewModel.isOneToOneCall()) {
-                when (callAndSession.second.status) {
-                    MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
-                        Timber.d("Session in progress, clientID = ${callAndSession.second.clientid}")
-                        inMeetingViewModel.addParticipant(callAndSession.second.clientid)
-                    }
-
-                    MegaChatSession.SESSION_STATUS_DESTROYED -> {
-                        Timber.d("Session destroyed, clientID = ${callAndSession.second.clientid}")
-                        inMeetingViewModel.removeParticipant(
-                            callAndSession.second,
-                        )
-                    }
-                }
-            }
-        }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -102,7 +80,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         }
 
         setupView()
-        initLiveEvent()
         collectFlows()
 
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
@@ -114,13 +91,36 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         }
     }
 
-    /**
-     * Method for initialising UI elements
-     */
-    private fun initLiveEvent() {
-        //Sessions Level
-        LiveEventBus.get<Pair<MegaChatCall?, MegaChatSession>>(EventConstants.EVENT_SESSION_STATUS_CHANGE)
-            .observe(this, sessionStatusObserver)
+    private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInStatusInSession }
+            .distinctUntilChanged()) {
+            it?.apply {
+                if (!inMeetingViewModel.isOneToOneCall()) {
+                    when (status) {
+                        ChatSessionStatus.Invalid -> {}
+                        ChatSessionStatus.Progress -> {
+                            Timber.d("Session in progress, clientID = $clientId")
+                            inMeetingViewModel.addParticipant(it)
+                        }
+
+                        ChatSessionStatus.Destroyed -> {
+                            Timber.d("Session destroyed, clientID = $clientId")
+                            inMeetingViewModel.removeParticipant(it)
+                        }
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.status }
+            .distinctUntilChanged()) {
+            it?.let { callStatus ->
+                if (callStatus == ChatCallStatus.TerminatingUserParticipation || callStatus == ChatCallStatus.Destroyed) {
+                    disableLocalCamera()
+                    finishActivity()
+                }
+            }
+        }
     }
 
     /**
@@ -200,18 +200,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         }
 
         participantsAdapter.submitList(participants.toList())
-    }
-
-    private fun collectFlows() {
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.status }
-            .distinctUntilChanged()) {
-            it?.let { callStatus ->
-                if (callStatus == ChatCallStatus.TerminatingUserParticipation || callStatus == ChatCallStatus.Destroyed) {
-                    disableLocalCamera()
-                    finishActivity()
-                }
-            }
-        }
     }
 
     /**
@@ -327,7 +315,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
      * Method to disable the local camera
      */
     fun disableLocalCamera() {
-        if (inMeetingViewModel.isLocalCameraOn()) {
+        if (inMeetingViewModel.state.value.hasLocalVideo) {
             Timber.d("Disable local camera")
             sharedModel.clickCamera(false)
         }

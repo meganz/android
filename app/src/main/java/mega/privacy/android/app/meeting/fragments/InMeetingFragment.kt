@@ -49,16 +49,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -107,7 +103,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MAX_USER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
-import mega.privacy.android.app.utils.Constants.INVALID_CALL_STATUS
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NAME_CHANGE
@@ -118,7 +113,6 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
@@ -127,6 +121,7 @@ import mega.privacy.android.domain.entity.meeting.AnotherCallType
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSession
+import mega.privacy.android.domain.entity.meeting.ChatSessionStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
@@ -135,11 +130,8 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_INITIAL
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -273,7 +265,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val privilegesChangeObserver = Observer<MegaChatListItem> { item ->
         if (inMeetingViewModel.isSameChatRoom(item.chatId)) {
             inMeetingViewModel.getCall()?.let { call ->
-                if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+                if (call.status == ChatCallStatus.InProgress) {
                     if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
                         Timber.d("Change in my privileges")
                         if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
@@ -303,63 +295,41 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bottomFloatingPanelViewHolder?.updatePanel(false)
     }
 
-    private val callCompositionObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId) &&
-            it.status != INVALID_CALL_STATUS &&
-            (it.callCompositionChange == 1 || it.callCompositionChange == -1)
-        ) {
-            if (inMeetingViewModel.showReconnectingBanner.value || !isOnline(
-                    requireContext()
-                )
-            ) {
-                Timber.d("Back from reconnecting")
-            } else {
-                Timber.d("Change in call composition, review the UI")
-                if (inMeetingViewModel.isOneToOneCall()) {
-                    if (it.numParticipants == 1 || it.numParticipants == 2) {
-                        checkChildFragments()
+    private fun sessionStatusChanged(session: ChatSession) {
+        if (!inMeetingViewModel.isOneToOneCall()) {
+            when (session.status) {
+                ChatSessionStatus.Invalid -> {}
+                ChatSessionStatus.Progress -> {
+                    Timber.d("Session in progress, clientID = ${session.clientId}")
+                    inMeetingViewModel.addParticipant(
+                        session
+                    )?.let { position ->
+                        if (position != INVALID_POSITION) {
+                            checkChildFragments()
+                            participantAddedOrLeftMeeting(true, position)
+                        }
                     }
-                } else {
-                    checkChildFragments()
+                }
+
+                ChatSessionStatus.Destroyed -> {
+                    Timber.d("Session destroyed, clientID = ${session.clientId}")
+                    inMeetingViewModel.removeParticipant(
+                        session
+                    ).let { position ->
+                        if (position != INVALID_POSITION) {
+                            checkChildFragments()
+                            participantAddedOrLeftMeeting(false, position)
+                        }
+                    }
                 }
             }
+
+        } else {
+            checkChildFragments()
         }
+
+        showMuteBanner()
     }
-
-    private val sessionStatusObserver =
-        Observer<Pair<MegaChatCall, MegaChatSession>> { callAndSession ->
-            if (!inMeetingViewModel.isOneToOneCall()) {
-                when (callAndSession.second.status) {
-                    MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
-                        Timber.d("Session in progress, clientID = ${callAndSession.second.clientid}")
-                        inMeetingViewModel.addParticipant(
-                            callAndSession.second.clientid
-                        )?.let { position ->
-                            if (position != INVALID_POSITION) {
-                                checkChildFragments()
-                                participantAddedOrLeftMeeting(true, position)
-                            }
-                        }
-                    }
-
-                    MegaChatSession.SESSION_STATUS_DESTROYED -> {
-                        Timber.d("Session destroyed, clientID = ${callAndSession.second.clientid}")
-                        inMeetingViewModel.removeParticipant(
-                            callAndSession.second,
-                        ).let { position ->
-                            if (position != INVALID_POSITION) {
-                                checkChildFragments()
-                                participantAddedOrLeftMeeting(false, position)
-                            }
-                        }
-                    }
-                }
-            } else {
-                checkChildFragments()
-            }
-
-            showMuteBanner()
-        }
 
     private val chatConnectionStatusObserver =
         Observer<Pair<Long, Int>> { chatAndState ->
@@ -368,183 +338,168 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-    private val sessionLowResObserver =
-        Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.isOneToOneCall()) {
-                callAndSession.second?.let { session ->
-                    inMeetingViewModel.getParticipant(
-                        session.peerid,
-                        session.clientid
-                    )?.let { participant ->
-                        val canRecvVideoLowRes = session.canRecvVideoLowRes()
-                        val sessionIsLowResVideo = session.isLowResVideo
-                        val sessionHasVideo =
-                            inMeetingViewModel.sessionHasVideo(participant.clientId)
-                        val participantHasLowRes = !participant.hasHiRes
+    private fun sessionLowRes(session: ChatSession) {
+        inMeetingViewModel.getParticipant(
+            session.peerId,
+            session.clientId
+        )?.let { participant ->
+            val canRecvVideoLowRes = session.canReceiveVideoLowRes
+            val sessionIsLowResVideo = session.isLowResVideo
+            val sessionHasVideo =
+                inMeetingViewModel.sessionHasVideo(participant.clientId)
+            val participantHasLowRes = !participant.hasHiRes
 
-                        if (participantHasLowRes) {
-                            when {
-                                canRecvVideoLowRes && sessionIsLowResVideo -> {
-                                    Timber.d("Add participant listener for ${participant.clientId}")
-                                    //Can receive Low res. Add listener
-                                    checkVideoListener(
-                                        participant,
-                                        shouldAddListener = true,
-                                        isHiRes = false
-                                    )
-                                }
-
-                                else -> {
-                                    Timber.d("Remove participant listener for ${participant.clientId}")
-                                    //Cannot receive Low res. Remove listener
-                                    checkVideoListener(
-                                        participant,
-                                        shouldAddListener = false,
-                                        isHiRes = false
-                                    )
-
-                                    //I have stopped receiving LowResolution. I have to verify that I no longer need it.
-                                    if (sessionHasVideo && inMeetingViewModel.isParticipantVisible(
-                                            participant
-                                        )
-                                    ) {
-                                        Timber.d("Ask for low-resolution video for ${participant.clientId}")
-                                        inMeetingViewModel.requestLowResVideo(
-                                            inMeetingViewModel.getSession(session.clientid),
-                                            inMeetingViewModel.getChatId()
-                                        )
-
-                                    } else {
-                                        Timber.d("it is not necessary to ask for a low-resolution for ${participant.clientId}")
-                                    }
-                                }
-                            }
-                        }
+            if (participantHasLowRes) {
+                when {
+                    canRecvVideoLowRes && sessionIsLowResVideo -> {
+                        Timber.d("Add participant listener for ${participant.clientId}")
+                        //Can receive Low res. Add listener
+                        checkVideoListener(
+                            participant,
+                            shouldAddListener = true,
+                            isHiRes = false
+                        )
                     }
-                }
-            }
-        }
 
-    private val sessionHiResObserver =
-        Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.isOneToOneCall()) {
-                callAndSession.second?.let { session ->
-                    inMeetingViewModel.getParticipant(
-                        session.peerid,
-                        session.clientid
-                    )?.let { participant ->
-                        val sessionCanReceiveHiRes = session.canRecvVideoHiRes()
-                        val sessionHasVideoWithHiRes = session.isHiResVideo
-                        val participantHasHiRes = participant.hasHiRes
-
-                        val existSpeaker =
-                            if (participant.isSpeaker && !participant.hasHiRes) inMeetingViewModel.getSpeaker(
-                                participant.peerId,
-                                participant.clientId
-                            )?.let {
-                                true
-                            } ?: run { false } else false
-
-                        val screenSharedParticipant = inMeetingViewModel.getScreenShared(
-                            participant.peerId,
-                            participant.clientId
+                    else -> {
+                        Timber.d("Remove participant listener for ${participant.clientId}")
+                        //Cannot receive Low res. Remove listener
+                        checkVideoListener(
+                            participant,
+                            shouldAddListener = false,
+                            isHiRes = false
                         )
 
-                        val existScreenShared = if (participant.isPresenting)
-                            screenSharedParticipant
-                                ?.let {
-                                    true
-                                } ?: run { false } else false
+                        //I have stopped receiving LowResolution. I have to verify that I no longer need it.
+                        if (sessionHasVideo && inMeetingViewModel.isParticipantVisible(
+                                participant
+                            )
+                        ) {
+                            Timber.d("Ask for low-resolution video for ${participant.clientId}")
+                            inMeetingViewModel.requestLowResVideo(
+                                session,
+                                inMeetingViewModel.getChatId()
+                            )
 
-                        if (sessionCanReceiveHiRes && sessionHasVideoWithHiRes) {
-                            //Can receive Hi res. Add listener.
-                            when {
-                                existSpeaker -> {
-                                    //Speaker listener
-                                    Timber.d("Add speaker listener for ${participant.clientId}")
-                                    checkSpeakerVideoListener(
-                                        session.peerid,
-                                        session.clientid,
-                                        shouldAddListener = true
-                                    )
-                                }
-
-                                existScreenShared -> {
-                                    //Screen shared listener
-                                    Timber.d("Add screen shared listener for ${participant.clientId}")
-                                    screenSharedParticipant?.let {
-                                        checkVideoListener(
-                                            it,
-                                            shouldAddListener = true,
-                                            isHiRes = true
-                                        )
-                                    }
-                                }
-
-                                else -> {
-                                    //Participant listener
-                                    Timber.d("Add participant listener for ${participant.clientId}")
-                                    checkVideoListener(
-                                        participant,
-                                        shouldAddListener = true,
-                                        isHiRes = true
-                                    )
-                                }
-                            }
-
-                        } else if (!participantHasHiRes) {
-                            val isParticipantVisible =
-                                inMeetingViewModel.isParticipantVisible(participant)
-                            if ((existScreenShared && isParticipantVisible) || existSpeaker) {
-                                Timber.d("Ask for high-resolution video for ${participant.clientId}")
-                                inMeetingViewModel.requestHiResVideo(
-                                    inMeetingViewModel.getSession(session.clientid),
-                                    inMeetingViewModel.getChatId()
-                                )
-
-                            } else {
-                                Timber.d("it is not necessary to ask for a high-resolution for ${participant.clientId}")
-                            }
                         } else {
-                            //Cannot receive Hi res. Remove listener.
-                            when {
-                                existSpeaker -> {
-                                    //Speaker listener
-                                    Timber.d("Remove speaker listener for ${participant.clientId}")
-                                    checkSpeakerVideoListener(
-                                        session.peerid,
-                                        session.clientid,
-                                        shouldAddListener = false
-                                    )
-                                }
-
-                                existScreenShared -> {
-                                    //Screen shared listener
-                                    Timber.d("Remove screen shared listener for ${participant.clientId}")
-                                    screenSharedParticipant?.let {
-                                        checkVideoListener(
-                                            it,
-                                            shouldAddListener = false,
-                                            isHiRes = true
-                                        )
-                                    }
-                                }
-
-                                else -> {
-                                    //Participant listener
-                                    Timber.d("Remove participant listener for ${participant.clientId}")
-                                    checkVideoListener(
-                                        participant,
-                                        shouldAddListener = false,
-                                        isHiRes = true
-                                    )
-                                }
-                            }
+                            Timber.d("it is not necessary to ask for a low-resolution for ${participant.clientId}")
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun sessionHiRes(session: ChatSession) {
+        inMeetingViewModel.getParticipant(
+            session.peerId, session.clientId
+        )?.let { participant ->
+            val speaker: Participant? =
+                if (participant.isSpeaker && !participant.hasHiRes) inMeetingViewModel.getSpeaker(
+                    participant.peerId, participant.clientId
+                )?.let {
+                    it
+                } ?: run { null } else null
+
+            val existSpeaker: Boolean = speaker != null
+
+            val screenSharedParticipant = inMeetingViewModel.getScreenShared(
+                participant.peerId, participant.clientId
+            )
+
+            val existScreenShared = if (participant.isPresenting) screenSharedParticipant?.let {
+                true
+            } ?: run { false } else false
+
+            if (session.canReceiveVideoHiRes && session.isHiResVideo) {
+                //Can receive Hi res. Add listener.
+                when {
+                    existSpeaker -> {
+                        //Speaker listener
+                        Timber.d("Add speaker listener for ${participant.clientId}")
+                        checkSpeakerVideoListener(
+                            session.peerId, session.clientId, shouldAddListener = true
+                        )
+                    }
+
+                    existScreenShared -> {
+                        //Screen shared listener
+                        Timber.d("Add screen shared listener for ${participant.clientId}")
+                        screenSharedParticipant?.let {
+                            checkVideoListener(
+                                it, shouldAddListener = true, isHiRes = true
+                            )
+                        }
+                    }
+
+                    else -> {
+                        //Participant listener
+                        Timber.d("Add participant listener for ${participant.clientId}")
+                        checkVideoListener(
+                            participant, shouldAddListener = true, isHiRes = true
+                        )
+                    }
+                }
+
+            } else if (!participant.hasHiRes && participant.isVideoOn) {
+                val isParticipantVisible = inMeetingViewModel.isParticipantVisible(participant)
+                if ((existScreenShared && isParticipantVisible) || existSpeaker) {
+                    Timber.d("Ask for high-resolution video for ${participant.clientId}")
+                    inMeetingViewModel.requestHiResVideo(
+                        inMeetingViewModel.getSessionByClientId(session.clientId),
+                        inMeetingViewModel.getChatId()
+                    )
+
+                } else {
+                    Timber.d("it is not necessary to ask for a high-resolution for ${participant.clientId}")
+                }
+            } else if (!session.canReceiveVideoHiRes) {
+                if (session.hasVideo) {
+                    if (!existSpeaker) {
+                        Timber.d("Ask for high-resolution video for ${participant.clientId}")
+                        inMeetingViewModel.requestHiResVideo(
+                            inMeetingViewModel.getSessionByClientId(session.clientId),
+                            inMeetingViewModel.getChatId()
+                        )
+
+                    } else {
+                        Timber.d("it is not necessary to ask for a high-resolution for ${participant.clientId}")
+                    }
+                } else {
+                    //Cannot receive Hi res. Remove listener.
+                    when {
+                        existSpeaker -> {
+                            //Speaker listener
+                            Timber.d("Remove speaker listener for ${participant.clientId}")
+                            checkSpeakerVideoListener(
+                                session.peerId, session.clientId, shouldAddListener = false
+                            )
+                        }
+
+                        existScreenShared -> {
+                            //Screen shared listener
+                            Timber.d("Remove screen shared listener for ${participant.clientId}")
+                            screenSharedParticipant?.let {
+                                checkVideoListener(
+                                    it, shouldAddListener = false, isHiRes = true
+                                )
+                            }
+                        }
+
+                        else -> {
+                            //Participant listener
+                            Timber.d("Remove participant listener for ${participant.clientId}")
+                            checkVideoListener(
+                                participant, shouldAddListener = false, isHiRes = true
+                            )
+                        }
+                    }
+                }
+
+            } else {
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -689,10 +644,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             MEETING_ACTION_RINGING_VIDEO_ON -> {
                 Timber.d("Action ringing with video on")
                 inMeetingViewModel.getCall()?.let {
-                    if (it.hasLocalAudio()) {
+                    if (it.hasLocalAudio) {
                         sharedModel.micInitiallyOn()
                     }
-                    if (it.hasLocalVideo()) {
+                    if (it.hasLocalVideo) {
                         sharedModel.camInitiallyOn()
                     }
                 }
@@ -701,7 +656,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             MEETING_ACTION_RINGING_VIDEO_OFF -> {
                 Timber.d("Action ringing with video off")
                 inMeetingViewModel.getCall()?.let {
-                    if (it.hasLocalAudio()) {
+                    if (inMeetingViewModel.state.value.hasLocalVideo) {
                         sharedModel.micInitiallyOn()
                     }
                 }
@@ -796,16 +751,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long::class.java)
             .observe(this, avatarChangeObserver)
 
-        LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
-            .observe(this, callCompositionObserver)
-
-        //Sessions Level
-        LiveEventBus.get<Pair<MegaChatCall, MegaChatSession>>(EVENT_SESSION_STATUS_CHANGE)
-            .observe(this, sessionStatusObserver)
-        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_SESSION_ON_HIRES_CHANGE)
-            .observe(this, sessionHiResObserver)
-        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_SESSION_ON_LOWRES_CHANGE)
-            .observe(this, sessionLowResObserver)
         LiveEventBus.get<Pair<Long, Int>>(EVENT_CHAT_CONNECTION_STATUS)
             .observe(this, chatConnectionStatusObserver)
     }
@@ -1136,6 +1081,39 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .distinctUntilChanged()) {
             it?.let { chatSession ->
                 updatesInRemoteAVFlags(chatSession)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInHiResInSession }
+            .distinctUntilChanged()) {
+            it?.let { chatSession ->
+                if (!inMeetingViewModel.isOneToOneCall()) {
+                    sessionHiRes(chatSession)
+                }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInLowResInSession }
+            .distinctUntilChanged()) {
+            it?.let { chatSession ->
+                if (!inMeetingViewModel.isOneToOneCall()) {
+                    sessionLowRes(chatSession)
+                }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInStatusInSession }
+            .distinctUntilChanged()) {
+            it?.let { chatSession ->
+                sessionStatusChanged(chatSession)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.shouldCheckChildFragments }
+            .distinctUntilChanged()) {
+            if (it) {
+                inMeetingViewModel.checkUpdatesInCallComposition(update = false)
+                checkChildFragments()
             }
         }
 
@@ -1525,12 +1503,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Control the initial state of the buttons when a call is established
      */
     private fun checkButtonsStatus() {
-        inMeetingViewModel.getCall()?.let {
-            if (it.hasLocalAudio()) {
+        inMeetingViewModel.getCall()?.run {
+            if (inMeetingViewModel.state.value.hasLocalAudio) {
                 sharedModel.micInitiallyOn()
             }
 
-            if (it.hasLocalVideo()) {
+            if (inMeetingViewModel.state.value.hasLocalVideo) {
                 sharedModel.camInitiallyOn()
             }
             updatePanel()
@@ -1724,12 +1702,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun updateOneToOneUI() {
         inMeetingViewModel.getCall()?.let {
-            if (inMeetingViewModel.amIAloneOnTheCall(it.chatid)) {
+            if (inMeetingViewModel.amIAloneOnTheCall(it.chatId)) {
                 Timber.d("One to one call. Waiting for connection")
-                waitingForConnection(it.chatid)
+                waitingForConnection(it.chatId)
             } else {
-                val session = inMeetingViewModel.getSessionOneToOneCall(it)
-                session?.let {
+                inMeetingViewModel.getSessionOneToOneCall()?.run {
                     Timber.d("One to one call. Session exists")
                     initOneToOneCall()
                 }
@@ -1742,7 +1719,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun updateGroupUI() {
         inMeetingViewModel.getCall()?.let { call ->
-            initGroupCall(call.chatid)
+            initGroupCall(call.chatId)
         }
     }
 
@@ -1888,18 +1865,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         removeListenersAndFragments()
 
-        val call: MegaChatCall? = inMeetingViewModel.getCall()
-        call?.let { currentCall ->
-            val session = inMeetingViewModel.getSessionOneToOneCall(currentCall)
-            session?.let { userSession ->
+        inMeetingViewModel.getCall()?.apply {
+            inMeetingViewModel.getSessionOneToOneCall()?.let { userSession ->
                 Timber.d("Show one to one call UI")
                 inMeetingViewModel.setStatus(newStatus = CallUIStatusType.OneToOne)
 
                 Timber.d("Create fragment")
                 individualCallFragment = IndividualCallFragment.newInstance(
-                    currentCall.chatid,
-                    userSession.peerid,
-                    userSession.clientid
+                    chatId,
+                    userSession.peerId,
+                    userSession.clientId
                 )
 
                 individualCallFragment?.let {
@@ -1911,7 +1886,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
 
-            initLocal(currentCall.chatid)
+            initLocal(chatId)
         }
     }
 
@@ -2088,13 +2063,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         } else {
             when {
                 !isManualModeView -> {
-                    inMeetingViewModel.getCall()?.let {
-                        if (it.sessionsClientid.size() <= MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC) {
-                            Timber.d("Automatic mode - Grid view")
-                            initGridViewMode()
-                        } else {
-                            Timber.d("Automatic mode - Speaker view")
-                            initSpeakerViewMode()
+                    inMeetingViewModel.getCall()?.apply {
+                        sessionsClientId?.let {
+                            when {
+                                it.size <= MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC -> {
+                                    Timber.d("Automatic mode - Grid view")
+                                    initGridViewMode()
+                                }
+
+                                else -> {
+                                    Timber.d("Automatic mode - Speaker view")
+                                    initSpeakerViewMode()
+                                }
+                            }
                         }
                     }
                 }
@@ -2177,7 +2158,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun checkGridSpeakerViewMenuItemVisibility() {
         inMeetingViewModel.getCall()?.let { call ->
-            if (call.status == MegaChatCall.CALL_STATUS_CONNECTING || inMeetingViewModel.showOnlyMeBanner.value || inMeetingViewModel.showWaitingForOthersBanner.value) {
+            if (call.status == ChatCallStatus.Connecting || inMeetingViewModel.showOnlyMeBanner.value || inMeetingViewModel.showWaitingForOthersBanner.value) {
                 gridViewMenuItem?.apply { isVisible = false }
                 speakerViewMenuItem?.apply { isVisible = false }
                 return
@@ -2352,8 +2333,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bottomFloatingPanelViewHolder?.updateMicIcon(isMicOn)
         updateParticipantsBottomPanel()
         showMuteBanner()
-        inMeetingViewModel.getCall()?.hasLocalAudio()
-            ?.let { floatingWindowFragment?.showLocalFloatingViewMicroMutedIcon(!it) }
+        floatingWindowFragment?.showLocalFloatingViewMicroMutedIcon(!inMeetingViewModel.state.value.hasLocalAudio)
     }
 
     /**
@@ -2446,8 +2426,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         val call = inMeetingViewModel.getCall()
 
         val shouldCheckVideoOn =
-            call != null && (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS ||
-                    call.status == MegaChatCall.CALL_STATUS_JOINING) && isCamOn
+            call != null && (call.status == ChatCallStatus.InProgress || call.status == ChatCallStatus.Joining) && isCamOn
 
         individualCallFragment?.let {
             if (it.isAdded) {
@@ -2477,10 +2456,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun updateLocalVideo(isCamOn: Boolean) {
         Timber.d("Local audio or video changes")
-        inMeetingViewModel.getCall()?.let {
-            val isVideoOn: Boolean = it.hasLocalVideo()
+        inMeetingViewModel.getCall()?.apply {
+            val isVideoOn: Boolean = inMeetingViewModel.state.value.hasLocalVideo
             if (!MegaApplication.getChatManagement().isInTemporaryState) {
-                MegaApplication.getChatManagement().setVideoStatus(it.chatid, isVideoOn)
+                MegaApplication.getChatManagement().setVideoStatus(chatId, isVideoOn)
             }
         }
 

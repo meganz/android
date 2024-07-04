@@ -45,6 +45,7 @@ import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -117,6 +118,7 @@ class MeetingActivityViewModelTest {
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase = mock()
     private val savedStateHandle: SavedStateHandle = mock()
     private val startVideoDeviceUseCase: StartVideoDeviceUseCase = mock()
+    private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock()
     private val enableOrDisableVideoUseCase: EnableOrDisableVideoUseCase = mock()
     private val enableOrDisableAudioUseCase: EnableOrDisableAudioUseCase = mock()
 
@@ -177,6 +179,7 @@ class MeetingActivityViewModelTest {
             getFeatureFlagValueUseCase,
             getMyUserHandleUseCase,
             startVideoDeviceUseCase,
+            monitorCallEndedUseCase,
             enableOrDisableAudioUseCase,
             enableOrDisableVideoUseCase,
             savedStateHandle
@@ -233,7 +236,8 @@ class MeetingActivityViewModelTest {
             savedStateHandle = savedStateHandle,
             enableOrDisableAudioUseCase = enableOrDisableAudioUseCase,
             enableOrDisableVideoUseCase = enableOrDisableVideoUseCase,
-            startVideoDeviceUseCase = startVideoDeviceUseCase
+            startVideoDeviceUseCase = startVideoDeviceUseCase,
+            monitorCallEndedUseCase = monitorCallEndedUseCase
         )
     }
 

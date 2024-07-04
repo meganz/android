@@ -701,19 +701,6 @@ public class CallUtil {
         }
     }
 
-    public static String sessionStatusToString(int status) {
-        switch (status) {
-            case MegaChatSession.SESSION_STATUS_INVALID:
-                return "SESSION_STATUS_INVALID";
-            case MegaChatSession.SESSION_STATUS_IN_PROGRESS:
-                return "SESSION_STATUS_IN_PROGRESS";
-            case MegaChatSession.SESSION_STATUS_DESTROYED:
-                return "SESSION_STATUS_DESTROYED";
-            default:
-                return String.valueOf(status);
-        }
-    }
-
     public static boolean isStatusConnected(Context context, long chatId) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         return checkConnection(context) && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED && megaChatApi.getChatConnectionState(chatId) == MegaChatApi.CHAT_CONNECTION_ONLINE;

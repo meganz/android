@@ -113,6 +113,7 @@ import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -224,6 +225,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val startVideoDeviceUseCase: StartVideoDeviceUseCase,
     private val enableOrDisableVideoUseCase: EnableOrDisableVideoUseCase,
     private val enableOrDisableAudioUseCase: EnableOrDisableAudioUseCase,
+    private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -359,6 +361,16 @@ class MeetingActivityViewModel @Inject constructor(
     ).post(isVisible)
 
     init {
+        viewModelScope.launch {
+            monitorCallEndedUseCase()
+                .catch { Timber.e(it) }
+                .collect {
+                    if (it == state.value.chatId) {
+                        finishMeetingActivity()
+                    }
+                }
+        }
+
         viewModelScope.launch {
             runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.RaiseToSpeak).let { flag ->

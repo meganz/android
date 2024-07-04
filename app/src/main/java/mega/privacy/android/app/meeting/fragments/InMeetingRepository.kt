@@ -22,13 +22,11 @@ import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
-import nz.mega.sdk.MegaChatApi.INIT_WAITING_NEW_SESSION
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaChatVideoListenerInterface
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -65,31 +63,6 @@ class InMeetingRepository @Inject constructor(
         return peerId == megaApi.myUserHandleBinary
     }
 
-
-    /**
-     * Get the session in a one to one call
-     *
-     * @param call The MegaChatCall
-     * @return MegaChatSession
-     */
-    fun getSessionOneToOneCall(call: MegaChatCall): MegaChatSession? {
-        val clientId = call.sessionsClientid?.get(0)
-        clientId?.let {
-            return call.getMegaChatSession(it)
-        }
-
-        return null
-    }
-
-    /**
-     * Get MegaChatSession
-     *
-     * @param chatId    Chat id
-     * @param clientId  Client Id
-     */
-    fun getMegaChatSession(chatId: Long, clientId: Long): MegaChatSession? =
-        getMeeting(chatId)?.getMegaChatSession(clientId)
-
     /**
      * Get a chat from a chat id
      *
@@ -125,18 +98,6 @@ class InMeetingRepository @Inject constructor(
      */
     fun createMeeting(meetingName: String, listener: MegaChatRequestListenerInterface) =
         megaChatApi.createMeeting(meetingName, false, false, true, listener)
-
-    /**
-     * Method for ignore a call
-     *
-     * @param chatId chat ID
-     */
-    fun ignoreCall(chatId: Long) {
-        if (chatId == MEGACHAT_INVALID_HANDLE)
-            return
-
-        megaChatApi.setIgnoredCall(chatId)
-    }
 
     /**
      * Method for getting a participant's email
@@ -185,43 +146,6 @@ class InMeetingRepository @Inject constructor(
      */
     fun getMyName(): String {
         return megaChatApi.myFullname
-    }
-
-    /**
-     * Create a participant with my data
-     *
-     * @param chat The chat room of a meeting
-     * @return me as a participant
-     */
-    fun getMeToSpeakerView(chat: MegaChatRoom): Participant {
-        var isAudioOn = true
-        var isVideoOn = true
-        var isAudioDetected = false
-
-        getMeeting(chat.chatId)?.let {
-            isAudioOn = it.hasLocalAudio()
-            isVideoOn = it.hasLocalVideo()
-            isAudioDetected = it.isAudioDetected
-        }
-
-        val avatar = getAvatarBitmap(megaApi.myUserHandleBinary)
-        return Participant(
-            megaApi.myUserHandleBinary,
-            MEGACHAT_INVALID_HANDLE,
-            megaChatApi.myFullname,
-            avatar,
-            true,
-            getOwnPrivileges(chat.chatId) == MegaChatRoom.PRIV_MODERATOR,
-            isAudioOn,
-            isVideoOn,
-            isAudioDetected,
-            isContact = false,
-            isSpeaker = true,
-            hasHiRes = true,
-            videoListener = null,
-            isChosenForAssign = false,
-            isGuest = false
-        )
     }
 
     /**
@@ -305,33 +229,6 @@ class InMeetingRepository @Inject constructor(
         return -1
     }
 
-    fun chatLogout(listener: MegaChatRequestListenerInterface) = megaChatApi.logout(listener)
-
-    /**
-     * Method to create an ephemera plus plus account
-     *
-     * @param firstName First name of the guest
-     * @param lastName Last name of the guest
-     * @param listener MegaRequestListenerInterface
-     */
-    fun createEphemeralAccountPlusPlus(
-        firstName: String,
-        lastName: String,
-        listener: MegaRequestListenerInterface,
-    ) {
-        val ret = megaChatApi.initState
-        if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-            Timber.d("INIT STATE: $ret")
-            val initResult = megaChatApi.init(null)
-            Timber.d("result of init ---> $initResult")
-            if (initResult == INIT_WAITING_NEW_SESSION) {
-                megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
-            } else {
-                Timber.w("Init chat failed, result: $initResult")
-            }
-        }
-    }
-
     fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface) =
         megaChatApi.openChatPreview(link, listener)
 
@@ -367,6 +264,7 @@ class InMeetingRepository @Inject constructor(
                                 chatSubscription?.dispose()
                             }
                         }
+
                         else -> {
                             // Nothing to do
                         }

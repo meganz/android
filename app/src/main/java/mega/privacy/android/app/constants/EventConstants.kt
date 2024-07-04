@@ -8,7 +8,6 @@ object EventConstants {
     const val EVENT_CHAT_OPEN_INVITE = "chat_open_invite"
 
     /** Event Keys related to calls*/
-    const val EVENT_CALL_COMPOSITION_CHANGE = "call_composition_change"
     const val EVENT_NOT_OUTGOING_CALL = "not_outgoing_call"
     const val EVENT_OUTGOING_CALL = "outgoing_call"
     const val EVENT_ENTER_IN_MEETING = "enter_in_meeting"
@@ -20,9 +19,6 @@ object EventConstants {
     const val EVENT_UPDATE_WAITING_FOR_OTHERS = "update_waiting_for_others"
 
     /** Event Keys related to sessions*/
-    const val EVENT_SESSION_STATUS_CHANGE = "session_status_change"
-    const val EVENT_SESSION_ON_HIRES_CHANGE = "session_on_hires_change"
-    const val EVENT_SESSION_ON_LOWRES_CHANGE = "session_on_lowres_change"
     const val EVENT_PRIVILEGES_CHANGE = "privileges_in_char_change"
     const val EVENT_USER_VISIBILITY_CHANGE = "user_visibility_change"
     const val EVENT_CHAT_CONNECTION_STATUS = "chat_connection_status_change"
