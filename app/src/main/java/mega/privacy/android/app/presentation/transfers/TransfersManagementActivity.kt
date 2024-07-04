@@ -289,8 +289,14 @@ open class TransfersManagementActivity : PasscodeActivity() {
     protected fun onTransfersWidgetClick() {
         transfersManagement.setAreFailedTransfers(false)
         if (this is ManagerActivity) {
-            drawerItem = DrawerItem.TRANSFERS
-            selectDrawerItem(this.drawerItem)
+            lifecycleScope.launch {
+                if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+                    navigator.openTransfers(this@TransfersManagementActivity, IN_PROGRESS_TAB_INDEX)
+                } else {
+                    drawerItem = DrawerItem.TRANSFERS
+                    selectDrawerItem(drawerItem)
+                }
+            }
         } else {
             openTransfersSection()
         }

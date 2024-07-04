@@ -3357,24 +3357,18 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun selectDrawerItemTransfers() {
         Timber.d("selectDrawerItemTransfers")
-        lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                navigator.openTransfers(this@ManagerActivity, IN_PROGRESS_TAB_INDEX)
-            } else {
-                appBarLayout.visibility = View.VISIBLE
-                hideTransfersWidget()
-                drawerItem = DrawerItem.TRANSFERS
-                setBottomNavigationMenuItemChecked(NO_BNV)
-                transfersManagementViewModel.checkIfShouldShowCompletedTab()
-                replaceFragment(
-                    transferPageFragment ?: TransferPageFragment.newInstance(),
-                    FragmentTag.TRANSFERS_PAGE.tag
-                )
-                setToolbarTitle()
-                showFabButton()
-                closeDrawer()
-            }
-        }
+        appBarLayout.visibility = View.VISIBLE
+        hideTransfersWidget()
+        drawerItem = DrawerItem.TRANSFERS
+        setBottomNavigationMenuItemChecked(NO_BNV)
+        transfersManagementViewModel.checkIfShouldShowCompletedTab()
+        replaceFragment(
+            transferPageFragment ?: TransferPageFragment.newInstance(),
+            FragmentTag.TRANSFERS_PAGE.tag
+        )
+        setToolbarTitle()
+        showFabButton()
+        closeDrawer()
     }
 
     /**
@@ -3606,16 +3600,22 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun drawerItemClicked(item: DrawerItem) {
-        val oldDrawerItem = drawerItem
-        isFirstTimeCam
-        checkIfShouldCloseSearchView(oldDrawerItem)
-        if (item == DrawerItem.OFFLINE) {
-            bottomItemBeforeOpenFullscreenOffline = bottomNavigationCurrentItem
-            openFullscreenOfflineFragment(pathNavigationOffline)
-        } else {
-            drawerItem = item
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection) && item == DrawerItem.TRANSFERS) {
+                navigator.openTransfers(this@ManagerActivity, IN_PROGRESS_TAB_INDEX)
+            } else {
+                val oldDrawerItem = drawerItem
+                isFirstTimeCam
+                checkIfShouldCloseSearchView(oldDrawerItem)
+                if (item == DrawerItem.OFFLINE) {
+                    bottomItemBeforeOpenFullscreenOffline = bottomNavigationCurrentItem
+                    openFullscreenOfflineFragment(pathNavigationOffline)
+                } else {
+                    drawerItem = item
+                }
+                selectDrawerItem(drawerItem)
+            }
         }
-        selectDrawerItem(drawerItem)
     }
 
     /**
