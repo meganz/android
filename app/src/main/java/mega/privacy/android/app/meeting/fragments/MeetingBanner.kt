@@ -126,7 +126,7 @@ fun MeetingBanner(inMeetingViewModel: InMeetingViewModel) {
             shouldShowFreeCallWarning = false
         }
     }
-    if (shouldShowFreeCallWarning && shouldShowParticipantsChanges.targetState.not()) {
+    if (shouldShowFreeCallWarning && shouldShowParticipantsChanges.targetState.not() && text.isNotBlank()) {
         Banner(text)
     }
     LaunchedEffect(key1 = showWaitingForOthersBanner) {
