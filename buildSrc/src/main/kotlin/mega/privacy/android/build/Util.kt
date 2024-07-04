@@ -159,6 +159,30 @@ fun getNocturnTimeout(project: Project): Long {
 }
 
 /**
+ * Get test account user name local.properties file.
+ */
+fun getTestAccountUserName(project: Project): String? =
+    project.rootProject.file("local.properties")
+        .takeIf { it.exists() }
+        ?.let { file ->
+            Properties()
+                .apply { load(FileInputStream(file)) }["test_account_username"]
+                ?.let { it as String }
+        }
+
+/**
+ * Get test account password local.properties file.
+ */
+fun getTestAccountPassword(project: Project): String? =
+    project.rootProject.file("local.properties")
+        .takeIf { it.exists() }
+        ?.let { file ->
+            Properties()
+                .apply { load(FileInputStream(file)) }["test_account_password"]
+                ?.let { it as String }
+        }
+
+/**
  * Get Karma ADB plugin port.
  */
 fun getKarmaPluginPort(project: Project): Int {

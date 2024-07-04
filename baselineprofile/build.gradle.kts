@@ -1,4 +1,6 @@
 import com.android.build.api.dsl.ManagedVirtualDevice
+import mega.privacy.android.build.getTestAccountPassword
+import mega.privacy.android.build.getTestAccountUserName
 
 plugins {
     id("com.android.test")
@@ -15,6 +17,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -24,6 +30,16 @@ android {
         targetSdk = 34
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField(
+            "String",
+            "TEST_ACCOUNT_USER_NAME",
+            getTestAccountUserName(project).orEmpty()
+        )
+        buildConfigField(
+            "String",
+            "TEST_ACCOUNT_PASSWORD",
+            getTestAccountPassword(project).orEmpty()
+        )
     }
 
     targetProjectPath = ":app"
@@ -50,8 +66,8 @@ baselineProfile {
 }
 
 dependencies {
-    implementation("androidx.test.ext:junit:1.1.5")
-    implementation("androidx.test.espresso:espresso-core:3.5.1")
-    implementation("androidx.test.uiautomator:uiautomator:2.2.0")
-    implementation("androidx.benchmark:benchmark-macro-junit4:1.2.2")
+    implementation("androidx.test.ext:junit:1.2.1")
+    implementation("androidx.test.espresso:espresso-core:3.6.1")
+    implementation("androidx.test.uiautomator:uiautomator:2.3.0")
+    implementation("androidx.benchmark:benchmark-macro-junit4:1.2.4")
 }
