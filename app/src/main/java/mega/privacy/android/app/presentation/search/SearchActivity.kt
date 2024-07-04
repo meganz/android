@@ -52,7 +52,7 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -618,7 +618,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     ) {
         val intent = when {
             fileNode.type.isSupported && fileNode.type is VideoFileTypeInfo ->
-                Intent(this, VideoPlayerActivity::class.java).apply {
+                Intent(this, LegacyVideoPlayerActivity::class.java).apply {
                     putExtra(
                         Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
                         viewModel.state.value.sortOrder

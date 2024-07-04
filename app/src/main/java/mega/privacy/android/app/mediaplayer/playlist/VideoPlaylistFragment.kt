@@ -25,7 +25,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentMediaPlaylistBinding
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
-import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.utils.CallUtil
@@ -51,7 +51,7 @@ class VideoPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListen
     @Inject
     lateinit var durationInSecondsTextMapper: DurationInSecondsTextMapper
 
-    private val videoViewModel: VideoPlayerViewModel by activityViewModels()
+    private val videoViewModel: LegacyVideoPlayerViewModel by activityViewModels()
 
     private var binding by autoCleared<FragmentMediaPlaylistBinding>()
 
@@ -170,7 +170,7 @@ class VideoPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListen
      *
      * @param viewModel VideoPlayerViewModel
      */
-    private fun setupItemTouchHelper(viewModel: VideoPlayerViewModel) {
+    private fun setupItemTouchHelper(viewModel: LegacyVideoPlayerViewModel) {
         adapter?.let {
             val itemTouchCallBack = PlaylistItemTouchCallBack(
                 adapter = it,

@@ -180,7 +180,7 @@ import kotlin.time.Duration.Companion.seconds
  * ViewModel for video player.
  */
 @HiltViewModel
-class VideoPlayerViewModel @Inject constructor(
+class LegacyVideoPlayerViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     @VideoPlayer private val mediaPlayerGateway: MediaPlayerGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,

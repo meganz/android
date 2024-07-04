@@ -15,6 +15,14 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
     /**
+     * Enables new video player
+     */
+    NewVideoPlayer(
+        "Enable new video player",
+        false,
+    ),
+
+    /**
      * Enables new video queue
      */
     NewZipBrowser(

@@ -16,7 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -165,7 +165,7 @@ data class NodeAttachmentUiMessage(
     ): Intent = when {
         fileNode.type.isSupported && fileNode.type is VideoFileTypeInfo -> Intent(
             context,
-            VideoPlayerActivity::class.java
+            LegacyVideoPlayerActivity::class.java
         )
 
         fileNode.type.isSupported && fileNode.type is AudioFileTypeInfo -> Intent(

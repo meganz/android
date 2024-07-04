@@ -121,7 +121,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity;
-import mega.privacy.android.app.mediaplayer.VideoPlayerActivity;
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.MegaPreferences;
@@ -1322,7 +1322,7 @@ public class Util {
         if (MimeTypeList.typeForName(nodeName).isAudio()) {
             return new Intent(context, AudioPlayerActivity.class);
         } else {
-            return new Intent(context, VideoPlayerActivity.class);
+            return new Intent(context, LegacyVideoPlayerActivity.class);
         }
     }
 

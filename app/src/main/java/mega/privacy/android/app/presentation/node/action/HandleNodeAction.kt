@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
@@ -51,8 +51,8 @@ fun HandleNodeAction(
     typedFileNode: TypedFileNode,
     snackBarHostState: SnackbarHostState,
     onActionHandled: () -> Unit,
-    nodeSourceType: Int? = null,
     coroutineScope: CoroutineScope,
+    nodeSourceType: Int? = null,
     nodeActionsViewModel: NodeActionsViewModel = hiltViewModel(),
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
 ) {
@@ -244,7 +244,7 @@ private suspend fun openVideoOrAudioFile(
     val intent = when {
         fileNode.type.isSupported && fileNode.type is VideoFileTypeInfo -> Intent(
             context,
-            VideoPlayerActivity::class.java
+            LegacyVideoPlayerActivity::class.java
         ).apply {
             putExtra(
                 Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder

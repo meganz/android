@@ -66,9 +66,9 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.VIDEO_TYPE_RESTART_PLAYBACK_POSITION
-import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.VIDEO_TYPE_RESUME_PLAYBACK_POSITION
-import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.VIDEO_TYPE_RESTART_PLAYBACK_POSITION
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.VIDEO_TYPE_RESUME_PLAYBACK_POSITION
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
@@ -149,7 +149,7 @@ import javax.inject.Inject
  * Video player activity
  */
 @AndroidEntryPoint
-class VideoPlayerActivity : MediaPlayerActivity() {
+class LegacyVideoPlayerActivity : MediaPlayerActivity() {
     /**
      * MediaPlayerGateway for video player
      */
@@ -167,7 +167,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
     private lateinit var binding: ActivityVideoPlayerBinding
 
-    private val videoViewModel: VideoPlayerViewModel by viewModels()
+    private val videoViewModel: LegacyVideoPlayerViewModel by viewModels()
 
     private var takenDownDialog: AlertDialog? = null
 
@@ -270,7 +270,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         binding.toolbar.apply {
             collapseIcon =
                 AppCompatResources.getDrawable(
-                    this@VideoPlayerActivity,
+                    this@LegacyVideoPlayerActivity,
                     androidx.appcompat.R.drawable.abc_ic_ab_back_material
                 )
             collapseIcon?.setTint(Color.WHITE)
@@ -440,26 +440,26 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     @OptIn(FlowPreview::class)
     private fun setupObserver() {
         with(viewModel) {
-            getCollision().observe(this@VideoPlayerActivity) { collision ->
+            getCollision().observe(this@LegacyVideoPlayerActivity) { collision ->
                 nameCollisionActivityContract?.launch(arrayListOf(collision))
             }
 
-            onSnackbarMessage().observe(this@VideoPlayerActivity) { message ->
+            onSnackbarMessage().observe(this@LegacyVideoPlayerActivity) { message ->
                 showSnackBarForVideoPlayer(getString(message))
             }
 
-            onExceptionThrown().observe(this@VideoPlayerActivity, ::manageException)
+            onExceptionThrown().observe(this@LegacyVideoPlayerActivity, ::manageException)
 
-            itemToRemove.observe(this@VideoPlayerActivity) { handle ->
+            itemToRemove.observe(this@LegacyVideoPlayerActivity) { handle ->
                 videoViewModel.removeItem(handle)
             }
 
-            renameUpdate.observe(this@VideoPlayerActivity) { node ->
+            renameUpdate.observe(this@LegacyVideoPlayerActivity) { node ->
                 node?.let {
                     MegaNodeDialogUtil.showRenameNodeDialog(
-                        context = this@VideoPlayerActivity,
+                        context = this@LegacyVideoPlayerActivity,
                         node = it,
-                        snackbarShower = this@VideoPlayerActivity,
+                        snackbarShower = this@LegacyVideoPlayerActivity,
                         actionNodeCallback = object : ActionNodeCallback {
                             override fun finishRenameActionWithSuccess(newName: String) {
                                 videoViewModel.updateItemName(it.handle, newName)
@@ -600,7 +600,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         else -> {
                             videoViewModel.run {
                                 MegaNodeUtil.shareNode(
-                                    context = this@VideoPlayerActivity,
+                                    context = this@LegacyVideoPlayerActivity,
                                     node = megaApi.getNodeByHandle(getCurrentPlayingHandle())
                                 )
                             }
@@ -743,7 +743,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
             collectFlow(errorState) { megaException ->
                 megaException?.let {
-                    this@VideoPlayerActivity.onError(it)
+                    this@LegacyVideoPlayerActivity.onError(it)
                 }
             }
 
@@ -759,7 +759,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 }
 
                 dragToExit.nodeChanged(
-                    lifecycleOwner = this@VideoPlayerActivity,
+                    lifecycleOwner = this@LegacyVideoPlayerActivity,
                     handle = getCurrentPlayingHandle()
                 )
             }
@@ -781,7 +781,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 if (state.showPlaybackDialog) {
                     mediaPlayerGateway.setPlayWhenReady(false)
                     playbackPositionDialog =
-                        MaterialAlertDialogBuilder(this@VideoPlayerActivity)
+                        MaterialAlertDialogBuilder(this@LegacyVideoPlayerActivity)
                             .setTitle(R.string.video_playback_position_dialog_title)
                             .setMessage(
                                 String.format(

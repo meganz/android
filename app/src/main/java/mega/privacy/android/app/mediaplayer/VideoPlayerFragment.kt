@@ -101,10 +101,10 @@ class VideoPlayerFragment : Fragment() {
 
     private lateinit var binding: FragmentVideoPlayerBinding
 
-    private val viewModel: VideoPlayerViewModel by activityViewModels()
+    private val viewModel: LegacyVideoPlayerViewModel by activityViewModels()
 
-    private val videoPlayerActivity by lazy {
-        activity as? VideoPlayerActivity
+    private val legacyVideoPlayerActivity by lazy {
+        activity as? LegacyVideoPlayerActivity
     }
 
     private var playlistObserved = false
@@ -170,7 +170,7 @@ class VideoPlayerFragment : Fragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        videoPlayerActivity?.updateToolbarTitleBasedOnOrientation(viewModel.metadataState.value)
+        legacyVideoPlayerActivity?.updateToolbarTitleBasedOnOrientation(viewModel.metadataState.value)
         observeFlow()
     }
 
@@ -194,7 +194,7 @@ class VideoPlayerFragment : Fragment() {
             viewModel.setPlayingReverted(false)
         }
 
-        videoPlayerActivity?.setDraggable(!viewModel.screenLockState.value)
+        legacyVideoPlayerActivity?.setDraggable(!viewModel.screenLockState.value)
     }
 
     /**
@@ -337,7 +337,7 @@ class VideoPlayerFragment : Fragment() {
 
                 // we need setup control buttons again, because reset player would reset PlayerControlView
                 setupPlaylistButton(viewModel.getPlaylistItems()) {
-                    videoPlayerActivity?.setDraggable(false)
+                    legacyVideoPlayerActivity?.setDraggable(false)
                     findNavController().let {
                         viewLifecycleOwner.lifecycleScope.launch {
                             if (it.currentDestination?.id == R.id.video_main_player) {
@@ -444,7 +444,7 @@ class VideoPlayerFragment : Fragment() {
                         layout = binding.screenshotScaleAnimationLayout,
                         bitmap = bitmap
                     )
-                    videoPlayerActivity?.showSnackBarForVideoPlayer(
+                    legacyVideoPlayerActivity?.showSnackBarForVideoPlayer(
                         getString(R.string.media_player_video_snackbar_screenshot_saved)
                     )
                 }
@@ -584,15 +584,15 @@ class VideoPlayerFragment : Fragment() {
 
     private fun hideToolbar(animate: Boolean = true) {
         toolbarVisible = false
-        videoPlayerActivity?.hideToolbar(animate)
+        legacyVideoPlayerActivity?.hideToolbar(animate)
     }
 
     private fun showToolbar() {
         toolbarVisible = true
         if (viewModel.screenLockState.value) {
-            videoPlayerActivity?.showSystemUI()
+            legacyVideoPlayerActivity?.showSystemUI()
         } else {
-            videoPlayerActivity?.showToolbar()
+            legacyVideoPlayerActivity?.showToolbar()
         }
     }
 
@@ -786,7 +786,7 @@ class VideoPlayerFragment : Fragment() {
     }
 
     private fun showAddingSubtitleFailedMessage() {
-        (activity as? VideoPlayerActivity)?.showSnackBarForVideoPlayer(
+        (activity as? LegacyVideoPlayerActivity)?.showSnackBarForVideoPlayer(
             getString(R.string.media_player_video_message_adding_subtitle_failed)
         )
     }

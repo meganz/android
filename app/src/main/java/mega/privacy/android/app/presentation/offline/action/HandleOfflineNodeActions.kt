@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -316,7 +316,7 @@ private suspend fun openVideoOrAudioFile(
     val intent = when {
         content.isSupported && content.isVideo -> Intent(
             context,
-            VideoPlayerActivity::class.java
+            LegacyVideoPlayerActivity::class.java
         ).apply {
             putExtra(
                 Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder

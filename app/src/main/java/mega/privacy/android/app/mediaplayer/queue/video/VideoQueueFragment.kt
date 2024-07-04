@@ -12,8 +12,8 @@ import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
-import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
-import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel
 import mega.privacy.android.app.mediaplayer.queue.view.VideoQueueView
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
@@ -23,7 +23,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 @AndroidEntryPoint
 class VideoQueueFragment : Fragment() {
     private val videoQueueViewModel by viewModels<VideoQueueViewModel>()
-    private val videoPlayerViewModel by activityViewModels<VideoPlayerViewModel>()
+    private val legacyVideoPlayerViewModel by activityViewModels<LegacyVideoPlayerViewModel>()
 
     private var playlistObserved = false
 
@@ -41,14 +41,14 @@ class VideoQueueFragment : Fragment() {
                 OriginalTempTheme(isDark = true) {
                     VideoQueueView(
                         viewModel = videoQueueViewModel,
-                        videoPlayerViewModel = videoPlayerViewModel,
-                        onDragFinished = { videoPlayerViewModel.updatePlaySource(false) },
+                        legacyVideoPlayerViewModel = legacyVideoPlayerViewModel,
+                        onDragFinished = { legacyVideoPlayerViewModel.updatePlaySource(false) },
                         onMove = { from, to ->
                             videoQueueViewModel.updateMediaQueueAfterReorder(from, to)
-                            videoPlayerViewModel.swapItems(from, to)
+                            legacyVideoPlayerViewModel.swapItems(from, to)
                         },
                         onToolbarColorUpdated = {
-                            (activity as? VideoPlayerActivity)?.setupToolbarColors(it)
+                            (activity as? LegacyVideoPlayerActivity)?.setupToolbarColors(it)
                         }
                     ) {
                         activity?.supportFragmentManager?.popBackStack()
@@ -62,8 +62,8 @@ class VideoQueueFragment : Fragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        videoQueueViewModel.initMediaQueueItemList(videoPlayerViewModel.getPlaylistItems())
-        (activity as? VideoPlayerActivity)?.hideToolbar()
+        videoQueueViewModel.initMediaQueueItemList(legacyVideoPlayerViewModel.getPlaylistItems())
+        (activity as? LegacyVideoPlayerActivity)?.hideToolbar()
         tryObservePlaylist()
     }
 
@@ -71,7 +71,7 @@ class VideoQueueFragment : Fragment() {
      * Observe playlist LiveData when view is created and service is connected.
      */
     private fun tryObservePlaylist() {
-        with(videoPlayerViewModel) {
+        with(legacyVideoPlayerViewModel) {
             if (!playlistObserved && view != null) {
                 playlistObserved = true
 

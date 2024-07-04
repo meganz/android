@@ -30,7 +30,7 @@ import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -295,7 +295,7 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                             } else {
                                 Intent(
                                     this@FileLinkComposeActivity,
-                                    VideoPlayerActivity::class.java
+                                    LegacyVideoPlayerActivity::class.java
                                 )
                             }
                         }

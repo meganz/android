@@ -10,10 +10,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel
-import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
-import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_MATCHED_ITEM
-import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_OFF
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_MATCHED_ITEM
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_OFF
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -51,8 +51,8 @@ import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorE
 )
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class VideoPlayerViewModelTest {
-    private lateinit var underTest: VideoPlayerViewModel
+internal class LegacyVideoPlayerViewModelTest {
+    private lateinit var underTest: LegacyVideoPlayerViewModel
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val savedStateHandle = SavedStateHandle(mapOf())
     private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
@@ -83,7 +83,7 @@ internal class VideoPlayerViewModelTest {
 
     private fun initViewModel() {
         wheneverBlocking { monitorVideoRepeatModeUseCase() }.thenReturn(emptyFlow())
-        underTest = VideoPlayerViewModel(
+        underTest = LegacyVideoPlayerViewModel(
             context = mock(),
             mediaPlayerGateway = mock(),
             ioDispatcher = UnconfinedTestDispatcher(),

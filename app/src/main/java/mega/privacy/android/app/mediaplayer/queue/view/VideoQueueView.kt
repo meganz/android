@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel
 import mega.privacy.android.app.mediaplayer.queue.model.VideoPlayerMenuAction
 import mega.privacy.android.app.mediaplayer.queue.video.VideoQueueViewModel
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -25,14 +25,14 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 @Composable
 internal fun VideoQueueView(
     viewModel: VideoQueueViewModel,
-    videoPlayerViewModel: VideoPlayerViewModel,
+    legacyVideoPlayerViewModel: LegacyVideoPlayerViewModel,
     onDragFinished: () -> Unit,
     onMove: (Int, Int) -> Unit,
     onToolbarColorUpdated: (Boolean) -> Unit,
     onClickedFinished: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    val playlistTitle = videoPlayerViewModel.playlistTitleState.collectAsStateWithLifecycle().value
+    val playlistTitle = legacyVideoPlayerViewModel.playlistTitleState.collectAsStateWithLifecycle().value
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -86,7 +86,7 @@ internal fun VideoQueueView(
 
                             is VideoPlayerMenuAction.VideoQueueRemoveAction -> {
                                 viewModel.removeSelectedItems()
-                                videoPlayerViewModel.removeAllSelectedItems()
+                                legacyVideoPlayerViewModel.removeAllSelectedItems()
                                 viewModel.updateActionMode(false)
                             }
                         }
@@ -128,11 +128,11 @@ internal fun VideoQueueView(
                     coroutineScope.launch {
                         if (uiState.isActionMode) {
                             viewModel.updateItemInSelectionState(index, item)
-                            videoPlayerViewModel.itemSelected(item.id.longValue)
+                            legacyVideoPlayerViewModel.itemSelected(item.id.longValue)
                             return@launch
                         }
                         if (!viewModel.isParticipatingInChatCall()) {
-                            videoPlayerViewModel.getIndexFromPlaylistItems(item.id.longValue)
+                            legacyVideoPlayerViewModel.getIndexFromPlaylistItems(item.id.longValue)
                                 ?.let { index ->
                                     viewModel.seekTo(index)
                                     onClickedFinished()
