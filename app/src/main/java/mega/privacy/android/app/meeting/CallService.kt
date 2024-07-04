@@ -23,11 +23,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT
-import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOVE_CALL_NOTIFICATION
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
@@ -40,8 +42,10 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.meeting.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -49,7 +53,6 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -62,7 +65,7 @@ import javax.inject.Inject
  * @property megaChatApi                    [MegaChatApiAndroid]
  * @property app                            [MegaApplication]
  * @property monitorChatCallUpdatesUseCase  [MonitorChatCallUpdatesUseCase]
-
+ * @property monitorChatListItemUpdates   [MonitorChatListItemUpdates]
  */
 @AndroidEntryPoint
 class CallService : LifecycleService() {
@@ -83,6 +86,11 @@ class CallService : LifecycleService() {
     @Inject
     lateinit var monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase
 
+    @Inject
+    lateinit var monitorChatListItemUpdates: MonitorChatListItemUpdates
+
+    private var monitorChatListItemUpdatesJob: Job? = null
+
     var app: MegaApplication? = null
 
     private var currentChatId: Long = MEGACHAT_INVALID_HANDLE
@@ -95,12 +103,6 @@ class CallService : LifecycleService() {
      * If is in meeting fragment.
      */
     private var isInMeeting = true
-
-    private val titleMeetingChangeObserver = Observer { chat: MegaChatRoom ->
-        if (currentChatId == chat.chatId && chat.isGroup) {
-            updateNotificationContent()
-        }
-    }
 
     private val removeNotificationObserver = Observer { callId: Long ->
         megaChatApi.getChatCallByCallId(callId)?.let { call ->
@@ -131,29 +133,32 @@ class CallService : LifecycleService() {
         mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         lifecycleScope.launch {
-            monitorChatCallUpdatesUseCase().collect { call ->
-                val changes = call.changes.orEmpty()
-                if (changes.contains(ChatCallChanges.Status)) {
-                    Timber.d("Call status is ${call.status}. Chat id id $currentChatId")
+            monitorChatCallUpdatesUseCase()
+                .catch { Timber.e(it) }
+                .collect { call ->
+                    val changes = call.changes.orEmpty()
+                    if (changes.contains(ChatCallChanges.Status)) {
+                        Timber.d("Call status is ${call.status}. Chat id id $currentChatId")
 
-                    when (call.status) {
-                        ChatCallStatus.UserNoPresent,
-                        ChatCallStatus.InProgress,
-                        -> updateNotificationContent()
+                        when (call.status) {
+                            ChatCallStatus.UserNoPresent,
+                            ChatCallStatus.InProgress,
+                            -> updateNotificationContent()
 
-                        ChatCallStatus.TerminatingUserParticipation,
-                        ChatCallStatus.Destroyed,
-                        -> removeNotification(call.chatId)
+                            ChatCallStatus.TerminatingUserParticipation,
+                            ChatCallStatus.Destroyed,
+                            -> removeNotification(call.chatId)
 
-                        else -> Unit
+                            else -> Unit
+                        }
+                    } else if (changes.contains(ChatCallChanges.OnHold)) {
+                        checkAnotherActiveCall()
                     }
-                } else if (changes.contains(ChatCallChanges.OnHold)) {
-                    checkAnotherActiveCall()
                 }
-            }
         }
-        LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom::class.java)
-            .observeForever(titleMeetingChangeObserver)
+
+        startMonitorChatListItemUpdatesUpdates()
+
         LiveEventBus.get(EVENT_REMOVE_CALL_NOTIFICATION, Long::class.java)
             .observeForever(removeNotificationObserver)
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
@@ -197,7 +202,26 @@ class CallService : LifecycleService() {
         }
 
         showCallInProgressNotification()
+
         return START_NOT_STICKY
+    }
+
+    /**
+     * Get chat list item updates
+     *
+     */
+    private fun startMonitorChatListItemUpdatesUpdates() {
+        monitorChatListItemUpdatesJob?.cancel()
+        monitorChatListItemUpdatesJob = lifecycleScope.launch {
+            monitorChatListItemUpdates()
+                .catch { Timber.e(it) }
+                .collectLatest { chat ->
+                    if (chat.chatId == currentChatId && chat.changes == ChatListItemChanges.Title && chat.isGroup) {
+                        Timber.d("Changes in title")
+                        updateNotificationContent()
+                    }
+                }
+        }
     }
 
     /**
@@ -544,8 +568,6 @@ class CallService : LifecycleService() {
      * Service ends
      */
     override fun onDestroy() {
-        LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom::class.java)
-            .removeObserver(titleMeetingChangeObserver)
         LiveEventBus.get(EVENT_REMOVE_CALL_NOTIFICATION, Long::class.java)
             .removeObserver(removeNotificationObserver)
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)

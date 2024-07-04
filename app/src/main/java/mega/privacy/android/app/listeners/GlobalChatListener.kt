@@ -9,7 +9,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
-import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
@@ -43,17 +42,6 @@ class GlobalChatListener @Inject constructor(
                     EVENT_PRIVILEGES_CHANGE,
                     MegaChatListItem::class.java
                 ).post(item)
-            }
-
-            if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
-                api?.let {
-                    it.getChatRoom(item.chatId)?.let { chat ->
-                        LiveEventBus.get(
-                            EVENT_CHAT_TITLE_CHANGE,
-                            MegaChatRoom::class.java
-                        ).post(chat)
-                    }
-                }
             }
 
             onChatListItemUpdate(item)

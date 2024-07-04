@@ -38,7 +38,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.ApiFeatures
@@ -332,15 +331,6 @@ class MeetingActivityViewModel @Inject constructor(
             MegaApplication.isWaitingForCall = true
         }
 
-    private val titleMeetingChangeObserver =
-        Observer<MegaChatRoom> { megaChatRoom ->
-            meetingActivityRepository.getChatRoom(_state.value.chatId)?.let { chatRoom ->
-                if (chatRoom.chatId == megaChatRoom.chatId) {
-                    _state.update { it.copy(meetingName = getTitleChat(chatRoom)) }
-                }
-            }
-        }
-
     /**
      * Set meeting action
      *
@@ -413,9 +403,6 @@ class MeetingActivityViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .observeForever(audioOutputStateObserver)
-
-        LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom::class.java)
-            .observeForever(titleMeetingChangeObserver)
 
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .observeForever(meetingCreatedObserver)
@@ -1541,10 +1528,6 @@ class MeetingActivityViewModel @Inject constructor(
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .removeObserver(audioOutputStateObserver)
 
-        LiveEventBus.get(
-            EVENT_CHAT_TITLE_CHANGE, MegaChatRoom::class.java
-        ).removeObserver(titleMeetingChangeObserver)
-
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .removeObserver(meetingCreatedObserver)
     }
@@ -1754,6 +1737,7 @@ class MeetingActivityViewModel @Inject constructor(
                             enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite,
                             hasWaitingRoom = waitingRoomValue,
                             title = titleValue,
+                            meetingName = titleValue,
                             callType = when {
                                 chat.isMeeting -> CallType.Meeting
                                 !chat.isMeeting && chat.isGroup -> CallType.Group
