@@ -618,6 +618,24 @@ internal class FileFacade @Inject constructor(
         return totalFile
     }
 
+    override suspend fun copyUriToDocumentFolder(
+        name: String,
+        source: Uri,
+        destination: DocumentFile
+    ) {
+        val fileName = getFileNameIfHasNameCollision(destination, name)
+        val fileNameWithoutExtension = fileName.substringBeforeLast(".")
+        val mimeType = context.contentResolver.getType(source) ?: "application/octet-stream"
+        val newFile = destination.createFile(mimeType, fileNameWithoutExtension)
+        newFile?.uri?.let { newUri ->
+            context.contentResolver.openInputStream(source)?.use { input ->
+                context.contentResolver.openOutputStream(newUri)?.use { output ->
+                    input.copyTo(output)
+                }
+            }
+        }
+    }
+
     private fun getFileNameIfHasNameCollision(folder: DocumentFile, fileName: String): String {
         val files = folder.listFiles()
         if (files.find { it.name == fileName } == null) return fileName

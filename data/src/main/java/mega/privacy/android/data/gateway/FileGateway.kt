@@ -360,4 +360,16 @@ interface FileGateway {
         source: File,
         destination: DocumentFile,
     ): Int
+
+    /**
+     * Copy uri to document folder
+     *
+     * @param source uri
+     * @param destination document folder
+     */
+    suspend fun copyUriToDocumentFolder(
+        name: String,
+        source: Uri,
+        destination: DocumentFile,
+    )
 }

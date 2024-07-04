@@ -455,4 +455,20 @@ interface FileSystemRepository {
      * @return [FileTypeInfo] object
      */
     fun getFileTypeInfoByName(name: String, duration: Int = 0): FileTypeInfo
+
+    /**
+     * Copy uri
+     *
+     * @param source
+     * @param destination
+     */
+    suspend fun copyUri(name: String, source: UriPath, destination: File)
+
+    /**
+     * Copy uri
+     *
+     * @param source
+     * @param destination
+     */
+    suspend fun copyUri(name: String, source: UriPath, destination: UriPath)
 }

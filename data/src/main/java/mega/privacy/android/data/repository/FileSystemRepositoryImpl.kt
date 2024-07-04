@@ -631,4 +631,29 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         query: String,
     ): Flow<DocumentFolder> = fileGateway.searchFilesInDocumentFolderRecursive(folder, query)
         .flowOn(ioDispatcher)
+
+    override suspend fun copyUri(name: String, source: UriPath, destination: File) =
+        withContext(ioDispatcher) {
+            fileGateway.copyUriToDocumentFolder(
+                name = name,
+                source = source.value.toUri(),
+                destination = DocumentFile.fromFile(destination)
+            )
+        }
+
+    override suspend fun copyUri(name: String, source: UriPath, destination: UriPath) =
+        withContext(ioDispatcher) {
+            val uri = destination.value.toUri()
+            val isTreeUri = DocumentsContract.isTreeUri(uri)
+            val destinationUri = if (isTreeUri) {
+                DocumentFile.fromTreeUri(context, uri)
+            } else {
+                DocumentFile.fromSingleUri(context, uri)
+            } ?: throw FileNotFoundException("Content uri doesn't exist: $destination")
+            fileGateway.copyUriToDocumentFolder(
+                name = name,
+                source = source.value.toUri(),
+                destination = destinationUri
+            )
+        }
 }
