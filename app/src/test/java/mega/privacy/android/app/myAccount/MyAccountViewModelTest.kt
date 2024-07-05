@@ -18,12 +18,18 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.exception.account.QueryCancelLinkException
 import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
@@ -64,6 +70,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -120,6 +127,7 @@ internal class MyAccountViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val snackBarHandler: SnackBarHandler = mock()
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
 
     private val userUpdatesFlow = MutableSharedFlow<UserChanges>()
     private val verificationStatusFlow = MutableSharedFlow<VerificationStatus>()
@@ -146,6 +154,18 @@ internal class MyAccountViewModelTest {
         whenever(monitorUserUpdates()).thenReturn(userUpdatesFlow)
         whenever(monitorVerificationStatus()).thenReturn(verificationStatusFlow)
         whenever(monitorBackupFolder()).thenReturn(backupFolderFlow)
+        whenever(
+            getExtendedAccountDetail(
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean()
+            )
+        ).thenReturn(Unit)
+        whenever(getPaymentMethodUseCase(anyBoolean())).thenReturn(PaymentMethodFlags(0L))
+        whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
+        whenever(myAccountInfo.usedFormatted).thenReturn("")
+
     }
 
     private fun initializeViewModel() {
@@ -187,7 +207,8 @@ internal class MyAccountViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             ioDispatcher = testDispatcher,
-            snackBarHandler = snackBarHandler
+            snackBarHandler = snackBarHandler,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 
@@ -525,6 +546,54 @@ internal class MyAccountViewModelTest {
         Arguments.of(false, false)
     )
 
+    private fun provideAccountTypeIdentifierParameters() = Stream.of(
+        Arguments.of(AccountType.PRO_I, true),
+        Arguments.of(AccountType.PRO_II, true),
+        Arguments.of(AccountType.PRO_III, true),
+        Arguments.of(AccountType.PRO_LITE, true),
+        Arguments.of(AccountType.PRO_FLEXI, true),
+        Arguments.of(AccountType.BUSINESS, false),
+        Arguments.of(AccountType.STARTER, false),
+        Arguments.of(AccountType.BASIC, false),
+        Arguments.of(AccountType.ESSENTIAL, false),
+        Arguments.of(AccountType.UNKNOWN, false),
+    )
+
+    @ParameterizedTest(name = "when account type is {0} isStandardProAccount is {1}")
+    @MethodSource("provideAccountTypeIdentifierParameters")
+    fun `test that isStandardProAccount is updated correctly when account details are provided`(
+        accountType: AccountType,
+        expected: Boolean,
+    ) = runTest {
+        val userAccount = UserAccount(
+            userId = UserId(0L),
+            email = "email",
+            fullName = "fullName",
+            isBusinessAccount = false,
+            isMasterBusinessAccount = false,
+            accountTypeIdentifier = accountType,
+            accountTypeString = "accountTypeString",
+        )
+
+        whenever(getAccountDetailsUseCase(anyBoolean())).thenReturn(userAccount)
+        underTest.refreshAccountInfo()
+        underTest.state.test {
+            assertThat(awaitItem().isStandardProAccount).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that businessProFlexiStatus is updated correctly when getBusinessStatusUseCase returns the correct value`() =
+        runTest {
+            val expectedValue = BusinessAccountStatus.Expired
+            whenever(getAccountDetailsUseCase(anyBoolean())).thenReturn(mock<UserAccount>())
+            whenever(getBusinessStatusUseCase()).thenReturn(expectedValue)
+            underTest.refreshAccountInfo()
+            underTest.state.test {
+                assertThat(awaitItem().businessProFlexiStatus).isEqualTo(expectedValue)
+            }
+        }
+
     @AfterEach
     fun resetMocks() {
         Dispatchers.resetMain()
@@ -565,7 +634,8 @@ internal class MyAccountViewModelTest {
             getFolderTreeInfo,
             getNodeByIdUseCase,
             getFeatureFlagValueUseCase,
-            snackBarHandler
+            snackBarHandler,
+            getBusinessStatusUseCase,
         )
     }
 }

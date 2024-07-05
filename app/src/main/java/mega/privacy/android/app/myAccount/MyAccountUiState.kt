@@ -1,6 +1,7 @@
 package mega.privacy.android.app.myAccount
 
 import androidx.annotation.StringRes
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 
 /**
  * My account ui state
@@ -16,6 +17,7 @@ import androidx.annotation.StringRes
  * @property canVerifyPhoneNumber
  * @property isBusinessAccount
  * @property isProFlexiAccount
+ * @property businessProFlexiStatus shows account status for Business or Pro Flexi
  * @property backupStorageSize
  * @property errorMessage The Error Message to be displayed
  * @property errorMessageRes A [StringRes] version of the Error Message to be displayed
@@ -25,6 +27,7 @@ import androidx.annotation.StringRes
  * @property showChangeEmailConfirmation true if a confirmation should be shown explaining that the
  * User's Email Address will be changed
  * @property showNewCancelSubscriptionFeature true if the new Cancel Subscription feature should be shown
+ * @property isStandardProAccount true if user has Pro subscription (Pro Lite, Pro I, Pro II, Pro III or Pro Flexi)
  */
 data class MyAccountUiState(
     val isFileVersioningEnabled: Boolean = true,
@@ -38,6 +41,7 @@ data class MyAccountUiState(
     val canVerifyPhoneNumber: Boolean = false,
     val isBusinessAccount: Boolean = false,
     val isProFlexiAccount: Boolean = false,
+    val businessProFlexiStatus: BusinessAccountStatus? = null,
     val backupStorageSize: Long = 0L,
     val errorMessage: String = "",
     @StringRes val errorMessageRes: Int? = null,
@@ -45,4 +49,5 @@ data class MyAccountUiState(
     val showInvalidChangeEmailLinkPrompt: Boolean = false,
     val showChangeEmailConfirmation: Boolean = false,
     val showNewCancelSubscriptionFeature: Boolean = false,
+    val isStandardProAccount: Boolean = false,
 )

@@ -66,6 +66,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
@@ -75,6 +76,7 @@ import mega.privacy.android.domain.exception.account.QueryCancelLinkException
 import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
@@ -191,6 +193,7 @@ class MyAccountViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val snackBarHandler: SnackBarHandler,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -1303,11 +1306,17 @@ class MyAccountViewModel @Inject constructor(
                 )
                 getPaymentMethodUseCase(false)
 
-                _state.update {
-                    it.copy(
+                val businessProFlexiStatus = getBusinessStatusUseCase()
+
+                _state.update { state ->
+                    state.copy(
                         isBusinessAccount = accountDetails.isBusinessAccount &&
                                 accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
                         isProFlexiAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.PRO_FLEXI,
+                        businessProFlexiStatus = businessProFlexiStatus,
+                        isStandardProAccount = accountDetails.accountTypeIdentifier?.let {
+                            isStandardProAccountCheck(it)
+                        } ?: false
                     )
                 }
             }.onFailure {
@@ -1354,4 +1363,25 @@ class MyAccountViewModel @Inject constructor(
             it.copy(shouldNavigateToSmsVerification = false)
         }
     }
+
+    /**
+     * Get account status for Business or Pro Flexi accounts
+     */
+    fun getBusinessProFlexiStatus(): BusinessAccountStatus? =
+        state.value.businessProFlexiStatus
+
+    private fun isStandardProAccountCheck(accountType: AccountType): Boolean = when (accountType) {
+        AccountType.PRO_I -> true
+        AccountType.PRO_II -> true
+        AccountType.PRO_III -> true
+        AccountType.PRO_LITE -> true
+        AccountType.PRO_FLEXI -> true
+        else -> false
+    }
+
+    /**
+     * Check if account has standard Pro subscription (Pro Lite, Pro I, Pro II, Pro III or Pro Flexi)
+     */
+    fun isStandardProAccount(): Boolean =
+        state.value.isStandardProAccount
 }

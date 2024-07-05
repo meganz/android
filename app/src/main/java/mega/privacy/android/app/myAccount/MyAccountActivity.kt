@@ -64,6 +64,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.mobile.analytics.event.CancelSubscriptionMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ToolbarOverflowMenuItemEvent
 import nz.mega.sdk.MegaApiJava
@@ -336,8 +337,14 @@ class MyAccountActivity : PasscodeActivity(),
             R.id.my_account -> {
                 menu.toggleAllMenuItemsVisibility(true)
 
-                if (viewModel.thereIsNoSubscription() || (isProFlexiAccount && !viewModel.isNewCancelSubscriptionFeatureEnabled())) {
-                    menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
+                if (viewModel.isNewCancelSubscriptionFeatureEnabled()) {
+                    if (!viewModel.isStandardProAccount() || (isProFlexiAccount && viewModel.getBusinessProFlexiStatus() == BusinessAccountStatus.Expired)) {
+                        menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
+                    }
+                } else {
+                    if (viewModel.thereIsNoSubscription() || isProFlexiAccount) {
+                        menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
+                    }
                 }
 
                 if (isBusinessAccount || isProFlexiAccount) {
@@ -473,6 +480,9 @@ class MyAccountActivity : PasscodeActivity(),
                 viewModel.resetErrorMessage()
             }
             if (state.isBusinessAccount || isProFlexiAccount) {
+                refreshMenuOptionsVisibility()
+            }
+            if (state.isStandardProAccount) {
                 refreshMenuOptionsVisibility()
             }
             if (state.showInvalidChangeEmailLinkPrompt) {
