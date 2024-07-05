@@ -1,10 +1,8 @@
-package test.mega.privacy.android.app.data.worker
+package mega.privacy.android.data.worker
 
 import android.app.Notification
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ProgressUpdater
 import androidx.work.SystemClock
 import androidx.work.WorkerFactory
@@ -31,9 +29,6 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.yield
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
-import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
-import mega.privacy.android.data.worker.ChatUploadsWorker
-import mega.privacy.android.data.worker.ForegroundSetter
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
@@ -63,15 +58,17 @@ import mega.privacy.android.domain.usecase.transfers.chatuploads.ClearPendingMes
 import mega.privacy.android.domain.usecase.transfers.chatuploads.PrepareAllPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartUploadingAllPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.anyVararg
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -81,12 +78,12 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 @ExperimentalCoroutinesApi
-@RunWith(AndroidJUnit4::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChatUploadsWorkerTest {
     private lateinit var underTest: ChatUploadsWorker
 
 
-    private lateinit var context: Context
+    private val context = mock<Context>()
     private lateinit var executor: Executor
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var workDatabase: WorkDatabase
@@ -119,11 +116,10 @@ class ChatUploadsWorkerTest {
     private val monitorPendingMessagesByStateUseCase = mock<MonitorPendingMessagesByStateUseCase>()
     private val prepareAllPendingMessagesUseCase = mock<PrepareAllPendingMessagesUseCase>()
 
-    @Before
+    @BeforeAll
     fun init() {
         val ioDispatcher = UnconfinedTestDispatcher()
         Dispatchers.setMain(ioDispatcher)
-        context = ApplicationProvider.getApplicationContext()
         executor = Executors.newSingleThreadExecutor()
         workExecutor = WorkManagerTaskExecutor(executor)
         workDatabase =
@@ -170,6 +166,35 @@ class ChatUploadsWorkerTest {
             crashReporter,
             setForeground,
             notificationSamplePeriod = 0L,
+        )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            context,
+            workProgressUpdater,
+            handleTransferEventUseCase,
+            areTransfersPausedUseCase,
+            getActiveTransferTotalsUseCase,
+            overQuotaNotificationBuilder,
+            areNotificationsEnabledUseCase,
+            notificationManager,
+            correctActiveTransfersUseCase,
+            clearActiveTransfersIfFinishedUseCase,
+            crashReporter,
+            setForeground,
+            monitorTransferEventsUseCase,
+            attachNodeWithPendingMessageUseCase,
+            monitorOngoingActiveTransfersUseCase,
+            chatUploadNotificationMapper,
+            updatePendingMessageUseCase,
+            checkFinishedChatUploadsUseCase,
+            compressPendingMessagesUseCase,
+            clearPendingMessagesCompressionProgressUseCase,
+            startUploadingAllPendingMessagesUseCase,
+            monitorPendingMessagesByStateUseCase,
+            prepareAllPendingMessagesUseCase,
         )
     }
 
