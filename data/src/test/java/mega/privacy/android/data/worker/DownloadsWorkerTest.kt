@@ -1,8 +1,7 @@
-package test.mega.privacy.android.app.transfers
+package mega.privacy.android.data.worker
 
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.ListenableWorker
 import androidx.work.ProgressUpdater
 import androidx.work.SystemClock
@@ -26,11 +25,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
-import mega.privacy.android.data.worker.AbstractTransfersWorker
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.ON_TRANSFER_UPDATE_REFRESH_MILLIS
-import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
-import mega.privacy.android.data.worker.DownloadsWorker
-import mega.privacy.android.data.worker.ForegroundSetter
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
@@ -46,16 +41,18 @@ import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTot
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -65,11 +62,11 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 @ExperimentalCoroutinesApi
-@RunWith(AndroidJUnit4::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DownloadsWorkerTest {
     private lateinit var underTest: DownloadsWorker
 
-    private lateinit var context: Context
+    private val context = mock<Context>()
     private lateinit var executor: Executor
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var workDatabase: WorkDatabase
@@ -91,12 +88,12 @@ class DownloadsWorkerTest {
     private val scanMediaFileUseCase = mock<ScanMediaFileUseCase>()
     private val setForeground = mock<ForegroundSetter>()
     private val crashReporter = mock<CrashReporter>()
+    private val notificationManager = mock<NotificationManagerCompat>()
 
-    @Before
+    @BeforeAll
     fun setup() {
         val ioDispatcher = UnconfinedTestDispatcher()
         Dispatchers.setMain(ioDispatcher)
-        context = ApplicationProvider.getApplicationContext()
         executor = Executors.newSingleThreadExecutor()
         workExecutor = WorkManagerTaskExecutor(executor)
         workDatabase =
@@ -128,7 +125,7 @@ class DownloadsWorkerTest {
             transfersNotificationMapper = transfersNotificationMapper,
             overQuotaNotificationBuilder = overQuotaNotificationBuilder,
             areNotificationsEnabledUseCase = areNotificationsEnabledUseCase,
-            notificationManager = mock(),
+            notificationManager = notificationManager,
             correctActiveTransfersUseCase = correctActiveTransfersUseCase,
             clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
             transfersFinishedNotificationMapper = transfersFinishedNotificationMapper,
@@ -140,7 +137,28 @@ class DownloadsWorkerTest {
     }
 
 
-    @After
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            context,
+            workProgressUpdater,
+            handleTransferEventUseCase,
+            areTransfersPausedUseCase,
+            getActiveTransferTotalsUseCase,
+            transfersNotificationMapper,
+            overQuotaNotificationBuilder,
+            areNotificationsEnabledUseCase,
+            notificationManager,
+            correctActiveTransfersUseCase,
+            clearActiveTransfersIfFinishedUseCase,
+            transfersFinishedNotificationMapper,
+            crashReporter,
+            setForeground,
+            monitorTransferEventsUseCase,
+        )
+    }
+
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -262,17 +280,6 @@ class DownloadsWorkerTest {
             underTest.doWork()
             verify(transfersFinishedNotificationMapper).invoke(transferTotal)
             verifyNoInteractions(overQuotaNotificationBuilder)
-        }
-
-    fun `test that setForeground is not invoked when worker starts with no transfers`() =
-        runTest {
-            val initial: ActiveTransferTotals = mockActiveTransferTotals(
-                hasCompleted = false,
-            )
-            whenever(initial.totalTransfers).thenReturn(0)
-            commonStub(initialTransferTotals = initial)
-            underTest.doWork()
-            verifyNoInteractions(setForeground)
         }
 
     @Test

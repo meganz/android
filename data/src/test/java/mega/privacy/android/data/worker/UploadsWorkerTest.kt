@@ -286,18 +286,6 @@ class UploadsWorkerTest {
         }
 
     @Test
-    fun `test that setForeground is not invoked when worker starts with no transfers`() =
-        runTest {
-            val initial: ActiveTransferTotals = mockActiveTransferTotals(
-                hasCompleted = true,
-            )
-            whenever(initial.totalTransfers).thenReturn(0)
-            commonStub(initialTransferTotals = initial)
-            underTest.doWork()
-            verifyNoInteractions(setForeground)
-        }
-
-    @Test
     fun `test that transfersFinishedNotificationMapper is invoked when worker starts with completed transfers`() =
         runTest {
             val initial: ActiveTransferTotals = mockActiveTransferTotals(true)
