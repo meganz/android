@@ -1157,6 +1157,26 @@ class DefaultTransfersRepositoryTest {
             )
         }
 
+        @ParameterizedTest
+        @EnumSource(TransferType::class)
+        fun `test that updateTransferredBytes takes the max value between current and new to avoid race conditions`(
+            transferType: TransferType,
+        ) = runTest {
+            testCurrentActiveTransferTotals(
+                transferType = transferType,
+                expectedMap = { transfer ->
+                    mapOf(transfer.tag to transfer.totalBytes)
+                },
+                callToTest = {
+                    val transferFinished = mock<Transfer>()
+                    stubActiveTransfer(transferFinished, transferType, finished = true)
+
+                    underTest.updateTransferredBytes(transferFinished)
+                    underTest.updateTransferredBytes(transfer)
+                }
+            )
+        }
+
         /**
          * As getCurrentActiveTransferTotalsByType is based on a state flow, we need to reset this state to make testing stateless
          * This is a convenient function to test changes on this state and then reset it to its initial empty value.
@@ -1166,7 +1186,7 @@ class DefaultTransfersRepositoryTest {
             expectedMap: (Transfer) -> Map<Int, Long>,
             callToTest: suspend () -> Unit,
         ) {
-            stubActiveTransfer(transferType)
+            stubActiveTransfer(transfer, transferType)
             val list = mock<List<ActiveTransfer>>()
             whenever(megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType))
                 .thenReturn(list)
@@ -1185,13 +1205,17 @@ class DefaultTransfersRepositoryTest {
             verify(activeTransferTotalsMapper).invoke(eq(transferType), eq(list), eq(emptyMap()))
         }
 
-        private fun stubActiveTransfer(transferType: TransferType) {
+        private fun stubActiveTransfer(
+            transfer: Transfer,
+            transferType: TransferType,
+            finished: Boolean = false,
+        ) {
             val transferred = 900L
             val total = 1024L
             val tag = 1
 
             whenever(transfer.transferType).thenReturn(transferType)
-            whenever(transfer.transferredBytes).thenReturn(transferred)
+            whenever(transfer.transferredBytes).thenReturn(if (finished) total else transferred)
             whenever(transfer.totalBytes).thenReturn(total)
             whenever(transfer.tag).thenReturn(tag)
         }
