@@ -714,7 +714,7 @@ def parseCommandParameter() {
         return result
     }
 
-    String[] paramList = otherParams.split(" +")
+    String[] paramList = otherParams.split("\\p{Z}+") // Split by tabs/spaces/ideographic space
 
     if (paramList.length % 2 != 0) {
         println("[ERROR] invalid parameter in command! parameter name and values are not in pair.")
