@@ -1,21 +1,15 @@
 package mega.privacy.android.feature.devicecenter.ui
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.sync.R as sharedSyncR
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
@@ -23,39 +17,30 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.lists.DeviceCenterListViewItem
 import mega.privacy.android.feature.devicecenter.ui.lists.loading.DeviceCenterLoadingScreen
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
@@ -69,11 +54,15 @@ import mega.privacy.android.feature.devicecenter.ui.renamedevice.RenameDeviceDia
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.resources.R as sharedR
-import androidx.compose.runtime.LaunchedEffect
-import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.shared.sync.ui.SyncEmptyState
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogUpgradeButtonPressedEvent
@@ -373,8 +362,8 @@ private fun DeviceCenterAppBar(
  */
 @Composable
 private fun DeviceCenterNoNetworkState() {
-    DeviceCenterEmptyState(
-        iconId = R.drawable.ic_device_center_no_network_state,
+    SyncEmptyState(
+        iconId = sharedSyncR.drawable.ic_no_cloud,
         iconSize = 144.dp,
         iconDescription = "No network connectivity state",
         textId = R.string.device_center_no_network_state,
@@ -387,7 +376,7 @@ private fun DeviceCenterNoNetworkState() {
  */
 @Composable
 private fun DeviceCenterNothingSetupState() {
-    DeviceCenterEmptyState(
+    SyncEmptyState(
         iconId = R.drawable.ic_folder_sync_empty,
         iconSize = 128.dp,
         iconDescription = "No setup state",
@@ -401,52 +390,13 @@ private fun DeviceCenterNothingSetupState() {
  */
 @Composable
 private fun DeviceCenterNoItemsFound() {
-    DeviceCenterEmptyState(
+    SyncEmptyState(
         iconId = iconPackR.drawable.ic_search_02,
         iconSize = 128.dp,
         iconDescription = "No results found for search",
         textId = R.string.device_center_empty_screen_no_results,
         testTag = DEVICE_CENTER_NO_ITEMS_FOUND_STATE
     )
-}
-
-/**
- * A [Composable] which displays an empty state
- *
- * @param iconId            [DrawableRes] ID to query the image file from.
- * @param iconSize          Size of the icon square in [Dp].
- * @param iconDescription   [String] used by accessibility services to describe what this image represents.
- * @param textId            [StringRes] ID of the text to display.
- * @param testTag           Tag to allow modified element to be found in tests.
- */
-@Composable
-private fun DeviceCenterEmptyState(
-    @DrawableRes iconId: Int,
-    iconSize: Dp,
-    iconDescription: String,
-    @StringRes textId: Int,
-    testTag: String,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .testTag(testTag),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(id = iconId),
-            contentDescription = iconDescription,
-            modifier = Modifier
-                .size(size = iconSize)
-                .padding(bottom = 8.dp)
-        )
-        MegaText(
-            text = stringResource(id = textId),
-            textColor = TextColor.Primary,
-            style = MaterialTheme.typography.subtitle2,
-        )
-    }
 }
 
 /**

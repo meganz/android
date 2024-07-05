@@ -532,4 +532,6 @@
     <string name="account_cancellation_instructions_tap_avatar">3. Tap on your avatar.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_cancel_subscription">4. Tap [A]Cancel subscription[/A].</string>
+    <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
+    <string name="sync_no_network_state">No internet connection</string>
 </resources>
