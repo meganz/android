@@ -22,7 +22,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.constant.CacheFolderConstant
-import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getRequestListener
@@ -44,6 +43,7 @@ import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -154,7 +154,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                         node = node,
                         localPath = file.absolutePath,
                         fileName = file.name,
-                        appData = APP_DATA_BACKGROUND_TRANSFER,
+                        appData = AppDataTypeConstants.BackgroundTransfer.sdkTypeValue,
                         startFirst = true,
                         cancelToken = null,
                         collisionCheck = COLLISION_CHECK_FINGERPRINT,

@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.model.RequestEvent
@@ -455,14 +455,6 @@ internal class MegaApiFacade @Inject constructor(
         }
     }
 
-    override fun cancelAllDownloadTransfers(listener: MegaRequestListenerInterface?) {
-        if (listener != null) {
-            megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, listener)
-        } else {
-            megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
-        }
-    }
-
     override fun cancelAllUploadTransfers(listener: MegaRequestListenerInterface?) {
         if (listener != null) {
             megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, listener)
@@ -593,7 +585,7 @@ internal class MegaApiFacade @Inject constructor(
             node,
             fullFile.absolutePath,
             fullFile.name,
-            APP_DATA_BACKGROUND_TRANSFER,
+            AppDataTypeConstants.BackgroundTransfer.sdkTypeValue,
             highPriority,
             null,
             MegaTransfer.COLLISION_CHECK_FINGERPRINT,
@@ -1113,15 +1105,6 @@ internal class MegaApiFacade @Inject constructor(
         value: MegaStringMap,
         listener: MegaRequestListenerInterface,
     ) = megaApi.setUserAttribute(type, value, listener)
-
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to\n" +
-                " * provide more data and avoid race conditions. They could change or be removed in the current form."
-    )
-    override suspend fun resetTotalDownloads() {
-        megaApi.resetTotalDownloads()
-    }
 
     override fun querySignupLink(link: String, listener: MegaRequestListenerInterface) =
         megaApi.querySignupLink(link, listener)

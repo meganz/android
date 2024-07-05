@@ -1002,11 +1002,6 @@ class DefaultTransfersRepositoryTest {
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class PendingCounters {
-        @Test
-        fun `test that getNumPendingGeneralUploads returns correctly`() = runTest {
-            stubUploadTransfers()
-            assertThat(underTest.getNumPendingGeneralUploads()).isEqualTo(2)
-        }
 
         @Test
         fun `test that getNumPendingCameraUploads returns correctly`() = runTest {
@@ -1015,27 +1010,9 @@ class DefaultTransfersRepositoryTest {
         }
 
         @Test
-        fun `test that getNumPendingChatUploads returns correctly`() = runTest {
-            stubUploadTransfers()
-            assertThat(underTest.getNumPendingChatUploads()).isEqualTo(2)
-        }
-
-        @Test
-        fun `test that getNumPendingPausedGeneralUploads returns correctly`() = runTest {
-            stubUploadTransfers()
-            assertThat(underTest.getNumPendingPausedGeneralUploads()).isEqualTo(1)
-        }
-
-        @Test
         fun `test that getNumPendingPausedCameraUploads returns correctly`() = runTest {
             stubUploadTransfers()
             assertThat(underTest.getNumPendingPausedCameraUploads()).isEqualTo(1)
-        }
-
-        @Test
-        fun `test that getNumPendingPausedChatUploads returns correctly`() = runTest {
-            stubUploadTransfers()
-            assertThat(underTest.getNumPendingPausedChatUploads()).isEqualTo(1)
         }
 
         private fun stubUploadTransfers() = runTest {

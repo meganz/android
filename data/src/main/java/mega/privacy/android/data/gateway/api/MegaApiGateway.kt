@@ -579,13 +579,6 @@ interface MegaApiGateway {
     fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?)
 
     /**
-     * Cancels all [MegaTransfer] downloads
-     *
-     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
-     */
-    fun cancelAllDownloadTransfers(listener: MegaRequestListenerInterface?)
-
-    /**
      * Cancels all [MegaTransfer] uploads
      *
      * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
@@ -2190,16 +2183,6 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun setUserAttribute(type: Int, value: MegaStringMap, listener: MegaRequestListenerInterface)
-
-    /**
-     * Reset the number of total downloads
-     * This function resets the number returned by MegaApi::getTotalDownloads
-     */
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to\n" +
-                "provide more data and avoid race conditions. They could change or be removed in the current form."
-    )
-    suspend fun resetTotalDownloads()
 
     /**
      * Get information about a confirmation link or a new signup link

@@ -38,7 +38,8 @@ internal fun TransfersView(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .imePadding(),
+            .imePadding()
+            .semantics { testTagsAsResourceId = true },
         scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(
@@ -52,8 +53,7 @@ internal fun TransfersView(
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize()
-                .semantics { testTagsAsResourceId = true },
+                .fillMaxSize(),
         ) {
             Tabs(
                 cells = persistentListOf(

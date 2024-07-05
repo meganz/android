@@ -43,19 +43,9 @@ interface TransferRepository {
     suspend fun getNumPendingUploads(): Int
 
     /**
-     * @return the number of pending General Uploads
-     */
-    suspend fun getNumPendingGeneralUploads(): Int
-
-    /**
      * @return the number of pending Camera Uploads
      */
     suspend fun getNumPendingCameraUploads(): Int
-
-    /**
-     * @return the number of pending Chat Uploads
-     */
-    suspend fun getNumPendingChatUploads(): Int
 
     /**
      * Gets number of pending transfers.
@@ -79,19 +69,9 @@ interface TransferRepository {
     suspend fun getNumPendingPausedUploads(): Int
 
     /**
-     * @return the number of pending and paused General Uploads
-     */
-    suspend fun getNumPendingPausedGeneralUploads(): Int
-
-    /**
      * @return the number of pending and paused Camera Uploads
      */
     suspend fun getNumPendingPausedCameraUploads(): Int
-
-    /**
-     * @return the number of pending and paused Chat Uploads
-     */
-    suspend fun getNumPendingPausedChatUploads(): Int
 
     /**
      * Gets the number of pending, non-background and paused downloads.
@@ -106,21 +86,10 @@ interface TransferRepository {
     suspend fun cancelAllUploadTransfers()
 
     /**
-     * Cancels all download transfers
-     */
-    suspend fun cancelAllDownloadTransfers()
-
-    /**
      * Cancel Transfer by Tag
      * @param transferTag   Tag that identifies the transfer
      */
     suspend fun cancelTransferByTag(transferTag: Int)
-
-    /**
-     * Reset Total Downloads
-     */
-    suspend fun resetTotalDownloads()
-
 
     /**
      * Monitor the offline availability of the file

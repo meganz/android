@@ -29,7 +29,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
-import mega.privacy.android.data.extensions.isBackgroundTransfer
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -243,17 +242,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaApiGateway.getTransferData()?.let { transferDataMapper(it) }
     }
 
-
-    override suspend fun cancelAllDownloadTransfers() = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("cancelAllDownloadTransfers") {}
-            megaApiGateway.cancelAllDownloadTransfers(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
     override suspend fun cancelAllUploadTransfers() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("cancelAllUploadTransfers") {}
@@ -282,21 +270,9 @@ internal class DefaultTransfersRepository @Inject constructor(
         getUploadTransfers().count { transfer -> !transfer.isFinished }
     }
 
-    override suspend fun getNumPendingGeneralUploads() = withContext(ioDispatcher) {
-        getUploadTransfers().count { transfer ->
-            !transfer.isFinished && !transfer.isCUUpload() && !transfer.isChatUpload()
-        }
-    }
-
     override suspend fun getNumPendingCameraUploads() = withContext(ioDispatcher) {
         getUploadTransfers().count { transfer ->
             !transfer.isFinished && transfer.isCUUpload()
-        }
-    }
-
-    override suspend fun getNumPendingChatUploads() = withContext(ioDispatcher) {
-        getUploadTransfers().count { transfer ->
-            !transfer.isFinished && transfer.isChatUpload()
         }
     }
 
@@ -314,13 +290,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
     }
 
-    override suspend fun getNumPendingPausedGeneralUploads() = withContext(ioDispatcher) {
-        getUploadTransfers().count { transfer ->
-            !transfer.isFinished && transfer.state == MegaTransfer.STATE_PAUSED
-                    && !transfer.isCUUpload() && !transfer.isChatUpload()
-        }
-    }
-
     override suspend fun getNumPendingPausedCameraUploads() = withContext(ioDispatcher) {
         getUploadTransfers().count { transfer ->
             !transfer.isFinished
@@ -328,15 +297,6 @@ internal class DefaultTransfersRepository @Inject constructor(
                     && transfer.isCUUpload()
         }
     }
-
-    override suspend fun getNumPendingPausedChatUploads() = withContext(ioDispatcher) {
-        getUploadTransfers().count { transfer ->
-            !transfer.isFinished
-                    && transfer.state == MegaTransfer.STATE_PAUSED
-                    && transfer.isChatUpload()
-        }
-    }
-
 
     override suspend fun getNumPendingNonBackgroundPausedDownloads(): Int =
         withContext(ioDispatcher) {
@@ -376,10 +336,6 @@ internal class DefaultTransfersRepository @Inject constructor(
                 megaApiGateway.removeRequestListener(listener)
             }
         }
-    }
-
-    override suspend fun resetTotalDownloads() = withContext(ioDispatcher) {
-        megaApiGateway.resetTotalDownloads()
     }
 
     override fun monitorOfflineFileAvailability(): Flow<Long> =
@@ -714,8 +670,11 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
 }
 
+private fun MegaTransfer.isBackgroundTransfer() =
+    appData?.contains(AppDataTypeConstants.BackgroundTransfer.sdkTypeValue) == true
+
 private fun MegaTransfer.isCUUpload() =
-    this.appData?.contains(AppDataTypeConstants.CameraUpload.sdkTypeValue) == true
+    appData?.contains(AppDataTypeConstants.CameraUpload.sdkTypeValue) == true
 
 private fun MegaTransfer.isChatUpload() =
-    this.appData?.contains(AppDataTypeConstants.ChatUpload.sdkTypeValue) == true
+    appData?.contains(AppDataTypeConstants.ChatUpload.sdkTypeValue) == true
