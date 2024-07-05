@@ -58,6 +58,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWit
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import timber.log.Timber
 import java.io.File
@@ -93,6 +94,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val startUploadWithWorkerUseCase: StartUploadsWithWorkerUseCase,
     private val saveOfflineNodesToDevice: SaveOfflineNodesToDevice,
     private val saveUriToDeviceUseCase: SaveUriToDeviceUseCase,
+    private val getCurrentUploadSpeedUseCase: GetCurrentUploadSpeedUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var currentInProgressJob: Job? = null
@@ -105,8 +107,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     internal val uiState = _uiState.asStateFlow()
 
     init {
-        checkRating()
+        checkDownloadRating()
         monitorDownloadFinish()
+        checkUploadRating()
         monitorUploadFinish()
     }
 
@@ -403,7 +406,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     }
                 }.last()
             }
-        checkRating()
+        checkDownloadRating()
         when {
             terminalEvent == MultiTransferEvent.InsufficientSpace ->
                 _uiState.updateEventAndClearProgress(StartTransferEvent.Message.NotSufficientSpace)
@@ -544,29 +547,29 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         return false
     }
 
-    private var checkShowRating = true
-    private fun checkRating() {
+    private var checkShowDownloadRating = true
+    private fun checkDownloadRating() {
         //check download speed and size to show rating
-        if (checkShowRating) {
+        if (checkShowDownloadRating) {
             viewModelScope.launch {
                 monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD).conflate().takeWhile {
-                    checkShowRating
+                    checkShowDownloadRating
                 }.catch {
                     Timber.e(it)
                 }.collect { (transferTotals, paused) ->
-                    if (checkShowRating && !paused && transferTotals.totalFileTransfers > 0) {
+                    if (checkShowDownloadRating && !paused && transferTotals.totalFileTransfers > 0) {
                         val currentDownloadSpeed = getCurrentDownloadSpeedUseCase()
                         RatingHandlerImpl().showRatingBaseOnSpeedAndSize(
                             size = transferTotals.totalFileTransfers.toLong(),
                             speed = currentDownloadSpeed.toLong(),
                             listener = object : OnCompleteListener {
                                 override fun onComplete() {
-                                    checkShowRating = false
+                                    checkShowDownloadRating = false
                                 }
 
 
                                 override fun onConditionsUnmet() {
-                                    checkShowRating = false
+                                    checkShowDownloadRating = false
                                 }
                             }
                         )
@@ -720,6 +723,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 _uiState.updateEventAndClearProgress(it)
             }
         }
+        checkUploadRating()
     }
 
     private var monitorUploadFinishJob: Job? = null
@@ -765,6 +769,38 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     }
                     lastTransferStartedHere = false
                 }
+        }
+    }
+
+    private var checkShowUploadRating = true
+    private fun checkUploadRating() {
+        //check upload speed and size to show rating
+        if (checkShowUploadRating) {
+            viewModelScope.launch {
+                monitorOngoingActiveTransfersUseCase(TransferType.GENERAL_UPLOAD).conflate()
+                    .takeWhile {
+                        checkShowUploadRating
+                    }.catch {
+                        Timber.e(it)
+                    }.collect { (transferTotals, paused) ->
+                        if (checkShowUploadRating && !paused && transferTotals.totalFileTransfers > 0) {
+                            val currentUploadSpeed = getCurrentUploadSpeedUseCase()
+                            RatingHandlerImpl().showRatingBaseOnSpeedAndSize(
+                                size = transferTotals.totalFileTransfers.toLong(),
+                                speed = currentUploadSpeed,
+                                listener = object : OnCompleteListener {
+                                    override fun onComplete() {
+                                        checkShowUploadRating = false
+                                    }
+
+                                    override fun onConditionsUnmet() {
+                                        checkShowUploadRating = false
+                                    }
+                                }
+                            )
+                        }
+                    }
+            }
         }
     }
 

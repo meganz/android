@@ -47,6 +47,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWit
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -102,6 +103,7 @@ class StartTransfersComponentViewModelTest {
     private val startUploadWithWorkerUseCase = mock<StartUploadsWithWorkerUseCase>()
     private val saveOfflineNodesToDevice = mock<SaveOfflineNodesToDevice>()
     private val saveUriToDeviceUseCase = mock<SaveUriToDeviceUseCase>()
+    private val getCurrentUploadSpeedUseCase = mock<GetCurrentUploadSpeedUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -148,7 +150,8 @@ class StartTransfersComponentViewModelTest {
             pauseAllTransfersUseCase = pauseAllTransfersUseCase,
             startUploadWithWorkerUseCase = startUploadWithWorkerUseCase,
             saveOfflineNodesToDevice = saveOfflineNodesToDevice,
-            saveUriToDeviceUseCase = saveUriToDeviceUseCase
+            saveUriToDeviceUseCase = saveUriToDeviceUseCase,
+            getCurrentUploadSpeedUseCase = getCurrentUploadSpeedUseCase,
         )
     }
 
@@ -181,7 +184,8 @@ class StartTransfersComponentViewModelTest {
             node,
             parentNode,
             saveOfflineNodesToDevice,
-            saveUriToDeviceUseCase
+            saveUriToDeviceUseCase,
+            getCurrentUploadSpeedUseCase,
         )
         initialStub()
     }
