@@ -77,7 +77,7 @@ class UploadsWorker @AssistedInject constructor(
     override fun monitorProgress(): Flow<MonitorOngoingActiveTransfersResult> =
         monitorOngoingActiveTransfersUntilFinishedUseCase(type)
 
-    override fun createUpdateNotification(
+    override suspend fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ) = transfersNotificationMapper(activeTransferTotals, paused)

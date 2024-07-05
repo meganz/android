@@ -510,6 +510,9 @@
         <activity
             android:name=".presentation.search.SearchActivity"
             android:launchMode="singleTop" />
+        <activity
+            android:name=".presentation.transfers.TransfersActivity"
+            android:launchMode="singleTask" />
 
         <service
             android:name=".meeting.CallService"
@@ -517,9 +520,6 @@
             android:foregroundServiceType="phoneCall" />
         <service
             android:name=".meeting.CallNotificationIntentService"
-            android:exported="false" />
-        <service
-            android:name=".presentation.notifications.DownloadNotificationIntentService"
             android:exported="false" />
         <service
             android:name=".UploadService"

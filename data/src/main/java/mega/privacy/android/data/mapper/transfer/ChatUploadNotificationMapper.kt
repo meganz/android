@@ -15,7 +15,7 @@ interface ChatUploadNotificationMapper {
      * @param chatCompressionProgress the video compression progress if corresponds, null if there are no compression currently in progress
      * @return a notification for chat uploads
      */
-    operator fun invoke(
+    suspend operator fun invoke(
         activeTransferTotals: ActiveTransferTotals?,
         chatCompressionProgress: ChatCompressionProgress?,
         paused: Boolean,

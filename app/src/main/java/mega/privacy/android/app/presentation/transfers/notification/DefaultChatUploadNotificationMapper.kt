@@ -8,13 +8,18 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
+import mega.privacy.android.app.presentation.transfers.TransfersActivity
+import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.ChatCompressionProgress
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 /**
@@ -22,16 +27,24 @@ import javax.inject.Inject
  */
 class DefaultChatUploadNotificationMapper @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ChatUploadNotificationMapper {
 
-    override fun invoke(
+    override suspend fun invoke(
         activeTransferTotals: ActiveTransferTotals?,
         chatCompressionProgress: ChatCompressionProgress?,
         paused: Boolean,
     ): Notification {
-        val intent = Intent(context, ManagerActivity::class.java)
-        intent.action = Constants.ACTION_SHOW_TRANSFERS
-        intent.putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
+        val intent = if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+            Intent(context, ManagerActivity::class.java).apply {
+                action = Constants.ACTION_SHOW_TRANSFERS
+                putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
+            }
+        } else {
+            Intent(context, TransfersActivity::class.java).apply {
+                putExtra(EXTRA_TAB, IN_PROGRESS_TAB_INDEX)
+            }
+        }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             context,
             0,

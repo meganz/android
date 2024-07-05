@@ -77,7 +77,7 @@ abstract class AbstractTransfersWorker(
     /**
      * Create the update Notification to show worker progress
      */
-    abstract fun createUpdateNotification(
+    abstract suspend fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ): Notification
@@ -197,7 +197,7 @@ abstract class AbstractTransfersWorker(
         areTransfersPausedUseCase()
     )
 
-    private fun getForegroundInfo(
+    private suspend fun getForegroundInfo(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ): ForegroundInfo =

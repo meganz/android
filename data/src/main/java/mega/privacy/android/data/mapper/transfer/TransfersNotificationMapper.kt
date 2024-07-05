@@ -11,7 +11,7 @@ interface TransfersNotificationMapper {
     /**
      * Invoke.
      */
-    operator fun invoke(
+    suspend operator fun invoke(
         activeTransferTotals: ActiveTransferTotals?,
         paused: Boolean,
     ): Notification

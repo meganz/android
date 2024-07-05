@@ -4,10 +4,13 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.commit
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Activity to show transfers.
  */
+
+@AndroidEntryPoint
 class TransfersActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

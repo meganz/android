@@ -11,13 +11,22 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.facade.AccountInfoFacade
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.notifications.DownloadNotificationIntentService
+import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.notifications.DismissNotificationBroadcastReceiver
+import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
+import mega.privacy.android.app.presentation.transfers.TransfersActivity
+import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
+import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import nz.mega.sdk.MegaAccountDetails
@@ -33,6 +42,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val accountInfoFacade: AccountInfoFacade,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : OverQuotaNotificationBuilder {
 
     override suspend operator fun invoke(storageOverQuota: Boolean) = if (storageOverQuota) {
@@ -45,13 +55,17 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
         val isLoggedIn =
             isUserLoggedIn() && hasCredentialsUseCase()
         var isFreeAccount = false
-        val intent = Intent(context, DownloadNotificationIntentService::class.java)
-        if (isLoggedIn) {
+        val intent = if (isLoggedIn) {
             isFreeAccount = accountInfoFacade.accountTypeId == MegaAccountDetails.ACCOUNT_TYPE_FREE
-            intent.action = Constants.ACTION_SHOW_UPGRADE_ACCOUNT
+            Intent(context, ManagerActivity::class.java).apply {
+                action = Constants.ACTION_SHOW_UPGRADE_ACCOUNT
+            }
         } else {
             clearEphemeralCredentialsUseCase()
-            intent.action = Constants.ACTION_LOG_IN
+            Intent(context, LoginActivity::class.java).apply {
+                action = Constants.ACTION_LOG_IN
+                putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+            }
         }
         val pendingIntent = PendingIntent.getService(
             context,
@@ -59,19 +73,26 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             intent,
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val dismissIntent = PendingIntent.getService(
+        val dismissIntent = PendingIntent.getBroadcast(
             context,
             0,
             Intent(
                 context.applicationContext,
-                DownloadNotificationIntentService::class.java
+                DismissNotificationBroadcastReceiver::class.java
             ),
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val clickIntent =
-            Intent(context, DownloadNotificationIntentService::class.java)
-        clickIntent.action = Constants.ACTION_SHOW_TRANSFERS
-        val clickPendingIntent = PendingIntent.getService(
+        val clickIntent = if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+            Intent(context, TransfersActivity::class.java).apply {
+                putExtra(EXTRA_TAB, IN_PROGRESS_TAB_INDEX)
+            }
+        } else {
+            Intent(context, ManagerActivity::class.java).apply {
+                action = Constants.ACTION_SHOW_TRANSFERS
+                putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
+            }
+        }
+        val clickPendingIntent = PendingIntent.getActivity(
             context,
             0,
             clickIntent,
