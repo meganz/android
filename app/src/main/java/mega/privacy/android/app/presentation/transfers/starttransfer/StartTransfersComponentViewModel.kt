@@ -56,6 +56,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownload
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
+import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import timber.log.Timber
@@ -91,6 +92,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val pauseAllTransfersUseCase: PauseAllTransfersUseCase,
     private val startUploadWithWorkerUseCase: StartUploadsWithWorkerUseCase,
     private val saveOfflineNodesToDevice: SaveOfflineNodesToDevice,
+    private val saveUriToDeviceUseCase: SaveUriToDeviceUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var currentInProgressJob: Job? = null
@@ -118,10 +120,13 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         viewModelScope.launch {
             when (transferTriggerEvent) {
                 is TransferTriggerEvent.DownloadTriggerEvent -> {
-                    if (checkAndHandleDeviceIsNotConnected()) {
+                    val isCopyEvent =
+                        transferTriggerEvent !is TransferTriggerEvent.CopyUri &&
+                                transferTriggerEvent !is TransferTriggerEvent.StartDownloadForPreview
+                    if (isCopyEvent && checkAndHandleDeviceIsNotConnected()) {
                         return@launch
                     }
-                    if (transferTriggerEvent.nodes.isEmpty()) {
+                    if (transferTriggerEvent.nodes.isEmpty() && transferTriggerEvent !is TransferTriggerEvent.CopyUri) {
                         Timber.e("Node in $transferTriggerEvent must exist")
                         _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
                     } else if (!checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent)) {
@@ -168,7 +173,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             }
         }
         val node = transferTriggerEvent.nodes.firstOrNull()
-        if (node == null) {
+        val isCopyByUriEvent = transferTriggerEvent is TransferTriggerEvent.CopyUri
+        if (node == null && !isCopyByUriEvent) {
             Timber.e("Node in $transferTriggerEvent must exist")
             _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
         } else {
@@ -179,7 +185,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     startDownloadForOffline(transferTriggerEvent)
                 }
 
-                is TransferTriggerEvent.StartDownloadNode, is TransferTriggerEvent.CopyOfflineNode -> {
+                is TransferTriggerEvent.StartDownloadNode, is TransferTriggerEvent.CopyOfflineNode, is TransferTriggerEvent.CopyUri -> {
                     viewModelScope.launch {
                         if (runCatching { shouldAskDownloadDestinationUseCase() }.getOrDefault(false)) {
                             _uiState.updateEventAndClearProgress(
@@ -233,31 +239,65 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         startDownloadNode: TransferTriggerEvent,
         destination: String,
     ) {
-        if (startDownloadNode is TransferTriggerEvent.StartDownloadNode) {
-            val nodes = startDownloadNode.nodes
-            if (nodes.isEmpty()) return
-            currentInProgressJob = viewModelScope.launch {
-                startDownloadNodes(
-                    nodes = nodes,
-                    isHighPriority = startDownloadNode.isHighPriority,
-                    getUri = {
-                        destination.ensureSuffix(File.separator)
-                    },
-                    transferTriggerEvent = startDownloadNode
-                )
-            }
-        } else if (startDownloadNode is TransferTriggerEvent.CopyOfflineNode) {
-            runCatching {
-                saveOfflineNodesToDevice(startDownloadNode.nodes, UriPath(destination))
-            }.onSuccess { totalFiles ->
-                _uiState.updateEventAndClearProgress(
-                    StartTransferEvent.MessagePlural.FinishDownloading(
-                        totalFiles
+        when (startDownloadNode) {
+            is TransferTriggerEvent.StartDownloadNode -> {
+                val nodes = startDownloadNode.nodes
+                if (nodes.isEmpty()) return
+                currentInProgressJob = viewModelScope.launch {
+                    startDownloadNodes(
+                        nodes = nodes,
+                        isHighPriority = startDownloadNode.isHighPriority,
+                        getUri = {
+                            destination.ensureSuffix(File.separator)
+                        },
+                        transferTriggerEvent = startDownloadNode
                     )
-                )
-            }.onFailure {
-                Timber.e(it)
+                }
             }
+
+            is TransferTriggerEvent.CopyOfflineNode -> {
+                saveOfflineNodeToDevice(startDownloadNode, destination)
+            }
+
+            is TransferTriggerEvent.CopyUri -> {
+                saveUriToDevice(startDownloadNode, destination)
+            }
+
+            else -> Unit
+        }
+    }
+
+    private suspend fun saveUriToDevice(
+        startDownloadNode: TransferTriggerEvent.CopyUri,
+        destination: String,
+    ) {
+        runCatching {
+            saveUriToDeviceUseCase(
+                name = startDownloadNode.name,
+                source = UriPath(startDownloadNode.uri.toString()),
+                destination = UriPath(destination)
+            )
+        }.onSuccess {
+            _uiState.updateEventAndClearProgress(StartTransferEvent.Message.FinishCopyUri)
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
+
+    private suspend fun saveOfflineNodeToDevice(
+        startDownloadNode: TransferTriggerEvent.CopyOfflineNode,
+        destination: String,
+    ) {
+        runCatching {
+            saveOfflineNodesToDevice(startDownloadNode.nodes, UriPath(destination))
+        }.onSuccess { totalFiles ->
+            _uiState.updateEventAndClearProgress(
+                StartTransferEvent.MessagePlural.FinishDownloading(
+                    totalFiles
+                )
+            )
+        }.onFailure {
+            Timber.e(it)
         }
     }
 

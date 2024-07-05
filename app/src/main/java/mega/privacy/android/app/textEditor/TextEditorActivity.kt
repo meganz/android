@@ -39,7 +39,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -52,7 +51,6 @@ import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActiv
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.usecase.exception.MegaException
-import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
@@ -144,10 +142,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     private val nodeAttacher by lazy { MegaAttacher(this) }
 
-    private val nodeSaver by lazy {
-        NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
-    }
-
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
@@ -211,7 +205,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
         if (savedInstanceState != null) {
             nodeAttacher.restoreState(savedInstanceState)
-            nodeSaver.restoreState(savedInstanceState)
 
             if (savedInstanceState.getBoolean(DISCARD_CHANGES_SHOWN, false)) {
                 showDiscardChangesConfirmationDialog()
@@ -233,7 +226,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
 
         nodeAttacher.saveState(outState)
-        nodeSaver.saveState(outState)
 
         super.onSaveInstanceState(outState)
     }
@@ -297,7 +289,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             R.id.action_download -> {
                 checkNotificationsPermission(this)
-                viewModel.downloadFile(nodeSaver)
+                viewModel.downloadFile()
             }
 
             R.id.action_get_link, R.id.action_remove_link -> viewModel.manageLink(this)
@@ -354,10 +346,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         super.onActivityResult(requestCode, resultCode, intent)
 
         if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
-            return
-        }
-
-        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return
         }
 
@@ -424,6 +412,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             if (viewModel.getNode() == null || viewModel.getNode()!!.isFolder) {
                 menu.toggleAllMenuItemsVisibility(false)
+                menu.findItem(R.id.action_download).isVisible = true
                 updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 return
             }

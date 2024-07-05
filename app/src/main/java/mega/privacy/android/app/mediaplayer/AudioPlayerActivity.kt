@@ -307,11 +307,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                             mediaItem?.localConfiguration?.uri?.let { uri ->
                                 playerServiceGateway?.getPlaylistItem(mediaItem.mediaId)
                                     ?.let { playlistItem ->
-                                        nodeSaver.saveUri(
+                                        startDownloadViewModel.onCopyUriClicked(
                                             uri = uri,
                                             name = playlistItem.nodeName,
-                                            size = playlistItem.size,
-                                            fromMediaViewer = true
                                         )
                                     }
                             }

@@ -116,6 +116,20 @@ sealed interface TransferTriggerEvent {
     ) : DownloadTriggerEvent
 
     /**
+     * Copy uri
+     *
+     * @property name
+     * @property uri
+     */
+    data class CopyUri(
+        val name: String,
+        val uri: Uri,
+    ) : DownloadTriggerEvent {
+        override val nodes = emptyList<TypedNode>()
+        override val isHighPriority: Boolean = false
+    }
+
+    /**
      * Event to start downloading node for preview
      *
      * @param node the node to be downloaded for preview

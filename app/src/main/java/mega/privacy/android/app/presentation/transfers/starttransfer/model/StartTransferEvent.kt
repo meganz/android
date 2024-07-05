@@ -107,6 +107,11 @@ sealed interface StartTransferEvent {
         data object FinishOffline : Message(R.string.file_available_offline, null, null)
 
         /**
+         * Copy uri has finished
+         */
+        data object FinishCopyUri : Message(R.string.copy_already_downloaded, null, null)
+
+        /**
          * Text file upload has finished
          *
          * @property isSuccess True if the upload finished with success, false otherwise.

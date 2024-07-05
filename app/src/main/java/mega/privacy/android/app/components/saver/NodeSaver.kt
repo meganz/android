@@ -4,7 +4,6 @@ import android.Manifest.permission
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.StatFs
@@ -79,26 +78,6 @@ class NodeSaver(
     private val dbHandler = getDbHandler()
 
     private var saving: Saving = Saving.Companion.NOTHING
-
-    /**
-     * Save an Uri into device.
-     *
-     * @param uri uri to save
-     * @param name name of this uri
-     * @param size size of this uri content
-     * @param fromMediaViewer whether this download is from media viewer
-     */
-    @JvmOverloads
-    fun saveUri(
-        uri: Uri,
-        name: String,
-        size: Long,
-        fromMediaViewer: Boolean = false,
-    ) {
-        save(app) {
-            UriSaving(uri, name, size, fromMediaViewer)
-        }
-    }
 
     /**
      * Handle app result from [FileStorageActivity] launched by requestLocalFolder,

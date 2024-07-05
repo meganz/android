@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.bottomsheet
 
+import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -193,6 +194,37 @@ class StartDownloadViewModelTest {
         underTest.downloadVoiceClip("messageName", chatId, messageId)
 
         verify(downloadFlow).collect(any())
+    }
+
+    @Test
+    fun `test that onCopyUriClicked launches the correct event`() = runTest {
+        val uri = mock<Uri>()
+        underTest.onCopyUriClicked("name", uri)
+        underTest.state.test {
+            val event = awaitItem()
+            assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+            val content = (event as StateEventWithContentTriggered).content
+            assertThat(content).isInstanceOf(TransferTriggerEvent.CopyUri::class.java)
+            assertThat((content as TransferTriggerEvent.CopyUri).uri).isEqualTo(uri)
+        }
+    }
+
+    // test for onCopyOfflineNodeClicked
+    @Test
+    fun `test that onCopyOfflineNodeClicked launches the correct event`() = runTest {
+        val nodeId = NodeId(1L)
+        val node = mock<TypedNode>()
+        whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
+        underTest.onCopyOfflineNodeClicked(listOf(nodeId))
+        underTest.state.test {
+            val event = awaitItem()
+            assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+            val content = (event as StateEventWithContentTriggered).content
+            assertThat(content).isInstanceOf(TransferTriggerEvent.CopyOfflineNode::class.java)
+            assertThat((content as TransferTriggerEvent.CopyOfflineNode).nodes).isEqualTo(
+                listOf(node)
+            )
+        }
     }
 
     private suspend fun assertStartDownloadNode(vararg node: TypedNode) {

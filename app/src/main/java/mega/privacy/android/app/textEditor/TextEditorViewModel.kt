@@ -28,7 +28,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.ExportListener
@@ -912,14 +911,18 @@ class TextEditorViewModel @Inject constructor(
      *
      * @param nodeSaver Required object to save nodes.
      */
-    fun downloadFile(nodeSaver: NodeSaver) {
+    fun downloadFile() {
         when (getAdapterType()) {
-            ZIP_ADAPTER -> nodeSaver.saveUri(
-                getFileUri()!!,
-                getNameOfFile(),
-                getFileSize()!!,
-                true
-            )
+            ZIP_ADAPTER -> _uiState.update { state ->
+                state.copy(
+                    transferEvent = triggered(
+                        TransferTriggerEvent.CopyUri(
+                            name = getNameOfFile(),
+                            uri = File(getFileUri().toString()).toUri()
+                        )
+                    )
+                )
+            }
 
             else -> {
                 viewModelScope.launch {

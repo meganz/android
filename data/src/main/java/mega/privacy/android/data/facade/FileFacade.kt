@@ -621,11 +621,14 @@ internal class FileFacade @Inject constructor(
     override suspend fun copyUriToDocumentFolder(
         name: String,
         source: Uri,
-        destination: DocumentFile
+        destination: DocumentFile,
     ) {
         val fileName = getFileNameIfHasNameCollision(destination, name)
         val fileNameWithoutExtension = fileName.substringBeforeLast(".")
-        val mimeType = context.contentResolver.getType(source) ?: "application/octet-stream"
+        val extension = fileName.substringAfterLast(".", "")
+        val mimeType = context.contentResolver.getType(source)
+            ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+            ?: "application/octet-stream"
         val newFile = destination.createFile(mimeType, fileNameWithoutExtension)
         newFile?.uri?.let { newUri ->
             context.contentResolver.openInputStream(source)?.use { input ->

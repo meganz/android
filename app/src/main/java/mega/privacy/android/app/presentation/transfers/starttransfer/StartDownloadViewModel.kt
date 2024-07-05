@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -97,6 +98,20 @@ class StartDownloadViewModel @Inject constructor(
             val nodes = nodeIds.mapNotNull { getNodeByIdUseCase(it) }
             _state.update {
                 triggered(TransferTriggerEvent.CopyOfflineNode(nodes))
+            }
+        }
+    }
+
+    /**
+     * On copy uri clicked
+     *
+     * @param name of the file
+     * @param uri of the file
+     */
+    fun onCopyUriClicked(name: String, uri: Uri) {
+        viewModelScope.launch {
+            _state.update {
+                triggered(TransferTriggerEvent.CopyUri(name, uri))
             }
         }
     }
