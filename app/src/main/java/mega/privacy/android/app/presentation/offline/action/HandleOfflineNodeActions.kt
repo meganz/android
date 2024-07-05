@@ -15,8 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -26,7 +24,7 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.MegaNavigatorEntryPoint
 import mega.privacy.android.domain.entity.SortOrder
 import timber.log.Timber
 import java.io.File
@@ -146,8 +144,8 @@ private suspend fun openFile(
             context = context,
             content = content,
             snackBarHostState = snackBarHostState,
-            applyNodeContentUri = applyNodeContentUri,
             sortOrder = sortOrder,
+            coroutineScope = coroutineScope
         )
 
         is OfflineNodeActionUiEntity.Pdf -> openPdfActivity(
@@ -196,7 +194,7 @@ private suspend fun openZipFile(
 ) {
     EntryPointAccessors.fromApplication(
         context,
-        MegaNodeUtil.MegaNavigatorEntryPoint::class.java
+        MegaNavigatorEntryPoint::class.java
     ).megaNavigator().openZipBrowserActivity(
         context = context,
         zipFilePath = content.file.absolutePath,
@@ -310,45 +308,23 @@ private suspend fun openVideoOrAudioFile(
     context: Context,
     content: OfflineNodeActionUiEntity.AudioOrVideo,
     snackBarHostState: SnackbarHostState?,
-    applyNodeContentUri: ApplyNodeContentUri,
     sortOrder: SortOrder,
+    coroutineScope: CoroutineScope,
 ) {
-    val intent = when {
-        content.isSupported && content.isVideo -> Intent(
-            context,
-            LegacyVideoPlayerActivity::class.java
-        ).apply {
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder
-            )
+    EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
+        .megaNavigator().openMediaPlayerActivityByLocalFile(
+            context = context,
+            localFile = content.file,
+            fileTypeInfo = content.fileTypeInfo,
+            viewType = Constants.OFFLINE_ADAPTER,
+            handle = content.nodeId.longValue,
+            parentId = content.parentId.toLong(),
+            sortOrder = sortOrder,
+        ) {
+            coroutineScope.launch {
+                snackBarHostState?.showSnackbar(message = context.getString(R.string.intent_not_available))
+            }
         }
-
-        content.isSupported && !content.isVideo -> Intent(
-            context, AudioPlayerActivity::class.java
-        ).apply {
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder
-            )
-        }
-
-        else -> Intent(Intent.ACTION_VIEW)
-    }.apply {
-        putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, content.nodeId.longValue)
-        putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, content.name)
-        putExtra(Constants.INTENT_EXTRA_KEY_PATH, content.file.absolutePath)
-        putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
-        putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
-        putExtra(Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, content.file.parent)
-        putExtra(Constants.INTENT_EXTRA_KEY_PARENT_ID, content.parentId)
-
-        val mimeType = if (content.extension == "opus") "audio/*" else content.mimeType
-        applyNodeContentUri(this, content.file, mimeType, content.isSupported)
-    }
-    safeLaunchActivity(
-        context = context,
-        intent = intent,
-        snackBarHostState = snackBarHostState
-    )
 }
 
 private suspend fun safeLaunchActivity(

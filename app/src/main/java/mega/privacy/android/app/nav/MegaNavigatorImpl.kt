@@ -7,12 +7,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivityV2
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
+import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivityV2
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
@@ -22,10 +25,27 @@ import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
+import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -36,6 +56,7 @@ import javax.inject.Inject
 internal class MegaNavigatorImpl @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
 ) : MegaNavigator,
     AppNavigatorImpl {
     override fun openSettingsCameraUploads(activity: Activity) {
@@ -169,5 +190,108 @@ internal class MegaNavigatorImpl @Inject constructor(
         Intent(context, TransfersActivity::class.java).apply {
             putExtra(EXTRA_TAB, tab)
         }.let(context::startActivity)
+    }
+
+    override fun openMediaPlayerActivityByFileNode(
+        context: Context,
+        contentUri: NodeContentUri,
+        fileNode: TypedFileNode,
+        viewType: Int,
+        sortOrder: SortOrder,
+        isFolderLink: Boolean,
+        onError: () -> Unit,
+    ) {
+        applicationScope.launch {
+            runCatching {
+                manageIntent(
+                    context = context,
+                    contentUri = contentUri,
+                    fileTypeInfo = fileNode.type,
+                    sortOrder = sortOrder,
+                    viewType = viewType,
+                    name = fileNode.name,
+                    handle = fileNode.id.longValue,
+                    parentHandle = fileNode.parentId.longValue,
+                    isFolderLink = isFolderLink
+                )
+            }.onFailure {
+                Timber.e(it)
+                onError()
+            }
+        }
+    }
+
+    private fun manageIntent(
+        context: Context,
+        contentUri: NodeContentUri,
+        fileTypeInfo: FileTypeInfo,
+        sortOrder: SortOrder,
+        viewType: Int,
+        name: String,
+        handle: Long,
+        parentHandle: Long,
+        isFolderLink: Boolean,
+        path: String? = null,
+        offlineParent: String? = null,
+    ) {
+        val intent = when {
+            fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
+                Intent(context, LegacyVideoPlayerActivity::class.java)
+
+            fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
+                Intent(context, AudioPlayerActivity::class.java)
+
+            else -> Intent(Intent.ACTION_VIEW)
+        }.apply {
+            putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
+            putExtra(INTENT_EXTRA_KEY_PLACEHOLDER, 0)
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
+            putExtra(INTENT_EXTRA_KEY_FILE_NAME, name)
+            putExtra(INTENT_EXTRA_KEY_HANDLE, handle)
+            putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentHandle)
+            putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, isFolderLink)
+            path?.let {
+                putExtra(INTENT_EXTRA_KEY_PATH, path)
+            }
+            offlineParent?.let {
+                putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, offlineParent)
+            }
+        }
+        val mimeType =
+            if (fileTypeInfo.extension == "opus") "audio/*" else fileTypeInfo.mimeType
+        nodeContentUriIntentMapper(intent, contentUri, mimeType, fileTypeInfo.isSupported)
+        context.startActivity(intent)
+    }
+
+    override fun openMediaPlayerActivityByLocalFile(
+        context: Context,
+        localFile: File,
+        fileTypeInfo: FileTypeInfo,
+        viewType: Int,
+        handle: Long,
+        parentId: Long,
+        sortOrder: SortOrder,
+        isFolderLink: Boolean,
+        onError: () -> Unit,
+    ) {
+        runCatching {
+            val contentUri = NodeContentUri.LocalContentUri(localFile)
+            manageIntent(
+                context = context,
+                contentUri = contentUri,
+                fileTypeInfo = fileTypeInfo,
+                sortOrder = sortOrder,
+                viewType = viewType,
+                name = localFile.name,
+                handle = handle,
+                parentHandle = parentId,
+                isFolderLink = isFolderLink,
+                path = localFile.absolutePath,
+                offlineParent = localFile.parent
+            )
+        }.onFailure {
+            Timber.e(it)
+            onError()
+        }
     }
 }

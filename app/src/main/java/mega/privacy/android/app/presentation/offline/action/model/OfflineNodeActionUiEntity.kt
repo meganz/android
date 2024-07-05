@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.offline.action.model
 
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import java.io.File
 
@@ -21,21 +22,13 @@ sealed interface OfflineNodeActionUiEntity {
     /**
      * Audio or video content
      * @property nodeId [NodeId]
-     * @property name [String]
-     * @property isSupported [Boolean]
-     * @property isVideo [Boolean]
-     * @property mimeType [String]
-     * @property extension [String]
+     * @property fileTypeInfo [FileTypeInfo]
      * @property file [File]
      * @property parentId [Int]
      */
     data class AudioOrVideo(
         val nodeId: NodeId,
-        val name: String,
-        val isSupported: Boolean,
-        val isVideo: Boolean,
-        val mimeType: String,
-        val extension: String,
+        val fileTypeInfo: FileTypeInfo,
         val file: File,
         val parentId: Int
     ) : OfflineNodeActionUiEntity

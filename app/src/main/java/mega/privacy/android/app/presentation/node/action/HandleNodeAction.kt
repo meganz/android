@@ -12,8 +12,6 @@ import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
@@ -26,10 +24,8 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.domain.entity.AudioFileTypeInfo
+import mega.privacy.android.app.utils.MegaNodeUtil.MegaNavigatorEntryPoint
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -91,9 +87,9 @@ fun HandleNodeAction(
                         content = content.uri,
                         fileNode = typedFileNode,
                         snackBarHostState = snackBarHostState,
-                        nodeActionsViewModel = nodeActionsViewModel,
                         sortOrder = sortOrder,
-                        viewType = nodeSourceType ?: Constants.FILE_BROWSER_ADAPTER
+                        viewType = nodeSourceType ?: Constants.FILE_BROWSER_ADAPTER,
+                        coroutineScope = coroutineScope
                     )
                 }
 
@@ -237,46 +233,24 @@ private suspend fun openVideoOrAudioFile(
     fileNode: TypedFileNode,
     content: NodeContentUri,
     snackBarHostState: SnackbarHostState?,
-    nodeActionsViewModel: NodeActionsViewModel,
     sortOrder: SortOrder,
     viewType: Int,
+    coroutineScope: CoroutineScope,
 ) {
-    val intent = when {
-        fileNode.type.isSupported && fileNode.type is VideoFileTypeInfo -> Intent(
-            context,
-            LegacyVideoPlayerActivity::class.java
-        ).apply {
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder
-            )
-        }
-
-        fileNode.type.isSupported && fileNode.type is AudioFileTypeInfo -> Intent(
-            context, AudioPlayerActivity::class.java
-        ).apply {
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder
-            )
-        }
-
-        else -> Intent(Intent.ACTION_VIEW)
-    }.apply {
-        putExtra(Constants.INTENT_EXTRA_KEY_PLACEHOLDER, 0)
-        putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
-        putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
-        putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
-        putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, fileNode.parentId.longValue)
-        putExtra(Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK, false)
-        val mimeType = if (fileNode.type.extension == "opus") "audio/*" else fileNode.type.mimeType
-        nodeActionsViewModel.applyNodeContentUri(
-            intent = this,
-            content = content,
-            mimeType = mimeType,
+    EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
+        .megaNavigator().openMediaPlayerActivityByFileNode(
+            context = context,
+            contentUri = content,
+            fileNode = fileNode,
+            sortOrder = sortOrder,
+            viewType = viewType,
+            isFolderLink = false,
+            onError = {
+                coroutineScope.launch {
+                    snackBarHostState?.showSnackbar(context.getString(R.string.intent_not_available))
+                }
+            }
         )
-    }
-    safeLaunchActivity(
-        context = context, intent = intent, snackBarHostState = snackBarHostState
-    )
 }
 
 private suspend fun openUrlFile(
@@ -335,7 +309,7 @@ private fun openZipFile(
     Timber.d("The file is zip, open in-app.")
     EntryPointAccessors.fromApplication(
         context,
-        MegaNodeUtil.MegaNavigatorEntryPoint::class.java
+        MegaNavigatorEntryPoint::class.java
     ).megaNavigator().openZipBrowserActivity(
         context = context,
         zipFilePath = localFile.absolutePath,

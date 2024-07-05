@@ -149,11 +149,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
                     fileType is VideoFileTypeInfo || fileType is AudioFileTypeInfo -> {
                         OfflineNodeActionUiEntity.AudioOrVideo(
                             nodeId = nodeId,
-                            name = info.name,
-                            isSupported = fileType.isSupported,
-                            isVideo = fileType is VideoFileTypeInfo,
-                            mimeType = fileType.mimeType,
-                            extension = fileType.extension,
+                            fileTypeInfo = fileType,
                             file = localFile,
                             parentId = info.parentId
                         )

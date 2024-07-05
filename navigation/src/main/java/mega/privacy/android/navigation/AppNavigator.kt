@@ -3,6 +3,11 @@ package mega.privacy.android.navigation
 import android.app.Activity
 import android.content.Context
 import androidx.annotation.StringRes
+import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import java.io.File
 
 /**
  * App module navigator
@@ -116,4 +121,50 @@ interface AppNavigator {
      * Navigate to [TransfersActivity]
      */
     fun openTransfers(context: Context, tab: Int)
+
+    /**
+     * Open media player by file node
+     *
+     * @param context Context
+     * @param contentUri NodeContentUri
+     * @param fileNode TypedFileNode
+     * @param sortOrder SortOrder
+     * @param viewType the adapter type of the view
+     * @param isFolderLink whether the file is a folder link
+     * @param onError Callback called when error occurs
+     */
+    fun openMediaPlayerActivityByFileNode(
+        context: Context,
+        contentUri: NodeContentUri,
+        fileNode: TypedFileNode,
+        viewType: Int,
+        sortOrder: SortOrder = SortOrder.ORDER_NONE,
+        isFolderLink: Boolean = false,
+        onError: () -> Unit = {},
+    )
+
+    /**
+     * Open media player by local file
+     *
+     * @param context Context
+     * @param localFile File
+     * @param fileTypeInfo FileTypeInfo
+     * @param viewType the adapter type of the view
+     * @param handle the handle of the node
+     * @param parentId the parent id of the node
+     * @param sortOrder SortOrder
+     * @param isFolderLink whether the file is a folder link
+     * @param onError Callback called when error occurs
+     */
+    fun openMediaPlayerActivityByLocalFile(
+        context: Context,
+        localFile: File,
+        fileTypeInfo: FileTypeInfo,
+        viewType: Int,
+        handle: Long,
+        parentId: Long,
+        sortOrder: SortOrder = SortOrder.ORDER_NONE,
+        isFolderLink: Boolean = false,
+        onError: () -> Unit = {},
+    )
 }
