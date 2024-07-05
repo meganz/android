@@ -1142,15 +1142,11 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                             }
                         }
 
-                        adapterType == FILE_LINK_ADAPTER -> {
+                        adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER -> {
                             menu.toggleAllMenuItemsVisibility(false)
 
                             menu.findItem(R.id.save_to_device).isVisible = true
                             menu.findItem(R.id.share).isVisible = true
-                        }
-
-                        adapterType == ZIP_ADAPTER -> {
-                            menu.toggleAllMenuItemsVisibility(false)
                         }
 
                         adapterType == FOLDER_LINK_ADAPTER
