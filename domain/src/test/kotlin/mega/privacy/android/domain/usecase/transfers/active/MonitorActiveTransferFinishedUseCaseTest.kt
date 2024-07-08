@@ -37,7 +37,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
-    fun `test that last non zero totalFileTransfers is emitted when active transfers totals with 0 totalFileTransfers is received`(
+    fun `test that last non zero totalCompletedFileTransfers is emitted when active transfers totals with 0 totalCompletedFileTransfers is received`(
         type: TransferType,
     ) = runTest {
         val flow = createTotals(5, 6, 7, 0)
@@ -51,7 +51,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
-    fun `test that last non zero totalFileTransfers are emitted for multiple active transfers totals with 0 totalFileTransfers is received`(
+    fun `test that last non zero totalCompletedFileTransfers are emitted for multiple active transfers totals with 0 totalCompletedFileTransfers is received`(
         type: TransferType,
     ) = runTest {
         val flow = createTotals(5, 0, 6, 0, 0, 7, 0)
@@ -67,7 +67,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
-    fun `test that no value is emitted when active transfers totals with 0 totalFileTransfers is not received`(
+    fun `test that no value is emitted when active transfers totals with 0 totalCompletedFileTransfers is not received`(
         type: TransferType,
     ) = runTest {
         val flow = createTotals(5, 6, 7)
@@ -80,7 +80,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
-    fun `test that no value is emitted when first active transfers totals has 0 totalFileTransfers`(
+    fun `test that no value is emitted when first active transfers totals has 0 totalCompletedFileTransfers`(
         type: TransferType,
     ) = runTest {
         val flow = createTotals(0, 5, 6, 7)
@@ -97,7 +97,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
         type: TransferType,
     ) = runTest {
         val flow = listOf(
-            mockTotal(5, 5),
+            mockTotal(0, 5),
             mockTotal(0)
         )
         whenever(transferRepository.getActiveTransferTotalsByType(any())) doReturn flow.asFlow()
@@ -107,13 +107,30 @@ class MonitorActiveTransferFinishedUseCaseTest {
         }
     }
 
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    fun `test that totalCompletedFileTransfers is emitted when there's a mix of completed and already download files `(
+        type: TransferType,
+    ) = runTest {
+        val flow = listOf(
+            mockTotal(1, 5),
+            mockTotal(0, 5)
+        )
+        whenever(transferRepository.getActiveTransferTotalsByType(any())) doReturn flow.asFlow()
+
+        underTest(type).test {
+            assertThat(awaitItem()).isEqualTo(1)
+            awaitComplete()
+        }
+    }
+
     private fun createTotals(vararg totals: Int) = totals.map { mockTotal(it) }
 
     private fun mockTotal(
-        totalFileTransfers: Int,
+        totalCompleted: Int,
         totalAlreadyDownloadedFiles: Int = 0,
     ) = mock<ActiveTransferTotals> {
-        on { this.totalCompletedFileTransfers } doReturn totalFileTransfers
+        on { this.totalCompletedFileTransfers } doReturn totalCompleted
         on { this.totalAlreadyDownloadedFiles } doReturn totalAlreadyDownloadedFiles
     }
 

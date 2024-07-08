@@ -17,7 +17,7 @@ class MonitorActiveTransferFinishedUseCase @Inject constructor(
 
     /**
      * Invoke
-     * @return flow emitting last non-zero totalFileTransfers when it goes back to 0 (unless they all were already downloaded files)
+     * @return flow emitting last non-zero totalCompletedFileTransfers when it goes back to 0 (please note that completed file transfers doesn't include transfers finished with error or because they were already downloaded)
      */
     operator fun invoke(transferType: TransferType) =
         transferRepository.getActiveTransferTotalsByType(transferType)
@@ -30,7 +30,6 @@ class MonitorActiveTransferFinishedUseCase @Inject constructor(
             }.mapNotNull { (prev, current) ->
                 prev.takeIf {
                     prev.totalCompletedFileTransfers > 0 && current.totalCompletedFileTransfers == 0
-                            && prev.totalCompletedFileTransfers > prev.totalAlreadyDownloadedFiles
                 }?.totalCompletedFileTransfers
             }
 
