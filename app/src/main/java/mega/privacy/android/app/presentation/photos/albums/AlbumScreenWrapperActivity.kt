@@ -14,7 +14,6 @@ import androidx.fragment.app.FragmentContainerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -29,7 +28,6 @@ import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImpor
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
-import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -63,9 +61,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState != null) {
-            nodeSaver.restoreState(savedInstanceState)
-        }
 
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
@@ -207,46 +202,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
         return containerView
     }
-
-    /**
-     * Start: Download node block
-     */
-
-    private val nodeSaver = NodeSaver(
-        activityLauncher = this,
-        permissionRequester = this,
-        snackbarShower = this,
-        confirmDialogShower = AlertsAndWarnings.showSaveToDeviceConfirmDialog(this),
-    )
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        nodeSaver.saveState(outState)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-        intent ?: return
-        nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        nodeSaver.handleRequestPermissionsResult(requestCode)
-    }
-
-    override fun onDestroy() {
-        nodeSaver.destroy()
-        super.onDestroy()
-    }
-
-    /**
-     * End
-     */
 
     /**
      * Start: Import album block

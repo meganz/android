@@ -34,7 +34,6 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -60,7 +59,6 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException.ChildDoesNot
 import mega.privacy.android.app.usecase.exception.MegaNodeException.ParentDoesNotExistException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN
@@ -141,10 +139,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     private var contact: MegaUser? = null
     private var fullName = ""
     private var contactFileListFragment: ContactFileListFragment? = null
-    private val nodeSaver = NodeSaver(
-        this, this, this,
-        showSaveToDeviceConfirmDialog(this)
-    )
     private var parentHandle: Long = -1
     private var newFolderDialog: AlertDialog? = null
     private var statusDialog: AlertDialog? = null
@@ -186,7 +180,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     public override fun onSaveInstanceState(outState: Bundle) {
         outState.putLong(PARENT_HANDLE, parentHandle)
         checkNewTextFileDialogState(newTextFileDialog, outState)
-        nodeSaver.saveState(outState)
         newFolderDialog.checkNewFolderDialogState(outState)
         super.onSaveInstanceState(outState)
     }
@@ -319,7 +312,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             setParentHandle(-1)
         } else {
             setParentHandle(savedInstanceState.getLong(PARENT_HANDLE, -1))
-            nodeSaver.restoreState(savedInstanceState)
         }
         megaApi.addGlobalListener(this)
         registerReceiver(manageShareReceiver, IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE))
@@ -511,7 +503,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 onGetReadWritePermission()
             }
         }
-        nodeSaver.handleRequestPermissionsResult(requestCode)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -528,7 +519,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         unregisterReceiver(manageShareReceiver)
         unregisterReceiver(destroyActionModeReceiver)
         dismissAlertDialogIfExists(newFolderDialog)
-        nodeSaver.destroy()
     }
 
     fun setParentHandle(parentHandle: Long) {
@@ -580,9 +570,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
-        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
-            return
-        }
         if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
             if (intent == null) {
                 return

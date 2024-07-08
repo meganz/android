@@ -226,8 +226,6 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         } else if (id == R.id.move_option) {
             if (requireActivity() instanceof ContactFileListActivity) {
                 contactFileListActivity.showMove(handleList);
-            } else if (requireActivity() instanceof ContactInfoActivity) {
-                contactInfoActivity.showMove(handleList);
             }
         } else if (id == R.id.copy_option) {
             if (requireActivity() instanceof ContactFileListActivity) {

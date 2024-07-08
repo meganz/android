@@ -51,7 +51,6 @@ import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityPdfviewerBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -66,7 +65,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownlo
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
-import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.HANDLE
@@ -160,10 +158,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     private var path: String? = null
     private var pathNavigation: String? = null
     private val nodeAttacher = MegaAttacher(this)
-    private val nodeSaver = NodeSaver(
-        this, this, this,
-        showSaveToDeviceConfirmDialog(this)
-    )
 
     // it's only used for enter animation
     private val dragToExit = DragToExitSupport(this, lifecycleScope, null, null)
@@ -243,7 +237,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             password = savedInstanceState.getString("password")
             maxIntents = savedInstanceState.getInt("maxIntents", 3)
             nodeAttacher.restoreState(savedInstanceState)
-            nodeSaver.restoreState(savedInstanceState)
         } else {
             currentPage = 1
             isDeleteDialogShow = false
@@ -628,7 +621,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             putInt("maxIntents", maxIntents)
         }
         nodeAttacher.saveState(outState)
-        nodeSaver.saveState(outState)
     }
 
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {}
@@ -733,15 +725,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 startDownloadViewModel.onDownloadClicked(NodeId(it))
             }
         }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        nodeSaver.handleRequestPermissionsResult(requestCode)
     }
 
     private fun setToolbarVisibilityShow() = with(binding) {
@@ -1483,9 +1466,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
         Timber.d("onActivityResult: ${requestCode}____$resultCode")
-        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
-            return
-        }
         if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
             return
         }
@@ -1703,7 +1683,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         }
         handler?.removeCallbacksAndMessages(null)
         unregisterReceiver(receiverToFinish)
-        nodeSaver.destroy()
         dismissAlertDialogIfExists(takenDownDialog)
         super.onDestroy()
     }

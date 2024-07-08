@@ -28,7 +28,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityVersionsFileBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.adapters.VersionsFileAdapter
@@ -42,7 +41,6 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.presentation.versions.VersionsFileViewModel
-import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -102,10 +100,6 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
     var errorRemove = 0
     var completedRemove = 0
     private var bottomSheetDialogFragment: VersionsBottomSheetDialogFragment? = null
-    private val nodeSaver = NodeSaver(
-        this, this, this,
-        showSaveToDeviceConfirmDialog(this)
-    )
     var accessLevel = 0
         private set
     private var deleteVersionConfirmationDialog: AlertDialog? = null
@@ -378,26 +372,11 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-        nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        nodeSaver.handleRequestPermissionsResult(requestCode)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         megaApi.removeGlobalListener(this)
         megaApi.removeRequestListener(this)
         handler?.removeCallbacksAndMessages(null)
-        nodeSaver.destroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -1071,7 +1050,6 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
             DELETING_HISTORY_VERSION_DIALOG_SHOWN,
             deleteVersionHistoryDialog != null && deleteVersionHistoryDialog!!.isShowing
         )
-        nodeSaver.saveState(outState)
     }
 
     public override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -1079,7 +1057,6 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
         selectedNodeHandle =
             savedInstanceState.getLong(SELECTED_NODE_HANDLE, MegaApiJava.INVALID_HANDLE)
         selectedPosition = savedInstanceState.getInt(SELECTED_POSITION)
-        nodeSaver.restoreState(savedInstanceState)
         selectedNode = megaApi.getNodeByHandle(selectedNodeHandle)
         if (selectedNode != null) {
             if (savedInstanceState.getBoolean(CHECKING_REVERT_VERSION, false)) {

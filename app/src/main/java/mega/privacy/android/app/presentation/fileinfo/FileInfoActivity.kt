@@ -28,7 +28,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityCo
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -99,12 +98,6 @@ class FileInfoActivity : BaseActivity() {
     private var fileBackupManager: FileBackupManager? = null
     private val nodeController: NodeController by lazy { NodeController(this) }
     private val nodeAttacher by lazy { MegaAttacher(this) }
-    private val nodeSaver by lazy {
-        NodeSaver(
-            this, this, this,
-            AlertsAndWarnings.showSaveToDeviceConfirmDialog(this)
-        )
-    }
 
     private var bottomSheetDialogFragment: FileContactsListBottomSheetDialogFragment? = null
 
@@ -133,7 +126,6 @@ class FileInfoActivity : BaseActivity() {
         })
         savedInstanceState?.apply {
             nodeAttacher.restoreState(this)
-            nodeSaver.restoreState(this)
         }
         configureActivityResultLaunchers()
         initFileBackupManager()
@@ -231,32 +223,9 @@ class FileInfoActivity : BaseActivity() {
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, data)) {
-            return
-        }
         if (nodeAttacher.handleActivityResult(requestCode, resultCode, data, this)) {
             return
         }
-    }
-
-    /**
-     * Receive the result of requesting permissions
-     */
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        nodeSaver.handleRequestPermissionsResult(requestCode)
-    }
-
-    /**
-     * Perform final cleaning when the activity is destroyed
-     */
-    override fun onDestroy() {
-        super.onDestroy()
-        nodeSaver.destroy()
     }
 
 
@@ -266,7 +235,6 @@ class FileInfoActivity : BaseActivity() {
     public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         nodeAttacher.saveState(outState)
-        nodeSaver.saveState(outState)
     }
 
     private fun readExtrasAndGetHandle() = intent.extras?.let { extras ->

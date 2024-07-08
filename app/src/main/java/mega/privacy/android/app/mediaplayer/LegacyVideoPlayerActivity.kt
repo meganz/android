@@ -255,7 +255,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
 
         if (savedInstanceState != null) {
             nodeAttacher.restoreState(savedInstanceState)
-            nodeSaver.restoreState(savedInstanceState)
         }
 
         currentOrientation = configuration.orientation
@@ -940,7 +939,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         super.onSaveInstanceState(outState)
 
         nodeAttacher.saveState(outState)
-        nodeSaver.saveState(outState)
     }
 
     private fun setupNavDestListener() {
@@ -977,7 +975,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             AudioPlayerService.resumeAudioPlayer(this)
         }
         unregisterReceiver(headsetPlugReceiver)
-        nodeSaver.destroy()
         AlertDialogUtil.dismissAlertDialogIfExists(takenDownDialog)
     }
 
@@ -1321,15 +1318,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                 }
             }
         }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        nodeSaver.handleRequestPermissionsResult(requestCode = requestCode)
     }
 
     override fun setupToolbar() {

@@ -10,12 +10,9 @@ import androidx.navigation.NavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
-import mega.privacy.android.app.utils.AlertsAndWarnings
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_HANDLES
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_TO
@@ -44,15 +41,6 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
     internal val nodeAttacher by lazy { MegaAttacher(this) }
     private var currentRequestCode: Int? = null
 
-    internal val nodeSaver by lazy {
-        NodeSaver(
-            activityLauncher = this,
-            permissionRequester = this,
-            snackbarShower = this,
-            confirmDialogShower = AlertsAndWarnings.showSaveToDeviceConfirmDialog(this)
-        )
-    }
-
     protected fun addStartDownloadTransferView(root: ViewGroup) {
         root.addView(
             createStartTransferView(
@@ -77,21 +65,6 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
                 }
             }
 
-        }
-
-    private val nodeSaverLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            currentRequestCode?.let {
-                if (nodeSaver.handleActivityResult(
-                        activity = this,
-                        requestCode = it,
-                        resultCode = result.resultCode,
-                        intent = result.data
-                    )
-                ) {
-                    currentRequestCode = null
-                }
-            }
         }
 
     internal val selectImportFolderLauncher =
@@ -210,11 +183,7 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
      */
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         currentRequestCode = requestCode
-        if (currentRequestCode == Constants.REQUEST_CODE_SELECT_CHAT) {
-            nodeAttacherLauncher
-        } else {
-            nodeSaverLauncher
-        }.launch(intent)
+        nodeAttacherLauncher.launch(intent)
     }
 
     internal abstract fun setupToolbar()

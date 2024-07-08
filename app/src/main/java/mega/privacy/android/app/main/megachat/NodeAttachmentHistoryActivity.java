@@ -52,7 +52,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
@@ -87,7 +86,6 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -105,7 +103,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel;
-import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
@@ -147,9 +144,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;
 
     public boolean isList = true;
-
-    private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
-            AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
     RelativeLayout container;
     LinearLayout linearLayoutList;
@@ -236,8 +230,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong("chatId", -1);
-
-            nodeSaver.restoreState(savedInstanceState);
         }
 
         //Set toolbar
@@ -423,8 +415,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
         }
-
-        nodeSaver.destroy();
     }
 
     @Override
@@ -786,8 +776,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         if (chatRoom != null) {
             outState.putLong("chatId", chatRoom.getChatId());
         }
-
-        nodeSaver.saveState(outState);
     }
 
     @Override
@@ -1038,21 +1026,9 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        nodeSaver.handleRequestPermissionsResult(requestCode);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         Timber.d("Result Code: %s", resultCode);
-
-        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
-            return;
-        }
 
         if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
             if (!viewModel.isOnline() || megaApi == null) {

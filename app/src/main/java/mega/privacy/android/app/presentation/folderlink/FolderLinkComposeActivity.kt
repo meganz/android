@@ -29,7 +29,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.extensions.isPortrait
@@ -58,7 +57,6 @@ import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertDialogUtil
-import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -91,15 +89,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
 
     private var mKey: String? = null
     private var statusDialog: AlertDialog? = null
-    private val nodeSaver = NodeSaver(
-        this, this, this,
-        showSaveToDeviceConfirmDialog(this)
-    )
-
-    private val storagePermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            nodeSaver.handleRequestPermissionsResult(Constants.REQUEST_WRITE_STORAGE)
-        }
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -554,18 +543,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         val accountIntent = Intent(this, MyAccountActivity::class.java)
             .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
         startActivity(accountIntent)
-    }
-
-    @SuppressLint("CheckResult")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-        Timber.d("onActivityResult")
-        if (intent == null) {
-            return
-        }
-        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
-            return
-        }
     }
 
     /**

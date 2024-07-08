@@ -24,7 +24,6 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -35,7 +34,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryScreen
 import mega.privacy.android.app.utils.AlertDialogUtil
-import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.Util
@@ -72,16 +70,8 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
     private lateinit var selectImportFolderLauncher: ActivityResultLauncher<Intent>
     private var statusDialog: AlertDialog? = null
 
-    private val nodeSaver = NodeSaver(
-        this, this, this,
-        AlertsAndWarnings.showSaveToDeviceConfirmDialog(this)
-    )
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState != null) {
-            nodeSaver.restoreState(savedInstanceState)
-        }
         checkLoginStatus()
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -104,16 +94,6 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
 
     private fun checkLoginStatus() {
         mediaDiscoveryViewModel.checkLoginRequired()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        nodeSaver.saveState(outState)
-    }
-
-    override fun onDestroy() {
-        nodeSaver.destroy()
-        super.onDestroy()
     }
 
     private fun setupFlow() {
@@ -343,23 +323,6 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         val intent = Intent(this, FileExplorerActivity::class.java)
         intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
         selectImportFolderLauncher.launch(intent)
-    }
-
-    @SuppressLint("CheckResult")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-        Timber.d("onActivityResult")
-        if (intent == null || nodeSaver.handleActivityResult(this, requestCode, resultCode, intent))
-            return
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        nodeSaver.handleRequestPermissionsResult(requestCode)
     }
 
     companion object {

@@ -26,7 +26,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityCo
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
-import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -43,7 +42,6 @@ import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowAct
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
@@ -95,14 +93,6 @@ class ImagePreviewActivity : BaseActivity() {
         )
 
     private val viewModel: ImagePreviewViewModel by viewModels()
-    private val nodeSaver: NodeSaver by lazy {
-        NodeSaver(
-            activityLauncher = this,
-            permissionRequester = this,
-            snackbarShower = this,
-            confirmDialogShower = AlertsAndWarnings.showSaveToDeviceConfirmDialog(this),
-        )
-    }
     private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
 
     private var tempNodeId: NodeId? = null
@@ -111,7 +101,6 @@ class ImagePreviewActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
         if (savedInstanceState != null) {
-            nodeSaver.restoreState(savedInstanceState)
             nodeAttacher.restoreState(savedInstanceState)
         }
         setContent {
@@ -348,34 +337,16 @@ class ImagePreviewActivity : BaseActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        nodeSaver.saveState(outState)
         nodeAttacher.saveState(outState)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         when {
-            nodeSaver.handleActivityResult(this, requestCode, resultCode, intent) ->
-                return
-
             nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this) ->
                 return
 
             else -> super.onActivityResult(requestCode, resultCode, intent)
         }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray,
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        nodeSaver.handleRequestPermissionsResult(requestCode)
-    }
-
-    override fun onDestroy() {
-        nodeSaver.destroy()
-        super.onDestroy()
     }
 
     /**
