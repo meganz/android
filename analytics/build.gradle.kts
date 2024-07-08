@@ -5,7 +5,7 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.android.hilt)
-    id("de.mannodermaus.android-junit5")
+    alias(plugin.plugins.de.mannodermaus.android.junit5)
 }
 
 android {

@@ -6,6 +6,7 @@ plugins {
     alias(plugin.plugins.mega.android.release)
     alias(plugin.plugins.jfrog.artifactory) apply false
     alias(plugin.plugins.mega.artifactory.publish.convention) apply false
+    alias(plugin.plugins.de.mannodermaus.android.junit5) apply false
     id("org.jetbrains.kotlin.android") version "1.9.24" apply false
 }
 

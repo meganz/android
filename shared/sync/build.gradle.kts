@@ -6,8 +6,9 @@ plugins {
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.android.hilt)
+    alias(plugin.plugins.de.mannodermaus.android.junit5)
     id("kotlin-android")
-    id("de.mannodermaus.android-junit5")
+
 }
 
 android {

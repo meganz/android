@@ -32,10 +32,10 @@ plugins {
     alias(convention.plugins.mega.android.application.firebase)
     alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.android.hilt)
+    alias(plugin.plugins.de.mannodermaus.android.junit5)
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.firebase.appdistribution")
-    id("de.mannodermaus.android-junit5")
     id("androidx.baselineprofile")
 }
 
