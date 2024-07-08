@@ -613,11 +613,12 @@ class StartTransfersComponentViewModelTest {
             val uri = mock<Uri> {
                 on { toString() } doReturn DESTINATION
             }
+            val nodeId = NodeId(1)
             underTest.startDownloadWithDestination(
-                TransferTriggerEvent.CopyOfflineNode(nodes),
+                TransferTriggerEvent.CopyOfflineNode(listOf(nodeId)),
                 uri
             )
-            verify(saveOfflineNodesToDevice).invoke(nodes, UriPath(DESTINATION))
+            verify(saveOfflineNodesToDevice).invoke(listOf(nodeId), UriPath(DESTINATION))
             verifyNoInteractions(startDownloadsWithWorkerUseCase)
         }
 
@@ -627,11 +628,12 @@ class StartTransfersComponentViewModelTest {
             commonStub()
             whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
             whenever(getOrCreateStorageDownloadLocationUseCase()).thenReturn(DESTINATION)
+            val nodeId = NodeId(1)
             underTest.startDownloadWithoutConfirmation(
-                TransferTriggerEvent.CopyOfflineNode(nodes),
+                TransferTriggerEvent.CopyOfflineNode(listOf(nodeId)),
                 false
             )
-            verify(saveOfflineNodesToDevice).invoke(nodes, UriPath(DESTINATION))
+            verify(saveOfflineNodesToDevice).invoke(listOf(nodeId), UriPath(DESTINATION))
             verifyNoInteractions(startDownloadsWithWorkerUseCase)
         }
 

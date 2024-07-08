@@ -95,9 +95,8 @@ class StartDownloadViewModel @Inject constructor(
      */
     fun onCopyOfflineNodeClicked(nodeIds: List<NodeId>) {
         viewModelScope.launch {
-            val nodes = nodeIds.mapNotNull { getNodeByIdUseCase(it) }
             _state.update {
-                triggered(TransferTriggerEvent.CopyOfflineNode(nodes))
+                triggered(TransferTriggerEvent.CopyOfflineNode(nodeIds))
             }
         }
     }

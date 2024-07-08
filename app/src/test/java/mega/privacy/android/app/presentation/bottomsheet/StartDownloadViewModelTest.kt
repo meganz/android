@@ -213,16 +213,14 @@ class StartDownloadViewModelTest {
     @Test
     fun `test that onCopyOfflineNodeClicked launches the correct event`() = runTest {
         val nodeId = NodeId(1L)
-        val node = mock<TypedNode>()
-        whenever(getNodeByIdUseCase(nodeId)).thenReturn(node)
         underTest.onCopyOfflineNodeClicked(listOf(nodeId))
         underTest.state.test {
             val event = awaitItem()
             assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
             val content = (event as StateEventWithContentTriggered).content
             assertThat(content).isInstanceOf(TransferTriggerEvent.CopyOfflineNode::class.java)
-            assertThat((content as TransferTriggerEvent.CopyOfflineNode).nodes).isEqualTo(
-                listOf(node)
+            assertThat((content as TransferTriggerEvent.CopyOfflineNode).nodeIds).isEqualTo(
+                listOf(nodeId)
             )
         }
     }

@@ -123,13 +123,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         viewModelScope.launch {
             when (transferTriggerEvent) {
                 is TransferTriggerEvent.DownloadTriggerEvent -> {
-                    val isCopyEvent =
-                        transferTriggerEvent !is TransferTriggerEvent.CopyUri &&
-                                transferTriggerEvent !is TransferTriggerEvent.StartDownloadForPreview
-                    if (isCopyEvent && checkAndHandleDeviceIsNotConnected()) {
+                    val isCopyEvent = transferTriggerEvent is TransferTriggerEvent.CopyTriggerEvent
+                    if (!isCopyEvent && checkAndHandleDeviceIsNotConnected()) {
                         return@launch
                     }
-                    if (transferTriggerEvent.nodes.isEmpty() && transferTriggerEvent !is TransferTriggerEvent.CopyUri) {
+                    if (transferTriggerEvent.nodes.isEmpty() && !isCopyEvent) {
                         Timber.e("Node in $transferTriggerEvent must exist")
                         _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
                     } else if (!checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent)) {
@@ -176,8 +174,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             }
         }
         val node = transferTriggerEvent.nodes.firstOrNull()
-        val isCopyByUriEvent = transferTriggerEvent is TransferTriggerEvent.CopyUri
-        if (node == null && !isCopyByUriEvent) {
+        val isCopyEvent = transferTriggerEvent is TransferTriggerEvent.CopyTriggerEvent
+        if (node == null && !isCopyEvent) {
             Timber.e("Node in $transferTriggerEvent must exist")
             _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
         } else {
@@ -292,7 +290,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         destination: String,
     ) {
         runCatching {
-            saveOfflineNodesToDevice(startDownloadNode.nodes, UriPath(destination))
+            saveOfflineNodesToDevice(startDownloadNode.nodeIds, UriPath(destination))
         }.onSuccess { totalFiles ->
             _uiState.updateEventAndClearProgress(
                 StartTransferEvent.MessagePlural.FinishDownloading(

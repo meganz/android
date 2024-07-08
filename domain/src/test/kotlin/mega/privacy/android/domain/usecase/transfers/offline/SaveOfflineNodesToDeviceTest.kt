@@ -1,12 +1,12 @@
 package mega.privacy.android.domain.usecase.transfers.offline
 
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.BackupsOfflineNodeInformation
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,14 +20,14 @@ import java.io.File
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SaveOfflineNodesToDeviceTest {
     private lateinit var underTest: SaveOfflineNodesToDevice
-    private val getOfflineNodeInformationUseCase: GetOfflineNodeInformationUseCase = mock()
+    private val getOfflineNodeInformationByNodeIdUseCase: GetOfflineNodeInformationByNodeIdUseCase = mock()
     private val getOfflineFileUseCase: GetOfflineFileUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
 
     @BeforeAll
     fun setup() {
         underTest = SaveOfflineNodesToDevice(
-            getOfflineNodeInformationUseCase,
+            getOfflineNodeInformationByNodeIdUseCase,
             getOfflineFileUseCase,
             fileSystemRepository
         )
@@ -35,7 +35,7 @@ class SaveOfflineNodesToDeviceTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(getOfflineNodeInformationUseCase, getOfflineFileUseCase, fileSystemRepository)
+        reset(getOfflineNodeInformationByNodeIdUseCase, getOfflineFileUseCase, fileSystemRepository)
     }
 
     // test that it's document uri and it invokes copyFilesToDocumentUri
@@ -45,8 +45,8 @@ class SaveOfflineNodesToDeviceTest {
             val destinationUri = UriPath("destinationUri")
             val file = mock<File>()
             val offlineInfo = mock<BackupsOfflineNodeInformation>()
-            val node = mock<TypedNode>()
-            whenever(getOfflineNodeInformationUseCase(node)).thenReturn(offlineInfo)
+            val nodeId = NodeId(1)
+            whenever(getOfflineNodeInformationByNodeIdUseCase(nodeId)).thenReturn(offlineInfo)
             whenever(getOfflineFileUseCase(offlineInfo)).thenReturn(file)
             whenever(fileSystemRepository.isContentUri(destinationUri.value)).thenReturn(true)
             whenever(
@@ -55,7 +55,7 @@ class SaveOfflineNodesToDeviceTest {
                     destinationUri
                 )
             ).thenReturn(1)
-            underTest(listOf(node), destinationUri)
+            underTest(listOf(nodeId), destinationUri)
             verify(fileSystemRepository).copyFilesToDocumentUri(file, destinationUri)
         }
 
@@ -65,8 +65,8 @@ class SaveOfflineNodesToDeviceTest {
             val destinationUri = UriPath("destinationUri")
             val file = mock<File>()
             val offlineInfo = mock<BackupsOfflineNodeInformation>()
-            val node = mock<TypedNode>()
-            whenever(getOfflineNodeInformationUseCase(node)).thenReturn(offlineInfo)
+            val nodeId = NodeId(1)
+            whenever(getOfflineNodeInformationByNodeIdUseCase(nodeId)).thenReturn(offlineInfo)
             whenever(getOfflineFileUseCase(offlineInfo)).thenReturn(file)
             whenever(fileSystemRepository.isContentUri(destinationUri.value)).thenReturn(false)
             whenever(fileSystemRepository.isFileUri(destinationUri.value)).thenReturn(true)
@@ -75,7 +75,7 @@ class SaveOfflineNodesToDeviceTest {
                 destination
             )
             whenever(fileSystemRepository.copyFiles(file, destination)).thenReturn(1)
-            underTest(listOf(node), destinationUri)
+            underTest(listOf(nodeId), destinationUri)
             verify(fileSystemRepository).copyFiles(file, destination)
         }
 
@@ -85,8 +85,8 @@ class SaveOfflineNodesToDeviceTest {
             val destinationUri = UriPath("destinationUri")
             val file = mock<File>()
             val offlineInfo = mock<BackupsOfflineNodeInformation>()
-            val node = mock<TypedNode>()
-            whenever(getOfflineNodeInformationUseCase(node)).thenReturn(offlineInfo)
+            val nodeId = NodeId(1)
+            whenever(getOfflineNodeInformationByNodeIdUseCase(nodeId)).thenReturn(offlineInfo)
             whenever(getOfflineFileUseCase(offlineInfo)).thenReturn(file)
             whenever(fileSystemRepository.isContentUri(destinationUri.value)).thenReturn(false)
             whenever(fileSystemRepository.isFileUri(destinationUri.value)).thenReturn(false)
@@ -96,7 +96,7 @@ class SaveOfflineNodesToDeviceTest {
                 destination
             )
             whenever(fileSystemRepository.copyFiles(file, destination)).thenReturn(1)
-            underTest(listOf(node), destinationUri)
+            underTest(listOf(nodeId), destinationUri)
             verify(fileSystemRepository).copyFiles(file, destination)
         }
 }
