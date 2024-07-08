@@ -21,8 +21,8 @@ import mega.privacy.android.app.presentation.offline.action.OfflineNodeActionsVi
 import mega.privacy.android.app.presentation.offline.confirmremovedialog.ConfirmRemoveFromOfflineDialogFragment
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.OfflineOptionsViewModel.Companion.NODE_HANDLE
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.view.OfflineOptionsContent
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -36,6 +36,7 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
 
     private val viewModel: OfflineOptionsViewModel by viewModels()
     private val offlineNodeActionsViewModel: OfflineNodeActionsViewModel by activityViewModels()
+    private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -104,12 +105,7 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
     }
 
     private fun saveToDevice(nodeId: NodeId) {
-        callManager {
-            it.saveHandlesToDevice(
-                listOf(nodeId.longValue),
-                true
-            )
-        }
+        startDownloadViewModel.onCopyOfflineNodeClicked(listOf(nodeId))
         dismissAllowingStateLoss()
     }
 

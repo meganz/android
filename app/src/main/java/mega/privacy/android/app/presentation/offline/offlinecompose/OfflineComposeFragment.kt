@@ -36,11 +36,13 @@ import mega.privacy.android.app.presentation.offline.confirmremovedialog.Confirm
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.OfflineOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.offline.view.OfflineFeatureScreen
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
@@ -66,7 +68,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
 
     private val viewModel: OfflineComposeViewModel by viewModels()
     private val offlineNodeActionsViewModel: OfflineNodeActionsViewModel by activityViewModels()
-
+    private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
     private val args: OfflineComposeFragmentArgs by navArgs()
     private var actionMode: ActionMode? = null
 
@@ -200,6 +202,9 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
             )
     }
 
+    /**
+     * On view created
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         callManager {
@@ -222,6 +227,9 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
         }
     }
 
+    /**
+     * On action mode finished
+     */
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         Timber.d("ActionBarCallBack::onPrepareActionMode")
 
@@ -231,29 +239,34 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
         return true
     }
 
-    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+    /**
+     * On create action mode
+     */
+    override fun onCreateActionMode(mode: ActionMode, menu: Menu?): Boolean {
         Timber.d("ActionBarCallBack::onCreateActionMode")
-        val inflater = mode!!.menuInflater
-
+        val inflater = mode.menuInflater
         inflater.inflate(R.menu.offline_browser_action, menu)
-
         return true
     }
 
+    /**
+     * On destroy action mode
+     */
     override fun onDestroyActionMode(mode: ActionMode?) {
-        Timber.d("ActionBarCallBack::onDestroyActionMode")
         viewModel.clearSelection()
         actionMode = null
     }
 
+    /**
+     * On action item clicked
+     */
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-        Timber.d("ActionBarCallBack::onActionItemClicked")
         when (item.itemId) {
             R.id.cab_menu_download -> {
-                callManager {
-                    it.saveHandlesToDevice(
-                        handles = viewModel.uiState.value.selectedNodeHandles,
-                        highPriority = true
+                val nodes = viewModel.uiState.value.selectedNodeHandles
+                if (nodes.isNotEmpty()) {
+                    startDownloadViewModel.onCopyOfflineNodeClicked(
+                        nodes.map { NodeId(it) }
                     )
                 }
                 viewModel.clearSelection()

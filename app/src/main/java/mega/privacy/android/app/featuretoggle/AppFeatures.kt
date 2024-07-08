@@ -148,7 +148,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To switch into new Offline Screen Compose UI
      */
-    OfflineCompose("Enable compose for Offline Screen", false),
+    OfflineCompose("Enable compose for Offline Screen", true),
 
     /**
      * Meeting notification settings
