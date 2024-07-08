@@ -1,32 +1,24 @@
 package mega.privacy.android.app.contacts.usecase
 
+import mega.privacy.android.domain.entity.contacts.ContactItem as DomainContact
 import android.content.Context
-import android.graphics.drawable.Drawable
-import androidx.annotation.ColorInt
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
-import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.core.BackpressureStrategy
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.rx3.asFlowable
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.scan
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.list.data.ContactItem
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
-import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
+import mega.privacy.android.app.contacts.mapper.ContactItemDataMapper
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.app.utils.view.TextDrawable
 import mega.privacy.android.data.extensions.getDecodedAliases
-import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -34,99 +26,41 @@ import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava.USER_ATTR_ALIAS
-import nz.mega.sdk.MegaApiJava.USER_ATTR_AVATAR
-import nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME
-import nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME
-import nz.mega.sdk.MegaChatApi
-import nz.mega.sdk.MegaChatApi.STATUS_ONLINE
-import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
-import nz.mega.sdk.MegaUser
-import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
-import timber.log.Timber
-import java.io.File
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.inject.Inject
 
 /**
  * Get contacts use case
  *
- * @property getChatChangesUseCase    Get chat changes use case
- * @property megaContactsMapper       Mapper to convert MegaUser to ContactItem.Data
- * @property getContacts              Get contacts
- * @property getUserAttribute          Get user attribute
- * @property getContact               Get contact
- * @property areCredentialsVerified   Check if credentials are verified
- *  @property getUserFullnameFromCache Get user full name from cache
- *  @property requestLastGreen         Request last green
- *  @property getChatRoomIdByUser      Get chat room id by user
- *  @property getUserAvatar            Get user avatar
  *  @property onlineString             Get online string
  *  @property getUnformattedLastSeenDate Get unformatted last seen date
  *  @property getAliasMap              Get alias map
  *  @property getUserUpdates           Get user updates
  */
-class GetContactsUseCase(
-    private val megaContactsMapper: (MegaUser, File) -> ContactItem.Data,
-    private val getContacts: () -> ArrayList<MegaUser>,
-    private val getUserAttribute: (String, Int, MegaRequestListenerInterface) -> Unit,
-    private val getContact: (String) -> MegaUser?,
-    private val areCredentialsVerified: (MegaUser) -> Boolean,
-    private val getUserFullnameFromCache: (Long) -> String,
-    private val requestLastGreen: (Long) -> Unit,
-    private val getChatRoomIdByUser: (Long) -> Long?,
-    private val getUserAvatar: (String, String, MegaRequestListenerInterface) -> Unit,
+internal class GetContactsUseCase(
     private val onlineString: () -> String,
     private val getUnformattedLastSeenDate: (Int) -> String,
     private val getAliasMap: (MegaRequest) -> Map<Long, String>,
     private val getUserUpdates: () -> Flow<UserUpdate>,
-    private val monitorChatLastGreen: () -> Flow<UserLastGreen>,
-    private val monitorChatOnlineStatus: () -> Flow<OnlineStatus>,
-    private val monitorChatConnectionStatus: () -> Flow<ChatConnectionState>,
+    private val contactMapper: ContactItemDataMapper,
+    private val contactsRepository: ContactsRepository,
+    private val chatRepository: ChatRepository,
 ) {
 
     @Inject
-    constructor(
+    internal constructor(
         @ApplicationContext context: Context,
-        @MegaApi megaApi: MegaApiAndroid,
-        megaChatApi: MegaChatApiAndroid,
         accountsRepository: AccountRepository,
         contactsRepository: ContactsRepository,
+        contactMapper: ContactItemDataMapper,
+        chatRepository: ChatRepository,
     ) : this(
-        megaContactsMapper = { user, avatarFolder ->
-            user.toContactItem(
-                avatarFolder = avatarFolder,
-                megaChatApi = megaChatApi,
-                megaApi = megaApi,
-                context = context
-            )
-        },
-        getContacts = { megaApi.contacts },
-        getUserAttribute = { email, attr, listener ->
-            megaApi.getUserAttribute(email, attr, listener)
-        },
-        getContact = { email ->
-            megaApi.getContact(email)
-        },
-        areCredentialsVerified = { user ->
-            megaApi.areCredentialsVerified(user)
-        },
-        getUserFullnameFromCache = { handle ->
-            megaChatApi.getUserFullnameFromCache(handle)
-        },
-        requestLastGreen = { handle ->
-            megaChatApi.requestLastGreen(handle, null)
-        },
-        getChatRoomIdByUser = { handle ->
-            megaChatApi.getChatRoomByUser(handle)?.chatId
-        },
-        getUserAvatar = { email, file, listener ->
-            megaApi.getUserAvatar(email, file, listener)
-        },
         onlineString = {
             context.getString(R.string.online_status)
         },
@@ -139,15 +73,9 @@ class GetContactsUseCase(
         getUserUpdates = {
             accountsRepository.monitorUserUpdates()
         },
-        monitorChatLastGreen = {
-            contactsRepository.monitorChatPresenceLastGreenUpdates()
-        },
-        monitorChatOnlineStatus = {
-            contactsRepository.monitorChatOnlineStatusUpdates()
-        },
-        monitorChatConnectionStatus = {
-            contactsRepository.monitorChatConnectionStateUpdates()
-        },
+        contactMapper = contactMapper,
+        contactsRepository = contactsRepository,
+        chatRepository = chatRepository,
     )
 
 
@@ -156,315 +84,160 @@ class GetContactsUseCase(
      *
      * @param avatarFolder Avatar folder in cache.
      */
-    fun get(avatarFolder: File): Flowable<List<ContactItem.Data>> = Flowable.create({ emitter ->
-        val disposable = CompositeDisposable()
-        val contacts = getContactList(avatarFolder)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun get(): Flow<List<ContactItem.Data>> =
+        listChangedFlow().flatMapLatest { initialContacts ->
+            merge(
+                chatOnlineStatusChangeFlow(),
+                lastGreenChangeFlow(),
+                chatConnectionStateChangeFlow(),
+                userUpdatesChangeFlow(),
+            ).scan(initialContacts) { contacts, change: suspend (List<DomainContact>) -> List<DomainContact> ->
+                change(contacts)
+            }
+        }.map { domainList: List<DomainContact> ->
+            domainList.map { contactMapper(it) }.sortedAlphabetically()
+        }.distinctUntilChanged()
 
-        emitter.onNext(contacts.sortedAlphabetically())
+    private fun lastGreenChangeFlow(): Flow<suspend (List<DomainContact>) -> List<DomainContact>> =
+        contactsRepository.monitorChatPresenceLastGreenUpdates().map { event ->
+            applyLastGreen(event)
+        }
 
-        val userAttrsListener = OptionalMegaRequestListenerInterface(
-            onRequestFinish = { request, error ->
-                if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
-
-                if (error.errorCode == MegaError.API_OK) {
-                    val index = contacts.indexOfFirst { it.email == request.email }
-                    if (index != INVALID_POSITION) {
-                        val currentContact = contacts[index]
-
-                        when (request.paramType) {
-                            USER_ATTR_AVATAR -> {
-                                if (!request.file.isNullOrBlank()) {
-                                    contacts[index] = currentContact.copy(
-                                        avatarUri = File(request.file).toUri()
-                                    )
-                                }
-                            }
-
-                            USER_ATTR_FIRSTNAME, USER_ATTR_LASTNAME ->
-                                contacts[index] = currentContact.copy(
-                                    fullName = getUserFullnameFromCache(currentContact.handle)
-                                )
-
-                            USER_ATTR_ALIAS ->
-                                contacts[index] = currentContact.copy(
-                                    alias = request.text
-                                )
-                        }
-
-                        emitter.onNext(contacts.sortedAlphabetically())
-                    } else if (request.paramType == USER_ATTR_ALIAS) {
-                        val requestAliases = getAliasMap(request)
-
-                        contacts.forEachIndexed { indexToUpdate, contact ->
-                            var newAlias: String? = null
-                            if (requestAliases.isNotEmpty() && requestAliases.containsKey(contact.handle)) {
-                                newAlias = requestAliases[contact.handle]
-                            }
-                            if (newAlias != contact.alias) {
-                                contacts[indexToUpdate] = contact.copy(alias = newAlias)
-                            }
-                        }
-
-                        emitter.onNext(contacts.sortedAlphabetically())
-                    }
+    private fun applyLastGreen(event: UserLastGreen): suspend (List<DomainContact>) -> List<DomainContact> =
+        { contacts: List<DomainContact> ->
+            contacts.map { contact ->
+                if (contact.handle == event.handle) {
+                    contact.copy(lastSeen = event.lastGreen)
                 } else {
-                    Timber.e(error.toThrowable())
+                    contact
                 }
-            },
-            onRequestTemporaryError = { _, error ->
-                Timber.e(error.toThrowable())
+            }
+        }
+
+    private fun chatOnlineStatusChangeFlow(): Flow<suspend (List<DomainContact>) -> List<DomainContact>> =
+        contactsRepository.monitorChatOnlineStatusUpdates().onEach {
+            if (it.status != UserChatStatus.Online) contactsRepository.requestLastGreen(it.userHandle)
+        }.map { event ->
+            applyChatOnlineStatus(event)
+        }
+
+    private fun applyChatOnlineStatus(event: OnlineStatus): suspend (List<DomainContact>) -> List<DomainContact> =
+        { contacts: List<DomainContact> ->
+            contacts.map { contact ->
+                if (contact.handle == event.userHandle) {
+                    contact.copy(
+                        status = event.status,
+                    )
+                } else {
+                    contact
+                }
+            }
+        }
+
+    private fun chatConnectionStateChangeFlow(): Flow<suspend (List<DomainContact>) -> List<DomainContact>> =
+        contactsRepository.monitorChatConnectionStateUpdates().map {
+            applyChatConnectionState()
+        }
+
+    private fun applyChatConnectionState(): suspend (List<DomainContact>) -> List<DomainContact> =
+        { contacts: List<DomainContact> ->
+            contacts.map { contact ->
+                if (contact.chatroomId == null && isWithinLastThreeDays(contact.timestamp)) {
+                    contact.copy(
+                        chatroomId = chatRepository.getChatRoomByUser(contact.handle)?.chatId
+                    )
+                } else {
+                    contact
+                }
+            }
+        }
+
+    private fun isWithinLastThreeDays(timestamp: Long): Boolean {
+        val now = LocalDateTime.now()
+        val addedTime =
+            Instant.ofEpochSecond(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime()
+        return Duration.between(addedTime, now).toDays() < 3
+    }
+
+    private fun listChangedFlow(): Flow<List<DomainContact>> = flow {
+        val contacts = contactsRepository.getVisibleContacts()
+        emit(contacts)
+        emitAll(getUserUpdates()
+            .map { userUpdate ->
+                userUpdate.changes
+                    .mapNotNull { (key, value) ->
+                        key.id to value.filter { it is UserChanges.Visibility || it is UserChanges.AuthenticationInformation }
+                    }.toMap()
+            }.scan(contacts) { acc, userUpdate ->
+                if (hasVisibilityChange(acc, userUpdate)
+                    || hasAuthChanges(userUpdate)
+                ) {
+                    contactsRepository.getVisibleContacts()
+                } else acc
             }
         )
+        awaitCancellation()
+    }.distinctUntilChanged()
 
-        monitorChatLastGreen().asFlowable().subscribeBy(onNext = { change ->
-            val index = contacts.indexOfFirst { it.handle == change.handle }
-            if (index != INVALID_POSITION) {
-                val currentContact = contacts[index]
-                contacts[index] = currentContact.copy(
-                    lastSeen = getUnformattedLastSeenDate(change.lastGreen)
-                )
+    private fun hasAuthChanges(userUpdate: Map<Long, List<UserChanges>>) =
+        userUpdate.values.any { it.any { change -> change is UserChanges.AuthenticationInformation } }
 
-                emitter.onNext(contacts.sortedAlphabetically())
-            }
-
-        }, onError = { Timber.e(it) })
-            .addTo(disposable)
-
-        monitorChatOnlineStatus().asFlowable().subscribeBy(onNext = { change ->
-            val index = contacts.indexOfFirst { it.handle == change.userHandle }
-            if (index != INVALID_POSITION) {
-                val currentContact = contacts[index]
-                val statusInt = getStatusInt(change.status)
-                contacts[index] = currentContact.copy(
-                    status = statusInt,
-                    statusColor = getUserStatusColor(statusInt),
-                    lastSeen = if (change.status == UserChatStatus.Online) {
-                        onlineString()
-                    } else {
-                        requestLastGreen(change.userHandle)
-                        currentContact.lastSeen
-                    }
-                )
-
-                emitter.onNext(contacts.sortedAlphabetically())
-            }
-        }, onError = { Timber.e(it) })
-            .addTo(disposable)
-
-        monitorChatConnectionStatus().asFlowable().subscribeBy(onNext = { change ->
-            val index = contacts.indexOfFirst {
-                it.isNew && change.chatId == getChatRoomIdByUser(it.handle)
-            }
-            if (index != INVALID_POSITION) {
-                val currentContact = contacts[index]
-                contacts[index] = currentContact.copy(
-                    isNew = false
-                )
-
-                emitter.onNext(contacts.sortedAlphabetically())
-            }
-        }, onError = { Timber.e(it) })
-            .addTo(disposable)
-
-
-        getUserUpdates().asFlowable()
-            .subscribeBy(
-                onNext = { userUpdate ->
-                    if (emitter.isCancelled) return@subscribeBy
-
-                    userUpdate.changesByEmail().forEach { (email, changes) ->
-                        val index = contacts.indexOfFirst { it.email == email }
-                        when {
-                            index != INVALID_POSITION -> {
-                                when {
-                                    changes.contains(UserChanges.Avatar) -> email?.let {
-                                        getUserAttribute(
-                                            it, USER_ATTR_AVATAR,
-                                            userAttrsListener
-                                        )
-                                    }
-
-                                    changes.contains(UserChanges.Firstname) -> email?.let {
-                                        getUserAttribute(
-                                            it,
-                                            USER_ATTR_FIRSTNAME,
-                                            userAttrsListener
-                                        )
-                                    }
-
-                                    changes.contains(UserChanges.Lastname) -> email?.let {
-                                        getUserAttribute(
-                                            it,
-                                            USER_ATTR_LASTNAME,
-                                            userAttrsListener
-                                        )
-                                    }
-
-                                    changes.any { it is UserChanges.Visibility && it.userVisibility != UserVisibility.Visible } -> {
-                                        contacts.removeAt(index)
-                                        emitter.onNext(contacts.sortedAlphabetically())
-                                    }
-                                }
-                            }
-
-                            changes.contains(UserChanges.Alias) -> {
-                                email?.let {
-                                    getUserAttribute(
-                                        it, USER_ATTR_ALIAS, userAttrsListener
-                                    )
-                                }
-                            }
-
-                            changes.any { it is UserChanges.Visibility && it.userVisibility == UserVisibility.Visible } -> { // New contact
-                                val newContactsList = getContactList(avatarFolder)
-                                val currentContactIds = contacts.map { it.handle }
-                                val diff =
-                                    newContactsList.filter { it.handle !in currentContactIds }
-                                contacts.addAll(diff)
-                                emitter.onNext(contacts.sortedAlphabetically())
-                                diff.forEach {
-                                    it.requestMissingFields(
-                                        avatarFolder, userAttrsListener
-                                    )
-                                }
-                            }
-
-                            changes.contains(UserChanges.AuthenticationInformation) -> {
-                                mutableListOf<ContactItem.Data>()
-                                    .apply { addAll(contacts) }
-                                    .forEachIndexed { i, _ ->
-                                        val currentContact = contacts[i]
-                                        val currentUser =
-                                            getContact(currentContact.email)
-
-                                        currentUser?.let {
-                                            val isVerified = areCredentialsVerified(it)
-
-                                            if (currentContact.isVerified != isVerified) {
-                                                contacts[i] = currentContact.copy(
-                                                    isVerified = isVerified
-                                                )
-                                            }
-                                        }
-                                    }
-
-                                emitter.onNext(contacts.sortedAlphabetically())
-                            }
-                        }
-                    }
-                },
-                onError = { Timber.e(it) }
-            ).addTo(disposable)
-
-        contacts.forEach { it.requestMissingFields(avatarFolder, userAttrsListener) }
-
-        emitter.setCancellable { disposable.clear() }
-    }, BackpressureStrategy.LATEST)
-
-    private fun getStatusInt(status: UserChatStatus): Int {
-        return when (status) {
-            UserChatStatus.Online -> STATUS_ONLINE
-            UserChatStatus.Away -> MegaChatApi.STATUS_AWAY
-            UserChatStatus.Busy -> MegaChatApi.STATUS_BUSY
-            UserChatStatus.Offline -> MegaChatApi.STATUS_OFFLINE
-            UserChatStatus.Invalid -> MegaChatApi.STATUS_INVALID
-        }
+    private fun hasVisibilityChange(
+        acc: List<DomainContact>,
+        userUpdate: Map<Long, List<UserChanges>>,
+    ) = userUpdate.mapValues { (_, values) ->
+        values.firstOrNull { it is UserChanges.Visibility }
+            ?.let { it as UserChanges.Visibility }?.userVisibility
+    }.let {
+        hasCurrentContactVisibilityChanged(acc, it)
+                || newContactHasBecomeVisible(it, acc)
     }
 
-    private fun getContactList(avatarFolder: File) =
-        getContacts().filter { it.visibility == VISIBILITY_VISIBLE }
-            .map { megaContactsMapper(it, avatarFolder) }.toMutableList()
+    private fun newContactHasBecomeVisible(
+        visibilityChanges: Map<Long, UserVisibility?>,
+        acc: List<DomainContact>,
+    ) = acc.map { it.handle }
+        .containsAll(visibilityChanges.filterValues { it == UserVisibility.Visible }.keys).not()
 
-    /**
-     * Request missing fields for current `ContactItem.Data`
-     *
-     * @param avatarFolder Avatar folder in cache.
-     * @param listener  Callback to retrieve requested fields
-     */
-    private fun ContactItem.Data.requestMissingFields(
-        avatarFolder: File,
-        listener: MegaRequestListenerInterface,
-    ) {
-        if (avatarUri == null) {
-            val userAvatarFile = File(avatarFolder, "$email.jpg").absolutePath
-            getUserAvatar(email, userAvatarFile, listener)
-        }
-        if (fullName.isNullOrBlank()) {
-            getUserAttribute(email, USER_ATTR_FIRSTNAME, listener)
-            getUserAttribute(email, USER_ATTR_LASTNAME, listener)
-        }
-        if (alias.isNullOrBlank()) {
-            getUserAttribute(email, USER_ATTR_ALIAS, listener)
-        }
-        if (status != STATUS_ONLINE) {
-            requestLastGreen(handle)
-        }
-    }
+    private fun hasCurrentContactVisibilityChanged(
+        acc: List<DomainContact>,
+        visibilityChanges: Map<Long, UserVisibility?>,
+    ) =
+        acc.any { visibilityChanges[it.handle]?.let { visibility -> visibility != it.visibility } == true }
 
-    private fun MutableList<ContactItem.Data>.sortedAlphabetically(): List<ContactItem.Data> =
+    private fun userUpdatesChangeFlow(): Flow<suspend (List<DomainContact>) -> List<DomainContact>> =
+        getUserUpdates().map {
+            it.changes.mapKeys { (key, _) ->
+                key.id
+            }.mapValues { (_, list) ->
+                list.filter { change -> change !is UserChanges.Visibility }
+            }
+        }.map { userUpdate ->
+            applyUserUpdates(userUpdate)
+        }
+
+    private fun applyUserUpdates(userUpdate: Map<Long, List<UserChanges>>): suspend (List<DomainContact>) -> List<DomainContact> =
+        { contacts: List<DomainContact> ->
+            contacts.map { contact ->
+                if (userUpdate.hasContactDataChangesForUser(contact) || userUpdate.hasAliasChange()) {
+                    contact.copy(contactData = contactsRepository.getContactData(contact))
+                } else {
+                    contact
+                }
+            }
+        }
+
+    private fun Map<Long, List<UserChanges>>.hasContactDataChangesForUser(
+        contact: DomainContact,
+    ) = this[contact.handle]?.any {
+        it is UserChanges.Avatar || it is UserChanges.Firstname || it is UserChanges.Lastname
+    } == true
+
+    private fun Map<Long, List<UserChanges>>.hasAliasChange() =
+        this.values.any { it.any { change -> change is UserChanges.Alias } }
+
+
+    private fun List<ContactItem.Data>.sortedAlphabetically(): List<ContactItem.Data> =
         sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, ContactItem.Data::getTitle))
 }
-
-/**
- * Build ContactItem.Data from MegaUser object
- *
- * @param avatarFolder Avatar folder in cache.
- * @return  ContactItem.Data
- */
-private fun MegaUser.toContactItem(
-    avatarFolder: File,
-    megaChatApi: MegaChatApiAndroid,
-    megaApi: MegaApiAndroid,
-    context: Context,
-): ContactItem.Data {
-    val alias = megaChatApi.getUserAliasFromCache(handle)
-    val fullName = megaChatApi.getUserFullnameFromCache(handle)
-    val userStatus = megaChatApi.getUserOnlineStatus(handle)
-    val userImageColor = megaApi.getUserAvatarColor(this)?.toColorInt() ?: -1
-    val title = when {
-        !alias.isNullOrBlank() -> alias
-        !fullName.isNullOrBlank() -> fullName
-        else -> email
-    }
-    val placeholder = getImagePlaceholder(context = context, title = title, color = userImageColor)
-    val userAvatarFile = File(avatarFolder, "$email.jpg")
-    val userAvatar = if (userAvatarFile.exists()) {
-        userAvatarFile.toUri()
-    } else {
-        null
-    }
-    val isNew = wasRecentlyAdded() && megaChatApi.getChatRoomByUser(handle) == null
-    val isVerified = megaApi.areCredentialsVerified(this)
-
-    return ContactItem.Data(
-        handle = handle,
-        email = email,
-        alias = alias,
-        fullName = fullName,
-        status = userStatus,
-        statusColor = getUserStatusColor(userStatus),
-        avatarUri = userAvatar,
-        placeholder = placeholder,
-        isNew = isNew,
-        isVerified = isVerified
-    )
-}
-
-/**
- * Build Avatar placeholder Drawable given a Title and a Color
- *
- * @param title     Title string
- * @param color     Background color
- * @return          Drawable with the placeholder
- */
-private fun getImagePlaceholder(context: Context, title: String, @ColorInt color: Int): Drawable =
-    TextDrawable.builder()
-        .beginConfig()
-        .width(context.resources.getDimensionPixelSize(R.dimen.image_contact_size))
-        .height(context.resources.getDimensionPixelSize(R.dimen.image_contact_size))
-        .fontSize(context.resources.getDimensionPixelSize(R.dimen.image_contact_text_size))
-        .textColor(ContextCompat.getColor(context, R.color.white))
-        .bold()
-        .toUpperCase()
-        .endConfig()
-        .buildRound(AvatarUtil.getFirstLetter(title), color)

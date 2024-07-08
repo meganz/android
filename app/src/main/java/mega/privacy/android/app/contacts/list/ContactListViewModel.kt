@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.asFlowable
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
@@ -31,7 +32,6 @@ import mega.privacy.android.app.contacts.list.data.ContactListState
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
-import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -46,7 +46,6 @@ import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -68,7 +67,7 @@ import javax.inject.Inject
  * @param context                       Application context
  */
 @HiltViewModel
-class ContactListViewModel @Inject constructor(
+internal class ContactListViewModel @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val removedContactByEmailUseCase: RemoveContactByEmailUseCase,
@@ -104,9 +103,7 @@ class ContactListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            CacheFolderManager.getCacheFolderAsync(CacheFolderManager.AVATAR_FOLDER)?.let {
-                retrieveContacts(it)
-            }
+            retrieveContacts()
         }
         retrieveContactActions()
     }
@@ -140,8 +137,9 @@ class ContactListViewModel @Inject constructor(
         }
     }
 
-    private fun retrieveContacts(avatarFolder: File) {
-        getContactsUseCase.get(avatarFolder)
+    private fun retrieveContacts() {
+        getContactsUseCase.get()
+            .asFlowable()
             .publish {
                 it.take(1).concatWith(it.debounce(REQUEST_TIMEOUT_IN_MS, TimeUnit.MILLISECONDS))
             }
