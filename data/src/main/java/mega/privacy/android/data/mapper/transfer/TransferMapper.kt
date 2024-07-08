@@ -41,6 +41,7 @@ internal class TransferMapper @Inject constructor(
             state = transferStateMapper(transfer.state),
             priority = transfer.priority,
             notificationNumber = transfer.notificationNumber,
+            isSyncTransfer = transfer.isSyncTransfer,
         )
     }
 

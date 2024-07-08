@@ -40,6 +40,7 @@ import java.math.BigInteger
  * @property priority Returns the priority of the transfer.
  *                    This value is intended to keep the order of the transfer queue on apps.
  * @property notificationNumber Returns the notification number of the SDK when this MEGATransfer was generated.
+ * @property isSyncTransfer True if the transfer is a sync transfer
  */
 data class Transfer(
     override val transferType: TransferType,
@@ -62,6 +63,7 @@ data class Transfer(
     val state: TransferState,
     val priority: BigInteger,
     val notificationNumber: Long,
+    val isSyncTransfer: Boolean = false
 ) : ActiveTransfer, AppDataOwner {
 
     /**

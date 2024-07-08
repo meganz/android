@@ -53,6 +53,7 @@ internal class TransferMapperTest {
             state = TransferState.STATE_COMPLETED,
             priority = megaTransfer.priority,
             notificationNumber = megaTransfer.notificationNumber,
+            isSyncTransfer = megaTransfer.isSyncTransfer
         )
         assertThat(
             TransferMapper(transferAppDataMapper, transferTypeMapper, transferStateMapper).invoke(
@@ -108,6 +109,7 @@ internal class TransferMapperTest {
             on { state }.thenReturn(MegaTransfer.STATE_COMPLETED)
             on { priority }.thenReturn(BigInteger.ONE)
             on { notificationNumber }.thenReturn(Random.nextLong())
+            on { isSyncTransfer }.thenReturn(true)
         }
 
 

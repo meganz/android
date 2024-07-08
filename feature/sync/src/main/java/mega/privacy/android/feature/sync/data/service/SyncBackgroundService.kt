@@ -11,17 +11,23 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
@@ -63,6 +69,12 @@ internal class SyncBackgroundService : LifecycleService() {
 
     @Inject
     internal lateinit var monitorAccountDetailUseCase: MonitorAccountDetailUseCase
+
+    @Inject
+    internal lateinit var monitorTransferEventsUseCase: MonitorTransferEventsUseCase
+
+    @Inject
+    internal lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
 
     override fun onCreate() {
         super.onCreate()
@@ -118,6 +130,7 @@ internal class SyncBackgroundService : LifecycleService() {
                 runCatching { backgroundFastLoginUseCase() }.getOrElse(Timber::e)
             }
         }
+        monitorCompletedSyncTransfers()
         lifecycleScope.launch {
             combine(
                 monitorConnectivityUseCase(),
@@ -139,6 +152,18 @@ internal class SyncBackgroundService : LifecycleService() {
             }
         }
         return START_STICKY
+    }
+
+    private fun monitorCompletedSyncTransfers() {
+        lifecycleScope.launch {
+            monitorTransferEventsUseCase()
+                .catch { Timber.e(it) }
+                .filterIsInstance<TransferEvent.TransferFinishEvent>()
+                .filter { it.transfer.isSyncTransfer }
+                .collect { transferEvent ->
+                    addCompletedTransferUseCase(transferEvent.transfer, transferEvent.error)
+                }
+        }
     }
 
     private suspend fun updateSyncState(
