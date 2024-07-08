@@ -23,10 +23,15 @@ import java.util.stream.Stream
 class CheckForValidNameUseCaseTest {
 
     private val nodeExistsInParentUseCase: NodeExistsInParentUseCase = mock()
+    private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase = mock()
     private val regexRepository: RegexRepository = mock()
 
     private val invalidNamePattern = Pattern.compile(INVALID_NAME_REGEX)
-    private val underTest = CheckForValidNameUseCase(nodeExistsInParentUseCase, regexRepository)
+    private val underTest = CheckForValidNameUseCase(
+        nodeExistsInParentUseCase,
+        nodeExistsInCurrentLocationUseCase,
+        regexRepository
+    )
 
     @ParameterizedTest(name = "Check for valid name {0}")
     @MethodSource("provideParams")

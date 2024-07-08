@@ -11,11 +11,12 @@ import javax.inject.Inject
  */
 class CheckForValidNameUseCase @Inject constructor(
     private val nodeExistsInParentUseCase: NodeExistsInParentUseCase,
+    private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
     private val regexRepository: RegexRepository,
 ) {
 
     /**
-     * Invoke
+     * Invoke - Rename
      * @param newName New Name for node
      * @param node Node on which rename operation is performed
      * @return [ValidNameType]
@@ -25,6 +26,21 @@ class CheckForValidNameUseCase @Inject constructor(
             newName.isBlank() -> ValidNameType.BLANK_NAME
             regexRepository.invalidNamePattern.matcher(newName).find() -> ValidNameType.INVALID_NAME
             nodeExistsInParentUseCase(node, newName) -> ValidNameType.NAME_ALREADY_EXISTS
+            else -> checkForExtension(newName, node)
+        }
+    }
+
+    /**
+     * Invoke - New folder creation
+     * @param newName New Name for node
+     * @param node Node on which rename operation is performed
+     * @return [ValidNameType]
+     */
+    suspend fun newFolderCreation(newName: String, node: Node): ValidNameType {
+        return when {
+            newName.isBlank() -> ValidNameType.BLANK_NAME
+            regexRepository.invalidNamePattern.matcher(newName).find() -> ValidNameType.INVALID_NAME
+            nodeExistsInCurrentLocationUseCase(node, newName) -> ValidNameType.NAME_ALREADY_EXISTS
             else -> checkForExtension(newName, node)
         }
     }

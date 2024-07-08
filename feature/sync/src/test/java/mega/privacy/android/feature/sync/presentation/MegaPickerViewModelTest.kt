@@ -18,6 +18,7 @@ import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
@@ -52,6 +53,7 @@ internal class MegaPickerViewModelTest {
     private val getCameraUploadsFolderHandleUseCase: GetPrimarySyncHandleUseCase = mock()
     private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase = mock()
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase = mock()
+    private val createFolderNodeUseCase: CreateFolderNodeUseCase = mock()
 
     private val typedNodeUiModels: List<TypedNodeUiModel> = emptyList()
     private val childrenNodes: List<TypedNode> = emptyList()
@@ -69,7 +71,8 @@ internal class MegaPickerViewModelTest {
             deviceFolderUINodeErrorMessageMapper,
             getCameraUploadsFolderHandleUseCase,
             getMediaUploadsFolderHandleUseCase,
-            getMyChatsFilesFolderIdUseCase
+            getMyChatsFilesFolderIdUseCase,
+            createFolderNodeUseCase,
         )
     }
 
@@ -365,7 +368,8 @@ internal class MegaPickerViewModelTest {
             deviceFolderUINodeErrorMessageMapper,
             getCameraUploadsFolderHandleUseCase,
             getMediaUploadsFolderHandleUseCase,
-            getMyChatsFilesFolderIdUseCase
+            getMyChatsFilesFolderIdUseCase,
+            createFolderNodeUseCase
         )
     }
 }

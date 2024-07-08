@@ -33,12 +33,12 @@ android {
         buildConfigField(
             "String",
             "TEST_ACCOUNT_USER_NAME",
-            getTestAccountUserName(project).orEmpty()
+            getTestAccountUserName(project) ?: "\"\""
         )
         buildConfigField(
             "String",
             "TEST_ACCOUNT_PASSWORD",
-            getTestAccountPassword(project).orEmpty()
+            getTestAccountPassword(project) ?: "\"\""
         )
     }
 

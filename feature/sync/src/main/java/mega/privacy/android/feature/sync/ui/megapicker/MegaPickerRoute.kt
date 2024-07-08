@@ -43,6 +43,12 @@ internal fun MegaPickerRoute(
             errorMessageId = state.value.errorMessageId,
             errorMessageShown = {
                 viewModel.handleAction(MegaPickerAction.ErrorMessageShown)
+            },
+            onCreateNewFolderDialogSuccess = { newFolderName ->
+                viewModel.createFolder(
+                    newFolderName = newFolderName,
+                    parentNode = state.value.currentFolder
+                )
             }
         )
     }

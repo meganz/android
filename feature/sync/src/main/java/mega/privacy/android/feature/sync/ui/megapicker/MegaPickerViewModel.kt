@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
@@ -40,6 +41,7 @@ internal class MegaPickerViewModel @Inject constructor(
     private val getCameraUploadsFolderHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase,
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
+    private val createFolderNodeUseCase: CreateFolderNodeUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MegaPickerState())
@@ -91,8 +93,8 @@ internal class MegaPickerViewModel @Inject constructor(
                         val errorMessage = deviceFolderUINodeErrorMessageMapper(error)
                             ?: sharedResR.string.general_sync_message_unknown_error
 
-                        _state.update {
-                            it.copy(
+                        _state.update { state ->
+                            state.copy(
                                 errorMessageId = errorMessage
                             )
                         }
@@ -219,5 +221,29 @@ internal class MegaPickerViewModel @Inject constructor(
                 Timber.d(it, "Error getting child folders of current folder ${currentFolder.name}")
             }
         }
+    }
+
+    /**
+     * Creates a new folder
+     *
+     * @param newFolderName The new folder name
+     * @param parentNode    Parent node under which the folder should be created
+     */
+    fun createFolder(
+        newFolderName: String,
+        parentNode: Node?,
+    ) = viewModelScope.launch {
+        runCatching {
+            createFolderNodeUseCase(
+                name = newFolderName,
+                parentNodeId = parentNode?.id,
+            )
+        }.onSuccess { nodeId ->
+            runCatching {
+                getNodeByHandleUseCase(nodeId.longValue)
+            }.onSuccess { node ->
+                node?.let(::fetchFolders)
+            }.onFailure { Timber.e(it) }
+        }.onFailure { Timber.e(it) }
     }
 }

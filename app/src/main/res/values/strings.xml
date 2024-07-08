@@ -1840,7 +1840,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d files were not shared</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Preview content</string>
+    <string name="preview_content">Open</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
