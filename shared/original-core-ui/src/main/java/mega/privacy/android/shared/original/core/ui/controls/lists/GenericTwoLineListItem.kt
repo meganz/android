@@ -26,8 +26,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
@@ -161,7 +161,7 @@ internal fun GenericTwoLineListItem(
 }
 
 @Composable
-private fun RowScope.TrailingIcons(trailingIcons: @Composable (RowScope.() -> Unit)?) {
+internal fun RowScope.TrailingIcons(trailingIcons: @Composable (RowScope.() -> Unit)?) {
     CompositionLocalProvider(
         LocalContentColor provides MegaOriginalTheme.colors.icon.secondary,
         LocalContentAlpha provides 1f,
@@ -171,7 +171,7 @@ private fun RowScope.TrailingIcons(trailingIcons: @Composable (RowScope.() -> Un
 }
 
 @Composable
-private fun TitleRow(
+internal fun TitleRow(
     title: @Composable () -> Unit,
     titleIcons: @Composable (RowScope.() -> Unit)?,
     fillTitleText: Boolean,
@@ -200,7 +200,7 @@ private fun TitleRow(
 }
 
 @Composable
-private fun SubTitleRow(
+internal fun SubTitleRow(
     subtitle: @Composable (() -> Unit)?,
     subTitlePrefixIcons: @Composable (RowScope.() -> Unit)?,
     subTitleSuffixIcons: @Composable (RowScope.() -> Unit)?,

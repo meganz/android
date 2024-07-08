@@ -24,11 +24,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
+import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedText
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
@@ -38,6 +39,7 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  *
  * @param title Title
  * @param subtitle Subtitle
+ * @param description Description
  * @param icon Icon
  * @param modifier Modifier
  * @param thumbnailData Thumbnail data
@@ -62,12 +64,14 @@ fun NodeListViewItem(
     subtitle: String,
     @DrawableRes icon: Int,
     modifier: Modifier = Modifier,
+    description: String? = null,
     thumbnailData: Any? = null,
     titleColor: TextColor = TextColor.Primary,
     subtitleColor: TextColor = TextColor.Secondary,
     @DrawableRes accessPermissionIcon: Int? = null,
     titleOverflow: LongTextBehaviour = LongTextBehaviour.MiddleEllipsis,
     subTitleOverflow: LongTextBehaviour = LongTextBehaviour.Clip(),
+    highlightText: String = "",
     showOffline: Boolean = false,
     showVersion: Boolean = false,
     showChecked: Boolean = false,
@@ -83,7 +87,7 @@ fun NodeListViewItem(
     onItemClicked: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
 ) {
-    GenericTwoLineListItem(
+    GenericThreeLineListItem(
         modifier = modifier
             .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
             .combinedClickable(
@@ -119,12 +123,21 @@ fun NodeListViewItem(
             }
         },
         title = {
-            MegaText(
-                text = title,
-                overflow = titleOverflow,
-                textColor = if (isTakenDown) TextColor.Error else titleColor,
-                modifier = Modifier.testTag(TITLE_TAG),
-            )
+            if (highlightText.isNotBlank()) {
+                HighlightedText(
+                    text = title,
+                    highlightText = highlightText,
+                    textColor = if (isTakenDown) TextColor.Error else titleColor,
+                    modifier = Modifier.testTag(TITLE_TAG),
+                )
+            } else {
+                MegaText(
+                    text = title,
+                    overflow = titleOverflow,
+                    textColor = if (isTakenDown) TextColor.Error else titleColor,
+                    modifier = Modifier.testTag(TITLE_TAG),
+                )
+            }
         },
         titleIcons = {
             if (labelColor != null) {
@@ -194,6 +207,18 @@ fun NodeListViewItem(
                 )
             }
         },
+        description = {
+            description?.let {
+                if (highlightText.isNotBlank()) {
+                    HighlightedText(
+                        text = description,
+                        highlightText = highlightText,
+                        highlightBold = true,
+                        textColor = subtitleColor,
+                    )
+                }
+            }
+        },
         trailingIcons = {
             if (accessPermissionIcon != null) {
                 Icon(
@@ -242,7 +267,7 @@ private fun Circle(color: Color, modifier: Modifier = Modifier) {
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewGenericTwoLineListViewItemSimple() {
+private fun GenericNodeListViewItemSimplePreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Simple title",
@@ -254,7 +279,20 @@ private fun PreviewGenericTwoLineListViewItemSimple() {
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewGenericTwoLineListItemWithLongTitle() {
+private fun GenericNodeListViewItemHighlightPreview() {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        NodeListViewItem(
+            title = "Simple title highlight",
+            highlightText = "TITLE",
+            subtitle = "Simple sub title",
+            icon = IconPackR.drawable.ic_folder_sync_medium_solid
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun GenericNodeListItemWithLongTitlePreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title very big for testing the middle ellipsis",
@@ -273,7 +311,7 @@ private fun PreviewGenericTwoLineListItemWithLongTitle() {
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewGenericTwoLineListItem() {
+private fun GenericNodeListItemPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title",
@@ -293,7 +331,7 @@ private fun PreviewGenericTwoLineListItem() {
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewGenericTwoLineListItemWithoutMoreOption() {
+private fun GenericNodeListItemWithoutMoreOptionPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         NodeListViewItem(
             title = "Title",

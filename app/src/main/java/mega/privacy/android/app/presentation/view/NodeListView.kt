@@ -69,6 +69,7 @@ fun <T : TypedNode> NodeListView(
     showMediaDiscoveryButton: Boolean,
     fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
+    searchQuery: String = "",
     showLinkIcon: Boolean = true,
     showChangeViewType: Boolean = true,
     isPublicNode: Boolean = false,
@@ -114,6 +115,7 @@ fun <T : TypedNode> NodeListView(
                 subtitle = nodeUiItem.node.getNodeItemDescription(
                     showPublicLinkCreationTime = showPublicLinkCreationTime
                 ),
+                description = nodeUiItem.node.description,
                 icon = nodeUiItem.node.getNodeItemThumbnail(fileTypeIconMapper = fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(nodeUiItem.id, isPublicNode),
                 isSelected = nodeUiItem.isSelected,
@@ -122,6 +124,7 @@ fun <T : TypedNode> NodeListView(
                 onLongClick = { onLongClick(nodeUiItem) },
                 accessPermissionIcon = (nodeUiItem.node as? ShareFolderNode).getSharesIcon(),
                 labelColor = nodeUiItem.node.getNodeLabel(),
+                highlightText = searchQuery,
                 showOffline = nodeUiItem.isAvailableOffline,
                 showLink = showLinkIcon && nodeUiItem.exportedData != null,
                 showFavourite = nodeUiItem.isFavourite && nodeUiItem.isIncomingShare.not(),

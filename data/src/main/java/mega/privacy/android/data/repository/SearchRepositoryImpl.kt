@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -17,7 +18,9 @@ import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaSearchFilter
 import javax.inject.Inject
 
 /**
@@ -53,21 +56,42 @@ internal class SearchRepositoryImpl @Inject constructor(
     ): List<UnTypedNode> = withContext(ioDispatcher) {
         val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
         val (query, searchTarget, searchCategory, modificationDate, creationDate, description) = parameters
-        val filter = megaSearchFilterMapper(
+        val queryFilter = megaSearchFilterMapper(
             searchQuery = query,
             parentHandle = nodeId ?: NodeId(-1L),
             searchTarget = searchTarget,
             searchCategory = searchCategory,
             modificationDate = modificationDate,
             creationDate = creationDate,
-            description = description,
         )
+        val queryListDeferred = async { searchAndMap(queryFilter, order, megaCancelToken) }
+        val descriptionListDeferred = async {
+            description?.let {
+                val descriptionFilter = megaSearchFilterMapper(
+                    parentHandle = nodeId ?: NodeId(-1L),
+                    searchTarget = searchTarget,
+                    searchCategory = searchCategory,
+                    modificationDate = modificationDate,
+                    creationDate = creationDate,
+                    description = description,
+                )
+                searchAndMap(descriptionFilter, order, megaCancelToken)
+            } ?: emptyList()
+        }
+        queryListDeferred.await() + descriptionListDeferred.await()
+    }
+
+    private suspend fun searchAndMap(
+        queryFilter: MegaSearchFilter,
+        order: SortOrder,
+        megaCancelToken: MegaCancelToken,
+    ): List<UnTypedNode> {
         val searchList = megaApiGateway.searchWithFilter(
-            filter = filter,
+            filter = queryFilter,
             order = sortOrderIntMapper(order),
             megaCancelToken = megaCancelToken,
         )
-        searchList.map { item -> nodeMapper(item) }
+        return searchList.map { item -> nodeMapper(item) }
     }
 
     override suspend fun getChildren(

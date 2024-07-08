@@ -84,8 +84,8 @@ fun SearchComposeView(
     nodeActionHandler: NodeActionHandler,
     clearSelection: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
-    modifier: Modifier = Modifier,
     nodeSourceType: NodeSourceType,
+    modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -171,6 +171,7 @@ fun SearchComposeView(
                         onItemClicked = onItemClick,
                         onLongClick = onLongClick,
                         sortOrder = sortOrder,
+                        searchQuery = if (state.searchDescriptionEnabled == true) searchQuery else "",
                         isListView = state.currentViewType == ViewType.LIST,
                         onSortOrderClick = onSortOrderClick,
                         onChangeViewTypeClick = onChangeViewTypeClick,
