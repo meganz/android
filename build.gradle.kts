@@ -31,6 +31,7 @@ buildscript {
         classpath(plugin.jfrog)
         classpath(plugin.junit5)
         classpath(plugin.kotlin.gradle)
+        classpath(lib.kotlin.serialisation)
         classpath("androidx.benchmark:benchmark-baseline-profile-gradle-plugin:1.2.4")
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:${plugin.versions.jfrog.artifactory.get()}")
     }

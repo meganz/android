@@ -1,7 +1,6 @@
 /**
  * The purpose of this script is to collect lint reports (And later build warnings) and send them to slack
  */
-
 import groovy.json.JsonSlurperClassic
 
 BUILD_STEP = ""
@@ -241,5 +240,5 @@ static boolean isDefined(String value) {
  */
 String generateWarningReport(String targetFileLocation) {
     sh "./gradlew -w clean compileGmsReleaseUnitTestSources 2>&1 | tee ${WARNING_SOURCE_FILE}"
-    sh "python3 ${WORKSPACE}/jenkinsfile/warning_report.py ${WARNING_SOURCE_FILE} ${targetFileLocation}"
+    sh "./gradlew generateBuildWarningReport --build-log $WARNING_SOURCE_FILE --target-file $targetFileLocation"
 }
