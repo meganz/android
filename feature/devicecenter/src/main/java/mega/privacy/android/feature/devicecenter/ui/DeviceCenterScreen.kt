@@ -2,7 +2,6 @@ package mega.privacy.android.feature.devicecenter.ui
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.shared.sync.R as sharedSyncR
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -363,7 +362,7 @@ private fun DeviceCenterAppBar(
 @Composable
 private fun DeviceCenterNoNetworkState() {
     SyncEmptyState(
-        iconId = sharedSyncR.drawable.ic_no_cloud,
+        iconId = iconPackR.drawable.ic_no_cloud,
         iconSize = 144.dp,
         iconDescription = "No network connectivity state",
         textId = R.string.device_center_no_network_state,
@@ -377,7 +376,7 @@ private fun DeviceCenterNoNetworkState() {
 @Composable
 private fun DeviceCenterNothingSetupState() {
     SyncEmptyState(
-        iconId = R.drawable.ic_folder_sync_empty,
+        iconId = iconPackR.drawable.ic_folder_sync,
         iconSize = 128.dp,
         iconDescription = "No setup state",
         textId = R.string.device_center_nothing_setup_state,

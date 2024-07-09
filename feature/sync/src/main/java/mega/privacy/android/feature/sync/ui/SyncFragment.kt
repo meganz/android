@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.sync.ui
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedResR
-import mega.privacy.android.shared.sync.R as sharedSyncR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -152,7 +152,7 @@ class SyncFragment : Fragment() {
                 )
             }, content = { _ ->
                 SyncEmptyState(
-                    iconId = sharedSyncR.drawable.ic_no_cloud,
+                    iconId = iconPackR.drawable.ic_no_cloud,
                     iconSize = 144.dp,
                     iconDescription = "No network connectivity state",
                     textId = sharedResR.string.sync_no_network_state,
