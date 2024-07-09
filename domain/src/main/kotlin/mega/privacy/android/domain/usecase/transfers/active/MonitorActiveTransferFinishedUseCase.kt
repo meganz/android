@@ -1,9 +1,9 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.scan
-import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
@@ -21,28 +21,11 @@ class MonitorActiveTransferFinishedUseCase @Inject constructor(
      */
     operator fun invoke(transferType: TransferType) =
         transferRepository.getActiveTransferTotalsByType(transferType)
-            .distinctUntilChanged(areEquivalent = { old, new ->
-                // transferredBytes are not important here, this helps distinctUntilChanged emit much less values
-                old.copy(transferredBytes = new.transferredBytes) == new
-            })
-            .scan(emptyTotals(transferType) to emptyTotals(transferType)) { (_, prev), new ->
+            .map { it.totalCompletedFileTransfers }
+            .distinctUntilChanged()
+            .scan(0 to 0) { (_, prev), new ->
                 prev to new
             }.mapNotNull { (prev, current) ->
-                prev.takeIf {
-                    prev.totalCompletedFileTransfers > 0 && current.totalCompletedFileTransfers == 0
-                }?.totalCompletedFileTransfers
+                prev.takeIf { prev > 0 && current == 0 }
             }
-
-    private fun emptyTotals(transferType: TransferType) = ActiveTransferTotals(
-        transfersType = transferType,
-        totalTransfers = 0,
-        totalFileTransfers = 0,
-        pausedFileTransfers = 0,
-        totalFinishedTransfers = 0,
-        totalFinishedFileTransfers = 0,
-        totalCompletedFileTransfers = 0,
-        totalBytes = 0L,
-        transferredBytes = 0L,
-        totalAlreadyDownloadedFiles = 0
-    )
 }

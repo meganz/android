@@ -72,7 +72,6 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.max
 
 /**
  * Default [TransferRepository] implementation.
@@ -511,15 +510,14 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun updateTransferredBytes(transfer: Transfer) {
         if (transfer.transferredBytes == 0L) return
         transferredBytesFlow(transfer.transferType).update {
-            //to avoid race conditions receiving transfer events, always take the max transferred bytes
-            it + (transfer.tag to max(transfer.transferredBytes, it.getOrDefault(transfer.tag, 0L)))
+            it + (transfer.tag to transfer.transferredBytes)
         }
     }
 
     override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
         withContext(ioDispatcher) {
-            transferredBytesFlow(transferType).value = mapOf()
             megaLocalRoomGateway.deleteAllActiveTransfersByType(transferType)
+            transferredBytesFlow(transferType).value = mapOf()
         }
 
     override suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>) =

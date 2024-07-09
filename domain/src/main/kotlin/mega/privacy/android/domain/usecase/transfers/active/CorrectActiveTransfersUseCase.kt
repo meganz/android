@@ -23,6 +23,11 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         val activeTransfers = transferRepository.getCurrentActiveTransfersByType(transferType)
         val inProgressTransfers = getInProgressTransfersUseCase()
 
+        //update transferred bytes for each transfer
+        inProgressTransfers.forEach {
+            transferRepository.updateTransferredBytes(it)
+        }
+
         //set not-in-progress active transfers as finished, this can happen if we missed a finish event from SDK
         val notInProgressActiveTransfersTags = activeTransfers
             .filter { activeTransfer ->
@@ -40,11 +45,6 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         }
         inProgressNotInActiveTransfers.forEach {
             transferRepository.insertOrUpdateActiveTransfer(it)
-        }
-
-        //update transferred bytes for each transfer
-        inProgressTransfers.forEach {
-            transferRepository.updateTransferredBytes(it)
         }
     }
 }

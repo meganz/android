@@ -1159,20 +1159,20 @@ class DefaultTransfersRepositoryTest {
 
         @ParameterizedTest
         @EnumSource(TransferType::class)
-        fun `test that updateTransferredBytes takes the max value between current and new to avoid race conditions`(
+        fun `test that updateTransferredBytes doesn't update when the new value is 0 bytes`(
             transferType: TransferType,
         ) = runTest {
             testCurrentActiveTransferTotals(
                 transferType = transferType,
                 expectedMap = { transfer ->
-                    mapOf(transfer.tag to transfer.totalBytes)
+                    mapOf(transfer.tag to transfer.transferredBytes)
                 },
                 callToTest = {
-                    val transferFinished = mock<Transfer>()
-                    stubActiveTransfer(transferFinished, transferType, finished = true)
+                    val transferZero = mock<Transfer>()
+                    stubActiveTransfer(transferZero, transferType, transferredBytes = 0L)
 
-                    underTest.updateTransferredBytes(transferFinished)
                     underTest.updateTransferredBytes(transfer)
+                    underTest.updateTransferredBytes(transferZero)
                 }
             )
         }
@@ -1208,14 +1208,13 @@ class DefaultTransfersRepositoryTest {
         private fun stubActiveTransfer(
             transfer: Transfer,
             transferType: TransferType,
-            finished: Boolean = false,
+            transferredBytes:Long = 900L
         ) {
-            val transferred = 900L
             val total = 1024L
             val tag = 1
 
             whenever(transfer.transferType).thenReturn(transferType)
-            whenever(transfer.transferredBytes).thenReturn(if (finished) total else transferred)
+            whenever(transfer.transferredBytes).thenReturn(transferredBytes)
             whenever(transfer.totalBytes).thenReturn(total)
             whenever(transfer.tag).thenReturn(tag)
         }
