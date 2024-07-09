@@ -21,6 +21,7 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,7 +54,6 @@ import mega.privacy.android.app.presentation.extensions.uploadFilesManually
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
-import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException.ChildDoesNotExistsException
 import mega.privacy.android.app.usecase.exception.MegaNodeException.ParentDoesNotExistException
@@ -86,6 +86,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import nz.mega.documentscanner.DocumentScannerActivity
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -112,7 +113,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     lateinit var filePrepareUseCase: FilePrepareUseCase
 
     @Inject
-    lateinit var getNodeUseCase: GetNodeUseCase
+    lateinit var getNodeByHandleUseCase: GetNodeByHandleUseCase
 
     @Inject
     lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
@@ -526,10 +527,10 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     }
 
     fun downloadFile(nodes: List<MegaNode>) {
-            startDownloadViewModel.onDownloadClicked(
-                nodeIds = nodes.map { NodeId(it.handle) },
-                isHighPriority = true
-            )
+        startDownloadViewModel.onDownloadClicked(
+            nodeIds = nodes.map { NodeId(it.handle) },
+            isHighPriority = true
+        )
     }
 
     private fun moveToTrash(handleList: ArrayList<Long>) {
@@ -783,17 +784,18 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     override fun onNodesUpdate(api: MegaApiJava, nodes: ArrayList<MegaNode>?) {
         for (node in nodes.orEmpty()) {
             if (node.isInShare && parentHandle == node.handle) {
-                composite.add(
-                    getNodeUseCase.get(parentHandle)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { result: MegaNode?, throwable: Throwable? ->
-                            if (throwable == null) {
-                                updateNodes()
-                            } else {
-                                finish()
-                            }
-                        })
+                lifecycleScope.launch {
+                    runCatching {
+                        getNodeByHandleUseCase(
+                            handle = node.handle,
+                            attemptFromFolderApi = true
+                        )
+                    }.onSuccess {
+                        updateNodes()
+                    }.onFailure {
+                        finish()
+                    }
+                }
             } else {
                 updateNodes()
             }
