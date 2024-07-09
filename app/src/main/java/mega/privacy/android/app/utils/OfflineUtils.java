@@ -3,22 +3,16 @@ package mega.privacy.android.app.utils;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.FROM_BACKUPS;
 import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
-import static mega.privacy.android.app.utils.Constants.OFFLINE_ROOT;
-import static mega.privacy.android.app.utils.Constants.SEPARATOR;
 import static mega.privacy.android.app.utils.Constants.URL_INDICATOR;
 import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
-import static mega.privacy.android.app.utils.FileUtil.MAIN_DIR;
 import static mega.privacy.android.app.utils.FileUtil.deleteFolderAndSubFolders;
-import static mega.privacy.android.app.utils.FileUtil.getDirSize;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest;
 import static mega.privacy.android.app.utils.FileUtil.shareFile;
 import static mega.privacy.android.app.utils.FileUtil.shareFiles;
-import static mega.privacy.android.app.utils.MegaApiUtils.getNodePath;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.MegaNodeUtil.shareNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.shareNodes;
-import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isOnline;
 
 import android.content.Context;
@@ -33,9 +27,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -44,11 +36,8 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.data.gateway.api.MegaApiGateway;
-import mega.privacy.android.domain.entity.transfer.Transfer;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
 import timber.log.Timber;
 
 @Deprecated
@@ -56,11 +45,6 @@ public class OfflineUtils {
 
     public static final String OFFLINE_DIR = "MEGA Offline";
     public static final String OFFLINE_BACKUPS_DIR = OFFLINE_DIR + File.separator + "in";
-
-    public static final String OLD_OFFLINE_DIR = MAIN_DIR + File.separator + OFFLINE_DIR;
-
-    public static final String DB_FILE = "0";
-    private static final String DB_FOLDER = "1";
 
     /**
      * @deprecated
@@ -304,258 +288,6 @@ public class OfflineUtils {
         return new File(path + File.separator + MegaApiUtils.createStringTree(node, context));
     }
 
-    public static File getOfflineParentFileName(Context context, MegaNode node) {
-        return new File(File.separator + MegaApiUtils.createStringTree(node, context));
-    }
-
-    public static String getOfflineSize(Context context) {
-        Timber.d("getOfflineSize");
-        File offline = getOfflineFolder(context, OFFLINE_DIR);
-        long size;
-        if (isFileAvailable(offline)) {
-            size = getDirSize(offline);
-            return getSizeString(size, context);
-        }
-
-        return getSizeString(0, context);
-    }
-
-    public static void clearOffline(Context context) {
-        Timber.d("clearOffline");
-        File offline = getOfflineFolder(context, OFFLINE_DIR);
-        if (isFileAvailable(offline)) {
-            try {
-                deleteFolderAndSubFolders(offline);
-            } catch (Exception e) {
-                Timber.e(e, "Exception deleting offline folder");
-            }
-        }
-    }
-
-    public static void saveOffline(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, MegaNode node, String path) {
-        Timber.d("Destination: %s", path);
-
-        File destination = new File(path);
-        destination.mkdirs();
-        Timber.d("Destination absolute path: %s", destination.getAbsolutePath());
-        Timber.d("Handle to save for offline: %s", node.getHandle());
-
-        Map<MegaNode, String> dlFiles = new HashMap<>();
-        if (node.getType() == MegaNode.TYPE_FOLDER) {
-            Timber.d("Is Folder");
-            MegaNodeUtil.getDlList(megaApi, dlFiles, node, new File(destination, node.getName()));
-        } else {
-            Timber.d("Is File");
-            dlFiles.put(node, destination.getAbsolutePath());
-        }
-
-        ArrayList<MegaNode> nodesToDB = new ArrayList<>();
-
-        for (MegaNode document : dlFiles.keySet()) {
-            nodesToDB.add(document);
-        }
-
-        insertDB(context, megaApi, dbH, nodesToDB, path.contains(OFFLINE_BACKUPS_DIR));
-    }
-
-    public static void saveOfflineChatFile(LegacyDatabaseHandler dbH, Transfer transfer) {
-        Timber.d("saveOfflineChatFile: %d %s", transfer.getNodeHandle(), transfer.getFileName());
-
-        MegaOffline mOffInsert = new MegaOffline(Long.toString(transfer.getNodeHandle()), "/", transfer.getFileName(), -1, DB_FILE, 0, "-1");
-        long checkInsert = dbH.setOfflineFile(mOffInsert);
-        Timber.d("Test insert Chat File: %s", checkInsert);
-
-    }
-
-    private static String isFileOrFolder(MegaNode node) {
-        if (node.isFile()) {
-            return DB_FILE;
-        }
-
-        return DB_FOLDER;
-    }
-
-    private static int comesFromBackups(boolean fromBackups) {
-        if (fromBackups) {
-            return MegaOffline.BACKUPS;
-        }
-
-        return MegaOffline.OTHER;
-    }
-
-    @Deprecated
-    private static void insertDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, ArrayList<MegaNode> nodesToDB, boolean fromBackups) {
-        Timber.d("insertDB");
-
-        MegaNode parentNode;
-        MegaNode nodeToInsert;
-        String path;
-        MegaOffline mOffParent;
-        MegaOffline mOffNode;
-
-        for (int i = nodesToDB.size() - 1; i >= 0; i--) {
-            nodeToInsert = nodesToDB.get(i);
-            String fileOrFolder = isFileOrFolder(nodeToInsert);
-            int origin = comesFromBackups(fromBackups);
-            int parentId = -1;
-            String handleIncoming = "-1";
-
-            //If I am the owner
-            if (megaApi.checkAccessErrorExtended(nodeToInsert, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK) {
-
-                if (megaApi.getParentNode(nodeToInsert).getType() != MegaNode.TYPE_ROOT) {
-
-                    parentNode = megaApi.getParentNode(nodeToInsert);
-                    Timber.d("PARENT NODE not ROOT");
-
-                    path = getNodePath(context, nodeToInsert);
-
-                    //Get the node parent
-                    mOffParent = dbH.findByHandle(parentNode.getHandle());
-                    //If the parent is not in the DB
-                    //Insert the parent in the DB
-                    if (mOffParent == null) {
-                        insertParentDB(context, megaApi, dbH, parentNode, fromBackups);
-                    }
-
-                    mOffNode = dbH.findByHandle(nodeToInsert.getHandle());
-                    mOffParent = dbH.findByHandle(parentNode.getHandle());
-                    if (mOffNode != null) return;
-
-                    if (mOffParent != null) {
-                        parentId = mOffParent.getId();
-                    }
-                } else {
-                    path = OFFLINE_ROOT;
-                }
-            } else {
-                //If I am not the owner
-                parentNode = megaApi.getParentNode(nodeToInsert);
-                path = getNodePath(context, nodeToInsert);
-                //Get the node parent
-                mOffParent = dbH.findByHandle(parentNode.getHandle());
-                //If the parent is not in the DB
-                //Insert the parent in the DB
-                if (mOffParent == null && parentNode != null) {
-                    insertIncomingParentDB(context, megaApi, dbH, parentNode);
-                }
-
-                mOffNode = dbH.findByHandle(nodeToInsert.getHandle());
-                mOffParent = dbH.findByHandle(parentNode.getHandle());
-
-                if (parentNode != null) {
-                    MegaNode ownerNode = megaApi.getParentNode(parentNode);
-                    if (ownerNode != null) {
-                        MegaNode nodeWhile = ownerNode;
-                        while (nodeWhile != null) {
-                            ownerNode = nodeWhile;
-                            nodeWhile = megaApi.getParentNode(nodeWhile);
-                        }
-
-                        handleIncoming = Long.toString(ownerNode.getHandle());
-                    } else {
-                        handleIncoming = Long.toString(parentNode.getHandle());
-                    }
-
-                }
-
-                if (mOffNode != null || mOffParent == null) return;
-
-                parentId = mOffParent.getId();
-                origin = MegaOffline.INCOMING;
-            }
-
-            MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), parentId, fileOrFolder, origin, handleIncoming);
-            long checkInsert = dbH.setOfflineFile(mOffInsert);
-            Timber.d("Test insert A: %s", checkInsert);
-        }
-    }
-
-    //Insert for incoming
-    private static void insertIncomingParentDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, MegaNode parentNode) {
-        Timber.d("insertIncomingParentDB");
-
-        String fileOrFolder = isFileOrFolder(parentNode);
-        MegaOffline mOffParentParent;
-        String path = getNodePath(context, parentNode);
-        MegaNode parentparentNode = megaApi.getParentNode(parentNode);
-        int parentId = -1;
-        String handleIncoming;
-
-        if (parentparentNode == null) {
-            handleIncoming = Long.toString(parentNode.getHandle());
-        } else {
-            MegaNode ownerNode = megaApi.getParentNode(parentparentNode);
-            if (ownerNode != null) {
-                MegaNode nodeWhile = ownerNode;
-                while (nodeWhile != null) {
-                    ownerNode = nodeWhile;
-                    nodeWhile = megaApi.getParentNode(nodeWhile);
-                }
-
-                handleIncoming = Long.toString(ownerNode.getHandle());
-            } else {
-                handleIncoming = Long.toString(parentparentNode.getHandle());
-            }
-
-
-            mOffParentParent = dbH.findByHandle(parentparentNode.getHandle());
-            if (mOffParentParent == null) {
-                insertIncomingParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode));
-                //Insert the parent node
-                mOffParentParent = dbH.findByHandle(megaApi.getParentNode(parentNode).getHandle());
-                if (mOffParentParent == null) {
-                    insertIncomingParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode));
-                    return;
-                }
-            }
-            parentId = mOffParentParent.getId();
-        }
-
-        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), parentId, fileOrFolder, MegaOffline.INCOMING, handleIncoming);
-        long checkInsert = dbH.setOfflineFile(mOffInsert);
-        Timber.d("Test insert B: %s", checkInsert);
-    }
-
-    private static void insertParentDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, MegaNode parentNode, boolean fromBackups) {
-        Timber.d("insertParentDB");
-
-        String fileOrFolder = isFileOrFolder(parentNode);
-        int origin = comesFromBackups(fromBackups);
-        MegaOffline mOffParentParent;
-        String path = getNodePath(context, parentNode);
-        MegaNode parentparentNode = megaApi.getParentNode(parentNode);
-        int parentId = -1;
-
-        if (parentparentNode == null) {
-            Timber.w("return insertParentNode == null");
-            return;
-        }
-
-        if (parentparentNode.getType() != MegaNode.TYPE_ROOT && parentparentNode.getHandle() != megaApi.getInboxNode().getHandle()) {
-            mOffParentParent = dbH.findByHandle(parentparentNode.getHandle());
-            if (mOffParentParent == null) {
-                Timber.w("mOffParentParent==null");
-                insertParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode), fromBackups);
-                //Insert the parent node
-                mOffParentParent = dbH.findByHandle(megaApi.getParentNode(parentNode).getHandle());
-                if (mOffParentParent == null) {
-                    Timber.d("call again");
-                    insertParentDB(context, megaApi, dbH, megaApi.getParentNode(parentNode), fromBackups);
-                    return;
-                } else {
-                    parentId = mOffParentParent.getId();
-                }
-            } else {
-                parentId = mOffParentParent.getId();
-            }
-        }
-
-        MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), parentId, fileOrFolder, origin, "-1");
-        long checkInsert = dbH.setOfflineFile(mOffInsert);
-        Timber.d("Test insert C: %s", checkInsert);
-    }
-
     /**
      * existsOffline
      * @param context current context
@@ -568,35 +300,6 @@ public class OfflineUtils {
                 && offlineFolder.length() > 0
                 && offlineFolder.listFiles() != null
                 && offlineFolder.listFiles().length > 0;
-    }
-
-    /**
-     * Replaces the root parent path by "Offline" in the offline path received.
-     * Used to show the location of an offline node in the app.
-     *
-     * @param path   path from which the root parent path has to be replaced
-     * @param handle identifier of the offline node
-     * @return The path with the root parent path replaced by "Offline".
-     */
-    public static String removeInitialOfflinePath(String path, long handle) {
-        MegaApplication app = MegaApplication.getInstance();
-        MegaApiAndroid megaApi = app.getMegaApi();
-
-        File filesDir = app.getFilesDir();
-        File backupsOfflineFolder = new File(filesDir + SEPARATOR + OFFLINE_BACKUPS_DIR);
-        MegaNode transferNode = megaApi.getNodeByHandle(handle);
-        File incomingFolder = new File(filesDir + SEPARATOR + OFFLINE_DIR + SEPARATOR
-                + findIncomingParentHandle(transferNode, megaApi));
-
-        if (backupsOfflineFolder.exists() && path.startsWith(backupsOfflineFolder.getAbsolutePath())) {
-            path = path.replace(backupsOfflineFolder.getPath(), "");
-        } else if (incomingFolder.exists() && path.startsWith(incomingFolder.getAbsolutePath())) {
-            path = path.replace(incomingFolder.getPath(), "");
-        } else {
-            path = path.replace(getOfflineFolder(app, OFFLINE_DIR).getPath(), "");
-        }
-
-        return app.getString(R.string.section_saved_for_offline_new) + path;
     }
 
     /**
