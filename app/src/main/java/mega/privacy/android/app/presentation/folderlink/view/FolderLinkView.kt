@@ -6,6 +6,11 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -26,17 +31,13 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -59,31 +60,29 @@ import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
 import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.filelink.view.animationScale
+import mega.privacy.android.app.presentation.filelink.view.animationSpecs
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
-import mega.privacy.android.app.presentation.folderlink.view.Constants.SNACKBAR_TAG
+import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.app.presentation.view.NodesView
-import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.shared.original.core.ui.theme.black
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
-import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
+import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
 
 internal object Constants {
-    /**
-     * Test tag for message SnackBar
-     */
-    const val SNACKBAR_TAG = "snackbar_test_tag"
 
     /**
      * Test tag for save to device bottom sheet button
@@ -121,7 +120,8 @@ internal object Constants {
 @Composable
 internal fun FolderLinkView(
     state: FolderLinkState,
-    snackBarHostState: SnackbarHostState,
+    transferState: TransferManagementUiState,
+    scaffoldState: ScaffoldState,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
     onMoreOptionClick: (NodeUIItem<TypedNode>?) -> Unit,
@@ -150,11 +150,11 @@ internal fun FolderLinkView(
     adsUiState: AdsUIState,
     onAdClicked: (uri: Uri?) -> Unit,
     onAdDismissed: () -> Unit,
+    onTransferWidgetClick: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
-    val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -196,7 +196,7 @@ internal fun FolderLinkView(
     )
 
     EventEffect(event = state.snackbarMessageContent, onConsumed = onResetSnackbarMessage) {
-        snackBarHostState.showSnackbar(it)
+        scaffoldState.snackbarHostState.showSnackbar(it)
     }
 
     LaunchedEffect(modalSheetState.isVisible) {
@@ -204,7 +204,7 @@ internal fun FolderLinkView(
             onResetMoreOptionNode()
     }
 
-    Scaffold(
+    MegaScaffold(
         scaffoldState = scaffoldState,
         topBar = {
             if (state.selectedNodeCount > 0) {
@@ -226,12 +226,17 @@ internal fun FolderLinkView(
                 )
             }
         },
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState) { data ->
-                Snackbar(
-                    modifier = Modifier.testTag(SNACKBAR_TAG),
-                    snackbarData = data,
-                    backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = transferState.widgetVisible,
+                enter = scaleIn(animationSpecs, initialScale = animationScale) +
+                        fadeIn(animationSpecs),
+                exit = scaleOut(animationSpecs, targetScale = animationScale) +
+                        fadeOut(animationSpecs),
+            ) {
+                TransfersWidgetView(
+                    transfersData = transferState.transfersInfo,
+                    onClick = onTransferWidgetClick,
                 )
             }
         }

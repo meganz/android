@@ -7,7 +7,6 @@ import android.os.CountDownTimer
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -264,7 +263,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
                 TransferManagementUiState()
             )
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
-                @OptIn(ExperimentalAnimationApi::class)
                 AnimatedVisibility(
                     visible = uiState.widgetVisible,
                     enter = scaleIn(animationSpecs, initialScale = animationScale) + fadeIn(

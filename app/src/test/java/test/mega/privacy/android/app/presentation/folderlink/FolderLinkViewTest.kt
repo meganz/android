@@ -1,6 +1,6 @@
 package test.mega.privacy.android.app.presentation.folderlink
 
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -20,11 +20,12 @@ import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MO
 import mega.privacy.android.app.presentation.folderlink.view.Constants.BOTTOM_SHEET_SAVE
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
-import mega.privacy.android.app.presentation.folderlink.view.Constants.SNACKBAR_TAG
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
+import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.legacy.core.ui.controls.lists.MEDIA_DISCOVERY_TAG
+import mega.privacy.android.shared.original.core.ui.controls.snackbars.SNACKBAR_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,7 +46,7 @@ class FolderLinkViewTest {
         composeTestRule.setContent {
             FolderLinkView(
                 state = uiState,
-                snackBarHostState = SnackbarHostState(),
+                scaffoldState = rememberScaffoldState(),
                 onBackPressed = { },
                 onShareClicked = { },
                 onMoreOptionClick = { },
@@ -74,7 +75,9 @@ class FolderLinkViewTest {
                 adsUiState = adsUiState,
                 onAdClicked = { },
                 onAdDismissed = { },
-                fileTypeIconMapper = FileTypeIconMapper()
+                fileTypeIconMapper = FileTypeIconMapper(),
+                onTransferWidgetClick = { },
+                transferState = TransferManagementUiState(),
             )
         }
     }
@@ -235,7 +238,7 @@ class FolderLinkViewTest {
                 snackbarMessageContent = triggered("Test")
             )
         )
-        composeTestRule.onNodeWithTag(SNACKBAR_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(SNACKBAR_TEST_TAG).assertIsDisplayed()
     }
 
     @Test

@@ -1718,7 +1718,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun openTransfers() {
-        val openTab = intent.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE
+        val openTab = intent?.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
                 val tab = openTab.let { tab ->

@@ -13,10 +13,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -151,7 +150,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
             }
         }
 
-        setTransfersWidgetLayout(binding.transfersWidgetLayout)
         intent?.let { viewModel.handleIntent(it) }
         setupObservers()
         viewModel.checkLoginRequired()
@@ -194,13 +192,14 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val adsUiState by adsViewModel.uiState.collectAsStateWithLifecycle()
+        val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
 
-
-        val snackBarHostState = remember { SnackbarHostState() }
+        val scaffoldState = rememberScaffoldState()
         OriginalTempTheme(isDark = themeMode.isDarkMode()) {
             FolderLinkView(
                 state = uiState,
-                snackBarHostState = snackBarHostState,
+                transferState = transferState,
+                scaffoldState = scaffoldState,
                 onBackPressed = viewModel::handleBackPress,
                 onShareClicked = ::onShareClicked,
                 onMoreOptionClick = viewModel::handleMoreOptionClick,
@@ -241,12 +240,13 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                     adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
                 },
                 onAdDismissed = adsViewModel::onAdConsumed,
+                onTransferWidgetClick = ::onTransfersWidgetClick,
                 fileTypeIconMapper = fileTypeIconMapper
             )
             StartTransferComponent(
                 event = uiState.downloadEvent,
                 onConsumeEvent = viewModel::resetDownloadNode,
-                snackBarHostState = snackBarHostState
+                snackBarHostState = scaffoldState.snackbarHostState
             )
         }
     }

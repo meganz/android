@@ -24,7 +24,7 @@ import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 
 
-internal const val SNACKBAR_TEST_TAG = "mega_snackbar:snackbar_body"
+const val SNACKBAR_TEST_TAG = "mega_snackbar:snackbar_body"
 
 /**
  * Snack bar following Mega theme
