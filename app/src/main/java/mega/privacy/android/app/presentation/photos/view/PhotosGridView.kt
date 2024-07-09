@@ -63,10 +63,10 @@ import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH_WITH_DAY
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_YEAR_WITH_MONTH
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_032
-import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_032
+import mega.privacy.android.shared.original.core.ui.theme.white
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -105,7 +105,6 @@ internal fun PhotosGridView(
             .fillMaxSize(),
         state = lazyGridState,
     ) {
-
         this.itemsIndexed(
             items = uiPhotoList,
             key = { _, item ->
@@ -117,7 +116,6 @@ internal fun PhotosGridView(
                 else GridItemSpan(1)
             },
         ) { index, item ->
-
 
             when (item) {
                 is UIPhoto.Separator -> {
@@ -348,7 +346,7 @@ private fun dateText(
 fun Modifier.photosZoomGestureDetector(
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
-) = pointerInput(Unit) {
+) = then(pointerInput(Unit) {
     awaitEachGesture {
         awaitFirstDown(requireUnconsumed = false)
         do {
@@ -369,4 +367,4 @@ fun Modifier.photosZoomGestureDetector(
             }
         } while (!canceled && event.changes.any { it.pressed })
     }
-}
+})

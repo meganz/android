@@ -68,6 +68,9 @@ fun PhotosGridView(
         }
     }
 
+    val context = LocalContext.current
+    val uiPhotoList = timelineViewState.photosListItems
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(spanCount),
         modifier = modifier
@@ -96,7 +99,7 @@ fun PhotosGridView(
         }
 
         this.items(
-            items = timelineViewState.photosListItems,
+            items = uiPhotoList,
             key = {
                 it.key
             },
@@ -122,7 +125,7 @@ fun PhotosGridView(
                     text = dateText(
                         modificationTime = item.modificationTime,
                         currentZoomLevel = timelineViewState.currentZoomLevel,
-                        locale = LocalContext.current.resources.configuration.locales[0],
+                        locale = context.resources.configuration.locales[0],
                     ),
                     textAlign = TextAlign.Start,
                     color = colorResource(id = R.color.grey_087_white_087),
