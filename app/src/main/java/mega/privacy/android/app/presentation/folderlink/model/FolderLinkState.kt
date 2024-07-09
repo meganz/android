@@ -54,7 +54,7 @@ data class FolderLinkState(
     val isLoginComplete: Boolean = false,
     val isNodesFetched: Boolean = false,
     val askForDecryptionKeyDialog: Boolean = false,
-    val collisions: ArrayList<NameCollision>? = null,
+    val collisions: List<NameCollision>? = null,
     val copyThrowable: Throwable? = null,
     val copyResultText: String? = null,
     val shouldLogin: Boolean? = null,

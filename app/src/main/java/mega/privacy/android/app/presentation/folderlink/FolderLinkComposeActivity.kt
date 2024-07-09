@@ -391,7 +391,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
 
                         it.collisions != null -> {
                             AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
-                            nameCollisionActivityContract?.launch(it.collisions)
+                            nameCollisionActivityContract?.launch(ArrayList(it.collisions))
                             viewModel.resetLaunchCollisionActivity()
                             viewModel.clearAllSelection()
                         }

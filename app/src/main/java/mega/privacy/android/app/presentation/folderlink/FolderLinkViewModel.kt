@@ -18,8 +18,7 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -32,7 +31,6 @@ import mega.privacy.android.app.presentation.mapper.UrlDownloadException
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
-import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -44,6 +42,7 @@ import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
@@ -70,11 +69,11 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSt
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -86,7 +85,6 @@ class FolderLinkViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val monitorViewType: MonitorViewType,
     private val loginToFolderUseCase: LoginToFolderUseCase,
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
@@ -96,7 +94,6 @@ class FolderLinkViewModel @Inject constructor(
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
     private val addNodeType: AddNodeType,
-    private val getNodeUseCase: GetNodeUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val areAchievementsEnabledUseCase: AreAchievementsEnabledUseCase,
     private val getAccountTypeUseCase: GetAccountTypeUseCase,
@@ -112,6 +109,7 @@ class FolderLinkViewModel @Inject constructor(
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
     private val getFileUriUseCase: GetFileUriUseCase,
     private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
+    private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
 ) : ViewModel() {
 
     /**
@@ -249,31 +247,49 @@ class FolderLinkViewModel @Inject constructor(
     }
 
     /**
+     * Handle node imports
+     *
+     * @param toHandle  Handle of the destination node
+     */
+    fun importNodes(toHandle: Long) {
+        viewModelScope.launch {
+            if (isMultipleNodeSelected()) {
+                getSelectedNodes().map { it.id.longValue }
+            } else {
+                listOfNotNull(
+                    (state.value.importNode ?: state.value.rootNode)?.id?.longValue
+                ).also {
+                    resetImportNode()
+                }
+            }.takeIf { it.isNotEmpty() }?.let {
+                checkNameCollision(it, toHandle)
+            } ?: showSnackbar(R.string.context_no_copied)
+        }
+    }
+
+    /**
      * Checks the list of nodes to copy in order to know which names already exist
      *
-     * @param nodes         List of node handles to copy.
+     * @param nodeHandles         List of node handles to copy.
      * @param toHandle      Handle of destination node
      */
-    fun checkNameCollision(nodes: List<MegaNode>, toHandle: Long) = viewModelScope.launch {
+    fun checkNameCollision(nodeHandles: List<Long>, toHandle: Long) = viewModelScope.launch {
         runCatching {
-            checkNameCollisionUseCase.checkNodeListAsync(
-                nodes = nodes,
-                parentHandle = toHandle,
-                type = NameCollisionType.COPY
+            checkNodesNameCollisionUseCase(
+                nodes = nodeHandles.associateWith { toHandle },
+                type = NodeNameCollisionType.COPY
             )
         }.onSuccess { result ->
-            val collisions = result.first
-            if (collisions.isNotEmpty()) {
+            if (result.conflictNodes.isNotEmpty()) {
                 _state.update {
-                    it.copy(collisions = collisions)
+                    it.copy(collisions = result.conflictNodes.values.map { item ->
+                        NameCollision.Copy.getCopyCollision(item)
+                    })
                 }
             }
-            val nodesWithoutCollisions = result.second.associate {
-                it.handle to toHandle
-            }
-            if (nodesWithoutCollisions.isNotEmpty()) {
+            if (result.noConflictNodes.isNotEmpty()) {
                 runCatching {
-                    copyNodesUseCase(nodesWithoutCollisions)
+                    copyNodesUseCase(result.noConflictNodes)
                 }.onSuccess { copyResult ->
                     _state.update {
                         it.copy(
@@ -625,37 +641,6 @@ class FolderLinkViewModel @Inject constructor(
      * Reset import node
      */
     fun resetImportNode() = _state.update { it.copy(importNode = null) }
-
-    /**
-     * Handle node imports
-     *
-     * @param toHandle  Handle of the destination node
-     */
-    fun importNodes(toHandle: Long) {
-        viewModelScope.launch {
-            if (isMultipleNodeSelected()) {
-                Timber.d("Is multiple select")
-                val selectedNodes = getSelectedNodes()
-                if (selectedNodes.isEmpty())
-                    return@launch
-                val selectedNodeIds = getSelectedNodes().map { it.id.longValue }
-                val selectedMegaNodes =
-                    getNodeUseCase.getAuthorizedNodes(selectedNodeIds).filterNotNull()
-                checkNameCollision(selectedMegaNodes, toHandle)
-            } else {
-                val importNodeHandle =
-                    state.value.importNode?.id?.longValue ?: state.value.rootNode?.id?.longValue
-                if (importNodeHandle != null) {
-                    val selectedNode = getNodeUseCase.getAuthorizedNode(importNodeHandle)
-                    selectedNode?.let { checkNameCollision(listOf(it), toHandle) }
-                    resetImportNode()
-                } else {
-                    Timber.w("Selected Node is NULL")
-                    showSnackbar(R.string.context_no_copied)
-                }
-            }
-        }
-    }
 
     /**
      * Handle Save to device button click

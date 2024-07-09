@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.node
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FileNode
@@ -62,7 +62,7 @@ internal class CheckNodesNameCollisionUseCaseTest {
             mapOf(1L to INVALID_NODE_HANDLE, 2L to INVALID_NODE_HANDLE, 3L to INVALID_NODE_HANDLE)
         whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
         whenever(getRootNodeUseCase()).thenReturn(null)
-        Truth.assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
+        assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
             NodeNameCollisionResult(nodes, emptyMap(), NodeNameCollisionType.RESTORE)
         )
     }
@@ -73,7 +73,7 @@ internal class CheckNodesNameCollisionUseCaseTest {
             mapOf(1L to 100L, 2L to 101L, 3L to 102L)
         whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
         whenever(getNodeByHandleUseCase(any(), any())).thenReturn(null)
-        Truth.assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
+        assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
             NodeNameCollisionResult(nodes, emptyMap(), NodeNameCollisionType.RESTORE)
         )
     }
@@ -85,7 +85,7 @@ internal class CheckNodesNameCollisionUseCaseTest {
         whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
         whenever(getNodeByHandleUseCase(any(), any())).thenReturn(mock<FileNode>())
         whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(true)
-        Truth.assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
+        assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
             NodeNameCollisionResult(nodes, emptyMap(), NodeNameCollisionType.RESTORE)
         )
     }
@@ -110,16 +110,16 @@ internal class CheckNodesNameCollisionUseCaseTest {
             on { id }.thenReturn(NodeId(Random(1000L).nextLong()))
         }
         whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
-        whenever(getNodeByHandleUseCase(100L)).thenReturn(mock<FolderNode>())
-        whenever(getNodeByHandleUseCase(101L)).thenReturn(parentConflictNode)
-        whenever(getNodeByHandleUseCase(102L)).thenReturn(mock<FolderNode>())
+        whenever(getNodeByHandleUseCase(100L, true)).thenReturn(mock<FolderNode>())
+        whenever(getNodeByHandleUseCase(101L, false)).thenReturn(parentConflictNode)
+        whenever(getNodeByHandleUseCase(102L, true)).thenReturn(mock<FolderNode>())
         whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
-        whenever(getNodeByHandleUseCase(1L)).thenReturn(mock<FolderNode>())
-        whenever(getNodeByHandleUseCase(2L)).thenReturn(currentNode)
-        whenever(getNodeByHandleUseCase(3L)).thenReturn(mock<FolderNode>())
+        whenever(getNodeByHandleUseCase(1L, true)).thenReturn(mock<FolderNode>())
+        whenever(getNodeByHandleUseCase(2L, true)).thenReturn(currentNode)
+        whenever(getNodeByHandleUseCase(3L, true)).thenReturn(mock<FolderNode>())
         whenever(getChildNodeUseCase(NodeId(101L), currentNode.name)).thenReturn(conflictNode)
 
-        Truth.assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
+        assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
             NodeNameCollisionResult(
                 mapOf(1L to 100L, 3L to 102L),
                 mapOf(
@@ -145,16 +145,16 @@ internal class CheckNodesNameCollisionUseCaseTest {
         val nodes =
             mapOf(1L to 100L, 2L to 101L, 3L to 102L)
         whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
-        whenever(getNodeByHandleUseCase(100L)).thenReturn(mock<FolderNode>())
-        whenever(getNodeByHandleUseCase(101L)).thenReturn(mock<FolderNode>())
-        whenever(getNodeByHandleUseCase(102L)).thenReturn(mock<FolderNode>())
+        whenever(getNodeByHandleUseCase(100L, true)).thenReturn(mock<FolderNode>())
+        whenever(getNodeByHandleUseCase(101L, true)).thenReturn(mock<FolderNode>())
+        whenever(getNodeByHandleUseCase(102L, true)).thenReturn(mock<FolderNode>())
         whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
-        whenever(getNodeByHandleUseCase(1L)).thenReturn(null)
+        whenever(getNodeByHandleUseCase(1L, true)).thenReturn(null)
 
         try {
             underTest(nodes, NodeNameCollisionType.RESTORE)
         } catch (e: Exception) {
-            Truth.assertThat(e).isInstanceOf(NodeDoesNotExistsException::class.java)
+            assertThat(e).isInstanceOf(NodeDoesNotExistsException::class.java)
         }
     }
 

@@ -10,17 +10,19 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -48,6 +50,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSt
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -72,7 +75,6 @@ class FolderLinkViewModelTest {
     private val monitorViewType: MonitorViewType = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val loginToFolderUseCase: LoginToFolderUseCase = mock()
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
     private val copyNodesUseCase: CopyNodesUseCase = mock()
     private val copyRequestMessageMapper: CopyRequestMessageMapper = mock()
     private val hasCredentialsUseCase: HasCredentialsUseCase = mock()
@@ -82,7 +84,6 @@ class FolderLinkViewModelTest {
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
     private val addNodeType: AddNodeType = mock()
-    private val getNodeUseCase: GetNodeUseCase = mock()
     private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
     private val areAchievementsEnabledUseCase: AreAchievementsEnabledUseCase = mock()
     private val getAccountTypeUseCase: GetAccountTypeUseCase = mock()
@@ -100,6 +101,7 @@ class FolderLinkViewModelTest {
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase = mock()
     private val getFileUriUseCase: GetFileUriUseCase = mock()
     private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase>()
+    private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
 
     @BeforeEach
     fun setup() {
@@ -113,7 +115,6 @@ class FolderLinkViewModelTest {
             isConnectedToInternetUseCase,
             monitorViewType,
             loginToFolderUseCase,
-            checkNameCollisionUseCase,
             copyNodesUseCase,
             copyRequestMessageMapper,
             hasCredentialsUseCase,
@@ -123,7 +124,6 @@ class FolderLinkViewModelTest {
             getFolderParentNodeUseCase,
             getFolderLinkChildrenNodesUseCase,
             addNodeType,
-            getNodeUseCase,
             getStringFromStringResMapper,
             areAchievementsEnabledUseCase,
             getAccountTypeUseCase,
@@ -139,6 +139,7 @@ class FolderLinkViewModelTest {
             getLocalFolderLinkFromMegaApiUseCase,
             getFileUriUseCase,
             mapNodeToPublicLinkUseCase,
+            checkNodesNameCollisionUseCase
         )
     }
 
@@ -147,7 +148,6 @@ class FolderLinkViewModelTest {
             isConnectedToInternetUseCase,
             monitorViewType,
             loginToFolderUseCase,
-            checkNameCollisionUseCase,
             copyNodesUseCase,
             copyRequestMessageMapper,
             hasCredentialsUseCase,
@@ -157,7 +157,6 @@ class FolderLinkViewModelTest {
             getFolderParentNodeUseCase,
             getFolderLinkChildrenNodesUseCase,
             addNodeType,
-            getNodeUseCase,
             getStringFromStringResMapper,
             areAchievementsEnabledUseCase,
             getAccountTypeUseCase,
@@ -173,6 +172,7 @@ class FolderLinkViewModelTest {
             getLocalFolderLinkFromMegaApiUseCase,
             getFileUriUseCase,
             mapNodeToPublicLinkUseCase,
+            checkNodesNameCollisionUseCase
         )
     }
 
@@ -564,6 +564,125 @@ class FolderLinkViewModelTest {
     }
 
     @Test
+    fun `test that node handle is extracted from importNode when multiple node is not selected`() =
+        runTest {
+            val base64Handle = "1234"
+            val rootNodeName = "RootNode"
+            val rootNode = mock<TypedFolderNode>()
+            val importNode = mock<TypedFolderNode> {
+                on { id.longValue }.thenReturn(1111L)
+            }
+            val parentNode = mock<TypedFolderNode>()
+            val node1 = mock<TypedFolderNode>()
+            val node2 = mock<TypedFolderNode>()
+            val childrenNodes = listOf(node1, node2)
+            val fetchFolderNodeResult = FetchFolderNodesResult(rootNode, parentNode, childrenNodes)
+
+            whenever(rootNode.name).thenReturn(rootNodeName)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
+            whenever(checkNodesNameCollisionUseCase(any(), any())).thenReturn(mock())
+            underTest.state.test {
+                underTest.fetchNodes(base64Handle)
+                underTest.handleImportClick(
+                    NodeUIItem(
+                        node = importNode,
+                        isSelected = true
+                    )
+                )
+
+                underTest.importNodes(3333L)
+
+                assertThat(expectMostRecentItem().importNode).isNull()
+                verify(checkNodesNameCollisionUseCase).invoke(
+                    nodes = mapOf(1111L to 3333L),
+                    type = NodeNameCollisionType.COPY
+                )
+                initViewModel()
+            }
+        }
+
+    @Test
+    fun `test that node handle is extracted from rootNode when multiple node is not selected and importNode is null`() =
+        runTest {
+            val base64Handle = "1234"
+            val rootNodeName = "RootNode"
+            val rootNode = mock<TypedFolderNode> {
+                on { id.longValue }.thenReturn(1111L)
+            }
+            val parentNode = mock<TypedFolderNode>()
+            val node1 = mock<TypedFolderNode>()
+            val node2 = mock<TypedFolderNode>()
+            val childrenNodes = listOf(node1, node2)
+            val fetchFolderNodeResult = FetchFolderNodesResult(rootNode, parentNode, childrenNodes)
+
+            whenever(rootNode.name).thenReturn(rootNodeName)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
+            whenever(checkNodesNameCollisionUseCase(any(), any())).thenReturn(mock())
+            underTest.state.test {
+                underTest.fetchNodes(base64Handle)
+                underTest.importNodes(3333L)
+
+                assertThat(expectMostRecentItem().importNode).isNull()
+                verify(checkNodesNameCollisionUseCase).invoke(
+                    nodes = mapOf(1111L to 3333L),
+                    type = NodeNameCollisionType.COPY
+                )
+                initViewModel()
+            }
+        }
+
+    @Test
+    fun `test that node handle is selected nodes when multiple nodes are selected`() =
+        runTest {
+            val base64Handle = "1234"
+            val rootNodeName = "RootNode"
+            val rootNode = mock<TypedFolderNode>()
+            val parentNode = mock<TypedFolderNode>()
+            val node1 = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(1111L))
+            }
+            val node2 = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(2222L))
+            }
+            val childrenNodes = listOf(node1, node2)
+            val fetchFolderNodeResult = FetchFolderNodesResult(rootNode, parentNode, childrenNodes)
+
+            whenever(rootNode.name).thenReturn(rootNodeName)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
+            whenever(checkNodesNameCollisionUseCase(any(), any())).thenReturn(mock())
+            underTest.state.test {
+                underTest.fetchNodes(base64Handle)
+                underTest.onSelectAllClicked()
+
+                underTest.importNodes(3333L)
+                cancelAndConsumeRemainingEvents()
+
+                verify(checkNodesNameCollisionUseCase).invoke(
+                    nodes = mapOf(1111L to 3333L, 2222L to 3333L),
+                    type = NodeNameCollisionType.COPY
+                )
+                initViewModel()
+            }
+        }
+
+    @Test
+    fun `test that non-conflict nodes are copied when checkNameCollision is invoked`() = runTest {
+        val nodeMap = mapOf(Pair(1234L, 2345L), Pair(234L, 2345L))
+        whenever(checkNodesNameCollisionUseCase(nodeMap, NodeNameCollisionType.COPY)).thenReturn(
+            NodeNameCollisionResult(
+                noConflictNodes = nodeMap,
+                conflictNodes = emptyMap(),
+                type = NodeNameCollisionType.COPY
+            )
+        )
+        whenever(copyNodesUseCase(nodeMap)).thenReturn(mock<MoveRequestResult.Copy>())
+
+        underTest.checkNameCollision(listOf(1234L, 234L), 2345L)
+
+        verify(copyNodesUseCase).invoke(nodeMap)
+    }
+
+    @Test
     fun `test that downloadEvent is triggered when updateNodesToDownload is invoked`() =
         runTest {
             val node1 = mock<TypedFileNode>()
@@ -581,5 +700,4 @@ class FolderLinkViewModelTest {
                     .containsExactly(link1, link2)
             }
         }
-
 }

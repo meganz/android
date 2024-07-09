@@ -41,14 +41,19 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
             if (parent == null || parent is FileNode) {
                 noConflictNodes[nodeHandle] = parentNodeHandle
             } else {
-                val currentNode =
-                    getNodeByHandleUseCase(nodeHandle) ?: throw NodeDoesNotExistsException()
+                val currentNode = getNodeByHandleUseCase(
+                    handle = nodeHandle,
+                    attemptFromFolderApi = true
+                ) ?: throw NodeDoesNotExistsException()
                 getChildNodeUseCase(
-                    NodeId(parentNodeHandle),
-                    currentNode.name
+                    parentNodeId = NodeId(parentNodeHandle),
+                    name = currentNode.name
                 )?.let { conflictNode ->
-                    conflictNodes[nodeHandle] =
-                        createNodeNameCollision(currentNode, parent, conflictNode)
+                    conflictNodes[nodeHandle] = createNodeNameCollision(
+                        currentNode = currentNode,
+                        parent = parent,
+                        conflictNode = conflictNode
+                    )
                 } ?: run {
                     noConflictNodes[nodeHandle] = parentNodeHandle
                 }
@@ -78,6 +83,6 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
         if (parentHandle == nodeRepository.getInvalidHandle()) {
             getRootNodeUseCase()
         } else {
-            getNodeByHandleUseCase(parentHandle)
+            getNodeByHandleUseCase(handle = parentHandle)
         }?.takeUnless { isNodeInRubbishBinUseCase(NodeId(parentHandle)) }
 }

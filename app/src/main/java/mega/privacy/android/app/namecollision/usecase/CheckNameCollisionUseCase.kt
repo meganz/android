@@ -45,7 +45,6 @@ class CheckNameCollisionUseCase @Inject constructor(
             parentHandle
         )
 
-
     /**
      * Checks if a node with the same name exists on the provided parent node.
      *
@@ -195,64 +194,6 @@ class CheckNameCollisionUseCase @Inject constructor(
 
             result
         }
-    }
-
-
-    /**
-     * Checks a list of handles in order to know which names already exist on the parent nodes.
-     *
-     * @param handles       List of node handles to check.
-     * @param parentHandle  Parent handle node in which to look.
-     * @return Single<Pair<List<NameCollision>, LongArray>> containing:
-     *  - First:    List of NameCollision with name collisions.
-     *  - Second:   Array of handles without name collision.
-     */
-    fun checkHandleList(
-        handles: LongArray,
-        parentHandle: Long,
-        type: NameCollisionType,
-    ): Single<Pair<ArrayList<NameCollision>, LongArray>> =
-        rxSingle(ioDispatcher) {
-            checkHandleListAsync(handles, parentHandle, type)
-        }
-
-    /**
-     * Check handle list async
-     *
-     * @param handles
-     * @param parentHandle
-     * @param type
-     * @return
-     */
-    suspend fun checkHandleListAsync(
-        handles: LongArray,
-        parentHandle: Long,
-        type: NameCollisionType,
-    ): Pair<ArrayList<NameCollision>, LongArray> {
-        if (handles.isEmpty()) throw NoPendingCollisionsException()
-        val resultPair = handles.fold(
-            Pair(
-                ArrayList<NameCollision>(),
-                mutableListOf<Long>()
-            )
-        ) { result, handle ->
-            runCatching {
-                checkNodeCollisionsWithType(
-                    node = megaApiGateway.getMegaNodeByHandle(handle),
-                    parentNode = getParentOrRootNode(parentHandle),
-                    type = type,
-                )
-            }.onFailure {
-                Timber.e(it, "No collision.")
-                result.second.add(handle)
-            }.onSuccess {
-                result.first.add(it)
-            }
-
-            result
-        }
-
-        return Pair(resultPair.first, resultPair.second.toLongArray())
     }
 
     /**
