@@ -45,17 +45,17 @@ import java.math.BigInteger
  */
 data class Transfer(
     override val transferType: TransferType,
-    val transferredBytes: Long,
+    override val transferredBytes: Long,
     override val totalBytes: Long,
     val localPath: String,
     val parentPath: String,
     val nodeHandle: Long,
     val parentHandle: Long,
-    val fileName: String,
+    override val fileName: String,
     val stage: TransferStage,
     override val tag: Int,
     val folderTransferTag: Int?,
-    val speed: Long,
+    override val speed: Long,
     val isSyncTransfer: Boolean,
     val isBackupTransfer: Boolean,
     val isForeignOverQuota: Boolean,
@@ -63,10 +63,10 @@ data class Transfer(
     override val isFinished: Boolean,
     override val isFolderTransfer: Boolean,
     override val appData: List<TransferAppData>,
-    val state: TransferState,
-    val priority: BigInteger,
+    override val state: TransferState,
+    override val priority: BigInteger,
     val notificationNumber: Long,
-) : ActiveTransfer, AppDataOwner {
+) : ActiveTransfer, InProgressTransferData, AppDataOwner {
 
     /**
      * Gets paused state from [state]
@@ -87,5 +87,5 @@ data class Transfer(
     /**
      * progress of the transfer
      */
-    val progress = Progress(transferredBytes, totalBytes)
+    override val progress = Progress(transferredBytes, totalBytes)
 }

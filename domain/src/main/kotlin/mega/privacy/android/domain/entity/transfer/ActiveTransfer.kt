@@ -3,22 +3,7 @@ package mega.privacy.android.domain.entity.transfer
 /**
  * Represents an active transfer.
  */
-interface ActiveTransfer {
-
-    /**
-     * An integer that identifies this transfer.
-     */
-    val tag: Int
-
-    /**
-     * [TransferType] of this transfer.
-     */
-    val transferType: TransferType
-
-    /**
-     * The total amount of bytes that will be transferred
-     */
-    val totalBytes: Long
+interface ActiveTransfer : TypedTransfer {
 
     /**
      * True if the transfer has already finished but it's still part of the current
@@ -29,11 +14,6 @@ interface ActiveTransfer {
      * True if it's a folder transfer, false otherwise (file transfer).
      */
     val isFolderTransfer: Boolean
-
-    /**
-     * True if the transfer is paused, false otherwise
-     */
-    val isPaused: Boolean
 
     /**
      * True if the transfer finished without actually transferring bytes because it was already transferred
