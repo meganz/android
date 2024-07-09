@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.audiosection.model
 
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
@@ -18,6 +19,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property isInSelection if list is in selection mode or not
  * @property accountDetail the account detail
  * @property isHiddenNodesOnboarded if is hidden nodes onboarded
+ * @property clickedItem the clicked item
  */
 data class AudioSectionState(
     val allAudios: List<AudioUiEntity> = emptyList(),
@@ -31,4 +33,5 @@ data class AudioSectionState(
     val isInSelection: Boolean = false,
     val accountDetail: AccountDetail? = null,
     val isHiddenNodesOnboarded: Boolean = false,
+    val clickedItem: TypedAudioNode? = null,
 )

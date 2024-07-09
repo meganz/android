@@ -3,6 +3,7 @@ package test.mega.privacy.android.app.presentation.videosection
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
@@ -23,20 +24,18 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
@@ -77,10 +76,6 @@ class VideoSectionViewModelTest {
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val fakeMonitorOfflineNodeUpdatesFlow = MutableSharedFlow<List<Offline>>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
-    private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
-    private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
-    private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
-    private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getVideoPlaylistsUseCase = mock<GetVideoPlaylistsUseCase>()
     private val videoPlaylistUIEntityMapper = mock<VideoPlaylistUIEntityMapper>()
@@ -95,6 +90,7 @@ class VideoSectionViewModelTest {
         mock<MonitorVideoPlaylistSetsUpdateUseCase>()
     private val fakeMonitorVideoPlaylistSetsUpdateFlow = MutableSharedFlow<List<Long>>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
+    private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -113,11 +109,14 @@ class VideoSectionViewModelTest {
     }
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
+    private val expectedId = NodeId(1)
     private val expectedVideo = mock<VideoUIEntity> {
+        on { id }.thenReturn(expectedId)
         on { name }.thenReturn("video name")
         on { elementID }.thenReturn(1L)
     }
     private val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
+        on { id }.thenReturn(expectedId)
         on { title }.thenReturn("playlist")
         on { videos }.thenReturn(listOf(expectedVideo, expectedVideo))
     }
@@ -144,10 +143,6 @@ class VideoSectionViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             getNodeByHandle = getNodeByHandle,
-            getFingerprintUseCase = getFingerprintUseCase,
-            megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
-            megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
-            getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getVideoPlaylistsUseCase = getVideoPlaylistsUseCase,
             videoPlaylistUIEntityMapper = videoPlaylistUIEntityMapper,
@@ -165,6 +160,7 @@ class VideoSectionViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
+            getNodeContentUriUseCase = getNodeContentUriUseCase,
         )
     }
 
@@ -175,10 +171,6 @@ class VideoSectionViewModelTest {
             videoUIEntityMapper,
             getCloudSortOrder,
             getNodeByHandle,
-            getFingerprintUseCase,
-            megaApiHttpServerIsRunningUseCase,
-            megaApiHttpServerStartUseCase,
-            getFileUrlByNodeHandleUseCase,
             getNodeByIdUseCase,
             getVideoPlaylistsUseCase,
             videoPlaylistUIEntityMapper,
@@ -188,7 +180,8 @@ class VideoSectionViewModelTest {
             updateVideoPlaylistTitleUseCase,
             getSyncUploadsFolderIdsUseCase,
             removeVideosFromPlaylistUseCase,
-            monitorVideoPlaylistSetsUpdateUseCase
+            monitorVideoPlaylistSetsUpdateUseCase,
+            getNodeContentUriUseCase
         )
     }
 
@@ -314,12 +307,13 @@ class VideoSectionViewModelTest {
     fun `test that the selected item is updated by 1 when long clicked`() =
         runTest {
             initVideosReturned()
+            initUnderTest()
 
             underTest.state.drop(1).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
-                underTest.onItemClicked(expectedVideo, 0)
+                underTest.onItemLongClicked(expectedVideo, 0)
                 assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -329,12 +323,13 @@ class VideoSectionViewModelTest {
     fun `test that the checked index is incremented by 1 when the selected item gets clicked`() =
         runTest {
             initVideosReturned()
+            initUnderTest()
 
             underTest.state.drop(1).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos.size).isEqualTo(2)
 
-                underTest.onItemClicked(expectedVideo, 0)
+                underTest.onItemLongClicked(expectedVideo, 0)
                 assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
 
                 underTest.onItemClicked(expectedVideo, 1)
@@ -509,7 +504,7 @@ class VideoSectionViewModelTest {
             underTest.state.test {
                 assertThat(awaitItem().currentVideoPlaylist?.videos).isNotEmpty()
 
-                underTest.onVideoItemOfPlaylistClicked(expectedVideo, 0)
+                underTest.onVideoItemOfPlaylistLongClicked(expectedVideo, 0)
                 assertThat(awaitItem().selectedVideoElementIDs.size).isEqualTo(1)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -1214,6 +1209,185 @@ class VideoSectionViewModelTest {
                 val actual = awaitItem()
                 assertThat(actual.videoPlaylists.size).isEqualTo(2)
                 assertThat(actual.isPlaylistProgressBarShown).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that getTypedVideoNodeById function returns the correct node`() = runTest {
+        val typedNodes = (0..3).map { handle ->
+            mock<TypedVideoNode> { on { id }.thenReturn(NodeId(handle.toLong())) }
+        }
+        initVideosReturned()
+        whenever(getAllVideosUseCase()).thenReturn(typedNodes)
+
+        underTest.refreshNodes()
+        delay(100)
+        val result = underTest.getTypedVideoNodeById(typedNodes[1].id)
+        assertThat(result).isEqualTo(typedNodes[1])
+    }
+
+    @Test
+    fun `test that getTypedVideoNodeOfPlaylistById function returns the correct node`() = runTest {
+        val expectedVideos = (0..3).map { handle ->
+            mock<TypedVideoNode> { on { id }.thenReturn(NodeId(handle.toLong())) }
+        }
+        val videoPlaylist = mock<VideoPlaylist> {
+            on { id }.thenReturn(NodeId(1L))
+            on { videos }.thenReturn(expectedVideos)
+        }
+        val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
+            on { id }.thenReturn(NodeId(1L))
+            on { title }.thenReturn("title")
+        }
+        whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(videoPlaylist))
+        whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
+
+        initUnderTest()
+        underTest.onTabSelected(VideoSectionTab.Playlists)
+        underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
+        delay(100)
+        val result = underTest.getTypedVideoNodeOfPlaylistById(expectedVideos[1].id)
+        assertThat(result).isEqualTo(expectedVideos[1])
+    }
+
+    @Test
+    fun `test that getNodeContentUri function returns the correct uri`() = runTest {
+        val url = "url"
+        val uri = NodeContentUri.RemoteContentUri(url, true)
+        initVideosReturned()
+        whenever(getNodeContentUriUseCase(anyOrNull())).thenReturn(uri)
+
+        val result = underTest.getNodeContentUri(mock())
+        assertThat(result).isEqualTo(uri)
+    }
+
+    @Test
+    fun `test that getNodeContentUri function returns null when the exception is thrown`() =
+        runTest {
+            initVideosReturned()
+            whenever(getNodeContentUriUseCase(anyOrNull())).thenThrow(NullPointerException())
+
+            val result = underTest.getNodeContentUri(mock())
+            assertThat(result).isNull()
+        }
+
+    @Test
+    fun `test that clickedItem is updated correctly`() = runTest {
+        val expectedVideoNode = mock<TypedVideoNode>()
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().clickedItem).isNull()
+            underTest.updateClickedItem(expectedVideoNode)
+            assertThat(awaitItem().clickedItem).isEqualTo(expectedVideoNode)
+            underTest.updateClickedItem(null)
+            assertThat(awaitItem().clickedItem).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that clickedPlaylistDetailItem is updated correctly`() = runTest {
+        val expectedVideoNode = mock<TypedVideoNode>()
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().clickedPlaylistDetailItem).isNull()
+            underTest.updateClickedPlaylistDetailItem(expectedVideoNode)
+            assertThat(awaitItem().clickedPlaylistDetailItem).isEqualTo(expectedVideoNode)
+            underTest.updateClickedPlaylistDetailItem(null)
+            assertThat(awaitItem().clickedPlaylistDetailItem).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that clickedItem is updated correctly when onItemClicked is invoked`() =
+        runTest {
+            val expectedVideoNode = mock<TypedVideoNode> {
+                on { id }.thenReturn(expectedId)
+            }
+            initVideosReturned()
+            whenever(getAllVideosUseCase()).thenReturn(listOf(mock(), expectedVideoNode))
+            initUnderTest()
+
+            underTest.state.drop(1).test {
+                underTest.refreshNodes()
+                assertThat(awaitItem().allVideos.size).isEqualTo(2)
+
+                underTest.onItemClicked(expectedVideo, 1)
+                assertThat(awaitItem().clickedItem).isEqualTo(expectedVideoNode)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that clickedPlaylistDetailItem is updated correctly when onVideoItemOfPlaylistClicked is invoked`() =
+        runTest {
+            val expectedId = NodeId(1L)
+            val expectedVideoNode = mock<TypedVideoNode> {
+                on { id }.thenReturn(expectedId)
+            }
+            val videoPlaylist = mock<VideoPlaylist> {
+                on { id }.thenReturn(expectedId)
+                on { videos }.thenReturn(listOf(expectedVideoNode))
+            }
+            val videoUIEntity = mock<VideoUIEntity> {
+                on { id }.thenReturn(expectedId)
+            }
+            val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
+                on { id }.thenReturn(expectedId)
+                on { title }.thenReturn("title")
+                on { videos }.thenReturn(listOf(videoUIEntity))
+            }
+
+            whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(videoPlaylist))
+            whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
+
+            initUnderTest()
+            underTest.onTabSelected(VideoSectionTab.Playlists)
+            underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
+
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().videoPlaylists).isNotEmpty()
+                underTest.onVideoItemOfPlaylistClicked(videoUIEntity, 0)
+                assertThat(awaitItem().clickedPlaylistDetailItem).isEqualTo(expectedVideoNode)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that clickedPlaylistDetailItem is updated correctly when playAllButtonClicked is invoked`() =
+        runTest {
+            val expectedId = NodeId(1L)
+            val expectedVideoNode = mock<TypedVideoNode> {
+                on { id }.thenReturn(expectedId)
+            }
+            val videoPlaylist = mock<VideoPlaylist> {
+                on { id }.thenReturn(expectedId)
+                on { videos }.thenReturn(listOf(expectedVideoNode))
+            }
+            val videoUIEntity = mock<VideoUIEntity> {
+                on { id }.thenReturn(expectedId)
+            }
+            val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
+                on { id }.thenReturn(expectedId)
+                on { title }.thenReturn("title")
+                on { videos }.thenReturn(listOf(videoUIEntity))
+            }
+
+            whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(videoPlaylist))
+            whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
+
+            initUnderTest()
+            underTest.onTabSelected(VideoSectionTab.Playlists)
+            underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
+
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().videoPlaylists).isNotEmpty()
+                underTest.playAllButtonClicked()
+                assertThat(awaitItem().clickedPlaylistDetailItem).isEqualTo(expectedVideoNode)
+                cancelAndIgnoreRemainingEvents()
             }
         }
 

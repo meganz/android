@@ -3,6 +3,7 @@ package test.mega.privacy.android.app.presentation.audiosection
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
@@ -18,20 +19,19 @@ import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -44,6 +44,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -62,15 +63,12 @@ class AudioSectionViewModelTest {
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
-    private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
-    private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
-    private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
-    private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val setViewType = mock<SetViewType>()
     private val fakeMonitorViewTypeFlow = MutableSharedFlow<ViewType>()
     private val monitorViewType = mock<MonitorViewType>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
+    private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -88,7 +86,11 @@ class AudioSectionViewModelTest {
     }
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
-    private val expectedAudio: AudioUiEntity = mock { on { name }.thenReturn("audio name") }
+    private val expectedId = NodeId(1)
+    private val expectedAudio: AudioUiEntity = mock {
+        on { id }.thenReturn(expectedId)
+        on { name }.thenReturn("audio name")
+    }
 
     @BeforeEach
     fun setUp() {
@@ -96,6 +98,10 @@ class AudioSectionViewModelTest {
         wheneverBlocking { monitorOfflineNodeUpdatesUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorViewType() }.thenReturn(fakeMonitorViewTypeFlow)
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        initUnderTest()
+    }
+
+    private fun initUnderTest() {
         underTest = AudioSectionViewModel(
             getAllAudioUseCase = getAllAudioUseCase,
             audioUIEntityMapper = audioUIEntityMapper,
@@ -103,10 +109,6 @@ class AudioSectionViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             getNodeByHandle = getNodeByHandle,
-            getFingerprintUseCase = getFingerprintUseCase,
-            megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
-            megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
-            getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             setViewType = setViewType,
             monitorViewType = monitorViewType,
@@ -116,6 +118,7 @@ class AudioSectionViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getNodeContentUriUseCase = getNodeContentUriUseCase
         )
     }
 
@@ -128,13 +131,10 @@ class AudioSectionViewModelTest {
             monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase,
             getNodeByHandle,
-            getFingerprintUseCase,
-            megaApiHttpServerIsRunningUseCase,
-            megaApiHttpServerStartUseCase,
-            getFileUrlByNodeHandleUseCase,
             getNodeByIdUseCase,
             setViewType,
-            monitorViewType
+            monitorViewType,
+            getNodeContentUriUseCase
         )
     }
 
@@ -145,7 +145,14 @@ class AudioSectionViewModelTest {
             assertThat(initial.allAudios).isEmpty()
             assertThat(initial.isPendingRefresh).isFalse()
             assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
-            assertThat(initial.progressBarShowing).isEqualTo(true)
+            assertThat(initial.progressBarShowing).isTrue()
+            assertThat(initial.searchMode).isFalse()
+            assertThat(initial.scrollToTop).isFalse()
+            assertThat(initial.selectedAudioHandles).isEmpty()
+            assertThat(initial.isInSelection).isFalse()
+            assertThat(initial.accountDetail).isNull()
+            assertThat(initial.isHiddenNodesOnboarded).isFalse()
+            assertThat(initial.clickedItem).isNull()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -319,6 +326,75 @@ class AudioSectionViewModelTest {
 
                 underTest.clearAllSelectedAudios()
                 assertThat(awaitItem().isInSelection).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that getTypedAudioNodeById function returns the correct node`() = runTest {
+        val typedNodes = (0..3).map { handle ->
+            mock<TypedAudioNode> { on { id }.thenReturn(NodeId(handle.toLong())) }
+        }
+        initAudiosReturned()
+        whenever(getAllAudioUseCase()).thenReturn(typedNodes)
+
+        underTest.refreshNodes()
+        delay(100)
+        val result = underTest.getTypedAudioNodeById(typedNodes[1].id)
+        assertThat(result).isEqualTo(typedNodes[1])
+    }
+
+    @Test
+    fun `test that getNodeContentUri function returns the correct uri`() = runTest {
+        val url = "url"
+        val uri = NodeContentUri.RemoteContentUri(url, true)
+        initAudiosReturned()
+        whenever(getNodeContentUriUseCase(anyOrNull())).thenReturn(uri)
+
+        val result = underTest.getNodeContentUri(mock())
+        assertThat(result).isEqualTo(uri)
+    }
+
+    @Test
+    fun `test that getNodeContentUri function returns null when the exception is thrown`() =
+        runTest {
+            initAudiosReturned()
+            whenever(getNodeContentUriUseCase(anyOrNull())).thenThrow(NullPointerException())
+
+            val result = underTest.getNodeContentUri(mock())
+            assertThat(result).isNull()
+        }
+
+    @Test
+    fun `test that clickedItem is updated correctly`() = runTest {
+        val expectedAudioNode = mock<TypedAudioNode>()
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().clickedItem).isNull()
+            underTest.updateClickedItem(expectedAudioNode)
+            assertThat(awaitItem().clickedItem).isEqualTo(expectedAudioNode)
+            underTest.updateClickedItem(null)
+            assertThat(awaitItem().clickedItem).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that clickedItem is updated correctly when onItemClicked is invoked`() =
+        runTest {
+            val expectedAudioNode = mock<TypedAudioNode>() {
+                on { id }.thenReturn(expectedId)
+            }
+            initAudiosReturned()
+            whenever(getAllAudioUseCase()).thenReturn(listOf(mock(), expectedAudioNode))
+
+            underTest.state.drop(1).test {
+                underTest.refreshNodes()
+                assertThat(awaitItem().allAudios.size).isEqualTo(2)
+
+                underTest.onItemClicked(expectedAudio, 1)
+                assertThat(awaitItem().clickedItem).isEqualTo(expectedAudioNode)
                 cancelAndIgnoreRemainingEvents()
             }
         }

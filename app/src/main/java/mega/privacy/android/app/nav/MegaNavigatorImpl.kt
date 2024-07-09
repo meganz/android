@@ -28,7 +28,9 @@ import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
@@ -199,11 +201,13 @@ internal class MegaNavigatorImpl @Inject constructor(
         viewType: Int,
         sortOrder: SortOrder,
         isFolderLink: Boolean,
+        searchedItems: List<Long>?,
+        mediaQueueTitle: String?,
         onError: () -> Unit,
     ) {
         applicationScope.launch {
             runCatching {
-                manageIntent(
+                manageMediaIntent(
                     context = context,
                     contentUri = contentUri,
                     fileTypeInfo = fileNode.type,
@@ -212,7 +216,9 @@ internal class MegaNavigatorImpl @Inject constructor(
                     name = fileNode.name,
                     handle = fileNode.id.longValue,
                     parentHandle = fileNode.parentId.longValue,
-                    isFolderLink = isFolderLink
+                    isFolderLink = isFolderLink,
+                    searchedItems = searchedItems,
+                    mediaQueueTitle = mediaQueueTitle
                 )
             }.onFailure {
                 Timber.e(it)
@@ -221,7 +227,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
     }
 
-    private fun manageIntent(
+    private fun manageMediaIntent(
         context: Context,
         contentUri: NodeContentUri,
         fileTypeInfo: FileTypeInfo,
@@ -233,6 +239,8 @@ internal class MegaNavigatorImpl @Inject constructor(
         isFolderLink: Boolean,
         path: String? = null,
         offlineParent: String? = null,
+        searchedItems: List<Long>? = null,
+        mediaQueueTitle: String? = null,
     ) {
         val intent = when {
             fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
@@ -256,6 +264,13 @@ internal class MegaNavigatorImpl @Inject constructor(
             offlineParent?.let {
                 putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, offlineParent)
             }
+            searchedItems?.let {
+                putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, it.toLongArray())
+            }
+            mediaQueueTitle?.let {
+                putExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE, it)
+            }
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
         val mimeType =
             if (fileTypeInfo.extension == "opus") "audio/*" else fileTypeInfo.mimeType
@@ -272,11 +287,12 @@ internal class MegaNavigatorImpl @Inject constructor(
         parentId: Long,
         sortOrder: SortOrder,
         isFolderLink: Boolean,
+        searchedItems: List<Long>?,
         onError: () -> Unit,
     ) {
         runCatching {
             val contentUri = NodeContentUri.LocalContentUri(localFile)
-            manageIntent(
+            manageMediaIntent(
                 context = context,
                 contentUri = contentUri,
                 fileTypeInfo = fileTypeInfo,
@@ -287,7 +303,8 @@ internal class MegaNavigatorImpl @Inject constructor(
                 parentHandle = parentId,
                 isFolderLink = isFolderLink,
                 path = localFile.absolutePath,
-                offlineParent = localFile.parent
+                offlineParent = localFile.parent,
+                searchedItems = searchedItems
             )
         }.onFailure {
             Timber.e(it)

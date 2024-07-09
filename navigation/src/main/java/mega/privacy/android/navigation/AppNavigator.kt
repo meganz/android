@@ -131,6 +131,8 @@ interface AppNavigator {
      * @param sortOrder SortOrder
      * @param viewType the adapter type of the view
      * @param isFolderLink whether the file is a folder link
+     * @param searchedItems the list of searched items, this is only used under the search mode
+     * @param mediaQueueTitle the title of the media queue
      * @param onError Callback called when error occurs
      */
     fun openMediaPlayerActivityByFileNode(
@@ -140,6 +142,8 @@ interface AppNavigator {
         viewType: Int,
         sortOrder: SortOrder = SortOrder.ORDER_NONE,
         isFolderLink: Boolean = false,
+        searchedItems: List<Long>? = null,
+        mediaQueueTitle: String? = null,
         onError: () -> Unit = {},
     )
 
@@ -154,6 +158,7 @@ interface AppNavigator {
      * @param parentId the parent id of the node
      * @param sortOrder SortOrder
      * @param isFolderLink whether the file is a folder link
+     * @param searchedItems the list of searched items, this is only used under the search mode
      * @param onError Callback called when error occurs
      */
     fun openMediaPlayerActivityByLocalFile(
@@ -165,6 +170,7 @@ interface AppNavigator {
         parentId: Long,
         sortOrder: SortOrder = SortOrder.ORDER_NONE,
         isFolderLink: Boolean = false,
+        searchedItems: List<Long>? = null,
         onError: () -> Unit = {},
     )
 }

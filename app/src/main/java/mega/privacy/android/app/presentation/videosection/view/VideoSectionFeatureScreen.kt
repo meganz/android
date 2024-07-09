@@ -18,16 +18,13 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.videoPla
 internal fun VideoSectionFeatureScreen(
     modifier: Modifier,
     videoSectionViewModel: VideoSectionViewModel,
-    onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onAddElementsClicked: () -> Unit,
     onSortOrderClick: () -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
     onLongClick: (item: VideoUIEntity, index: Int) -> Unit,
-    onPlaylistDetailItemClick: (item: VideoUIEntity, index: Int) -> Unit,
     onPlaylistDetailItemLongClick: (item: VideoUIEntity, index: Int) -> Unit,
     onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
     onActionModeFinished: () -> Unit,
-    onPlayAllClicked: () -> Unit,
     onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = {},
 ) {
     val navHostController = rememberNavController()
@@ -36,32 +33,26 @@ internal fun VideoSectionFeatureScreen(
         modifier = modifier,
         navHostController = navHostController,
         viewModel = videoSectionViewModel,
-        onClick = onClick,
         onSortOrderClick = onSortOrderClick,
         onMenuClick = onMenuClick,
         onLongClick = onLongClick,
-        onPlaylistDetailItemClick = onPlaylistDetailItemClick,
         onPlaylistItemLongClick = onPlaylistItemLongClick,
         onAddElementsClicked = onAddElementsClicked,
         onPlaylistDetailLongClicked = onPlaylistDetailItemLongClick,
-        onActionModeFinished = onActionModeFinished,
-        onPlayAllClicked = onPlayAllClicked
+        onActionModeFinished = onActionModeFinished
     )
 }
 
 @Composable
 internal fun VideoSectionNavHost(
     navHostController: NavHostController,
-    onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onSortOrderClick: () -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
     onLongClick: (item: VideoUIEntity, index: Int) -> Unit,
     onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
-    onPlaylistDetailItemClick: (item: VideoUIEntity, index: Int) -> Unit,
     onAddElementsClicked: () -> Unit,
     onPlaylistDetailLongClicked: (item: VideoUIEntity, index: Int) -> Unit,
     onActionModeFinished: () -> Unit,
-    onPlayAllClicked: () -> Unit,
     modifier: Modifier,
     onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = {},
     viewModel: VideoSectionViewModel = hiltViewModel(),
@@ -108,7 +99,7 @@ internal fun VideoSectionNavHost(
         ) {
             VideoSectionComposeView(
                 videoSectionViewModel = viewModel,
-                onClick = onClick,
+                onClick = viewModel::onItemClicked,
                 onSortOrderClick = onSortOrderClick,
                 onMenuClick = onMenuClick,
                 onLongClick = onLongClick,
@@ -150,15 +141,16 @@ internal fun VideoSectionNavHost(
                 onAddElementsClicked = onAddElementsClicked,
                 errorMessage = state.createDialogErrorMessage,
                 onClick = { item, index ->
-                    if (navHostController.currentDestination?.route == videoPlaylistDetailRoute)
-                        onPlaylistDetailItemClick(item, index)
+                    if (navHostController.currentDestination?.route == videoPlaylistDetailRoute) {
+                        viewModel.onVideoItemOfPlaylistClicked(item, index)
+                    }
                 },
                 onMenuClick = onMenuClick,
                 onLongClick = onPlaylistDetailLongClicked,
                 shouldDeleteVideosDialog = state.shouldDeleteVideosFromPlaylist,
                 setShouldDeleteVideosDialog = viewModel::setShouldDeleteVideosFromPlaylist,
                 onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
-                onPlayAllClicked = onPlayAllClicked,
+                onPlayAllClicked = viewModel::playAllButtonClicked,
                 onUpdatedTitle = viewModel::setUpdateToolbarTitle
             )
         }

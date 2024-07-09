@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.videosection
 
-import android.content.Intent
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +21,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -32,23 +31,19 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionStat
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTabState
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
-import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
-import mega.privacy.android.app.utils.FileUtil.getLocalFile
-import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
@@ -64,7 +59,6 @@ import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylist
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -78,10 +72,6 @@ class VideoSectionViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val getNodeByHandle: GetNodeByHandle,
-    private val getFingerprintUseCase: GetFingerprintUseCase,
-    private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
-    private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
-    private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getVideoPlaylistsUseCase: GetVideoPlaylistsUseCase,
     private val videoPlaylistUIEntityMapper: VideoPlaylistUIEntityMapper,
@@ -99,6 +89,7 @@ class VideoSectionViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -117,8 +108,11 @@ class VideoSectionViewModel @Inject constructor(
     val tabState = _tabState.asStateFlow()
 
     private var searchQuery = ""
-    private val originalData = mutableListOf<VideoUIEntity>()
-    private val originalPlaylistData = mutableListOf<VideoPlaylistUIEntity>()
+    private val originalData = mutableListOf<TypedVideoNode>()
+    private val originalEntities = mutableListOf<VideoUIEntity>()
+
+    private val originalPlaylistData = mutableListOf<VideoPlaylist>()
+    private val originalPlaylistEntities = mutableListOf<VideoPlaylistUIEntity>()
 
     private var createVideoPlaylistJob: Job? = null
 
@@ -180,7 +174,8 @@ class VideoSectionViewModel @Inject constructor(
     private fun loadVideoPlaylists() {
         viewModelScope.launch {
             val videoPlaylists =
-                getVideoPlaylists().updateOriginalPlaylistData().filterVideoPlaylistsBySearchQuery()
+                getVideoPlaylists().updateOriginalPlaylistEntities()
+                    .filterVideoPlaylistsBySearchQuery()
             _state.update {
                 it.copy(
                     videoPlaylists = videoPlaylists,
@@ -191,15 +186,23 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getVideoPlaylists() = getVideoPlaylistsUseCase().map { videoPlaylist ->
-        videoPlaylistUIEntityMapper(videoPlaylist)
-    }
+    private suspend fun getVideoPlaylists() =
+        getVideoPlaylistsUseCase().updateOriginalPlaylistData().map { videoPlaylist ->
+            videoPlaylistUIEntityMapper(videoPlaylist)
+        }
 
-    private fun List<VideoPlaylistUIEntity>.updateOriginalPlaylistData() = also { data ->
+    private fun List<VideoPlaylist>.updateOriginalPlaylistData() = also { data ->
         if (originalPlaylistData.isNotEmpty()) {
             originalPlaylistData.clear()
         }
         originalPlaylistData.addAll(data)
+    }
+
+    private fun List<VideoPlaylistUIEntity>.updateOriginalPlaylistEntities() = also { data ->
+        if (originalPlaylistEntities.isNotEmpty()) {
+            originalPlaylistEntities.clear()
+        }
+        originalPlaylistEntities.addAll(data)
     }
 
     private fun List<VideoPlaylistUIEntity>.filterVideoPlaylistsBySearchQuery() =
@@ -214,7 +217,7 @@ class VideoSectionViewModel @Inject constructor(
             items = getVideoUIEntityList(),
             showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
             isPaid = _state.value.accountDetail?.levelDetail?.accountType?.isPaid,
-        ).updateOriginalData()
+        ).updateOriginalEntities()
             .filterVideosBySearchQuery()
             .filterVideosByDuration()
             .filterVideosByLocation()
@@ -230,20 +233,27 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    private fun List<VideoUIEntity>.filterVideosBySearchQuery() =
-        filter { video ->
-            video.name.contains(searchQuery, true)
-        }
+    private suspend fun getVideoUIEntityList() =
+        getAllVideosUseCase().updateOriginalData().map { videoUIEntityMapper(it) }
 
-    private fun List<VideoUIEntity>.updateOriginalData() = also { data ->
+    private fun List<TypedVideoNode>.updateOriginalData() = also { data ->
         if (originalData.isNotEmpty()) {
             originalData.clear()
         }
         originalData.addAll(data)
     }
 
-    private suspend fun getVideoUIEntityList() =
-        getAllVideosUseCase().map { videoUIEntityMapper(it) }
+    private fun List<VideoUIEntity>.filterVideosBySearchQuery() =
+        filter { video ->
+            video.name.contains(searchQuery, true)
+        }
+
+    private fun List<VideoUIEntity>.updateOriginalEntities() = also { data ->
+        if (originalEntities.isNotEmpty()) {
+            originalEntities.clear()
+        }
+        originalEntities.addAll(data)
+    }
 
     private suspend fun List<VideoUIEntity>.filterVideosByLocation(): List<VideoUIEntity> {
         val syncUploadsFolderIds = getSyncUploadsFolderIdsUseCase()
@@ -285,7 +295,7 @@ class VideoSectionViewModel @Inject constructor(
     internal fun markHandledPendingRefresh() = _state.update { it.copy(isPendingRefresh = false) }
 
     internal fun onTabSelected(selectTab: VideoSectionTab) {
-        if (selectTab == VideoSectionTab.Playlists && originalPlaylistData.isEmpty()) {
+        if (selectTab == VideoSectionTab.Playlists && originalPlaylistEntities.isEmpty()) {
             loadVideoPlaylists()
         }
         if (_state.value.searchMode) {
@@ -338,7 +348,7 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private fun searchNodeByQueryString() {
-        val videos = originalData.filter { video ->
+        val videos = originalEntities.filter { video ->
             video.name.contains(searchQuery, true)
         }
         _state.update {
@@ -350,7 +360,7 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private fun searchPlaylistByQueryString() {
-        val playlists = originalPlaylistData.filter { playlist ->
+        val playlists = originalPlaylistEntities.filter { playlist ->
             playlist.title.contains(searchQuery, true)
         }
         _state.update {
@@ -370,55 +380,6 @@ class VideoSectionViewModel @Inject constructor(
         } else {
             loadVideoPlaylists()
         }
-    }
-
-    /**
-     * Detect the node whether is local file
-     *
-     * @param handle node handle
-     * @return true is local file, otherwise is false
-     */
-    internal suspend fun isLocalFile(
-        handle: Long,
-    ): String? =
-        getNodeByHandle(handle)?.let { node ->
-            val localPath = getLocalFile(node)
-            File(getDownloadLocation(), node.name).let { file ->
-                if (localPath != null && ((isFileAvailable(file) && file.length() == node.size)
-                            || (node.fingerprint == getFingerprintUseCase(localPath)))
-                ) {
-                    localPath
-                } else {
-                    null
-                }
-            }
-        }
-
-    /**
-     * Update intent
-     *
-     * @param handle node handle
-     * @param type node type
-     * @param intent Intent
-     * @return updated intent
-     */
-    internal suspend fun updateIntent(
-        handle: Long,
-        type: String,
-        intent: Intent,
-    ): Intent {
-        if (megaApiHttpServerIsRunningUseCase() == 0) {
-            megaApiHttpServerStartUseCase()
-            intent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
-        }
-
-        getFileUrlByNodeHandleUseCase(handle)?.let { url ->
-            Uri.parse(url)?.let { uri ->
-                intent.setDataAndType(uri, type)
-            }
-        }
-
-        return intent
     }
 
     internal fun clearAllSelectedVideos() {
@@ -522,7 +483,15 @@ class VideoSectionViewModel @Inject constructor(
 
         }
 
-    internal fun onItemClicked(item: VideoUIEntity, index: Int) =
+    internal fun onItemClicked(item: VideoUIEntity, index: Int) {
+        if (_state.value.isInSelection) {
+            updateVideoItemInSelectionState(item = item, index = index)
+        } else {
+            updateClickedItem(getTypedVideoNodeById(item.id))
+        }
+    }
+
+    internal fun onItemLongClicked(item: VideoUIEntity, index: Int) =
         updateVideoItemInSelectionState(item = item, index = index)
 
     private fun updateVideoItemInSelectionState(item: VideoUIEntity, index: Int) {
@@ -594,8 +563,16 @@ class VideoSectionViewModel @Inject constructor(
             }
         } else this
 
-    internal fun onVideoItemOfPlaylistClicked(item: VideoUIEntity, index: Int) =
+    internal fun onVideoItemOfPlaylistLongClicked(item: VideoUIEntity, index: Int) =
         updateVideoItemOfPlaylistInSelectionState(item = item, index = index)
+
+    internal fun onVideoItemOfPlaylistClicked(item: VideoUIEntity, index: Int) {
+        if (state.value.isInSelection) {
+            updateVideoItemOfPlaylistInSelectionState(item = item, index = index)
+        } else {
+            updateClickedPlaylistDetailItem(getTypedVideoNodeOfPlaylistById(item.id))
+        }
+    }
 
     private fun updateVideoItemOfPlaylistInSelectionState(item: VideoUIEntity, index: Int) =
         _state.value.currentVideoPlaylist?.let { playlist ->
@@ -733,7 +710,8 @@ class VideoSectionViewModel @Inject constructor(
     private fun refreshVideoPlaylistsWithUpdateCurrentVideoPlaylist() =
         viewModelScope.launch {
             val videoPlaylists =
-                getVideoPlaylists().updateOriginalPlaylistData().filterVideoPlaylistsBySearchQuery()
+                getVideoPlaylists().updateOriginalPlaylistEntities()
+                    .filterVideoPlaylistsBySearchQuery()
             val updatedCurrentVideoPlaylist = videoPlaylists.firstOrNull {
                 it.id == _state.value.currentVideoPlaylist?.id
             }
@@ -792,7 +770,8 @@ class VideoSectionViewModel @Inject constructor(
     private fun refreshVideoPlaylistsWithUpdatedTitle(newTitle: String) =
         viewModelScope.launch {
             val videoPlaylists =
-                getVideoPlaylists().updateOriginalPlaylistData().filterVideoPlaylistsBySearchQuery()
+                getVideoPlaylists().updateOriginalPlaylistEntities()
+                    .filterVideoPlaylistsBySearchQuery()
             val updatedCurrentVideoPlaylist =
                 _state.value.currentVideoPlaylist?.copy(title = newTitle)
             _state.update {
@@ -975,6 +954,33 @@ class VideoSectionViewModel @Inject constructor(
         } else {
             items.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
         }
+    }
+
+    internal suspend fun getNodeContentUri(fileNode: TypedFileNode) = runCatching {
+        FileNodeContent.AudioOrVideo(uri = getNodeContentUriUseCase(fileNode)).uri
+    }.recover {
+        Timber.e(it)
+        null
+    }.getOrNull()
+
+    internal fun getTypedVideoNodeById(id: NodeId) = originalData.firstOrNull { it.id == id }
+
+    internal fun getTypedVideoNodeOfPlaylistById(id: NodeId) =
+        originalPlaylistData.firstOrNull {
+            it.id == _state.value.currentVideoPlaylist?.id
+        }?.let { playlist ->
+            playlist.videos?.firstOrNull { it.id == id }
+        }
+
+    internal fun updateClickedItem(value: TypedVideoNode?) =
+        _state.update { it.copy(clickedItem = value) }
+
+    internal fun updateClickedPlaylistDetailItem(value: TypedVideoNode?) =
+        _state.update { it.copy(clickedPlaylistDetailItem = value) }
+
+    internal fun playAllButtonClicked() {
+        val clickedItem = _state.value.currentVideoPlaylist?.videos?.firstOrNull() ?: return
+        updateClickedPlaylistDetailItem(getTypedVideoNodeOfPlaylistById(clickedItem.id))
     }
 
     companion object {

@@ -8,32 +8,34 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.presentation.audiosection.model.AudioSectionState
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 
 /**
  * The compose view for audio section
  */
 @Composable
 fun AudioSectionComposeView(
-    uiState: AudioSectionState,
+    viewModel: AudioSectionViewModel,
     modifier: Modifier = Modifier,
     onChangeViewTypeClick: () -> Unit = {},
-    onClick: (item: AudioUiEntity, index: Int) -> Unit = { _, _ -> },
     onSortOrderClick: () -> Unit = {},
     onMenuClick: (AudioUiEntity) -> Unit = {},
     onLongClick: (item: AudioUiEntity, index: Int) -> Unit = { _, _ -> },
 ) {
+
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     val progressBarShowing = uiState.progressBarShowing
@@ -87,7 +89,7 @@ fun AudioSectionComposeView(
                     modifier = Modifier,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onSortOrderClick = onSortOrderClick,
-                    onClick = onClick,
+                    onClick = viewModel::onItemClicked,
                     onLongClick = onLongClick,
                     onMenuClick = onMenuClick,
                     inSelectionMode = uiState.isInSelection

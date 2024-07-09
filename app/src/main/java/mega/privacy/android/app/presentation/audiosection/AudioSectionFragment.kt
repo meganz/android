@@ -2,8 +2,6 @@ package mega.privacy.android.app.presentation.audiosection
 
 import android.app.Activity
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +19,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -44,22 +41,15 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -81,6 +71,12 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
      */
     @Inject
     lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
+
+    /**
+     * Mega Navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private var actionMode: ActionMode? = null
 
@@ -112,7 +108,7 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
                         lifecycle = lifecycle,
                     )
                     AudioSectionComposeView(
-                        uiState = uiState,
+                        viewModel = audioSectionViewModel,
                         modifier = Modifier
                             .constrainAs(audioSectionComposeView) {
                                 top.linkTo(parent.top)
@@ -122,17 +118,6 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
                             .fillMaxWidth(),
                         onChangeViewTypeClick = audioSectionViewModel::onChangeViewTypeClicked,
                         onSortOrderClick = { showSortByPanel() },
-                        onClick = { item, index ->
-                            if (uiState.isInSelection) {
-                                audioSectionViewModel.onItemClicked(item, index)
-                            } else {
-                                openAudioFile(
-                                    activity = requireActivity(),
-                                    item = item,
-                                    index = index
-                                )
-                            }
-                        },
                         onLongClick = { item, index ->
                             audioSectionViewModel.onItemLongClicked(item, index)
                             activateActionMode()
@@ -175,70 +160,35 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
                 }
             }
         }
+
+        viewLifecycleOwner.collectFlow(
+            audioSectionViewModel.state.map { it.clickedItem }.distinctUntilChanged()
+        ) { fileNode ->
+            fileNode?.let {
+                val uiState = audioSectionViewModel.state.value
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val nodeContentUri =
+                        audioSectionViewModel.getNodeContentUri(it) ?: return@launch
+                    megaNavigator.openMediaPlayerActivityByFileNode(
+                        context = requireContext(),
+                        contentUri = nodeContentUri,
+                        fileNode = it,
+                        sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
+                        viewType = if (uiState.searchMode)
+                            SEARCH_BY_ADAPTER
+                        else
+                            AUDIO_BROWSE_ADAPTER,
+                        isFolderLink = false,
+                        searchedItems = uiState.allAudios.map { it.id.longValue }
+                    )
+                    audioSectionViewModel.updateClickedItem(null)
+                }
+            }
+        }
     }
 
     private fun showSortByPanel() {
         (requireActivity() as? ManagerActivity)?.showNewSortByPanel(Constants.ORDER_CLOUD)
-    }
-
-    private fun openAudioFile(
-        activity: Activity,
-        item: AudioUiEntity,
-        index: Int,
-    ) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val nodeHandle = item.id.longValue
-            val fileType = item.fileTypeInfo.mimeType
-            val intent = getIntent(item = item, index = index)
-
-            activity.startActivity(
-                audioSectionViewModel.isLocalFile(nodeHandle)?.let { localPath ->
-                    File(localPath).let { mediaFile ->
-                        runCatching {
-                            FileProvider.getUriForFile(
-                                activity,
-                                Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                                mediaFile
-                            )
-                        }.onFailure {
-                            Uri.fromFile(mediaFile)
-                        }.map { mediaFileUri ->
-                            intent.setDataAndType(mediaFileUri, fileType)
-                            intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        }
-                    }
-                    intent
-                } ?: audioSectionViewModel.updateIntent(
-                    handle = nodeHandle,
-                    fileType = fileType,
-                    intent = intent
-                )
-            )
-        }
-    }
-
-    private fun getIntent(
-        item: AudioUiEntity,
-        index: Int,
-    ) = getMediaIntent(activity, item.name).apply {
-        putExtra(INTENT_EXTRA_KEY_POSITION, index)
-        putExtra(INTENT_EXTRA_KEY_HANDLE, item.id.longValue)
-        putExtra(INTENT_EXTRA_KEY_FILE_NAME, item.name)
-        val state = audioSectionViewModel.state.value
-        if (state.searchMode) {
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, SEARCH_BY_ADAPTER)
-            putExtra(
-                INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
-                state.allAudios.map { it.id.longValue }.toLongArray()
-            )
-        } else {
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_BROWSE_ADAPTER)
-        }
-        putExtra(
-            INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-            sortByHeaderViewModel.cloudSortOrder.value
-        )
-        addFlags(FLAG_ACTIVITY_SINGLE_TOP)
     }
 
     private fun activateActionMode() {

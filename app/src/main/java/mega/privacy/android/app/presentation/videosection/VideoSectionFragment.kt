@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.videosection
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -23,7 +22,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.core.content.FileProvider
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -47,19 +45,13 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
+import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
+import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionFeatureScreen
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
-import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.ORDER_VIDEO_PLAYLIST
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
@@ -68,10 +60,12 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -94,6 +88,12 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
      */
     @Inject
     lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
+
+    /**
+     * Mega Navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private var actionMode: ActionMode? = null
 
@@ -167,20 +167,9 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                             .fillMaxWidth(),
                         onSortOrderClick = { showSortByPanel() },
                         videoSectionViewModel = videoSectionViewModel,
-                        onClick = { item, index ->
-                            if (uiState.isInSelection) {
-                                videoSectionViewModel.onItemClicked(item, index)
-                            } else {
-                                openVideoFile(
-                                    activity = requireActivity(),
-                                    item = item,
-                                    index = index
-                                )
-                            }
-                        },
                         onLongClick = { item, index ->
                             activateActionMode()
-                            videoSectionViewModel.onItemClicked(item, index)
+                            videoSectionViewModel.onItemLongClicked(item, index)
                         },
                         onMenuClick = { item ->
                             showOptionsMenuForItem(item)
@@ -188,35 +177,15 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                         onAddElementsClicked = {
                             navigateToVideoSelectedActivity()
                         },
-                        onPlaylistDetailItemClick = { item, index ->
-                            if (uiState.isInSelection) {
-                                videoSectionViewModel.onVideoItemOfPlaylistClicked(item, index)
-                            } else {
-                                openVideoFile(
-                                    activity = requireActivity(),
-                                    item = item,
-                                    index = index
-                                )
-                            }
-                        },
                         onPlaylistItemLongClick = { item, index ->
                             activateVideoPlaylistActionMode(ACTION_TYPE_VIDEO_PLAYLIST)
                             videoSectionViewModel.onVideoPlaylistItemClicked(item, index)
                         },
                         onPlaylistDetailItemLongClick = { item, index ->
                             activateVideoPlaylistActionMode(ACTION_TYPE_VIDEO_PLAYLIST_DETAIL)
-                            videoSectionViewModel.onVideoItemOfPlaylistClicked(item, index)
+                            videoSectionViewModel.onVideoItemOfPlaylistLongClicked(item, index)
                         },
-                        onActionModeFinished = { actionMode?.finish() },
-                        onPlayAllClicked = {
-                            uiState.currentVideoPlaylist?.videos?.firstOrNull()?.let {
-                                openVideoFile(
-                                    activity = requireActivity(),
-                                    item = it,
-                                    index = 0
-                                )
-                            }
-                        }
+                        onActionModeFinished = { actionMode?.finish() }
                     )
                 }
             }
@@ -237,77 +206,6 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         (requireActivity() as ManagerActivity).showNewSortByPanel(
             if (currentSelectTab == VideoSectionTab.All) ORDER_CLOUD else ORDER_VIDEO_PLAYLIST
         )
-    }
-
-    private fun openVideoFile(
-        activity: Activity,
-        item: VideoUIEntity,
-        index: Int,
-    ) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val nodeHandle = item.id.longValue
-            val nodeType = item.fileTypeInfo.mimeType
-            val intent = getIntent(item = item, index = index)
-
-            activity.startActivity(
-                videoSectionViewModel.isLocalFile(nodeHandle)?.let { localPath ->
-                    File(localPath).let { mediaFile ->
-                        runCatching {
-                            FileProvider.getUriForFile(
-                                activity,
-                                AUTHORITY_STRING_FILE_PROVIDER,
-                                mediaFile
-                            )
-                        }.onFailure {
-                            Uri.fromFile(mediaFile)
-                        }.map { mediaFileUri ->
-                            intent.setDataAndType(mediaFileUri, nodeType)
-                            intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        }
-                    }
-                    intent
-                } ?: videoSectionViewModel.updateIntent(
-                    handle = nodeHandle,
-                    type = nodeType,
-                    intent = intent
-                )
-            )
-        }
-    }
-
-    private fun getIntent(
-        item: VideoUIEntity,
-        index: Int,
-    ) = Util.getMediaIntent(activity, item.name).apply {
-        val state = videoSectionViewModel.state.value
-        putExtra(INTENT_EXTRA_KEY_POSITION, index)
-        putExtra(INTENT_EXTRA_KEY_HANDLE, item.id.longValue)
-        putExtra(INTENT_EXTRA_KEY_FILE_NAME, item.name)
-        when (state.currentDestinationRoute) {
-            videoSectionRoute ->
-                if (state.searchMode) {
-                    putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, SEARCH_BY_ADAPTER)
-                    putExtra(
-                        INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
-                        state.allVideos.map { it.id.longValue }.toLongArray()
-                    )
-                } else {
-                    putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, VIDEO_BROWSE_ADAPTER)
-                }
-
-            videoPlaylistDetailRoute -> {
-                putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, SEARCH_BY_ADAPTER)
-                putExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE, state.currentVideoPlaylist?.title)
-                state.currentVideoPlaylist?.videos?.map { it.id.longValue }?.let {
-                    putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, it.toLongArray())
-                }
-            }
-        }
-        putExtra(
-            INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-            sortByHeaderViewModel.cloudSortOrder.value
-        )
-        addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
 
     private fun activateActionMode() {
@@ -421,6 +319,72 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
             ).collectLatest { list ->
                 updateActionModeTitle(count = list.size)
             }
+        }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.clickedItem }.distinctUntilChanged()
+        ) { fileNode ->
+            fileNode?.let {
+                openVideoFileFromAllVideos(it)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.clickedPlaylistDetailItem }.distinctUntilChanged()
+        ) { fileNode ->
+            fileNode?.let {
+                openVideoFileFromPlaylist(it)
+            }
+        }
+    }
+
+    private fun openVideoFileFromAllVideos(node: TypedFileNode) {
+        val uiState = videoSectionViewModel.state.value
+        val isDurationFilterEnabled =
+            uiState.durationSelectedFilterOption != DurationFilterOption.AllDurations
+        val isLocationFilterEnabled =
+            uiState.locationSelectedFilterOption != LocationFilterOption.AllLocations
+        val isSearchMode = uiState.searchMode || isDurationFilterEnabled || isLocationFilterEnabled
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val nodeContentUri = videoSectionViewModel.getNodeContentUri(node) ?: return@launch
+            megaNavigator.openMediaPlayerActivityByFileNode(
+                context = requireContext(),
+                contentUri = nodeContentUri,
+                fileNode = node,
+                sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
+                viewType = if (isSearchMode) {
+                    SEARCH_BY_ADAPTER
+                } else {
+                    VIDEO_BROWSE_ADAPTER
+                },
+                isFolderLink = false,
+                searchedItems =
+                if (uiState.currentDestinationRoute == videoSectionRoute && isSearchMode) {
+                    uiState.allVideos.map { it.id.longValue }
+                } else {
+                    null
+                },
+            )
+            videoSectionViewModel.updateClickedItem(null)
+        }
+    }
+
+    private fun openVideoFileFromPlaylist(node: TypedVideoNode) {
+        val uiState = videoSectionViewModel.state.value
+        viewLifecycleOwner.lifecycleScope.launch {
+            val nodeContentUri = videoSectionViewModel.getNodeContentUri(node) ?: return@launch
+            megaNavigator.openMediaPlayerActivityByFileNode(
+                context = requireContext(),
+                contentUri = nodeContentUri,
+                fileNode = node,
+                sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
+                viewType = SEARCH_BY_ADAPTER,
+                isFolderLink = false,
+                searchedItems = uiState.currentVideoPlaylist?.videos?.map { it.id.longValue },
+                mediaQueueTitle = uiState.currentVideoPlaylist?.title
+            )
+            videoSectionViewModel.updateClickedPlaylistDetailItem(null)
         }
     }
 

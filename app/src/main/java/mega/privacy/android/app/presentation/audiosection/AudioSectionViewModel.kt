@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.audiosection
 
-import android.content.Intent
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,25 +21,21 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.audiosection.mapper.AudioUiEntityMapper
 import mega.privacy.android.app.presentation.audiosection.model.AudioSectionState
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
-import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
-import mega.privacy.android.app.utils.FileUtil.getLocalFile
-import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedAudioNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -49,7 +43,6 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -63,10 +56,6 @@ class AudioSectionViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val getNodeByHandle: GetNodeByHandle,
-    private val getFingerprintUseCase: GetFingerprintUseCase,
-    private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
-    private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
-    private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
@@ -76,6 +65,7 @@ class AudioSectionViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AudioSectionState())
 
@@ -85,7 +75,8 @@ class AudioSectionViewModel @Inject constructor(
     val state: StateFlow<AudioSectionState> = _state.asStateFlow()
 
     private var searchQuery = ""
-    private val originalData = mutableListOf<AudioUiEntity>()
+    private val originalData = mutableListOf<TypedAudioNode>()
+    private val originalEntities = mutableListOf<AudioUiEntity>()
     private var showHiddenItems: Boolean? = null
 
     init {
@@ -157,7 +148,7 @@ class AudioSectionViewModel @Inject constructor(
             items = getAudioUiEntityList(),
             showHiddenItems = this@AudioSectionViewModel.showHiddenItems,
             isPaid = _state.value.accountDetail?.levelDetail?.accountType?.isPaid,
-        ).updateOriginalData().filterAudiosBySearchQuery()
+        ).updateOriginalEntities().filterAudiosBySearchQuery()
 
         val sortOrder = getCloudSortOrder()
         _state.update {
@@ -171,20 +162,27 @@ class AudioSectionViewModel @Inject constructor(
         }
     }
 
-    private fun List<AudioUiEntity>.filterAudiosBySearchQuery() =
-        filter { audio ->
-            audio.name.contains(searchQuery, true)
-        }
+    private suspend fun getAudioUiEntityList() =
+        getAllAudioUseCase().updateOriginalData().map { audioUIEntityMapper(it) }
 
-    private fun List<AudioUiEntity>.updateOriginalData() = also { data ->
+    private fun List<TypedAudioNode>.updateOriginalData() = also { data ->
         if (originalData.isNotEmpty()) {
             originalData.clear()
         }
         originalData.addAll(data)
     }
 
-    private suspend fun getAudioUiEntityList() =
-        getAllAudioUseCase().map { audioUIEntityMapper(it) }
+    private fun List<AudioUiEntity>.filterAudiosBySearchQuery() =
+        filter { audio ->
+            audio.name.contains(searchQuery, true)
+        }
+
+    private fun List<AudioUiEntity>.updateOriginalEntities() = also { entities ->
+        if (originalEntities.isNotEmpty()) {
+            originalEntities.clear()
+        }
+        originalEntities.addAll(entities)
+    }
 
     internal fun markHandledPendingRefresh() = _state.update { it.copy(isPendingRefresh = false) }
 
@@ -207,55 +205,6 @@ class AudioSectionViewModel @Inject constructor(
                 ViewType.GRID -> setViewType(ViewType.LIST)
             }
         }
-    }
-
-    /**
-     * Detect the node whether is local file
-     *
-     * @param handle node handle
-     * @return true is local file, otherwise is false
-     */
-    internal suspend fun isLocalFile(
-        handle: Long,
-    ): String? =
-        getNodeByHandle(handle)?.let { node ->
-            val localPath = getLocalFile(node)
-            File(getDownloadLocation(), node.name).let { file ->
-                if (localPath != null && ((isFileAvailable(file) && file.length() == node.size)
-                            || (node.fingerprint == getFingerprintUseCase(localPath)))
-                ) {
-                    localPath
-                } else {
-                    null
-                }
-            }
-        }
-
-    /**
-     * Update intent
-     *
-     * @param handle node handle
-     * @param fileType node file type
-     * @param intent Intent
-     * @return updated intent
-     */
-    internal suspend fun updateIntent(
-        handle: Long,
-        fileType: String,
-        intent: Intent,
-    ): Intent {
-        if (megaApiHttpServerIsRunningUseCase() == 0) {
-            megaApiHttpServerStartUseCase()
-            intent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
-        }
-
-        getFileUrlByNodeHandleUseCase(handle)?.let { url ->
-            Uri.parse(url)?.let { uri ->
-                intent.setDataAndType(uri, fileType)
-            }
-        }
-
-        return intent
     }
 
     internal fun clearAllSelectedAudios() {
@@ -290,7 +239,11 @@ class AudioSectionViewModel @Inject constructor(
     }
 
     internal fun onItemClicked(item: AudioUiEntity, index: Int) {
-        updateAudioItemInSelectionState(item = item, index = index)
+        if (_state.value.isInSelection) {
+            updateAudioItemInSelectionState(item = item, index = index)
+        } else {
+            updateClickedItem(getTypedAudioNodeById(item.id))
+        }
     }
 
     internal fun onItemLongClicked(item: AudioUiEntity, index: Int) =
@@ -351,7 +304,7 @@ class AudioSectionViewModel @Inject constructor(
     }
 
     private fun searchNodeByQueryString() {
-        val audios = originalData.filter { audio ->
+        val audios = originalEntities.filter { audio ->
             audio.name.contains(searchQuery, true)
         }
         _state.update {
@@ -401,4 +354,16 @@ class AudioSectionViewModel @Inject constructor(
             it.copy(isHiddenNodesOnboarded = true)
         }
     }
+
+    internal suspend fun getNodeContentUri(fileNode: TypedFileNode) = runCatching {
+        FileNodeContent.AudioOrVideo(uri = getNodeContentUriUseCase(fileNode)).uri
+    }.recover {
+        Timber.e(it)
+        null
+    }.getOrNull()
+
+    internal fun getTypedAudioNodeById(id: NodeId) = originalData.firstOrNull { it.id == id }
+
+    internal fun updateClickedItem(value: TypedAudioNode?) =
+        _state.update { it.copy(clickedItem = value) }
 }

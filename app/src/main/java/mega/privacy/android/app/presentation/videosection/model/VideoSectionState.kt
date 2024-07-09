@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.videosection.model
 
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 
 /**
  * The state is for the videos section
@@ -40,6 +41,8 @@ import mega.privacy.android.domain.entity.account.AccountDetail
  * @property updateToolbarTitle true is to update toolbar title
  * @property accountDetail the account detail
  * @property isHiddenNodesOnboarded if is hidden nodes onboarded
+ * @property clickedItem the clicked item
+ * @property clickedPlaylistDetailItem the clicked playlist detail item
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -76,4 +79,6 @@ data class VideoSectionState(
     val updateToolbarTitle: String? = null,
     val accountDetail: AccountDetail? = null,
     val isHiddenNodesOnboarded: Boolean = false,
+    val clickedItem: TypedVideoNode? = null,
+    val clickedPlaylistDetailItem: TypedVideoNode? = null,
 )
