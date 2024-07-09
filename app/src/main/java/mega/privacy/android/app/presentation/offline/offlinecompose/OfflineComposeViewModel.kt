@@ -231,6 +231,8 @@ class OfflineComposeViewModel @Inject constructor(
 
     /**
      * OnBackClicked
+     *
+     * @return [Int] 0 if no node was opened, and offline page should be exited
      */
     fun onBackClicked(): Int? {
         parentStack.pop()?.let { (parentId, parentTitle) ->
@@ -243,7 +245,7 @@ class OfflineComposeViewModel @Inject constructor(
             refreshOfflineNodes()
             return null
         } ?: run {
-            return -1
+            return 0
         }
     }
 

@@ -5026,7 +5026,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun handleBackPressIfFullscreenOfflineFragmentOpened() {
         if (enableOfflineCompose) {
-            fullscreenOfflineComposeFragment?.onBackClicked()?.let {
+            if (fullscreenOfflineComposeFragment == null || fullscreenOfflineComposeFragment?.onBackPressed() == 0) {
                 handleOfflineBackClick()
             }
         } else {

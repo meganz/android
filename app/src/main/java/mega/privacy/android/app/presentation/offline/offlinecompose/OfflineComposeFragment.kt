@@ -299,9 +299,9 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
     }
 
     /**
-     * On back clicked
+     * On back pressed or clicked
      */
-    fun onBackClicked(): Int? = viewModel.onBackClicked()
+    fun onBackPressed(): Int? = viewModel.onBackClicked()
 
     private fun showConfirmRemoveFromOfflineDialog(handles: List<Long>) {
         ConfirmRemoveFromOfflineDialogFragment.newInstance(handles)
