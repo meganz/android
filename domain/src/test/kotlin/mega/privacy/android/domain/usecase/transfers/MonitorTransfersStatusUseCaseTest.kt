@@ -58,6 +58,8 @@ internal class MonitorTransfersStatusUseCaseTest {
         tag = 1,
         folderTransferTag = 2,
         speed = 1L,
+        isSyncTransfer = false,
+        isBackupTransfer = false,
         isForeignOverQuota = false,
         isStreamingTransfer = false,
         isFinished = false,

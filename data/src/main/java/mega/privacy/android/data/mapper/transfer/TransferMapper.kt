@@ -33,6 +33,8 @@ internal class TransferMapper @Inject constructor(
             tag = transfer.tag,
             folderTransferTag = transfer.folderTransferTag.takeIf { it > 0 },
             speed = transfer.speed,
+            isSyncTransfer = transfer.isSyncTransfer,
+            isBackupTransfer = transfer.isBackupTransfer,
             isForeignOverQuota = transfer.isForeignOverquota,
             isStreamingTransfer = transfer.isStreamingTransfer,
             isFinished = transfer.isFinished,
@@ -41,7 +43,6 @@ internal class TransferMapper @Inject constructor(
             state = transferStateMapper(transfer.state),
             priority = transfer.priority,
             notificationNumber = transfer.notificationNumber,
-            isSyncTransfer = transfer.isSyncTransfer,
         )
     }
 

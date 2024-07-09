@@ -29,6 +29,8 @@ import java.math.BigInteger
  * @property tag An integer that identifies this transfer.
  * @property folderTransferTag tag of the initial folder transfer that initiated this transfer
  * @property speed The average speed of this transfer.
+ * @property isSyncTransfer True if this transfer belongs to the synchronization engine
+ * @property isBackupTransfer True if this transfer belongs to the backup engine
  * @property isForeignOverQuota True if the transfer has failed with MEGAErrorTypeApiEOverquota
  *                              and the target is foreign, false otherwise.
  * @property isStreamingTransfer True if this is a streaming transfer, false otherwise.
@@ -40,7 +42,6 @@ import java.math.BigInteger
  * @property priority Returns the priority of the transfer.
  *                    This value is intended to keep the order of the transfer queue on apps.
  * @property notificationNumber Returns the notification number of the SDK when this MEGATransfer was generated.
- * @property isSyncTransfer True if the transfer is a sync transfer
  */
 data class Transfer(
     override val transferType: TransferType,
@@ -55,6 +56,8 @@ data class Transfer(
     override val tag: Int,
     val folderTransferTag: Int?,
     val speed: Long,
+    val isSyncTransfer: Boolean,
+    val isBackupTransfer: Boolean,
     val isForeignOverQuota: Boolean,
     val isStreamingTransfer: Boolean,
     override val isFinished: Boolean,
@@ -63,7 +66,6 @@ data class Transfer(
     val state: TransferState,
     val priority: BigInteger,
     val notificationNumber: Long,
-    val isSyncTransfer: Boolean = false
 ) : ActiveTransfer, AppDataOwner {
 
     /**

@@ -45,6 +45,8 @@ internal class TransferMapperTest {
             tag = megaTransfer.tag,
             folderTransferTag = megaTransfer.folderTransferTag,
             speed = megaTransfer.speed,
+            isSyncTransfer = megaTransfer.isSyncTransfer,
+            isBackupTransfer = megaTransfer.isBackupTransfer,
             isForeignOverQuota = megaTransfer.isForeignOverquota,
             isStreamingTransfer = megaTransfer.isStreamingTransfer,
             isFinished = megaTransfer.isFinished,
@@ -53,14 +55,11 @@ internal class TransferMapperTest {
             state = TransferState.STATE_COMPLETED,
             priority = megaTransfer.priority,
             notificationNumber = megaTransfer.notificationNumber,
-            isSyncTransfer = megaTransfer.isSyncTransfer
         )
         assertThat(
-            TransferMapper(transferAppDataMapper, transferTypeMapper, transferStateMapper).invoke(
-                megaTransfer
-            )
-        )
-            .isEqualTo(expected)
+            TransferMapper(transferAppDataMapper, transferTypeMapper, transferStateMapper)
+                .invoke(megaTransfer)
+        ).isEqualTo(expected)
     }
 
     @ParameterizedTest
@@ -101,6 +100,8 @@ internal class TransferMapperTest {
             on { tag }.thenReturn(Random.nextInt())
             on { this.folderTransferTag }.thenReturn(folderTransferTag)
             on { speed }.thenReturn(Random.nextLong())
+            on { isSyncTransfer }.thenReturn(true)
+            on { isBackupTransfer }.thenReturn(false)
             on { isForeignOverquota }.thenReturn(Random.nextBoolean())
             on { isStreamingTransfer }.thenReturn(true)
             on { isFinished }.thenReturn(Random.nextBoolean())
@@ -109,7 +110,6 @@ internal class TransferMapperTest {
             on { state }.thenReturn(MegaTransfer.STATE_COMPLETED)
             on { priority }.thenReturn(BigInteger.ONE)
             on { notificationNumber }.thenReturn(Random.nextLong())
-            on { isSyncTransfer }.thenReturn(true)
         }
 
 
