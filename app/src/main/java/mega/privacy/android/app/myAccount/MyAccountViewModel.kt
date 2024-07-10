@@ -151,6 +151,7 @@ import javax.inject.Inject
  * @property getCurrentUserEmail
  * @property monitorVerificationStatus
  * @property snackBarHandler Handler used to display a Snackbar
+ * @property getBusinessStatusUseCase
  */
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")

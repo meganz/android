@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.myaccount
+package test.mega.privacy.android.app.presentation.cancelaccountplan.view
 
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
