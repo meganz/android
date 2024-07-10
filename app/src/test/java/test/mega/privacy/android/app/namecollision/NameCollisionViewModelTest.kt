@@ -63,7 +63,7 @@ internal class NameCollisionViewModelTest {
             copyCollidedNodesUseCase = copyCollidedNodesUseCase,
             copyCollidedNodeUseCase = copyCollidedNodeUseCase,
             monitorUserUpdates = monitorUserUpdates,
-            getNodeUseCase = mock(),
+            getNodeByHandleUseCase = mock(),
             setCopyLatestTargetPathUseCase = mock(),
             setMoveLatestTargetPathUseCase = mock(),
             copyRequestMessageMapper = copyRequestMessageMapper,

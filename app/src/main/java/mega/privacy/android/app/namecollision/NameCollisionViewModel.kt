@@ -10,7 +10,6 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -37,7 +36,6 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -52,6 +50,7 @@ import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByFingerprintAndParentNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MoveCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveCollidedNodesUseCase
 import nz.mega.sdk.MegaNode
@@ -63,7 +62,6 @@ import javax.inject.Inject
  *
  * @property getNameCollisionResultUseCase  Required for getting all the needed info for present a collision.
  * @property uploadUseCase                  Required for uploading files.
- * @property getNodeUseCase                 Required for getting node from handle
  * @property uiState                        NameCollisionUiState.
  */
 @HiltViewModel
@@ -74,7 +72,7 @@ class NameCollisionViewModel @Inject constructor(
     private val copyCollidedNodeUseCase: CopyCollidedNodeUseCase,
     private val copyCollidedNodesUseCase: CopyCollidedNodesUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
-    private val getNodeUseCase: GetNodeUseCase,
+    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
@@ -132,24 +130,32 @@ class NameCollisionViewModel @Inject constructor(
         }
     }
 
-    private fun setCopyToOrigin(collision: NameCollision.Copy, action: () -> Unit) {
-        getNodeUseCase.get(collision.nodeHandle).blockingGetOrNull()?.let { node ->
-            isCopyToOrigin = node.parentHandle == collision.parentHandle
-            action.invoke()
-        } ?: MegaNode.unserialize(collision.serializedNode)?.let { node ->
+    /**
+     * Checks if a node is attempted to be copied to its parent folder again
+     * isCopyToOrigin flag is used to create a duplicate node
+     *
+     * @param collision [NameCollision.Copy] to resolve.
+     */
+    private suspend fun checkCopyToOrigin(collision: NameCollision.Copy) {
+        runCatching {
+            getNodeByHandleUseCase(collision.nodeHandle, true)
+        }.getOrNull()?.let {
+            isCopyToOrigin = it.parentId.longValue == collision.parentHandle
+        } ?: runCatching {
+            MegaNode.unserialize(collision.serializedNode)
+        }.onSuccess { node ->
             if (!node.isForeign) {
-                node.fingerprint?.let {
-                    viewModelScope.launch {
-                        getNodeByFingerprintAndParentNodeUseCase(
-                            it,
-                            NodeId(collision.parentHandle)
-                        )?.let {
-                            isCopyToOrigin = it.parentId.longValue == collision.parentHandle
-                            action.invoke()
-                        }
+                node.fingerprint?.let { fingerprint ->
+                    getNodeByFingerprintAndParentNodeUseCase(
+                        fingerprint = fingerprint,
+                        parentNode = NodeId(collision.parentHandle)
+                    )?.let {
+                        isCopyToOrigin = it.parentId.longValue == collision.parentHandle
                     }
-                } ?: Timber.w("Fingerprint is null")
+                }
             }
+        }.onFailure {
+            Timber.w("Fingerprint is null", it)
         }
     }
 
@@ -162,10 +168,9 @@ class NameCollisionViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 if (collision is NameCollision.Copy) {
-                    setCopyToOrigin(collision) { getCurrentCollision(collision, context, true) }
-                } else {
-                    getCurrentCollision(collision, context, true)
+                    checkCopyToOrigin(collision)
                 }
+                getCurrentCollision(collision, context, true)
             }.onFailure { Timber.e("Exception setting single data $it") }
         }
     }
@@ -217,13 +222,14 @@ class NameCollisionViewModel @Inject constructor(
     fun setData(collisions: ArrayList<NameCollision>, context: Context) {
         viewModelScope.launch {
             runCatching {
-                val firstCollision = collisions[0]
-                if (firstCollision is NameCollision.Copy) {
-                    setCopyToOrigin(firstCollision) { getCollisionResult(collisions, context) }
-                } else {
-                    getCollisionResult(collisions, context)
+                require(collisions.isNotEmpty()) { "Collisions list is empty" }
+                collisions.first().let {
+                    if (it is NameCollision.Copy) {
+                        checkCopyToOrigin(it)
+                    }
                 }
-            }.onFailure { Timber.e("Exception setting data $it") }
+                getCollisionResult(collisions, context)
+            }.onFailure { Timber.e("Exception setting data", it) }
         }
     }
 
@@ -863,11 +869,4 @@ class NameCollisionViewModel @Inject constructor(
         super.onCleared()
         composite.clear()
     }
-
-    private fun <T : Any> Single<T>.blockingGetOrNull(): T? =
-        try {
-            blockingGet()
-        } catch (ignore: Exception) {
-            null
-        }
 }
