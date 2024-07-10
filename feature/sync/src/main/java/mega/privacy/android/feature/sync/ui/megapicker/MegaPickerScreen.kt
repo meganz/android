@@ -141,9 +141,9 @@ private fun MegaPickerScreenContent(
             onSortOrderClick = {},
             onChangeViewTypeClick = {},
             nodesList = nodes,
-            sortOrder = "Name",
-            showSortOrder = true,
-            showChangeViewType = true,
+            sortOrder = "",
+            showSortOrder = false,
+            showChangeViewType = false,
             listState = LazyListState(),
             onFolderClick = {
                 folderClicked(it)
