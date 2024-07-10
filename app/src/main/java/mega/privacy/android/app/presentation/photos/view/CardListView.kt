@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,6 +41,7 @@ import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.DateCardCount
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 
 @Composable
 fun CardListView(
@@ -59,11 +59,14 @@ fun CardListView(
             DateCardCount.Grid.landscape
         }
 
-    LazyVerticalGrid(
+    FastScrollLazyVerticalGrid(
+        totalItems = dateCards.size,
         columns = GridCells.Fixed(spanCount),
-        modifier = Modifier
-            .fillMaxSize(),
-        state = state
+        modifier = Modifier.fillMaxSize(),
+        state = state,
+        tooltipText = { index ->
+            dateCards.getOrNull(index)?.date ?: ""
+        },
     ) {
         item(
             span = { GridItemSpan(currentLineSpan = maxCurrentLineSpan) }

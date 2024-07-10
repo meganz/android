@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.Icon
@@ -65,6 +64,7 @@ import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_YEAR_WITH_M
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_032
 import mega.privacy.android.shared.original.core.ui.theme.white
 import java.text.SimpleDateFormat
@@ -99,11 +99,24 @@ internal fun PhotosGridView(
         }
     }
 
-    LazyVerticalGrid(
+    val context = LocalContext.current
+
+    FastScrollLazyVerticalGrid(
+        totalItems = uiPhotoList.size,
         columns = GridCells.Fixed(spanCount),
-        modifier = modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         state = lazyGridState,
+        tooltipText = { index ->
+            val modificationTime = when (val item = uiPhotoList[index]) {
+                is UIPhoto.Separator -> item.modificationTime
+                is UIPhoto.PhotoItem -> item.photo.modificationTime
+            }
+            dateText(
+                modificationTime = modificationTime,
+                currentZoomLevel = currentZoomLevel,
+                locale = context.resources.configuration.locales[0],
+            )
+        },
     ) {
         this.itemsIndexed(
             items = uiPhotoList,

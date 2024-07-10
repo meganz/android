@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.Text
@@ -29,13 +28,13 @@ import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
 
-const val DATE_FORMAT_YEAR = "uuuu"
 const val DATE_FORMAT_YEAR_WITH_MONTH = "yyyy"
 const val DATE_FORMAT_MONTH = "LLLL"
 const val DATE_FORMAT_DAY = "dd"
@@ -71,11 +70,22 @@ fun PhotosGridView(
     val context = LocalContext.current
     val uiPhotoList = timelineViewState.photosListItems
 
-    LazyVerticalGrid(
+    FastScrollLazyVerticalGrid(
+        totalItems = uiPhotoList.size,
         columns = GridCells.Fixed(spanCount),
-        modifier = modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         state = lazyGridState,
+        tooltipText = { index ->
+            val modificationTime = when (val item = uiPhotoList[index]) {
+                is PhotoListItem.Separator -> item.modificationTime
+                is PhotoListItem.PhotoGridItem -> item.photo.modificationTime
+            }
+            dateText(
+                modificationTime = modificationTime,
+                currentZoomLevel = timelineViewState.currentZoomLevel,
+                locale = context.resources.configuration.locales[0],
+            )
+        },
     ) {
         if (timelineViewState.isCameraUploadsLimitedAccess) {
             item(

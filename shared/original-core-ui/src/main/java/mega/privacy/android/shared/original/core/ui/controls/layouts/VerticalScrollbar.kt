@@ -122,10 +122,12 @@ private fun VerticalScrollbar(
 
     val thumbOffset by remember {
         derivedStateOf {
-            val scrollProportion = if (reverseLayout) {
-                1 - firstVisibleItemIndex.value.toFloat() / scrollableItemsAmount
-            } else {
-                firstVisibleItemIndex.value.toFloat() / scrollableItemsAmount
+            val isScrollToEnd =
+                firstVisibleItemIndex.value == lastVisibleItemIndex.value || scrollableItemsAmount == 0
+            val scrollProportion = when {
+                isScrollToEnd -> if (reverseLayout) 0f else 1f
+                reverseLayout -> 1 - firstVisibleItemIndex.value.toFloat() / scrollableItemsAmount
+                else -> firstVisibleItemIndex.value.toFloat() / scrollableItemsAmount
             }
             scrollableHeight * scrollProportion
         }
