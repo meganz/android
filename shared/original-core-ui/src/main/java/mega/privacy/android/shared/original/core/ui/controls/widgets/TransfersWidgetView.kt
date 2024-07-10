@@ -2,6 +2,12 @@ package mega.privacy.android.shared.original.core.ui.controls.widgets
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,22 +19,82 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+
+/**
+ * Sets a transfers widget as the content of this ComposeView.
+ *
+ * @param transfersInfoFlow a flow with the info to update the widget
+ * @param visibleFlow a flow to show or hide the widget
+ */
+fun ComposeView.setTransfersWidgetContent(
+    transfersInfoFlow: Flow<TransfersInfo>,
+    visibleFlow: Flow<Boolean>,
+    onClick: () -> Unit,
+) {
+
+    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    setContent {
+        val transfersInfo by transfersInfoFlow.collectAsStateWithLifecycle(
+            TransfersInfo()
+        )
+        val widgetVisible by visibleFlow.collectAsStateWithLifecycle(
+            false
+        )
+        OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+            TransfersWidgetViewAnimated(
+                transfersInfo = transfersInfo,
+                visible = widgetVisible,
+                onClick = onClick,
+            )
+        }
+    }
+}
+
+/**
+ * Widget to show current transfers progress with animated visibility
+ */
+@Composable
+fun TransfersWidgetViewAnimated(
+    transfersInfo: TransfersInfo,
+    visible: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) = AnimatedVisibility(
+    visible = visible,
+    enter = scaleIn(animationSpecs, initialScale = animationScale) + fadeIn(
+        animationSpecs
+    ),
+    exit = scaleOut(animationSpecs, targetScale = animationScale) + fadeOut(
+        animationSpecs
+    ),
+    modifier = modifier,
+) {
+    TransfersWidgetView(
+        transfersInfo = transfersInfo,
+        onClick = onClick,
+    )
+}
 
 /**
  * Widget to show current transfers progress
@@ -41,7 +107,9 @@ fun TransfersWidgetView(
 ) {
     FloatingActionButton(
         onClick = onClick,
-        modifier = modifier.padding(bottom = 16.dp, end = 16.dp, start = 16.dp),
+        modifier = modifier
+            .testTag(TAG_TRANSFERS_WIDGET)
+            .padding(bottom = 16.dp, end = 16.dp, start = 16.dp),
         backgroundColor = MegaOriginalTheme.colors.background.surface1,
     ) {
 
@@ -121,15 +189,22 @@ private const val innerRadius = diameter / 2.75f
 private const val outerRadius = innerRadius + thickness / 2f
 private const val padding = diameter / 2f - outerRadius
 
+private const val animationScale = 0.2f
+private const val animationDuration = 300
+private val animationSpecs = TweenSpec<Float>(durationMillis = animationDuration)
+
 /**
  * debug tag for status icon
  */
-const val TAG_STATUS_ICON = "statusIcon"
+internal const val TAG_STATUS_ICON = "statusIcon"
 
 /**
  * debug tag for downloading / uploading icon
  */
-const val TAG_UPLOADING_DOWNLOADING_ICON = "uploadingDownloading"
+internal const val TAG_UPLOADING_DOWNLOADING_ICON = "uploadingDownloading"
+
+internal const val TAG_TRANSFERS_WIDGET = "transfers_widget_view:button:floating_button"
+
 
 @CombinedThemePreviews
 @Composable

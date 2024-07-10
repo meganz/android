@@ -6,19 +6,10 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -35,14 +26,12 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -51,8 +40,6 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetView
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -66,12 +53,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         private const val IS_CANCEL_TRANSFERS_SHOWN = "IS_CANCEL_TRANSFERS_SHOWN"
         private const val SHOW_SCANNING_DIALOG_TIMER = 800L
         private const val HIDE_SCANNING_DIALOG_TIMER = 1200L
-        private const val animationDuration = 300
-        private const val animationScale = 0.2f
-        private val animationSpecs = TweenSpec<Float>(durationMillis = animationDuration)
     }
-
-    private var transfersWidget: ComposeView? = null
 
     private var scanningTransfersDialog: AlertDialog? = null
     private var cancelTransfersDialog: AlertDialog? = null
@@ -247,38 +229,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
                     }
                 }
             }.start()
-    }
-
-    /**
-     * Sets a view as transfers widget.
-     *
-     * @param transfersWidget RelativeLayout view to set
-     */
-    protected fun setTransfersWidgetLayout(transfersWidget: ComposeView) {
-        this.transfersWidget = transfersWidget
-        transfersWidget.setContent {
-            val themeMode by getThemeMode()
-                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            val uiState by transfersManagementViewModel.state.collectAsStateWithLifecycle(
-                TransferManagementUiState()
-            )
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
-                AnimatedVisibility(
-                    visible = uiState.widgetVisible,
-                    enter = scaleIn(animationSpecs, initialScale = animationScale) + fadeIn(
-                        animationSpecs
-                    ),
-                    exit = scaleOut(animationSpecs, targetScale = animationScale) + fadeOut(
-                        animationSpecs
-                    ),
-                ) {
-                    TransfersWidgetView(
-                        transfersInfo = uiState.transfersInfo,
-                        onClick = this@TransfersManagementActivity::onTransfersWidgetClick,
-                    )
-                }
-            }
-        }
     }
 
     /**

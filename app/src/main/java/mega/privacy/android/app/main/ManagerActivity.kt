@@ -101,6 +101,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -319,6 +320,7 @@ import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.shared.original.core.ui.controls.widgets.setTransfersWidgetContent
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ChatRoomsBottomNavigationItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
@@ -872,7 +874,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             // Apply the previous Appbar elevation(e.g. before rotation) after all views have been created
             handler.postDelayed({ changeAppBarElevation(true, elevationCause) }, 100)
         }
-        setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout))
         setupAudioPlayerController()
         megaApi.getAccountAchievements(this)
         if (!viewModel.isConnected) {
@@ -965,6 +966,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         setContentView(R.layout.activity_manager)
         initialiseViews()
         addStartTransferView()
+        findViewById<ComposeView>(R.id.transfers_widget).setTransfersWidgetContent(
+            transfersInfoFlow = transfersManagementViewModel.state.map { it.transfersInfo },
+            visibleFlow = transfersManagementViewModel.state.map { it.widgetVisible },
+            onClick = ::onTransfersWidgetClick
+        )
         setInitialViewProperties()
         setViewListeners()
     }
@@ -5051,7 +5057,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     fun adjustTransferWidgetPositionInHomepage() {
         if (isInMainHomePage) {
             val transfersWidgetLayout: View =
-                findViewById(R.id.transfers_widget_layout)
+                findViewById(R.id.transfers_widget)
                     ?: return
             val params = transfersWidgetLayout.layoutParams as LinearLayout.LayoutParams
             params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM.toFloat(), outMetrics)
@@ -7712,7 +7718,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     private fun updateTransfersWidgetPosition(bNVHidden: Boolean) {
         val transfersWidgetLayout: View =
-            findViewById(R.id.transfers_widget_layout)
+            findViewById(R.id.transfers_widget)
                 ?: return
         val params = transfersWidgetLayout.layoutParams as LinearLayout.LayoutParams
         params.gravity = Gravity.END

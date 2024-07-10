@@ -2,12 +2,6 @@ package mega.privacy.android.app.presentation.filelink.view
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +43,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.Confirmatio
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
-import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetView
+import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
@@ -150,18 +144,11 @@ internal fun FileLinkView(
             }
         },
         floatingActionButton = {
-            AnimatedVisibility(
+            TransfersWidgetViewAnimated(
+                transfersInfo = transferState.transfersInfo,
                 visible = transferState.widgetVisible,
-                enter = scaleIn(animationSpecs, initialScale = animationScale) +
-                        fadeIn(animationSpecs),
-                exit = scaleOut(animationSpecs, targetScale = animationScale) +
-                        fadeOut(animationSpecs),
-            ) {
-                TransfersWidgetView(
-                    transfersInfo = transferState.transfersInfo,
-                    onClick = onTransferWidgetClick,
-                )
-            }
+                onClick = onTransferWidgetClick,
+            )
         },
         headerSpacerHeight = if (viewState.iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp,
         modifier = modifier,
@@ -294,8 +281,5 @@ private fun PreviewFileLinkView() {
     }
 }
 
-internal const val animationDuration = 300
-internal const val animationScale = 0.2f
-internal val animationSpecs = TweenSpec<Float>(durationMillis = animationDuration)
 private const val MAX_HEADER_HEIGHT = 96
 private const val APP_BAR_HEIGHT = 56

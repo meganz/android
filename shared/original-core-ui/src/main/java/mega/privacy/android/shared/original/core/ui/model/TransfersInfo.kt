@@ -2,7 +2,7 @@ package mega.privacy.android.shared.original.core.ui.model
 
 
 /**
- * Transfers info.
+ * Transfers info to show progress in transfer widget view.
  *
  * @property status                             the current status of transfers
  * @property totalSizeAlreadyTransferred        total size already transferred

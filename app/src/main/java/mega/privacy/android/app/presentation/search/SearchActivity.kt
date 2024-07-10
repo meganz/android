@@ -7,11 +7,6 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -47,7 +42,6 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.session.SessionContainer
-import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetView
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -58,8 +52,6 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.filelink.view.animationScale
-import mega.privacy.android.app.presentation.filelink.view.animationSpecs
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.BackupsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
@@ -108,6 +100,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
@@ -263,22 +256,14 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             .semantics { testTagsAsResourceId = true },
                         scaffoldState = scaffoldState,
                         floatingActionButton = {
-                            AnimatedVisibility(
+                            TransfersWidgetViewAnimated(
+                                transfersInfo = transferState.transfersInfo,
                                 visible = transferState.widgetVisible,
-                                enter = scaleIn(animationSpecs, initialScale = animationScale) +
-                                        fadeIn(animationSpecs),
-                                exit = scaleOut(animationSpecs, targetScale = animationScale) +
-                                        fadeOut(animationSpecs),
-                                modifier = Modifier.navigationBarsPadding(),
-                            ) {
-                                TransfersWidgetView(
-                                    transfersInfo = transferState.transfersInfo,
-                                    onClick = ::transfersWidgetClicked,
-                                    modifier = Modifier.testTag(
-                                        SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG
-                                    )
-                                )
-                            }
+                                onClick = ::transfersWidgetClicked,
+                                modifier = Modifier
+                                    .navigationBarsPadding()
+                                    .testTag(SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG)
+                            )
                         },
                     ) { padding ->
                         ConstraintLayout(

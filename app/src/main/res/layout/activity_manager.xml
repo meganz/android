@@ -95,8 +95,8 @@
                 android:fitsSystemWindows="true"
                 android:orientation="vertical">
 
-                <include
-                    layout="@layout/transfers_widget"
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/transfers_widget"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end" />

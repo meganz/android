@@ -6,11 +6,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -60,13 +55,10 @@ import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetView
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
 import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.filelink.view.animationScale
-import mega.privacy.android.app.presentation.filelink.view.animationSpecs
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
@@ -78,6 +70,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
@@ -227,18 +220,11 @@ internal fun FolderLinkView(
             }
         },
         floatingActionButton = {
-            AnimatedVisibility(
+            TransfersWidgetViewAnimated(
+                transfersInfo = transferState.transfersInfo,
                 visible = transferState.widgetVisible,
-                enter = scaleIn(animationSpecs, initialScale = animationScale) +
-                        fadeIn(animationSpecs),
-                exit = scaleOut(animationSpecs, targetScale = animationScale) +
-                        fadeOut(animationSpecs),
-            ) {
-                TransfersWidgetView(
-                    transfersInfo = transferState.transfersInfo,
-                    onClick = onTransferWidgetClick,
-                )
-            }
+                onClick = onTransferWidgetClick,
+            )
         }
     ) {
         if (state.nodesList.isEmpty()) {

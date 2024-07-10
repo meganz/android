@@ -2,6 +2,7 @@ package mega.privacy.android.shared.original.core.ui.controls.widgets
 
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -56,6 +57,32 @@ class TransfersWidgetViewTest {
         }
         composeTestRule.onNodeWithTag(TAG_UPLOADING_DOWNLOADING_ICON, useUnmergedTree = true)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that transfer widget animated is shown when visibility is set to true`() {
+        composeTestRule.setContent {
+            TransfersWidgetViewAnimated(
+                TransfersInfo(TransfersStatus.Transferring, 10, 5, false),
+                visible = true,
+                onClick = {},
+            )
+        }
+        composeTestRule.onNodeWithTag(TAG_TRANSFERS_WIDGET, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that transfer widget animated is not shown when visibility is set to false`() {
+        composeTestRule.setContent {
+            TransfersWidgetViewAnimated(
+                TransfersInfo(TransfersStatus.Transferring, 10, 5, false),
+                visible = false,
+                onClick = {},
+            )
+        }
+        composeTestRule.onNodeWithTag(TAG_TRANSFERS_WIDGET, useUnmergedTree = true)
+            .assertIsNotDisplayed()
     }
 
     private fun testStatusIcon(status: TransfersStatus) {
