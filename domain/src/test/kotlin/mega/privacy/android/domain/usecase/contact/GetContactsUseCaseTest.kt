@@ -1,14 +1,12 @@
-package mega.privacy.android.app.contacts.usecase
+package mega.privacy.android.domain.usecase.contact
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -24,11 +22,8 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
-import nz.mega.sdk.MegaChatApi
-import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -37,17 +32,10 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.verifyNoInteractions
-import test.mega.privacy.android.app.InstantExecutorExtension
-import test.mega.privacy.android.app.TestSchedulerExtension
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-@OptIn(ExperimentalCoroutinesApi::class)
-@ExtendWith(
-    InstantExecutorExtension::class,
-    CoroutineMainDispatcherExtension::class,
-    TestSchedulerExtension::class
-)
+
 class GetContactsUseCaseTest {
     private lateinit var underTest: GetContactsUseCase
 
@@ -140,7 +128,7 @@ class GetContactsUseCaseTest {
         val userEmail = "email"
         val initial = ContactData(fullName = "Initial", alias = "alias", avatarUri = null)
         val expected = ContactData(fullName = "Expected", alias = "alias", avatarUri = null)
-        val changes = listOf(MegaUser.CHANGE_TYPE_FIRSTNAME)
+        val changes = listOf(UserChanges.Firstname)
 
         stubContact(
             userHandle = userHandle,
@@ -168,7 +156,7 @@ class GetContactsUseCaseTest {
         val userEmail = "email"
         val initial = ContactData(fullName = "Initial", alias = "alias", avatarUri = null)
         val expected = ContactData(fullName = "Expected", alias = "alias", avatarUri = null)
-        val changes = listOf(MegaUser.CHANGE_TYPE_LASTNAME)
+        val changes = listOf(UserChanges.Lastname)
 
         stubContact(
             userHandle = userHandle,
@@ -197,7 +185,7 @@ class GetContactsUseCaseTest {
         val initial = ContactData(fullName = "Initial", alias = "alias", avatarUri = null)
         val newUri = "newUri"
         val expected = ContactData(fullName = "Expected", alias = "alias", avatarUri = newUri)
-        val changes = listOf(MegaUser.CHANGE_TYPE_FIRSTNAME)
+        val changes = listOf(UserChanges.Firstname)
 
         stubContact(
             userHandle = userHandle,
@@ -232,7 +220,7 @@ class GetContactsUseCaseTest {
         stubContact(
             userHandle = userHandle, userEmail = userEmail, alias = oldAlias.alias.orEmpty()
         )
-        stubGlobalUpdate(notUserEmail, notUserHandle, listOf(MegaUser.CHANGE_TYPE_ALIAS))
+        stubGlobalUpdate(notUserEmail, notUserHandle, listOf(UserChanges.Alias))
 
         val newAlias = ContactData(
             fullName = "name", alias = "newAlias", avatarUri = null
@@ -316,7 +304,7 @@ class GetContactsUseCaseTest {
         stubContact(userHandle = userHandle.toLong(), userEmail = "email", isNew = true)
 
         val expectedChatId = 123L
-        val expectedState = MegaChatApi.CHAT_CONNECTION_ONLINE
+        val expectedState = ChatConnectionStatus.Online
 
         val chatRoom = mock<ChatRoom> {
             on { chatId } doReturn expectedChatId
@@ -350,7 +338,7 @@ class GetContactsUseCaseTest {
         stubGlobalUpdate(
             userEmail = userEmail,
             userHandle = userHandle,
-            changes = listOf(MegaUser.CHANGE_TYPE_AUTHRING),
+            changes = listOf(UserChanges.AuthenticationInformation),
         )
 
         initUnderTest()
@@ -362,25 +350,18 @@ class GetContactsUseCaseTest {
         verifyBlocking(contactsRepository, times(2)) { getVisibleContacts() }
     }
 
-    private fun stubChatConnectionUpdate(expectedChatId: Long, expectedState: Int) {
+    private fun stubChatConnectionUpdate(expectedChatId: Long, expectedState: ChatConnectionStatus) {
         contactsRepository.stub {
             on { monitorChatConnectionStateUpdates() } doReturn flow {
                 emit(
                     ChatConnectionState(
                         chatId = expectedChatId,
-                        chatConnectionStatus = getConnectedStatusFromInt(expectedState)
+                        chatConnectionStatus = expectedState
                     )
                 )
                 awaitCancellation()
             }
         }
-    }
-
-    private fun getConnectedStatusFromInt(expectedState: Int) = when (expectedState) {
-        MegaChatApi.CHAT_CONNECTION_OFFLINE -> ChatConnectionStatus.Offline
-        MegaChatApi.CHAT_CONNECTION_IN_PROGRESS -> ChatConnectionStatus.InProgress
-        MegaChatApi.CHAT_CONNECTION_ONLINE -> ChatConnectionStatus.Online
-        else -> ChatConnectionStatus.Unknown
     }
 
     private fun stubLastGreenUpdate(userHandle: Long, lastGreen: Int) {
@@ -414,7 +395,7 @@ class GetContactsUseCaseTest {
     private fun stubGlobalUpdate(
         userEmail: String,
         userHandle: Long,
-        changes: List<Int>,
+        changes: List<UserChanges>,
         userVisibility: UserVisibility = UserVisibility.Visible,
     ) {
         accountRepository.stub {
@@ -433,50 +414,14 @@ class GetContactsUseCaseTest {
 
     private fun stubChangesList(
         userHandle: Long,
-        changes: List<Int>,
+        changes: List<UserChanges>,
         userVisibility: UserVisibility,
     ) = mapOf(
-        UserId(userHandle) to (mapChanges(changes).takeUnless { it.isEmpty() }
+        UserId(userHandle) to (changes.takeUnless { it.isEmpty() }
             ?: listOf(
                 UserChanges.Visibility(userVisibility)
             ))
     )
-
-    private fun mapChanges(changes: List<Int>) = changes.mapNotNull {
-        when (it) {
-            MegaUser.CHANGE_TYPE_AUTHRING -> UserChanges.AuthenticationInformation
-            MegaUser.CHANGE_TYPE_LSTINT -> UserChanges.LastInteractionTimestamp
-            MegaUser.CHANGE_TYPE_AVATAR -> UserChanges.Avatar
-            MegaUser.CHANGE_TYPE_FIRSTNAME -> UserChanges.Firstname
-            MegaUser.CHANGE_TYPE_LASTNAME -> UserChanges.Lastname
-            MegaUser.CHANGE_TYPE_EMAIL -> UserChanges.Email
-            MegaUser.CHANGE_TYPE_KEYRING -> UserChanges.Keyring
-            MegaUser.CHANGE_TYPE_COUNTRY -> UserChanges.Country
-            MegaUser.CHANGE_TYPE_BIRTHDAY -> UserChanges.Birthday
-            MegaUser.CHANGE_TYPE_PUBKEY_CU255 -> UserChanges.ChatPublicKey
-            MegaUser.CHANGE_TYPE_PUBKEY_ED255 -> UserChanges.SigningPublicKey
-            MegaUser.CHANGE_TYPE_SIG_PUBKEY_RSA -> UserChanges.RsaPublicKeySignature
-            MegaUser.CHANGE_TYPE_SIG_PUBKEY_CU255 -> UserChanges.ChatPublicKeySignature
-            MegaUser.CHANGE_TYPE_LANGUAGE -> UserChanges.Language
-            MegaUser.CHANGE_TYPE_PWD_REMINDER -> UserChanges.PasswordReminder
-            MegaUser.CHANGE_TYPE_DISABLE_VERSIONS -> UserChanges.DisableVersions
-            MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION -> UserChanges.ContactLinkVerification
-            MegaUser.CHANGE_TYPE_RICH_PREVIEWS -> UserChanges.RichPreviews
-            MegaUser.CHANGE_TYPE_RUBBISH_TIME -> UserChanges.RubbishTime
-            MegaUser.CHANGE_TYPE_STORAGE_STATE -> UserChanges.StorageState
-            MegaUser.CHANGE_TYPE_GEOLOCATION -> UserChanges.Geolocation
-            MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER -> UserChanges.CameraUploadsFolder
-            MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER -> UserChanges.MyChatFilesFolder
-            MegaUser.CHANGE_TYPE_PUSH_SETTINGS -> UserChanges.PushSettings
-            MegaUser.CHANGE_TYPE_ALIAS -> UserChanges.Alias
-            MegaUser.CHANGE_TYPE_UNSHAREABLE_KEY -> UserChanges.UnshareableKey
-            MegaUser.CHANGE_TYPE_DEVICE_NAMES -> UserChanges.DeviceNames
-            MegaUser.CHANGE_TYPE_MY_BACKUPS_FOLDER -> UserChanges.MyBackupsFolder
-            MegaUser.CHANGE_TYPE_COOKIE_SETTINGS -> UserChanges.CookieSettings
-            MegaUser.CHANGE_TYPE_NO_CALLKIT -> UserChanges.NoCallkit
-            else -> null
-        }
-    }
 
     private fun stubContactsList(list: List<ContactItem>, vararg lists: List<ContactItem>) {
         contactsRepository.stub {

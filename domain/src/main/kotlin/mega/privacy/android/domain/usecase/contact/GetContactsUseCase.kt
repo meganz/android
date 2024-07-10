@@ -1,4 +1,4 @@
-package mega.privacy.android.app.contacts.usecase
+package mega.privacy.android.domain.usecase.contact
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -33,7 +33,7 @@ import javax.inject.Inject
  * @property contactsRepository Repository to provide information about contacts.
  * @property chatRepository Repository to provide information about chats.
  */
-internal class GetContactsUseCase @Inject constructor(
+class GetContactsUseCase @Inject constructor(
     private val accountsRepository: AccountRepository,
     private val contactsRepository: ContactsRepository,
     private val chatRepository: ChatRepository,

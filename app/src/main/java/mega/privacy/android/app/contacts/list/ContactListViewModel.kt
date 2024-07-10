@@ -26,7 +26,6 @@ import mega.privacy.android.app.contacts.list.data.ContactActionItem.Type
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.contacts.list.data.ContactListState
 import mega.privacy.android.app.contacts.mapper.ContactItemDataMapper
-import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
@@ -36,6 +35,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestsUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
