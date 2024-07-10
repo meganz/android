@@ -256,6 +256,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     TransfersSection(
         "Enable new transfers fragment",
         false
+    ),
+
+    /**
+     * New import section
+     */
+    ImportSection(
+        "Enable new import screen",
+        false
     );
 
     companion object : FeatureFlagValueProvider {
