@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferData
@@ -512,4 +513,20 @@ interface TransferRepository {
      * @return a flow that emits true if UploadsWorker is enqueued. false otherwise
      */
     fun isUploadsWorkerEnqueuedFlow(): Flow<Boolean>
+
+
+    /**
+     * Updates or adds a new transfer to the in progress transfers list.
+     */
+    suspend fun updateInProgressTransfer(transfer: Transfer)
+
+    /**
+     * Monitor in progress transfers flow.
+     */
+    fun monitorInProgressTransfers(): Flow<Map<Int, InProgressTransfer>>
+
+    /**
+     * Remove in progress transfer by tag.
+     */
+    suspend fun removeInProgressTransfer(tag: Int)
 }

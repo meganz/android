@@ -41,6 +41,7 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
 import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
+import mega.privacy.android.data.mapper.transfer.InProgressTransferMapper
 import mega.privacy.android.data.mapper.transfer.PausedTransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferDataMapper
@@ -54,6 +55,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -103,11 +105,17 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val megaNodeMapper: MegaNodeMapper,
     private val sdCardGateway: SDCardGateway,
     private val deviceGateway: DeviceGateway,
+    private val inProgressTransferMapper: InProgressTransferMapper,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
 
     private val monitorAskedResumeTransfers = MutableStateFlow(false)
+
+    /**
+     * To store in progress transfers in memory instead of in database
+     */
+    private val inProgressTransfersFlow = MutableStateFlow<Map<Int, InProgressTransfer>>(emptyMap())
 
     /**
      * to store current transferred bytes in memory instead of in database
@@ -431,6 +439,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         withContext(ioDispatcher) {
             val completedTransfer = completedTransferMapper(transfer, megaException, transferPath)
             megaLocalRoomGateway.addCompletedTransfer(completedTransfer)
+            removeInProgressTransfer(transfer.tag)
             appEventGateway.broadcastCompletedTransfer(completedTransfer)
         }
     }
@@ -669,6 +678,25 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.monitorUploadsStatusInfo().map { workInfos ->
             workInfos.any { it.state == WorkInfo.State.ENQUEUED }
         }
+
+    override suspend fun updateInProgressTransfer(transfer: Transfer) {
+        val inProgressTransfer = inProgressTransferMapper(transfer)
+        inProgressTransfersFlow.update { inProgressTransfers ->
+            inProgressTransfers.toMutableMap().also {
+                it[transfer.tag] = inProgressTransfer
+            }
+        }
+    }
+
+    override fun monitorInProgressTransfers() = inProgressTransfersFlow
+
+    override suspend fun removeInProgressTransfer(tag: Int) {
+        inProgressTransfersFlow.update { inProgressTransfers ->
+            inProgressTransfers.toMutableMap().also {
+                it.remove(tag)
+            }
+        }
+    }
 }
 
 private fun MegaTransfer.isBackgroundTransfer() =

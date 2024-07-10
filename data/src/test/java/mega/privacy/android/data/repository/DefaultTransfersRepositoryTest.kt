@@ -23,6 +23,7 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
 import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
+import mega.privacy.android.data.mapper.transfer.InProgressTransferMapper
 import mega.privacy.android.data.mapper.transfer.PausedTransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferDataMapper
@@ -38,6 +39,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -93,6 +95,7 @@ class DefaultTransfersRepositoryTest {
     private val megaNodeMapper = mock<MegaNodeMapper>()
     private val sdCardGateway = mock<SDCardGateway>()
     private val deviceGateway = mock<DeviceGateway>()
+    private val inProgressTransferMapper = mock<InProgressTransferMapper>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -124,6 +127,7 @@ class DefaultTransfersRepositoryTest {
             megaNodeMapper = megaNodeMapper,
             sdCardGateway = sdCardGateway,
             deviceGateway = deviceGateway,
+            inProgressTransferMapper = inProgressTransferMapper,
         )
     }
 
@@ -144,6 +148,7 @@ class DefaultTransfersRepositoryTest {
             megaNodeMapper,
             sdCardGateway,
             deviceGateway,
+            inProgressTransferMapper,
         )
     }
 
@@ -1208,7 +1213,7 @@ class DefaultTransfersRepositoryTest {
         private fun stubActiveTransfer(
             transfer: Transfer,
             transferType: TransferType,
-            transferredBytes:Long = 900L
+            transferredBytes: Long = 900L,
         ) {
             val total = 1024L
             val tag = 1
@@ -1329,4 +1334,92 @@ class DefaultTransfersRepositoryTest {
             )
         }
     }
+
+    @Test
+    fun `test that monitorInProgressTransfers emits empty map when no in progress transfers has been added`() =
+        runTest {
+            setUp()
+            underTest.monitorInProgressTransfers().test {
+                assertThat(awaitItem()).isEqualTo(emptyMap<Int, InProgressTransfer>())
+            }
+        }
+
+    @Test
+    fun `test that monitorInProgressTransfers emits a map with a transfer after call updateInProgressTransfer`() =
+        runTest {
+            val tag = 1
+            val transfer = mock<Transfer> {
+                on { this.tag } doReturn tag
+            }
+            val expected = mock<InProgressTransfer> {
+                on { this.tag } doReturn tag
+            }
+
+            setUp()
+            whenever(inProgressTransferMapper(transfer)).thenReturn(expected)
+
+            underTest.monitorInProgressTransfers().test {
+                assertThat(awaitItem()).isEqualTo(emptyMap<Int, InProgressTransfer>())
+                underTest.updateInProgressTransfer(transfer)
+                assertThat(awaitItem()).isEqualTo(mapOf(Pair(tag, expected)))
+            }
+        }
+
+    @Test
+    fun `test that monitorInProgressTransfers correctly after different calls to updateInProgressTransfer and addCompletedTransfer`() =
+        runTest {
+            val tag1 = 1
+            val tag2 = 2
+            val tag3 = 3
+            val tag4 = 4
+            val transfer1 = mock<Transfer> {
+                on { this.tag } doReturn tag1
+            }
+            val transfer2 = mock<Transfer> {
+                on { this.tag } doReturn tag2
+            }
+            val transfer3 = mock<Transfer> {
+                on { this.tag } doReturn tag3
+            }
+            val transfer4 = mock<Transfer> {
+                on { this.tag } doReturn tag4
+            }
+            val inProgressTransfer1 = mock<InProgressTransfer> {
+                on { this.tag } doReturn tag1
+            }
+            val inProgressTransfer2 = mock<InProgressTransfer> {
+                on { this.tag } doReturn tag2
+            }
+            val inProgressTransfer3 = mock<InProgressTransfer> {
+                on { this.tag } doReturn tag3
+            }
+
+            setUp()
+            whenever(inProgressTransferMapper(transfer1)).thenReturn(inProgressTransfer1)
+            whenever(inProgressTransferMapper(transfer2)).thenReturn(inProgressTransfer2)
+            whenever(inProgressTransferMapper(transfer3)).thenReturn(inProgressTransfer3)
+
+            underTest.monitorInProgressTransfers().test {
+                assertThat(awaitItem()).isEqualTo(emptyMap<Int, InProgressTransfer>())
+                underTest.updateInProgressTransfer(transfer1)
+                assertThat(awaitItem()).isEqualTo(mapOf(Pair(tag1, inProgressTransfer1)))
+                underTest.updateInProgressTransfer(transfer2)
+                assertThat(awaitItem()).isEqualTo(
+                    mapOf(
+                        Pair(tag1, inProgressTransfer1),
+                        Pair(tag2, inProgressTransfer2)
+                    )
+                )
+                underTest.addCompletedTransfer(transfer1, null, "")
+                assertThat(awaitItem()).isEqualTo(mapOf(Pair(tag2, inProgressTransfer2)))
+                underTest.updateInProgressTransfer(transfer3)
+                assertThat(awaitItem()).isEqualTo(
+                    mapOf(
+                        Pair(tag2, inProgressTransfer2),
+                        Pair(tag3, inProgressTransfer3)
+                    )
+                )
+                underTest.addCompletedTransfer(transfer4, null, "")
+            }
+        }
 }

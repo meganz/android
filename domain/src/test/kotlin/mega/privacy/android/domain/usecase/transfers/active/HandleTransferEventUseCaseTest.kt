@@ -321,6 +321,15 @@ class HandleTransferEventUseCaseTest {
         verify(handleAvailableOfflineEventUseCase).invoke(transferEvent)
     }
 
+    @ParameterizedTest
+    @MethodSource("provideStartPauseUpdateEvents")
+    fun `test that updateInProgressTransfer in repository is invoked when start, pause or update event is received`(
+        transferEvent: TransferEvent,
+    ) = runTest {
+        underTest(transferEvent)
+        verify(transferRepository).updateInProgressTransfer(transferEvent.transfer)
+    }
+
     private fun provideStartPauseFinishEvents() =
         provideTransferEvents<TransferEvent.TransferStartEvent>() +
                 provideTransferEvents<TransferEvent.TransferPaused>() +
@@ -342,6 +351,11 @@ class HandleTransferEventUseCaseTest {
     private fun provideStartFinishEvents() =
         provideTransferEvents<TransferEvent.TransferStartEvent>() +
                 provideTransferEvents<TransferEvent.TransferFinishEvent>()
+
+    private fun provideStartPauseUpdateEvents() =
+        provideTransferEvents<TransferEvent.TransferStartEvent>() +
+                provideTransferEvents<TransferEvent.TransferPaused>() +
+                provideTransferEvents<TransferEvent.TransferUpdateEvent>()
 
 
     private inline fun <reified T : TransferEvent> provideTransferEvents(stubbing: KStubbing<T>.(T) -> Unit = {}) =

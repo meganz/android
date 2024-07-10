@@ -34,7 +34,10 @@ class CorrectActiveTransfersUseCase @Inject constructor(
                 !activeTransfer.isFinished && !inProgressTransfers.map { it.tag }
                     .contains(activeTransfer.tag)
             }
-            .map { it.tag }
+            .map {
+                transferRepository.removeInProgressTransfer(it.tag)
+                it.tag
+            }
         if (notInProgressActiveTransfersTags.isNotEmpty()) {
             transferRepository.setActiveTransferAsFinishedByTag(notInProgressActiveTransfersTags)
         }
@@ -44,6 +47,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
             activeTransfers.map { it.tag }.contains(transfer.tag)
         }
         inProgressNotInActiveTransfers.forEach {
+            transferRepository.updateInProgressTransfer(it)
             transferRepository.insertOrUpdateActiveTransfer(it)
         }
     }

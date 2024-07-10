@@ -114,4 +114,43 @@ internal class CorrectActiveTransfersUseCaseTest {
                 )
             }
         }
+
+    @Test
+    fun `test that active transfers not finished and not in progress are removed as in progress transfers`() =
+        runTest {
+            stubActiveTransfers(false)
+            stubTransfers()
+            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+                .thenReturn(mockedActiveTransfers)
+            val inProgress = subSetTransfers()
+            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
+            val expected = mockedActiveTransfers.filter { transfer ->
+                !inProgress.map { it.tag }.contains(transfer.tag)
+            }
+            Truth.assertThat(expected).isNotEmpty()
+            underTest(TransferType.GENERAL_UPLOAD)
+            expected.forEach {
+                verify(transferRepository).removeInProgressTransfer(it.tag)
+            }
+        }
+
+    @Test
+    fun `test that in progress transfers not in active transfers are updated in in progress transfers`() =
+        runTest {
+            stubActiveTransfers(false)
+            stubTransfers()
+            val alreadyInDataBase = subSetActiveTransfers()
+            val notInDataBase = mockedActiveTransfers - alreadyInDataBase.toSet()
+            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+                .thenReturn(alreadyInDataBase)
+            whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
+            underTest(TransferType.GENERAL_UPLOAD)
+            verify(transferRepository, times(notInDataBase.size))
+                .insertOrUpdateActiveTransfer(any())
+            notInDataBase.forEach {
+                verify(transferRepository).updateInProgressTransfer(
+                    argThat { tag == it.tag }
+                )
+            }
+        }
 }

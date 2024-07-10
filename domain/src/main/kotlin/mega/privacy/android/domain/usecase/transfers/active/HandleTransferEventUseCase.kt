@@ -59,10 +59,12 @@ class HandleTransferEventUseCase @Inject internal constructor(
         handleSDCardEventUseCase(event, transferDestination)
         when (event) {
             is TransferEvent.TransferStartEvent, is TransferEvent.TransferPaused -> {
+                transferRepository.updateInProgressTransfer(event.transfer)
                 transferRepository.insertOrUpdateActiveTransfer(event.transfer)
             }
 
             is TransferEvent.TransferUpdateEvent -> {
+                transferRepository.updateInProgressTransfer(event.transfer)
                 transferRepository.updateTransferredBytes(event.transfer)
             }
 
