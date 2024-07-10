@@ -10,27 +10,18 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -232,57 +223,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
     }
 
     /**
-     * Handle widget click
-     */
-    protected fun onTransfersWidgetClick() {
-        transfersManagement.setAreFailedTransfers(false)
-        if (this is ManagerActivity) {
-            lifecycleScope.launch {
-                if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                    navigator.openTransfers(this@TransfersManagementActivity, IN_PROGRESS_TAB_INDEX)
-                } else {
-                    drawerItem = DrawerItem.TRANSFERS
-                    selectDrawerItem(drawerItem)
-                }
-            }
-        } else {
-            openTransfersSection()
-        }
-
-        if (transfersManagement.isOnTransferOverQuota()) {
-            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
-        }
-    }
-
-    /**
-     * Defines the click action of the transfers widget.
-     * Launches an Intent to navigate to In progress tab in Transfers section.
-     */
-    private fun openTransfersSection() = lifecycleScope.launch {
-        val credentials = runCatching { getAccountCredentialsUseCase() }.getOrNull()
-        if (megaApi.isLoggedIn == 0 || credentials == null) {
-            Timber.w("Not logged in, no action.")
-            return@launch
-        }
-
-        lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                navigator.openTransfers(this@TransfersManagementActivity, IN_PROGRESS_TAB_INDEX)
-            } else {
-                startActivity(
-                    Intent(this@TransfersManagementActivity, ManagerActivity::class.java)
-                        .setAction(ACTION_SHOW_TRANSFERS)
-                        .putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                )
-            }
-
-            finish()
-        }
-    }
-
-    /**
      * Shows a scanning transfers dialog.
      */
     private fun showScanningTransfersDialog() {
@@ -381,7 +321,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
     }
 
     /**
-     * Hides the transfers widget.
+     * Hides the transfers widget. Remove this
      */
     fun hideTransfersWidget() {
         transfersManagementViewModel.hideTransfersWidget()

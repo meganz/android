@@ -32,9 +32,11 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
@@ -48,16 +50,19 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImag
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
@@ -333,6 +338,35 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Handle widget click
+     */
+    private fun onTransfersWidgetClick() {
+        transfersManagement.setAreFailedTransfers(false)
+        if (transfersManagement.isOnTransferOverQuota()) {
+            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
+        }
+        lifecycleScope.launch {
+            val credentials = runCatching { getAccountCredentialsUseCase() }.getOrNull()
+            if (megaApi.isLoggedIn == 0 || credentials == null) {
+                Timber.w("Not logged in, no action.")
+                return@launch
+            }
+            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+                navigator.openTransfers(this@FolderLinkComposeActivity, IN_PROGRESS_TAB_INDEX)
+            } else {
+                startActivity(
+                    Intent(this@FolderLinkComposeActivity, ManagerActivity::class.java)
+                        .setAction(ACTION_SHOW_TRANSFERS)
+                        .putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+            }
+            finish()
         }
     }
 

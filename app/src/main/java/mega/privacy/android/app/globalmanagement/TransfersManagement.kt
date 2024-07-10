@@ -135,7 +135,6 @@ class TransfersManagement @Inject constructor(
     private var networkTimer: CountDownTimer? = null
 
     private var transferOverQuotaTimestamp: Long = 0
-    private var hasNotToBeShowDueToTransferOverQuota = false
     var isCurrentTransferOverQuota = false
     var isOnTransfersSection = false
     private var areFailedTransfers = false
@@ -157,7 +156,6 @@ class TransfersManagement @Inject constructor(
     fun resetDefaults() {
         networkTimer = null
         transferOverQuotaTimestamp = 0
-        hasNotToBeShowDueToTransferOverQuota = false
         isCurrentTransferOverQuota = false
         isOnTransfersSection = false
         areFailedTransfers = false
@@ -230,7 +228,6 @@ class TransfersManagement @Inject constructor(
      * has been opened from the transfers widget, false otherwise
      */
     fun setHasNotToBeShowDueToTransferOverQuota(hasNotToBeShowDueToTransferOverQuota: Boolean) {
-        this.hasNotToBeShowDueToTransferOverQuota = hasNotToBeShowDueToTransferOverQuota
         isTransferOverQuotaBannerShown = hasNotToBeShowDueToTransferOverQuota
     }
 

@@ -969,7 +969,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         findViewById<ComposeView>(R.id.transfers_widget).setTransfersWidgetContent(
             transfersInfoFlow = transfersManagementViewModel.state.map { it.transfersInfo },
             visibleFlow = transfersManagementViewModel.state.map { it.widgetVisible },
-            onClick = ::onTransfersWidgetClick
+            onClick = this::onTransfersWidgetClick
         )
         setInitialViewProperties()
         setViewListeners()
@@ -1246,6 +1246,22 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     override fun removeDrawerListener(listener: DrawerLayout.DrawerListener) {
         drawerLayout.removeDrawerListener(listener)
+    }
+
+    private fun onTransfersWidgetClick() {
+        transfersManagement.setAreFailedTransfers(false)
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+                navigator.openTransfers(this@ManagerActivity, IN_PROGRESS_TAB_INDEX)
+            } else {
+                drawerItem = DrawerItem.TRANSFERS
+                selectDrawerItem(drawerItem)
+            }
+        }
+
+        if (transfersManagement.isOnTransferOverQuota()) {
+            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
+        }
     }
 
     private fun initialiseChatBadgeView() {
