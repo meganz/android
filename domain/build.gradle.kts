@@ -9,6 +9,11 @@ plugins {
     kotlin("plugin.serialization") version "1.9.21"
 }
 
+lint {
+    abortOnError = true
+    warningsAsErrors = true
+}
+
 dependencies {
     lintChecks(project(":lint"))
     implementation(lib.coroutines.core)

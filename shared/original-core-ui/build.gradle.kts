@@ -17,6 +17,10 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    lint {
+        abortOnError = true
+    }
+
     namespace = "mega.privacy.android.core"
 }
 

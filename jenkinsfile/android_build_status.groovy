@@ -353,7 +353,9 @@ pipeline {
                                 }
 
                                 MODULE_LIST.each { module ->
-                                    LINT_REPORT_SUMMARY_MAP.put(module, lintSummary(module))
+                                    def lintResult = lintSummary(module)
+                                    checkFatalError(lintResult)
+                                    LINT_REPORT_SUMMARY_MAP.put(module, lintResult)
                                 }
                                 archiveLintReports()
 
@@ -549,4 +551,14 @@ def unitTestArchiveLink(String reportPath, String archiveTargetName) {
         result = "Unit Test report not available, perhaps test code has compilation error. Please check full build log."
     }
     return result
+}
+
+def checkFatalError(String lintResult) {
+    println("Check if there are Fatal Lint errors. $lintResult")
+    def jsonSlurperClassic = new JsonSlurperClassic()
+    def jsonObject = jsonSlurperClassic.parseText(lintResult)
+    def fatalCount = jsonObject.fatalCount as int
+    if (fatalCount > 0) {
+        util.failPipeline("!!!!!!!! There are ${fatalCount} fatal lint errors. Build is failing.")
+    }
 }

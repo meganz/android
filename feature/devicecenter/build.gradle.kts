@@ -13,6 +13,9 @@ plugins {
 }
 
 android {
+    lint {
+        abortOnError = true
+    }
     namespace = "mega.privacy.android.feature.devicecenter"
 }
 

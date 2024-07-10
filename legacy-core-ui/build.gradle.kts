@@ -9,13 +9,16 @@ plugins {
 }
 
 android {
-
     buildFeatures {
         buildConfig = true
     }
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
+    }
+
+    lint {
+        abortOnError = true
     }
 
     namespace = "mega.privacy.android.legacy.core.ui"
