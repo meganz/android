@@ -103,7 +103,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                     mediaDiscoveryViewModel.state.collect {
                         if (it.collisions != null) {
                             AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
-                            nameCollisionActivityContract?.launch(it.collisions)
+                            nameCollisionActivityContract?.launch(ArrayList(it.collisions))
                             mediaDiscoveryViewModel.resetLaunchCollisionActivity()
                         } else if (it.copyResultText != null || it.copyThrowable != null) {
                             showCopyResult(it.copyResultText, it.copyThrowable)
@@ -172,7 +172,10 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                     // When there are no selected nodes, import the whole folder
                     it.ifEmpty { listOf(megaApiFolder.rootNode) }
                 }.mapNotNull { it }
-                mediaDiscoveryViewModel.checkNameCollision(selectedNodes, toHandle)
+                mediaDiscoveryViewModel.checkNameCollision(
+                    nodeHandles = selectedNodes.map { it.handle },
+                    toHandle = toHandle
+                )
             }
         }
 

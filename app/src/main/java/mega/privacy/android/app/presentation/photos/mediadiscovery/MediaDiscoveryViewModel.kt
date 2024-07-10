@@ -21,13 +21,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
-import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
@@ -49,6 +47,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -70,6 +69,7 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
@@ -82,6 +82,9 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * ViewModel for MediaDiscoveryFragment
+ */
 @HiltViewModel
 class MediaDiscoveryViewModel @Inject constructor(
     private val getNodeListByIds: GetNodeListByIds,
@@ -98,8 +101,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
-    private val authorizeNode: AuthorizeNode,
+    private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
@@ -607,29 +609,26 @@ class MediaDiscoveryViewModel @Inject constructor(
     /**
      * Checks the list of nodes to copy in order to know which names already exist
      *
-     * @param nodes         List of node handles to copy.
+     * @param nodeHandles         List of node handles to copy.
      * @param toHandle      Handle of destination node
      */
-    fun checkNameCollision(nodes: List<MegaNode>, toHandle: Long) = viewModelScope.launch {
+    fun checkNameCollision(nodeHandles: List<Long>, toHandle: Long) = viewModelScope.launch {
         runCatching {
-            checkNameCollisionUseCase.checkNodeListAsync(
-                nodes = nodes,
-                parentHandle = toHandle,
-                type = NameCollisionType.COPY
+            checkNodesNameCollisionUseCase(
+                nodes = nodeHandles.associateWith { toHandle },
+                type = NodeNameCollisionType.COPY
             )
         }.onSuccess { result ->
-            val collisions = result.first
-            if (collisions.isNotEmpty()) {
+            if (result.conflictNodes.isNotEmpty()) {
                 _state.update {
-                    it.copy(collisions = collisions)
+                    it.copy(collisions = result.conflictNodes.values.map { item ->
+                        NameCollision.Copy.fromNodeNameCollision(item)
+                    })
                 }
             }
-            val nodesWithoutCollisions = result.second.associate {
-                it.handle to toHandle
-            }
-            if (nodesWithoutCollisions.isNotEmpty()) {
+            if (result.noConflictNodes.isNotEmpty()) {
                 runCatching {
-                    copyNodesUseCase(nodesWithoutCollisions)
+                    copyNodesUseCase(result.noConflictNodes)
                 }.onSuccess { copyResult ->
                     _state.update {
                         it.copy(
@@ -642,8 +641,9 @@ class MediaDiscoveryViewModel @Inject constructor(
                     }
                 }
             }
-        }.onFailure { throwable ->
-            Timber.e(throwable)
+
+        }.onFailure {
+            Timber.e(it)
         }
     }
 
@@ -664,8 +664,6 @@ class MediaDiscoveryViewModel @Inject constructor(
             it.copy(collisions = null)
         }
     }
-
-    suspend fun authorizeNodeById(id: Long): MegaNode? = authorizeNode(id)
 
     /**
      * Check if login is required

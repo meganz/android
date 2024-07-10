@@ -13,12 +13,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -26,7 +24,10 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
@@ -46,6 +47,7 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
@@ -87,8 +89,7 @@ class MediaDiscoveryViewModelTest {
     private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
     private val getLocalFolderLinkFromMegaApiUseCase = mock<GetLocalFolderLinkFromMegaApiUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
-    private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
-    private val authorizeNode = mock<AuthorizeNode>()
+    private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
     private val copyNodesUseCase = mock<CopyNodesUseCase>()
     private val copyRequestMessageMapper = mock<CopyRequestMessageMapper>()
     private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
@@ -136,8 +137,7 @@ class MediaDiscoveryViewModelTest {
             getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
             getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            checkNameCollisionUseCase = checkNameCollisionUseCase,
-            authorizeNode = authorizeNode,
+            checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             copyNodesUseCase = copyNodesUseCase,
             copyRequestMessageMapper = copyRequestMessageMapper,
             hasCredentialsUseCase = hasCredentialsUseCase,
@@ -183,8 +183,7 @@ class MediaDiscoveryViewModelTest {
         getFileUrlByNodeHandleUseCase,
         getLocalFolderLinkFromMegaApiUseCase,
         monitorConnectivityUseCase,
-        checkNameCollisionUseCase,
-        authorizeNode,
+        checkNodesNameCollisionUseCase,
         copyNodesUseCase,
         copyRequestMessageMapper,
         hasCredentialsUseCase,
@@ -464,6 +463,23 @@ class MediaDiscoveryViewModelTest {
                 assertThat(awaitItem().shouldGoBack).isFalse()
             }
         }
+
+    @Test
+    fun `test that non-conflict nodes are copied when checkNameCollision is invoked`() = runTest {
+        val nodeMap = mapOf(Pair(1234L, 2345L), Pair(234L, 2345L))
+        whenever(checkNodesNameCollisionUseCase(nodeMap, NodeNameCollisionType.COPY)).thenReturn(
+            NodeNameCollisionResult(
+                noConflictNodes = nodeMap,
+                conflictNodes = emptyMap(),
+                type = NodeNameCollisionType.COPY
+            )
+        )
+        whenever(copyNodesUseCase(nodeMap)).thenReturn(mock<MoveRequestResult.Copy>())
+
+        underTest.checkNameCollision(listOf(1234L, 234L), 2345L)
+
+        verify(copyNodesUseCase).invoke(nodeMap)
+    }
 
     private fun createNonSensitivePhoto(): Photo.Image {
         return mock<Photo.Image> {

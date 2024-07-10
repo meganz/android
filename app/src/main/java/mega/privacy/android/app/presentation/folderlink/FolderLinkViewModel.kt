@@ -283,7 +283,7 @@ class FolderLinkViewModel @Inject constructor(
             if (result.conflictNodes.isNotEmpty()) {
                 _state.update {
                     it.copy(collisions = result.conflictNodes.values.map { item ->
-                        NameCollision.Copy.getCopyCollision(item)
+                        NameCollision.Copy.fromNodeNameCollision(item)
                     })
                 }
             }

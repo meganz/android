@@ -32,6 +32,7 @@ import kotlin.contracts.contract
  * @property getChatMessageUseCase  Required for getting chat [MegaNode]s.
  */
 @OptIn(ExperimentalContracts::class)
+@Deprecated("Use CheckNodesNameCollisionUseCase")
 class CheckNameCollisionUseCase @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
@@ -89,7 +90,7 @@ class CheckNameCollisionUseCase @Inject constructor(
         val handle = checkAsync(node.name, parentNode)
         val childCounts = getChildCounts(parentNode)
         return when (type) {
-            NameCollisionType.COPY -> NameCollision.Copy.getCopyCollision(
+            NameCollisionType.COPY -> NameCollision.Copy.fromNodeNameCollision(
                 handle,
                 node,
                 parentHandle = parentNode.handle,

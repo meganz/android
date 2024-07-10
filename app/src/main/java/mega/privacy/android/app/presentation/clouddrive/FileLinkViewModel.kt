@@ -217,7 +217,7 @@ class FileLinkViewModel @Inject constructor(
             if (result.noConflictNodes.isNotEmpty()) {
                 copy(targetHandle)
             } else if (result.conflictNodes.isNotEmpty()) {
-                val collision = NameCollision.Copy.getCopyCollision(result.conflictNodes[0])
+                val collision = NameCollision.Copy.fromNodeNameCollision(result.conflictNodes[0])
                 _state.update {
                     it.copy(collision = collision, jobInProgressState = null)
                 }

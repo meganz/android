@@ -728,7 +728,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 NodeNameCollisionType.MOVE,
                                 -> NameCollision.Movement.getMovementCollision(it)
 
-                                NodeNameCollisionType.COPY -> NameCollision.Copy.getCopyCollision(it)
+                                NodeNameCollisionType.COPY -> NameCollision.Copy.fromNodeNameCollision(it)
                             }
                         },
                     )

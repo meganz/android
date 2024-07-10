@@ -127,7 +127,7 @@ class ContactFileListViewModel @Inject constructor(
         result.conflictNodes.values.map {
             when (result.type) {
                 NodeNameCollisionType.MOVE -> NameCollision.Movement.getMovementCollision(it)
-                NodeNameCollisionType.COPY -> NameCollision.Copy.getCopyCollision(it)
+                NodeNameCollisionType.COPY -> NameCollision.Copy.fromNodeNameCollision(it)
                 else -> throw UnsupportedOperationException("Invalid collision result")
             }
         }

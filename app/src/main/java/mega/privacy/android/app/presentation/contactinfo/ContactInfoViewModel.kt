@@ -736,7 +736,7 @@ class ContactInfoViewModel @Inject constructor(
             )
         }.onSuccess { result ->
             val collisions = result.conflictNodes.values.map {
-                NameCollision.Copy.getCopyCollision(it)
+                NameCollision.Copy.fromNodeNameCollision(it)
             }
             _uiState.update {
                 it.copy(isCopyInProgress = false, nameCollisions = collisions)

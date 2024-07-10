@@ -64,7 +64,7 @@ data class MediaDiscoveryViewState(
     val showSortByDialog: Boolean = false,
     val showFilterDialog: Boolean = false,
     val showSlidersPopup: Boolean = false,
-    val collisions: ArrayList<NameCollision>? = null,
+    val collisions: List<NameCollision>? = null,
     val copyThrowable: Throwable? = null,
     val copyResultText: String? = null,
     val isConnectedToNetwork: Boolean = true,

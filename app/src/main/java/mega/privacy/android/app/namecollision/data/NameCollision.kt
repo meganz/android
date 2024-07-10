@@ -19,6 +19,7 @@ import java.io.Serializable
  * @property isFile
  * @constructor Create empty Name collision
  */
+@Deprecated("Use domain's NodeNameCollision")
 sealed class NameCollision : Serializable {
     abstract val collisionHandle: Long
     abstract val name: String
@@ -163,7 +164,7 @@ sealed class NameCollision : Serializable {
              * @param parentHandle      The parent handle of the node in which the file has to be copied.
              */
             @JvmStatic
-            fun getCopyCollision(
+            fun fromNodeNameCollision(
                 collisionHandle: Long,
                 node: MegaNode,
                 parentHandle: Long,
@@ -183,22 +184,25 @@ sealed class NameCollision : Serializable {
                     serializedNode = node.serialize(),
                 )
 
+            /**
+             * Temporary mapper to create get [NameCollision] from domain module's [NodeNameCollision]
+             * Should be removed when [GetNameCollisionResultUseCase] is refactored
+             */
             @JvmStatic
-            fun getCopyCollision(
+            fun fromNodeNameCollision(
                 nameCollision: NodeNameCollision,
-            ): Copy =
-                Copy(
-                    collisionHandle = nameCollision.collisionHandle,
-                    nodeHandle = nameCollision.nodeHandle,
-                    name = nameCollision.name,
-                    size = nameCollision.size,
-                    childFolderCount = nameCollision.childFolderCount,
-                    childFileCount = nameCollision.childFileCount,
-                    lastModified = nameCollision.lastModified,
-                    parentHandle = nameCollision.parentHandle,
-                    isFile = nameCollision.isFile,
-                    serializedNode = nameCollision.serializedData
-                )
+            ): Copy = Copy(
+                collisionHandle = nameCollision.collisionHandle,
+                nodeHandle = nameCollision.nodeHandle,
+                name = nameCollision.name,
+                size = nameCollision.size,
+                childFolderCount = nameCollision.childFolderCount,
+                childFileCount = nameCollision.childFileCount,
+                lastModified = nameCollision.lastModified,
+                parentHandle = nameCollision.parentHandle,
+                isFile = nameCollision.isFile,
+                serializedNode = nameCollision.serializedData
+            )
         }
     }
 
