@@ -36,13 +36,13 @@ class DefaultChatUploadNotificationMapper @Inject constructor(
         paused: Boolean,
     ): Notification {
         val intent = if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+            Intent(context, TransfersActivity::class.java).apply {
+                putExtra(EXTRA_TAB, IN_PROGRESS_TAB_INDEX)
+            }
+        } else {
             Intent(context, ManagerActivity::class.java).apply {
                 action = Constants.ACTION_SHOW_TRANSFERS
                 putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-            }
-        } else {
-            Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, IN_PROGRESS_TAB_INDEX)
             }
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(

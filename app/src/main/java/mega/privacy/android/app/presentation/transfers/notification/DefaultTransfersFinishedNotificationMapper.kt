@@ -88,13 +88,13 @@ class DefaultTransfersFinishedNotificationMapper @Inject constructor(
         }
 
         val intent = if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
+            Intent(context, TransfersActivity::class.java).apply {
+                putExtra(EXTRA_TAB, COMPLETED_TAB_INDEX)
+            }
+        } else {
             Intent(context, ManagerActivity::class.java).apply {
                 action = Constants.ACTION_SHOW_TRANSFERS
                 putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.COMPLETED_TAB)
-            }
-        } else {
-            Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, COMPLETED_TAB_INDEX)
             }
         }
         val pendingIntent = PendingIntent.getActivity(
