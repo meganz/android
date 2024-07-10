@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.entity
+package mega.privacy.android.shared.original.core.ui.model
 
 
 /**
@@ -18,7 +18,11 @@ data class TransfersInfo(
     /**
      * computed value of the completed progress (base 1)
      */
-    val completedProgress = Progress(totalSizeAlreadyTransferred, totalSizeToTransfer)
+    val completedProgress = if (totalSizeToTransfer <= 0L) {
+        0f
+    } else {
+        totalSizeAlreadyTransferred.toFloat() / totalSizeToTransfer.toFloat()
+    }
 }
 
 /**

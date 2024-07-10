@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
+import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetView
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
 import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
@@ -235,7 +235,7 @@ internal fun FolderLinkView(
                         fadeOut(animationSpecs),
             ) {
                 TransfersWidgetView(
-                    transfersData = transferState.transfersInfo,
+                    transfersInfo = transferState.transfersInfo,
                     onClick = onTransferWidgetClick,
                 )
             }

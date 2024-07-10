@@ -1,16 +1,12 @@
-package test.mega.privacy.android.app.components.transferWidget
+package mega.privacy.android.shared.original.core.ui.controls.widgets
 
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertContentDescriptionEquals
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.R
-import mega.privacy.android.app.components.transferWidget.TAG_STATUS_ICON
-import mega.privacy.android.app.components.transferWidget.TAG_UPLOADING_DOWNLOADING_ICON
-import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
-import mega.privacy.android.domain.entity.TransfersInfo
-import mega.privacy.android.domain.entity.TransfersStatus
+import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
+import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,24 +42,20 @@ class TransfersWidgetViewTest {
 
     @Test
     fun `test that when transfersInfo is uploading then the uploading icon is shown`() {
-        var description = ""
         composeTestRule.setContent {
-            description = stringResource(id = R.string.context_upload)
             TransfersWidgetView(TransfersInfo(TransfersStatus.Transferring, 10, 5, true), {})
         }
         composeTestRule.onNodeWithTag(TAG_UPLOADING_DOWNLOADING_ICON, useUnmergedTree = true)
-            .assertContentDescriptionEquals(description)
+            .assertIsDisplayed()
     }
 
     @Test
     fun `test that when transfersInfo is downloading then the downloading icon is shown`() {
-        var description = ""
         composeTestRule.setContent {
-            description = stringResource(id = R.string.context_download)
             TransfersWidgetView(TransfersInfo(TransfersStatus.Transferring, 10, 5, false), {})
         }
         composeTestRule.onNodeWithTag(TAG_UPLOADING_DOWNLOADING_ICON, useUnmergedTree = true)
-            .assertContentDescriptionEquals(description)
+            .assertIsDisplayed()
     }
 
     private fun testStatusIcon(status: TransfersStatus) {

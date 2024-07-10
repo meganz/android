@@ -2,7 +2,7 @@ package test.mega.privacy.android.app.presentation.transfers.model.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
-import mega.privacy.android.domain.entity.TransfersStatus
+import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -25,7 +25,7 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
             )
-            assertThat(result.completedProgress.floatValue).isEqualTo(0.5f)
+            assertThat(result.completedProgress).isEqualTo(0.5f)
         }
 
         @Test
@@ -40,7 +40,7 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
             )
-            assertThat(result.completedProgress.floatValue).isEqualTo(0)
+            assertThat(result.completedProgress).isEqualTo(0)
         }
 
     }

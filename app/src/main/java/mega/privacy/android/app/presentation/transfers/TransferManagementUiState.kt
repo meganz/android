@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.transfers
 
-import mega.privacy.android.domain.entity.TransfersInfo
-import mega.privacy.android.domain.entity.TransfersStatus
+import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
+import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 
 /**
  * Transfer management ui state

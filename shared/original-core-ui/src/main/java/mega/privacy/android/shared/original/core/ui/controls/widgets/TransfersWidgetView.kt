@@ -1,13 +1,17 @@
-package mega.privacy.android.app.components.transferWidget
+package mega.privacy.android.shared.original.core.ui.controls.widgets
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,36 +21,33 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.R
-import mega.privacy.android.domain.entity.TransfersInfo
-import mega.privacy.android.domain.entity.TransfersStatus.OverQuota
-import mega.privacy.android.domain.entity.TransfersStatus.Paused
-import mega.privacy.android.domain.entity.TransfersStatus.TransferError
-import mega.privacy.android.domain.entity.TransfersStatus.Transferring
+import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
+import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.amber_700_amber_300
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 
+/**
+ * Widget to show current transfers progress
+ */
 @Composable
-internal fun TransfersWidgetView(
-    transfersData: TransfersInfo,
+fun TransfersWidgetView(
+    transfersInfo: TransfersInfo,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     FloatingActionButton(
         onClick = onClick,
         modifier = modifier.padding(bottom = 16.dp, end = 16.dp, start = 16.dp),
-        backgroundColor = MaterialTheme.colors.primary,
+        backgroundColor = MegaOriginalTheme.colors.background.surface1,
     ) {
 
-        val progressBackgroundColor = MaterialTheme.colors.grey_alpha_012_white_alpha_012
-        val progressColor = transfersData.progressColor()
-        val progressArc = transfersData.completedProgress.floatValue * 360f
+        val progressBackgroundColor = MegaOriginalTheme.colors.background.surface3
+        val progressColor = transfersInfo.progressColor()
+        val progressArc = transfersInfo.completedProgress * 360f
         Canvas(modifier = Modifier.size(diameter.dp)) {
             //background
             drawCircle(
@@ -67,42 +68,50 @@ internal fun TransfersWidgetView(
         }
         // upload / download icon
         Image(
-            painter = painterResource(if (transfersData.uploading) R.drawable.ic_transfers_upload else R.drawable.ic_transfers_download),
-            contentDescription = stringResource(if (transfersData.uploading) R.string.context_upload else R.string.context_download),
+            painter = painterResource(if (transfersInfo.uploading) iconPackR.drawable.ic_transfers_upload else iconPackR.drawable.ic_transfers_download),
+            contentDescription = if (transfersInfo.uploading) "Upload" else "Download",
             modifier = Modifier
                 .size(diameter.dp)
                 .testTag(TAG_UPLOADING_DOWNLOADING_ICON),
             contentScale = ContentScale.None,
         )
         // status icon
-        transfersData.statusIconRes()?.let {
-            Image(
-                painter = painterResource(id = it),
-                contentDescription = transfersData.status.name,
-                alignment = Alignment.TopEnd,
-                modifier = Modifier
-                    .size(diameter.dp)
-                    .padding(end = 8.dp, top = 3.dp)
-                    .testTag(TAG_STATUS_ICON),
-                contentScale = ContentScale.None
-            )
+        transfersInfo.statusIconRes()?.let {
+            Box(
+                modifier = Modifier.size(diameter.dp),
+                contentAlignment = Alignment.TopEnd,
+            ) {
+                Icon(
+                    painter = painterResource(id = it),
+                    contentDescription = transfersInfo.status.name,
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .size(16.dp)
+                        .background(
+                            color = MegaOriginalTheme.colors.background.pageBackground,
+                            shape = CircleShape
+                        )
+                        .padding(2.dp)
+                        .testTag(TAG_STATUS_ICON),
+                    tint = progressColor
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun TransfersInfo.progressColor() = when (status) {
-    Paused -> MaterialTheme.colors.secondary
-    OverQuota -> MaterialTheme.colors.amber_700_amber_300
-    TransferError -> MaterialTheme.colors.error
-    else -> MaterialTheme.colors.secondary
+    TransfersStatus.OverQuota -> MegaOriginalTheme.colors.support.warning
+    TransfersStatus.TransferError -> MegaOriginalTheme.colors.support.error
+    else -> MegaOriginalTheme.colors.icon.secondary
 }
 
 @DrawableRes
 private fun TransfersInfo.statusIconRes() = when (status) {
-    Paused -> R.drawable.ic_transfers_paused
-    OverQuota -> R.drawable.ic_transfers_overquota
-    TransferError -> R.drawable.ic_transfers_error
+    TransfersStatus.Paused -> iconPackR.drawable.ic_pause_circle_small_regular_solid
+    TransfersStatus.OverQuota -> iconPackR.drawable.ic_alert_triangle_small_regular_solid
+    TransfersStatus.TransferError -> iconPackR.drawable.ic_alert_circle_small_regular_solid
     else -> null
 }
 
@@ -137,31 +146,31 @@ private class TransfersWidgetPreviewProvider :
     override val values: Sequence<TransfersInfo>
         get() = listOf(
             TransfersInfo(
-                status = Transferring,
+                status = TransfersStatus.Transferring,
                 totalSizeAlreadyTransferred = 3,
                 totalSizeToTransfer = 10,
                 uploading = true
             ),
             TransfersInfo(
-                status = Transferring,
+                status = TransfersStatus.Transferring,
                 totalSizeAlreadyTransferred = 4,
                 totalSizeToTransfer = 10,
                 uploading = false
             ),
             TransfersInfo(
-                status = Paused,
+                status = TransfersStatus.Paused,
                 totalSizeAlreadyTransferred = 5,
                 totalSizeToTransfer = 10,
                 uploading = true
             ),
             TransfersInfo(
-                status = OverQuota,
+                status = TransfersStatus.OverQuota,
                 totalSizeAlreadyTransferred = 6,
                 totalSizeToTransfer = 10,
                 uploading = false
             ),
             TransfersInfo(
-                status = TransferError,
+                status = TransfersStatus.TransferError,
                 totalSizeAlreadyTransferred = 7,
                 totalSizeToTransfer = 10,
                 uploading = true

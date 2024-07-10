@@ -28,7 +28,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -52,6 +51,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetView
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -273,7 +273,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
                     ),
                 ) {
                     TransfersWidgetView(
-                        transfersData = uiState.transfersInfo,
+                        transfersInfo = uiState.transfersInfo,
                         onClick = this@TransfersManagementActivity::onTransfersWidgetClick,
                     )
                 }

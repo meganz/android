@@ -47,7 +47,7 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.session.SessionContainer
-import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
+import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetView
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -272,7 +272,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 modifier = Modifier.navigationBarsPadding(),
                             ) {
                                 TransfersWidgetView(
-                                    transfersData = transferState.transfersInfo,
+                                    transfersInfo = transferState.transfersInfo,
                                     onClick = ::transfersWidgetClicked,
                                     modifier = Modifier.testTag(
                                         SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG

@@ -41,7 +41,7 @@ import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.entity.TransfersStatus
+import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
