@@ -37,6 +37,7 @@ class CancelAccountPlanViewTest {
         val proPlanDetails = UIAccountDetails(
             accountType = "PRO I",
             storageQuotaSize = "200 GB",
+            usedStorageSize = "100 GB",
             transferQuotaSize = "1 TB"
         )
         composeTestRule.setContent {
@@ -67,7 +68,7 @@ class CancelAccountPlanViewTest {
                 hasText(
                     fromId(
                         R.string.account_cancel_account_screen_plan_current_storage_warning,
-                        proPlanDetails.storageQuotaSize
+                        proPlanDetails.usedStorageSize
                     )
                 )
             )

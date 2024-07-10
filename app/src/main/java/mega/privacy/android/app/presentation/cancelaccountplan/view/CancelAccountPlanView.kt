@@ -38,9 +38,6 @@ internal fun CancelAccountPlanView(
 
     val scrollState = rememberScrollState()
 
-    val currentStorageLabel = accountDetailsUI.storageQuotaSize
-    val currentTransferLabel = accountDetailsUI.transferQuotaSize
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -71,7 +68,7 @@ internal fun CancelAccountPlanView(
         MegaText(
             text = stringResource(
                 id = SharedR.string.account_cancel_account_screen_plan_current_storage_warning,
-                currentStorageLabel
+                accountDetailsUI.usedStorageSize
             ),
             textColor = TextColor.Secondary,
             style = MaterialTheme.typography.subtitle1medium,
@@ -111,7 +108,8 @@ internal fun CancelAccountPlanView(
                     cellAlignment = TableCell.CellAlignment.Center,
                 ),
                 TableCell.TextCell(
-                    text = currentStorageLabel, style = TableCell.TextCellStyle.Normal,
+                    text = accountDetailsUI.storageQuotaSize,
+                    style = TableCell.TextCellStyle.Normal,
                     cellAlignment = TableCell.CellAlignment.Center,
                 ),
 
@@ -126,7 +124,8 @@ internal fun CancelAccountPlanView(
                     cellAlignment = TableCell.CellAlignment.Center,
                 ),
                 TableCell.TextCell(
-                    text = currentTransferLabel, style = TableCell.TextCellStyle.Normal,
+                    text = accountDetailsUI.transferQuotaSize,
+                    style = TableCell.TextCellStyle.Normal,
                     cellAlignment = TableCell.CellAlignment.Center,
                 ),
                 TableCell.TextCell(
@@ -250,6 +249,7 @@ private fun CancelAccountPlanViewPreview() {
         CancelAccountPlanView(
             accountDetailsUI = UIAccountDetails(
                 accountType = "Pro Lite",
+                usedStorageSize = "1 TB",
                 storageQuotaSize = "3 TB",
                 transferQuotaSize = "1 TB",
             ),

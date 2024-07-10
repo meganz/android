@@ -513,6 +513,8 @@ class MyAccountActivity : PasscodeActivity(),
                     CancelAccountPlanActivity.EXTRA_TRANSFER_QUOTA, totalTransfer
                 ).putExtra(
                     CancelAccountPlanActivity.EXTRA_STORAGE_QUOTA, totalStorage
+                ).putExtra(
+                    CancelAccountPlanActivity.EXTRA_USED_STORAGE, viewModel.getUsedStorage()
                 )
         )
     }
