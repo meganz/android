@@ -50,18 +50,6 @@ class GetCallUseCase @Inject constructor(
     @ApplicationScope private val sharingScope: CoroutineScope,
     @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
-
-    /**
-     * Get the MegaChatCall from a chatRoom ID
-     *
-     * @param chatRoomId Chat ID
-     * @return MegaChatCall
-     */
-    fun getMegaChatCall(chatRoomId: Long): Single<MegaChatCall> =
-        Single.fromCallable {
-            megaChatApi.getChatCall(chatRoomId)
-        }
-
     /**
      * Get a chat id of another call in progress or on hold
      *
@@ -82,42 +70,6 @@ class GetCallUseCase @Inject constructor(
 
             result
         }
-
-    /**
-     * Method to check if there is another call in progress or on hold
-     *
-     * @param currentChatId Chat ID of the current call
-     * @return Chat ID of the another call or -1 if no exists
-     */
-    fun checkAnotherCall(currentChatId: Long): Flowable<Long> =
-        Flowable.create({ emitter ->
-            emitter.onNext(getChatIdOfAnotherCallInProgress(currentChatId).blockingGet())
-
-            sharingScope.launch {
-                monitorChatCallUpdatesUseCase()
-                    .collectLatest { call ->
-                        withContext(mainImmediateDispatcher) {
-                            call.changes?.apply {
-                                Timber.d("Monitor chat call updated, changes $this")
-                                if (contains(ChatCallChanges.Status)) {
-                                    when (call.status) {
-                                        ChatCallStatus.Destroyed -> {
-                                            Timber.d("Terminating user participation")
-                                            emitter.onNext(
-                                                getChatIdOfAnotherCallInProgress(
-                                                    currentChatId
-                                                ).blockingGet()
-                                            )
-                                        }
-
-                                        else -> {}
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
-        }, BackpressureStrategy.LATEST)
 
     /**
      * Method to get the destroyed call

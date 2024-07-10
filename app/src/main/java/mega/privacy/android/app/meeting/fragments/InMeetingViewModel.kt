@@ -20,7 +20,6 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -87,6 +86,7 @@ import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallReconnectingStatusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatsUseCase
 import mega.privacy.android.domain.usecase.chat.SetChatTitleUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
@@ -100,7 +100,6 @@ import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUse
 import mega.privacy.android.domain.usecase.meeting.JoinMeetingAsGuestUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorParticipatingInAnotherCallUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestLowResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
@@ -156,7 +155,7 @@ import kotlin.time.DurationUnit
  * @property raiseHandToSpeakUseCase            [RaiseHandToSpeakUseCase]
  * @property lowerHandToStopSpeakUseCase        [LowerHandToStopSpeakUseCase]
  * @property holdChatCallUseCase                [HoldChatCallUseCase]
- * @property monitorParticipatingInAnotherCallUseCase [MonitorParticipatingInAnotherCallUseCase]
+ * @property monitorParticipatingInACallInOtherChatsUseCase [MonitorParticipatingInACallInOtherChatsUseCase]
  * @property getStringFromStringResMapper        [GetStringFromStringResMapper]
  * @property isEphemeralPlusPlusUseCase         [IsEphemeralPlusPlusUseCase]
  * @property isRaiseToHandSuggestionShownUseCase [IsRaiseToHandSuggestionShownUseCase]
@@ -196,7 +195,7 @@ class InMeetingViewModel @Inject constructor(
     private val chatLogoutUseCase: ChatLogoutUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val holdChatCallUseCase: HoldChatCallUseCase,
-    private val monitorParticipatingInAnotherCallUseCase: MonitorParticipatingInAnotherCallUseCase,
+    private val monitorParticipatingInACallInOtherChatsUseCase: MonitorParticipatingInACallInOtherChatsUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     private val raiseHandToSpeakUseCase: RaiseHandToSpeakUseCase,
@@ -222,7 +221,6 @@ class InMeetingViewModel @Inject constructor(
      */
     val state = _state.asStateFlow()
 
-    private var anotherCallInProgressDisposable: Disposable? = null
     private var reconnectingJob: Job? = null
 
     private var monitorParticipatingInAnotherCallJob: Job? = null
@@ -491,7 +489,6 @@ class InMeetingViewModel @Inject constructor(
                         checkSubtitleToolbar()
                         if (_updateCallId.value != call.callId) {
                             _updateCallId.value = call.callId
-                            checkAnotherCallBanner()
                             checkParticipantsList()
                             checkReconnectingChanges()
                             updateMeetingInfoBottomPanel()
@@ -783,10 +780,20 @@ class InMeetingViewModel @Inject constructor(
     private fun startMonitorParticipatingInACall(chatId: Long) {
         monitorParticipatingInAnotherCallJob?.cancel()
         monitorParticipatingInAnotherCallJob = viewModelScope.launch {
-            monitorParticipatingInAnotherCallUseCase(chatId)
+            monitorParticipatingInACallInOtherChatsUseCase(chatId)
                 .catch { Timber.e(it) }
                 .collect {
-                    _state.update { state -> state.copy(anotherCall = if (it.isEmpty()) null else it.first()) }
+                    val currentCall = it.firstOrNull()
+                    _state.update { state -> state.copy(anotherCall = currentCall) }
+                    if (currentCall != null) {
+                        getAnotherChatCall(currentCall.chatId)
+                    } else {
+                        _state.update { state ->
+                            state.copy(
+                                updateAnotherCallBannerType = AnotherCallType.NotCall,
+                            )
+                        }
+                    }
                 }
         }
     }
@@ -992,30 +999,8 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method to get the duration of the call
      */
-    fun getCallDuration(): Long = getCall()?.duration?.toLong(DurationUnit.SECONDS) ?: INVALID_VALUE.toLong()
-
-    /**
-     * Method that controls whether the another call banner should be visible or not
-     */
-    private fun checkAnotherCallBanner() {
-        anotherCallInProgressDisposable?.dispose()
-
-        anotherCallInProgressDisposable =
-            getCallUseCase.checkAnotherCall(_state.value.currentChatId).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-                    onNext = {
-                        if (it == MEGACHAT_INVALID_HANDLE) {
-                            _state.update { state ->
-                                state.copy(
-                                    updateAnotherCallBannerType = AnotherCallType.NotCall,
-                                )
-                            }
-                        } else {
-                            getAnotherChatCall(it)
-                        }
-                    }, onError = Timber::e
-                ).addTo(composite)
-    }
+    fun getCallDuration(): Long =
+        getCall()?.duration?.toLong(DurationUnit.SECONDS) ?: INVALID_VALUE.toLong()
 
     /**
      * Control when Stay on call option is chosen
@@ -1654,7 +1639,8 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return the privileges
      */
-    fun getOwnPrivileges(): Int = inMeetingRepository.getOwnPrivileges(_state.value.currentChatId)
+    fun getOwnPrivileges(): Int =
+        inMeetingRepository.getOwnPrivileges(_state.value.currentChatId)
 
     /**
      * Method to know if the participant is a moderator.
@@ -1925,7 +1911,7 @@ class InMeetingViewModel @Inject constructor(
         state.value.call?.apply {
             val numberOfParticipants: Int = participants.value?.size ?: 0
             sessionsClientId?.let { list ->
-                if(list.isNotEmpty() && numberOfParticipants != list.size) {
+                if (list.isNotEmpty() && numberOfParticipants != list.size) {
                     createCurrentParticipants(list)
                 }
             }
