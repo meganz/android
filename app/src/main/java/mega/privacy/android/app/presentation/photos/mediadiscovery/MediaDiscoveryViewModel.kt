@@ -69,8 +69,7 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
-import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -101,8 +100,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
-    private val copyNodesUseCase: CopyNodesUseCase,
+    private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getPublicNodeListByIds: GetPublicNodeListByIds,
@@ -614,36 +612,25 @@ class MediaDiscoveryViewModel @Inject constructor(
      */
     fun checkNameCollision(nodeHandles: List<Long>, toHandle: Long) = viewModelScope.launch {
         runCatching {
-            checkNodesNameCollisionUseCase(
+            checkNodesNameCollisionWithActionUseCase(
                 nodes = nodeHandles.associateWith { toHandle },
                 type = NodeNameCollisionType.COPY
             )
         }.onSuccess { result ->
-            if (result.conflictNodes.isNotEmpty()) {
-                _state.update {
-                    it.copy(collisions = result.conflictNodes.values.map { item ->
+            _state.update { state ->
+                state.copy(
+                    collisions = result.collisionResult.conflictNodes.values.map { item ->
                         NameCollision.Copy.fromNodeNameCollision(item)
-                    })
-                }
-            }
-            if (result.noConflictNodes.isNotEmpty()) {
-                runCatching {
-                    copyNodesUseCase(result.noConflictNodes)
-                }.onSuccess { copyResult ->
-                    _state.update {
-                        it.copy(
-                            copyResultText = copyRequestMessageMapper(copyResult.toCopyRequestResult())
-                        )
+                    },
+                    copyResultText = result.moveRequestResult?.let {
+                        copyRequestMessageMapper(it.toCopyRequestResult())
                     }
-                }.onFailure { throwable ->
-                    _state.update {
-                        it.copy(copyThrowable = throwable)
-                    }
-                }
+                )
             }
-
-        }.onFailure {
-            Timber.e(it)
+        }.onFailure { throwable ->
+            _state.update {
+                it.copy(copyThrowable = throwable)
+            }
         }
     }
 
@@ -661,7 +648,7 @@ class MediaDiscoveryViewModel @Inject constructor(
      */
     fun resetLaunchCollisionActivity() {
         _state.update {
-            it.copy(collisions = null)
+            it.copy(collisions = emptyList())
         }
     }
 

@@ -101,7 +101,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 launch {
                     mediaDiscoveryViewModel.state.collect {
-                        if (it.collisions != null) {
+                        if (it.collisions.isNotEmpty()) {
                             AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
                             nameCollisionActivityContract?.launch(ArrayList(it.collisions))
                             mediaDiscoveryViewModel.resetLaunchCollisionActivity()

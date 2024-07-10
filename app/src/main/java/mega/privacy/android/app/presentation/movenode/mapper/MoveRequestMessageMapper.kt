@@ -222,5 +222,41 @@ class MoveRequestMessageMapper @Inject constructor(
             is MoveRequestResult.RemoveOffline -> {
                 context.resources.getString(R.string.file_removed_offline)
             }
+
+            is MoveRequestResult.Restore -> {
+                when {
+                    request.isAllRequestError -> {
+                        context.resources.getQuantityString(
+                            R.plurals.number_incorrectly_restored_from_rubbish,
+                            request.count,
+                            request.count
+                        )
+                    }
+
+                    request.isSuccess -> {
+                        context.resources.getQuantityString(
+                            R.plurals.number_correctly_restored_from_rubbish,
+                            request.count,
+                            request.count
+                        )
+                    }
+
+                    else -> {
+                        "${
+                            context.resources.getQuantityString(
+                                R.plurals.number_correctly_restored_from_rubbish,
+                                request.count - request.errorCount,
+                                request.count - request.errorCount
+                            )
+                        }, ${
+                            context.resources.getQuantityString(
+                                R.plurals.number_incorrectly_restored_from_rubbish,
+                                request.errorCount,
+                                request.errorCount
+                            )
+                        }"
+                    }
+                }
+            }
         }
 }

@@ -27,3 +27,22 @@ data class MultipleNodesRestoreResult(
     val successCount: Int,
     val errorCount: Int,
 ) : RestoreNodeResult
+
+/**
+ * Temporary mapper to Convert [RestoreNodeResult] to [MoveRequestResult]
+ */
+fun RestoreNodeResult.toMovementResult() = when (this) {
+    is SingleNodeRestoreResult -> {
+        MoveRequestResult.Restore(
+            count = successCount,
+            errorCount = 0,
+        )
+    }
+
+    is MultipleNodesRestoreResult -> {
+        MoveRequestResult.Restore(
+            count = successCount + errorCount,
+            errorCount = errorCount,
+        )
+    }
+}

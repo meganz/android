@@ -12,3 +12,13 @@ data class NodeNameCollisionResult(
     val conflictNodes: Map<Long, NodeNameCollision>,
     val type: NodeNameCollisionType,
 )
+
+/**
+ * Node name collision with action result
+ * @property collisionResult [NodeNameCollisionResult]
+ * @property moveRequestResult [MoveRequestResult] null if no action was performed
+ */
+data class NodeNameCollisionWithActionResult(
+    val collisionResult: NodeNameCollisionResult,
+    val moveRequestResult: MoveRequestResult? = null,
+)

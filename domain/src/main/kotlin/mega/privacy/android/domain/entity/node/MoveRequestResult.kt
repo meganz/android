@@ -112,4 +112,15 @@ sealed class MoveRequestResult(
         errorCount = errorCount,
         nodes = nodes,
     )
+
+    /**
+     * Result of restore
+     */
+    class Restore(
+        count: Int,
+        errorCount: Int,
+    ) : MoveRequestResult(
+        count = count,
+        errorCount = errorCount,
+    )
 }
