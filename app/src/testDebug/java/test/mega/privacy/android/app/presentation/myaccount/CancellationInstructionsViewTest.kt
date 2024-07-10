@@ -1,26 +1,19 @@
 package test.mega.privacy.android.app.presentation.myaccount
 
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
-import mega.privacy.android.app.presentation.cancelaccountplan.view.APPLE_INSTRUCTIONS_DETAILED_INSTRUCTIONS_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.APPLE_INSTRUCTIONS_SUBTITLE_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.APPLE_INSTRUCTIONS_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.APPLE_INSTRUCTIONS_TITLE_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.APPLE_INSTRUCTIONS_VIEW_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.CancellationInstructionsView
-import mega.privacy.android.shared.resources.R
+import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.APPLE_INSTRUCTIONS_VIEW_TEST_TAG
+import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.CancellationInstructionsView
+import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.WEB_CANCELLATION_INSTRUCTIONS_VIEW_TEST_TAG
+import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.WEB_REACTIVATION_INSTRUCTIONS_VIEW_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import test.mega.privacy.android.app.fromId
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -38,30 +31,52 @@ class CancellationInstructionsViewTest {
                 onMegaUrlClicked = { },
                 onCancelSubsFromOtherDeviceClicked = { },
                 onBackPressed = { },
-                isAccountExpired = false
+                isAccountReactivationNeeded = false
             )
         }
+        composeTestRule.onNodeWithTag(WEB_CANCELLATION_INSTRUCTIONS_VIEW_TEST_TAG)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(WEB_REACTIVATION_INSTRUCTIONS_VIEW_TEST_TAG)
+            .assertDoesNotExist()
         composeTestRule.onNodeWithTag(APPLE_INSTRUCTIONS_VIEW_TEST_TAG)
             .assertIsDisplayed()
     }
 
     @Test
-    fun `test that all apple instructions views are showing`() {
+    fun `test that instructions details view is showing the webclient cancellation instructions view`() {
         composeTestRule.setContent {
             CancellationInstructionsView(
-                instructionsType = CancellationInstructionsType.AppStore,
+                instructionsType = CancellationInstructionsType.WebClient,
                 onMegaUrlClicked = { },
                 onCancelSubsFromOtherDeviceClicked = { },
                 onBackPressed = { },
-                isAccountExpired = false
+                isAccountReactivationNeeded = false
             )
         }
-        composeTestRule.onNodeWithTag(APPLE_INSTRUCTIONS_TITLE_TEST_TAG)
-            .assertTextEquals(fromId(R.string.account_cancellation_instructions_not_managed_by_google))
-        composeTestRule.onNodeWithTag(APPLE_INSTRUCTIONS_SUBTITLE_TEST_TAG)
-            .assertTextEquals(fromId(R.string.account_cancellation_instructions_message_apple_description))
-        composeTestRule.onNodeWithTag(APPLE_INSTRUCTIONS_DETAILED_INSTRUCTIONS_TEST_TAG)
-        composeTestRule.onAllNodesWithTag(APPLE_INSTRUCTIONS_TEST_TAG).assertCountEquals(5)
+        composeTestRule.onNodeWithTag(APPLE_INSTRUCTIONS_VIEW_TEST_TAG)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(WEB_REACTIVATION_INSTRUCTIONS_VIEW_TEST_TAG)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(WEB_CANCELLATION_INSTRUCTIONS_VIEW_TEST_TAG)
+            .assertIsDisplayed()
+    }
 
+    @Test
+    fun `test that instructions details view is showing the webclient reactivation instructions view`() {
+        composeTestRule.setContent {
+            CancellationInstructionsView(
+                instructionsType = CancellationInstructionsType.WebClient,
+                onMegaUrlClicked = { },
+                onCancelSubsFromOtherDeviceClicked = { },
+                onBackPressed = { },
+                isAccountReactivationNeeded = true
+            )
+        }
+        composeTestRule.onNodeWithTag(APPLE_INSTRUCTIONS_VIEW_TEST_TAG)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(WEB_CANCELLATION_INSTRUCTIONS_VIEW_TEST_TAG)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(WEB_REACTIVATION_INSTRUCTIONS_VIEW_TEST_TAG)
+            .assertIsDisplayed()
     }
 }

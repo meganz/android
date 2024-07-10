@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.cancelaccountplan
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -14,7 +16,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
 import mega.privacy.android.app.presentation.cancelaccountplan.model.UIAccountDetails
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
-import mega.privacy.android.app.presentation.cancelaccountplan.view.CancellationInstructionsView
+import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.CancellationInstructionsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
@@ -22,7 +24,6 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.CancelSubscriptionContinueCancellationButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CancelSubscriptionKeepPlanButtonPressedEvent
-import org.jetbrains.anko.toast
 import javax.inject.Inject
 
 /**
@@ -66,12 +67,13 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                     },
                 ) {
                     composable(cancelAccountPlanRoute) {
-                        CancelAccountPlanView(accountDetailsUI = UIAccountDetails(
-                            accountType = getString(getAccountNameRes(accountType)),
-                            storageQuotaSize = storageQuota,
-                            usedStorageSize = usedStorage,
-                            transferQuotaSize = transferQuota,
-                        ),
+                        CancelAccountPlanView(
+                            accountDetailsUI = UIAccountDetails(
+                                accountType = getString(getAccountNameRes(accountType)),
+                                storageQuotaSize = storageQuota,
+                                usedStorageSize = usedStorage,
+                                transferQuotaSize = transferQuota,
+                            ),
                             onKeepPlanButtonClicked = {
                                 Analytics.tracker.trackEvent(
                                     CancelSubscriptionKeepPlanButtonPressedEvent
@@ -82,29 +84,44 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                                 Analytics.tracker.trackEvent(
                                     CancelSubscriptionContinueCancellationButtonPressedEvent
                                 )
-                                toast("Cancel button clicked")
                                 navController.navigate(cancellationInstructionsRoute)
                             })
                     }
                     composable(cancellationInstructionsRoute) {
                         CancellationInstructionsView(
-                            instructionsType = CancellationInstructionsType.AppStore,
-                            onMegaUrlClicked = {},
-                            onCancelSubsFromOtherDeviceClicked = {},
-                            onBackPressed = {
-                                navController.popBackStack()
+                            instructionsType = CancellationInstructionsType.WebClient,
+                            onMegaUrlClicked = { url ->
+                                navigateToBrowser(url)
                             },
-                            isAccountExpired = false
+                            onCancelSubsFromOtherDeviceClicked = { url ->
+                                navigateToBrowser(url)
+                            },
+                            onBackPressed = {
+                                if (accountType == Constants.PRO_FLEXI) {
+                                    finish()
+                                } else {
+                                    navController.popBackStack()
+                                }
+                            },
+                            isAccountReactivationNeeded = false
                         )
-                        toast("Show the correct cancellation instruction steps")
                     }
                 }
             }
         }
     }
 
-    private fun getAccountNameRes(accountType: Int): Int {
-        return when (accountType) {
+    private fun navigateToBrowser(url: String) {
+        startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(url)
+            )
+        )
+    }
+
+    private fun getAccountNameRes(accountTypeInt: Int): Int {
+        return when (accountTypeInt) {
             Constants.PRO_LITE -> R.string.prolite_account
             Constants.PRO_I -> R.string.pro1_account
             Constants.PRO_II -> R.string.pro2_account
