@@ -96,8 +96,6 @@
     <string name="device_center_list_view_item_sub_state_active_sync_same_path">يوجد بالفعل مجلد تمت مزامنته على نفس المسار</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">فشلت عملية إعادة التسمية.</string>
-    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">تعذّر إنشاء ملف.megaignore لهذه المزامنة</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">موقع مجلد المزامنة غير معروف</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
@@ -152,28 +150,6 @@
     <string name="device_center_top_app_bar_search_syncs_hint">البحث عن مزامنة</string>
     <!-- Text to show in the Device Center when no search results are found -->
     <string name="device_center_empty_screen_no_results">لا نتائج</string>
-    <!-- Header of the Info view field for what is the content of a device/folder -->
-    <string name="device_center_info_content">المحتويات</string>
-    <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
-    <string name="device_center_info_total_size">الحجم الإجمالي</string>
-    <!-- String which indicates the number of files contained into a device/folder -->
-    <plurals name="device_center_info_num_files">
-        <item quantity="zero">%1$d ملف</item>
-        <item quantity="one">%1$d ملف</item>
-        <item quantity="two">%1$d ملفان</item>
-        <item quantity="few">%1$d ملفات</item>
-        <item quantity="many">%1$d ملفاً</item>
-        <item quantity="other">%1$d ملف</item>
-    </plurals>
-    <!-- String which indicates the number of folders contained into a device/folder -->
-    <plurals name="device_center_info_num_folders">
-        <item quantity="zero">%1$d مجلد</item>
-        <item quantity="one">%1$d مجلد</item>
-        <item quantity="two">%1$d مجلدان</item>
-        <item quantity="few">%1$d مجلدات</item>
-        <item quantity="many">%1$d مجلداً</item>
-        <item quantity="other">%1$d مجلد</item>
-    </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="device_center_info_num_folders_and_files">
         <item quantity="zero">%1$d مجلد&#160;.&#160;</item>
@@ -183,6 +159,4 @@
         <item quantity="many">%1$d مجلداً&#160;.&#160;</item>
         <item quantity="other">%1$d مجلد&#160;.&#160;</item>
     </plurals>
-    <!-- Header of the Info view field for the date and time a folder was added -->
-    <string name="device_center_info_added">أُضِيف</string>
 </resources>

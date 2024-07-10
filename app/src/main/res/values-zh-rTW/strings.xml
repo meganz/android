@@ -280,10 +280,6 @@
     <plurals name="upload_finish">
         <item quantity="other">%1$d個上傳已完成</item>
     </plurals>
-    <!-- Warning shown when it tries to download some empty folders. Plural -->
-    <plurals name="empty_folders">
-        <item quantity="other">資料夾是空的。</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">查看傳輸</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -1797,7 +1793,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">未能共享%d個檔案</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">預覽內容</string>
+    <string name="preview_content">開啟</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">沒有網路連線。檔案尚未下載而且無法進行串流傳輸。</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
@@ -4797,7 +4793,7 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">透過Pro方案獲得更多功能</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">升級到Pro方案可獲得更多儲存空間和使用Pro功能的權限。方案一個月%1$s起。</string>
+    <string name="dialog_onboarding_get_pro_description">升級到Pro方案可獲得更多儲存空間和獲得Pro功能的權限。方案一個月%1$s起。</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro方案包括：</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -4917,7 +4913,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">由於電池電量低於%1$d%%，上傳已暫停</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">相機上傳停止運作。嘗試重新啟用相機上傳來解決問題。如果問題仍然存在，聯繫support&#64;mega.nz。</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">相機上傳正在進行中，%1$d個檔案待處理</item>
@@ -4982,8 +4978,6 @@
     <string name="notifications_screen_notification_promo_expiration_time">%1$s%2$s到期</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
     <string name="meetings_free_call_organiser_number_of_participants_warning">只有100位與會者可以加入通話。任何其他與會者只能發送和接收對話記錄。召集人可以升級到Pro方案以移除這些限制。</string>
-    <!-- Warning Message for non organiser for Free Call -->
-    <string name="meetings_free_call_non_organiser_number_of_participants_warning">只有100個與會者可以加入通話。任何其他與會者將只能發送和讀取對話記錄。請召集人取消此限制。</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
     <string name="settings_camera_uploads_video_quality_dialog_option_low">低</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->

@@ -532,6 +532,8 @@
     <string name="account_cancellation_instructions_tap_avatar">3. Tap on your avatar.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_cancel_subscription">4. Tap [A]Cancel subscription[/A].</string>
+    <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
+    <string name="sync_no_network_state">No internet connection</string>
     <!-- Menu option to create a new folder in the file manager -->
     <string name="general_menu_create_new_folder">Create new folder</string>
     <!-- Create new folder dialog title -->
@@ -548,6 +550,4 @@
     <string name="create_new_folder_dialog_error_existing_folder">There is already a folder with the same name</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">The following characters are not allowed: %1$s</string>
-    <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
-    <string name="sync_no_network_state">No internet connection</string>
 </resources>

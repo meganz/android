@@ -96,8 +96,6 @@
     <string name="device_center_list_view_item_sub_state_active_sync_same_path">同一路径下已经有一个同步文件夹</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">重命名失败。</string>
-    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">无法为此同步创建.megaignore文件</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">同步文件夹位置未知</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
@@ -152,22 +150,8 @@
     <string name="device_center_top_app_bar_search_syncs_hint">搜索同步</string>
     <!-- Text to show in the Device Center when no search results are found -->
     <string name="device_center_empty_screen_no_results">无搜索结果</string>
-    <!-- Header of the Info view field for what is the content of a device/folder -->
-    <string name="device_center_info_content">包含</string>
-    <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
-    <string name="device_center_info_total_size">总大小</string>
-    <!-- String which indicates the number of files contained into a device/folder -->
-    <plurals name="device_center_info_num_files">
-        <item quantity="other">%1$d个文件</item>
-    </plurals>
-    <!-- String which indicates the number of folders contained into a device/folder -->
-    <plurals name="device_center_info_num_folders">
-        <item quantity="other">%1$d个文件夹</item>
-    </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="device_center_info_num_folders_and_files">
         <item quantity="other">%1$d个文件夹&#160;·&#160;</item>
     </plurals>
-    <!-- Header of the Info view field for the date and time a folder was added -->
-    <string name="device_center_info_added">添加于</string>
 </resources>

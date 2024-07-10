@@ -486,4 +486,84 @@
     <string name="account_cancel_account_plan_continue_cancellation">Kontynuuj anulowanie</string>
     <!-- error label for add tags page when tag character limit reached -->
     <string name="add_tags_error_maximum_characters">Maksymalnie 32 znaki</string>
+    <!-- Hidden item -->
+    <string name="hidden_item">Ukryty element</string>
+    <!-- Share hidden item link description -->
+    <string name="share_hidden_item_link_description">Ten element jest ustawiony na ukryty. Po udostępnieniu element każdy, kto ma link, będzie mógł go zobaczyć. Nadal będzie ukryty na Dysku w chmurze.</string>
+    <!-- Share hidden item links description -->
+    <string name="share_hidden_item_links_description">Jeden lub więcej z tych elementów jest ustawiony na ukryty. Po udostępnieniu ukrytych elementów każdy, kto ma link, będzie mógł je zobaczyć. Elementy będą nadal ukryte na Dysku w chmurze.</string>
+    <!-- Title shown when cancelling the subscription -->
+    <string name="account_cancellation_instructions_cancel_subscription_title">Anuluj subskrypcję</string>
+    <!-- Title shown when reactivating the subscription -->
+    <string name="account_cancellation_instructions_reactivate_subscription_title">Reactivate subscription</string>
+    <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
+    <string name="account_cancellation_instructions_not_managed_by_google">Your subscription is not managed by Google</string>
+    <!-- Message shown when cancelling the current plan in the instructions screen, informing the user about how to cancel subscription -->
+    <string name="account_cancellation_instructions_message_apple_description">This is because you subscribed to MEGA via Apple. To cancel your subscription, you will need to:</string>
+    <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
+    <string name="account_cancellation_instructions_ios_device">On a iOS Device</string>
+    <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
+    <string name="account_cancellation_instructions_open_settings">1. Open the Settings app.</string>
+    <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
+    <string name="account_cancellation_instructions_tap_on_name">2. Tap on your name.</string>
+    <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
+    <string name="account_cancellation_instructions_select_subscriptions">3. Tap Subscriptions.</string>
+    <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
+    <string name="account_cancellation_instructions_select_mega_subscription">4. Tap your MEGA subscription.</string>
+    <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tap Cancel subscription.</string>
+    <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
+    <string name="account_cancellation_instructions_detailed_instructions">[A]Tap here[/A] for detailed instructions on how to cancel your subscription on a computer or other device.</string>
+    <!-- Title shown when needing to cancel the subscription using a web browser -->
+    <string name="account_cancellation_instructions_cancellation_web_browser_needed">Musisz anulować subskrypcję za pomocą przeglądarki internetowej</string>
+    <!-- Title shown when needing to reactivate the subscription using a web browser -->
+    <string name="account_cancellation_instructions_reactivation_web_browser_needed">You need to reactivate your subscription using a web browser</string>
+    <!-- Message shown when reactivating the current plan in the instructions screen, informing the user about how to reactivate the subscription -->
+    <string name="account_cancellation_instructions_reactivation_web_browser_description">This is because you subscribed to MEGA in your web browser. To reactivate your subscription, you will need to:</string>
+    <!-- Description explaining why the subscription needs to be canceled using a web browser -->
+    <string name="account_cancellation_instructions_web_browser_description">Dzieje się tak, ponieważ subskrybowałeś MEGA w swojej przeglądarce internetowej. Aby anulować subskrypcja, musisz:</string>
+    <!-- Label for cancellation instructions on a computer -->
+    <string name="account_cancellation_instructions_on_computer">Na komputerze</string>
+    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
+    <string name="account_cancellation_instructions_visit_website">1. Visit [A]www.mega.nz[/A] in your web browser.</string>
+    <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
+    <string name="account_cancellation_instructions_login_account">2. Zaloguj się na swoje konto MEGA.</string>
+    <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
+    <string name="account_cancellation_instructions_click_main_menu">3. Click the main menu.</string>
+    <!-- Step 4: instruction step no.4 to Click Settings of the MEGA account on MEGA website -->
+    <string name="account_cancellation_instructions_click_settings">4. Click [A]Settings.[/A]</string>
+    <!-- Step 5: instruction step no.5 to Click on Plan section of the MEGA account on MEGA website-->
+    <string name="account_cancellation_instructions_click_plan">5. Click [A]Plan[/A].</string>
+    <!-- Step 6: instruction step no.6 Click Cancel subscription of the MEGA account on MEGA website -->
+    <string name="account_cancellation_instructions_click_cancel_subscription">6. Click [A]Cancel subscription[/A].</string>
+    <!-- Alternative Step 6: instruction step no.5 Click Reactivate subscription when user's subscription has expired of the MEGA account on MEGA website-->
+    <string name="account_cancellation_instructions_click_reactivate_subscription">6. Click [A]Reactivate subscription[/A].</string>
+    <!-- Label for cancellation instructions on a mobile device -->
+    <string name="account_cancellation_instructions_on_mobile_device">Na urządzeniu mobilnym</string>
+    <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
+    <string name="account_cancellation_instructions_mobile_visit_website">1. Visit [A]www.mega.nz[/A] in your web browser.</string>
+    <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
+    <string name="account_cancellation_instructions_mobile_login_account">2. Zaloguj się na swoje konto MEGA.</string>
+    <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
+    <string name="account_cancellation_instructions_tap_avatar">3. Kliknij swojego awatara</string>
+    <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
+    <string name="account_cancellation_instructions_tap_cancel_subscription">4. Tap [A]Cancel subscription[/A].</string>
+    <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
+    <string name="sync_no_network_state">Brak połączenia z internetem</string>
+    <!-- Menu option to create a new folder in the file manager -->
+    <string name="general_menu_create_new_folder">Utwórz nowy katalog</string>
+    <!-- Create new folder dialog title -->
+    <string name="create_new_folder_dialog_title">Nowy katalog</string>
+    <!-- Create new folder dialog hint text (input field description) -->
+    <string name="create_new_folder_dialog_hint_text">Nazwa katalogu</string>
+    <!-- Create new folder dialog confirm button -->
+    <string name="create_new_folder_dialog_confirm_button">Utwórz</string>
+    <!-- Dialog cancel option -->
+    <string name="general_dialog_cancel_button">Anuluj</string>
+    <!-- Create new folder dialog error message shown when the user tries to an empty folder name -->
+    <string name="create_new_folder_dialog_error_message_empty_folder_name">Wprowadź nazwę katalogu</string>
+    <!-- Create new folder dialog error message shown when folder cannot be created because there is already one with the same name -->
+    <string name="create_new_folder_dialog_error_existing_folder">Istnieje już katalog o takiej nazwie</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="general_invalid_characters_defined">Następujące znaki są niedozwolone: %1$s</string>
 </resources>

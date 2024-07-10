@@ -280,10 +280,6 @@
     <plurals name="upload_finish">
         <item quantity="other">อัปโหลด %1$d รายการเสร็จสิ้นแล้ว</item>
     </plurals>
-    <!-- Warning shown when it tries to download some empty folders. Plural -->
-    <plurals name="empty_folders">
-        <item quantity="other">โฟลเดอร์ว่างเปล่า</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">ดูการถ่ายโอน</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -1797,7 +1793,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">ไม่ได้แชร์ไฟล์ %d ไฟล์</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">ดูตัวอย่างเนื้อหา</string>
+    <string name="preview_content">เปิด</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">ไม่มีการเชื่อมต่อกับเครือข่าย ไฟล์ยังไม่ได้ดาวน์โหลดและไม่สามารถสตรีมได้</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
@@ -4982,8 +4978,6 @@
     <string name="notifications_screen_notification_promo_expiration_time">หมดอายุในวันที่ %1$s เวลา %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
     <string name="meetings_free_call_organiser_number_of_participants_warning">ผู้เข้าร่วมสามารถเข้าร่วมการโทรได้สูงสุด 100&#160;คนเท่านั้น หากมีผู้เข้าร่วมมากกว่านั้น จะสามารถส่งและรับข้อความได้อย่างเดียว ผู้จัดการประชุมสามารถอัปเกรดเป็นแผน Pro เพื่อยกเลิกข้อจำกัดนี้ได้</string>
-    <!-- Warning Message for non organiser for Free Call -->
-    <string name="meetings_free_call_non_organiser_number_of_participants_warning">ผู้เข้าร่วมสามารถเข้าร่วมการโทรได้สูงสุด 100&#160;คนเท่านั้น หากมีผู้เข้าร่วมเพิ่มเติม จะสามารถส่งและอ่านข้อความในแชทได้เท่านั้น กรุณาขอให้ผู้จัดการประชุมยกเลิกข้อจำกัดนี้ก่อน</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
     <string name="settings_camera_uploads_video_quality_dialog_option_low">ต่ำ</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->

@@ -96,8 +96,6 @@
     <string name="device_center_list_view_item_sub_state_active_sync_same_path">มีโฟลเดอร์ที่ซิงค์ข้อมูลอยู่ที่เส้นทางเดียวกันแล้ว</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">การเปลี่ยนชื่อไม่สำเร็จ</string>
-    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">ไม่สามารถสร้างไฟล์ .megaignore เพื่อใช้การซิงค์นี้ได้</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">ไม่ทราบตำแหน่งที่ตั้งโฟลเดอร์สำหรับซิงค์ได้</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
@@ -152,22 +150,8 @@
     <string name="device_center_top_app_bar_search_syncs_hint">ค้นหาการซิงค์</string>
     <!-- Text to show in the Device Center when no search results are found -->
     <string name="device_center_empty_screen_no_results">ไม่พบรายการค้นหา</string>
-    <!-- Header of the Info view field for what is the content of a device/folder -->
-    <string name="device_center_info_content">จำนวน</string>
-    <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
-    <string name="device_center_info_total_size">ขนาดทั้งหมด</string>
-    <!-- String which indicates the number of files contained into a device/folder -->
-    <plurals name="device_center_info_num_files">
-        <item quantity="other">%1$d ไฟล์</item>
-    </plurals>
-    <!-- String which indicates the number of folders contained into a device/folder -->
-    <plurals name="device_center_info_num_folders">
-        <item quantity="other">%1$d โฟลเดอร์</item>
-    </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="device_center_info_num_folders_and_files">
         <item quantity="other">%1$d โฟลเดอร์&#160;·&#160;</item>
     </plurals>
-    <!-- Header of the Info view field for the date and time a folder was added -->
-    <string name="device_center_info_added">ถูกเพิ่ม</string>
 </resources>

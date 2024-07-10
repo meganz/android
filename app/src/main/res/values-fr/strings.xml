@@ -290,12 +290,6 @@
         <item quantity="many">%1$d téléversements sont terminés</item>
         <item quantity="other">%1$d téléversements sont terminés</item>
     </plurals>
-    <!-- Warning shown when it tries to download some empty folders. Plural -->
-    <plurals name="empty_folders">
-        <item quantity="one">Le dossier est vide.</item>
-        <item quantity="many">Les dossiers sont vides.</item>
-        <item quantity="other">Les dossiers sont vides.</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Visualiser les transferts</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -1883,7 +1877,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d fichiers n’ont pas été partagés</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Prévisualiser le contenu</string>
+    <string name="preview_content">Ouvrir</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">Il n’y a pas de connexion réseau. Le fichier n’a pas été téléchargé et ne peut pas être diffusé en continu.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
@@ -5452,8 +5446,6 @@
     <string name="notifications_screen_notification_promo_expiration_time">Expire le %1$s à %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
     <string name="meetings_free_call_organiser_number_of_participants_warning">Seuls 100&#160;participants peuvent participer à l’appel. Tout participant supplémentaire ne pourra qu’envoyer et recevoir des messages. La personne qui organise l’appel peut souscrire un abonnement Pro pour lever ces restrictions.</string>
-    <!-- Warning Message for non organiser for Free Call -->
-    <string name="meetings_free_call_non_organiser_number_of_participants_warning">Seuls 100&#160;participants peuvent participer à l’appel. Tout participant supplémentaire ne pourra qu’envoyer et lire les conversations. Demandez à la personne qui l’organise de lever cette restriction.</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
     <string name="settings_camera_uploads_video_quality_dialog_option_low">Basse</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->

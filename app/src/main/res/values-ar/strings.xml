@@ -305,15 +305,6 @@
         <item quantity="many">تم الانتهاء من %1$d عملية ترفيع</item>
         <item quantity="other">تم الانتهاء من %1$d عملية ترفيع</item>
     </plurals>
-    <!-- Warning shown when it tries to download some empty folders. Plural -->
-    <plurals name="empty_folders">
-        <item quantity="zero">المجلد فارغ.</item>
-        <item quantity="one">المجلد فارغ.</item>
-        <item quantity="two">المجلدات فارغة.</item>
-        <item quantity="few">المجلدات فارغة.</item>
-        <item quantity="many">المجلدات فارغة.</item>
-        <item quantity="other">المجلدات فارغة.</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">عرض عمليات تراسل المعطيات</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -2012,7 +2003,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">لم تنجح مشاركة %d ملف</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">عرض المحتوى</string>
+    <string name="preview_content">فتح</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">لا يوجد اتصال شبكة. لم يتم تنزيل الملف ولا يمكن بثه.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
@@ -6157,8 +6148,6 @@
     <string name="notifications_screen_notification_promo_expiration_time">تنتهي الصلاحية في %1$s الساعة %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
     <string name="meetings_free_call_organiser_number_of_participants_warning">يمكن لـ 100 مشارك فقط الانضمام إلى المكالمة. لن يتمكن أي مشارك إضافي إلا من إرسال الرسائل وتلقيها. يمكن للمنظم الترقية إلى برو Pro لإزالة هذه القيود.</string>
-    <!-- Warning Message for non organiser for Free Call -->
-    <string name="meetings_free_call_non_organiser_number_of_participants_warning">يمكن لـ 100&#160;مشارك فقط الانضمام إلى المكالمة. لن يتمكن أي مشارك إضافي إلا من إرسال المحادثات وقراءتها. اطلب من المنظم إزالة هذا التقييد.</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
     <string name="settings_camera_uploads_video_quality_dialog_option_low">منخفضة</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->

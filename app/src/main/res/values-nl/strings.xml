@@ -285,11 +285,6 @@
         <item quantity="one">Uploaden is voltooid</item>
         <item quantity="other">%1$d uploads zijn voltooid</item>
     </plurals>
-    <!-- Warning shown when it tries to download some empty folders. Plural -->
-    <plurals name="empty_folders">
-        <item quantity="one">Map is leeg.</item>
-        <item quantity="other">Mappen zijn leeg.</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Overdrachten weergeven</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -1840,7 +1835,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d bestanden waren niet gedeeld</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Voorbeeld van inhoud bekijken</string>
+    <string name="preview_content">Openen</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">Geen netwerkverbinding. Bestand is niet gedownload en kan niet worden gestreamd.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
@@ -5149,7 +5144,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Het uploaden is gepauzeerd omdat de batterij lager is dan %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Het uploaden van de camera werkt niet meer. Probeer camera-uploads opnieuw in te schakelen om het probleem op te lossen. Als het probleem zich blijft voordoen, neem contact op met support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Camera uploads zijn in behandeling,%1$d bestand in wachtrij</item>
@@ -5217,8 +5212,6 @@
     <string name="notifications_screen_notification_promo_expiration_time">Vervalt op %1$s om %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
     <string name="meetings_free_call_organiser_number_of_participants_warning">Er kunnen slechts 100 deelnemers deelnemen aan de oproep. Eventuele extra deelnemers kunnen alleen berichten verzenden en ontvangen. De organisator kan upgraden naar Pro om deze beperkingen op te heffen.</string>
-    <!-- Warning Message for non organiser for Free Call -->
-    <string name="meetings_free_call_non_organiser_number_of_participants_warning">Slechts 100&#160;deelnemers kunnen deelnemen aan de oproep. Eventuele extra deelnemers kunnen alleen gesprekken verzenden en lezen. Vraag de organisator om deze beperking op te heffen.</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
     <string name="settings_camera_uploads_video_quality_dialog_option_low">Laag</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->

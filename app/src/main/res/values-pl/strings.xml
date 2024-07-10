@@ -295,13 +295,6 @@
         <item quantity="many">Przesyłanie %1$d zostało zakończone</item>
         <item quantity="other">Przesyłanie %1$d zostało zakończone</item>
     </plurals>
-    <!-- Warning shown when it tries to download some empty folders. Plural -->
-    <plurals name="empty_folders">
-        <item quantity="one">Katalog jest pusty.</item>
-        <item quantity="few">Katalogi są puste.</item>
-        <item quantity="many">Katalogi są puste.</item>
-        <item quantity="other">Katalogi są puste.</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Pokaż transfery</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -1926,7 +1919,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d plików nieudostępniono</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Podgląd</string>
+    <string name="preview_content">Otwórz</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">Brak połączenia sieciowego. Plik nie został pobrany i nie może być przesyłany strumieniowo.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
@@ -5613,7 +5606,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Przesyłanie wstrzymane, ponieważ bateria jest poniżej %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Przesyłanie z kamery przestało działać. Spróbuj ponownie włączyć przesyłanie z kamery, aby rozwiązać ten problem. Jeśli problem nie ustąpi, skontaktuj się z support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Trwa przesyłanie kamery, %1$d plików oczekuje na przesłanie</item>
@@ -5687,8 +5680,6 @@
     <string name="notifications_screen_notification_promo_expiration_time">Wygasa dnia %1$s o %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
     <string name="meetings_free_call_organiser_number_of_participants_warning">Do połączenia może dołączyć tylko 100 uczestników. Dodatkowi uczestnicy będą mogli jedynie wysyłać i odbierać wiadomości. Organizator może zmień do wersji Pro, aby usunąć te ograniczenia.</string>
-    <!-- Warning Message for non organiser for Free Call -->
-    <string name="meetings_free_call_non_organiser_number_of_participants_warning">Do rozmowy może dołączyć tylko 100 uczestników. Dodatkowi uczestnicy będą mogli jedynie wysyłać i odczytywać czaty. Poproś organizatora o usunięcie tego ograniczenia.</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
     <string name="settings_camera_uploads_video_quality_dialog_option_low">Niska</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->

@@ -280,10 +280,6 @@
     <plurals name="upload_finish">
         <item quantity="other">%1$d unggahan telah selesai</item>
     </plurals>
-    <!-- Warning shown when it tries to download some empty folders. Plural -->
-    <plurals name="empty_folders">
-        <item quantity="other">Folder kosong.</item>
-    </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Lihat pemindahan</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -1797,7 +1793,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d files tidak dibagikan</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Pratinjau konten</string>
+    <string name="preview_content">Buka</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">Tidak ada koneksi jaringan. File belum diunduh dan tidak dapat dialirkan.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
@@ -4982,8 +4978,6 @@
     <string name="notifications_screen_notification_promo_expiration_time">Kedaluwarsa pada %1$s pukul %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
     <string name="meetings_free_call_organiser_number_of_participants_warning">Hanya 100 peserta yang dapat bergabung dengan panggilan. Setiap peserta tambahan hanya akan dapat mengirim dan menerima pesan. Penyelenggara dapat meningkatkan ke Pro untuk menghapus batasan ini.</string>
-    <!-- Warning Message for non organiser for Free Call -->
-    <string name="meetings_free_call_non_organiser_number_of_participants_warning">Hanya 100 peserta yang dapat bergabung dengan panggilan. Setiap peserta tambahan hanya akan dapat mengirim dan membaca obrolan. Minta penyelenggara untuk menghapus batasan ini.</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
     <string name="settings_camera_uploads_video_quality_dialog_option_low">Rendah</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->

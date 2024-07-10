@@ -169,11 +169,11 @@
     <!-- Last name of the user -->
     <string name="lastname_text">Cognome</string>
     <!-- text placed on the checkbox of acceptation of the Terms of Service -->
-    <string name="tos">Accetto i [A]Termini di Servizio[/A] di MEGA</string>
+    <string name="tos">Accetto i [A]Termini di servizio[/A] di MEGA</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Capisco che [B]se perdo la mia password, potrei perdere i miei dati[/B]. Leggi di più riguardo la [A]criptazione end-to-end di MEGA[/A]</string>
     <!-- warning dialog -->
-    <string name="create_account_no_terms">Per continuare devi accettare i nostri Termini di Servizio</string>
+    <string name="create_account_no_terms">Per continuare devi accettare i nostri Termini di servizio</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Devi essere d’accordo che capisci il pericolo della perdita della password</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
@@ -289,12 +289,6 @@
         <item quantity="one">Il caricamento è terminato</item>
         <item quantity="many">%1$d caricamenti sono stati terminati</item>
         <item quantity="other">%1$d caricamenti sono stati terminati</item>
-    </plurals>
-    <!-- Warning shown when it tries to download some empty folders. Plural -->
-    <plurals name="empty_folders">
-        <item quantity="one">La cartella è vuota.</item>
-        <item quantity="many">Le cartelle sono vuote.</item>
-        <item quantity="other">Le cartelle sono vuote.</item>
     </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Vedi trasferimenti</string>
@@ -649,7 +643,7 @@
     <!-- Preference screen item action button -->
     <string name="settings_about_privacy_policy">Politica sulla privacy</string>
     <!--  -->
-    <string name="settings_about_terms_of_service">Termini di Servizio</string>
+    <string name="settings_about_terms_of_service">Termini di servizio</string>
     <!-- App means “Application” -->
     <string name="settings_about_app_version">Versione</string>
     <!-- Title of the label where the SDK version is shown -->
@@ -827,7 +821,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">E-mail o password non valide. Per favore, riprova.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Il tuo account è stato sospeso a causa di violazioni dei Termini di Servizio. Per favore, contatta support&#64;mega.nz</string>
+    <string name="error_account_suspended">Il tuo account è stato sospeso a causa di violazioni dei Termini di servizio. Per favore, contatta support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Troppi tentativi falliti di effettuare il login, per favore aspetta un’ora.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -835,11 +829,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Link della cartella non disponibile</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Il link della cartella è stato rimosso perché viola i nostri Termini di Servizio.</string>
+    <string name="folder_link_unavaible_ToS_violation">Il link della cartella è stato rimosso perché viola i nostri Termini di servizio.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Link del file non disponibile</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Il link del file è stato rimosso in quanto violava i nostri Termini di Servizio.</string>
+    <string name="file_link_unavaible_ToS_violation">Il link del file è stato rimosso in quanto violava i nostri Termini di servizio.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Questo URL è corrotto o deformato. Il link a cui stai cercando di accedere non esiste.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -853,7 +847,7 @@
         <item quantity="other">%1$d oggetti</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_delete_account">L’account dell’utente associato è stato chiuso a causa di ripetute violazioni dei nostri Termini di Servizio.</string>
+    <string name="file_link_unavaible_delete_account">L’account dell’utente associato è stato chiuso a causa di ripetute violazioni dei nostri Termini di servizio.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">La chiave di decriptazione fornita per il link della cartella non è valida.</string>
     <!-- Item of the navigation title for the chat section -->
@@ -1883,7 +1877,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d file non sono stati condivisi</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Anteprima</string>
+    <string name="preview_content">Apri</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">Nessuna connessione ad internet. Il file non è stato scaricato e non può esserne effettuato lo stream.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
@@ -2181,12 +2175,12 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Contesta chiusura</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Non accessibile in quanto violava i nostri Termini di Servizio</string>
+    <string name="error_download_takendown_node">Non accessibile in quanto violava i nostri Termini di servizio</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d file non è stato scaricato in quanto violava i nostri Termini di Servizio.</item>
-        <item quantity="many">%d file non sono stati scaricati in quanto violavano i nostri Termini di Servizio.</item>
-        <item quantity="other">%d file non sono stati scaricati in quanto violavano i nostri Termini di Servizio.</item>
+        <item quantity="one">%d file non è stato scaricato in quanto violava i nostri Termini di servizio.</item>
+        <item quantity="many">%d file non sono stati scaricati in quanto violavano i nostri Termini di servizio.</item>
+        <item quantity="other">%d file non sono stati scaricati in quanto violavano i nostri Termini di servizio.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Il tuo file pubblicamente condiviso[/A] [B]%s[/B] è stato reintegrato.</string>
@@ -3439,9 +3433,9 @@
     <!-- Title of pop-up error message for taken down file -->
     <string name="error_file_not_available">File nomn più disponibile</string>
     <!-- Body of pop-up error message for taken down file. -->
-    <string name="error_takendown_file">File rimosso perché viola i nostri Termini di Servizio.</string>
+    <string name="error_takendown_file">File rimosso perché viola i nostri Termini di servizio.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
-    <string name="error_download_takendown_file">Termini di Servizio violati</string>
+    <string name="error_download_takendown_file">Termini di servizio violati</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_warning_no_picker">Questo dispositivo non ha app per selezionare le cartelle.</string>
     <!-- Next audios to be played in the audio playlist -->
@@ -3767,7 +3761,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Il tuo account MEGA è stato sospeso a causa di ripetute accuse di violazione di copyright. Questo significa che non puoi accedere al tuo account o ai dati al suo interno.\nControlla la tua casella di posta elettronica per maggiori informazioni su come puoi inviare una contro-notifica.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Il tuo account MEGA è stato chiuso a causa di una violazione dei Termini di Servizio di MEGA.\nNon puoi riottenere accesso ai dati che hai archiviato o registrare un nuovo account.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Il tuo account MEGA è stato chiuso a causa di una violazione dei Termini di servizio di MEGA.\nNon puoi riottenere accesso ai dati che hai archiviato o registrare un nuovo account.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Meeting</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -5381,7 +5375,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Caricamento sospeso perché la batteria è minore del %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">I Caricamenti da fotocamera hanno smesso di funzionare. Prova a riattivare i Caricamenti da fotocamera per risolvere il problema. Se il problema persiste, contatta support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Caricamenti da fotocamera in corso, %1$d file in attesa</item>
@@ -5419,9 +5413,9 @@
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Ti verrà addebitato %1$s immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 12 mesi al costo di %2$s all\’anno. Il rinnovo verrà addebitato sul tuo account Google&#160;Play entro 24 ore dalla fine di ogni periodo di fatturazione. Per annullare l\’abbonamento, devi disattivare il rinnovo automatico dell\’abbonamento MEGA&#160;Pro almeno 24 ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">L\’addebito avverrà immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 1 mese. Il tuo account Google&#160;Play riceverà un addebito per il rinnovo entro le 24 ore precedenti la fine del periodo di fatturazione. Per annullare il tuo abbonamento, devi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro almeno 24 ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di Servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">L\’addebito avverrà immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 1 mese. Il tuo account Google&#160;Play riceverà un addebito per il rinnovo entro le 24 ore precedenti la fine del periodo di fatturazione. Per annullare il tuo abbonamento, devi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro almeno 24 ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">L\’addebito avverrà immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 12&#160;mesi. Il tuo account Google&#160;Play riceverà un addebito per il rinnovo entro le 24&#160;ore precedenti la fine del periodo di fatturazione. Per annullare il tuo abbonamento, devi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro almeno 24&#160;ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di Servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">L\’addebito avverrà immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 12&#160;mesi. Il tuo account Google&#160;Play riceverà un addebito per il rinnovo entro le 24&#160;ore precedenti la fine del periodo di fatturazione. Per annullare il tuo abbonamento, devi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro almeno 24&#160;ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">Account Business disattivato</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
@@ -5452,8 +5446,6 @@
     <string name="notifications_screen_notification_promo_expiration_time">Scade il giorno %1$s alle ore %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
     <string name="meetings_free_call_organiser_number_of_participants_warning">Solo 100 partecipanti possono partecipare alla chiamata. Eventuali partecipanti aggiuntivi potranno solo inviare e ricevere messaggi. L\’organizzatore può effettuare l\’upgrade a Pro per rimuovere queste restrizioni.</string>
-    <!-- Warning Message for non organiser for Free Call -->
-    <string name="meetings_free_call_non_organiser_number_of_participants_warning">Only 100 participants can join the call. Any additional participants will only be able to send and read chats. Ask the organiser to remove this restriction.</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
     <string name="settings_camera_uploads_video_quality_dialog_option_low">Bassa</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
@@ -5571,7 +5563,7 @@
         <item quantity="other">%1$s and %2$d others raised their hands</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="hidden_nodes_sharing_album">Ci sono oggetti nascosti in questo album. Condividere l\’album significa che gli oggetti nascosti saranno visibili alle persone con cui condividi. Gli oggetti saranno comunque nascosti nel tuo Cloud drive.</string>
     <!-- Hidden nodes items -->
     <plurals name="hidden_nodes_items">
         <item quantity="one"></item>
