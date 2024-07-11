@@ -61,7 +61,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -1004,9 +1004,9 @@ class VideoSectionViewModelTest {
             val typedVideoNode2 = getTypedVideoNode(2)
             val typedVideoNode3 = getTypedVideoNode(3)
 
-            val videoOfDurationLessThan4 = getVideoUIEntityWithDuration(3.minutes)
-            val videoOfDurationBetween4And20 = getVideoUIEntityWithDuration(8.minutes)
-            val videoOfDurationMoreThan20 = getVideoUIEntityWithDuration(21.minutes)
+            val videoOfDurationLessThan4 = getVideoUIEntityWithDuration(180.seconds)
+            val videoOfDurationBetween4And20 = getVideoUIEntityWithDuration(480.seconds)
+            val videoOfDurationMoreThan20 = getVideoUIEntityWithDuration(1260.seconds)
 
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
             whenever(getAllVideosUseCase()).thenReturn(
@@ -1037,9 +1037,9 @@ class VideoSectionViewModelTest {
             val typedVideoNode2 = getTypedVideoNode(2)
             val typedVideoNode3 = getTypedVideoNode(3)
 
-            val videoOfDurationLessThan4 = getVideoUIEntityWithDuration(3.minutes)
-            val videoOfDurationBetween4And20 = getVideoUIEntityWithDuration(8.minutes)
-            val videoOfDurationMoreThan20 = getVideoUIEntityWithDuration(21.minutes)
+            val videoOfDurationLessThan4 = getVideoUIEntityWithDuration(180.seconds)
+            val videoOfDurationBetween4And20 = getVideoUIEntityWithDuration(480.seconds)
+            val videoOfDurationMoreThan20 = getVideoUIEntityWithDuration(1260.seconds)
 
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
             whenever(getAllVideosUseCase()).thenReturn(

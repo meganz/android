@@ -276,7 +276,6 @@ class VideoSectionViewModel @Inject constructor(
     private fun List<VideoUIEntity>.filterVideosByDuration() =
         filter {
             val seconds = it.duration.inWholeSeconds
-            val minutes = it.duration.inWholeMinutes
             when (_state.value.durationSelectedFilterOption) {
                 DurationFilterOption.AllDurations -> true
 
@@ -284,11 +283,11 @@ class VideoSectionViewModel @Inject constructor(
 
                 DurationFilterOption.Between10And60Seconds -> seconds in 10..60
 
-                DurationFilterOption.Between1And4 -> minutes in 1..4
+                DurationFilterOption.Between1And4 -> seconds in 60..240
 
-                DurationFilterOption.Between4And20 -> minutes in 4..20
+                DurationFilterOption.Between4And20 -> seconds in 241..1200
 
-                DurationFilterOption.MoreThan20 -> minutes > 20
+                DurationFilterOption.MoreThan20 -> seconds > 1200
             }
         }
 
