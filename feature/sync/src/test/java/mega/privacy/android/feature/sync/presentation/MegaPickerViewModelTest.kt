@@ -156,7 +156,7 @@ internal class MegaPickerViewModelTest {
             awaitCancellation()
         })
         val expectedState = MegaPickerState(
-            currentFolder = clickedFolder, nodes = typedNodeUiModels
+            currentFolder = clickedFolder, nodes = typedNodeUiModels, isSelectEnabled = true,
         )
 
         underTest.handleAction(MegaPickerAction.FolderClicked(clickedFolder))
@@ -191,7 +191,7 @@ internal class MegaPickerViewModelTest {
             awaitCancellation()
         })
         val expectedState = MegaPickerState(
-            currentFolder = parentFolder, nodes = typedNodeUiModels
+            currentFolder = parentFolder, nodes = typedNodeUiModels, isSelectEnabled = true,
         )
 
         initViewModel()
@@ -355,6 +355,62 @@ internal class MegaPickerViewModelTest {
 
         underTest.state.test {
             assertThat(awaitItem().errorMessageId).isEqualTo(null)
+        }
+    }
+
+    @Test
+    fun `test that viewmodel disables selection for root node`() = runTest {
+        val rootFolderId = NodeId(123456L)
+        val rootFolder: FolderNode = mock {
+            on { id } doReturn rootFolderId
+        }
+        whenever(getRootNodeUseCase()).thenReturn(rootFolder)
+        whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(flow {
+            emit(childrenNodes)
+            awaitCancellation()
+        })
+
+        initViewModel()
+        val expectedState = MegaPickerState(
+            currentFolder = rootFolder,
+            nodes = typedNodeUiModels,
+            isSelectEnabled = false,
+        )
+
+        underTest.state.test {
+            assertThat(awaitItem()).isEqualTo(expectedState)
+        }
+    }
+
+    @Test
+    fun `test that viewmodel enables selection for clicked non root node`() = runTest {
+        val rootFolderId = NodeId(123456L)
+        val rootFolder: FolderNode = mock {
+            on { id } doReturn rootFolderId
+        }
+        val clickedFolderId = NodeId(2323L)
+        val clickedFolderName = "Folder"
+        val clickedFolder: TypedFolderNode = mock {
+            on { id } doReturn clickedFolderId
+            on { name } doReturn clickedFolderName
+        }
+        whenever(getRootNodeUseCase()).thenReturn(rootFolder)
+        whenever(getTypedNodesFromFolder(clickedFolderId)).thenReturn(flow {
+            emit(childrenNodes)
+            awaitCancellation()
+        })
+
+        initViewModel()
+        val expectedState = MegaPickerState(
+            currentFolder = clickedFolder,
+            nodes = typedNodeUiModels,
+            isSelectEnabled = true,
+        )
+
+        underTest.handleAction(MegaPickerAction.FolderClicked(clickedFolder))
+
+        underTest.state.test {
+            assertThat(awaitItem()).isEqualTo(expectedState)
         }
     }
 

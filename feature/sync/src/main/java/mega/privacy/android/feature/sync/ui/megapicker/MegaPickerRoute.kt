@@ -49,7 +49,8 @@ internal fun MegaPickerRoute(
                     newFolderName = newFolderName,
                     parentNode = state.value.currentFolder
                 )
-            }
+            },
+            isSelectEnabled = state.value.isSelectEnabled,
         )
     }
 

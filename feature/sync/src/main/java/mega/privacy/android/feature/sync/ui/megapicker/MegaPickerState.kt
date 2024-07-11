@@ -11,4 +11,5 @@ internal data class MegaPickerState(
     val showDisableBatteryOptimizationsDialog: Boolean = false,
     val errorMessageId: Int? = null,
     val navigateNextEvent: StateEvent = consumed,
+    val isSelectEnabled: Boolean = false,
 )

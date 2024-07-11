@@ -213,7 +213,8 @@ internal class MegaPickerViewModel @Inject constructor(
                                 }
                             } else {
                                 childFolders.map { TypedNodeUiModel(it, false) }
-                            }
+                            },
+                            isSelectEnabled = isRootFolder(currentFolder).not()
                         )
                     }
                 }
@@ -222,6 +223,8 @@ internal class MegaPickerViewModel @Inject constructor(
             }
         }
     }
+
+    private fun isRootFolder(folder: Node) = rootFolder?.id == folder.id
 
     /**
      * Creates a new folder
