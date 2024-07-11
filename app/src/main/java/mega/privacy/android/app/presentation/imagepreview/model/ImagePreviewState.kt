@@ -23,4 +23,5 @@ data class ImagePreviewState(
     val showDeletedMessage: Boolean = false,
     val accountDetail: AccountDetail? = null,
     val isHiddenNodesOnboarded: Boolean? = null,
+    val isMagnifierMode: Boolean = false,
 )

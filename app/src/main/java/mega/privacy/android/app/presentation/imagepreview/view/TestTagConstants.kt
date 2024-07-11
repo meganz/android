@@ -7,6 +7,7 @@ internal const val IMAGE_PREVIEW_APP_BAR_FORWARD = "image_preview_app_bar:icon_f
 internal const val IMAGE_PREVIEW_APP_BAR_SAVE_TO_DEVICE =
     "image_preview_app_bar:icon_save_to_device"
 internal const val IMAGE_PREVIEW_APP_BAR_MANAGE_LINK = "image_preview_app_bar:icon_manage_link"
+internal const val IMAGE_PREVIEW_APP_BAR_MAGNIFIER = "image_preview_app_bar:icon_magnifier"
 internal const val IMAGE_PREVIEW_APP_BAR_SEND_TO = "image_preview_app_bar:icon_send_to"
 internal const val IMAGE_PREVIEW_APP_BAR_MORE = "image_preview_app_bar:icon_more"
 /** AppBar options test tags */

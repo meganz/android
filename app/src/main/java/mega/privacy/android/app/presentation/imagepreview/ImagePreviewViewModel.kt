@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.imagepreview
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -35,6 +36,8 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewStat
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.domain.entity.GifFileTypeInfo
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -362,6 +365,12 @@ class ImagePreviewViewModel @Inject constructor(
 
     suspend fun isMoveToRubbishBinMenuVisible(imageNode: ImageNode): Boolean {
         return menu?.isMoveToRubbishBinMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isMagnifierMenuVisible(imageNode: ImageNode): Boolean {
+        return Build.VERSION.SDK_INT >= 28
+                && imageNode.type is ImageFileTypeInfo
+                && imageNode.type !is GifFileTypeInfo
     }
 
     suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {
@@ -838,6 +847,11 @@ class ImagePreviewViewModel @Inject constructor(
         )
     }
 
+    fun switchMagnifierMode() {
+        _state.update {
+            it.copy(isMagnifierMode = !it.isMagnifierMode)
+        }
+    }
 
     companion object {
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"
