@@ -289,12 +289,10 @@ internal fun SettingsCameraUploadsView(
                         uploadConnectionType = uiState.uploadConnectionType,
                         onItemClicked = { showHowToUploadPrompt = true },
                     )
-                    if (uiState.canChangeChargingWhenUploadingContentState) {
-                        UploadOnlyWhileChargingTile(
-                            isChecked = uiState.requireChargingWhenUploadingContent,
-                            onCheckedChange = onChargingWhenUploadingContentStateChanged,
-                        )
-                    }
+                    UploadOnlyWhileChargingTile(
+                        isChecked = uiState.requireChargingWhenUploadingContent,
+                        onCheckedChange = onChargingWhenUploadingContentStateChanged,
+                    )
                     FileUploadTile(
                         uploadOptionUiItem = uiState.uploadOptionUiItem,
                         onItemClicked = { showFileUploadPrompt = true },
@@ -432,7 +430,6 @@ private class SettingsCameraUploadsViewParameterProvider
             SettingsCameraUploadsUiState(),
             // Camera Uploads Enabled - All Options Shown
             SettingsCameraUploadsUiState(
-                canChangeChargingWhenUploadingContentState = true,
                 isCameraUploadsEnabled = true,
                 isMediaUploadsEnabled = true,
                 primaryFolderName = "Camera Uploads",

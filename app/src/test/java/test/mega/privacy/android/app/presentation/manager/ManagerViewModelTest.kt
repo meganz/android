@@ -1438,11 +1438,8 @@ class ManagerViewModelTest {
     )
 
     @Test
-    fun `test that camera uploads automatically starts when the device begins charging and the charging feature flag is enabled`() =
+    fun `test that camera uploads automatically starts when the device begins charging`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
-                true
-            )
             monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Connected)
             testScheduler.advanceUntilIdle()
 
@@ -1450,23 +1447,8 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that camera uploads does not automatically start when the device begins charging and the charging feature flag is disabled`() =
+    fun `test that camera uploads does not automatically start when the device is not charging`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
-                false
-            )
-            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Connected)
-            testScheduler.advanceUntilIdle()
-
-            verifyNoInteractions(startCameraUploadUseCase)
-        }
-
-    @Test
-    fun `test that camera uploads does not automatically start when the device is not charging and the charging feature flag is enabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
-                true
-            )
             monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Disconnected)
             testScheduler.advanceUntilIdle()
 
@@ -1474,35 +1456,8 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that camera uploads does not automatically start when the device is not charging and the charging feature flag is disabled`() =
+    fun `test that camera uploads does not automatically start when the device charging state is unknown`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
-                false
-            )
-            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Disconnected)
-            testScheduler.advanceUntilIdle()
-
-            verifyNoInteractions(startCameraUploadUseCase)
-        }
-
-    @Test
-    fun `test that camera uploads does not automatically start when the device charging state is unknown and the feature flag is enabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
-                true
-            )
-            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Unknown)
-            testScheduler.advanceUntilIdle()
-
-            verifyNoInteractions(startCameraUploadUseCase)
-        }
-
-    @Test
-    fun `test that camera uploads does not automatically start when the device charging state is unknown and the feature flag is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
-                false
-            )
             monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Unknown)
             testScheduler.advanceUntilIdle()
 

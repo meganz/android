@@ -71,15 +71,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Shows the "Upload only while charging" Option in the refactored Settings Camera Uploads screen
-     */
-    SettingsCameraUploadsUploadWhileCharging(
-        description = "Shows the Upload only while charging Option in the refactored Settings Camera " +
-                "Uploads screen.",
-        defaultValue = true,
-    ),
-
-    /**
      * Enables new video section flag
      */
     NewVideoSection(

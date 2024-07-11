@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.UploadOptionUiItemMapper
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.VideoQualityUiItemMapper
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
@@ -75,7 +74,6 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFo
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
@@ -96,7 +94,6 @@ import javax.inject.Inject
  * Uploads Folder
  * @property deleteCameraUploadsTemporaryRootDirectoryUseCase Deletes the temporary Camera Uploads Cache Folder
  * @property disableMediaUploadsSettingsUseCase Disables Media Uploads
- * @property getFeatureFlagValueUseCase Retrieves the local Feature Flag configurations
  * @property getPrimaryFolderNodeUseCase Gets the Camera Uploads Primary Folder Node
  * @property getPrimaryFolderPathUseCase Gets the Camera Uploads Primary Folder Path
  * @property getSecondaryFolderNodeUseCase Gets the Media Uploads Secondary Folder Node
@@ -165,7 +162,6 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
     private val disableMediaUploadsSettingsUseCase: DisableMediaUploadsSettingsUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPrimaryFolderNodeUseCase: GetPrimaryFolderNodeUseCase,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val getSecondaryFolderNodeUseCase: GetSecondaryFolderNodeUseCase,
@@ -253,9 +249,6 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
 
                 _uiState.update {
                     it.copy(
-                        canChangeChargingWhenUploadingContentState = getFeatureFlagValueUseCase(
-                            AppFeatures.SettingsCameraUploadsUploadWhileCharging
-                        ),
                         isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
                         isMediaUploadsEnabled = isMediaUploadsEnabled.await(),
                         maximumNonChargingVideoCompressionSize = maximumNonChargingVideoCompressionSize.await(),

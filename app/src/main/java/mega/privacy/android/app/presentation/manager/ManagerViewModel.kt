@@ -526,9 +526,7 @@ class ManagerViewModel @Inject constructor(
                 )
             }.collect { state ->
                 Timber.d("The Device Power Connection State is $state")
-                if (state == DevicePowerConnectionState.Connected &&
-                    getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)
-                ) {
+                if (state == DevicePowerConnectionState.Connected) {
                     startCameraUploadUseCase()
                 }
             }

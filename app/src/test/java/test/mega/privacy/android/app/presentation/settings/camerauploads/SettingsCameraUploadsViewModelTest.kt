@@ -14,7 +14,6 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.UploadOptionUiItemMapper
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.VideoQualityUiItemMapper
@@ -261,9 +260,6 @@ internal class SettingsCameraUploadsViewModelTest {
         }
         whenever(areLocationTagsEnabledUseCase()).thenReturn(shouldIncludeLocationTags)
         whenever(areUploadFileNamesKeptUseCase()).thenReturn(shouldKeepUploadFileNames)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
-            true
-        )
         whenever(getPrimaryFolderNodeUseCase()).thenReturn(cameraUploadsFolderNode)
         whenever(getPrimaryFolderPathUseCase()).thenReturn(primaryFolderPath)
         whenever(getSecondaryFolderNodeUseCase()).thenReturn(mediaUploadsFolderNode)
@@ -297,7 +293,6 @@ internal class SettingsCameraUploadsViewModelTest {
             clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
             disableMediaUploadsSettingsUseCase = disableMediaUploadsSettingsUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPrimaryFolderNodeUseCase = getPrimaryFolderNodeUseCase,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getSecondaryFolderNodeUseCase = getSecondaryFolderNodeUseCase,
