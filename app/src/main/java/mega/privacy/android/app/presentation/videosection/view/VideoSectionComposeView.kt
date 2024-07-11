@@ -9,10 +9,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -65,33 +62,11 @@ internal fun VideoSectionComposeView(
 
     val accountType = uiState.accountDetail?.levelDetail?.accountType
 
-    var isHideMenuActionVisible by rememberSaveable { mutableStateOf(false) }
-    var isUnhideMenuActionVisible by rememberSaveable { mutableStateOf(false) }
-    var isRemoveLinkMenuActionVisible by rememberSaveable { mutableStateOf(false) }
-
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             videoSectionViewModel.onTabSelected(selectTab = tabState.tabs[page])
             val tab = VideoSectionTab.entries[page]
             pagerState.scrollToPage(tab.ordinal)
-        }
-    }
-
-    LaunchedEffect(uiState.selectedVideoHandles) {
-        val handles = uiState.selectedVideoHandles
-        val isAllTabSelected = tabState.selectedTab == VideoSectionTab.All
-        if (handles.isNotEmpty()) {
-            isHideMenuActionVisible = isAllTabSelected
-            isUnhideMenuActionVisible = isAllTabSelected
-
-            val isExported = if (handles.size == 1) {
-                videoSectionViewModel.getSelectedNodes().firstOrNull()?.let {
-                    it.exportedData != null
-                } ?: false
-            } else {
-                false
-            }
-            isRemoveLinkMenuActionVisible = isAllTabSelected && isExported
         }
     }
 
@@ -166,9 +141,9 @@ internal fun VideoSectionComposeView(
                         else -> onMenuAction(action)
                     }
                 },
-                onSearchTextChanged = {},
-                onCloseClicked = {},
-                onSearchClicked = {},
+                onSearchTextChanged = videoSectionViewModel::searchQuery,
+                onCloseClicked = videoSectionViewModel::exitSearch,
+                onSearchClicked = videoSectionViewModel::searchWidgetStateUpdate,
                 onBackPressed = {
                     when {
                         uiState.isInSelection -> {
@@ -183,9 +158,9 @@ internal fun VideoSectionComposeView(
                             onBackPressedDispatcher?.onBackPressed()
                     }
                 },
-                isHideMenuActionVisible = isHideMenuActionVisible,
-                isUnhideMenuActionVisible = isUnhideMenuActionVisible,
-                isRemoveLinkMenuActionVisible = isRemoveLinkMenuActionVisible
+                isHideMenuActionVisible = uiState.isHideMenuActionVisible,
+                isUnhideMenuActionVisible = uiState.isUnhideMenuActionVisible,
+                isRemoveLinkMenuActionVisible = uiState.isRemoveLinkMenuActionVisible
             )
         }
     ) { paddingValues ->

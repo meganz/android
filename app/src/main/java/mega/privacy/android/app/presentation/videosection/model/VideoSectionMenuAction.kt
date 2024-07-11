@@ -159,6 +159,17 @@ sealed interface VideoSectionMenuAction : MenuAction {
         override val orderInCategory = 165
     }
 
+    /**
+     * Video section more action
+     */
+    object VideoSectionMoreAction : MenuActionString(
+        iconRes = iconPackR.drawable.ic_more_vertical_medium_regular_outline,
+        descriptionRes = R.string.label_more,
+        testTag = TEST_TAG_VIDEO_SECTION_MORE_ACTION
+    ), VideoSectionMenuAction {
+        override val orderInCategory = 170
+    }
+
     companion object {
         /**
          * Test tag for video section download action
@@ -231,5 +242,9 @@ sealed interface VideoSectionMenuAction : MenuAction {
          */
         const val TEST_TAG_VIDEO_SECTION_REMOVE_ACTION = "video_section:action_remove"
 
+        /**
+         * Test tag for video section more action
+         */
+        const val TEST_TAG_VIDEO_SECTION_MORE_ACTION = "video_section:action_more"
     }
 }

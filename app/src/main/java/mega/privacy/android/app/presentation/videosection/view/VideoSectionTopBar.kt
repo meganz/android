@@ -108,7 +108,7 @@ private fun getAllTabMenuItems(
     }
 
 /**
- * Test tag for search top bar of video selected
+ * Test tag for search top bar
  */
 const val VIDEO_SECTION_SEARCH_TOP_BAR_TEST_TAG = "video_section_view:top_bar_search"
 

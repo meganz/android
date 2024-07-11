@@ -24,9 +24,11 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -49,6 +51,7 @@ import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSets
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -283,22 +286,8 @@ class VideoSectionViewModelTest {
             assertThat(awaitItem().allVideos.size).isEqualTo(2)
 
             underTest.searchQuery("video")
+            assertThat(awaitItem().query).isEqualTo("video")
             assertThat(awaitItem().allVideos.size).isEqualTo(1)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that the searchMode is correctly updated`() = runTest {
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
-        whenever(getAllVideosUseCase()).thenReturn(emptyList())
-
-        underTest.state.drop(1).test {
-            underTest.searchReady()
-            assertThat(awaitItem().searchMode).isTrue()
-
-            underTest.exitSearch()
-            assertThat(awaitItem().searchMode).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -489,6 +478,7 @@ class VideoSectionViewModelTest {
             assertThat(awaitItem().videoPlaylists.size).isEqualTo(2)
 
             underTest.searchQuery("playlist")
+            assertThat(awaitItem().query).isEqualTo("playlist")
             assertThat(awaitItem().videoPlaylists.size).isEqualTo(1)
             cancelAndIgnoreRemainingEvents()
         }
@@ -670,25 +660,6 @@ class VideoSectionViewModelTest {
         }
 
     @Test
-    fun `test that the searchMode is closed when tab is switched`() = runTest {
-        initVideoPlaylistsReturned()
-        initVideosReturned()
-        initUnderTest()
-
-        underTest.state.test {
-            assertThat(awaitItem().searchMode).isFalse()
-            underTest.searchReady()
-            assertThat(awaitItem().searchMode).isTrue()
-            underTest.onTabSelected(selectTab = VideoSectionTab.Playlists)
-            assertThat(awaitItem().searchMode).isFalse()
-            underTest.searchReady()
-            assertThat(awaitItem().searchMode).isTrue()
-            underTest.onTabSelected(selectTab = VideoSectionTab.All)
-            assertThat(awaitItem().searchMode).isFalse()
-        }
-    }
-
-    @Test
     fun `test that the currentVideoPlaylist is correctly updated`() = runTest {
         initUnderTest()
 
@@ -724,19 +695,6 @@ class VideoSectionViewModelTest {
             assertThat(awaitItem().shouldDeleteVideosFromPlaylist).isTrue()
             underTest.setShouldDeleteVideosFromPlaylist(false)
             assertThat(awaitItem().shouldDeleteVideosFromPlaylist).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that the actionMode is correctly updated`() = runTest {
-        initUnderTest()
-
-        underTest.state.test {
-            assertThat(awaitItem().actionMode).isFalse()
-            underTest.setActionMode(true)
-            assertThat(awaitItem().actionMode).isTrue()
-            underTest.setActionMode(false)
-            assertThat(awaitItem().actionMode).isFalse()
         }
     }
 
@@ -822,20 +780,6 @@ class VideoSectionViewModelTest {
                 assertThat(awaitItem().areVideoPlaylistsRemovedSuccessfully).isTrue()
                 underTest.setAreVideoPlaylistsRemovedSuccessfully(false)
                 assertThat(awaitItem().areVideoPlaylistsRemovedSuccessfully).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that the setShouldShowMoreVideoPlaylistOptions is correctly updated`() =
-        runTest {
-            initUnderTest()
-
-            underTest.state.test {
-                assertThat(awaitItem().shouldShowMoreVideoPlaylistOptions).isFalse()
-                underTest.setShouldShowMoreVideoPlaylistOptions(true)
-                assertThat(awaitItem().shouldShowMoreVideoPlaylistOptions).isTrue()
-                underTest.setShouldShowMoreVideoPlaylistOptions(false)
-                assertThat(awaitItem().shouldShowMoreVideoPlaylistOptions).isFalse()
             }
         }
 
@@ -1387,6 +1331,186 @@ class VideoSectionViewModelTest {
                 assertThat(awaitItem().videoPlaylists).isNotEmpty()
                 underTest.playAllButtonClicked()
                 assertThat(awaitItem().clickedPlaylistDetailItem).isEqualTo(expectedVideoNode)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that search state is updated as expected`() = runTest {
+        initUnderTest()
+        underTest.state.test {
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+            underTest.searchWidgetStateUpdate()
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.EXPANDED)
+            underTest.searchWidgetStateUpdate()
+            assertThat(awaitItem().searchState).isEqualTo(SearchWidgetState.COLLAPSED)
+        }
+    }
+
+    @Test
+    fun `test that the state is updated correctly when the selected node is not marked as sensitive`() =
+        runTest {
+            val mockTypedNode = mock<TypedNode> {
+                on { isSensitiveInherited }.thenReturn(false)
+                on { isMarkedSensitive }.thenReturn(false)
+            }
+            initVideosReturned()
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+            whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
+            initUnderTest()
+
+            underTest.state.drop(1).test {
+                underTest.refreshNodes()
+                assertThat(awaitItem().allVideos).isNotEmpty()
+
+                underTest.onItemLongClicked(expectedVideo, 0)
+                assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
+                underTest.checkActionsVisible()
+                val actual = awaitItem()
+                assertThat(actual.isHideMenuActionVisible).isTrue()
+                assertThat(actual.isUnhideMenuActionVisible).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the state is updated correctly when the selected node is sensitive inherited`() =
+        runTest {
+            val mockTypedNode = mock<TypedNode> {
+                on { isSensitiveInherited }.thenReturn(true)
+            }
+            initVideosReturned()
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+            whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
+            initUnderTest()
+
+            underTest.state.drop(1).test {
+                underTest.refreshNodes()
+                assertThat(awaitItem().allVideos).isNotEmpty()
+
+                underTest.onItemLongClicked(expectedVideo, 0)
+                assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
+
+                underTest.checkActionsVisible()
+                val actual = awaitItem()
+                assertThat(actual.isHideMenuActionVisible).isFalse()
+                assertThat(actual.isUnhideMenuActionVisible).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the state is updated correctly when feature flag is disabled`() =
+        runTest {
+            initVideosReturned()
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
+            initUnderTest()
+            underTest.refreshNodes()
+
+            underTest.state.test {
+                underTest.checkActionsVisible()
+                val actual = awaitItem()
+                assertThat(actual.isHideMenuActionVisible).isFalse()
+                assertThat(actual.isUnhideMenuActionVisible).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the isRemoveLinkMenuActionVisible is updated correctly when exportedData of the selected node is not null`() =
+        runTest {
+            val mockTypedNode = mock<TypedNode> {
+                on { exportedData }.thenReturn(ExportedData("", 0))
+            }
+            initVideosReturned()
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+            whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
+            initUnderTest()
+
+            underTest.state.drop(1).test {
+                underTest.refreshNodes()
+                assertThat(awaitItem().allVideos).isNotEmpty()
+
+                underTest.onItemLongClicked(expectedVideo, 0)
+                assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
+
+                underTest.checkActionsVisible()
+                val actual = awaitItem()
+                assertThat(actual.isRemoveLinkMenuActionVisible).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the isRemoveLinkMenuActionVisible is updated correctly when exportedData of the selected node is null`() =
+        runTest {
+            val mockTypedNode = mock<TypedNode>()
+            initVideosReturned()
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+            whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
+            initUnderTest()
+
+            underTest.state.drop(1).test {
+                underTest.refreshNodes()
+                assertThat(awaitItem().allVideos).isNotEmpty()
+
+                underTest.onItemLongClicked(expectedVideo, 0)
+                assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
+
+                underTest.checkActionsVisible()
+                val actual = awaitItem()
+                assertThat(actual.isRemoveLinkMenuActionVisible).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the isRemoveLinkMenuActionVisible is updated correctly when select node size is more than 1`() =
+        runTest {
+            val mockTypedNode = mock<TypedNode> {
+                on { exportedData }.thenReturn(ExportedData("", 0))
+            }
+            initVideosReturned()
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+            whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
+            initUnderTest()
+
+            underTest.state.drop(1).test {
+                underTest.refreshNodes()
+                assertThat(awaitItem().allVideos).isNotEmpty()
+
+                underTest.onItemLongClicked(expectedVideo, 0)
+                assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
+                underTest.onItemLongClicked(expectedVideo, 1)
+                assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(2)
+
+                underTest.checkActionsVisible()
+                val actual = awaitItem()
+                assertThat(actual.isRemoveLinkMenuActionVisible).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the state is updated correctly when the select tab is not All tab`() =
+        runTest {
+            val mockTypedNode = mock<TypedNode> {
+                on { isSensitiveInherited }.thenReturn(false)
+                on { isMarkedSensitive }.thenReturn(false)
+                on { exportedData }.thenReturn(ExportedData("", 0))
+            }
+            initVideosReturned()
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+            whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
+            initUnderTest()
+
+            underTest.onTabSelected(VideoSectionTab.Playlists)
+            underTest.state.drop(2).test {
+                underTest.checkActionsVisible()
+                val actual = awaitItem()
+                assertThat(actual.isHideMenuActionVisible).isFalse()
+                assertThat(actual.isUnhideMenuActionVisible).isFalse()
+                assertThat(actual.isUnhideMenuActionVisible).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
         }

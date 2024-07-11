@@ -12,8 +12,6 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property sortOrder the sort order of video items
  * @property isPendingRefresh
  * @property progressBarShowing the progress bar showing state
- * @property searchMode the search mode state
- * @property actionMode the action mode state
  * @property scrollToTop the scroll to top state
  * @property selectedVideoHandles the selected video handles
  * @property selectedVideoPlaylistHandles the selected video playlist handles
@@ -46,14 +44,15 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property clickedPlaylistDetailItem the clicked playlist detail item
  * @property searchState the search state
  * @property query the search query
+ * @property isHideMenuActionVisible the hide menu action whether is visible
+ * @property isUnhideMenuActionVisible the unhide menu action whether is visible
+ * @property isRemoveLinkMenuActionVisible the remove link menu action whether is visible
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val isPendingRefresh: Boolean = false,
     val progressBarShowing: Boolean = true,
-    val searchMode: Boolean = false,
-    val actionMode: Boolean = false,
     val scrollToTop: Boolean = false,
     val selectedVideoHandles: List<Long> = emptyList(),
     val selectedVideoPlaylistHandles: List<Long> = emptyList(),
@@ -86,4 +85,7 @@ data class VideoSectionState(
     val clickedPlaylistDetailItem: TypedVideoNode? = null,
     val searchState: SearchWidgetState = SearchWidgetState.COLLAPSED,
     val query: String? = null,
+    val isHideMenuActionVisible: Boolean = false,
+    val isUnhideMenuActionVisible: Boolean = false,
+    val isRemoveLinkMenuActionVisible: Boolean = false,
 )
