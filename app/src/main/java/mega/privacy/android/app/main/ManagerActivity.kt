@@ -3038,6 +3038,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             )?.setupToolbar()
                         }
 
+                        HomepageScreen.VIDEO_SECTION -> supportActionBar?.hide()
                         else -> {}
                     }
                     if (titleId != -1) {

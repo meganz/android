@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.videosection.model
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
 /**
  * The state is for the videos section
@@ -43,6 +44,8 @@ import mega.privacy.android.domain.entity.node.TypedVideoNode
  * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  * @property clickedItem the clicked item
  * @property clickedPlaylistDetailItem the clicked playlist detail item
+ * @property searchState the search state
+ * @property query the search query
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -81,4 +84,6 @@ data class VideoSectionState(
     val isHiddenNodesOnboarded: Boolean = false,
     val clickedItem: TypedVideoNode? = null,
     val clickedPlaylistDetailItem: TypedVideoNode? = null,
+    val searchState: SearchWidgetState = SearchWidgetState.COLLAPSED,
+    val query: String? = null,
 )

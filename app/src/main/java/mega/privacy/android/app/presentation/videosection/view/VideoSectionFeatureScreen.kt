@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailView
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
@@ -21,11 +22,7 @@ internal fun VideoSectionFeatureScreen(
     onAddElementsClicked: () -> Unit,
     onSortOrderClick: () -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
-    onLongClick: (item: VideoUIEntity, index: Int) -> Unit,
-    onPlaylistDetailItemLongClick: (item: VideoUIEntity, index: Int) -> Unit,
-    onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
-    onActionModeFinished: () -> Unit,
-    onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = {},
+    onMenuAction: (VideoSectionMenuAction?) -> Unit,
 ) {
     val navHostController = rememberNavController()
 
@@ -35,11 +32,8 @@ internal fun VideoSectionFeatureScreen(
         viewModel = videoSectionViewModel,
         onSortOrderClick = onSortOrderClick,
         onMenuClick = onMenuClick,
-        onLongClick = onLongClick,
-        onPlaylistItemLongClick = onPlaylistItemLongClick,
         onAddElementsClicked = onAddElementsClicked,
-        onPlaylistDetailLongClicked = onPlaylistDetailItemLongClick,
-        onActionModeFinished = onActionModeFinished
+        onMenuAction = onMenuAction,
     )
 }
 
@@ -48,13 +42,9 @@ internal fun VideoSectionNavHost(
     navHostController: NavHostController,
     onSortOrderClick: () -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
-    onLongClick: (item: VideoUIEntity, index: Int) -> Unit,
-    onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
     onAddElementsClicked: () -> Unit,
-    onPlaylistDetailLongClicked: (item: VideoUIEntity, index: Int) -> Unit,
-    onActionModeFinished: () -> Unit,
     modifier: Modifier,
-    onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = {},
+    onMenuAction: (VideoSectionMenuAction?) -> Unit,
     viewModel: VideoSectionViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
@@ -63,7 +53,7 @@ internal fun VideoSectionNavHost(
         viewModel.setShouldDeleteVideosFromPlaylist(false)
         val removedVideoIDs = state.selectedVideoElementIDs
         viewModel.removeVideosFromPlaylist(playlist.id, removedVideoIDs)
-        onActionModeFinished()
+        viewModel.clearAllSelectedVideosOfPlaylist()
     }
 
     if (state.isVideoPlaylistCreatedSuccessfully) {
@@ -102,7 +92,7 @@ internal fun VideoSectionNavHost(
                 onClick = viewModel::onItemClicked,
                 onSortOrderClick = onSortOrderClick,
                 onMenuClick = onMenuClick,
-                onLongClick = onLongClick,
+                onLongClick = viewModel::onItemLongClicked,
                 onPlaylistItemClick = { playlist, index ->
                     if (state.isInSelection) {
                         viewModel.onVideoPlaylistItemClicked(playlist, index)
@@ -113,9 +103,9 @@ internal fun VideoSectionNavHost(
                         )
                     }
                 },
-                onPlaylistItemMenuClick = onPlaylistItemMenuClick,
-                onPlaylistItemLongClick = onPlaylistItemLongClick,
-                onDeleteDialogButtonClicked = onActionModeFinished
+                onPlaylistItemLongClick = viewModel::onVideoPlaylistItemClicked,
+                onDeleteDialogButtonClicked = viewModel::clearAllSelectedVideoPlaylists,
+                onMenuAction = onMenuAction
             )
         }
         composable(
@@ -146,7 +136,7 @@ internal fun VideoSectionNavHost(
                     }
                 },
                 onMenuClick = onMenuClick,
-                onLongClick = onPlaylistDetailLongClicked,
+                onLongClick = viewModel::onVideoItemOfPlaylistLongClicked,
                 shouldDeleteVideosDialog = state.shouldDeleteVideosFromPlaylist,
                 setShouldDeleteVideosDialog = viewModel::setShouldDeleteVideosFromPlaylist,
                 onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
