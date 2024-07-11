@@ -30,15 +30,13 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Visibility
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -78,8 +76,26 @@ internal fun VideoPlaylistItemView(
             totalDuration = totalDuration,
             showMenuButton = showMenuButton,
             onMenuClick = onMenuClick,
-            modifier = Modifier,
+            modifier = Modifier.weight(1f),
             isSelected = isSelected
+        )
+
+        Image(
+            painter = painterResource(
+                id = if (isSelected)
+                    R.drawable.ic_select_thumbnail
+                else
+                    mega.privacy.android.core.R.drawable.ic_dots_vertical_grey
+            ),
+            contentDescription = "3 dots",
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .clickable {
+                    if (!isSelected) {
+                        onMenuClick()
+                    }
+                },
+            alignment = Alignment.CenterEnd,
         )
     }
 }
@@ -227,54 +243,18 @@ internal fun VideoPlaylistInfoView(
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ConstraintLayout(
-        modifier = modifier
-            .padding(start = 25.dp)
-            .height(80.dp),
-    ) {
-        val (videoPlaylistName, threeDots, playlistInfoText) = createRefs()
+    Column(modifier = modifier.padding(vertical = 5.dp, horizontal = 10.dp).fillMaxHeight()) {
         Text(
             text = title,
-            modifier = Modifier
-                .padding(bottom = 5.dp)
-                .constrainAs(videoPlaylistName) {
-                    start.linkTo(parent.start)
-                    top.linkTo(parent.top)
-                    end.linkTo(threeDots.start, margin = 10.dp)
-                }
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.subtitle1,
             color = colorResource(id = R.color.dark_grey_white),
             textAlign = TextAlign.Start,
             maxLines = 2
         )
-        Image(
-            painter = painterResource(
-                id = if (isSelected)
-                    R.drawable.ic_select_thumbnail
-                else
-                    mega.privacy.android.core.R.drawable.ic_dots_vertical_grey
-            ),
-            contentDescription = "3 dots",
-            modifier = Modifier
-                .constrainAs(threeDots) {
-                    end.linkTo(parent.end)
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    visibility = if (showMenuButton) Visibility.Visible else Visibility.Gone
-                }
-                .clickable {
-                    if (!isSelected) {
-                        onMenuClick()
-                    }
-                }
-        )
 
         Text(
-            modifier = Modifier.constrainAs(playlistInfoText) {
-                start.linkTo(videoPlaylistName.start)
-                top.linkTo(videoPlaylistName.bottom)
-            },
+            modifier = Modifier.padding(vertical = 5.dp),
             text = if (numberOfVideos != 0) {
                 val numberOfVideosText = if (numberOfVideos == 1) {
                     "1 Video"
