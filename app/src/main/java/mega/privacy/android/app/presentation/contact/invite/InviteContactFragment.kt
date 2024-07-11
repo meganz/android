@@ -63,6 +63,7 @@ class InviteContactFragment : Fragment() {
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     PasscodeContainer(
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                        loading = {},
                         content = {
                             // This is necessary to prevent the viewmodel class from being recreated when the configuration changes.
                             // This can be removed after we fully migrate to a single activity and Compose navigation.
