@@ -14,6 +14,12 @@ const val PLAY_STORE_SUBSCRIPTION_URL =
     "https://play.google.com/store/account/subscriptions"
 
 /**
+ * Manage Subscription page URL in Google Play Store for user to manage their subscriptions (the link need the sku and app package added)
+ */
+const val MANAGE_PLAY_STORE_SUBSCRIPTION_URL =
+    "https://play.google.com/store/account/subscriptions?sku="
+
+/**
  * Apple Support URL for canceling subscription
  */
 const val APPLE_SUPPORT_URL = "https://support.apple.com/118428"

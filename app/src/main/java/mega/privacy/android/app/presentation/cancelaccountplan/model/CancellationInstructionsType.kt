@@ -19,9 +19,4 @@ enum class CancellationInstructionsType {
      * Instructions to cancel the subscription in the play store.
      */
     PlayStore,
-
-    /**
-     * Default value
-     */
-    Others,
 }

@@ -19,7 +19,7 @@ import mega.privacy.android.shared.resources.R
  */
 @Composable
 internal fun CancellationInstructionsView(
-    instructionsType: CancellationInstructionsType,
+    instructionsType: CancellationInstructionsType?,
     onMegaUrlClicked: (url: String) -> Unit,
     isAccountReactivationNeeded: Boolean,
     onCancelSubsFromOtherDeviceClicked: (url: String) -> Unit,

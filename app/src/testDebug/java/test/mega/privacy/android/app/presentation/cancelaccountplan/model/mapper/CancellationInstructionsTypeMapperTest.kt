@@ -21,14 +21,14 @@ class CancellationInstructionsTypeMapperTest {
         Arguments.of(PaymentMethod.STRIPE, CancellationInstructionsType.WebClient),
         Arguments.of(PaymentMethod.STRIPE2, CancellationInstructionsType.WebClient),
         Arguments.of(PaymentMethod.ECP, CancellationInstructionsType.WebClient),
-        Arguments.of(PaymentMethod.HUAWEI_WALLET, CancellationInstructionsType.Others)
+        Arguments.of(PaymentMethod.HUAWEI_WALLET, null)
     )
 
     @ParameterizedTest(name = "when current payment method is {0} then cancellation instructions type is {1}")
     @MethodSource("provideParameters")
     fun `test that mapper returns correct cancellation instructions type`(
         paymentMethod: PaymentMethod,
-        cancellationInstructionsType: CancellationInstructionsType,
+        cancellationInstructionsType: CancellationInstructionsType?,
     ) {
         assertThat(underTest(paymentMethod)).isEqualTo(cancellationInstructionsType)
     }

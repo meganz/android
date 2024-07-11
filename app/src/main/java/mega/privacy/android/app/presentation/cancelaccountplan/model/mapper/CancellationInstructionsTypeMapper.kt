@@ -10,12 +10,12 @@ import javax.inject.Inject
 class CancellationInstructionsTypeMapper @Inject constructor() {
     internal operator fun invoke(
         currentPaymentType: PaymentMethod,
-    ): CancellationInstructionsType = when (currentPaymentType) {
+    ): CancellationInstructionsType? = when (currentPaymentType) {
         PaymentMethod.ITUNES -> CancellationInstructionsType.AppStore
         PaymentMethod.GOOGLE_WALLET -> CancellationInstructionsType.PlayStore
         PaymentMethod.STRIPE -> CancellationInstructionsType.WebClient
         PaymentMethod.ECP -> CancellationInstructionsType.WebClient
         PaymentMethod.STRIPE2 -> CancellationInstructionsType.WebClient
-        PaymentMethod.HUAWEI_WALLET -> CancellationInstructionsType.Others
+        else -> null
     }
 }

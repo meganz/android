@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.cancelaccountplan
 
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -18,12 +20,15 @@ import mega.privacy.android.app.presentation.cancelaccountplan.model.UIAccountDe
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.CancellationInstructionsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion.getProductId
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.MANAGE_PLAY_STORE_SUBSCRIPTION_URL
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.CancelSubscriptionContinueCancellationButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CancelSubscriptionKeepPlanButtonPressedEvent
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -42,6 +47,8 @@ class CancelAccountPlanActivity : AppCompatActivity() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+    private val viewModel: CancelAccountPlanViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -57,6 +64,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
             val navController = rememberNavController()
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 NavHost(
                     navController = navController,
@@ -84,12 +92,28 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                                 Analytics.tracker.trackEvent(
                                     CancelSubscriptionContinueCancellationButtonPressedEvent
                                 )
-                                navController.navigate(cancellationInstructionsRoute)
+                                uiState.cancellationInstructionsType?.let { cancellationInstructionsType ->
+                                    when (cancellationInstructionsType) {
+                                        CancellationInstructionsType.AppStore,
+                                        CancellationInstructionsType.WebClient,
+                                        -> navController.navigate(
+                                            cancellationInstructionsRoute
+                                        )
+
+                                        CancellationInstructionsType.PlayStore ->
+                                            uiState.isMonthlySubscription?.let { isMonthlySubscription ->
+                                                redirectToCancelPlayStoreSubscription(
+                                                    accountType,
+                                                    isMonthlySubscription
+                                                )
+                                            }
+                                    }
+                                }
                             })
                     }
                     composable(cancellationInstructionsRoute) {
                         CancellationInstructionsView(
-                            instructionsType = CancellationInstructionsType.WebClient,
+                            instructionsType = uiState.cancellationInstructionsType,
                             onMegaUrlClicked = { url ->
                                 navigateToBrowser(url)
                             },
@@ -114,7 +138,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
     private fun navigateToBrowser(url: String) {
         startActivity(
             Intent(
-                Intent.ACTION_VIEW,
+                ACTION_VIEW,
                 Uri.parse(url)
             )
         )
@@ -128,6 +152,22 @@ class CancelAccountPlanActivity : AppCompatActivity() {
             Constants.PRO_III -> R.string.pro3_account
             Constants.PRO_FLEXI -> R.string.pro_flexi_account
             else -> R.string.free_account
+        }
+    }
+
+    private fun redirectToCancelPlayStoreSubscription(
+        accountType: Int,
+        isMonthly: Boolean,
+    ) {
+        val appPackage = applicationContext.packageName
+        val productID = getProductId(isMonthly, accountType)
+        val link = "${MANAGE_PLAY_STORE_SUBSCRIPTION_URL}${productID}&package=${appPackage}"
+        val uriUrl = Uri.parse(link)
+        val launchBrowser = Intent(ACTION_VIEW, uriUrl)
+        runCatching {
+            startActivity(launchBrowser)
+        }.onFailure {
+            Timber.e("Failed to open play store subscription page with error: ${it.message}")
         }
     }
 }
