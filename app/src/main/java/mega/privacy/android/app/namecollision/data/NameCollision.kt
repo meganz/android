@@ -266,6 +266,27 @@ sealed class NameCollision : Serializable {
                     lastModified = node.modificationTime,
                     parentHandle = parentHandle
                 )
+
+            /**
+             * Temporary mapper to create a [NameCollision] from domain module's [NodeNameCollision]
+             * Should be removed when [GetNameCollisionResultUseCase] is refactored
+             */
+            @JvmStatic
+            fun fromNodeNameCollision(
+                nameCollision: NodeNameCollision.Chat,
+            ): Import = Import(
+                collisionHandle = nameCollision.collisionHandle,
+                nodeHandle = nameCollision.nodeHandle,
+                chatId = nameCollision.chatId,
+                messageId = nameCollision.messageId,
+                name = nameCollision.name,
+                size = nameCollision.size,
+                childFolderCount = nameCollision.childFolderCount,
+                childFileCount = nameCollision.childFileCount,
+                lastModified = nameCollision.lastModified,
+                parentHandle = nameCollision.parentHandle,
+                isFile = nameCollision.isFile
+            )
         }
     }
 
@@ -305,7 +326,7 @@ sealed class NameCollision : Serializable {
              * @param parentHandle      The parent handle of the node in which the file has to be moved.
              */
             @JvmStatic
-            fun getMovementCollision(
+            fun fromNodeNameCollision(
                 collisionHandle: Long,
                 node: MegaNode,
                 parentHandle: Long,
@@ -323,8 +344,12 @@ sealed class NameCollision : Serializable {
                 isFile = node.isFile
             )
 
+            /**
+             * Temporary mapper to create a [NameCollision] from domain module's [NodeNameCollision]
+             * Should be removed when [GetNameCollisionResultUseCase] is refactored
+             */
             @JvmStatic
-            fun getMovementCollision(
+            fun fromNodeNameCollision(
                 nameCollision: NodeNameCollision,
             ): Movement = Movement(
                 collisionHandle = nameCollision.collisionHandle,

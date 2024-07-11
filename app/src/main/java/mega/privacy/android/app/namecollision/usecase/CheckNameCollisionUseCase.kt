@@ -98,7 +98,7 @@ class CheckNameCollisionUseCase @Inject constructor(
                 childFileCount = childCounts.second,
             )
 
-            NameCollisionType.MOVE -> NameCollision.Movement.getMovementCollision(
+            NameCollisionType.MOVE -> NameCollision.Movement.fromNodeNameCollision(
                 handle,
                 node,
                 parentHandle = parentNode.handle,
@@ -242,7 +242,7 @@ class CheckNameCollisionUseCase @Inject constructor(
                     }
                     .onSuccess {
                         result.first.add(
-                            NameCollision.Movement.getMovementCollision(
+                            NameCollision.Movement.fromNodeNameCollision(
                                 collisionHandle = it,
                                 node = node,
                                 parentHandle = restoreHandle,

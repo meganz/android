@@ -126,7 +126,7 @@ class ContactFileListViewModel @Inject constructor(
     private fun updateStateWithConflictNodes(result: NodeNameCollisionResult) = runCatching {
         result.conflictNodes.values.map {
             when (result.type) {
-                NodeNameCollisionType.MOVE -> NameCollision.Movement.getMovementCollision(it)
+                NodeNameCollisionType.MOVE -> NameCollision.Movement.fromNodeNameCollision(it)
                 NodeNameCollisionType.COPY -> NameCollision.Copy.fromNodeNameCollision(it)
                 else -> throw UnsupportedOperationException("Invalid collision result")
             }
