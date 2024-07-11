@@ -78,7 +78,8 @@ class GetParticipantsChangesUseCase @Inject constructor(
         val chatId: Long,
         val onlyMeInTheCall: Boolean,
         val waitingForOthers: Boolean,
-        var isReceivedChange: Boolean)
+        var isReceivedChange: Boolean,
+    )
 
     /**
      * Method to check if I am alone on any call and whether it is because I am waiting for others or because everyone has dropped out of the call.
@@ -100,20 +101,18 @@ class GetParticipantsChangesUseCase @Inject constructor(
                         withContext(mainImmediateDispatcher) {
                             call.changes?.apply {
                                 Timber.d("Monitor chat call updated, changes $this")
-                                if (contains(ChatCallChanges.CallComposition)) {
-                                    if (call.status == ChatCallStatus.InProgress || call.status == ChatCallStatus.Joining) {
-                                        emitter.onNext(checkIfIAmAloneOnSpecificCall(call))
-                                    } else if (call.status != ChatCallStatus.Destroyed && call.status != ChatCallStatus.UserNoPresent && call.status != ChatCallStatus.TerminatingUserParticipation) {
-                                        emitter.onNext(
-                                            NumParticipantsChangesResult(
-                                                call.chatId,
-                                                onlyMeInTheCall = false,
-                                                waitingForOthers = false,
-                                                isReceivedChange = true
-                                            )
+                                if (call.status == ChatCallStatus.InProgress || call.status == ChatCallStatus.Joining) {
+                                    emitter.onNext(checkIfIAmAloneOnSpecificCall(call))
+                                } else if (call.status != ChatCallStatus.Destroyed && call.status != ChatCallStatus.UserNoPresent && call.status != ChatCallStatus.TerminatingUserParticipation) {
+                                    emitter.onNext(
+                                        NumParticipantsChangesResult(
+                                            call.chatId,
+                                            onlyMeInTheCall = false,
+                                            waitingForOthers = false,
+                                            isReceivedChange = true
                                         )
+                                    )
 
-                                    }
                                 }
                             }
                         }
@@ -143,10 +142,12 @@ class GetParticipantsChangesUseCase @Inject constructor(
             }
         }
 
-        return NumParticipantsChangesResult(call.chatid,
+        return NumParticipantsChangesResult(
+            call.chatid,
             onlyMeInTheCall,
             waitingForOthers,
-            isReceivedChange = true)
+            isReceivedChange = true
+        )
     }
 
     /**
