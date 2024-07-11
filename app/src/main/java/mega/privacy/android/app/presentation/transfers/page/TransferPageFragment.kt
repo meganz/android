@@ -41,10 +41,10 @@ import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaTransfer
@@ -207,7 +207,6 @@ internal class TransferPageFragment : Fragment() {
                 pauseTransfersMenuIcon?.isVisible =
                     !isPause && uiState.transfersTab == TransfersTab.PENDING_TAB
                 legacyTransfersFragment?.refresh()
-                transfersManagementViewModel.checkTransfersInfo()
                 viewModel.markPauseOrResultResultConsumed()
             }
 
@@ -242,7 +241,6 @@ internal class TransferPageFragment : Fragment() {
     private fun handleAllTransfersCanceled(cancelTransfersResult: Result<Unit>) {
         viewModel.onCancelTransfersResultConsumed()
         if (cancelTransfersResult.isSuccess) {
-            transfersManagementViewModel.hideTransfersWidget()
             pauseTransfersMenuIcon?.isVisible = false
             playTransfersMenuIcon?.isVisible = false
             cancelAllTransfersMenuItem?.isVisible = false

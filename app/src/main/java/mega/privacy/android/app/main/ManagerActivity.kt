@@ -2304,6 +2304,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         checkTransferOverQuotaOnResume()
         checkForInAppUpdateInstallStatus()
         cookieDialogHandler.onResume()
+        updateTransfersWidgetVisibility()
     }
 
     private fun checkForInAppUpdateInstallStatus() {
@@ -3381,7 +3382,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun selectDrawerItemTransfers() {
         Timber.d("selectDrawerItemTransfers")
         appBarLayout.visibility = View.VISIBLE
-        hideTransfersWidget()
+        transfersManagementViewModel.hideTransfersWidget()
         drawerItem = DrawerItem.TRANSFERS
         setBottomNavigationMenuItemChecked(NO_BNV)
         transfersManagementViewModel.checkIfShouldShowCompletedTab()
@@ -3551,7 +3552,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         appBarLayout.visibility = View.GONE
                     }
                     handleShowingAds(TAB_HOME_SLOT_ID)
-                    updateTransfersWidget()
+                    updateTransfersWidgetVisibility()
                     setDrawerLockMode(false)
                     return@addOnDestinationChangedListener
                 }
@@ -3600,7 +3601,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     homepageScreen = HomepageScreen.RECENT_BUCKET
                 }
             }
-            updateTransfersWidget()
+            updateTransfersWidgetVisibility()
             updatePsaViewVisibility()
             if (destinationId != R.id.offlineFragmentCompose)
                 appBarLayout.visibility = View.VISIBLE
@@ -3682,7 +3683,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         // Homepage may hide the Appbar before
         appBarLayout.visibility = View.VISIBLE
         Util.resetActionBar(supportActionBar)
-        updateTransfersWidget()
+        updateTransfersWidgetVisibility()
         if (drawerItem == DrawerItem.TRANSFERS) {
             transfersViewModel.resetSelectedTab()
         } else {
@@ -4174,13 +4175,25 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             errorMessage = errorMessage,
         )
 
-    override val isOnFileManagementManagerSection: Boolean
+    private val isOnFileManagementManagerSection: Boolean
         get() = drawerItem !== DrawerItem.TRANSFERS
                 && drawerItem !== DrawerItem.NOTIFICATIONS
                 && drawerItem !== DrawerItem.CHAT
                 && drawerItem !== DrawerItem.RUBBISH_BIN
                 && drawerItem !== DrawerItem.PHOTOS
                 && !isInImagesPage
+
+
+    /**
+     * Updates the transfers widget.
+     */
+    private fun updateTransfersWidgetVisibility() {
+        if (isOnFileManagementManagerSection) {
+            transfersManagementViewModel.showTransfersWidget()
+        } else {
+            transfersManagementViewModel.hideTransfersWidget()
+        }
+    }
 
     fun checkScrollElevation() {
         if (drawerItem == null) {

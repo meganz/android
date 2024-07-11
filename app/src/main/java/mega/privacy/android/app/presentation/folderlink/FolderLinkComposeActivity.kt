@@ -139,9 +139,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         selectImportFolderResult
     )
 
-    override val isOnFileManagementManagerSection: Boolean
-        get() = true
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFolderLinkComposeBinding.inflate(layoutInflater)

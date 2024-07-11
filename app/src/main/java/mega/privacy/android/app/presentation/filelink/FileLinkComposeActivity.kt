@@ -75,9 +75,6 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
         selectImportFolderResult
     )
 
-    override val isOnFileManagementManagerSection: Boolean
-        get() = true
-
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate()")
         super.onCreate(savedInstanceState)

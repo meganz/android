@@ -111,10 +111,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
             }
         }
 
-        collectFlow(monitorTransferOverQuotaUseCase(), Lifecycle.State.CREATED) {
-            updateTransfersWidget()
-        }
-
         collectFlow(
             transfersViewModel.monitorTransferEvent,
             Lifecycle.State.CREATED
@@ -127,20 +123,12 @@ open class TransfersManagementActivity : PasscodeActivity() {
         }
     }
 
-    /**
-     * Checks if the widget is on a file management section in ManagerActivity.
-     *
-     * @return True if the widget is on a file management section (in ManagerActivity), false otherwise.
-     */
-    protected open val isOnFileManagementManagerSection = false
-
 
     private fun handleTransferTemporaryError(transfer: Transfer, error: MegaException) {
         Timber.w("onTransferTemporaryError: ${transfer.nodeHandle} - ${transfer.tag}")
         if (error is QuotaExceededMegaException) {
             if (error.value != 0L) {
                 Timber.d("TRANSFER OVER QUOTA ERROR: ${error.errorCode}")
-                updateTransfersWidget()
             } else {
                 Timber.w("STORAGE OVER QUOTA ERROR: ${error.errorCode}")
                 //work around - SDK does not return over quota error for folder upload,
@@ -288,11 +276,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
             .removeObserver(showScanTransferDialogObserver)
     }
 
-    override fun onResume() {
-        super.onResume()
-        updateTransfersWidget()
-    }
-
     override fun onPostResume() {
         super.onPostResume()
 
@@ -307,23 +290,5 @@ open class TransfersManagementActivity : PasscodeActivity() {
         cancelTransfersDialog?.dismiss()
         LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
             .removeObserver(showScanTransferDialogObserver)
-    }
-
-    /**
-     * Updates the transfers widget.
-     */
-    fun updateTransfersWidget() {
-        if (isOnFileManagementManagerSection) {
-            transfersManagementViewModel.checkTransfersInfo(true)
-        } else {
-            hideTransfersWidget()
-        }
-    }
-
-    /**
-     * Hides the transfers widget. Remove this
-     */
-    fun hideTransfersWidget() {
-        transfersManagementViewModel.hideTransfersWidget()
     }
 }
