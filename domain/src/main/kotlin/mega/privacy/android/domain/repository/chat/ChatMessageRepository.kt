@@ -296,10 +296,10 @@ interface ChatMessageRepository {
      * a message id set to MEGACHAT_INVALID_HANDLE.
      *
      * @param chatId MegaChatHandle that identifies the chat room
-     * @param nodeHandle Handle of the node that the user wants to attach
+     * @param nodeId node id of the node that the user wants to attach
      * @return Msg id.
      */
-    suspend fun attachNode(chatId: Long, nodeHandle: Long): Long?
+    suspend fun attachNode(chatId: Long, nodeId: NodeId): Long?
 
     /**
      * Sends a node that contains a voice message to the specified chatroom

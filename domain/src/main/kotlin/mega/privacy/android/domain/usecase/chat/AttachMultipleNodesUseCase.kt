@@ -5,14 +5,14 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import javax.inject.Inject
 
 /**
  * Use case to attach multiple node use case to chat
- * @property legacyAttachNodeUseCase [LegacyAttachNodeUseCase]
  */
 class AttachMultipleNodesUseCase @Inject constructor(
-    private val legacyAttachNodeUseCase: LegacyAttachNodeUseCase,
+    private val chatMessageRepository: ChatMessageRepository
 ) {
     /**
      * Invoke
@@ -29,7 +29,7 @@ class AttachMultipleNodesUseCase @Inject constructor(
                 async {
                     runCatching {
                         chatIds.map { chatId ->
-                            legacyAttachNodeUseCase(chatId = chatId, nodeId = nodeId)
+                            chatMessageRepository.attachNode(chatId = chatId, nodeId = nodeId)
                         }
                     }.recover {
                         return@async Result.failure(it)

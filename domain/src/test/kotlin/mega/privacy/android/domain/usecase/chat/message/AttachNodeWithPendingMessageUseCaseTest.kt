@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -88,7 +87,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
             whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(
                 pendingMessage
             )
-            whenever(chatMessageRepository.attachNode(chatId, nodeHandle)).thenReturn(null)
+            whenever(chatMessageRepository.attachNode(chatId, NodeId(nodeHandle))).thenReturn(null)
 
             underTest(pendingMsgId, NodeId(1L))
             verify(updatePendingMessageUseCase)
@@ -110,7 +109,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
             whenever(getPendingMessageUseCase(pendingMsgId)).thenReturn(
                 pendingMessage
             )
-            whenever(chatMessageRepository.attachNode(chatId, nodeHandle)).thenReturn(msgId)
+            whenever(chatMessageRepository.attachNode(chatId, NodeId(nodeHandle))).thenReturn(msgId)
             whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
             whenever(createSaveSentMessageRequestUseCase(message, chatId))
                 .thenReturn(createTypedMessageRequest)
@@ -140,7 +139,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
                     nodeId.longValue,
                     File(filePath),
                 )
-            inOrder.verify(chatMessageRepository).attachNode(any(), any())
+            inOrder.verify(chatMessageRepository).attachNode(chatId, nodeId)
         }
 
     @Test

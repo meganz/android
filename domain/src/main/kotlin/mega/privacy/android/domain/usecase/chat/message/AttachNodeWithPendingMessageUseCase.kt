@@ -58,7 +58,7 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
                 val attachedNode = if (pendingMessage.isVoiceClip) {
                     chatMessageRepository.attachVoiceMessage(chatId, nodeId.longValue)
                 } else {
-                    chatMessageRepository.attachNode(chatId, nodeId.longValue)
+                    chatMessageRepository.attachNode(chatId, nodeId)
                 }
                 if (attachedNode != null) {
                     getChatMessageUseCase(chatId, attachedNode)?.let { message ->

@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
-import mega.privacy.android.domain.usecase.chat.LegacyAttachNodeUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -18,8 +18,8 @@ import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AttachMultipleNodesUseCaseTest {
-    private val legacyAttachNodeUseCase: LegacyAttachNodeUseCase = mock()
-    private val underTest = AttachMultipleNodesUseCase(legacyAttachNodeUseCase)
+    private val chatMessageRepository: ChatMessageRepository = mock()
+    private val underTest = AttachMultipleNodesUseCase(chatMessageRepository)
 
     @ParameterizedTest(name = "Test {0} and {1}")
     @MethodSource("provideParams")
@@ -29,37 +29,37 @@ class AttachMultipleNodesUseCaseTest {
         expected: ChatRequestResult,
     ) = runTest {
         whenever(
-            legacyAttachNodeUseCase(
+            chatMessageRepository.attachNode(
                 nodeId = NodeId(SUCCESS_NODE_HANDLE_1),
                 chatId = CHAT_HANDLE_1
             )
         ).thenReturn(12L)
         whenever(
-            legacyAttachNodeUseCase(
+            chatMessageRepository.attachNode(
                 nodeId = NodeId(SUCCESS_NODE_HANDLE_1),
                 chatId = CHAT_HANDLE_2
             )
         ).thenReturn(12L)
         whenever(
-            legacyAttachNodeUseCase(
+            chatMessageRepository.attachNode(
                 nodeId = NodeId(SUCCESS_NODE_HANDLE_2),
                 chatId = CHAT_HANDLE_1
             )
         ).thenReturn(12L)
         whenever(
-            legacyAttachNodeUseCase(
+            chatMessageRepository.attachNode(
                 nodeId = NodeId(SUCCESS_NODE_HANDLE_2),
                 chatId = CHAT_HANDLE_2
             )
         ).thenReturn(12L)
         whenever(
-            legacyAttachNodeUseCase(
+            chatMessageRepository.attachNode(
                 nodeId = NodeId(FAILED_NODE_HANDLE),
                 chatId = CHAT_HANDLE_1
             )
         ).thenThrow(RuntimeException::class.java)
         whenever(
-            legacyAttachNodeUseCase(
+            chatMessageRepository.attachNode(
                 nodeId = NodeId(FAILED_NODE_HANDLE),
                 chatId = CHAT_HANDLE_2
             )
@@ -108,6 +108,6 @@ class AttachMultipleNodesUseCaseTest {
 
     @AfterEach
     fun resetMocks() {
-        reset(legacyAttachNodeUseCase)
+        reset(chatMessageRepository)
     }
 }

@@ -76,16 +76,16 @@ class AttachNodeUseCaseTest {
     @Test
     fun `test that message is attached`() =
         runTest {
-            whenever(chatMessageRepository.attachNode(chatId, nodeHandle)).thenReturn(msgId)
+            whenever(chatMessageRepository.attachNode(chatId, NodeId(nodeHandle))).thenReturn(msgId)
             whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
             underTest.invoke(chatId = chatId, fileNode)
-            verify(chatMessageRepository).attachNode(chatId, nodeHandle)
+            verify(chatMessageRepository).attachNode(chatId, NodeId(nodeHandle))
         }
 
 
     @Test
     fun `test that message is stored`() = runTest {
-        whenever(chatMessageRepository.attachNode(chatId, nodeHandle)).thenReturn(msgId)
+        whenever(chatMessageRepository.attachNode(chatId, NodeId(nodeHandle))).thenReturn(msgId)
         whenever(getChatMessageUseCase(chatId, msgId)).thenReturn(message)
         val request = mock<CreateTypedMessageRequest>()
         whenever(createSaveSentMessageRequestUseCase(message, chatId)).thenReturn(request)
@@ -99,6 +99,6 @@ class AttachNodeUseCaseTest {
             val incomingId = nodeHandle + 15L
             whenever(getAttachableNodeIdUseCase(fileNode)).thenReturn(NodeId(incomingId))
             underTest.invoke(chatId = chatId, fileNode)
-            verify(chatMessageRepository).attachNode(chatId, incomingId)
+            verify(chatMessageRepository).attachNode(chatId, NodeId(incomingId))
         }
 }

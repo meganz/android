@@ -193,13 +193,13 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun attachNode(chatId: Long, nodeHandle: Long): Long? =
+    override suspend fun attachNode(chatId: Long, nodeId: NodeId): Long? =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getChatRequestListener("attachNode") {
                     it.megaChatMessage.tempId
                 }
-                megaChatApiGateway.attachNode(chatId, nodeHandle, listener)
+                megaChatApiGateway.attachNode(chatId, nodeId.longValue, listener)
                 continuation.invokeOnCancellation {
                     megaChatApiGateway.removeRequestListener(listener)
                 }

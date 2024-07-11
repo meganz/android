@@ -27,7 +27,7 @@ class AttachNodeUseCase @Inject constructor(
      */
     suspend operator fun invoke(chatId: Long, fileNode: TypedFileNode) {
         val attachableNodeId = getAttachableNodeIdUseCase(fileNode)
-        chatMessageRepository.attachNode(chatId, attachableNodeId.longValue)?.let {
+        chatMessageRepository.attachNode(chatId, attachableNodeId)?.let {
             getChatMessageUseCase(chatId, it)?.let { message ->
                 val request = createSaveSentMessageRequestUseCase(message, chatId)
                 chatRepository.storeMessages(listOf(request))

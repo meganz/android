@@ -372,7 +372,7 @@ class ChatMessageRepositoryImplTest {
                 megaChatErrorSuccess,
             )
         }
-        val actual = underTest.attachNode(chatId, handle)
+        val actual = underTest.attachNode(chatId, NodeId(handle))
         assertThat(actual).isEqualTo(expectedTempId)
         verify(megaChatApiGateway).attachNode(any(), any(), any())
     }
@@ -657,6 +657,7 @@ class ChatMessageRepositoryImplTest {
             }
         }
 
+    @Test
     fun `test that updatePendingMessagesCompressionProgress emits a new flow value with the new updated progress`() =
         runTest {
             underTest.clearPendingMessagesCompressionProgress() // to be sure we start with an empty flow
