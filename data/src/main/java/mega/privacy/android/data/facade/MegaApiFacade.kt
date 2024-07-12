@@ -1117,7 +1117,8 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.getPublicNode(nodeFileLink, listener)
 
-    override suspend fun cancelTransfers(direction: Int) = megaApi.cancelTransfers(direction)
+    override fun cancelTransfers(direction: Int, listener: MegaRequestListenerInterface) =
+        megaApi.cancelTransfers(direction, listener)
 
     override suspend fun getVerifiedPhoneNumber(): String? = megaApi.smsVerifiedPhoneNumber()
 

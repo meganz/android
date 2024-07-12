@@ -1430,4 +1430,24 @@ class DefaultTransfersRepositoryTest {
                 underTest.addCompletedTransfer(transfer4, null, "")
             }
         }
+
+    @Test
+    fun `test that cancelTransfers is invoked for each direction when cancelTransfers is invoked`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            whenever(megaApiGateway.cancelTransfers(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    megaError,
+                )
+            }
+
+            underTest.cancelTransfers()
+
+            verify(megaApiGateway).cancelTransfers(eq(MegaTransfer.TYPE_UPLOAD), any())
+            verify(megaApiGateway).cancelTransfers(eq(MegaTransfer.TYPE_DOWNLOAD), any())
+        }
 }

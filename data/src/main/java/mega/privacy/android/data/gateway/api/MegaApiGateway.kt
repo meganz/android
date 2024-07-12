@@ -2254,8 +2254,9 @@ interface MegaApiGateway {
      *                  Valid values are:
      *                  - MegaTransfer::TYPE_DOWNLOAD = 0
      *                  - MegaTransfer::TYPE_UPLOAD = 1
+     * @param listener MegaRequestListener to track this request
      */
-    suspend fun cancelTransfers(direction: Int)
+    fun cancelTransfers(direction: Int, listener: MegaRequestListenerInterface)
 
     /**
      * Get verified phone number

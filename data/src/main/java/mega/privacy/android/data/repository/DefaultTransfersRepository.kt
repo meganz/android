@@ -369,9 +369,16 @@ internal class DefaultTransfersRepository @Inject constructor(
     }
 
     override suspend fun cancelTransfers() = withContext(ioDispatcher) {
-        megaApiGateway.cancelTransfers(MegaTransfer.TYPE_UPLOAD)
-        megaApiGateway.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
+        cancelTransfersByType(MegaTransfer.TYPE_UPLOAD)
+        cancelTransfersByType(MegaTransfer.TYPE_DOWNLOAD)
     }
+
+    private suspend fun cancelTransfersByType(direction: Int) =
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("cancelTransfersByType") {}
+            megaApiGateway.cancelTransfers(direction, listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
 
     override fun monitorFailedTransfer(): Flow<Boolean> = appEventGateway.monitorFailedTransfer()
 
