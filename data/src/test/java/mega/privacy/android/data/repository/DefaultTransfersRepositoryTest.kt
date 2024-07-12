@@ -1098,6 +1098,14 @@ class DefaultTransfersRepositoryTest {
                 verify(megaLocalRoomGateway).insertOrUpdateActiveTransfer(activeTransfer)
             }
 
+        @Test
+        fun `test that insertOrUpdateActiveTransfers gateway is called when insertOrUpdateActiveTransfers is called`() =
+            runTest {
+                val activeTransfers = mock<List<ActiveTransfer>>()
+                underTest.insertOrUpdateActiveTransfers(activeTransfers)
+                verify(megaLocalRoomGateway).insertOrUpdateActiveTransfers(activeTransfers)
+            }
+
         @ParameterizedTest
         @EnumSource(TransferType::class)
         fun `test that deleteAllActiveTransfersByType gateway is called when deleteAllActiveTransfersByType is called`(

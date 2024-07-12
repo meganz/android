@@ -18,7 +18,6 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -106,13 +105,9 @@ internal class CorrectActiveTransfersUseCaseTest {
                 .thenReturn(alreadyInDataBase)
             whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository, times(notInDataBase.size))
-                .insertOrUpdateActiveTransfer(any())
-            notInDataBase.forEach {
-                verify(transferRepository).insertOrUpdateActiveTransfer(
-                    argThat { tag == it.tag }
-                )
-            }
+            verify(transferRepository).insertOrUpdateActiveTransfers(argThat { it ->
+                it.map { it.tag } == notInDataBase.map { it.tag }
+            })
         }
 
     @Test
@@ -145,8 +140,7 @@ internal class CorrectActiveTransfersUseCaseTest {
                 .thenReturn(alreadyInDataBase)
             whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository, times(notInDataBase.size))
-                .insertOrUpdateActiveTransfer(any())
+
             notInDataBase.forEach {
                 verify(transferRepository).updateInProgressTransfer(
                     argThat { tag == it.tag }

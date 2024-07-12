@@ -185,6 +185,11 @@ interface MegaLocalRoomGateway {
     suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer)
 
     /**
+     * Insert (or replace  if there's already an active transfer with the same tag) a list of active transfers
+     */
+    suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>)
+
+    /**
      * Delete all active transfer by type
      */
     suspend fun deleteAllActiveTransfersByType(transferType: TransferType)

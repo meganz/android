@@ -48,7 +48,8 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         }
         inProgressNotInActiveTransfers.forEach {
             transferRepository.updateInProgressTransfer(it)
-            transferRepository.insertOrUpdateActiveTransfer(it)
         }
+
+        transferRepository.insertOrUpdateActiveTransfers(inProgressNotInActiveTransfers)
     }
 }

@@ -516,6 +516,11 @@ internal class DefaultTransfersRepository @Inject constructor(
             megaLocalRoomGateway.insertOrUpdateActiveTransfer(activeTransfer)
         }
 
+    override suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>) =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.insertOrUpdateActiveTransfers(activeTransfers)
+        }
+
     override suspend fun updateTransferredBytes(transfer: Transfer) {
         if (transfer.transferredBytes == 0L) return
         transferredBytesFlow(transfer.transferType).update {

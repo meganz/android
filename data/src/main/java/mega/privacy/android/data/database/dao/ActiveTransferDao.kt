@@ -23,6 +23,9 @@ internal interface ActiveTransferDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateActiveTransfer(entity: ActiveTransferEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdateActiveTransfers(entity: List<ActiveTransferEntity>)
+
     @Query("DELETE FROM active_transfers WHERE transfer_type = :transferType")
     suspend fun deleteAllActiveTransfersByType(transferType: TransferType)
 

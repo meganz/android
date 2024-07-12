@@ -354,6 +354,11 @@ interface TransferRepository {
     suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer)
 
     /**
+     * Insert (or replace  if there's already an active transfer with the same tag) a list of active transfers
+     */
+    suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>)
+
+    /**
      * Set or update the transferred bytes counter of this transfer
      */
     suspend fun updateTransferredBytes(transfer: Transfer)

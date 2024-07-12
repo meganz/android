@@ -15,6 +15,7 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
+import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
@@ -45,6 +46,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.Transfer
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -584,5 +586,21 @@ internal class MegaLocalRoomFacadeTest {
         val actual = underTest.getSdTransferByTag(tag)
 
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that insertOrUpdateActiveTransfers insert the mapped entities`() = runTest {
+        val activeTransfers = (0..10).map {
+            mock<Transfer>()
+        }
+        val roomEntitiesMap = activeTransfers.associateWith { mock<ActiveTransferEntity>() }
+        activeTransfers.forEach {
+            whenever(activeTransferEntityMapper(it)) doReturn roomEntitiesMap.getValue(it)
+        }
+        val expected = roomEntitiesMap.values.toList()
+
+        underTest.insertOrUpdateActiveTransfers(activeTransfers)
+
+        verify(activeTransferDao).insertOrUpdateActiveTransfers(expected)
     }
 }
