@@ -20,6 +20,8 @@ class StalledIssueDetailInfoMapperTest {
     private val context: Context = mock()
     private val underTest = StalledIssueDetailInfoMapper(context)
 
+    private val syncId = 323232L
+
     @BeforeEach
     fun getStrings() {
         whenever(context.getString(R.string.sync_stalled_issue_no_reason)).thenReturn("No Reason")
@@ -115,6 +117,7 @@ class StalledIssueDetailInfoMapperTest {
     private fun provideStringParameters() = Stream.of(
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.NoReason,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -125,6 +128,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.FileIssue,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -136,6 +140,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.MoveOrRenameCannotOccur,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -147,6 +152,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.MoveOrRenameCannotOccur,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -158,6 +164,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.DeleteOrMoveWaitingOnScanning,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -169,6 +176,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.DeleteWaitingOnMoves,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -180,6 +188,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.UploadIssue,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -191,6 +200,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.DownloadIssue,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -202,6 +212,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.CannotCreateFolder,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -213,6 +224,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.CannotPerformDeletion,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -224,6 +236,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.SyncItemExceedsSupportedTreeDepth,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -235,6 +248,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.FolderMatchedAgainstFile,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -246,6 +260,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -257,6 +272,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.LocalAndRemotePreviouslyNotSyncedDifferUserMustChoose,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -268,6 +284,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.NamesWouldClashWhenSynced,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
@@ -279,6 +296,7 @@ class StalledIssueDetailInfoMapperTest {
         ),
         Arguments.of(
             StalledIssue(
+                syncId = syncId,
                 issueType = StallIssueType.SyncStallReasonLastPlusOne,
                 nodeIds = emptyList(),
                 localPaths = emptyList(),

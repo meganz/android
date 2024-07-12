@@ -90,6 +90,7 @@ class SyncFoldersViewModelTest {
 
     private val stalledIssues = listOf(
         StalledIssue(
+            syncId = 1L,
             nodeIds = listOf(NodeId(3L)),
             localPaths = listOf("DCIM/photo.jpg"),
             issueType = StallIssueType.DownloadIssue,

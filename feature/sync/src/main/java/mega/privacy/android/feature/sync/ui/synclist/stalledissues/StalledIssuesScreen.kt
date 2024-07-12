@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.sync.ui.synclist.stalledissues
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,17 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
-import mega.privacy.android.feature.sync.ui.views.StalledIssueCard
-import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
-import mega.privacy.android.icon.pack.R as iconPackR
-import androidx.compose.foundation.isSystemInDarkTheme
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.model.StalledIssueDetailedInfo
+import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
+import mega.privacy.android.feature.sync.ui.views.StalledIssueCard
+import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
@@ -96,6 +96,7 @@ internal fun StalledIssuesScreenPreview() {
         StalledIssuesScreen(
             stalledIssues = listOf(
                 StalledIssueUiItem(
+                    syncId = 1L,
                     nodeIds = listOf(NodeId(1L)),
                     localPaths = listOf("Folder name"),
                     issueType = StallIssueType.FileIssue,
@@ -106,6 +107,7 @@ internal fun StalledIssuesScreenPreview() {
                     actions = listOf(stalledIssueResolutionAction)
                 ),
                 StalledIssueUiItem(
+                    syncId = 1L,
                     nodeIds = listOf(NodeId(2L)),
                     localPaths = listOf("Folder name"),
                     issueType = StallIssueType.UploadIssue,
@@ -116,6 +118,7 @@ internal fun StalledIssuesScreenPreview() {
                     actions = listOf(stalledIssueResolutionAction)
                 ),
                 StalledIssueUiItem(
+                    syncId = 1L,
                     nodeIds = listOf(NodeId(3L)),
                     localPaths = listOf("Folder name"),
                     issueType = StallIssueType.UploadIssue,
@@ -126,6 +129,7 @@ internal fun StalledIssuesScreenPreview() {
                     actions = listOf(stalledIssueResolutionAction)
                 ),
                 StalledIssueUiItem(
+                    syncId = 1L,
                     nodeIds = listOf(NodeId(4L)),
                     localPaths = listOf("Folder name"),
                     issueType = StallIssueType.UploadIssue,

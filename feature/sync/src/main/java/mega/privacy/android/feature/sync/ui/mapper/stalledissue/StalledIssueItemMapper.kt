@@ -1,12 +1,12 @@
 package mega.privacy.android.feature.sync.ui.mapper.stalledissue
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.ui.extension.getIcon
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import javax.inject.Inject
 
@@ -24,6 +24,7 @@ internal class StalledIssueItemMapper @Inject constructor(
         val areAllNodesFolders = nodes.all { it is FolderNode }
         val detailedInfo = stalledIssueDetailInfoMapper(stalledIssueEntity)
         return StalledIssueUiItem(
+            syncId = stalledIssueEntity.syncId,
             nodeIds = stalledIssueEntity.nodeIds,
             localPaths = stalledIssueEntity.localPaths,
             issueType = stalledIssueEntity.issueType,
@@ -46,6 +47,7 @@ internal class StalledIssueItemMapper @Inject constructor(
 
     operator fun invoke(stalledIssueUiItem: StalledIssueUiItem): StalledIssue =
         StalledIssue(
+            syncId = stalledIssueUiItem.syncId,
             nodeIds = stalledIssueUiItem.nodeIds,
             localPaths = stalledIssueUiItem.localPaths,
             issueType = stalledIssueUiItem.issueType,

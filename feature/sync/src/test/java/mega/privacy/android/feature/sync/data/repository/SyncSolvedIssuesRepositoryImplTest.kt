@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.data.repository
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
 import mega.privacy.android.domain.entity.node.NodeId
@@ -13,7 +12,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class SyncSolvedIssuesRepositoryImplTest {
     private val syncSolvedIssuesGateway: SyncSolvedIssuesGateway = mock()
     private val solvedIssueToSolvedIssueEntityMapper: SolvedIssueToSolvedIssueEntityMapper = mock()
@@ -26,12 +24,14 @@ class SyncSolvedIssuesRepositoryImplTest {
     )
 
     private val solvedIssue = SolvedIssue(
+        syncId = 1L,
         nodeIds = listOf(NodeId(3)),
         localPaths = listOf("/usr/Documents"),
         resolutionExplanation = "Folders merged",
     )
 
     private val syncSolvedIssueEntity = SyncSolvedIssueEntity(
+        syncId = 1L,
         entityId = null,
         nodeIds = "[{\"longValue\":3}]",
         localPaths = "[\"usr/Documents\"]",
@@ -51,4 +51,11 @@ class SyncSolvedIssuesRepositoryImplTest {
         underTest.insertSolvedIssues(solvedIssue)
         verify(syncSolvedIssuesGateway).set(syncSolvedIssueEntity)
     }
+
+    @Test
+    fun `test that removing solved issue by sync id invokes gateway removeBySyncId method`() =
+        runTest {
+            underTest.removeBySyncId(1L)
+            verify(syncSolvedIssuesGateway).removeBySyncId(1L)
+        }
 }

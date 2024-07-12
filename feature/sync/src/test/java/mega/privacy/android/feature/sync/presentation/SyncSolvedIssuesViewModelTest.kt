@@ -37,6 +37,7 @@ class SyncSolvedIssuesViewModelTest {
 
     private val solvedIssues = listOf(
         SolvedIssue(
+            syncId = 3L,
             nodeIds = listOf(NodeId(3L)),
             localPaths = listOf("/storage/emulated/0/DCIM"),
             resolutionExplanation = "folders merged",

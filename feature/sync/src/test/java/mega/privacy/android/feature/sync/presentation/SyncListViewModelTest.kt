@@ -64,6 +64,7 @@ class SyncListViewModelTest {
 
     private val stalledIssues = listOf(
         StalledIssue(
+            syncId = 3L,
             nodeIds = listOf(NodeId(3L)),
             localPaths = listOf("/storage/emulated/0/DCIM"),
             issueType = StallIssueType.DownloadIssue,
@@ -74,7 +75,7 @@ class SyncListViewModelTest {
 
     private val solvedIssues = listOf(
         SolvedIssue(
-            nodeIds = listOf(), localPaths = listOf(), resolutionExplanation = ""
+            syncId = 1L, nodeIds = listOf(), localPaths = listOf(), resolutionExplanation = ""
         )
     )
 

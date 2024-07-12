@@ -5,7 +5,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
@@ -15,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class SyncSolvedIssuesDaoTest {
     private lateinit var syncSolvedIssuesDao: SyncSolvedIssuesDao
@@ -73,12 +71,30 @@ class SyncSolvedIssuesDaoTest {
         Truth.assertThat(result).isEmpty()
     }
 
-    private fun generateEntity(nodeIds: String, localPaths: String, resolutionExplanation: String) =
-        SyncSolvedIssueEntity(
-            nodeIds = nodeIds,
-            localPaths = localPaths,
-            resolutionExplanation = resolutionExplanation
-        )
+    @Test
+    fun test_that_removeBySyncId_removes_entity_by_syncId() = runTest {
+        val entity1 = generateEntity("node1", "/local/path/1", "Issue resolved", syncId = 1L)
+        val entity2 = generateEntity("node2", "/local/path/2", "Issue resolved again", syncId = 2L)
+
+        insertEntity(entity1)
+        insertEntity(entity2)
+        syncSolvedIssuesDao.removeBySyncId(1L)
+
+        val result = syncSolvedIssuesDao.monitorSolvedIssues().first()
+        Truth.assertThat(result).isEqualTo(listOf(entity2.copy(entityId = 2)))
+    }
+
+    private fun generateEntity(
+        nodeIds: String,
+        localPaths: String,
+        resolutionExplanation: String,
+        syncId: Long = 1L,
+    ) = SyncSolvedIssueEntity(
+        syncId = syncId,
+        nodeIds = nodeIds,
+        localPaths = localPaths,
+        resolutionExplanation = resolutionExplanation
+    )
 
     private suspend fun insertEntity(entity: SyncSolvedIssueEntity) {
         syncSolvedIssuesDao.insertSolvedIssue(entity)

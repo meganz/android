@@ -42,6 +42,7 @@ class SyncStalledIssuesScreenTest {
             SyncStalledIssuesState(
                 listOf(
                     StalledIssueUiItem(
+                        syncId = 1L,
                         nodeIds = listOf(NodeId(1L)),
                         localPaths = listOf(folderName),
                         issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,

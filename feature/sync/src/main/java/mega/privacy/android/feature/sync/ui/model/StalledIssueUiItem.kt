@@ -4,9 +4,9 @@ import androidx.annotation.DrawableRes
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
-import mega.privacy.android.feature.sync.ui.model.StalledIssueDetailedInfo
 
 internal data class StalledIssueUiItem(
+    val syncId: Long,
     val nodeIds: List<NodeId>,
     val localPaths: List<String>,
     val issueType: StallIssueType,

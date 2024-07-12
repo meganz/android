@@ -38,6 +38,7 @@ class SyncStalledIssuesViewModelTest {
 
     private val stalledIssues = listOf(
         StalledIssue(
+            syncId = 1L,
             nodeIds = listOf(NodeId(3L)),
             localPaths = listOf("/storage/emulated/0/DCIM"),
             issueType = StallIssueType.DownloadIssue,
@@ -48,6 +49,7 @@ class SyncStalledIssuesViewModelTest {
 
     private val stalledIssuesUiItems = listOf(
         StalledIssueUiItem(
+            syncId = 1L,
             nodeIds = listOf(NodeId(3L)),
             localPaths = listOf("/storage/emulated/0/DCIM"),
             issueType = StallIssueType.DownloadIssue,

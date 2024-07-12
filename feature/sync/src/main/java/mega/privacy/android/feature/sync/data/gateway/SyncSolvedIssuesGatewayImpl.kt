@@ -18,4 +18,8 @@ internal class SyncSolvedIssuesGatewayImpl @Inject constructor(
     override suspend fun clear() {
         syncSolvedIssuesDao.deleteAllSolvedIssues()
     }
+
+    override suspend fun removeBySyncId(syncId: Long) {
+        syncSolvedIssuesDao.removeBySyncId(syncId)
+    }
 }

@@ -31,4 +31,8 @@ internal class SyncSolvedIssuesRepositoryImpl @Inject constructor(
     override suspend fun clear() {
         syncSolvedIssuesGateway.clear()
     }
+
+    override suspend fun removeBySyncId(syncId: Long) {
+        syncSolvedIssuesGateway.removeBySyncId(syncId)
+    }
 }

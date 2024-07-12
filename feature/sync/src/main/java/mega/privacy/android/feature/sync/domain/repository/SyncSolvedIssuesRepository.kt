@@ -10,4 +10,6 @@ internal interface SyncSolvedIssuesRepository {
     suspend fun insertSolvedIssues(solvedIssues: SolvedIssue)
 
     suspend fun clear()
+
+    suspend fun removeBySyncId(syncId: Long)
 }

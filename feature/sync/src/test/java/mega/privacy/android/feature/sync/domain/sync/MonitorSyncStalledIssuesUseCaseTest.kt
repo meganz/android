@@ -28,6 +28,7 @@ internal class MonitorSyncStalledIssuesUseCaseTest {
 
     private val stalledIssues = listOf(
         StalledIssue(
+            syncId = 3L,
             nodeIds = listOf(NodeId(3L)),
             localPaths = listOf("/storage/emulated/0/DCIM"),
             issueType = StallIssueType.DownloadIssue,

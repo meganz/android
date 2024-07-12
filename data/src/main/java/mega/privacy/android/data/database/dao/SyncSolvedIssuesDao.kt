@@ -32,4 +32,11 @@ interface SyncSolvedIssuesDao {
      */
     @Query("DELETE FROM ${MegaDatabaseConstant.TABLE_SYNC_SOLVED_ISSUES}")
     suspend fun deleteAllSolvedIssues()
+
+    /**
+     * Remove [SyncSolvedIssueEntity] by syncId
+     * @param syncId syncId
+     */
+    @Query("DELETE FROM ${MegaDatabaseConstant.TABLE_SYNC_SOLVED_ISSUES} WHERE :syncId = syncId")
+    suspend fun removeBySyncId(syncId: Long)
 }

@@ -12,6 +12,7 @@ internal class StalledIssueToSolvedIssueMapper @Inject constructor() {
         actionTaken: StalledIssueResolutionActionType
     ): SolvedIssue =
         SolvedIssue(
+            syncId = stalledIssue.syncId,
             nodeIds = stalledIssue.nodeIds,
             localPaths = stalledIssue.localPaths,
             resolutionExplanation = actionTaken.name
