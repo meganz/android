@@ -2,14 +2,16 @@
 
 package test.mega.privacy.android.app.presentation.photos.imagepreview
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.CheckNameCollision
+import mega.privacy.android.app.R
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewVideoLauncher
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
@@ -19,6 +21,10 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -32,11 +38,10 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
-import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
-import mega.privacy.android.domain.usecase.node.CopyTypedNodeUseCase
+import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
-import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
@@ -68,11 +73,10 @@ class ImagePreviewViewModelTest {
     private val getImageUseCase: GetImageUseCase = mock()
     private val getImageFromFileUseCase: GetImageFromFileUseCase = mock()
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase = mock()
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
-    private val checkNameCollision: CheckNameCollision = mock()
-    private val copyNodeUseCase: CopyNodeUseCase = mock()
-    private val copyTypedNodeUseCase: CopyTypedNodeUseCase = mock()
-    private val moveNodeUseCase: MoveNodeUseCase = mock()
+    private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase =
+        mock()
+    private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase =
+        mock()
     private val addFavouritesUseCase: AddFavouritesUseCase = mock()
     private val removeFavouritesUseCase: RemoveFavouritesUseCase = mock()
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase = mock()
@@ -107,11 +111,8 @@ class ImagePreviewViewModelTest {
         getImageUseCase,
         getImageFromFileUseCase,
         areTransfersPausedUseCase,
-        checkNameCollisionUseCase,
-        checkNameCollision,
-        copyNodeUseCase,
-        copyTypedNodeUseCase,
-        moveNodeUseCase,
+        checkNodesNameCollisionWithActionUseCase,
+        checkChatNodesNameCollisionAndCopyUseCase,
         addFavouritesUseCase,
         removeFavouritesUseCase,
         removeOfflineNodeUseCase,
@@ -142,11 +143,8 @@ class ImagePreviewViewModelTest {
             getImageUseCase = getImageUseCase,
             getImageFromFileUseCase = getImageFromFileUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
-            checkNameCollisionUseCase = checkNameCollisionUseCase,
-            checkNameCollision = checkNameCollision,
-            copyNodeUseCase = copyNodeUseCase,
-            copyTypedNodeUseCase = copyTypedNodeUseCase,
-            moveNodeUseCase = moveNodeUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
+            checkNodesNameCollisionWithActionUseCase = checkNodesNameCollisionWithActionUseCase,
             addFavouritesUseCase = addFavouritesUseCase,
             removeFavouritesUseCase = removeFavouritesUseCase,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
@@ -249,6 +247,191 @@ class ImagePreviewViewModelTest {
             )
             assertThat(expectedNodes.size).isEqualTo(1)
             assertThat(expectedNodes).isEqualTo(listOf(nonSensitiveNode))
+        }
+
+
+    @Test
+    internal fun `test that resultMessage is set when node is copied`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            val successMessage = "Copy success"
+            val context = mock<Context> {
+                on { getString(R.string.context_correctly_copied) } doReturn successMessage
+            }
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.Copy(
+                    count = 1,
+                    errorCount = 0
+                )
+            )
+
+            underTest.copyNode(
+                context = context,
+                copyHandle = selectedNode,
+                toHandle = newParentNode,
+            )
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = expectMostRecentItem()
+                assertThat(state.resultMessage).isEqualTo(successMessage)
+            }
+        }
+
+    @Test
+    internal fun `test that copyMoveException is set when copy is failed`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            val runtimeException = RuntimeException("Copy node failed")
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ).thenThrow(runtimeException)
+            underTest.copyNode(
+                context = mock(),
+                copyHandle = selectedNode,
+                toHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.state.test {
+                val state = expectMostRecentItem()
+                assertThat(state.copyMoveException).isEqualTo(runtimeException)
+            }
+        }
+
+    @Test
+    internal fun `test that resultMessage is set when node is moved`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            val successMessage = "Move success"
+            val context = mock<Context> {
+                on { getString(R.string.context_correctly_moved) } doReturn successMessage
+            }
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 0
+                )
+            )
+
+            underTest.moveNode(
+                context = context,
+                moveHandle = selectedNode,
+                toHandle = newParentNode,
+            )
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = expectMostRecentItem()
+                assertThat(state.resultMessage).isEqualTo(successMessage)
+            }
+        }
+
+    @Test
+    internal fun `test that copyMoveException is set when move is failed`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            val runtimeException = RuntimeException("Move node failed")
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            ).thenThrow(runtimeException)
+            underTest.moveNode(
+                context = mock(),
+                moveHandle = selectedNode,
+                toHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.state.test {
+                val state = expectMostRecentItem()
+                assertThat(state.copyMoveException).isEqualTo(runtimeException)
+            }
+        }
+
+    @Test
+    internal fun `test that resultMessage is set when chat node is imported`() =
+        runTest {
+            val newParentNode = 158401030174851
+            val chatId = 1000L
+            val messageId = 2000L
+            val successMessage = "Import success"
+            val context = mock<Context> {
+                on { getString(R.string.context_correctly_copied) } doReturn successMessage
+            }
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = chatId,
+                    messageIds = listOf(messageId),
+                    newNodeParent = NodeId(newParentNode),
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 0
+                )
+            )
+            underTest.importChatNode(
+                context = context,
+                chatId = chatId,
+                messageId = messageId,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.state.test {
+                val state = expectMostRecentItem()
+                assertThat(state.resultMessage).isEqualTo(successMessage)
+            }
+        }
+
+    @Test
+    internal fun `test that copyMoveException is set when import failed`() =
+        runTest {
+            val newParentNode = NodeId(158401030174851)
+            val chatId = 1000L
+            val messageId = 2000L
+
+            val runtimeException = RuntimeException("Import node failed")
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = chatId,
+                    messageIds = listOf(messageId),
+                    newNodeParent = newParentNode,
+                )
+            ).thenThrow(runtimeException)
+
+            underTest.importChatNode(
+                context = mock(),
+                chatId = chatId,
+                messageId = messageId,
+                newParentHandle = newParentNode.longValue,
+            )
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = expectMostRecentItem()
+                assertThat(state.copyMoveException).isEqualTo(runtimeException)
+            }
         }
 
     private fun createNonSensitiveNode(): ImageNode {

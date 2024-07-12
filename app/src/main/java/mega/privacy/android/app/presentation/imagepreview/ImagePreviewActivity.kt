@@ -27,6 +27,7 @@ import mega.privacy.android.app.activities.contract.SelectFolderToImportActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
@@ -60,6 +61,9 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
+/**
+ * Activity to view an image node
+ */
 @AndroidEntryPoint
 class ImagePreviewActivity : BaseActivity() {
     @Inject
@@ -149,6 +153,13 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun handleState(state: ImagePreviewState) {
         manageCopyMoveException(state.copyMoveException)
+        manageNameCollision(state.nameCollision)
+    }
+
+    private fun manageNameCollision(nameCollision: NameCollision?) {
+        nameCollision ?: return
+        nameCollisionActivityContract?.launch(arrayListOf(nameCollision))
+        viewModel.onNameCollisionConsumed()
     }
 
     private fun handleMoveFolderResult(result: Pair<LongArray, Long>?) {

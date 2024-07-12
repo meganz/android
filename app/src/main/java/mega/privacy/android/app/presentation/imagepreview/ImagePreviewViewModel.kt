@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,11 +24,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -35,12 +34,13 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollision
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -57,21 +57,23 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
-import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
-import mega.privacy.android.domain.usecase.node.CopyTypedNodeUseCase
+import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
-import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * ViewModel for business logic regarding the image preview.
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ImagePreviewViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
@@ -81,11 +83,8 @@ class ImagePreviewViewModel @Inject constructor(
     private val getImageUseCase: GetImageUseCase,
     private val getImageFromFileUseCase: GetImageFromFileUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
-    private val checkNameCollision: CheckNameCollision,
-    private val copyNodeUseCase: CopyNodeUseCase,
-    private val copyTypedNodeUseCase: CopyTypedNodeUseCase,
-    private val moveNodeUseCase: MoveNodeUseCase,
+    private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
+    private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase,
     private val addFavouritesUseCase: AddFavouritesUseCase,
     private val removeFavouritesUseCase: RemoveFavouritesUseCase,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
@@ -202,7 +201,6 @@ class ImagePreviewViewModel @Inject constructor(
         imageFetcher.monitorImageNodes(params)
             .catch { Timber.e(it) }
             .mapLatest { imageNodes ->
-
                 val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(
                     imageNodes
                 )
@@ -224,6 +222,9 @@ class ImagePreviewViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    /**
+     * Sets isHiddenNodesOnboarded to true
+     */
     fun setHiddenNodesOnboarded() {
         _state.update {
             it.copy(isHiddenNodesOnboarded = true)
@@ -521,193 +522,151 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Move node to the new parent node.
+     * @param
+     * @param moveHandle        Node handle to move.
+     * @param toHandle          Parent handle in which the node will be moved.
+     */
     fun moveNode(context: Context, moveHandle: Long, toHandle: Long) {
         viewModelScope.launch {
-            checkForNameCollision(
-                context = context,
-                nodeHandle = moveHandle,
-                newParentHandle = toHandle,
-                type = NameCollisionType.MOVE,
-                completeAction = { handleMoveNodeNameCollision(context, moveHandle, toHandle) }
-            )
-        }
-    }
-
-    private suspend fun handleMoveNodeNameCollision(
-        context: Context,
-        moveHandle: Long,
-        toHandle: Long,
-    ) {
-        runCatching {
-            moveNodeUseCase(
-                nodeToMove = NodeId(moveHandle),
-                newNodeParent = NodeId(toHandle),
-            )
-        }.onSuccess {
-            setResultMessage(context.getString(R.string.context_correctly_moved))
-        }.onFailure { throwable ->
-            Timber.d("Move node failure $throwable")
-            setCopyMoveException(throwable)
-        }
-    }
-
-    fun copyNode(context: Context, copyHandle: Long, toHandle: Long) {
-        viewModelScope.launch {
-            checkForNameCollision(
-                context = context,
-                nodeHandle = copyHandle,
-                newParentHandle = toHandle,
-                type = NameCollisionType.COPY,
-                completeAction = { handleCopyNodeNameCollision(copyHandle, toHandle, context) }
-            )
-        }
-    }
-
-    private suspend fun handleCopyNodeNameCollision(
-        copyHandle: Long,
-        toHandle: Long,
-        context: Context,
-    ) {
-        runCatching {
-            copyNodeUseCase(
-                nodeToCopy = NodeId(copyHandle),
-                newNodeParent = NodeId(toHandle),
-                newNodeName = null,
-            )
-        }.onSuccess {
-            setResultMessage(context.getString(R.string.context_correctly_copied))
-        }.onFailure { throwable ->
-            Timber.e("Error not copied $throwable")
-            setCopyMoveException(throwable)
-        }
-    }
-
-    fun importNode(context: Context, importHandle: Long, toHandle: Long) {
-        viewModelScope.launch {
-            when (imagePreviewFetcherSource) {
-                ImagePreviewFetcherSource.CHAT -> {
-                    importChatNode(
-                        context = context,
-                        newParentHandle = toHandle,
-                    )
-                }
-
-                else -> {
-                    checkForNameCollision(
-                        context = context,
-                        nodeHandle = importHandle,
-                        newParentHandle = toHandle,
-                        type = NameCollisionType.COPY,
-                        completeAction = {
-                            handleImportNodeNameCollision(
-                                importHandle,
-                                toHandle,
-                                context
-                            )
-                        }
-                    )
-                }
-            }
-        }
-    }
-
-    private suspend fun importChatNode(context: Context, newParentHandle: Long) {
-        val imageNode = _state.value.currentImageNode
-        val chatNode = MegaNode.unserialize(_state.value.currentImageNode?.serializedData)
-        runCatching {
-            checkNameCollisionUseCase.check(
-                node = chatNode,
-                parentHandle = newParentHandle,
-                type = NameCollisionType.COPY,
-            )
-        }.onSuccess { nameCollision ->
-            _state.update {
-                it.copy(nameCollision = nameCollision)
-            }
-        }.onFailure {
-            when (it) {
-                is MegaNodeException.ChildDoesNotExistsException -> copyChatNode(
-                    context = context,
-                    imageNode = imageNode,
-                    parentHandle = newParentHandle,
+            runCatching {
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(moveHandle to toHandle),
+                    type = NodeNameCollisionType.MOVE,
                 )
-
-                else -> Timber.e(it)
+            }.onSuccess {
+                if (it.collisionResult.conflictNodes.isNotEmpty()) {
+                    _state.update { state ->
+                        state.copy(
+                            nameCollision = it.collisionResult.conflictNodes.values
+                                .first()
+                                .let { item -> NameCollision.Movement.fromNodeNameCollision(item) }
+                        )
+                    }
+                }
+                if (it.moveRequestResult != null) {
+                    setResultMessage(context.getString(R.string.context_correctly_moved))
+                }
+            }.onFailure {
+                Timber.d("Move node failure", it)
+                setCopyMoveException(it)
             }
-        }
-    }
-
-    private suspend fun copyChatNode(
-        context: Context,
-        imageNode: ImageNode?,
-        parentHandle: Long,
-    ) {
-        runCatching {
-            copyTypedNodeUseCase(
-                nodeToCopy = imageNode as ChatImageFile,
-                newNodeParent = NodeId(parentHandle),
-            )
-        }.onSuccess {
-            setResultMessage(context.getString(R.string.context_correctly_copied))
-        }.onFailure { throwable ->
-            Timber.e("Error not copied $throwable")
-            setCopyMoveException(throwable)
-        }
-    }
-
-    private suspend fun handleImportNodeNameCollision(
-        importHandle: Long,
-        toHandle: Long,
-        context: Context,
-    ) {
-        runCatching {
-            copyNodeUseCase(
-                nodeToCopy = NodeId(importHandle),
-                newNodeParent = NodeId(toHandle),
-                newNodeName = null,
-            )
-        }.onSuccess {
-            setResultMessage(context.getString(R.string.context_correctly_copied))
-        }.onFailure { throwable ->
-            Timber.e("Error not copied $throwable")
-            setCopyMoveException(throwable)
         }
     }
 
     /**
-     * Checks if there is a name collision before proceeding with the action.
+     * Copy node to the new parent node.
      *
-     * @param nodeHandle        Handle of the node to check the name collision.
-     * @param newParentHandle   Handle of the parent folder in which the action will be performed.
-     * @param completeAction    Action to complete after checking the name collision.
+     * @param context           Context
+     * @param copyHandle        Node handle to copy
+     * @param toHandle          Parent handle in which the node will be copied
      */
-    private suspend fun checkForNameCollision(
-        context: Context,
-        nodeHandle: Long,
-        newParentHandle: Long,
-        type: NameCollisionType,
-        completeAction: suspend (() -> Unit),
-    ) {
-        runCatching {
-            checkNameCollision(
-                nodeHandle = NodeId(nodeHandle),
-                parentHandle = NodeId(newParentHandle),
-                type = type,
-            )
-        }.onSuccess { nameCollision ->
-            _state.update {
-                it.copy(nameCollision = nameCollision)
-            }
-        }.onFailure {
-            when (it) {
-                is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
-
-                is MegaNodeException.ParentDoesNotExistException -> {
-                    setResultMessage(context.getString(R.string.general_error))
+    fun copyNode(context: Context, copyHandle: Long, toHandle: Long) {
+        viewModelScope.launch {
+            runCatching {
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(copyHandle to toHandle),
+                    type = NodeNameCollisionType.COPY,
+                )
+            }.onSuccess {
+                if (it.collisionResult.conflictNodes.isNotEmpty()) {
+                    _state.update { state ->
+                        state.copy(
+                            nameCollision = it.collisionResult.conflictNodes.values
+                                .first()
+                                .let { item -> NameCollision.Copy.fromNodeNameCollision(item) }
+                        )
+                    }
                 }
-
-                else -> Timber.e(it)
+                if (it.moveRequestResult != null) {
+                    setResultMessage(context.getString(R.string.context_correctly_copied))
+                }
+            }.onFailure {
+                Timber.e("Error not copied", it)
+                setCopyMoveException(it)
             }
+        }
+    }
+
+
+    /**
+     * Import/copy node to the new parent node
+     */
+    fun importNode(context: Context, importHandle: Long, toHandle: Long) {
+        when (imagePreviewFetcherSource) {
+            ImagePreviewFetcherSource.CHAT -> {
+                (_state.value.currentImageNode as? ChatImageFile)?.let {
+                    importChatNode(
+                        context = context,
+                        chatId = it.chatId,
+                        messageId = it.messageId,
+                        newParentHandle = toHandle
+                    )
+                }
+            }
+
+            else -> {
+                copyNode(
+                    context = context,
+                    copyHandle = importHandle,
+                    toHandle = toHandle,
+                )
+            }
+        }
+    }
+
+    /**
+     * Import/copy chat node to the new parent node
+     *
+     * @param context           Context
+     * @param chatId            Chat id
+     * @param messageId         Message id
+     * @param newParentHandle   Parent handle in which the node will be copied
+     */
+    fun importChatNode(
+        context: Context,
+        chatId: Long,
+        messageId: Long,
+        newParentHandle: Long,
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = chatId,
+                    messageIds = listOf(messageId),
+                    newNodeParent = NodeId(newParentHandle),
+                )
+            }.onSuccess {
+                if (it.collisionResult.conflictNodes.isNotEmpty()) {
+                    val nodeNameCollision = it.collisionResult.conflictNodes.values.first()
+                    if (nodeNameCollision is NodeNameCollision.Chat) {
+                        _state.update {
+                            it.copy(
+                                nameCollision = NameCollision.Import.fromNodeNameCollision(
+                                    nodeNameCollision
+                                )
+                            )
+                        }
+                    }
+                }
+                if (it.moveRequestResult != null) {
+                    setResultMessage(context.getString(R.string.context_correctly_copied))
+                }
+            }.onFailure {
+                Timber.e("Error not copied", it)
+                setCopyMoveException(it)
+            }
+        }
+    }
+
+
+    /**
+     * Consume name collision after handling it
+     */
+    fun onNameCollisionConsumed() {
+        _state.update {
+            it.copy(nameCollision = null)
         }
     }
 
