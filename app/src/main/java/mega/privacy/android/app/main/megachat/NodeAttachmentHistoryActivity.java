@@ -77,8 +77,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -93,8 +91,6 @@ import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
-import mega.privacy.android.app.namecollision.data.NameCollision;
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity;
@@ -126,9 +122,6 @@ import timber.log.Timber;
 public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         MegaChatRequestListenerInterface, MegaChatNodeHistoryListenerInterface,
         StoreDataBeforeForward<ArrayList<MegaChatMessage>>, SnackbarShower {
-
-    @Inject
-    CheckNameCollisionUseCase checkNameCollisionUseCase;
 
     @Inject
     CopyRequestMessageMapper copyRequestMessageMapper;
@@ -383,6 +376,18 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                             : getString(R.string.import_success_error),
                     MEGACHAT_INVALID_HANDLE);
             viewModel.copyResultConsumed();
+            return Unit.INSTANCE;
+        });
+
+        // Observe node collision result
+        ViewExtensionsKt.collectFlow(this, viewModel.getCollisionsFlow(), Lifecycle.State.STARTED, collisions -> {
+            if (collisions == null) return Unit.INSTANCE;
+            dismissAlertDialogIfExists(statusDialog);
+
+            if (!collisions.isEmpty() && nameCollisionActivityContract != null) {
+                nameCollisionActivityContract.launch(new ArrayList<>(collisions));
+                viewModel.nodeCollisionsConsumed();
+            }
             return Unit.INSTANCE;
         });
     }
@@ -1034,16 +1039,12 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             if (!viewModel.isOnline() || megaApi == null) {
                 try {
                     statusDialog.dismiss();
-                } catch (Exception ex) {
+                } catch (Exception ignored) {
                 }
-                ;
-
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
                 return;
             }
-
             final long toHandle = intent.getLongExtra("IMPORT_TO", 0);
-
             final long[] importMessagesHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT");
 
             importNodes(toHandle, importMessagesHandles);
@@ -1051,9 +1052,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             if (!viewModel.isOnline()) {
                 try {
                     statusDialog.dismiss();
-                } catch (Exception ex) {
+                } catch (Exception ignored) {
                 }
-                ;
 
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
                 return;
@@ -1122,30 +1122,12 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     public void importNodes(final long toHandle, final long[] importMessagesHandles) {
+        if (importMessagesHandles == null) return;
         statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
         statusDialog.show();
-
-        composite.add(checkNameCollisionUseCase.checkMessagesToImport(importMessagesHandles, chatId, toHandle)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    if (throwable == null) {
-                        ArrayList<NameCollision> collisions = result.getFirst();
-                        if (nameCollisionActivityContract != null && !collisions.isEmpty()) {
-                            dismissAlertDialogIfExists(statusDialog);
-                            nameCollisionActivityContract.launch(collisions);
-                        }
-
-                        List<MegaNode> nodesWithoutCollision = result.getSecond();
-                        if (!nodesWithoutCollision.isEmpty()) {
-                            List<Long> messageIds = new ArrayList<>();
-                            for (long id : importMessagesHandles) messageIds.add(id);
-                            viewModel.copyChatNodes(chatId, messageIds, toHandle);
-                        }
-                    } else {
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), MEGACHAT_INVALID_HANDLE);
-                    }
-                }));
+        List<Long> messageIds = new ArrayList<>();
+        for (long id : importMessagesHandles) messageIds.add(id);
+        viewModel.importChatNodes(chatId, messageIds, toHandle);
     }
 
     @Override

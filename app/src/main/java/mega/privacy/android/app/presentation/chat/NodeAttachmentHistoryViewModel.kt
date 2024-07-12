@@ -7,14 +7,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
-import mega.privacy.android.domain.usecase.node.CopyChatNodesUseCase
+import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -23,9 +26,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class NodeAttachmentHistoryViewModel @Inject constructor(
+    private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
-    private val copyChatNodesUseCase: CopyChatNodesUseCase,
 ) : ViewModel() {
 
     private val _copyResultFlow = MutableStateFlow<CopyRequestState?>(null)
@@ -34,6 +37,13 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
      * Flow of [CopyRequestState] to notify the result of the copy operation.
      */
     val copyResultFlow = _copyResultFlow.asStateFlow()
+
+    private val _collisionsFlow = MutableStateFlow<List<NameCollision>>(emptyList())
+
+    /**
+     * Flow of [NameCollision] to notify the name collisions
+     */
+    val collisionsFlow = _collisionsFlow.asStateFlow()
 
     /**
      * Get latest [StorageState] from [MonitorStorageStateEventUseCase] use case.
@@ -49,30 +59,41 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
     fun isOnline(): Boolean = isConnectedToInternetUseCase()
 
     /**
-     * Copies the nodes to the destination node
+     * Imports a chat node if there is no name collision.
      *
-     * @param chatId The chat id
-     * @param messageIds The list of message ids
-     * @param newNodeParent The destination node handle
+     * @param chatId            Chat ID where the node is.
+     * @param messageIds        Message IDs where the node is.
+     * @param newParentHandle   Parent handle in which the nodes will be copied.
      */
-    fun copyChatNodes(
+    fun importChatNodes(
         chatId: Long,
         messageIds: MutableList<Long>,
-        newNodeParent: Long,
-    ) = viewModelScope.launch {
-        runCatching {
-            copyChatNodesUseCase(
-                chatId = chatId,
-                messageIds = messageIds,
-                newNodeParent = NodeId(newNodeParent)
-            )
-        }.onSuccess { result ->
-            _copyResultFlow.update {
-                CopyRequestState(result = result.toCopyRequestResult())
-            }
-        }.onFailure { throwable ->
-            _copyResultFlow.update {
-                CopyRequestState(error = throwable)
+        newParentHandle: Long,
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = chatId,
+                    messageIds = messageIds,
+                    newNodeParent = NodeId(newParentHandle),
+                )
+            }.onSuccess { result ->
+                result.collisionResult.conflictNodes.values
+                    .filterIsInstance<NodeNameCollision.Chat>()
+                    .map { NameCollision.Import.fromNodeNameCollision(it) }
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { _collisionsFlow.update { _ -> it } }
+
+                result.moveRequestResult?.let {
+                    _copyResultFlow.update { _ ->
+                        CopyRequestState(result = it.toCopyRequestResult())
+                    }
+                }
+            }.onFailure { throwable ->
+                Timber.e(throwable)
+                _copyResultFlow.update {
+                    CopyRequestState(error = throwable)
+                }
             }
         }
     }
@@ -82,6 +103,15 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
      */
     fun copyResultConsumed() {
         _copyResultFlow.value = null
+    }
+
+    /**
+     * Clears the collisions after consuming the value
+     */
+    fun nodeCollisionsConsumed() {
+        _collisionsFlow.update {
+            emptyList()
+        }
     }
 
 }

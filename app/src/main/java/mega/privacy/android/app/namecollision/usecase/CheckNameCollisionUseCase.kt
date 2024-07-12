@@ -1,18 +1,15 @@
 package mega.privacy.android.app.namecollision.usecase
 
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.rx3.rxSingle
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -137,19 +134,6 @@ class CheckNameCollisionUseCase @Inject constructor(
             )
         }
 
-
-    /**
-     * Checks if a node with the given name exists on the provided parent node.
-     *
-     * @param name          Name of the node.
-     * @param parentNode    Parent node in which to look.
-     * @return Single Long with the node handle with which there is a name collision.
-     */
-    private fun check(name: String, parentNode: MegaNode?): Single<Long> =
-        rxSingle(ioDispatcher) {
-            checkAsync(name, parentNode)
-        }
-
     suspend fun checkAsync(name: String, parent: MegaNode?): Long {
         contract { returns() implies (parent != null) }
         if (parent == null) {
@@ -159,103 +143,6 @@ class CheckNameCollisionUseCase @Inject constructor(
         return withContext(ioDispatcher) { megaApiGateway.getChildNode(parent, name)?.handle }
             ?: throw MegaNodeException.ChildDoesNotExistsException()
     }
-
-    /**
-     * Check node list async
-     *
-     * @param nodes
-     * @param parentHandle
-     * @param type
-     * @return
-     */
-    suspend fun checkNodeListAsync(
-        nodes: List<MegaNode>,
-        parentHandle: Long,
-        type: NameCollisionType,
-    ): Pair<ArrayList<NameCollision>, MutableList<MegaNode>> {
-        if (nodes.isEmpty()) throw NoPendingCollisionsException()
-        return nodes.fold(
-            Pair(
-                ArrayList(),
-                mutableListOf()
-            )
-        ) { result, node ->
-            runCatching {
-                checkNodeCollisionsWithType(
-                    node = node,
-                    parentNode = getParentOrRootNode(parentHandle),
-                    type = type,
-                )
-            }.onFailure {
-                Timber.e(it, "No collision.")
-                result.second.add(node)
-            }.onSuccess {
-                result.first.add(it)
-            }
-
-            result
-        }
-    }
-
-    /**
-     * Checks a list of [MegaNode] in order to know which names already exist on the parent nodes
-     * in which them will be restored.
-     *
-     * @param nodes List of nodes to check.
-     * @return Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> containing:
-     *  - First:    List of [NameCollision] with name collisions.
-     *  - Second:   List of [MegaNode] without name collision.
-     */
-    fun checkRestorations(
-        nodes: List<MegaNode>,
-    ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
-        rxSingle(ioDispatcher) {
-            checkRestorationsAsync(nodes)
-        }
-
-    /**
-     * Check restorations async
-     *
-     * @param nodes
-     * @return
-     */
-    suspend fun checkRestorationsAsync(
-        nodes: List<MegaNode>,
-    ): Pair<ArrayList<NameCollision>, MutableList<MegaNode>> {
-        if (nodes.isEmpty()) throw NoPendingCollisionsException()
-        return nodes.fold(
-            Pair(
-                ArrayList(),
-                mutableListOf()
-            )
-        ) { result, node ->
-            val restoreHandle = node.restoreHandle
-            val parent = getParentOrRootNode(restoreHandle)
-            if (parent == null || megaApiGateway.isInRubbish(parent)) {
-                result.second.add(node)
-            } else {
-                val childCounts = getChildCounts(parent)
-                runCatching { checkAsync(node.name, parent) }
-                    .onFailure {
-                        Timber.e(it, "No collision.")
-                        result.second.add(node)
-                    }
-                    .onSuccess {
-                        result.first.add(
-                            NameCollision.Movement.fromNodeNameCollision(
-                                collisionHandle = it,
-                                node = node,
-                                parentHandle = restoreHandle,
-                                childFileCount = childCounts.second,
-                                childFolderCount = childCounts.first,
-                            )
-                        )
-                    }
-            }
-            result
-        }
-    }
-
 
     /**
      * Checks a list of ShareInfo in order to know which names already exist
@@ -313,83 +200,4 @@ class CheckNameCollisionUseCase @Inject constructor(
             result
         }
     }
-
-    /**
-     * Checks a list of attached nodes in a chat conversation in order to know which names already
-     * exist on the provided parent node.
-     *
-     * @param messageIds    Array of message identifiers.
-     * @param chatId        Chat identifier.
-     * @param parentHandle  Parent handle node in which to look.
-     * @return Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> containing:
-     *  - First:    List of [NameCollision] with name collisions.
-     *  - Second:   List of [MegaNode] without name collision.
-     */
-    fun checkMessagesToImport(
-        messageIds: LongArray,
-        chatId: Long,
-        parentHandle: Long,
-    ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
-        Single.create { emitter ->
-            val parentNode = getNodeUseCase.get(parentHandle).blockingGetOrNull()
-
-            if (parentNode == null) {
-                emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                return@create
-            }
-
-            if (messageIds.isEmpty()) {
-                emitter.onError(MessageDoesNotExistException())
-                return@create
-            }
-
-            val collisions = ArrayList<NameCollision>()
-            val nodesWithoutCollision = mutableListOf<MegaNode>()
-
-            messageIds.forEach { messageId ->
-                getChatMessageUseCase.getChatNodes(chatId, messageId).blockingSubscribeBy(
-                    onError = { error -> Timber.e(error, "Error getting chat node.") },
-                    onSuccess = { nodes ->
-                        nodes.forEach { node ->
-                            check(node.name, parentNode).blockingSubscribeBy(
-                                onError = { error ->
-                                    when (error) {
-                                        is MegaNodeException.ChildDoesNotExistsException -> {
-                                            nodesWithoutCollision.add(node)
-                                        }
-
-                                        else -> {
-                                            emitter.onError(error)
-                                        }
-                                    }
-                                },
-                                onSuccess = { handle ->
-                                    collisions.add(
-                                        NameCollision.Import.getImportCollision(
-                                            handle,
-                                            chatId,
-                                            messageId,
-                                            node,
-                                            parentHandle
-                                        )
-                                    )
-                                }
-                            )
-                        }
-                    }
-                )
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(Pair(collisions, nodesWithoutCollision))
-            }
-        }
-
-    private fun <T : Any> Single<T>.blockingGetOrNull(): T? =
-        try {
-            blockingGet()
-        } catch (ignore: Exception) {
-            null
-        }
 }

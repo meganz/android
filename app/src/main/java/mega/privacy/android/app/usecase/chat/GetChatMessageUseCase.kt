@@ -16,6 +16,7 @@ import javax.inject.Inject
  *
  * @property megaChatApi    Mega Chat API needed to call node information.
  */
+@Deprecated("Should be removed when GetNameCollisionResultUseCase is refactored")
 class GetChatMessageUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid
@@ -25,18 +26,6 @@ class GetChatMessageUseCase @Inject constructor(
         Single.fromCallable {
             megaChatApi.getMessage(chatRoomId, messageId)
                 ?: megaChatApi.getMessageFromNodeHistory(chatRoomId, messageId)
-        }
-
-    fun getChatNode(chatRoomId: Long, messageId: Long): Single<MegaNode> =
-        Single.fromCallable {
-            val chatRoom = megaChatApi.getChatRoom(chatRoomId)
-            val chatMessage = get(chatRoomId, messageId).blockingGet()
-            val node = chatMessage.megaNodeList[0]
-            if (chatRoom.isPreview) {
-                megaApi.authorizeChatNode(node, chatRoom.authorizationToken) ?: node
-            } else {
-                node
-            }
         }
 
     /**

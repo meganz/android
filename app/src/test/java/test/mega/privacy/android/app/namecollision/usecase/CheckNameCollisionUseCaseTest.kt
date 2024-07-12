@@ -6,7 +6,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -21,7 +20,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
@@ -98,37 +96,4 @@ internal class CheckNameCollisionUseCaseTest {
                 .isEqualTo(expected)
         }
     }
-
-    @Test
-    internal fun `test that checkRestorations returns the correct file and folder count`() =
-        runTest {
-            val deletedHandle = 1234L
-            val deletedNode = mock<MegaNode> {
-                on { restoreHandle }.thenReturn(deletedHandle)
-                on { name }.thenReturn("name")
-            }
-            val folders = 4
-            val files = 20
-
-            val childHandle = 1234L
-            val child = mock<MegaNode> {
-                on { handle }.thenReturn(childHandle)
-            }
-            val parent = mock<MegaNode>()
-            megaApiGateway.stub {
-                onBlocking { getChildNode(anyOrNull(), anyOrNull()) }.thenReturn(child)
-                onBlocking { isInRubbish(any()) }.thenReturn(false)
-                onBlocking { getNumChildFolders(any()) }.thenReturn(folders)
-                onBlocking { getNumChildFiles(any()) }.thenReturn(files)
-                onBlocking { getMegaNodeByHandle(deletedHandle) }.thenReturn(parent)
-            }
-
-            underTest.checkRestorations(
-                nodes = listOf(deletedNode),
-            ).test()
-                .assertValue {
-                    val actual: NameCollision = it.first.first()
-                    actual.childFolderCount == folders && actual.childFileCount == files
-                }
-        }
 }
