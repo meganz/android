@@ -3,9 +3,12 @@ package mega.privacy.android.app.contacts.list.adapter
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.CircleCropTransformation
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.ItemContactDataBinding
-import mega.privacy.android.app.utils.setImageRequestFromUri
+import mega.privacy.android.domain.entity.user.ContactAvatar
+import mega.privacy.android.domain.entity.user.UserId
 
 /**
  * RecyclerView's ViewHolder to show ContactItem Data info.
@@ -22,11 +25,11 @@ class ContactListDataViewHolder(
         binding.txtLastSeen.isVisible = !item.lastSeen.isNullOrBlank()
         binding.chipNew.isVisible = item.isNew
         binding.verifiedIcon.isVisible = item.isVerified
-        binding.imgThumbnail.hierarchy.setPlaceholderImage(item.placeholder)
-        if (item.avatarUri != null) {
-            binding.imgThumbnail.setImageRequestFromUri(item.avatarUri)
-        } else {
-            binding.imgThumbnail.setImageRequest(null)
+        binding.imgThumbnail.load(
+            data = ContactAvatar(id = UserId(item.handle))
+        ) {
+            transformations(CircleCropTransformation())
+            placeholder(item.placeholder)
         }
         if (item.statusColor != null) {
             val color = ContextCompat.getColor(itemView.context, item.statusColor)

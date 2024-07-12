@@ -5,7 +5,7 @@
     android:layout_height="72dp"
     android:background="?selectableItemBackground">
 
-    <com.facebook.drawee.view.SimpleDraweeView
+    <ImageView
         android:id="@+id/img_thumbnail"
         android:layout_width="@dimen/image_contact_size"
         android:layout_height="@dimen/image_contact_size"
@@ -13,7 +13,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:roundAsCircle="true"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
     <ImageView

@@ -14,6 +14,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import coil.load
+import coil.transform.CircleCropTransformation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -36,7 +38,8 @@ import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
 import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.app.utils.setImageRequestFromUri
+import mega.privacy.android.domain.entity.user.ContactAvatar
+import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
@@ -200,8 +203,13 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.header.txtName.text = contact.getTitle()
         binding.header.txtLastSeen.text = contact.lastSeen
         binding.header.txtLastSeen.isVisible = !contact.lastSeen.isNullOrBlank()
-        binding.header.imgThumbnail.hierarchy.setPlaceholderImage(contact.placeholder)
-        binding.header.imgThumbnail.setImageRequestFromUri(contact.avatarUri)
+        binding.header.imgThumbnail.load(
+            data = ContactAvatar(id = UserId(contact.handle))
+        ) {
+            transformations(CircleCropTransformation())
+            placeholder(contact.placeholder)
+        }
+
         contact.statusColor?.let { color ->
             binding.header.imgState.setColorFilter(ContextCompat.getColor(requireContext(), color))
         }
