@@ -18,7 +18,7 @@ class SyncOfflineFilesUseCase @Inject constructor(
      */
     suspend operator fun invoke() {
         val offlineNodes = nodeRepository.getAllOfflineNodes()
-        if (fileSystemRepository.getOfflineFolder().exists()) {
+        if (fileSystemRepository.getOfflineFolder().exists() && offlineNodes.isNotEmpty()) {
             getOfflineFilesUseCase(offlineNodes)
                 .asSequence()
                 .partition { it.value.exists() }

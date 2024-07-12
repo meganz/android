@@ -74,4 +74,10 @@ internal class GetOfflineFilesUseCaseTest {
 
         assertThat(result.values).containsExactly(file)
     }
+
+    @Test
+    fun `test that empty map is returned when invoked with empty list`() = runTest {
+        val result = underTest(emptyList())
+        assertThat(result).isEmpty()
+    }
 }
