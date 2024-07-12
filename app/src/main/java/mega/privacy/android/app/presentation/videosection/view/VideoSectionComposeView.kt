@@ -9,7 +9,10 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -61,6 +64,8 @@ internal fun VideoSectionComposeView(
     }
 
     val accountType = uiState.accountDetail?.levelDetail?.accountType
+
+    var showDeleteVideoPlaylist by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -130,11 +135,7 @@ internal fun VideoSectionComposeView(
                             }
 
                         is VideoSectionMenuAction.VideoSectionRemoveAction -> {
-                            if (tabState.selectedTab == VideoSectionTab.All) {
-                                videoSectionViewModel.setShouldDeleteVideosFromPlaylist(true)
-                            } else {
-                                videoSectionViewModel.setShouldDeleteVideoPlaylist(true)
-                            }
+                            showDeleteVideoPlaylist = true
                             videoSectionViewModel.clearAllSelectedVideoPlaylists()
                         }
 
@@ -223,22 +224,18 @@ internal fun VideoSectionComposeView(
                     isInputTitleValid = uiState.isInputTitleValid,
                     inputPlaceHolderText = uiState.createVideoPlaylistPlaceholderTitle,
                     setInputValidity = videoSectionViewModel::setNewPlaylistTitleValidity,
-                    shouldCreateVideoPlaylistDialog = uiState.shouldCreateVideoPlaylist,
-                    setShouldCreateVideoPlaylist = videoSectionViewModel::setShouldCreateVideoPlaylist,
                     onCreateDialogPositiveButtonClicked = videoSectionViewModel::createNewPlaylist,
-                    shouldRenameVideoPlaylistDialog = uiState.shouldRenameVideoPlaylist,
-                    setShouldRenameVideoPlaylist = videoSectionViewModel::setShouldRenameVideoPlaylist,
                     onRenameDialogPositiveButtonClicked = videoSectionViewModel::updateVideoPlaylistTitle,
-                    shouldDeleteVideoPlaylistDialog = uiState.shouldDeleteVideoPlaylist,
-                    setShouldDeleteVideoPlaylist = videoSectionViewModel::setShouldDeleteVideoPlaylist,
+                    showDeleteVideoPlaylistDialog = showDeleteVideoPlaylist,
+                    updateShowDeleteVideoPlaylist = { showDeleteVideoPlaylist = it },
                     onDeleteDialogPositiveButtonClicked = { playlist ->
-                        videoSectionViewModel.setShouldDeleteSingleVideoPlaylist(false)
+                        showDeleteVideoPlaylist = false
                         videoSectionViewModel.removeVideoPlaylists(listOf(playlist))
                     },
                     onDeletedMessageShown = videoSectionViewModel::clearDeletedVideoPlaylistTitles,
                     deletedVideoPlaylistTitles = uiState.deletedVideoPlaylistTitles,
                     onDeletePlaylistsDialogPositiveButtonClicked = {
-                        videoSectionViewModel.setShouldDeleteVideoPlaylist(false)
+                        showDeleteVideoPlaylist = false
                         val removedPlaylists =
                             uiState.selectedVideoPlaylistHandles.mapNotNull {
                                 uiState.videoPlaylists.firstOrNull { playlist ->

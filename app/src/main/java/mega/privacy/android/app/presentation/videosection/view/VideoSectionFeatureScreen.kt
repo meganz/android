@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.view
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,7 +51,6 @@ internal fun VideoSectionNavHost(
     val state = viewModel.state.collectAsStateWithLifecycle().value
 
     val onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit = { playlist ->
-        viewModel.setShouldDeleteVideosFromPlaylist(false)
         val removedVideoIDs = state.selectedVideoElementIDs
         viewModel.removeVideosFromPlaylist(playlist.id, removedVideoIDs)
         viewModel.clearAllSelectedVideosOfPlaylist()
@@ -98,9 +98,7 @@ internal fun VideoSectionNavHost(
                         viewModel.onVideoPlaylistItemClicked(playlist, index)
                     } else {
                         viewModel.updateCurrentVideoPlaylist(playlist)
-                        navHostController.navigate(
-                            route = videoPlaylistDetailRoute,
-                        )
+                        navHostController.navigate(route = videoPlaylistDetailRoute)
                     }
                 },
                 onPlaylistItemLongClick = viewModel::onVideoPlaylistItemClicked,
@@ -111,19 +109,16 @@ internal fun VideoSectionNavHost(
         composable(
             route = videoPlaylistDetailRoute
         ) {
+            val onBackPressedDispatcher =
+                LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
             VideoPlaylistDetailView(
                 playlist = state.currentVideoPlaylist,
+                selectedSize = state.selectedVideoElementIDs.size,
                 isInputTitleValid = state.isInputTitleValid,
-                shouldDeleteVideoPlaylistDialog = state.shouldDeleteSingleVideoPlaylist,
-                shouldRenameVideoPlaylistDialog = state.shouldRenameVideoPlaylist,
-                shouldShowVideoPlaylistBottomSheetDetails = state.shouldShowMoreVideoPlaylistOptions,
                 numberOfAddedVideos = state.numberOfAddedVideos,
                 addedMessageShown = viewModel::clearNumberOfAddedVideos,
                 numberOfRemovedItems = state.numberOfRemovedItems,
                 removedMessageShown = viewModel::clearNumberOfRemovedItems,
-                setShouldDeleteVideoPlaylistDialog = viewModel::setShouldDeleteSingleVideoPlaylist,
-                setShouldRenameVideoPlaylistDialog = viewModel::setShouldRenameVideoPlaylist,
-                setShouldShowVideoPlaylistBottomSheetDetails = viewModel::setShouldShowMoreVideoPlaylistOptions,
                 inputPlaceHolderText = state.createVideoPlaylistPlaceholderTitle,
                 setInputValidity = viewModel::setNewPlaylistTitleValidity,
                 onRenameDialogPositiveButtonClicked = viewModel::updateVideoPlaylistTitle,
@@ -137,11 +132,26 @@ internal fun VideoSectionNavHost(
                 },
                 onMenuClick = onMenuClick,
                 onLongClick = viewModel::onVideoItemOfPlaylistLongClicked,
-                shouldDeleteVideosDialog = state.shouldDeleteVideosFromPlaylist,
-                setShouldDeleteVideosDialog = viewModel::setShouldDeleteVideosFromPlaylist,
                 onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
                 onPlayAllClicked = viewModel::playAllButtonClicked,
-                onUpdatedTitle = viewModel::setUpdateToolbarTitle
+                onBackPressed = {
+                    if (state.selectedVideoElementIDs.isNotEmpty()) {
+                        viewModel.clearAllSelectedVideosOfPlaylist()
+                    } else {
+                        onBackPressedDispatcher?.onBackPressed()
+                    }
+                },
+                onMenuActionClick = { action ->
+                    when (action) {
+                        is VideoSectionMenuAction.VideoSectionSelectAllAction ->
+                            viewModel.selectAllVideosOfPlaylist()
+
+                        is VideoSectionMenuAction.VideoSectionClearSelectionAction ->
+                            viewModel.clearAllSelectedVideosOfPlaylist()
+
+                        else -> {}
+                    }
+                }
             )
         }
     }

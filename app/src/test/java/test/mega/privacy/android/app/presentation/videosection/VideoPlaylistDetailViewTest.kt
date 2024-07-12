@@ -14,6 +14,9 @@ import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
 import coil.test.FakeImageLoaderEngine
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_MORE_ACTION
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_REMOVE_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.playlist.DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
@@ -22,7 +25,9 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.DETAIL_R
 import mega.privacy.android.app.presentation.videosection.view.playlist.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.PLAYLIST_TITLE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.PLAYLIST_TOTAL_DURATION_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailView
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Before
@@ -54,14 +59,9 @@ class VideoPlaylistDetailViewTest {
 
     private fun setComposeContent(
         playlist: VideoPlaylistUIEntity? = null,
+        selectedSize: Int = 0,
         modifier: Modifier = Modifier,
         isInputTitleValid: Boolean = true,
-        shouldDeleteVideoPlaylistDialog: Boolean = false,
-        shouldRenameVideoPlaylistDialog: Boolean = false,
-        shouldShowVideoPlaylistBottomSheetDetails: Boolean = false,
-        setShouldDeleteVideoPlaylistDialog: (Boolean) -> Unit = {},
-        setShouldRenameVideoPlaylistDialog: (Boolean) -> Unit = {},
-        setShouldShowVideoPlaylistBottomSheetDetails: (Boolean) -> Unit = {},
         inputPlaceHolderText: String = "",
         setInputValidity: (Boolean) -> Unit = {},
         onRenameDialogPositiveButtonClicked: (playlistID: NodeId, newTitle: String) -> Unit = { _, _ -> },
@@ -73,25 +73,19 @@ class VideoPlaylistDetailViewTest {
         onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
         numberOfAddedVideos: Int = 0,
         addedMessageShown: () -> Unit = {},
-        shouldDeleteVideosDialog: Boolean = false,
-        setShouldDeleteVideosDialog: (Boolean) -> Unit = {},
         onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit = {},
         removedMessageShown: () -> Unit = {},
         numberOfRemovedItems: Int = 0,
         onPlayAllClicked: () -> Unit = {},
-        onUpdatedTitle: (String?) -> Unit = {},
+        onBackPressed: () -> Unit = {},
+        onMenuActionClick: (VideoSectionMenuAction?) -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideoPlaylistDetailView(
                 playlist = playlist,
+                selectedSize = selectedSize,
                 modifier = modifier,
                 isInputTitleValid = isInputTitleValid,
-                shouldDeleteVideoPlaylistDialog = shouldDeleteVideoPlaylistDialog,
-                shouldRenameVideoPlaylistDialog = shouldRenameVideoPlaylistDialog,
-                shouldShowVideoPlaylistBottomSheetDetails = shouldShowVideoPlaylistBottomSheetDetails,
-                setShouldDeleteVideoPlaylistDialog = setShouldDeleteVideoPlaylistDialog,
-                setShouldRenameVideoPlaylistDialog = setShouldRenameVideoPlaylistDialog,
-                setShouldShowVideoPlaylistBottomSheetDetails = setShouldShowVideoPlaylistBottomSheetDetails,
                 inputPlaceHolderText = inputPlaceHolderText,
                 setInputValidity = setInputValidity,
                 onRenameDialogPositiveButtonClicked = onRenameDialogPositiveButtonClicked,
@@ -103,13 +97,12 @@ class VideoPlaylistDetailViewTest {
                 onLongClick = onLongClick,
                 numberOfAddedVideos = numberOfAddedVideos,
                 addedMessageShown = addedMessageShown,
-                shouldDeleteVideosDialog = shouldDeleteVideosDialog,
-                setShouldDeleteVideosDialog = setShouldDeleteVideosDialog,
                 onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
                 removedMessageShown = removedMessageShown,
                 numberOfRemovedItems = numberOfRemovedItems,
                 onPlayAllClicked = onPlayAllClicked,
-                onUpdatedTitle = onUpdatedTitle
+                onBackPressed = onBackPressed,
+                onMenuActionClick = onMenuActionClick
             )
         }
     }
@@ -118,19 +111,24 @@ class VideoPlaylistDetailViewTest {
     fun `test that ui is displayed correctly when the playlist is null`() {
         setComposeContent(null)
 
-        composeTestRule.onNodeWithTag(VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(PLAYLIST_TITLE_TEST_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(PLAYLIST_TITLE_TEST_TAG)
-            .assertTextEquals("")
-        composeTestRule.onNodeWithTag(PLAYLIST_TOTAL_DURATION_TEST_TAG)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(PLAYLIST_TOTAL_DURATION_TEST_TAG)
-            .assertTextEquals("00:00:00")
-        composeTestRule.onNodeWithTag(PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
-            .assertTextEquals("no videos")
+        VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG.assertIsDisplayed()
+        PLAYLIST_TITLE_TEST_TAG.assertIsDisplayed()
+        PLAYLIST_TITLE_TEST_TAG.assertTextEquals("")
+        PLAYLIST_TOTAL_DURATION_TEST_TAG.assertIsDisplayed()
+        PLAYLIST_TOTAL_DURATION_TEST_TAG.assertTextEquals("00:00:00")
+        PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG.assertIsDisplayed()
+        PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG.assertTextEquals("no videos")
     }
+
+    private fun String.assertIsDisplayed() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsDisplayed()
+
+    private fun String.assertIsNotDisplayed() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsNotDisplayed()
+
+    private fun String.assertTextEquals(value: String) =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true)
+            .assertTextEquals(value)
 
     @Test
     fun `test that ui is displayed correctly when the playlist is not null`() {
@@ -152,81 +150,62 @@ class VideoPlaylistDetailViewTest {
 
         setComposeContent(playlist)
 
-        composeTestRule.onNodeWithTag(PLAYLIST_TITLE_TEST_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(PLAYLIST_TITLE_TEST_TAG)
-            .assertTextEquals(expectedTitle)
-        composeTestRule.onNodeWithTag(PLAYLIST_TOTAL_DURATION_TEST_TAG)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(PLAYLIST_TOTAL_DURATION_TEST_TAG)
-            .assertTextEquals(expectedTotalDuration)
-        composeTestRule.onNodeWithTag(PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
-            .assertTextEquals("2 videos")
+        PLAYLIST_TITLE_TEST_TAG.assertIsDisplayed()
+        PLAYLIST_TITLE_TEST_TAG.assertTextEquals(expectedTitle)
+        PLAYLIST_TOTAL_DURATION_TEST_TAG.assertIsDisplayed()
+        PLAYLIST_TOTAL_DURATION_TEST_TAG.assertTextEquals(expectedTotalDuration)
+        PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG.assertIsDisplayed()
+        PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG.assertTextEquals("2 videos")
     }
 
     @Test
-    fun `test that RenameVideoPlaylistDialog is displayed correctly when shouldRenameVideoPlaylistDialog is true`() {
-        setComposeContent(
-            playlist = playlist,
-            shouldRenameVideoPlaylistDialog = true
-        )
+    fun `test that RenameVideoPlaylistDialog is displayed`() {
+        setComposeContent(playlist = playlist)
 
-        composeTestRule.onNodeWithTag(DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG)
-            .assertIsDisplayed()
+        TEST_TAG_VIDEO_SECTION_MORE_ACTION.performClick()
+        VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+        DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayed()
+    }
+
+    private fun String.performClick() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).performClick()
+
+    @Test
+    fun `test that RenameVideoPlaylistDialog is not displayed by default`() {
+        setComposeContent(playlist = playlist)
+
+        DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayed()
     }
 
     @Test
-    fun `test that RenameVideoPlaylistDialog is not displayed correctly when shouldRenameVideoPlaylistDialog is false`() {
-        setComposeContent(
-            playlist = playlist,
-            shouldRenameVideoPlaylistDialog = false
-        )
+    fun `test that DeleteVideoPlaylistDialog is displayed`() {
+        setComposeContent(playlist = playlist)
 
-        composeTestRule.onNodeWithTag(DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG)
-            .assertIsNotDisplayed()
+        TEST_TAG_VIDEO_SECTION_MORE_ACTION.performClick()
+        VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+        DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayed()
     }
 
     @Test
-    fun `test that DeleteVideoPlaylistDialog is displayed correctly when shouldDeleteVideoPlaylistDialog is true`() {
-        setComposeContent(
-            playlist = playlist,
-            shouldDeleteVideoPlaylistDialog = true
-        )
+    fun `test that DeleteVideosDialog is not displayed by default`() {
+        setComposeContent(playlist = playlist)
 
-        composeTestRule.onNodeWithTag(DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG)
-            .assertIsDisplayed()
+        DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG.assertIsNotDisplayed()
     }
 
     @Test
-    fun `test that DeleteVideosDialog is not displayed correctly when shouldDeleteVideosDialog is false`() {
-        setComposeContent(
-            playlist = playlist,
-            shouldDeleteVideosDialog = false
-        )
+    fun `test that DeleteVideosDialog is displayed`() {
+        setComposeContent(playlist = playlist, selectedSize = 1)
 
-        composeTestRule.onNodeWithTag(DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG).assertIsNotDisplayed()
+        TEST_TAG_VIDEO_SECTION_REMOVE_ACTION.performClick()
+        DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG.assertIsDisplayed()
     }
 
     @Test
-    fun `test that DeleteVideosDialog is displayed correctly when shouldDeleteVideosDialog is true`() {
-        setComposeContent(
-            playlist = playlist,
-            shouldDeleteVideosDialog = true
-        )
+    fun `test that DeleteVideoPlaylistDialog is not displayed by default`() {
+        setComposeContent(playlist = playlist)
 
-        composeTestRule.onNodeWithTag(DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that DeleteVideoPlaylistDialog is not displayed correctly when shouldDeleteVideoPlaylistDialog is false`() {
-        setComposeContent(
-            playlist = playlist,
-            shouldDeleteVideoPlaylistDialog = false
-        )
-
-        composeTestRule.onNodeWithTag(DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG)
-            .assertIsNotDisplayed()
+        DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayed()
     }
 
     @Test
@@ -260,7 +239,7 @@ class VideoPlaylistDetailViewTest {
             onPlayAllClicked = onPlayAllClicked
         )
 
-        composeTestRule.onNodeWithTag(DETAIL_PLAY_ALL_BUTTON_TEST_TAG).performClick()
+        DETAIL_PLAY_ALL_BUTTON_TEST_TAG.performClick()
         verify(onPlayAllClicked).invoke()
     }
 }

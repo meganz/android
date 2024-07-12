@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -15,6 +16,8 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.FAB_BUTT
 import mega.privacy.android.app.presentation.videosection.view.playlist.PROGRESS_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistsView
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Rule
@@ -35,14 +38,10 @@ class VideoPlaylistsViewTest {
         lazyListState: LazyListState = LazyListState(),
         sortOrder: String = "",
         isInputTitleValid: Boolean = true,
-        shouldCreateVideoPlaylistDialog: Boolean = false,
-        shouldDeleteVideoPlaylistDialog: Boolean = false,
-        shouldRenameVideoPlaylistDialog: Boolean = false,
+        showDeleteVideoPlaylistDialog: Boolean = false,
         inputPlaceHolderText: String = "",
         modifier: Modifier = Modifier,
-        setShouldCreateVideoPlaylist: (Boolean) -> Unit = {},
-        setShouldDeleteVideoPlaylist: (Boolean) -> Unit = {},
-        setShouldRenameVideoPlaylist: (Boolean) -> Unit = {},
+        updateShowDeleteVideoPlaylist: (Boolean) -> Unit = {},
         setDialogInputPlaceholder: (String) -> Unit = {},
         setInputValidity: (Boolean) -> Unit = {},
         onClick: (item: VideoPlaylistUIEntity, index: Int) -> Unit = { _, _ -> },
@@ -65,14 +64,10 @@ class VideoPlaylistsViewTest {
                 lazyListState = lazyListState,
                 sortOrder = sortOrder,
                 isInputTitleValid = isInputTitleValid,
-                shouldCreateVideoPlaylistDialog = shouldCreateVideoPlaylistDialog,
-                shouldDeleteVideoPlaylistDialog = shouldDeleteVideoPlaylistDialog,
-                shouldRenameVideoPlaylistDialog = shouldRenameVideoPlaylistDialog,
+                showDeleteVideoPlaylistDialog = showDeleteVideoPlaylistDialog,
                 inputPlaceHolderText = inputPlaceHolderText,
                 modifier = modifier,
-                setShouldCreateVideoPlaylist = setShouldCreateVideoPlaylist,
-                setShouldDeleteVideoPlaylist = setShouldDeleteVideoPlaylist,
-                setShouldRenameVideoPlaylist = setShouldRenameVideoPlaylist,
+                updateShowDeleteVideoPlaylist = updateShowDeleteVideoPlaylist,
                 setDialogInputPlaceholder = setDialogInputPlaceholder,
                 onCreateDialogPositiveButtonClicked = onCreateDialogPositiveButtonClicked,
                 setInputValidity = setInputValidity,
@@ -90,87 +85,92 @@ class VideoPlaylistsViewTest {
     }
 
     @Test
-    fun `test that CreateVideoPlaylistDialog is displayed correctly when shouldCreateVideoPlaylistDialog is true`() {
-        setComposeContent(
-            shouldCreateVideoPlaylistDialog = true
-        )
+    fun `test that CreateVideoPlaylistDialog is displayed`() {
+        setComposeContent()
 
-        composeTestRule.onNodeWithTag(CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG).assertIsDisplayed()
+        FAB_BUTTON_TEST_TAG.performClick()
+        CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayed()
     }
+
+    private fun String.performClick() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).performClick()
+
+    private fun String.assertIsDisplayed() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsDisplayed()
 
     @Test
-    fun `test that CreateVideoPlaylistDialog is not displayed correctly when shouldCreateVideoPlaylistDialog is false`() {
-        setComposeContent(
-            shouldCreateVideoPlaylistDialog = false
-        )
+    fun `test that CreateVideoPlaylistDialog is not displayed by default`() {
+        setComposeContent()
 
-        composeTestRule.onNodeWithTag(CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG).assertIsNotDisplayed()
+        CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayed()
     }
+
+    private fun String.assertIsNotDisplayed() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsNotDisplayed()
 
     @Test
     fun `test that progressBar is displayed correctly`() {
-        setComposeContent(
-            progressBarShowing = true
-        )
+        setComposeContent(progressBarShowing = true)
 
-        composeTestRule.onNodeWithTag(PROGRESS_BAR_TEST_TAG).assertIsDisplayed()
+        PROGRESS_BAR_TEST_TAG.assertIsDisplayed()
     }
 
     @Test
     fun `test that empty view is displayed correctly`() {
-        setComposeContent(
-            items = emptyList()
-        )
+        setComposeContent(items = emptyList())
 
-        composeTestRule.onNodeWithTag(VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG).assertIsDisplayed()
+        VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG.assertIsDisplayed()
     }
 
     @Test
-    fun `test that CreateVideoPlaylistFabButton calls the correct function`() {
-        val setShowCreateVideoPlaylist = mock<(Boolean) -> Unit>()
+    fun `test that RenameVideoPlaylistDialog is displayed`() {
+        val entity = mock<VideoPlaylistUIEntity> {
+            on { title }.thenReturn("title")
+        }
+        setComposeContent(items = listOf(entity))
 
-        setComposeContent(
-            setShouldCreateVideoPlaylist = setShowCreateVideoPlaylist,
-        )
-
-        composeTestRule.onNodeWithTag(FAB_BUTTON_TEST_TAG).performClick()
-
-        verify(setShowCreateVideoPlaylist).invoke(true)
+        composeTestRule.onNodeWithContentDescription(label = "3 dots", useUnmergedTree = true)
+            .performClick()
+        VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+        RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayed()
     }
 
     @Test
-    fun `test that RenameVideoPlaylistDialog is displayed correctly when shouldRenameVideoPlaylistDialog is true`() {
-        setComposeContent(
-            shouldRenameVideoPlaylistDialog = true
-        )
+    fun `test that RenameVideoPlaylistDialog is not displayed by default`() {
+        setComposeContent()
 
-        composeTestRule.onNodeWithTag(RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that RenameVideoPlaylistDialog is not displayed correctly when shouldRenameVideoPlaylistDialog is false`() {
-        setComposeContent(
-            shouldRenameVideoPlaylistDialog = false
-        )
-
-        composeTestRule.onNodeWithTag(RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG).assertIsNotDisplayed()
+        RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayed()
     }
 
     @Test
     fun `test that DeleteVideoPlaylistDialog is displayed correctly when shouldDeleteVideoPlaylistDialog is true`() {
-        setComposeContent(
-            shouldDeleteVideoPlaylistDialog = true
-        )
+        setComposeContent(showDeleteVideoPlaylistDialog = true)
 
-        composeTestRule.onNodeWithTag(DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG).assertIsDisplayed()
+        DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayed()
     }
 
     @Test
     fun `test that DeleteVideoPlaylistDialog is not displayed correctly when shouldDeleteVideoPlaylistDialog is false`() {
+        setComposeContent(showDeleteVideoPlaylistDialog = false)
+
+        DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that setShouldDeleteVideoPlaylist function is invoked as expected`() {
+        val setShouldDeleteVideoPlaylist = mock<(Boolean) -> Unit>()
+        val entity = mock<VideoPlaylistUIEntity> {
+            on { title }.thenReturn("title")
+        }
         setComposeContent(
-            shouldDeleteVideoPlaylistDialog = false
+            items = listOf(entity),
+            updateShowDeleteVideoPlaylist = setShouldDeleteVideoPlaylist
         )
 
-        composeTestRule.onNodeWithTag(DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG).assertIsNotDisplayed()
+        composeTestRule.onNodeWithContentDescription(label = "3 dots", useUnmergedTree = true)
+            .performClick()
+        VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG.performClick()
+
+        verify(setShouldDeleteVideoPlaylist).invoke(true)
     }
 }

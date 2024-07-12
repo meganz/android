@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
@@ -13,8 +15,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.resources.R
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.resources.R
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -56,6 +58,7 @@ internal fun RenameVideoPlaylistBottomSheetTile(
     onActionClicked: () -> Unit,
 ) {
     MenuActionListTile(
+        modifier = Modifier.testTag(VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG),
         dividerType = null,
         text = stringResource(id = R.string.video_section_playlists_rename_playlist_dialog_title),
         icon = painterResource(id = iconPackR.drawable.ic_pen_02_medium_regular_outline),
@@ -68,6 +71,7 @@ internal fun DeleteVideoPlaylistBottomSheetTile(
     onActionClicked: () -> Unit,
 ) {
     MenuActionListTile(
+        modifier = Modifier.testTag(VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG),
         dividerType = null,
         text = stringResource(id = R.string.video_section_playlist_bottom_sheet_option_title_delete),
         icon = painterResource(id = iconPackR.drawable.ic_trash_medium_regular_outline),
@@ -101,3 +105,15 @@ private fun DeleteVideoPlaylistBottomSheetTilePreview() {
         DeleteVideoPlaylistBottomSheetTile(onActionClicked = {})
     }
 }
+
+/**
+ * Test tag for rename bottom Sheet tile
+ */
+const val VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG =
+    "video_playlist:bottom_sheet_tile_rename"
+
+/**
+ * Test tag for delete bottom Sheet tile
+ */
+const val VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG =
+    "video_playlist:bottom_sheet_tile_delete"

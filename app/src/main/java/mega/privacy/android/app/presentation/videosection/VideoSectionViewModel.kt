@@ -230,10 +230,10 @@ class VideoSectionViewModel @Inject constructor(
             items = getVideoUIEntityList(),
             showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
             isPaid = _state.value.accountDetail?.levelDetail?.accountType?.isPaid,
-        ).updateOriginalEntities()
-            .filterVideosBySearchQuery()
-            .filterVideosByDuration()
+        ).filterVideosByDuration()
             .filterVideosByLocation()
+            .updateOriginalEntities()
+            .filterVideosBySearchQuery()
 
         val sortOrder = getCloudSortOrder()
         _state.update {
@@ -645,7 +645,6 @@ class VideoSectionViewModel @Inject constructor(
             .takeIf { it.isNotEmpty() && checkVideoPlaylistTitleValidity(it) }
             ?.let { playlistTitle ->
                 createVideoPlaylistJob = viewModelScope.launch {
-                    setShouldCreateVideoPlaylist(false)
                     runCatching {
                         createVideoPlaylistUseCase(playlistTitle)
                     }.onSuccess { videoPlaylist ->
@@ -683,8 +682,6 @@ class VideoSectionViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         deletedVideoPlaylistTitles = deletedPlaylistTitles,
-                        shouldDeleteVideoPlaylist = false,
-                        shouldDeleteSingleVideoPlaylist = false,
                         areVideoPlaylistsRemovedSuccessfully = true
                     )
                 }
@@ -693,8 +690,6 @@ class VideoSectionViewModel @Inject constructor(
                 Timber.e(exception)
                 _state.update {
                     it.copy(
-                        shouldDeleteVideoPlaylist = false,
-                        shouldDeleteSingleVideoPlaylist = false,
                         areVideoPlaylistsRemovedSuccessfully = false
                     )
                 }
@@ -773,19 +768,9 @@ class VideoSectionViewModel @Inject constructor(
                         updateVideoPlaylistTitleUseCase(playlistID, title)
                     }.onSuccess { title ->
                         Timber.d("Updated video playlist title: $title")
-                        _state.update {
-                            it.copy(
-                                shouldRenameVideoPlaylist = false
-                            )
-                        }
                         refreshVideoPlaylistsWithUpdatedTitle(title)
                     }.onFailure { exception ->
                         Timber.e(exception)
-                        _state.update {
-                            it.copy(
-                                shouldRenameVideoPlaylist = false
-                            )
-                        }
                     }
                 }
             }
@@ -807,18 +792,10 @@ class VideoSectionViewModel @Inject constructor(
             }
         }
 
-    internal fun setShouldRenameVideoPlaylist(value: Boolean) = _state.update {
-        it.copy(shouldRenameVideoPlaylist = value)
-    }
-
     internal fun updateCurrentVideoPlaylist(playlist: VideoPlaylistUIEntity?) {
         _state.update {
             it.copy(currentVideoPlaylist = playlist)
         }
-    }
-
-    internal fun setShouldCreateVideoPlaylist(value: Boolean) = _state.update {
-        it.copy(shouldCreateVideoPlaylist = value)
     }
 
     internal fun setPlaceholderTitle(placeholderTitle: String) {
@@ -870,24 +847,8 @@ class VideoSectionViewModel @Inject constructor(
         it.copy(isVideoPlaylistCreatedSuccessfully = value)
     }
 
-    internal fun setShouldDeleteVideoPlaylist(value: Boolean) = _state.update {
-        it.copy(shouldDeleteVideoPlaylist = value)
-    }
-
-    internal fun setShouldDeleteVideosFromPlaylist(value: Boolean) = _state.update {
-        it.copy(shouldDeleteVideosFromPlaylist = value)
-    }
-
-    internal fun setShouldDeleteSingleVideoPlaylist(value: Boolean) = _state.update {
-        it.copy(shouldDeleteSingleVideoPlaylist = value)
-    }
-
     internal fun clearDeletedVideoPlaylistTitles() = _state.update {
         it.copy(deletedVideoPlaylistTitles = emptyList())
-    }
-
-    internal fun setShouldShowMoreVideoPlaylistOptions(value: Boolean) = _state.update {
-        it.copy(shouldShowMoreVideoPlaylistOptions = value)
     }
 
     internal fun setAreVideoPlaylistsRemovedSuccessfully(value: Boolean) = _state.update {

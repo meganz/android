@@ -33,8 +33,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -51,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -77,19 +81,12 @@ import nz.mega.sdk.MegaNode
 @Composable
 fun VideoPlaylistDetailView(
     playlist: VideoPlaylistUIEntity?,
+    selectedSize: Int,
     isInputTitleValid: Boolean,
-    shouldDeleteVideoPlaylistDialog: Boolean,
-    shouldRenameVideoPlaylistDialog: Boolean,
-    shouldDeleteVideosDialog: Boolean,
-    shouldShowVideoPlaylistBottomSheetDetails: Boolean,
     numberOfAddedVideos: Int,
     numberOfRemovedItems: Int,
     addedMessageShown: () -> Unit,
     removedMessageShown: () -> Unit,
-    setShouldDeleteVideoPlaylistDialog: (Boolean) -> Unit,
-    setShouldRenameVideoPlaylistDialog: (Boolean) -> Unit,
-    setShouldShowVideoPlaylistBottomSheetDetails: (Boolean) -> Unit,
-    setShouldDeleteVideosDialog: (Boolean) -> Unit,
     inputPlaceHolderText: String,
     setInputValidity: (Boolean) -> Unit,
     onRenameDialogPositiveButtonClicked: (playlistID: NodeId, newTitle: String) -> Unit,
@@ -97,12 +94,13 @@ fun VideoPlaylistDetailView(
     onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit,
     onAddElementsClicked: () -> Unit,
     onPlayAllClicked: () -> Unit,
-    onUpdatedTitle: (String?) -> Unit,
+    onClick: (item: VideoUIEntity, index: Int) -> Unit,
+    onMenuClick: (VideoUIEntity) -> Unit,
+    onLongClick: ((item: VideoUIEntity, index: Int) -> Unit),
+    onBackPressed: () -> Unit,
+    onMenuActionClick: (VideoSectionMenuAction?) -> Unit,
     modifier: Modifier = Modifier,
     errorMessage: Int? = null,
-    onClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
-    onMenuClick: (VideoUIEntity) -> Unit = { _ -> },
-    onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     val items = playlist?.videos ?: emptyList()
     val lazyListState = rememberLazyListState()
@@ -112,9 +110,10 @@ fun VideoPlaylistDetailView(
             lazyListState.firstVisibleItemIndex != 0
         }
     }
+    var playlistTitle by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(isInFirstItem) {
-        onUpdatedTitle(if (isInFirstItem) playlist?.title else null)
+        playlistTitle = if (isInFirstItem) playlist?.title ?: "" else ""
     }
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -123,22 +122,10 @@ fun VideoPlaylistDetailView(
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = false,
-        confirmValueChange = { value ->
-            if (value == ModalBottomSheetValue.Hidden) {
-                setShouldShowVideoPlaylistBottomSheetDetails(false)
-            }
-            true
-        }
+        skipHalfExpanded = false
     )
     val scrollNotInProgress by remember {
         derivedStateOf { !lazyListState.isScrollInProgress }
-    }
-
-    LaunchedEffect(shouldShowVideoPlaylistBottomSheetDetails) {
-        if (shouldShowVideoPlaylistBottomSheetDetails) {
-            modalSheetState.show()
-        }
     }
 
     val context = LocalContext.current
@@ -157,6 +144,16 @@ fun VideoPlaylistDetailView(
         }
     }
 
+    var showDeleteVideosDialog by rememberSaveable { mutableStateOf(false) }
+    var showDeleteVideoPlaylistDialog by rememberSaveable { mutableStateOf(false) }
+    var showRenameVideoPlaylistDialog by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(playlist?.title) {
+        if (showRenameVideoPlaylistDialog) {
+            showRenameVideoPlaylistDialog = false
+        }
+    }
+
     LaunchedEffect(numberOfRemovedItems) {
         if (numberOfRemovedItems > 0) {
             val message = context.resources.getQuantityString(
@@ -172,15 +169,45 @@ fun VideoPlaylistDetailView(
         }
     }
 
-    BackHandler(enabled = modalSheetState.isVisible) {
-        coroutineScope.launch {
-            modalSheetState.hide()
+    BackHandler(modalSheetState.isVisible) {
+        if (modalSheetState.isVisible) {
+            coroutineScope.launch {
+                modalSheetState.hide()
+            }
+        }
+    }
+
+    BackHandler(selectedSize > 0) {
+        if (selectedSize > 0) {
+            onBackPressed()
         }
     }
 
     Scaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
         scaffoldState = rememberScaffoldState(),
+        topBar = {
+            VideoPlaylistDetailTopBar(
+                title = playlistTitle,
+                isActionMode = selectedSize > 0,
+                selectedSize = selectedSize,
+                onMenuActionClick = { action ->
+                    when (action) {
+                        is VideoSectionMenuAction.VideoSectionMoreAction -> {
+                            coroutineScope.launch {
+                                modalSheetState.show()
+                            }
+                        }
+
+                        is VideoSectionMenuAction.VideoSectionRemoveAction ->
+                            showDeleteVideosDialog = true
+
+                        else -> onMenuActionClick(action)
+                    }
+                },
+                onBackPressed = onBackPressed
+            )
+        },
         snackbarHost = {
             SnackbarHost(
                 hostState = snackBarHostState,
@@ -200,7 +227,7 @@ fun VideoPlaylistDetailView(
         }
     ) { paddingValue ->
         playlist?.let {
-            if (shouldRenameVideoPlaylistDialog) {
+            if (showRenameVideoPlaylistDialog) {
                 CreateVideoPlaylistDialog(
                     modifier = Modifier.testTag(DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
                     title = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
@@ -209,7 +236,7 @@ fun VideoPlaylistDetailView(
                     errorMessage = errorMessage,
                     onDialogInputChange = setInputValidity,
                     onDismissRequest = {
-                        setShouldRenameVideoPlaylistDialog(false)
+                        showRenameVideoPlaylistDialog = false
                         setInputValidity(true)
                         coroutineScope.launch { modalSheetState.hide() }
                     },
@@ -222,33 +249,35 @@ fun VideoPlaylistDetailView(
                 }
             }
 
-            if (shouldDeleteVideoPlaylistDialog) {
+            if (showDeleteVideoPlaylistDialog) {
                 DeleteItemsDialog(
                     modifier = Modifier.testTag(DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
                     title = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_title),
                     text = null,
                     confirmButtonText = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_delete_button),
                     onDeleteButtonClicked = {
+                        showDeleteVideoPlaylistDialog = false
                         onDeleteDialogPositiveButtonClicked(listOf(playlist))
                     },
                     onDismiss = {
-                        setShouldDeleteVideoPlaylistDialog(false)
+                        showDeleteVideoPlaylistDialog = false
                         coroutineScope.launch { modalSheetState.hide() }
                     }
                 )
             }
 
-            if (shouldDeleteVideosDialog) {
+            if (showDeleteVideosDialog) {
                 DeleteItemsDialog(
                     modifier = Modifier.testTag(DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG),
                     title = stringResource(id = sharedR.string.video_section_playlist_detail_remove_videos_dialog_title),
                     text = null,
                     confirmButtonText = stringResource(id = sharedR.string.video_section_playlist_detail_remove_videos_dialog_remove_button),
                     onDeleteButtonClicked = {
+                        showDeleteVideosDialog = false
                         onDeleteVideosDialogPositiveButtonClicked(playlist)
                     },
                     onDismiss = {
-                        setShouldDeleteVideosDialog(false)
+                        showDeleteVideosDialog = false
                         coroutineScope.launch { modalSheetState.hide() }
                     }
                 )
@@ -322,10 +351,10 @@ fun VideoPlaylistDetailView(
             modalSheetState = modalSheetState,
             coroutineScope = coroutineScope,
             onRenameVideoPlaylistClicked = {
-                setShouldRenameVideoPlaylistDialog(true)
+                showRenameVideoPlaylistDialog = true
             },
             onDeleteVideoPlaylistClicked = {
-                setShouldDeleteVideoPlaylistDialog(true)
+                showDeleteVideoPlaylistDialog = true
             }
         )
     }
@@ -498,27 +527,52 @@ private fun VideoPlaylistDetailViewPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistDetailView(
             playlist = null,
+            selectedSize = 0,
             isInputTitleValid = true,
-            shouldDeleteVideoPlaylistDialog = false,
-            shouldRenameVideoPlaylistDialog = false,
-            setShouldDeleteVideoPlaylistDialog = {},
-            setShouldRenameVideoPlaylistDialog = {},
             inputPlaceHolderText = "",
             setInputValidity = {},
             onRenameDialogPositiveButtonClicked = { _, _ -> },
             onDeleteDialogPositiveButtonClicked = {},
             onAddElementsClicked = {},
-            shouldShowVideoPlaylistBottomSheetDetails = false,
-            setShouldShowVideoPlaylistBottomSheetDetails = {},
             addedMessageShown = {},
             numberOfAddedVideos = 0,
-            shouldDeleteVideosDialog = false,
-            setShouldDeleteVideosDialog = {},
             onDeleteVideosDialogPositiveButtonClicked = {},
             removedMessageShown = {},
             numberOfRemovedItems = 0,
             onPlayAllClicked = {},
-            onUpdatedTitle = {}
+            onBackPressed = {},
+            onClick = { _, _ -> },
+            onLongClick = { _, _ -> },
+            onMenuClick = {},
+            onMenuActionClick = {}
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun VideoPlaylistDetailViewUnderActionModePreview() {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        VideoPlaylistDetailView(
+            playlist = null,
+            selectedSize = 2,
+            isInputTitleValid = true,
+            inputPlaceHolderText = "",
+            setInputValidity = {},
+            onRenameDialogPositiveButtonClicked = { _, _ -> },
+            onDeleteDialogPositiveButtonClicked = {},
+            onAddElementsClicked = {},
+            addedMessageShown = {},
+            numberOfAddedVideos = 0,
+            onDeleteVideosDialogPositiveButtonClicked = {},
+            removedMessageShown = {},
+            numberOfRemovedItems = 0,
+            onPlayAllClicked = {},
+            onBackPressed = {},
+            onClick = { _, _ -> },
+            onLongClick = { _, _ -> },
+            onMenuClick = {},
+            onMenuActionClick = {}
         )
     }
 }

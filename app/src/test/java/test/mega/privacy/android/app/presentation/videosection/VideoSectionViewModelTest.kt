@@ -673,32 +673,6 @@ class VideoSectionViewModelTest {
     }
 
     @Test
-    fun `test that the showCreateVideoPlaylist is correctly updated`() = runTest {
-        initUnderTest()
-
-        underTest.state.test {
-            assertThat(awaitItem().shouldCreateVideoPlaylist).isFalse()
-            underTest.setShouldCreateVideoPlaylist(true)
-            assertThat(awaitItem().shouldCreateVideoPlaylist).isTrue()
-            underTest.setShouldCreateVideoPlaylist(false)
-            assertThat(awaitItem().shouldCreateVideoPlaylist).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that the shouldDeleteVideosFromPlaylist is correctly updated`() = runTest {
-        initUnderTest()
-
-        underTest.state.test {
-            assertThat(awaitItem().shouldDeleteVideosFromPlaylist).isFalse()
-            underTest.setShouldDeleteVideosFromPlaylist(true)
-            assertThat(awaitItem().shouldDeleteVideosFromPlaylist).isTrue()
-            underTest.setShouldDeleteVideosFromPlaylist(false)
-            assertThat(awaitItem().shouldDeleteVideosFromPlaylist).isFalse()
-        }
-    }
-
-    @Test
     fun `test that the createVideoPlaylistPlaceholderTitle is correctly updated`() = runTest {
         val expectedTitle = "new playlist"
         whenever(
@@ -744,32 +718,6 @@ class VideoSectionViewModelTest {
     }
 
     @Test
-    fun `test that the setShouldDeleteVideoPlaylist is correctly updated`() = runTest {
-        initUnderTest()
-
-        underTest.state.test {
-            assertThat(awaitItem().shouldDeleteVideoPlaylist).isFalse()
-            underTest.setShouldDeleteVideoPlaylist(true)
-            assertThat(awaitItem().shouldDeleteVideoPlaylist).isTrue()
-            underTest.setShouldDeleteVideoPlaylist(false)
-            assertThat(awaitItem().shouldDeleteVideoPlaylist).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that the setShouldDeleteSingleVideoPlaylist is correctly updated`() = runTest {
-        initUnderTest()
-
-        underTest.state.test {
-            assertThat(awaitItem().shouldDeleteSingleVideoPlaylist).isFalse()
-            underTest.setShouldDeleteSingleVideoPlaylist(true)
-            assertThat(awaitItem().shouldDeleteSingleVideoPlaylist).isTrue()
-            underTest.setShouldDeleteSingleVideoPlaylist(false)
-            assertThat(awaitItem().shouldDeleteSingleVideoPlaylist).isFalse()
-        }
-    }
-
-    @Test
     fun `test that the setAreVideoPlaylistsRemovedSuccessfully is correctly updated`() =
         runTest {
             initUnderTest()
@@ -808,72 +756,9 @@ class VideoSectionViewModelTest {
             assertThat(actual.deletedVideoPlaylistTitles.size).isEqualTo(2)
             assertThat(actual.deletedVideoPlaylistTitles[0]).isEqualTo(videoPlaylistTitles[0])
             assertThat(actual.areVideoPlaylistsRemovedSuccessfully).isTrue()
-            assertThat(actual.shouldDeleteVideoPlaylist).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
-
-    @Test
-    fun `test that shouldRenameVideoPlaylist is correctly updated after updated video playlist title`() =
-        runTest {
-            val newTitle = "newTitle"
-            val playlistID = NodeId(1L)
-            val videoPlaylist = mock<VideoPlaylist> {
-                on { title }.thenReturn("playlist")
-                on { id }.thenReturn(NodeId(1L))
-            }
-            val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
-                on { title }.thenReturn("playlist")
-                on { id }.thenReturn(NodeId(0L))
-            }
-            val updatedVideoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
-                on { title }.thenReturn(newTitle)
-                on { id }.thenReturn(NodeId(0L))
-            }
-
-            whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(videoPlaylist, videoPlaylist))
-            whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
-            whenever(updateVideoPlaylistTitleUseCase(playlistID, newTitle)).thenReturn(newTitle)
-            whenever(videoPlaylistUIEntity.copy(title = newTitle)).thenReturn(
-                updatedVideoPlaylistUIEntity
-            )
-            underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
-
-            underTest.state.test {
-                assertThat(awaitItem().shouldRenameVideoPlaylist).isFalse()
-                underTest.setShouldRenameVideoPlaylist(true)
-                assertThat(awaitItem().shouldRenameVideoPlaylist).isTrue()
-                underTest.updateVideoPlaylistTitle(playlistID, newTitle)
-                assertThat(awaitItem().shouldRenameVideoPlaylist).isFalse()
-
-                val updated = awaitItem()
-                assertThat(updated.videoPlaylists).isNotEmpty()
-                assertThat(updated.isPlaylistProgressBarShown).isFalse()
-                assertThat(updated.currentVideoPlaylist?.title).isEqualTo(newTitle)
-                assertThat(updated.currentVideoPlaylist?.id).isEqualTo(videoPlaylistUIEntity.id)
-            }
-        }
-
-    @Test
-    fun `test that shouldRenameVideoPlaylist is correctly updated when throw exception`() =
-        runTest {
-            val newTitle = "newTitle"
-            val playlistID = NodeId(1L)
-            whenever(
-                updateVideoPlaylistTitleUseCase(
-                    playlistID,
-                    newTitle
-                )
-            ).thenAnswer { throw Exception() }
-
-            underTest.state.test {
-                assertThat(awaitItem().shouldRenameVideoPlaylist).isFalse()
-                underTest.setShouldRenameVideoPlaylist(true)
-                assertThat(awaitItem().shouldRenameVideoPlaylist).isTrue()
-                underTest.updateVideoPlaylistTitle(playlistID, newTitle)
-                assertThat(awaitItem().shouldRenameVideoPlaylist).isFalse()
-            }
-        }
 
     @Test
     fun `test that the setCurrentDestinationRoute is correctly updated`() = runTest {
