@@ -44,8 +44,8 @@ fun HighlightedText(
 ) {
     val annotatedText: AnnotatedString = buildAnnotatedString {
         append(text)
-        val startIndex = text.indexOf(string = highlightText, startIndex = 0, ignoreCase = true)
-        if (startIndex >= 0) {
+        var startIndex = text.indexOf(string = highlightText, ignoreCase = true)
+        while (startIndex >= 0) {
             val endIndex = startIndex + highlightText.length
             addStyle(
                 style = SpanStyle(
@@ -53,10 +53,16 @@ fun HighlightedText(
                     fontWeight = if (highlightBold) FontWeight.Bold else FontWeight.Normal
                 ),
                 start = startIndex,
-                end = endIndex,
+                end = endIndex
+            )
+            startIndex = text.indexOf(
+                string = highlightText,
+                startIndex = startIndex + highlightText.length,
+                ignoreCase = true
             )
         }
     }
+
     Text(
         text = annotatedText,
         modifier = modifier,
@@ -72,7 +78,7 @@ fun HighlightedText(
 private fun HighlightedTextPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         HighlightedText(
-            text = "This is a title with highlight",
+            text = "This is a title with Title highlight",
             highlightText = "TITLE",
             textColor = TextColor.Primary,
         )
@@ -84,7 +90,7 @@ private fun HighlightedTextPreview() {
 private fun HighlightedTextBoldPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         HighlightedText(
-            text = "This is a title with highlight",
+            text = "This is a title with TITLE highlight",
             highlightText = "TITLE",
             textColor = TextColor.Primary,
             highlightColor = red_200,

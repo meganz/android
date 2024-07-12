@@ -13,6 +13,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -110,6 +111,12 @@ fun SearchComposeView(
         },
     )
 
+    val highlightText by remember(state.navigationLevel) {
+        derivedStateOf {
+            searchQuery.takeIf { state.navigationLevel.isEmpty() }.orEmpty()
+        }
+    }
+
     topBarPadding = if (state.navigationLevel.isNotEmpty()) 8.dp else 0.dp
 
     state.errorMessageId?.let {
@@ -171,7 +178,7 @@ fun SearchComposeView(
                         onItemClicked = onItemClick,
                         onLongClick = onLongClick,
                         sortOrder = sortOrder,
-                        searchQuery = if (state.searchDescriptionEnabled == true) searchQuery else "",
+                        highlightText = if (state.searchDescriptionEnabled == true) highlightText else "",
                         isListView = state.currentViewType == ViewType.LIST,
                         onSortOrderClick = onSortOrderClick,
                         onChangeViewTypeClick = onChangeViewTypeClick,
