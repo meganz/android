@@ -73,11 +73,14 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                 sortOrderIntMapper(order),
                 megaCancelToken,
             ).map { megaNode ->
+                val isOutShared =
+                    megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
                 typedVideoNodeMapper(
                     fileNode = megaNode.convertToFileNode(
                         offlineItems?.get(megaNode.handle.toString())
                     ),
                     duration = megaNode.duration,
+                    isOutShared = isOutShared
                 )
             }
         }

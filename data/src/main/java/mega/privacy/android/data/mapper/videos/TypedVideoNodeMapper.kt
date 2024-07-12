@@ -10,9 +10,11 @@ internal class TypedVideoNodeMapper @Inject constructor() {
         fileNode: FileNode,
         duration: Int,
         elementID: Long? = null,
+        isOutShared: Boolean = false,
     ) = TypedVideoNode(
         fileNode = fileNode,
         duration = duration.seconds,
-        elementID = elementID
+        elementID = elementID,
+        isOutShared = isOutShared
     )
 }

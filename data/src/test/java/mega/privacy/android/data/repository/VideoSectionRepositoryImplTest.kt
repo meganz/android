@@ -219,15 +219,11 @@ class VideoSectionRepositoryImplTest {
     ) {
         val megaNode = mock<MegaNode> {
             on { duration }.thenReturn(100)
-        }
-        val typedVideoNode = mock<TypedVideoNode> {
-            on { thumbnailPath }.thenReturn(null)
-            on { duration.inWholeSeconds }.thenReturn(100L)
+            on { isOutShare }.thenReturn(false)
         }
         whenever(megaApiGateway.getSets()).thenReturn(megaSetList)
         whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
         whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(megaNode)
-        whenever(typedVideoNodeMapper(any(), any(), any())).thenReturn(typedVideoNode)
     }
 
     @Test
@@ -238,6 +234,7 @@ class VideoSectionRepositoryImplTest {
             val typedVideoNode = mock<TypedVideoNode> {
                 on { thumbnailPath }.thenReturn(null)
                 on { duration.inWholeSeconds }.thenReturn(100L)
+                on { isOutShared }.thenReturn(false)
             }
 
             val testVideos: List<TypedVideoNode> =
@@ -249,7 +246,9 @@ class VideoSectionRepositoryImplTest {
                 on { videos }.thenReturn(listOf(mock(), mock(), mock()))
             }
 
-            whenever(typedVideoNodeMapper(anyOrNull(), any(), any())).thenReturn(typedVideoNode)
+            whenever(typedVideoNodeMapper(anyOrNull(), any(), any(), anyOrNull())).thenReturn(
+                typedVideoNode
+            )
             whenever(megaApiGateway.isInRubbish(any())).thenReturn(false)
             whenever(videoPlaylistMapper(userSet, testVideos)).thenReturn(testVideoPlaylist)
 

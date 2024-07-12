@@ -42,27 +42,52 @@ class VideoUIEntityMapperTest {
     }
 
     @Test
-    fun `test that VideoUIEntity can be mapped correctly`() = runTest {
-        val testNode = initTypedVideoNode(expectedExportedData)
-        val videoUIEntity = underTest(testNode)
-        assertMappedVideoUIEntity(
-            videoUIEntity = videoUIEntity,
-            expectedIsShared = true
-        )
-    }
+    fun `test that VideoUIEntity can be mapped correctly when exportedData is not null and isOutShare is false`() =
+        runTest {
+            val testNode = initTypedVideoNode(expectedExportedData, false)
+            val videoUIEntity = underTest(testNode)
+            assertMappedVideoUIEntity(
+                videoUIEntity = videoUIEntity,
+                expectedIsShared = true
+            )
+        }
 
     @Test
-    fun `test that VideoUIEntity can be mapped correctly when exportedData is null`() = runTest {
-        val testNode = initTypedVideoNode(null)
-        val videoUIEntity = underTest(testNode)
-        assertMappedVideoUIEntity(
-            videoUIEntity = videoUIEntity,
-            expectedIsShared = false
-        )
-    }
+    fun `test that VideoUIEntity can be mapped correctly when exportedData is not null and isOutShare is true`() =
+        runTest {
+            val testNode = initTypedVideoNode(expectedExportedData, true)
+            val videoUIEntity = underTest(testNode)
+            assertMappedVideoUIEntity(
+                videoUIEntity = videoUIEntity,
+                expectedIsShared = true
+            )
+        }
+
+    @Test
+    fun `test that VideoUIEntity can be mapped correctly when exportedData is null and isOutShared is true`() =
+        runTest {
+            val testNode = initTypedVideoNode(null, true)
+            val videoUIEntity = underTest(testNode)
+            assertMappedVideoUIEntity(
+                videoUIEntity = videoUIEntity,
+                expectedIsShared = true
+            )
+        }
+
+    @Test
+    fun `test that VideoUIEntity can be mapped correctly when exportedData is null and isOutShared is false`() =
+        runTest {
+            val testNode = initTypedVideoNode(null, false)
+            val videoUIEntity = underTest(testNode)
+            assertMappedVideoUIEntity(
+                videoUIEntity = videoUIEntity,
+                expectedIsShared = false
+            )
+        }
 
     private fun initTypedVideoNode(
         exportData: ExportedData?,
+        expectedIsOutShared: Boolean,
     ) = mock<TypedVideoNode> {
         on { id }.thenReturn(expectedId)
         on { parentId }.thenReturn(expectedParentId)
@@ -76,6 +101,7 @@ class VideoUIEntityMapperTest {
         on { elementID }.thenReturn(expectedElementID)
         on { label }.thenReturn(expectedLabel)
         on { type }.thenReturn(expectedType)
+        on { isOutShared }.thenReturn(expectedIsOutShared)
     }
 
     private fun assertMappedVideoUIEntity(
