@@ -12,6 +12,7 @@ import org.mockito.Mockito.reset
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -58,6 +59,20 @@ internal class SyncOfflineFilesUseCaseTest {
 
         verify(nodeRepository).removeOfflineNodeByIds(listOf(123))
     }
+
+    @Test
+    fun `test that getOfflineFilesUseCase is not invoked when offline nodes doesn't exist`() =
+        runTest {
+            val offlineFolder = mock<File> {
+                on { exists() } doReturn true
+            }
+            whenever(fileSystemRepository.getOfflineFolder()) doReturn offlineFolder
+            whenever(nodeRepository.getAllOfflineNodes()).thenReturn(emptyList())
+
+            underTest()
+
+            verifyNoInteractions(getOfflineFilesUseCase)
+        }
 
     @Test
     fun `test that node information is removed if folder is empty`() = runTest {

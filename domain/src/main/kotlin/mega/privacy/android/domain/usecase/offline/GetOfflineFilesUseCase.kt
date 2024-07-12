@@ -23,6 +23,8 @@ class GetOfflineFilesUseCase @Inject constructor(
      */
     suspend operator fun invoke(nodes: List<OfflineNodeInformation>) =
         coroutineScope {
+            if (nodes.isEmpty()) return@coroutineScope emptyMap()
+
             val semaphore = Semaphore(8)
             val results = nodes.associateBy { it.id }.map {
                 async {
