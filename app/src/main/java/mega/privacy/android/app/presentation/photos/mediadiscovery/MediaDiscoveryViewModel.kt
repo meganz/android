@@ -25,7 +25,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.toLegacyCopy
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
@@ -619,9 +619,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         }.onSuccess { result ->
             _state.update { state ->
                 state.copy(
-                    collisions = result.collisionResult.conflictNodes.values.map { item ->
-                        NameCollision.Copy.fromNodeNameCollision(item)
-                    },
+                    collisions = result.collisionResult.conflictNodes.values.map { it.toLegacyCopy() },
                     copyResultText = result.moveRequestResult?.let {
                         copyRequestMessageMapper(it.toCopyRequestResult())
                     }

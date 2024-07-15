@@ -10,37 +10,30 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
-import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.namecollision.data.toLegacyCopy
+import mega.privacy.android.app.namecollision.data.toLegacyImport
+import mega.privacy.android.app.namecollision.data.toLegacyMove
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
-import mega.privacy.android.domain.usecase.node.CopyChatNodeUseCase
-import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
-import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
-import nz.mega.sdk.MegaNode
+import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import timber.log.Timber
 import java.net.URL
 import javax.inject.Inject
 
 /**
- * view model for [PdfViewerActivity]
- *
- * @property moveNodeUseCase        [MoveNodeUseCase]
+ * View model for [PdfViewerActivity]
  */
 @HiltViewModel
 class PdfViewerViewModel @Inject constructor(
-    private val copyNodeUseCase: CopyNodeUseCase,
-    private val moveNodeUseCase: MoveNodeUseCase,
-    private val checkNameCollision: CheckNameCollision,
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
+    private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
+    private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase,
     private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
-    private val copyChatNodeUseCase: CopyChatNodeUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
 ) : ViewModel() {
@@ -61,59 +54,36 @@ class PdfViewerViewModel @Inject constructor(
     /**
      * Imports a chat node if there is no name collision.
      *
-     * @param node              Node handle to copy.
      * @param chatId            Chat ID where the node is.
      * @param messageId         Message ID where the node is.
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
     fun importChatNode(
-        node: MegaNode,
         chatId: Long,
         messageId: Long,
         newParentHandle: NodeId,
     ) = viewModelScope.launch {
         runCatching {
-            checkNameCollisionUseCase.check(
-                node = node,
-                parentHandle = newParentHandle.longValue,
-                type = NameCollisionType.COPY,
+            checkChatNodesNameCollisionAndCopyUseCase(
+                chatId = chatId,
+                messageIds = listOf(messageId),
+                newNodeParent = newParentHandle,
             )
-        }.onSuccess { collisionResult ->
-            _state.update { it.copy(nameCollision = collisionResult) }
-        }.onFailure { throwable ->
-            when (throwable) {
-                is MegaNodeException.ChildDoesNotExistsException -> {
-                    copyChatNode(chatId, messageId, newParentHandle)
+        }.onSuccess { result ->
+            result.firstChatNodeCollisionOrNull?.toLegacyImport()?.let { item ->
+                _state.update {
+                    it.copy(nameCollision = item)
                 }
-
-                else -> Timber.e(throwable)
             }
-        }
-    }
-
-    /**
-     * Copies a chat node
-     * @param chatId Chat ID where the node is.
-     * @param messageId Message ID where the node is.
-     * @param newParentNodeId Parent handle in which the node will be copied.
-     */
-    private fun copyChatNode(chatId: Long, messageId: Long, newParentNodeId: NodeId) {
-        viewModelScope.launch {
-            runCatching {
-                copyChatNodeUseCase(
-                    chatId = chatId,
-                    messageId = messageId,
-                    newNodeParent = newParentNodeId,
-                )
-            }.onSuccess {
+            result.moveRequestResult?.let {
                 _state.update {
                     it.copy(snackBarMessage = R.string.context_correctly_copied)
                 }
-            }.onFailure { throwable ->
-                Timber.e(throwable, "The chat node is not copied")
-                _state.update {
-                    it.copy(nodeCopyError = throwable)
-                }
+            }
+        }.onFailure { throwable ->
+            Timber.e(throwable, "The chat node is not copied")
+            _state.update {
+                it.copy(nodeCopyError = throwable)
             }
         }
     }
@@ -126,27 +96,25 @@ class PdfViewerViewModel @Inject constructor(
      */
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
         viewModelScope.launch {
-            checkForNameCollision(
-                nodeHandle = nodeHandle,
-                newParentHandle = newParentHandle,
-                type = NameCollisionType.COPY
-            ) {
-                runCatching {
-                    copyNodeUseCase(
-                        nodeToCopy = NodeId(nodeHandle),
-                        newNodeParent = NodeId(newParentHandle),
-                        newNodeName = null,
-                    )
-                }.onSuccess {
+            runCatching {
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(nodeHandle to newParentHandle),
+                    type = NodeNameCollisionType.COPY,
+                )
+            }.onSuccess { result ->
+                result.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
+                    _state.update { it.copy(nameCollision = item) }
+                }
+                result.moveRequestResult?.let {
                     _state.update {
                         it.copy(snackBarMessage = R.string.context_correctly_copied)
                     }
-                }.onFailure { error ->
-                    _state.update {
-                        it.copy(nodeCopyError = error)
-                    }
-                    Timber.e("Error not copied $error")
                 }
+            }.onFailure { throwable ->
+                _state.update {
+                    it.copy(nodeCopyError = throwable)
+                }
+                Timber.e("Error while copying", throwable)
             }
         }
     }
@@ -159,65 +127,28 @@ class PdfViewerViewModel @Inject constructor(
      */
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
         viewModelScope.launch {
-            checkForNameCollision(
-                nodeHandle = nodeHandle,
-                newParentHandle = newParentHandle,
-                type = NameCollisionType.MOVE
-            ) {
-                viewModelScope.launch {
-                    runCatching {
-                        moveNodeUseCase(
-                            nodeToMove = NodeId(nodeHandle),
-                            newNodeParent = NodeId(newParentHandle),
+            runCatching {
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(nodeHandle to newParentHandle),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            }.onSuccess { result ->
+                result.firstNodeCollisionOrNull?.toLegacyMove()?.let { item ->
+                    _state.update { it.copy(nameCollision = item) }
+                }
+                result.moveRequestResult?.let {
+                    _state.update {
+                        it.copy(
+                            snackBarMessage = R.string.context_correctly_moved,
+                            shouldFinishActivity = true
                         )
-                    }.onSuccess {
-                        _state.update {
-                            it.copy(
-                                snackBarMessage = R.string.context_correctly_moved,
-                                shouldFinishActivity = true
-                            )
-                        }
-                    }.onFailure { error ->
-                        _state.update {
-                            it.copy(nodeMoveError = error)
-                        }
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * Checks if there is a name collision before proceeding with the action.
-     *
-     * @param nodeHandle        Handle of the node to check the name collision.
-     * @param newParentHandle   Handle of the parent folder in which the action will be performed.
-     * @param completeAction    Action to complete after checking the name collision.
-     */
-    private suspend fun checkForNameCollision(
-        nodeHandle: Long,
-        newParentHandle: Long,
-        type: NameCollisionType,
-        completeAction: suspend (() -> Unit),
-    ) {
-        runCatching {
-            checkNameCollision(
-                nodeHandle = NodeId(nodeHandle),
-                parentHandle = NodeId(newParentHandle),
-                type = type,
-            )
-        }.onSuccess { collision ->
-            _state.update { it.copy(nameCollision = collision) }
-        }.onFailure {
-            when (it) {
-                is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
-                is MegaNodeException.ParentDoesNotExistException -> _state.update { state ->
-                    state.copy(
-                        snackBarMessage = R.string.general_error
-                    )
+            }.onFailure { throwable ->
+                Timber.e("Error while moving", throwable)
+                _state.update {
+                    it.copy(nodeMoveError = throwable)
                 }
-
-                else -> Timber.e(it)
             }
         }
     }

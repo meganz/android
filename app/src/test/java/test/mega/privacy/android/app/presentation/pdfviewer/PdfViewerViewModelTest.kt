@@ -1,58 +1,48 @@
 package test.mega.privacy.android.app.presentation.pdfviewer
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
-import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
-import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerViewModel
-import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
-import mega.privacy.android.domain.usecase.node.CopyChatNodeUseCase
-import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
-import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
-import nz.mega.sdk.MegaNode
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
+import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 
-@ExperimentalCoroutinesApi
 @ExtendWith(InstantTaskExecutorExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled("Ignore the unstable test. Will add the tests back once stability issue is resolved.")
 internal class PdfViewerViewModelTest {
 
     private lateinit var underTest: PdfViewerViewModel
-    private lateinit var checkNameCollision: CheckNameCollision
-    private lateinit var copyNodeUseCase: CopyNodeUseCase
-    private lateinit var moveNodeUseCase: MoveNodeUseCase
-    private lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
-    private lateinit var copyChatNodeUseCase: CopyChatNodeUseCase
-    private lateinit var getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase
-    private lateinit var updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase
+    private val checkNodesNameCollisionWithActionUseCase =
+        mock<CheckNodesNameCollisionWithActionUseCase>()
+    private val checkChatNodesNameCollisionAndCopyUseCase =
+        mock<CheckChatNodesNameCollisionAndCopyUseCase>()
+    private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase = mock()
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase = mock()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -64,35 +54,25 @@ internal class PdfViewerViewModelTest {
         }.thenReturn(false)
     }
 
-    @BeforeAll
-    fun initialise() {
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
-    }
 
     @BeforeEach
     fun setUp() {
-        checkNameCollision = mock()
-        copyNodeUseCase = mock()
-        moveNodeUseCase = mock()
-        checkNameCollisionUseCase = mock()
-        copyChatNodeUseCase = mock()
-        updateNodeSensitiveUseCase = mock()
         underTest = PdfViewerViewModel(
-            moveNodeUseCase = moveNodeUseCase,
-            checkNameCollision = checkNameCollision,
-            copyNodeUseCase = copyNodeUseCase,
-            copyChatNodeUseCase = copyChatNodeUseCase,
-            checkNameCollisionUseCase = checkNameCollisionUseCase,
             getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            checkNodesNameCollisionWithActionUseCase = checkNodesNameCollisionWithActionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase
         )
     }
 
-    @AfterAll
-    fun tearDown() {
-        RxAndroidPlugins.reset()
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            checkNodesNameCollisionWithActionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase
+        )
     }
 
     @Test
@@ -101,23 +81,20 @@ internal class PdfViewerViewModelTest {
             val newParentNode = NodeId(158401030174851)
             val chatId = 1000L
             val messageId = 2000L
-            val nodeToImport = mock<MegaNode>()
             whenever(
-                checkNameCollisionUseCase.check(
-                    node = nodeToImport,
-                    parentHandle = newParentNode.longValue,
-                    type = NameCollisionType.COPY,
-                )
-            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
-            whenever(
-                copyChatNodeUseCase(
+                checkChatNodesNameCollisionAndCopyUseCase(
                     chatId = chatId,
-                    messageId = messageId,
-                    newNodeParent = newParentNode
+                    messageIds = listOf(messageId),
+                    newNodeParent = newParentNode,
                 )
-            ).thenReturn(NodeId(1234567890))
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 0
+                )
+            )
             underTest.importChatNode(
-                node = nodeToImport,
                 chatId = chatId,
                 messageId = messageId,
                 newParentHandle = newParentNode,
@@ -125,7 +102,7 @@ internal class PdfViewerViewModelTest {
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
-                Truth.assertThat(actual.snackBarMessage)
+                assertThat(actual.snackBarMessage)
                     .isEqualTo(R.string.context_correctly_copied)
             }
         }
@@ -133,31 +110,19 @@ internal class PdfViewerViewModelTest {
     @Test
     internal fun `test that onExceptionThrown is triggered when import failed`() =
         runTest {
-            val selectedNode = 73248538798194
             val newParentNode = NodeId(158401030174851)
             val chatId = 1000L
             val messageId = 2000L
-            val nodeToImport = mock<MegaNode> {
-                on { handle }.thenReturn(selectedNode)
-            }
-            val parentNode = mock<MegaNode>()
-            whenever(
-                checkNameCollisionUseCase.check(
-                    node = nodeToImport,
-                    parentHandle = newParentNode.longValue,
-                    type = NameCollisionType.COPY,
-                )
-            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
             val runtimeException = RuntimeException("Import node failed")
             whenever(
-                copyChatNodeUseCase(
+                checkChatNodesNameCollisionAndCopyUseCase(
                     chatId = chatId,
-                    messageId = messageId,
-                    newNodeParent = newParentNode
+                    messageIds = listOf(messageId),
+                    newNodeParent = newParentNode,
                 )
             ).thenThrow(runtimeException)
+
             underTest.importChatNode(
-                node = nodeToImport,
                 chatId = chatId,
                 messageId = messageId,
                 newParentHandle = newParentNode,
@@ -165,7 +130,7 @@ internal class PdfViewerViewModelTest {
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
-                Truth.assertThat(actual.nodeCopyError).isEqualTo(runtimeException)
+                assertThat(actual.nodeCopyError).isEqualTo(runtimeException)
             }
         }
 
@@ -175,18 +140,17 @@ internal class PdfViewerViewModelTest {
             val selectedNode = 73248538798194
             val newParentNode = 158401030174851
             whenever(
-                checkNameCollision(
-                    nodeHandle = NodeId(selectedNode),
-                    parentHandle = NodeId(newParentNode),
-                    type = NameCollisionType.MOVE,
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.MOVE,
                 )
-            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
-            whenever(
-                moveNodeUseCase(
-                    nodeToMove = NodeId(selectedNode),
-                    newNodeParent = NodeId(newParentNode)
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 0
                 )
-            ).thenReturn(NodeId(selectedNode))
+            )
             underTest.moveNode(
                 nodeHandle = selectedNode,
                 newParentHandle = newParentNode,
@@ -194,7 +158,7 @@ internal class PdfViewerViewModelTest {
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
-                Truth.assertThat(actual.snackBarMessage).isEqualTo(R.string.context_correctly_moved)
+                assertThat(actual.snackBarMessage).isEqualTo(R.string.context_correctly_moved)
             }
         }
 
@@ -203,19 +167,13 @@ internal class PdfViewerViewModelTest {
         runTest {
             val selectedNode = 73248538798194
             val newParentNode = 158401030174851
+            val runtimeException = RuntimeException("Move node failed")
             whenever(
-                checkNameCollision(
-                    nodeHandle = NodeId(selectedNode),
-                    parentHandle = NodeId(newParentNode),
-                    type = NameCollisionType.MOVE,
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.MOVE,
                 )
-            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
-            whenever(
-                moveNodeUseCase(
-                    nodeToMove = NodeId(selectedNode),
-                    newNodeParent = NodeId(newParentNode)
-                )
-            ).thenThrow(IllegalStateException())
+            ).thenThrow(runtimeException)
             underTest.moveNode(
                 nodeHandle = selectedNode,
                 newParentHandle = newParentNode,
@@ -223,8 +181,8 @@ internal class PdfViewerViewModelTest {
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
-                Truth.assertThat(actual.nodeMoveError)
-                    .isInstanceOf(IllegalStateException::class.java)
+                assertThat(actual.nodeMoveError)
+                    .isInstanceOf(RuntimeException::class.java)
             }
         }
 
@@ -234,18 +192,17 @@ internal class PdfViewerViewModelTest {
             val selectedNode = 73248538798194
             val newParentNode = 158401030174851
             whenever(
-                checkNameCollision(
-                    nodeHandle = NodeId(selectedNode),
-                    parentHandle = NodeId(newParentNode),
-                    type = NameCollisionType.COPY,
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.COPY,
                 )
-            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
-            whenever(
-                copyNodeUseCase(
-                    nodeToCopy = NodeId(selectedNode),
-                    newNodeParent = NodeId(newParentNode), newNodeName = null
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 0
                 )
-            ).thenReturn(NodeId(selectedNode))
+            )
             underTest.copyNode(
                 nodeHandle = selectedNode,
                 newParentHandle = newParentNode,
@@ -253,7 +210,7 @@ internal class PdfViewerViewModelTest {
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
-                Truth.assertThat(actual.snackBarMessage)
+                assertThat(actual.snackBarMessage)
                     .isEqualTo(R.string.context_correctly_copied)
             }
         }
@@ -263,19 +220,13 @@ internal class PdfViewerViewModelTest {
         runTest {
             val selectedNode = 73248538798194
             val newParentNode = 158401030174851
+            val runtimeException = RuntimeException("Copy node failed")
             whenever(
-                checkNameCollision(
-                    nodeHandle = NodeId(selectedNode),
-                    parentHandle = NodeId(newParentNode),
-                    type = NameCollisionType.COPY,
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.COPY,
                 )
-            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
-            whenever(
-                copyNodeUseCase(
-                    nodeToCopy = NodeId(selectedNode),
-                    newNodeParent = NodeId(newParentNode), newNodeName = null
-                )
-            ).thenThrow(IllegalStateException())
+            ).thenThrow(runtimeException)
             underTest.copyNode(
                 nodeHandle = selectedNode,
                 newParentHandle = newParentNode,
@@ -283,8 +234,8 @@ internal class PdfViewerViewModelTest {
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
-                Truth.assertThat(actual.nodeCopyError)
-                    .isInstanceOf(IllegalStateException::class.java)
+                assertThat(actual.nodeCopyError)
+                    .isInstanceOf(RuntimeException::class.java)
             }
         }
 

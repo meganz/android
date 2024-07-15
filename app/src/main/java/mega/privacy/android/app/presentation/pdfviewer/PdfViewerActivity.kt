@@ -1533,7 +1533,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             node?.let { megaNode ->
                 if (fromChat)
                     viewModel.importChatNode(
-                        node = megaNode,
                         chatId = chatId,
                         messageId = msgId,
                         newParentHandle = NodeId(toHandle)

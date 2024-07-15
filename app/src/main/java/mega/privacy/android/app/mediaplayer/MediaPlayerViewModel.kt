@@ -18,10 +18,12 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlayerMenuClickedEvent
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerState
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.toLegacyCopy
+import mega.privacy.android.app.namecollision.data.toLegacyImport
+import mega.privacy.android.app.namecollision.data.toLegacyMove
 import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -137,12 +139,10 @@ class MediaPlayerViewModel @Inject constructor(
                     type = NodeNameCollisionType.COPY,
                 )
             }.onSuccess {
-                if (it.collisionResult.conflictNodes.isNotEmpty()) {
-                    collision.value = it.collisionResult.conflictNodes.values.first().let { item ->
-                        NameCollision.Copy.fromNodeNameCollision(item)
-                    }
+                it.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
+                    collision.value = item
                 }
-                if (it.moveRequestResult != null) {
+                it.moveRequestResult?.let {
                     snackbarMessage.value = R.string.context_correctly_copied
                 }
             }.onFailure {
@@ -175,13 +175,11 @@ class MediaPlayerViewModel @Inject constructor(
                 newNodeParent = newParentHandle,
             )
         }.onSuccess {
-            if (it.collisionResult.conflictNodes.isNotEmpty()) {
-                val nodeNameCollision = it.collisionResult.conflictNodes.values.first()
-                if (nodeNameCollision is NodeNameCollision.Chat) {
-                    collision.value = NameCollision.Import.fromNodeNameCollision(nodeNameCollision)
-                }
+            it.firstChatNodeCollisionOrNull?.toLegacyImport()?.let { item ->
+                collision.value = item
             }
-            if (it.moveRequestResult != null) {
+
+            it.moveRequestResult?.let {
                 snackbarMessage.value = R.string.context_correctly_copied
             }
         }.onFailure {
@@ -204,12 +202,10 @@ class MediaPlayerViewModel @Inject constructor(
                     type = NodeNameCollisionType.MOVE,
                 )
             }.onSuccess {
-                if (it.collisionResult.conflictNodes.isNotEmpty()) {
-                    collision.value = it.collisionResult.conflictNodes.values.first().let { item ->
-                        NameCollision.Movement.fromNodeNameCollision(item)
-                    }
+                it.firstNodeCollisionOrNull?.toLegacyMove()?.let { item ->
+                    collision.value = item
                 }
-                if (it.moveRequestResult != null) {
+                it.moveRequestResult?.let {
                     _itemToRemove.value = nodeHandle
                     snackbarMessage.value = R.string.context_correctly_moved
                 }

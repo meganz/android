@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.toLegacyImport
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.extensions.getState
@@ -80,7 +81,7 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
             }.onSuccess { result ->
                 result.collisionResult.conflictNodes.values
                     .filterIsInstance<NodeNameCollision.Chat>()
-                    .map { NameCollision.Import.fromNodeNameCollision(it) }
+                    .map { it.toLegacyImport() }
                     .takeIf { it.isNotEmpty() }
                     ?.let { _collisionsFlow.update { _ -> it } }
 

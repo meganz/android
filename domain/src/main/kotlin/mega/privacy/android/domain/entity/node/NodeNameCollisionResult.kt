@@ -21,4 +21,16 @@ data class NodeNameCollisionResult(
 data class NodeNameCollisionWithActionResult(
     val collisionResult: NodeNameCollisionResult,
     val moveRequestResult: MoveRequestResult? = null,
-)
+) {
+    /**
+     * Get the first collision from result, null if there is no collision
+     */
+    val firstNodeCollisionOrNull: NodeNameCollision?
+        get() = collisionResult.conflictNodes.values.firstOrNull()
+
+    /**
+     * Get the first chat node collision from result, null if there is no chat node collision
+     */
+    val firstChatNodeCollisionOrNull
+        get() = firstNodeCollisionOrNull as? NodeNameCollision.Chat
+}

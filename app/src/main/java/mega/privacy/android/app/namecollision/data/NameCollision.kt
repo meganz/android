@@ -365,3 +365,21 @@ sealed class NameCollision : Serializable {
         }
     }
 }
+
+/**
+ * Temporary mapper to create a [NameCollision.Import] from domain module's [NodeNameCollision]
+ * Should be removed when [GetNameCollisionResultUseCase] is refactored
+ */
+fun NodeNameCollision.Chat.toLegacyImport() = NameCollision.Import.fromNodeNameCollision(this)
+
+/**
+ * Temporary mapper to create a [NameCollision.Movement] from domain module's [NodeNameCollision]
+ * Should be removed when [GetNameCollisionResultUseCase] is refactored
+ */
+fun NodeNameCollision.toLegacyMove() = NameCollision.Movement.fromNodeNameCollision(this)
+
+/**
+ * Temporary mapper to create a [NameCollision.Copy] from domain module's [NodeNameCollision]
+ * Should be removed when [GetNameCollisionResultUseCase] is refactored
+ */
+fun NodeNameCollision.toLegacyCopy() = NameCollision.Copy.fromNodeNameCollision(this)

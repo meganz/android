@@ -26,7 +26,9 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.toLegacyCopy
+import mega.privacy.android.app.namecollision.data.toLegacyImport
+import mega.privacy.android.app.namecollision.data.toLegacyMove
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -39,7 +41,6 @@ import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
@@ -535,17 +536,14 @@ class ImagePreviewViewModel @Inject constructor(
                     nodes = mapOf(moveHandle to toHandle),
                     type = NodeNameCollisionType.MOVE,
                 )
-            }.onSuccess {
-                if (it.collisionResult.conflictNodes.isNotEmpty()) {
-                    _state.update { state ->
-                        state.copy(
-                            nameCollision = it.collisionResult.conflictNodes.values
-                                .first()
-                                .let { item -> NameCollision.Movement.fromNodeNameCollision(item) }
-                        )
+            }.onSuccess { result ->
+                result.firstNodeCollisionOrNull?.toLegacyMove()?.let { item ->
+                    _state.update {
+                        it.copy(nameCollision = item)
                     }
                 }
-                if (it.moveRequestResult != null) {
+
+                result.moveRequestResult?.let {
                     setResultMessage(context.getString(R.string.context_correctly_moved))
                 }
             }.onFailure {
@@ -569,17 +567,14 @@ class ImagePreviewViewModel @Inject constructor(
                     nodes = mapOf(copyHandle to toHandle),
                     type = NodeNameCollisionType.COPY,
                 )
-            }.onSuccess {
-                if (it.collisionResult.conflictNodes.isNotEmpty()) {
-                    _state.update { state ->
-                        state.copy(
-                            nameCollision = it.collisionResult.conflictNodes.values
-                                .first()
-                                .let { item -> NameCollision.Copy.fromNodeNameCollision(item) }
-                        )
+            }.onSuccess { result ->
+                result.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
+                    _state.update {
+                        it.copy(nameCollision = item)
                     }
                 }
-                if (it.moveRequestResult != null) {
+
+                result.moveRequestResult?.let {
                     setResultMessage(context.getString(R.string.context_correctly_copied))
                 }
             }.onFailure {
@@ -637,20 +632,13 @@ class ImagePreviewViewModel @Inject constructor(
                     messageIds = listOf(messageId),
                     newNodeParent = NodeId(newParentHandle),
                 )
-            }.onSuccess {
-                if (it.collisionResult.conflictNodes.isNotEmpty()) {
-                    val nodeNameCollision = it.collisionResult.conflictNodes.values.first()
-                    if (nodeNameCollision is NodeNameCollision.Chat) {
-                        _state.update {
-                            it.copy(
-                                nameCollision = NameCollision.Import.fromNodeNameCollision(
-                                    nodeNameCollision
-                                )
-                            )
-                        }
+            }.onSuccess { result ->
+                result.firstChatNodeCollisionOrNull?.toLegacyImport()?.let { item ->
+                    _state.update {
+                        it.copy(nameCollision = item)
                     }
                 }
-                if (it.moveRequestResult != null) {
+                result.moveRequestResult?.let {
                     setResultMessage(context.getString(R.string.context_correctly_copied))
                 }
             }.onFailure {
