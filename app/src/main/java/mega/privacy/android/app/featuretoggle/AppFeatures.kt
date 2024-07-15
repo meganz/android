@@ -252,8 +252,8 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * New import section
      */
-    ImportSection(
-        "Enable new import screen",
+    NewUploadDestinationActivity(
+        "Enable upload destination activity",
         false
     );
 
