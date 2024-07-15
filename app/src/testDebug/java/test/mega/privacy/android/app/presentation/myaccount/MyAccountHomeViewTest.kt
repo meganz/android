@@ -17,6 +17,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewActions
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.app.presentation.myaccount.view.AccountTypeSection
@@ -145,9 +146,25 @@ class MyAccountHomeViewTest {
     }
 
     @Test
+    fun `test that account type section render with correct attributes when account is Starter`() {
+        verifyAccountTypeSection(STARTER, sharedR.string.general_low_tier_plan_starter_label)
+    }
+
+    @Test
+    fun `test that account type section render with correct attributes when account is Basic`() {
+        verifyAccountTypeSection(BASIC, sharedR.string.general_low_tier_plan_basic_label)
+    }
+
+    @Test
+    fun `test that account type section render with correct attributes when account is Essential`() {
+        verifyAccountTypeSection(ESSENTIAL, sharedR.string.general_low_tier_plan_essential_label)
+    }
+
+    @Test
     fun `test that account type section render with correct attributes when account is Business`() {
         verifyAccountTypeSection(BUSINESS, R.string.business_label)
     }
+
 
     @Test
     fun `test that account type button should be invisible when account is BUSINESS account`() {
