@@ -1,10 +1,10 @@
 package mega.privacy.android.app.service.iar
 
 import android.content.Context
+import com.google.android.gms.tasks.Task
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
-import com.google.android.play.core.tasks.Task
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.middlelayer.iar.RatingHandler

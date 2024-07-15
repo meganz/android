@@ -241,9 +241,11 @@ dependencies {
     implementation(google.code.scanner)
     implementation(google.install.referrer)
 
-    // Play Core
-    implementation(google.play.core)
-    implementation(google.play.core.ktx)
+    //Play
+    implementation(google.play.review)
+    implementation(google.play.review.ktx)
+    implementation(google.play.update)
+    implementation(google.play.update.ktx)
 
     // protobuf-java for tombstone debug
     implementation(google.protobuff)
