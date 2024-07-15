@@ -551,7 +551,7 @@ internal class MyAccountViewModelTest {
         Arguments.of(AccountType.PRO_II, true),
         Arguments.of(AccountType.PRO_III, true),
         Arguments.of(AccountType.PRO_LITE, true),
-        Arguments.of(AccountType.PRO_FLEXI, true),
+        Arguments.of(AccountType.PRO_FLEXI, false),
         Arguments.of(AccountType.BUSINESS, false),
         Arguments.of(AccountType.STARTER, false),
         Arguments.of(AccountType.BASIC, false),

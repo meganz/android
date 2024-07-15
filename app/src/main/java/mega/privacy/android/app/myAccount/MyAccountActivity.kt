@@ -338,7 +338,7 @@ class MyAccountActivity : PasscodeActivity(),
                 menu.toggleAllMenuItemsVisibility(true)
 
                 if (viewModel.isNewCancelSubscriptionFeatureEnabled()) {
-                    if (!viewModel.isStandardProAccount() || (isProFlexiAccount && viewModel.getBusinessProFlexiStatus() == BusinessAccountStatus.Expired)) {
+                    if (!viewModel.isStandardProAccount()) {
                         menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
                     }
                 } else {

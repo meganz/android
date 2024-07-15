@@ -66,7 +66,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
@@ -1365,18 +1364,11 @@ class MyAccountViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Get account status for Business or Pro Flexi accounts
-     */
-    fun getBusinessProFlexiStatus(): BusinessAccountStatus? =
-        state.value.businessProFlexiStatus
-
     private fun isStandardProAccountCheck(accountType: AccountType): Boolean = when (accountType) {
         AccountType.PRO_I -> true
         AccountType.PRO_II -> true
         AccountType.PRO_III -> true
         AccountType.PRO_LITE -> true
-        AccountType.PRO_FLEXI -> true
         else -> false
     }
 
