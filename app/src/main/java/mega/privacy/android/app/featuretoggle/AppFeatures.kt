@@ -211,6 +211,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     * Camera uploads utilizes active transfers to monitor transfers
+     */
+    ActiveTransfersInCameraUploads(
+        "Camera Uploads uses Active transfers to monitor the transfer progress",
+        false,
+    ),
+
+    /**
      * Enables new confirm email fragment compose page
      */
     NewConfirmEmailFragment(

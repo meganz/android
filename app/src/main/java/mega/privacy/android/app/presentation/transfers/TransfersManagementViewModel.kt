@@ -9,7 +9,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -64,15 +63,11 @@ class TransfersManagementViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(ioDispatcher) {
-            val flow = if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                monitorTransfersSize()
-            } else {
-                monitorTransfersSize.invokeLegacy()
-                    .onStart {
-                        //in invokeLegacy we only receive updates with transfer updates, so we need to force a first update
-                        emit(TransfersStatusInfo())
-                    }
-            }
+            val flow = monitorTransfersSize(
+                uploadsWorkerFlag = getFeatureFlagValueUseCase(AppFeatures.UploadWorker),
+                activeTransfersInCameraUploadsFlag = getFeatureFlagValueUseCase(AppFeatures.ActiveTransfersInCameraUploads),
+            )
+
             val samplePeriodFinal = samplePeriod ?: DEFAULT_SAMPLE_PERIOD
             if (samplePeriodFinal > 0) {
                 flow.sample(samplePeriodFinal)
