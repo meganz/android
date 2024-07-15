@@ -35,21 +35,19 @@ class CorrectActiveTransfersUseCase @Inject constructor(
                     .contains(activeTransfer.tag)
             }
             .map {
-                transferRepository.removeInProgressTransfer(it.tag)
                 it.tag
             }
         if (notInProgressActiveTransfersTags.isNotEmpty()) {
             transferRepository.setActiveTransferAsFinishedByTag(notInProgressActiveTransfersTags)
+            transferRepository.removeInProgressTransfers(notInProgressActiveTransfersTags.toSet())
         }
 
         //add in-progress active transfers if they are not added, this can happen if we missed a start event from SDK
         val inProgressNotInActiveTransfers = inProgressTransfers.filterNot { transfer ->
             activeTransfers.map { it.tag }.contains(transfer.tag)
         }
-        inProgressNotInActiveTransfers.forEach {
-            transferRepository.updateInProgressTransfer(it)
-        }
 
         transferRepository.insertOrUpdateActiveTransfers(inProgressNotInActiveTransfers)
+        transferRepository.updateInProgressTransfers(inProgressNotInActiveTransfers)
     }
 }

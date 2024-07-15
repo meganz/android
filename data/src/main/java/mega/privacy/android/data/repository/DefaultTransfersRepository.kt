@@ -700,13 +700,31 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
     }
 
+    override suspend fun updateInProgressTransfers(transfers: List<Transfer>) {
+        val newInProgressTransfers =
+            transfers.map { inProgressTransferMapper(it) }.associateBy { it.tag }
+        inProgressTransfersFlow.update { inProgressTransfers ->
+            inProgressTransfers.toMutableMap().also {
+                it.putAll(newInProgressTransfers)
+            }
+        }
+    }
+
     override fun monitorInProgressTransfers() = inProgressTransfersFlow
 
     override suspend fun removeInProgressTransfer(tag: Int) {
+        if (!inProgressTransfersFlow.value.containsKey(tag)) return
         inProgressTransfersFlow.update { inProgressTransfers ->
             inProgressTransfers.toMutableMap().also {
                 it.remove(tag)
             }
+        }
+    }
+
+    override suspend fun removeInProgressTransfers(tags: Set<Int>) {
+        if (tags.isEmpty()) return
+        inProgressTransfersFlow.update { inProgressTransfers ->
+            inProgressTransfers.filterKeys { it !in tags }
         }
     }
 }

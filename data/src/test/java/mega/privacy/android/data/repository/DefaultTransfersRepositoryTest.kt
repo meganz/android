@@ -1432,6 +1432,29 @@ class DefaultTransfersRepositoryTest {
         }
 
     @Test
+    fun `test that in progress transfers flow is updated correctly when updateInProgressTransfers and removeInProgressTransfers are called`() =
+        runTest {
+            val tag = 5
+            val transfer = mock<Transfer> {
+                on { it.tag } doReturn tag
+            }
+            val inProgressTransfer = mock<InProgressTransfer> {
+                on { it.tag } doReturn tag
+            }
+            whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
+            setUp()
+            underTest.monitorInProgressTransfers().test {
+                assertThat(awaitItem()).isEmpty()
+                underTest.updateInProgressTransfers(listOf(transfer))
+
+                assertThat(awaitItem()).containsExactly(tag, inProgressTransfer)
+                underTest.removeInProgressTransfers(setOf(tag))
+
+                assertThat(awaitItem()).isEmpty()
+            }
+        }
+
+    @Test
     fun `test that cancelTransfers is invoked for each direction when cancelTransfers is invoked`() =
         runTest {
             val megaError = mock<MegaError> {

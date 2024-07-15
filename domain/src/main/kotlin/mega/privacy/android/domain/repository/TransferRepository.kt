@@ -526,6 +526,11 @@ interface TransferRepository {
     suspend fun updateInProgressTransfer(transfer: Transfer)
 
     /**
+     * Updates or adds a list of transfers to the in progress transfers list.
+     */
+    suspend fun updateInProgressTransfers(transfers: List<Transfer>)
+
+    /**
      * Monitor in progress transfers flow.
      */
     fun monitorInProgressTransfers(): Flow<Map<Int, InProgressTransfer>>
@@ -534,4 +539,9 @@ interface TransferRepository {
      * Remove in progress transfer by tag.
      */
     suspend fun removeInProgressTransfer(tag: Int)
+
+    /**
+     * Remove a list of in progress transfers by tag.
+     */
+    suspend fun removeInProgressTransfers(tags: Set<Int>)
 }

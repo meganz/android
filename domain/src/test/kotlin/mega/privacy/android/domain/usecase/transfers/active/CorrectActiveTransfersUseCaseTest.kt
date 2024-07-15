@@ -124,9 +124,8 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)
-            expected.forEach {
-                verify(transferRepository).removeInProgressTransfer(it.tag)
-            }
+
+            verify(transferRepository).removeInProgressTransfers(expected.map { it.tag }.toSet())
         }
 
     @Test
@@ -141,10 +140,8 @@ internal class CorrectActiveTransfersUseCaseTest {
             whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
             underTest(TransferType.GENERAL_UPLOAD)
 
-            notInDataBase.forEach {
-                verify(transferRepository).updateInProgressTransfer(
-                    argThat { tag == it.tag }
-                )
-            }
+            verify(transferRepository).updateInProgressTransfers(
+                argThat { this.map { it.tag } == notInDataBase.map { it.tag } }
+            )
         }
 }
