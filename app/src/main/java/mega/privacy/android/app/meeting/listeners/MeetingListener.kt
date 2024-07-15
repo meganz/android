@@ -1,7 +1,6 @@
 package mega.privacy.android.app.meeting.listeners
 
 import androidx.lifecycle.MutableLiveData
-import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 
@@ -62,13 +61,6 @@ class MeetingListener : MegaChatCallListenerInterface {
             Timber.w("Logging out")
             return
         }
-    }
-
-    private fun sendCallEvent(type: String, call: MegaChatCall) {
-        LiveEventBus.get(
-            type,
-            MegaChatCall::class.java
-        ).post(call)
     }
 
     /**

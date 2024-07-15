@@ -3222,23 +3222,7 @@ class InMeetingViewModel @Inject constructor(
      * Control when the hang up button is clicked
      */
     fun checkClickEndButton() {
-        if (isOneToOneCall()) {
-            hangCurrentCall()
-            return
-        }
-
-        if (amIAGuest()) {
-            _state.value.call?.apply {
-                LiveEventBus.get(
-                    EventConstants.EVENT_REMOVE_CALL_NOTIFICATION,
-                    Long::class.java
-                ).post(callId)
-                hangCurrentCall()
-            }
-            return
-        }
-
-        if (numParticipants() == 0) {
+        if (isOneToOneCall() || amIAGuest() || numParticipants() == 0) {
             hangCurrentCall()
             return
         }

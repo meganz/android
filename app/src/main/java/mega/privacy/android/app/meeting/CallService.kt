@@ -31,7 +31,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
-import mega.privacy.android.app.constants.EventConstants.EVENT_REMOVE_CALL_NOTIFICATION
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.AvatarUtil
@@ -104,12 +103,6 @@ class CallService : LifecycleService() {
      */
     private var isInMeeting = true
 
-    private val removeNotificationObserver = Observer { callId: Long ->
-        megaChatApi.getChatCallByCallId(callId)?.let { call ->
-            removeNotification(call.chatid)
-        }
-    }
-
     private val callAnsweredInAnotherClientObserver = Observer { chatId: Long ->
         if (currentChatId == chatId) {
             stopSelf()
@@ -139,7 +132,6 @@ class CallService : LifecycleService() {
                     val changes = call.changes.orEmpty()
                     if (changes.contains(ChatCallChanges.Status)) {
                         Timber.d("Call status is ${call.status}. Chat id id $currentChatId")
-
                         when (call.status) {
                             ChatCallStatus.UserNoPresent,
                             ChatCallStatus.InProgress,
@@ -158,9 +150,6 @@ class CallService : LifecycleService() {
         }
 
         startMonitorChatListItemUpdatesUpdates()
-
-        LiveEventBus.get(EVENT_REMOVE_CALL_NOTIFICATION, Long::class.java)
-            .observeForever(removeNotificationObserver)
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
             .observeForever(callAnsweredInAnotherClientObserver)
         LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean::class.java)
@@ -568,8 +557,6 @@ class CallService : LifecycleService() {
      * Service ends
      */
     override fun onDestroy() {
-        LiveEventBus.get(EVENT_REMOVE_CALL_NOTIFICATION, Long::class.java)
-            .removeObserver(removeNotificationObserver)
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
             .removeObserver(callAnsweredInAnotherClientObserver)
         LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean::class.java)
