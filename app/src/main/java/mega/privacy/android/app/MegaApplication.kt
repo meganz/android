@@ -19,10 +19,9 @@ import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.HiltAndroidApp
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
@@ -45,7 +44,7 @@ import mega.privacy.android.app.meeting.listeners.MeetingListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
-import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase
+import mega.privacy.android.app.usecase.call.MonitorCallSoundsUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.greeter.Greeter
@@ -79,7 +78,7 @@ import javax.inject.Provider
  * @property passcodeManagement
  * @property crashReporter
  * @property updateCrashAndPerformanceReportersUseCase
- * @property getCallSoundsUseCase
+ * @property monitorCallSoundsUseCase
  * @property themeModeState
  * @property transfersManagement
  * @property activityLifecycleHandler
@@ -131,7 +130,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase
 
     @Inject
-    lateinit var getCallSoundsUseCase: GetCallSoundsUseCase
+    lateinit var monitorCallSoundsUseCase: MonitorCallSoundsUseCase
 
 
     @ApplicationScope
@@ -355,12 +354,12 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
      * Check the changes of the meeting to play the right sound
      */
     private fun checkCallSounds() {
-        getCallSoundsUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { next: CallSoundType ->
-                soundsController.playSound(next)
-            }
+        applicationScope.launch {
+            monitorCallSoundsUseCase()
+                .collectLatest { next: CallSoundType ->
+                    soundsController.playSound(next)
+                }
+        }
     }
 
     /**

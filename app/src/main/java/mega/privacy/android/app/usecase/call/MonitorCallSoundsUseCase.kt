@@ -4,7 +4,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Pair
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
@@ -17,11 +16,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx3.rxFlowable
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.meeting.CallSoundType
@@ -40,7 +39,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallsReconnectingStatusUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
@@ -55,11 +53,10 @@ import javax.inject.Inject
  * @property megaChatApi   Mega Chat API needed to get call information.
  * @property getParticipantsChangesUseCase GetParticipantsChangesUseCase
  */
-class GetCallSoundsUseCase @Inject constructor(
+class MonitorCallSoundsUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
-    private val getChatCallUseCase: GetChatCallUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorCallsReconnectingStatusUseCase: MonitorCallsReconnectingStatusUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
@@ -98,7 +95,7 @@ class GetCallSoundsUseCase @Inject constructor(
      *
      * @return CallSoundType
      */
-    fun get(): Flowable<CallSoundType> =
+    operator fun invoke() =
         Flowable.create({ emitter ->
 
             rxFlowable<Boolean> { monitorCallsReconnectingStatusUseCase() }
@@ -298,7 +295,7 @@ class GetCallSoundsUseCase @Inject constructor(
                 disposable.clear()
             }
 
-        }, BackpressureStrategy.LATEST)
+        }, BackpressureStrategy.LATEST).asFlow()
 
     /**
      * Hang call
