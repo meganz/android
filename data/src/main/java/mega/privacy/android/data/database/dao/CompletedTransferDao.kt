@@ -21,6 +21,9 @@ internal interface CompletedTransferDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateCompletedTransfer(entity: CompletedTransferEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdateCompletedTransfers(entities: List<CompletedTransferEntity>)
+
     @Query("DELETE FROM completedtransfers")
     suspend fun deleteAllCompletedTransfers()
 

@@ -589,6 +589,22 @@ internal class MegaLocalRoomFacadeTest {
     }
 
     @Test
+    fun `test that addCompletedTransfers insert the mapped entities`() = runTest {
+        val completedTransfers = (0..10).map {
+            mock<CompletedTransfer>()
+        }
+        val roomEntitiesMap = completedTransfers.associateWith { mock<CompletedTransferEntity>() }
+        completedTransfers.forEach {
+            whenever(completedTransferEntityMapper(it)) doReturn roomEntitiesMap.getValue(it)
+        }
+        val expected = roomEntitiesMap.values.toList()
+
+        underTest.addCompletedTransfers(completedTransfers)
+
+        verify(completedTransferDao).insertOrUpdateCompletedTransfers(expected)
+    }
+
+    @Test
     fun `test that insertOrUpdateActiveTransfers insert the mapped entities`() = runTest {
         val activeTransfers = (0..10).map {
             mock<Transfer>()

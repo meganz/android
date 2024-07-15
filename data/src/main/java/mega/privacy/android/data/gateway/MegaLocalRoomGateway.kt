@@ -125,6 +125,13 @@ interface MegaLocalRoomGateway {
     suspend fun addCompletedTransfer(transfer: CompletedTransfer)
 
     /**
+     * Add a list of completed transfer
+     *
+     * @param transfers the completed transfers to add
+     */
+    suspend fun addCompletedTransfers(transfers: List<CompletedTransfer>)
+
+    /**
      * Get the completed transfers count
      */
     suspend fun getCompletedTransfersCount(): Int

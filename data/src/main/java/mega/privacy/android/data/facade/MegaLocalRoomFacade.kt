@@ -144,6 +144,12 @@ internal class MegaLocalRoomFacade @Inject constructor(
         completedTransferDao.insertOrUpdateCompletedTransfer(completedTransferEntityMapper(transfer))
     }
 
+    override suspend fun addCompletedTransfers(transfers: List<CompletedTransfer>) {
+        completedTransferDao.insertOrUpdateCompletedTransfers(
+            transfers.map { completedTransferEntityMapper(it) }
+        )
+    }
+
     override suspend fun getCompletedTransfersCount() =
         completedTransferDao.getCompletedTransfersCount()
 

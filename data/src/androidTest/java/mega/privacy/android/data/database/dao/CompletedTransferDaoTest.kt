@@ -128,6 +128,31 @@ class CompletedTransferDaoTest {
     }
 
     @Test
+    fun test_that_insertOrUpdateCompletedTransfers_insert_the_corresponding_items() = runTest {
+        val expected = (1..10).map {
+            CompletedTransferEntity(
+                fileName = "2023-03-24 00.13.20_$it.jpg",
+                type = "1",
+                state = "6",
+                size = "3.57 MB",
+                handle = "27169983390750",
+                path = "Cloud drive/Camera uploads",
+                isOffline = "false",
+                timestamp = "1684228012974",
+                error = "No error",
+                originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
+                parentHandle = "11622336899311",
+                appData = "appData"
+            )
+        }
+        completedTransferDao.insertOrUpdateCompletedTransfers(expected)
+
+        assertThat(
+            completedTransferDao.getAllCompletedTransfers().first().map { it.copy(id = null) }
+        ).isEqualTo(expected)
+    }
+
+    @Test
     fun test_that_deleteAll_delete_all_items() = runTest {
         (1..10).map {
             val entity = CompletedTransferEntity(

@@ -431,7 +431,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         transfers.sortedBy { it.priority }
     }
 
-    override fun monitorCompletedTransfer(): Flow<CompletedTransfer> =
+    override fun monitorCompletedTransfer(): Flow<Unit> =
         appEventGateway.monitorCompletedTransfer
 
     override fun getAllCompletedTransfers(size: Int?): Flow<List<CompletedTransfer>> =
@@ -447,7 +447,22 @@ internal class DefaultTransfersRepository @Inject constructor(
             val completedTransfer = completedTransferMapper(transfer, megaException, transferPath)
             megaLocalRoomGateway.addCompletedTransfer(completedTransfer)
             removeInProgressTransfer(transfer.tag)
-            appEventGateway.broadcastCompletedTransfer(completedTransfer)
+            appEventGateway.broadcastCompletedTransfer()
+        }
+    }
+
+    override suspend fun addCompletedTransfers(
+        finishEventsAndPaths: Map<TransferEvent.TransferFinishEvent, String>,
+    ) {
+        withContext(ioDispatcher) {
+            val completedTransfers = finishEventsAndPaths.map { (event, transferPath) ->
+                completedTransferMapper(event.transfer, event.error, transferPath)
+            }
+            megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
+            finishEventsAndPaths.keys.forEach {
+                removeInProgressTransfer(it.transfer.tag)
+            }
+            appEventGateway.broadcastCompletedTransfer()
         }
     }
 
@@ -457,11 +472,10 @@ internal class DefaultTransfersRepository @Inject constructor(
             val existingTransfers =
                 megaLocalRoomGateway.getAllCompletedTransfers().firstOrNull()
                     .orEmpty().map { it.copy(id = null) }
-            transfers.map { it.copy(id = null) }.forEach { transfer ->
-                if (!existingTransfers.any { existingTransfer -> existingTransfer == transfer }) {
-                    megaLocalRoomGateway.addCompletedTransfer(transfer)
-                }
-            }
+            transfers
+                .map { it.copy(id = null) }
+                .filter { !existingTransfers.any { existingTransfer -> existingTransfer == it } }
+                .let { megaLocalRoomGateway.addCompletedTransfers(it) }
         }
 
     override suspend fun deleteOldestCompletedTransfers() = withContext(ioDispatcher) {

@@ -66,7 +66,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -690,7 +689,24 @@ class DefaultTransfersRepositoryTest {
             whenever(completedTransferMapper(transfer, error, path)).thenReturn(expected)
             underTest.addCompletedTransfer(transfer, error, path)
             verify(megaLocalRoomGateway).addCompletedTransfer(expected)
-            verify(appEventGateway).broadcastCompletedTransfer(expected)
+            verify(appEventGateway).broadcastCompletedTransfer()
+        }
+
+    @Test
+    fun `test that addCompletedTransfers call local storage gateway addCompletedTransfers and app event gateway broadcastCompletedTransfer with the mapped transfers`() =
+        runTest {
+            val transfer = mock<Transfer>()
+            val error = mock<MegaException>()
+            val expected = listOf(mock<CompletedTransfer>())
+            val path = "path"
+            val event = mock<TransferEvent.TransferFinishEvent> {
+                on { it.transfer } doReturn transfer
+                on { it.error } doReturn error
+            }
+            whenever(completedTransferMapper(transfer, error, path)).thenReturn(expected.first())
+            underTest.addCompletedTransfers(mapOf(event to path))
+            verify(megaLocalRoomGateway).addCompletedTransfers(expected)
+            verify(appEventGateway).broadcastCompletedTransfer()
         }
 
     @Test
@@ -744,19 +760,25 @@ class DefaultTransfersRepositoryTest {
             whenever(megaLocalRoomGateway.getAllCompletedTransfers())
                 .thenReturn(flowOf(listOf(existingTransfer1)))
             underTest.addCompletedTransfersIfNotExist(listOf(transfer1, transfer2))
-            verify(megaLocalRoomGateway).addCompletedTransfer(transfer2.copy(id = null))
-            verify(megaLocalRoomGateway, times(0)).addCompletedTransfer(transfer1.copy(id = null))
+            verify(megaLocalRoomGateway).addCompletedTransfers(listOf(transfer2.copy(id = null)))
         }
 
     @Test
     fun `test that monitorCompletedTransfer returns the result of app event gateway monitorCompletedTransfer`() =
         runTest {
-            val expected = mock<CompletedTransfer>()
-            whenever(appEventGateway.monitorCompletedTransfer).thenReturn(flowOf(expected))
+            whenever(appEventGateway.monitorCompletedTransfer).thenReturn(flowOf(Unit))
             underTest.monitorCompletedTransfer().test {
-                assertThat(awaitItem()).isEqualTo(expected)
+                assertThat(awaitItem()).isEqualTo(Unit)
                 awaitComplete()
             }
+        }
+
+    @Test
+    fun `test that insertOrUpdateActiveTransfer gateway is called when insertOrUpdateActiveTransfer is called`() =
+        runTest {
+            val activeTransfer = mock<ActiveTransfer>()
+            underTest.insertOrUpdateActiveTransfer(activeTransfer)
+            verify(megaLocalRoomGateway).insertOrUpdateActiveTransfer(activeTransfer)
         }
 
     @Test

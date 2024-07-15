@@ -193,7 +193,7 @@ interface TransferRepository {
      *
      * @return a flow of completed transfer
      */
-    fun monitorCompletedTransfer(): Flow<CompletedTransfer>
+    fun monitorCompletedTransfer(): Flow<Unit>
 
     /**
      * Get the list of completed transfers
@@ -211,6 +211,15 @@ interface TransferRepository {
         transfer: Transfer,
         megaException: MegaException?,
         transferPath: String? = null,
+    )
+
+    /**
+     * Add a list of completed transfer to local storage
+     *
+     * @param finishEventsAndPaths
+     */
+    suspend fun addCompletedTransfers(
+        finishEventsAndPaths: Map<TransferEvent.TransferFinishEvent, String>,
     )
 
     /**

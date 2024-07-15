@@ -8,8 +8,6 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -44,25 +42,11 @@ class AppEventFacadeTest {
 
     @Test
     fun `test that broadcast completed transfer fires an event`() = runTest {
-        val expected = CompletedTransfer(
-            fileName = "",
-            type = MegaTransfer.TYPE_UPLOAD,
-            state = MegaTransfer.STATE_COMPLETED,
-            size = "",
-            handle = 0L,
-            isOffline = false,
-            path = "",
-            timestamp = 0L,
-            error = "",
-            originalPath = "",
-            parentHandle = 0L,
-            appData = null,
-        )
         underTest.monitorCompletedTransfer.test {
-            underTest.broadcastCompletedTransfer(expected)
+            underTest.broadcastCompletedTransfer()
 
             val actual = awaitItem()
-            assertThat(actual).isEqualTo(expected)
+            assertThat(actual).isEqualTo(Unit)
         }
     }
 
