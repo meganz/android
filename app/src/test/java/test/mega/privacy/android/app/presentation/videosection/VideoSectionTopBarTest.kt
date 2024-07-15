@@ -121,7 +121,7 @@ class VideoSectionTopBarTest {
     }
 
     @Test
-    fun `test that the unhide action is not displayed when isRemoveLinkMenuActionVisible is false`() {
+    fun `test that the remove link action is not displayed when isRemoveLinkMenuActionVisible is false`() {
         setComposeContent(
             isActionMode = true,
             selectedSize = 1,
@@ -138,7 +138,7 @@ class VideoSectionTopBarTest {
     }
 
     @Test
-    fun `test that the unhide action is not displayed when selectSize more than 1`() {
+    fun `test that the remove link action is not displayed when selectSize more than 1`() {
         setComposeContent(
             isActionMode = true,
             selectedSize = 2,
@@ -156,7 +156,21 @@ class VideoSectionTopBarTest {
     }
 
     @Test
-    fun `test that the remove link action is not displayed when isUnhideMenuActionVisible is false`() {
+    fun `test that the rename action is not displayed when selectSize more than 1`() {
+        setComposeContent(isActionMode = true, selectedSize = 2)
+        composeTestRule.onNodeWithTag(testTag = TAG_MENU_ACTIONS_SHOW_MORE, useUnmergedTree = true)
+            .apply {
+                assertIsDisplayed()
+                performClick()
+            }
+        composeTestRule.onNodeWithTag(
+            testTag = TEST_TAG_VIDEO_SECTION_RENAME_ACTION,
+            useUnmergedTree = true
+        ).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that the unhide action is not displayed when isUnhideMenuActionVisible is false`() {
         setComposeContent(
             isActionMode = true,
             selectedSize = 1,

@@ -40,7 +40,8 @@ internal fun VideoSectionTopBar(
                         getAllTabMenuItems(
                             isHideMenuActionVisible = isHideMenuActionVisible,
                             isUnhideMenuActionVisible = isUnhideMenuActionVisible,
-                            isRemoveLinkShown = selectedSize == 1 && isRemoveLinkMenuActionVisible
+                            isRemoveLinkVisible = selectedSize == 1 && isRemoveLinkMenuActionVisible,
+                            isRenameVisible = selectedSize == 1
                         )
                     } else {
                         getPlaylistTabMenuItems()
@@ -83,7 +84,8 @@ private fun getPlaylistTabMenuItems() =
 private fun getAllTabMenuItems(
     isHideMenuActionVisible: Boolean,
     isUnhideMenuActionVisible: Boolean,
-    isRemoveLinkShown: Boolean,
+    isRemoveLinkVisible: Boolean,
+    isRenameVisible: Boolean,
 ) =
     mutableListOf<VideoSectionMenuAction>().apply {
         add(VideoSectionMenuAction.VideoSectionDownloadAction)
@@ -98,10 +100,12 @@ private fun getAllTabMenuItems(
         if (isUnhideMenuActionVisible) {
             add(VideoSectionMenuAction.VideoSectionUnhideAction)
         }
-        if (isRemoveLinkShown) {
+        if (isRemoveLinkVisible) {
             add(VideoSectionMenuAction.VideoSectionRemoveLinkAction)
         }
-        add(VideoSectionMenuAction.VideoSectionRenameAction)
+        if (isRenameVisible) {
+            add(VideoSectionMenuAction.VideoSectionRenameAction)
+        }
         add(VideoSectionMenuAction.VideoSectionMoveAction)
         add(VideoSectionMenuAction.VideoSectionCopyAction)
         add(VideoSectionMenuAction.VideoSectionRubbishBinAction)
