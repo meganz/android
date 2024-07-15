@@ -199,7 +199,10 @@ class HomepageFragment : Fragment() {
         setupBottomSheetBehavior()
         setupFabs()
 
-        (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
+        (activity as? ManagerActivity)?.apply {
+            adjustTransferWidgetPositionInHomepage()
+            fetchPsa()
+        }
 
         if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {
             showChooseStartScreenDialog()

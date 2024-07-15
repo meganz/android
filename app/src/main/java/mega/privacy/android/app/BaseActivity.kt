@@ -583,6 +583,14 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         Util.setAppFontSize(this)
         isActivityInBackground = false
         retryConnectionsAndSignalPresence()
+        fetchPsa()
+    }
+
+    /**
+     * Fetch psa
+     *
+     */
+    fun fetchPsa() {
         lifecycleScope.launch {
             kotlin.runCatching { fetchPsaUseCase(System.currentTimeMillis()) }
                 .onFailure { Timber.e(it) }
