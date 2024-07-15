@@ -11,18 +11,19 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.domain.entity.TransfersStatusInfo
-import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
+import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
+import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.eq
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -46,8 +47,9 @@ class TransfersManagementViewModelTest {
         //this mocks are only used in viewmodel init, so no need to reset
         val monitorTransfersSize = mock<MonitorTransfersStatusUseCase>()
         val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-        whenever(monitorTransfersSize()) doReturn monitorTransfersSizeFlow
+        whenever(monitorTransfersSize(any(), any())) doReturn monitorTransfersSizeFlow
         whenever(getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) doReturn true
+        whenever(getFeatureFlagValueUseCase(AppFeatures.ActiveTransfersInCameraUploads)) doReturn true
         commonStub()
 
         underTest = TransfersManagementViewModel(
