@@ -142,8 +142,12 @@ class MediaPlayerViewModel @Inject constructor(
                 it.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
                     collision.value = item
                 }
-                it.moveRequestResult?.let {
-                    snackbarMessage.value = R.string.context_correctly_copied
+                it.moveRequestResult?.let { result ->
+                    snackbarMessage.value = if (result.isSuccess) {
+                        R.string.context_correctly_copied
+                    } else {
+                        R.string.context_no_copied
+                    }
                 }
             }.onFailure {
                 Timber.e("Error not copied", it)
@@ -178,9 +182,12 @@ class MediaPlayerViewModel @Inject constructor(
             it.firstChatNodeCollisionOrNull?.toLegacyImport()?.let { item ->
                 collision.value = item
             }
-
-            it.moveRequestResult?.let {
-                snackbarMessage.value = R.string.context_correctly_copied
+            it.moveRequestResult?.let { result ->
+                snackbarMessage.value = if (result.isSuccess) {
+                    R.string.context_correctly_copied
+                } else {
+                    R.string.context_no_copied
+                }
             }
         }.onFailure {
             throwable.value = it
@@ -206,8 +213,12 @@ class MediaPlayerViewModel @Inject constructor(
                     collision.value = item
                 }
                 it.moveRequestResult?.let {
-                    _itemToRemove.value = nodeHandle
-                    snackbarMessage.value = R.string.context_correctly_moved
+                    if (it.isSuccess) {
+                        _itemToRemove.value = nodeHandle
+                        snackbarMessage.value = R.string.context_correctly_moved
+                    } else {
+                        snackbarMessage.value = R.string.context_no_moved
+                    }
                 }
             }.onFailure {
                 Timber.e("Error not copied", it)

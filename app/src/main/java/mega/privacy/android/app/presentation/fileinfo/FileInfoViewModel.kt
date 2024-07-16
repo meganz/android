@@ -20,11 +20,11 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.data.toLegacyCopy
+import mega.privacy.android.app.namecollision.data.toLegacyMove
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
@@ -34,7 +34,6 @@ import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.StartDownloadForOffline
-import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
@@ -56,6 +55,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges.Remove
 import mega.privacy.android.domain.entity.node.NodeChanges.Tags
 import mega.privacy.android.domain.entity.node.NodeChanges.Timestamp
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -84,11 +84,10 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
-import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
-import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
@@ -116,9 +115,7 @@ class FileInfoViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
-    private val checkNameCollision: CheckNameCollision,
-    private val moveNodeUseCase: MoveNodeUseCase,
-    private val copyNodeUseCase: CopyNodeUseCase,
+    private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase,
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
@@ -331,12 +328,22 @@ class FileInfoViewModel @Inject constructor(
      */
     fun moveNodeCheckingCollisions(parentHandle: NodeId) =
         performBlockSettingProgress(FileInfoJobInProgressState.Moving) {
-            if (checkCollision(parentHandle, NameCollisionType.MOVE)) {
-                runCatching {
-                    moveNodeUseCase(typedNode.id, parentHandle)
+            runCatching {
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(typedNode.id.longValue to parentHandle.longValue),
+                    type = NodeNameCollisionType.MOVE
+                ).also {
+                    if (it.moveRequestResult?.isAllRequestError == true) {
+                        throw IllegalStateException("Move request failed")
+                    }
                 }
-            } else {
-                null
+            }.onSuccess {
+                it.firstNodeCollisionOrNull?.toLegacyMove()?.let { collision ->
+                    _uiState.updateEventAndClearProgress(
+                        FileInfoOneOffViewEvent.CollisionDetected(collision)
+                    )
+                    return@performBlockSettingProgress null
+                }
             }
         }
 
@@ -348,16 +355,22 @@ class FileInfoViewModel @Inject constructor(
      */
     fun copyNodeCheckingCollisions(parentHandle: NodeId) =
         performBlockSettingProgress(FileInfoJobInProgressState.Copying) {
-            if (checkCollision(parentHandle, NameCollisionType.COPY)) {
-                runCatching {
-                    copyNodeUseCase(
-                        nodeToCopy = typedNode.id,
-                        newNodeParent = parentHandle,
-                        newNodeName = null
-                    )
+            runCatching {
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(typedNode.id.longValue to parentHandle.longValue),
+                    type = NodeNameCollisionType.COPY
+                ).also {
+                    if (it.moveRequestResult?.isAllRequestError == true) {
+                        throw IllegalStateException("Copy request failed")
+                    }
                 }
-            } else {
-                null
+            }.onSuccess {
+                it.firstNodeCollisionOrNull?.toLegacyCopy()?.let { collision ->
+                    _uiState.updateEventAndClearProgress(
+                        FileInfoOneOffViewEvent.CollisionDetected(collision)
+                    )
+                    return@performBlockSettingProgress null
+                }
             }
         }
 
@@ -1027,35 +1040,6 @@ class FileInfoViewModel @Inject constructor(
             }
         }
     }
-
-    /**
-     * Checks if there is a name collision before moving or copying the node.
-     *
-     * @param parentHandle Parent handle of the node in which the node will be moved or copied.
-     * @param type         Type of name collision to check.
-     * @return true if there are no collision detected, so it can go ahead with the move or copy
-     */
-    private suspend fun checkCollision(parentHandle: NodeId, type: NameCollisionType) =
-        try {
-            val nameCollision = checkNameCollision(
-                typedNode.id,
-                parentHandle,
-                type
-            )
-            _uiState.updateEventAndClearProgress(
-                FileInfoOneOffViewEvent.CollisionDetected(
-                    nameCollision
-                )
-            )
-            false
-        } catch (throwable: Throwable) {
-            if (throwable is MegaNodeException.ChildDoesNotExistsException) {
-                true
-            } else {
-                _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.GeneralError)
-                false
-            }
-        }
 
     private fun MutableStateFlow<FileInfoViewState>.updateEventAndClearProgress(event: FileInfoOneOffViewEvent?) =
         this.update {

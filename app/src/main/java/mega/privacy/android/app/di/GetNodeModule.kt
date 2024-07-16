@@ -5,10 +5,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
 
 /**
@@ -41,22 +39,5 @@ abstract class GetNodeModule {
         @Provides
         fun provideGetNodeByHandle(megaNodeRepository: MegaNodeRepository): GetNodeByHandle =
             GetNodeByHandle(megaNodeRepository::getNodeByHandle)
-
-        /**
-         * Provides [CheckNameCollision] implementation
-         * @param checkNameCollisionUseCase [CheckNameCollisionUseCase] is the current implementation, not following the current architecture
-         * @return [CheckNameCollision]
-         */
-        @Provides
-        fun provideCheckNameCollision(
-            checkNameCollisionUseCase: CheckNameCollisionUseCase,
-        ): CheckNameCollision =
-            CheckNameCollision { nodeHandle, parentNodeHandle, type ->
-                checkNameCollisionUseCase.check(
-                    nodeHandle.longValue,
-                    parentNodeHandle.longValue,
-                    type,
-                )
-            }
     }
 }

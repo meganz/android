@@ -14,18 +14,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
-import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.fileinfo.FileInfoViewModel
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
 import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -39,8 +35,13 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.node.ExportedData
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollision
+import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -71,11 +72,10 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
-import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
-import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
@@ -116,10 +116,7 @@ internal class FileInfoViewModelTest {
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
-    private val checkNameCollision: CheckNameCollision = mock()
-    private val moveNodeUseCase: MoveNodeUseCase = mock()
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase = mock()
-    private val copyNodeUseCase: CopyNodeUseCase = mock()
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase = mock()
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase = mock()
     private val node: MegaNode = mock()
@@ -154,6 +151,8 @@ internal class FileInfoViewModelTest {
     private val monitorOfflineFileAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
+    private val checkNodesNameCollisionWithActionUseCase =
+        mock<CheckNodesNameCollisionWithActionUseCase>()
     private val fileTypeIconMapper = FileTypeIconMapper()
 
     private val typedFileNode: TypedFileNode = mock()
@@ -175,10 +174,8 @@ internal class FileInfoViewModelTest {
             isConnectedToInternetUseCase,
             isNodeInBackupsUseCase,
             isNodeInRubbishBinUseCase,
-            checkNameCollision,
-            moveNodeUseCase,
             moveNodeToRubbishBinUseCase,
-            copyNodeUseCase,
+            checkNodesNameCollisionWithActionUseCase,
             deleteNodeByHandleUseCase,
             deleteNodeVersionsUseCase,
             node,
@@ -225,9 +222,7 @@ internal class FileInfoViewModelTest {
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
-            checkNameCollision = checkNameCollision,
-            moveNodeUseCase = moveNodeUseCase,
-            copyNodeUseCase = copyNodeUseCase,
+            checkNodesNameCollisionWithActionUseCase = checkNodesNameCollisionWithActionUseCase,
             moveNodeToRubbishBinUseCase = moveNodeToRubbishBinUseCase,
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
@@ -400,16 +395,6 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.copyNodeCheckingCollisions(parentId)
             testEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
-        }
-
-    @Test
-    fun `test GeneralError event is launched when an unknown error is returned when check collision`() =
-        runTest {
-            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
-                .thenThrow(RuntimeException::class.java)
-            underTest.setNode(node.handle, true)
-            underTest.copyNodeCheckingCollisions(parentId)
-            testEventIsOfType(FileInfoOneOffViewEvent.GeneralError::class.java)
         }
 
     @Test
@@ -1064,51 +1049,147 @@ internal class FileInfoViewModelTest {
 
 
     private suspend fun mockCollisionCopying() {
-        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
-            .thenReturn(mock<NameCollision.Copy>())
+        whenever(
+            checkNodesNameCollisionWithActionUseCase(
+                mapOf(nodeId.longValue to parentId.longValue),
+                NodeNameCollisionType.COPY
+            )
+        ).thenReturn(
+            NodeNameCollisionWithActionResult(
+                collisionResult = NodeNameCollisionResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = mapOf(
+                        nodeId.longValue to NodeNameCollision.Default(
+                            collisionHandle = 123L,
+                            nodeHandle = 456L,
+                            name = "name",
+                            size = 789L,
+                            childFolderCount = 0,
+                            childFileCount = 0,
+                            lastModified = 123456L,
+                            parentHandle = 789L,
+                            isFile = true
+                        )
+                    ),
+                    type = NodeNameCollisionType.COPY
+                ),
+                moveRequestResult = null
+            )
+        )
     }
 
     private suspend fun mockCollisionMoving() {
-        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE))
-            .thenReturn(mock<NameCollision.Movement>())
+        whenever(
+            checkNodesNameCollisionWithActionUseCase(
+                mapOf(nodeId.longValue to parentId.longValue),
+                NodeNameCollisionType.MOVE
+            )
+        ).thenReturn(
+            NodeNameCollisionWithActionResult(
+                collisionResult = NodeNameCollisionResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = mapOf(
+                        nodeId.longValue to NodeNameCollision.Default(
+                            collisionHandle = 123L,
+                            nodeHandle = 456L,
+                            name = "name",
+                            size = 789L,
+                            childFolderCount = 0,
+                            childFileCount = 0,
+                            lastModified = 123456L,
+                            parentHandle = 789L,
+                            isFile = true
+                        )
+                    ),
+                    type = NodeNameCollisionType.MOVE
+                ),
+                moveRequestResult = null
+            )
+        )
     }
 
     private suspend fun mockCopySuccess() {
         whenever(
-            copyNodeUseCase.invoke(
-                nodeToCopy = nodeId,
-                newNodeParent = parentId,
-                newNodeName = null
+            checkNodesNameCollisionWithActionUseCase(
+                mapOf(nodeId.longValue to parentId.longValue),
+                NodeNameCollisionType.COPY
             )
-        ).thenReturn(nodeId)
-        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
-            .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
+        ).thenReturn(
+            NodeNameCollisionWithActionResult(
+                collisionResult = NodeNameCollisionResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.COPY
+                ),
+                moveRequestResult = MoveRequestResult.Copy(
+                    count = 1,
+                    errorCount = 0
+                )
+            )
+        )
     }
 
     private suspend fun mockMoveSuccess() {
-        whenever(moveNodeUseCase.invoke(nodeId, parentId)).thenReturn(nodeId)
-        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE))
-            .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
+        whenever(
+            checkNodesNameCollisionWithActionUseCase(
+                mapOf(nodeId.longValue to parentId.longValue),
+                NodeNameCollisionType.MOVE
+            )
+        ).thenReturn(
+            NodeNameCollisionWithActionResult(
+                collisionResult = NodeNameCollisionResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.MOVE
+                ),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 0
+                )
+            )
+        )
     }
 
     private suspend fun mockCopyFailure() {
         whenever(
-            copyNodeUseCase.invoke(
-                nodeToCopy = nodeId,
-                newNodeParent = parentId,
-                newNodeName = null
+            checkNodesNameCollisionWithActionUseCase(
+                mapOf(nodeId.longValue to parentId.longValue),
+                NodeNameCollisionType.COPY
+            )
+        ).thenReturn(
+            NodeNameCollisionWithActionResult(
+                collisionResult = NodeNameCollisionResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.COPY
+                ),
+                moveRequestResult = MoveRequestResult.Copy(
+                    count = 1,
+                    errorCount = 1
+                )
             )
         )
-            .thenThrow(RuntimeException("fake exception"))
-        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
-            .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
     }
 
     private suspend fun mockMoveFailure() {
-        whenever(moveNodeUseCase.invoke(nodeId, parentId))
-            .thenThrow(RuntimeException("fake exception"))
-        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE))
-            .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
+        whenever(
+            checkNodesNameCollisionWithActionUseCase(
+                mapOf(nodeId.longValue to parentId.longValue),
+                NodeNameCollisionType.MOVE
+            )
+        ).thenReturn(
+            NodeNameCollisionWithActionResult(
+                collisionResult = NodeNameCollisionResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.MOVE
+                ),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
+        )
     }
 
     private suspend fun mockMoveToRubbishSuccess() {
