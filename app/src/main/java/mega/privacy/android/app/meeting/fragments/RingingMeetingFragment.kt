@@ -19,7 +19,6 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.twemoji.EmojiTextView
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT
 import mega.privacy.android.app.databinding.MeetingRingingFragmentBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
@@ -175,13 +174,6 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             binding.avatar.setImageBitmap(bitmap)
         }
 
-        LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
-            .observe(this) {
-                if (chatId == it) {
-                    requireActivity().finish()
-                }
-            }
-
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) { allowed ->
             if (allowed) {
                 permissionsRequester = permissionsBuilder(
@@ -226,6 +218,13 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             .distinctUntilChanged()) {
             if (it.isNotBlank()) {
                 toolbarTitle.text = it
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.callAnsweredInAnotherClient }
+            .distinctUntilChanged()) {
+            if (it) {
+                requireActivity().finish()
             }
         }
 

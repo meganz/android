@@ -693,6 +693,17 @@ class InMeetingViewModel @Inject constructor(
 
                             contains(ChatCallChanges.CallComposition) -> {
                                 if (call.callCompositionChange == CallCompositionChanges.Added || call.callCompositionChange == CallCompositionChanges.Removed) {
+                                    val numParticipants = call.numParticipants ?: 0
+                                    if (call.callCompositionChange == CallCompositionChanges.Added && numParticipants > 1 &&
+                                        state.value.myUserHandle == call.peerIdCallCompositionChange && call.status == ChatCallStatus.UserNoPresent
+                                    ) {
+                                        _state.update { state ->
+                                            state.copy(
+                                                callAnsweredInAnotherClient = true,
+                                            )
+                                        }
+                                    }
+
                                     if (showReconnectingBanner.value || !isOnline()
                                     ) {
                                         Timber.d("Back from reconnecting")

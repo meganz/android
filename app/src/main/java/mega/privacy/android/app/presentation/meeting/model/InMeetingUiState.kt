@@ -112,6 +112,7 @@ data class InMeetingUiState(
     val changesInLowResInSession: ChatSession? = null,
     val changesInStatusInSession: ChatSession? = null,
     val shouldCheckChildFragments: Boolean = false,
+    val callAnsweredInAnotherClient: Boolean = false,
 ) {
     /**
      * Is call on hold

@@ -115,12 +115,6 @@ class CallChangesObserver @Inject constructor(
             if (getMyUserHandleUseCase() == call.peerIdCallCompositionChange) {
                 CallUtil.clearIncomingCallNotification(call.callId)
                 chatManagement.removeValues(call.chatId)
-                if (call.status == ChatCallStatus.UserNoPresent) {
-                    LiveEventBus.get(
-                        EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT,
-                        Long::class.java
-                    ).post(call.chatId)
-                }
             }
         }
     }

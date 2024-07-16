@@ -26,10 +26,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.main.controllers.ChatController
@@ -42,9 +42,11 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
+import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -64,7 +66,8 @@ import javax.inject.Inject
  * @property megaChatApi                    [MegaChatApiAndroid]
  * @property app                            [MegaApplication]
  * @property monitorChatCallUpdatesUseCase  [MonitorChatCallUpdatesUseCase]
- * @property monitorChatListItemUpdates   [MonitorChatListItemUpdates]
+ * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
+ * @property getMyUserHandleUseCase         [GetMyUserHandleUseCase]
  */
 @AndroidEntryPoint
 class CallService : LifecycleService() {
@@ -86,9 +89,13 @@ class CallService : LifecycleService() {
     lateinit var monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase
 
     @Inject
+    lateinit var getMyUserHandleUseCase: GetMyUserHandleUseCase
+
+    @Inject
     lateinit var monitorChatListItemUpdates: MonitorChatListItemUpdates
 
     private var monitorChatListItemUpdatesJob: Job? = null
+    private var monitorChatCallUpdatesJob: Job? = null
 
     var app: MegaApplication? = null
 
@@ -97,17 +104,12 @@ class CallService : LifecycleService() {
     private var mNotificationManager: NotificationManager? = null
     private var mBuilderCompatO: NotificationCompat.Builder? = null
     private val notificationChannelId = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID
+    private var myUserHandle: Long = MEGACHAT_INVALID_HANDLE
 
     /**
      * If is in meeting fragment.
      */
     private var isInMeeting = true
-
-    private val callAnsweredInAnotherClientObserver = Observer { chatId: Long ->
-        if (currentChatId == chatId) {
-            stopSelf()
-        }
-    }
 
     private val isInMeetingObserver = Observer { isOpened: Boolean ->
         isInMeeting = isOpened
@@ -125,35 +127,24 @@ class CallService : LifecycleService() {
         mBuilderCompat = NotificationCompat.Builder(this, notificationChannelId)
         mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
-        lifecycleScope.launch {
-            monitorChatCallUpdatesUseCase()
-                .catch { Timber.e(it) }
-                .collect { call ->
-                    val changes = call.changes.orEmpty()
-                    if (changes.contains(ChatCallChanges.Status)) {
-                        Timber.d("Call status is ${call.status}. Chat id id $currentChatId")
-                        when (call.status) {
-                            ChatCallStatus.UserNoPresent,
-                            ChatCallStatus.InProgress,
-                            -> updateNotificationContent()
 
-                            ChatCallStatus.TerminatingUserParticipation,
-                            ChatCallStatus.Destroyed,
-                            -> removeNotification(call.chatId)
-
-                            else -> Unit
-                        }
-                    } else if (changes.contains(ChatCallChanges.OnHold)) {
-                        checkAnotherActiveCall()
-                    }
-                }
-        }
-
+        startMonitoringChatCallUpdates()
         startMonitorChatListItemUpdatesUpdates()
-        LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
-            .observeForever(callAnsweredInAnotherClientObserver)
+        getMyUserHandle()
+
         LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean::class.java)
             .observeForever(isInMeetingObserver)
+    }
+
+    /**
+     * Load my user handle
+     */
+    private fun getMyUserHandle() {
+        lifecycleScope.launch {
+            runCatching {
+                myUserHandle = getMyUserHandleUseCase()
+            }.onFailure { Timber.e(it) }
+        }
     }
 
     /**
@@ -193,6 +184,50 @@ class CallService : LifecycleService() {
         showCallInProgressNotification()
 
         return START_NOT_STICKY
+    }
+
+    /**
+     * Get chat call updates
+     *
+     */
+    private fun startMonitoringChatCallUpdates() {
+        monitorChatCallUpdatesJob?.cancel()
+        monitorChatCallUpdatesJob = lifecycleScope.launch {
+            monitorChatCallUpdatesUseCase()
+                .catch { Timber.e(it) }
+                .collect { call ->
+                    call.changes?.apply {
+                        Timber.d("Changes in call: $this")
+                        when {
+                            contains(ChatCallChanges.Status) -> {
+                                Timber.d("Call status is ${call.status}. Chat id id $currentChatId")
+
+                                when (call.status) {
+                                    ChatCallStatus.UserNoPresent,
+                                    ChatCallStatus.InProgress,
+                                    -> updateNotificationContent()
+
+                                    ChatCallStatus.TerminatingUserParticipation,
+                                    ChatCallStatus.Destroyed,
+                                    -> removeNotification(call.chatId)
+
+                                    else -> Unit
+                                }
+                            }
+
+                            contains(ChatCallChanges.OnHold) -> checkAnotherActiveCall()
+                            contains(ChatCallChanges.CallComposition) -> {
+                                val numParticipants = call.numParticipants ?: 0
+                                if (currentChatId == call.chatId && call.callCompositionChange == CallCompositionChanges.Added && numParticipants > 1 &&
+                                    myUserHandle == call.peerIdCallCompositionChange && call.status == ChatCallStatus.UserNoPresent
+                                ) {
+                                    stopSelf()
+                                }
+                            }
+                        }
+                    }
+                }
+        }
     }
 
     /**
@@ -557,8 +592,6 @@ class CallService : LifecycleService() {
      * Service ends
      */
     override fun onDestroy() {
-        LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
-            .removeObserver(callAnsweredInAnotherClientObserver)
         LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean::class.java)
             .removeObserver(isInMeetingObserver)
         cancelNotification()
