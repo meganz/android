@@ -1740,11 +1740,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun openTransfers() {
-        val openTab = intent?.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE
+        val openTab = intent?.serializable(TRANSFERS_TAB) ?: TransfersTab.PENDING_TAB
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
                 val tab = openTab.let { tab ->
-                    if (tab == TransfersTab.NONE) {
+                    if (tab == TransfersTab.COMPLETED_TAB) {
                         COMPLETED_TAB_INDEX
                     } else {
                         IN_PROGRESS_TAB_INDEX
@@ -2515,7 +2515,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Timber.d("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC")
                     drawerItem = DrawerItem.TRANSFERS
                     transferPageViewModel.setTransfersTab(
-                        intent.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE
+                        intent.serializable(TRANSFERS_TAB) ?: TransfersTab.PENDING_TAB
                     )
                     selectDrawerItem(drawerItem)
                     val text: String = getString(R.string.cam_sync_cancel_sync)
@@ -3383,7 +3383,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         Timber.d("selectDrawerItemTransfers")
         appBarLayout.visibility = View.VISIBLE
         transfersManagementViewModel.hideTransfersWidget()
-        drawerItem = DrawerItem.TRANSFERS
         setBottomNavigationMenuItemChecked(NO_BNV)
         transfersManagementViewModel.checkIfShouldShowCompletedTab()
         replaceFragment(
@@ -4435,7 +4434,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 return true
             }
         })
-        val enableSelectMenuItem = menu.findItem(R.id.action_enable_select)
         doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb)
         clearRubbishBinMenuItem = menu.findItem(R.id.action_menu_clear_rubbish_bin)
         returnCallMenuItem = menu.findItem(R.id.action_return_call)
@@ -4506,12 +4504,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             searchMenuItem?.isVisible = true
                         }
                     }
-                }
-
-                DrawerItem.TRANSFERS -> if (transferPageViewModel.transferTab == TransfersTab.PENDING_TAB
-                    && transfersViewModel.getActiveTransfers().isNotEmpty()
-                ) {
-                    enableSelectMenuItem.isVisible = true
                 }
 
                 DrawerItem.CHAT -> if (searchExpand) {
