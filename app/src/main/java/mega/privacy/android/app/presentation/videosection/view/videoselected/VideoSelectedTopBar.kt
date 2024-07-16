@@ -11,13 +11,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
-import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
@@ -37,7 +37,8 @@ internal fun VideoSelectedTopBar(
         isEmpty -> MegaAppBar(
             modifier = Modifier.testTag(EMPTY_TOP_BAR_TEST_TAG),
             appBarType = AppBarType.BACK_NAVIGATION,
-            title = title
+            title = title,
+            onNavigationPressed = onBackPressed
         )
 
         selectedSize != 0 -> {
