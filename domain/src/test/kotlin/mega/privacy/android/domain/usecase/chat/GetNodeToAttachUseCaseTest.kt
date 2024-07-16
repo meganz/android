@@ -7,9 +7,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.filenode.GetOwnNodeUseCase
-import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.chat.message.GetAttachableNodeIdUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -23,16 +21,12 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetNodeToAttachUseCaseTest {
 
-    private val copyNodeUseCase: CopyNodeUseCase = mock()
-    private val getOwnNodeUseCase: GetOwnNodeUseCase = mock()
-    private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
+    private val getAttachableNodeIdUseCase: GetAttachableNodeIdUseCase = mock()
 
     private val underTest = GetNodeToAttachUseCase(
-        copyNodeUseCase = copyNodeUseCase,
-        getOwnNodeUseCase = getOwnNodeUseCase,
-        getOrCreateMyChatsFilesFolderIdUseCase = getOrCreateMyChatsFilesFolderIdUseCase,
-        getNodeByIdUseCase = getNodeByIdUseCase
+        getNodeByIdUseCase = getNodeByIdUseCase,
+        getAttachableNodeIdUseCase = getAttachableNodeIdUseCase
     )
 
     private val defaultFileNode = mock<DefaultTypedFileNode> {
@@ -44,25 +38,14 @@ class GetNodeToAttachUseCaseTest {
         whenever(it.id).thenReturn(NodeId(COPIED_HANDLE))
     }
 
-    @ParameterizedTest(name = "test provided node {0}, myNode {1}, new node {2} returns expected")
+    @ParameterizedTest(name = "test provided node {0} returns expected {1}")
     @MethodSource("provideParams")
     fun `test that expected is actual with provided params`(
         inputNode: TypedFileNode,
-        myNode: TypedNode?,
-        newNode: TypedNode?,
         expected: TypedNode?,
     ) = runTest {
-        whenever(getOwnNodeUseCase(inputNode)).thenReturn(myNode)
-        whenever(getOrCreateMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(CHAT_FOLDER_HANDLE))
-        whenever(
-            copyNodeUseCase(
-                inputNode.id,
-                NodeId(CHAT_FOLDER_HANDLE),
-                inputNode.name
-            )
-        ).thenReturn(NodeId(COPIED_HANDLE))
-        whenever(getNodeByIdUseCase(NodeId(COPIED_HANDLE))).thenReturn(newNode)
-        whenever(getOwnNodeUseCase(newFileNode)).thenReturn(defaultFileNode)
+        whenever(getNodeByIdUseCase(NodeId(COPIED_HANDLE))).thenReturn(expected)
+        whenever(getAttachableNodeIdUseCase(inputNode)).thenReturn(NodeId(COPIED_HANDLE))
 
         val actual = underTest(inputNode)
         assertThat(actual).isEqualTo(expected)
@@ -72,29 +55,21 @@ class GetNodeToAttachUseCaseTest {
         Arguments.of(
             defaultFileNode,
             null,
-            newFileNode,
-            defaultFileNode
         ),
         Arguments.of(
             defaultFileNode,
             newFileNode,
-            newFileNode,
-            newFileNode
         ),
         Arguments.of(
             defaultFileNode,
             null,
-            defaultFileNode,
-            null
         )
     )
 
     @AfterEach
     fun resetMocks() {
         reset(
-            copyNodeUseCase,
-            getOwnNodeUseCase,
-            getOrCreateMyChatsFilesFolderIdUseCase,
+            getAttachableNodeIdUseCase,
             getNodeByIdUseCase
         )
     }
@@ -102,6 +77,5 @@ class GetNodeToAttachUseCaseTest {
     companion object {
         const val DEFAULT_HANDLE = 1234L
         const val COPIED_HANDLE = 12L
-        const val CHAT_FOLDER_HANDLE = 34L
     }
 }
