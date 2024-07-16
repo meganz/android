@@ -14,6 +14,15 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+
+    /**
+     * Enables Map location
+     */
+    MapLocation(
+        "Enable map location feature",
+        false,
+    ),
+
     /**
      * Enables new video player
      */

@@ -43,5 +43,5 @@ class MonitorCustomAlbumNodesUseCase @Inject constructor(
     )
 
     private suspend fun refreshNodes(): List<ImageNode> =
-        elements.mapNotNull { photosRepository.getImageNode(it.nodeId) }
+        elements.mapNotNull { photosRepository.getImageNodeFromCache(it.nodeId) }
 }

@@ -238,6 +238,7 @@ dependencies {
     implementation(google.services.location)
     implementation(google.services.maps)
     implementation(google.maps.utils)
+    implementation(google.maps.compose)
     implementation(google.code.scanner)
     implementation(google.install.referrer)
 

@@ -1,18 +1,25 @@
 package mega.privacy.android.app.presentation.fileinfo
 
+import android.content.Context
+import android.location.Address
+import android.location.Geocoder
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
@@ -33,7 +40,9 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges.Description
@@ -52,7 +61,9 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
+import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -90,7 +101,9 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
+import java.util.Locale
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 /**
  * View Model class for [FileInfoActivity]
@@ -139,6 +152,8 @@ class FileInfoViewModel @Inject constructor(
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val isProAccountUseCase: IsProAccountUseCase,
+    private val getImageNodeByNodeId: GetImageNodeByIdUseCase,
+    @IoDispatcher private val iODispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -171,6 +186,7 @@ class FileInfoViewModel @Inject constructor(
 
     init {
         checkDescriptionFlag()
+        checkMapLocationFeatureFlag()
         checkTagsFeatureFlag()
         checkIsProAccount()
         viewModelScope.launch {
@@ -194,7 +210,15 @@ class FileInfoViewModel @Inject constructor(
         runCatching { getFeatureFlagValueUseCase(AppFeatures.NodeWithTags) }.onSuccess { flag ->
             _uiState.update { it.copy(tagsEnabled = flag) }
         }.onFailure {
-            Timber.e("Get feature flag failed $it")
+            Timber.e("Get tag feature flag failed $it")
+        }
+    }
+
+    private fun checkMapLocationFeatureFlag() = viewModelScope.launch {
+        runCatching { getFeatureFlagValueUseCase(AppFeatures.MapLocation) }.onSuccess { flag ->
+            _uiState.update { it.copy(mapLocationEnabled = flag) }
+        }.onFailure {
+            Timber.e("Get gis feature flag failed $it")
         }
     }
 
@@ -815,6 +839,7 @@ class FileInfoViewModel @Inject constructor(
         updateOwner()
         updateOutShares()
         updateLocation()
+        updateMapLocationInfo()
     }
 
     private fun updateHistory() {
@@ -893,6 +918,36 @@ class FileInfoViewModel @Inject constructor(
     private fun updateLocation() {
         updateState {
             it.copy(nodeLocationInfo = getNodeLocationInfo(typedNode))
+        }
+    }
+
+    private fun isPhoto(): Boolean {
+        return (typedNode as? TypedFileNode)?.type.let { fileType ->
+            isFile() && (fileType is ImageFileTypeInfo || fileType is VideoFileTypeInfo)
+        }
+    }
+
+    private fun updateMapLocationInfo() = viewModelScope.launch {
+        if (isPhoto()) {
+            runCatching {
+                getImageNodeByNodeId(typedNode.id)?.let { imageNode ->
+                    _uiState.update {
+                        it.copy(
+                            longitude = imageNode.longitude,
+                            latitude = imageNode.latitude,
+                            isPhoto = true,
+                        )
+                    }
+                } ?: _uiState.update {
+                    it.copy(isPhoto = false)
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        } else {
+            _uiState.update {
+                it.copy(isPhoto = false)
+            }
         }
     }
 
@@ -1037,4 +1092,33 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
+    suspend fun getAddress(
+        context: Context,
+        latitude: Double,
+        longitude: Double,
+    ): Address? = withContext(iODispatcher) {
+        try {
+            val geocoder = Geocoder(context.applicationContext, Locale.getDefault())
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                suspendCancellableCoroutine { cont ->
+                    geocoder.getFromLocation(latitude, longitude, 1) {
+                        if (cont.isActive) {
+                            cont.resume(it.firstOrNull())
+                        }
+                    }
+                }
+            } else {
+                suspendCancellableCoroutine { cont ->
+                    @Suppress("DEPRECATION")
+                    val address = geocoder.getFromLocation(latitude, longitude, 1)?.firstOrNull()
+                    if (cont.isActive) {
+                        cont.resume(address)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+            null
+        }
+    }
 }

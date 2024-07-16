@@ -52,6 +52,13 @@ import nz.mega.sdk.MegaShare
  * @param actions a list of [FileInfoMenuAction] representing available actions for this node
  * @param requiredExtraAction an initiated action that needs to be confirmed by the user or more data needs to be specified (typically by an alert dialog)
  * @param isRemindersForContactVerificationEnabled checks if reminders for contact verification is enabled
+ * @param tagsEnabled checks if tags are enabled
+ * @param isProAccount checks if the user is a PRO account
+ * @param tags list of tags for the node
+ * @param mapLocationEnabled checks if GIS location is enabled
+ * @param longitude the longitude of the node
+ * @param latitude the latitude of the node
+ * @param isPhoto true if the node is a photo (Image or Video)
  */
 internal data class FileInfoViewState(
     val title: String = "",
@@ -95,6 +102,10 @@ internal data class FileInfoViewState(
     val tagsEnabled: Boolean = false,
     val isProAccount: Boolean = false,
     val tags: List<String> = emptyList(),
+    val mapLocationEnabled: Boolean = false,
+    val longitude: Double = 0.0,
+    val latitude: Double = 0.0,
+    val isPhoto: Boolean = false,
 ) {
 
     /**
@@ -128,6 +139,12 @@ internal data class FileInfoViewState(
     fun isDescriptionEnabled() = !isNodeInRubbish && !isNodeInBackups &&
             (accessPermission == AccessPermission.FULL ||
                     accessPermission == AccessPermission.OWNER)
+
+    /**
+     * Check Conditions to enable gis field
+     */
+    fun canEnableMapLocation() = mapLocationEnabled && !isNodeInRubbish &&
+            accessPermission == AccessPermission.OWNER
 
     /**
      * Check Conditions to enable tags field

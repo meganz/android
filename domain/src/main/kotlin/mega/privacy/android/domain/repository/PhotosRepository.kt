@@ -113,7 +113,7 @@ interface PhotosRepository {
      * Get image node from cache
      * @param nodeId
      */
-    suspend fun getImageNode(nodeId: NodeId): ImageNode?
+    suspend fun getImageNodeFromCache(nodeId: NodeId): ImageNode?
 
     /**
      * Get image node

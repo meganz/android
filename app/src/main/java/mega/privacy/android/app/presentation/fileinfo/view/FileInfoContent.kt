@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.fileinfo.view
 
 import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
+import android.content.Context
+import android.location.Address
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -57,6 +59,7 @@ internal fun FileInfoContent(
     onAddTagClick: () -> Unit,
     modifier: Modifier = Modifier,
     onUpgradeAccountClick: () -> Unit,
+    getAddress: suspend (Context, Double, Double) -> Address?,
 ) {
     var isShareContactExpanded by remember { mutableStateOf(false) }
     Column(
@@ -195,6 +198,18 @@ internal fun FileInfoContent(
                 )
             }
 
+            // Map location
+            if (isPhoto && canEnableMapLocation()) {
+                FileInfoMapLocationView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    latitude = latitude,
+                    longitude = longitude,
+                    getAddress = getAddress,
+                )
+            }
+
             //description
             if (nodeDescriptionEnabled) {
                 FileInfoDescriptionField(
@@ -284,7 +299,8 @@ private fun FileInfoContentPreview(
             onSetDescriptionClick = {},
             onAddTagClick = {},
             onUpgradeAccountClick = {},
-            modifier = Modifier.verticalScroll(scrollState)
+            modifier = Modifier.verticalScroll(scrollState),
+            getAddress = { _, _, _ -> null }
         )
     }
 }

@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.fileinfo.view
 
 import mega.privacy.android.icon.pack.R as IconPackR
 import android.annotation.SuppressLint
+import android.content.Context
+import android.location.Address
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -67,6 +69,7 @@ internal fun FileInfoScreen(
     onAddTagClick: () -> Unit,
     onUpgradeAccountClick: () -> Unit,
     modifier: Modifier = Modifier,
+    getAddress: suspend (Context, Double, Double) -> Address?,
 ) {
     val actionModeSelect = viewState.outShareContactsSelected.isNotEmpty()
     ScaffoldWithCollapsibleHeader(
@@ -146,6 +149,7 @@ internal fun FileInfoScreen(
             onSetDescriptionClick = onSetDescriptionClick,
             onAddTagClick = onAddTagClick,
             onUpgradeAccountClick = onUpgradeAccountClick,
+            getAddress = getAddress,
         )
         viewState.jobInProgressState?.progressMessage?.let {
             LoadingDialog(text = stringResource(id = it))
@@ -202,6 +206,7 @@ private fun FileInfoScreenPreview(
             onAddTagClick = {},
             onUpgradeAccountClick = {},
             modifier = Modifier.background(color = MaterialTheme.colors.background),
+            getAddress = { _, _, _ -> null },
         )
     }
 }

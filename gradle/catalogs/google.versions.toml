@@ -10,6 +10,7 @@ gson = "2.10.1"
 hilt = "2.51"
 material = "1.12.0"
 maps-utils = "0.5"
+maps-compose = "6.1.0"
 play-review = "2.0.1"
 play-update = "2.1.0"
 protobuff = "3.22.3"
@@ -45,6 +46,7 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt"
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-android-test = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
 maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "maps-utils" }
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 play-review = { module = "com.google.android.play:review", version.ref = "play-review" }
 play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "play-review" }

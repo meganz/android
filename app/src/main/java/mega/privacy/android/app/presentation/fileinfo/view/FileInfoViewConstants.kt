@@ -20,3 +20,10 @@ internal const val TEST_TAG_OWNER_EMAIL = "ownerEmail"
 internal const val TEST_TAG_SHARES_HEADER = "shareContactsHeader"
 internal const val TEST_TAG_SHOW_MORE = "shareMoreButton"
 internal const val MENU_ACTIONS_TO_SHOW = 2
+internal const val TEST_TAG_MAP_LOCATION_TITLE = "file_info:text_map_location_title"
+internal const val TEST_TAG_MAP_LOCATION_MAP = "file_info:text_map_location_map"
+internal const val TEST_TAG_MAP_LOCATION_ADDRESS = "file_info:text_map_location_address"
+internal const val TEST_TAG_MAP_LOCATION_NO_LOCATION_INFO_ICON =
+    "file_info:text_map_location_no_location_info_icon"
+internal const val TEST_TAG_MAP_LOCATION_NO_LOCATION_INFO_TEXT =
+    "file_info:text_map_location_no_location_info_text"

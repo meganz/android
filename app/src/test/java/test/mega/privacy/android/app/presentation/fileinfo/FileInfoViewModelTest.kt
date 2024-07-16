@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
@@ -49,6 +50,7 @@ import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
+import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -157,6 +159,7 @@ internal class FileInfoViewModelTest {
     private val typedFileNode: TypedFileNode = mock()
 
     private val previewFile: File = mock()
+    private val getImageNodeByIdUseCase = mock<GetImageNodeByIdUseCase>()
 
     @BeforeEach
     fun cleanUp() = runTest {
@@ -257,7 +260,9 @@ internal class FileInfoViewModelTest {
             monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
             isProAccountUseCase = isProAccountUseCase,
-            fileTypeIconMapper = fileTypeIconMapper
+            fileTypeIconMapper = fileTypeIconMapper,
+            getImageNodeByNodeId = getImageNodeByIdUseCase,
+            iODispatcher = UnconfinedTestDispatcher()
         )
     }
 

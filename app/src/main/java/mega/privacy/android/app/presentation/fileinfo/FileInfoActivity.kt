@@ -168,7 +168,8 @@ class FileInfoActivity : BaseActivity() {
                     onUpgradeAccountClick = this::navigateToUpgradeAccountScreen,
                     modifier = Modifier.semantics {
                         testTagsAsResourceId = true
-                    }
+                    },
+                    getAddress = viewModel::getAddress,
                 )
                 uiState.requiredExtraAction?.let { action ->
                     ExtraActionDialog(

@@ -804,7 +804,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         }
     }
 
-    override suspend fun getImageNode(nodeId: NodeId): ImageNode? {
+    override suspend fun getImageNodeFromCache(nodeId: NodeId): ImageNode? {
         return imageNodesCache[nodeId]
     }
 

@@ -43,6 +43,7 @@ class FileInfoScreenTest {
                 onVerifyContactClick = {},
                 onAddTagClick = {},
                 onUpgradeAccountClick = {},
+                getAddress = { _, _, _ -> null },
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_PREVIEW, true).assertExists()
@@ -76,6 +77,7 @@ class FileInfoScreenTest {
                 onVerifyContactClick = {},
                 onAddTagClick = {},
                 onUpgradeAccountClick = {},
+                getAddress = { _, _, _ -> null },
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_ICON, true).assertDoesNotExist()
