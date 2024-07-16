@@ -7,7 +7,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -25,7 +24,6 @@ import kotlin.contracts.contract
  * Use case for checking name collisions before uploading, copying or moving.
  *
  * @property megaApiGateway                [MegaApiAndroid] instance to check collisions.
- * @property getNodeUseCase         Required for getting nodes.
  * @property getChatMessageUseCase  Required for getting chat [MegaNode]s.
  */
 @OptIn(ExperimentalContracts::class)
@@ -33,7 +31,6 @@ import kotlin.contracts.contract
 class CheckNameCollisionUseCase @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
-    private val getNodeUseCase: GetNodeUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {

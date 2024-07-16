@@ -7,7 +7,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
-import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -37,14 +36,11 @@ internal class CheckNameCollisionUseCaseTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
 
-    private val getNodeUseCase = mock<GetNodeUseCase>()
-
     @BeforeEach
     internal fun setUp() {
         underTest = CheckNameCollisionUseCase(
             megaApiGateway = megaApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
-            getNodeUseCase = getNodeUseCase,
             getChatMessageUseCase = mock(),
             ioDispatcher = UnconfinedTestDispatcher(),
         )

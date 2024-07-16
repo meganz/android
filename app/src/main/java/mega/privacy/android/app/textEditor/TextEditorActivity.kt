@@ -355,7 +355,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     ?: return
 
                 viewModel.getNode()?.let {
-                    viewModel.importNode(it, toHandle)
+                    viewModel.importNode(toHandle)
                 }
             }
 

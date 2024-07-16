@@ -28,14 +28,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
-import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.namecollision.data.toLegacyCopy
+import mega.privacy.android.app.namecollision.data.toLegacyImport
+import mega.privacy.android.app.namecollision.data.toLegacyMove
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
@@ -69,20 +68,24 @@ import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.ViewerNode
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
-import mega.privacy.android.domain.usecase.node.CopyChatNodeUseCase
-import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
-import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadBackgroundFile
 import nz.mega.sdk.MegaApiAndroid
@@ -110,9 +113,6 @@ import javax.inject.Inject
  * @property megaApi                    Needed to manage nodes.
  * @property megaApiFolder              Needed to manage folder link nodes.
  * @property megaChatApi                Needed to get text file info from chats.
- * @property checkNameCollision         UseCase required to check name collisions.
- * @property moveNodeUseCase            UseCase required to move nodes.
- * @property copyNodeUseCase            UseCase required to copy nodes.
  * @property downloadBackgroundFile     Use case for downloading the file in background if required.
  * @property ioDispatcher
  * @property getNodeByIdUseCase
@@ -125,15 +125,13 @@ class TextEditorViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
-    private val checkNameCollision: CheckNameCollision,
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
-    private val moveNodeUseCase: MoveNodeUseCase,
-    private val copyNodeUseCase: CopyNodeUseCase,
+    private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase,
+    private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase,
+    private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
     private val downloadBackgroundFile: DownloadBackgroundFile,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
-    private val copyChatNodeUseCase: CopyChatNodeUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
@@ -640,27 +638,28 @@ class TextEditorViewModel @Inject constructor(
 
         viewModelScope.launch {
             runCatching {
-                checkNameCollisionUseCase.checkNameCollision(
-                    tempFile.name,
-                    parentHandle
+                checkFileNameCollisionsUseCase(
+                    files = listOf(tempFile.let {
+                        DocumentEntity(
+                            name = it.name,
+                            size = it.length(),
+                            lastModified = it.lastModified(),
+                            uri = UriPath(it.toUri().toString()),
+                            isFolder = it.isDirectory,
+                            numFiles = 0,
+                            numFolders = 0,
+                        )
+                    }),
+                    parentNodeId = NodeId(parentHandle)
                 )
-            }.onSuccess { handle ->
-                collision.value =
-                    NameCollision.Upload.getUploadCollision(
-                        handle,
-                        tempFile,
-                        parentHandle,
-                    )
-            }.onFailure { error ->
-                when (error) {
-                    is MegaNodeException.ParentDoesNotExistException -> {
-                        Timber.e(error)
-                    }
-
-                    is MegaNodeException.ChildDoesNotExistsException -> {
-                        uploadFile(activity, fromHome, tempFile, parentHandle)
-                    }
-                }
+            }.onSuccess { fileCollisions ->
+                fileCollisions.map {
+                    NameCollision.Upload.getUploadCollision(it)
+                }.firstOrNull()?.let {
+                    collision.value = it
+                } ?: uploadFile(activity, fromHome, tempFile, parentHandle)
+            }.onFailure {
+                Timber.e(it, "Cannot check name collisions")
             }
         }
     }
@@ -730,50 +729,48 @@ class TextEditorViewModel @Inject constructor(
     /**
      * Imports a node if there is no name collision.
      *
-     * @param node              Node handle to copy.
-     * @param newParentHandle   Parent handle in which the node will be copied.
+     * @param newParentHandle
      */
-    fun importNode(node: MegaNode, newParentHandle: Long) = viewModelScope.launch {
+    fun importNode(newParentHandle: Long) {
         runCatching {
-            checkNameCollisionUseCase.check(
-                node = node,
-                parentHandle = newParentHandle,
-                type = NameCollisionType.COPY,
+            val viewerNode = textEditorData.value?.viewerNode
+            if (viewerNode !is ViewerNode.ChatNode) throw IllegalStateException("ViewerNode must be a ChatNode type")
+            importChatNode(
+                chatId = viewerNode.chatId,
+                messageId = viewerNode.messageId,
+                newParentNode = NodeId(newParentHandle)
             )
-        }.onSuccess { collisionResult ->
-            collision.value = collisionResult
-        }.onFailure { throwable ->
-            when (throwable) {
-                is MegaNodeException.ChildDoesNotExistsException -> {
-                    copyChatNode(NodeId(newParentHandle))
-                }
-
-                else -> Timber.e(throwable)
-            }
+        }.onFailure {
+            throwable.value = it
+            Timber.e(it)
         }
     }
 
     /**
-     * Copies a chat node
-     *
-     * @param newParentNodeId Parent handle in which the node will be copied.
+     * Imports a chat node if there is no name collision.
+     * @param chatId            Chat id where the node is.
+     * @param messageId         Message id of the node to import.
+     * @param newParentNode     Parent node in which the node will be copied.
      */
-    private fun copyChatNode(newParentNodeId: NodeId) {
+    fun importChatNode(chatId: Long, messageId: Long, newParentNode: NodeId) {
         viewModelScope.launch {
             runCatching {
-                val viewerNode = textEditorData.value?.viewerNode
-                if (viewerNode !is ViewerNode.ChatNode) throw IllegalStateException("ViewerNode must be a ChatNode type")
-                copyChatNodeUseCase(
-                    chatId = viewerNode.chatId,
-                    messageId = viewerNode.messageId,
-                    newNodeParent = newParentNodeId,
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = chatId,
+                    messageIds = listOf(messageId),
+                    newNodeParent = newParentNode,
                 )
             }.onSuccess {
-                snackBarMessage.value =
-                    R.string.context_correctly_copied
+                it.firstChatNodeCollisionOrNull?.toLegacyImport()?.let { item ->
+                    collision.value = item
+                }
+
+                it.moveRequestResult?.let {
+                    snackBarMessage.value = R.string.context_correctly_copied
+                }
             }.onFailure {
-                Timber.e(it, "Error not copied")
                 throwable.value = it
+                Timber.e(it)
             }
         }
     }
@@ -785,22 +782,24 @@ class TextEditorViewModel @Inject constructor(
      */
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
         viewModelScope.launch {
-            checkForNameCollision(
-                nodeHandle = nodeHandle,
-                newParentHandle = newParentHandle,
-                type = NameCollisionType.COPY
-            ) {
-                runCatching {
-                    copyNodeUseCase(
-                        nodeToCopy = NodeId(nodeHandle),
-                        newNodeParent = NodeId(newParentHandle),
-                        newNodeName = null,
-                    )
-                }.onSuccess {
+            runCatching {
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(nodeHandle to newParentHandle),
+                    type = NodeNameCollisionType.COPY,
+                )
+            }.onSuccess {
+                it.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
+                    collision.value = item
+                }
+                it.moveRequestResult?.let {
                     snackBarMessage.value = R.string.context_correctly_copied
-                }.onFailure {
+                }
+            }.onFailure {
+                Timber.e("Error not copied", it)
+                if (it is NodeDoesNotExistsException) {
+                    snackBarMessage.value = R.string.general_error
+                } else {
                     throwable.value = it
-                    Timber.e(it, "Error not copied")
                 }
             }
         }
@@ -813,23 +812,24 @@ class TextEditorViewModel @Inject constructor(
      */
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
         viewModelScope.launch {
-            checkForNameCollision(
-                nodeHandle = nodeHandle,
-                newParentHandle = newParentHandle,
-                type = NameCollisionType.MOVE,
-            ) {
-                viewModelScope.launch {
-                    runCatching {
-                        moveNodeUseCase(
-                            nodeToMove = NodeId(nodeHandle),
-                            newNodeParent = NodeId(newParentHandle)
-                        )
-                    }.onSuccess {
-                        snackBarMessage.value = R.string.context_correctly_moved
-                    }.onFailure {
-                        throwable.value = it
-                        Timber.e(it, "Not moved")
-                    }
+            runCatching {
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(nodeHandle to newParentHandle),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            }.onSuccess {
+                it.firstNodeCollisionOrNull?.toLegacyMove()?.let { item ->
+                    collision.value = item
+                }
+                it.moveRequestResult?.let {
+                    snackBarMessage.value = R.string.context_correctly_moved
+                }
+            }.onFailure {
+                Timber.e("Error not copied", it)
+                if (it is NodeDoesNotExistsException) {
+                    snackBarMessage.value = R.string.general_error
+                } else {
+                    throwable.value = it
                 }
             }
         }
@@ -863,39 +863,6 @@ class TextEditorViewModel @Inject constructor(
     fun setHiddenNodesOnboarded() {
         _uiState.update {
             it.copy(isHiddenNodesOnboarded = true)
-        }
-    }
-
-    /**
-     * Checks if there is a name collision before proceeding with the action.
-     *
-     * @param nodeHandle        Handle of the node to check the name collision.
-     * @param newParentHandle   Handle of the parent folder in which the action will be performed.
-     * @param completeAction    Action to complete after checking the name collision.
-     */
-    private suspend fun checkForNameCollision(
-        nodeHandle: Long,
-        newParentHandle: Long,
-        type: NameCollisionType,
-        completeAction: suspend (() -> Unit),
-    ) {
-        runCatching {
-            checkNameCollision(
-                nodeHandle = NodeId(nodeHandle),
-                parentHandle = NodeId(newParentHandle),
-                type = type,
-            )
-        }.onSuccess {
-            collision.value = it
-        }.onFailure {
-            when (it) {
-                is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
-                is MegaNodeException.ParentDoesNotExistException -> {
-                    snackBarMessage.value = R.string.general_error
-                }
-
-                else -> Timber.e(it)
-            }
         }
     }
 
