@@ -5,6 +5,8 @@ import android.content.Context
 import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import java.io.File
@@ -172,5 +174,22 @@ interface AppNavigator {
         isFolderLink: Boolean = false,
         searchedItems: List<Long>? = null,
         onError: () -> Unit = {},
+    )
+
+    /**
+     * Open media player from Chat
+     *
+     * @param context Context
+     * @param message [NodeAttachmentMessage]
+     * @param fileNode [FileNode]
+     * @param viewType the adapter type of the view
+     * @param onError Callback called when error occurs
+     */
+    fun openMediaPlayerActivityFromChat(
+        context: Context,
+        contentUri: NodeContentUri,
+        message: NodeAttachmentMessage,
+        fileNode: FileNode,
+        onError: (Throwable) -> Unit = {},
     )
 }

@@ -25,12 +25,16 @@ import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
@@ -41,6 +45,8 @@ import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -242,15 +248,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         searchedItems: List<Long>? = null,
         mediaQueueTitle: String? = null,
     ) {
-        val intent = when {
-            fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
-                Intent(context, LegacyVideoPlayerActivity::class.java)
-
-            fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
-                Intent(context, AudioPlayerActivity::class.java)
-
-            else -> Intent(Intent.ACTION_VIEW)
-        }.apply {
+        val intent = getIntent(context, fileTypeInfo).apply {
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
             putExtra(INTENT_EXTRA_KEY_PLACEHOLDER, 0)
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
@@ -276,6 +274,16 @@ internal class MegaNavigatorImpl @Inject constructor(
             if (fileTypeInfo.extension == "opus") "audio/*" else fileTypeInfo.mimeType
         nodeContentUriIntentMapper(intent, contentUri, mimeType, fileTypeInfo.isSupported)
         context.startActivity(intent)
+    }
+
+    private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo) = when {
+        fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
+            Intent(context, LegacyVideoPlayerActivity::class.java)
+
+        fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
+            Intent(context, AudioPlayerActivity::class.java)
+
+        else -> Intent(Intent.ACTION_VIEW)
     }
 
     override fun openMediaPlayerActivityByLocalFile(
@@ -309,6 +317,32 @@ internal class MegaNavigatorImpl @Inject constructor(
         }.onFailure {
             Timber.e(it)
             onError()
+        }
+    }
+
+    override fun openMediaPlayerActivityFromChat(
+        context: Context,
+        contentUri: NodeContentUri,
+        message: NodeAttachmentMessage,
+        fileNode: FileNode,
+        onError: (Throwable) -> Unit,
+    ) {
+        runCatching {
+            val intent = getIntent(context, fileNode.type).apply {
+                putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
+                putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
+                putExtra(INTENT_EXTRA_KEY_MSG_ID, message.msgId)
+                putExtra(INTENT_EXTRA_KEY_CHAT_ID, message.chatId)
+                putExtra(INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
+                putExtra(INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
+            }
+
+            val mimeType =
+                if (fileNode.type.extension == "opus") "audio/*" else fileNode.type.mimeType
+            nodeContentUriIntentMapper(intent, contentUri, mimeType, fileNode.type.isSupported)
+            context.startActivity(intent)
+        }.onFailure {
+            onError(it)
         }
     }
 }
