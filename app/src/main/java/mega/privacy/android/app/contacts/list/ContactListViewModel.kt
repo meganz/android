@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -110,9 +111,10 @@ internal class ContactListViewModel @Inject constructor(
                 } else {
                     list.filter { it.matches(query) }
                 }
-            }.collectLatest {
-                contacts.value = it
-            }
+            }.distinctUntilChanged()
+                .collectLatest {
+                    contacts.value = it
+                }
         }
         retrieveContactActions()
     }
