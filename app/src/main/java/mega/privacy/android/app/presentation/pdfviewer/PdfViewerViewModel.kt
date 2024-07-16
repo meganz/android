@@ -75,9 +75,14 @@ class PdfViewerViewModel @Inject constructor(
                     it.copy(nameCollision = item)
                 }
             }
-            result.moveRequestResult?.let {
+            result.moveRequestResult?.let { movementResult ->
                 _state.update {
-                    it.copy(snackBarMessage = R.string.context_correctly_copied)
+                    it.copy(
+                        snackBarMessage = if (movementResult.isSuccess)
+                            R.string.context_correctly_copied
+                        else
+                            R.string.context_no_copied
+                    )
                 }
             }
         }.onFailure { throwable ->
@@ -105,9 +110,14 @@ class PdfViewerViewModel @Inject constructor(
                 result.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
                     _state.update { it.copy(nameCollision = item) }
                 }
-                result.moveRequestResult?.let {
+                result.moveRequestResult?.let { movementResult ->
                     _state.update {
-                        it.copy(snackBarMessage = R.string.context_correctly_copied)
+                        it.copy(
+                            snackBarMessage = if (movementResult.isSuccess)
+                                R.string.context_correctly_copied
+                            else
+                                R.string.context_no_copied
+                        )
                     }
                 }
             }.onFailure { throwable ->
@@ -136,11 +146,14 @@ class PdfViewerViewModel @Inject constructor(
                 result.firstNodeCollisionOrNull?.toLegacyMove()?.let { item ->
                     _state.update { it.copy(nameCollision = item) }
                 }
-                result.moveRequestResult?.let {
+                result.moveRequestResult?.let { movementResult ->
                     _state.update {
                         it.copy(
-                            snackBarMessage = R.string.context_correctly_moved,
-                            shouldFinishActivity = true
+                            snackBarMessage = if (movementResult.isSuccess)
+                                R.string.context_correctly_moved
+                            else
+                                R.string.context_no_moved,
+                            shouldFinishActivity = movementResult.isSuccess
                         )
                     }
                 }

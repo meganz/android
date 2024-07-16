@@ -286,6 +286,41 @@ class ImagePreviewViewModelTest {
         }
 
     @Test
+    internal fun `test that resultMessage is set when node copy is failed`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            val successMessage = "Copy success"
+            val context = mock<Context> {
+                on { getString(R.string.context_no_copied) } doReturn successMessage
+            }
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.Copy(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
+
+            underTest.copyNode(
+                context = context,
+                copyHandle = selectedNode,
+                toHandle = newParentNode,
+            )
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = expectMostRecentItem()
+                assertThat(state.resultMessage).isEqualTo(successMessage)
+            }
+        }
+
+    @Test
     internal fun `test that copyMoveException is set when copy is failed`() =
         runTest {
             val selectedNode = 73248538798194
@@ -328,6 +363,41 @@ class ImagePreviewViewModelTest {
                 moveRequestResult = MoveRequestResult.GeneralMovement(
                     count = 1,
                     errorCount = 0
+                )
+            )
+
+            underTest.moveNode(
+                context = context,
+                moveHandle = selectedNode,
+                toHandle = newParentNode,
+            )
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = expectMostRecentItem()
+                assertThat(state.resultMessage).isEqualTo(successMessage)
+            }
+        }
+
+    @Test
+    internal fun `test that resultMessage is set when node move is failed`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            val successMessage = "Move failed"
+            val context = mock<Context> {
+                on { getString(R.string.context_no_moved) } doReturn successMessage
+            }
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
                 )
             )
 
@@ -389,6 +459,42 @@ class ImagePreviewViewModelTest {
                 moveRequestResult = MoveRequestResult.GeneralMovement(
                     count = 1,
                     errorCount = 0
+                )
+            )
+            underTest.importChatNode(
+                context = context,
+                chatId = chatId,
+                messageId = messageId,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.state.test {
+                val state = expectMostRecentItem()
+                assertThat(state.resultMessage).isEqualTo(successMessage)
+            }
+        }
+
+    @Test
+    internal fun `test that resultMessage is set when chat node import is failed`() =
+        runTest {
+            val newParentNode = 158401030174851
+            val chatId = 1000L
+            val messageId = 2000L
+            val successMessage = "Import failed"
+            val context = mock<Context> {
+                on { getString(R.string.context_no_copied) } doReturn successMessage
+            }
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = chatId,
+                    messageIds = listOf(messageId),
+                    newNodeParent = NodeId(newParentNode),
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
                 )
             )
             underTest.importChatNode(

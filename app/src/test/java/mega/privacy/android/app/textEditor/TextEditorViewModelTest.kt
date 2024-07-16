@@ -89,7 +89,7 @@ internal class TextEditorViewModelTest {
     }
 
     @Test
-    internal fun `test that copy complete snack bar is shown when file is copied to different directory`() =
+    internal fun `test that copy complete snack bar message is shown when node is copied to different directory`() =
         runTest {
             val selectedNode = 73248538798194
             val newParentNode = 158401030174851
@@ -116,6 +116,33 @@ internal class TextEditorViewModelTest {
         }
 
     @Test
+    internal fun `test that copy error snack bar message is shown when node is not copied to different directory`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
+
+            underTest.copyNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            testScheduler.advanceUntilIdle()
+
+            underTest.onSnackBarMessage().test().assertValue(R.string.context_no_copied)
+        }
+
+    @Test
     internal fun `test that onExceptionThrown is triggered when copy failed`() =
         runTest {
             val selectedNode = 73248538798194
@@ -136,7 +163,7 @@ internal class TextEditorViewModelTest {
         }
 
     @Test
-    internal fun `test that move complete snack bar message is shown when file is moved to different directory`() =
+    internal fun `test that move complete snack bar message is shown when node is moved to different directory`() =
         runTest {
             val selectedNode = 73248538798194
             val newParentNode = 158401030174851
@@ -163,6 +190,33 @@ internal class TextEditorViewModelTest {
         }
 
     @Test
+    internal fun `test that move error snack bar message is shown when node is not moved to different directory`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
+            underTest.moveNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.onSnackBarMessage().observeOnce {
+                assertThat(it).isEqualTo(R.string.context_no_moved)
+            }
+        }
+
+    @Test
     internal fun `test that onExceptionThrown is triggered when move failed`() =
         runTest {
             val selectedNode = 73248538798194
@@ -185,7 +239,7 @@ internal class TextEditorViewModelTest {
         }
 
     @Test
-    internal fun `test that copy complete snack bar message is shown when file is imported to different directory`() =
+    internal fun `test that copy complete snack bar message is shown when chat node is imported to different directory`() =
         runTest {
             val newParentNode = NodeId(158401030174851)
             val chatId = 1000L
@@ -211,6 +265,37 @@ internal class TextEditorViewModelTest {
             advanceUntilIdle()
             underTest.onSnackBarMessage().observeOnce {
                 assertThat(it).isEqualTo(R.string.context_correctly_copied)
+            }
+        }
+
+
+    @Test
+    internal fun `test that copy error snack bar message is shown when chat node is not imported to different directory`() =
+        runTest {
+            val newParentNode = NodeId(158401030174851)
+            val chatId = 1000L
+            val messageId = 2000L
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = chatId,
+                    messageIds = listOf(messageId),
+                    newNodeParent = newParentNode,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
+            underTest.importChatNode(
+                chatId = chatId,
+                messageId = messageId,
+                newParentNode = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.onSnackBarMessage().observeOnce {
+                assertThat(it).isEqualTo(R.string.context_no_copied)
             }
         }
 

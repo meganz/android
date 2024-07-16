@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.presentation.pdfviewer
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -32,6 +33,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PdfViewerViewModelTest {
@@ -76,7 +78,7 @@ internal class PdfViewerViewModelTest {
     }
 
     @Test
-    internal fun `test that copy complete snack bar is shown when file is imported to different directory`() =
+    internal fun `test that copy complete snack bar message is shown when chat node is imported to different directory`() =
         runTest {
             val newParentNode = NodeId(158401030174851)
             val chatId = 1000L
@@ -104,6 +106,38 @@ internal class PdfViewerViewModelTest {
                 val actual = awaitItem()
                 assertThat(actual.snackBarMessage)
                     .isEqualTo(R.string.context_correctly_copied)
+            }
+        }
+
+    @Test
+    internal fun `test that copy error snack bar message is shown when chat node is not imported to different directory`() =
+        runTest {
+            val newParentNode = NodeId(158401030174851)
+            val chatId = 1000L
+            val messageId = 2000L
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = chatId,
+                    messageIds = listOf(messageId),
+                    newNodeParent = newParentNode,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
+            underTest.importChatNode(
+                chatId = chatId,
+                messageId = messageId,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.snackBarMessage)
+                    .isEqualTo(R.string.context_no_copied)
             }
         }
 
@@ -135,7 +169,7 @@ internal class PdfViewerViewModelTest {
         }
 
     @Test
-    internal fun `test move complete snack bar is shown when file is moved to different directory`() =
+    internal fun `test move complete snack bar message is shown when node is moved to different directory`() =
         runTest {
             val selectedNode = 73248538798194
             val newParentNode = 158401030174851
@@ -159,6 +193,35 @@ internal class PdfViewerViewModelTest {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.snackBarMessage).isEqualTo(R.string.context_correctly_moved)
+            }
+        }
+
+
+    @Test
+    internal fun `test move error snack bar message is shown when node is not moved to different directory`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
+            underTest.moveNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.snackBarMessage).isEqualTo(R.string.context_no_moved)
             }
         }
 
@@ -187,7 +250,7 @@ internal class PdfViewerViewModelTest {
         }
 
     @Test
-    internal fun `test copy complete snack bar is shown when file is copied to different directory`() =
+    internal fun `test copy complete snack bar message is shown when node is copied to different directory`() =
         runTest {
             val selectedNode = 73248538798194
             val newParentNode = 158401030174851
@@ -212,6 +275,35 @@ internal class PdfViewerViewModelTest {
                 val actual = awaitItem()
                 assertThat(actual.snackBarMessage)
                     .isEqualTo(R.string.context_correctly_copied)
+            }
+        }
+
+    @Test
+    internal fun `test copy error snack bar message is shown when node is not copied to different directory`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNodesNameCollisionWithActionUseCase(
+                    nodes = mapOf(selectedNode to newParentNode),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ) doReturn NodeNameCollisionWithActionResult(
+                collisionResult = mock(),
+                moveRequestResult = MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
+            underTest.copyNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.snackBarMessage)
+                    .isEqualTo(R.string.context_no_copied)
             }
         }
 

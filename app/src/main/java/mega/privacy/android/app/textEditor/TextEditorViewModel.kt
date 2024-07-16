@@ -760,13 +760,17 @@ class TextEditorViewModel @Inject constructor(
                     messageIds = listOf(messageId),
                     newNodeParent = newParentNode,
                 )
-            }.onSuccess {
-                it.firstChatNodeCollisionOrNull?.toLegacyImport()?.let { item ->
+            }.onSuccess { result ->
+                result.firstChatNodeCollisionOrNull?.toLegacyImport()?.let { item ->
                     collision.value = item
                 }
 
-                it.moveRequestResult?.let {
-                    snackBarMessage.value = R.string.context_correctly_copied
+                result.moveRequestResult?.let {
+                    snackBarMessage.value = if (it.isSuccess) {
+                        R.string.context_correctly_copied
+                    } else {
+                        R.string.context_no_copied
+                    }
                 }
             }.onFailure {
                 throwable.value = it
@@ -787,12 +791,16 @@ class TextEditorViewModel @Inject constructor(
                     nodes = mapOf(nodeHandle to newParentHandle),
                     type = NodeNameCollisionType.COPY,
                 )
-            }.onSuccess {
-                it.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
+            }.onSuccess { result ->
+                result.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
                     collision.value = item
                 }
-                it.moveRequestResult?.let {
-                    snackBarMessage.value = R.string.context_correctly_copied
+                result.moveRequestResult?.let {
+                    snackBarMessage.value = if (it.isSuccess) {
+                        R.string.context_correctly_copied
+                    } else {
+                        R.string.context_no_copied
+                    }
                 }
             }.onFailure {
                 Timber.e("Error not copied", it)
@@ -817,12 +825,16 @@ class TextEditorViewModel @Inject constructor(
                     nodes = mapOf(nodeHandle to newParentHandle),
                     type = NodeNameCollisionType.MOVE,
                 )
-            }.onSuccess {
-                it.firstNodeCollisionOrNull?.toLegacyMove()?.let { item ->
+            }.onSuccess { result ->
+                result.firstNodeCollisionOrNull?.toLegacyMove()?.let { item ->
                     collision.value = item
                 }
-                it.moveRequestResult?.let {
-                    snackBarMessage.value = R.string.context_correctly_moved
+                result.moveRequestResult?.let {
+                    snackBarMessage.value = if (it.isSuccess) {
+                        R.string.context_correctly_moved
+                    } else {
+                        R.string.context_no_moved
+                    }
                 }
             }.onFailure {
                 Timber.e("Error not copied", it)

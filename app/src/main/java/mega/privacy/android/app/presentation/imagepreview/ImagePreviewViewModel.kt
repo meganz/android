@@ -544,7 +544,14 @@ class ImagePreviewViewModel @Inject constructor(
                 }
 
                 result.moveRequestResult?.let {
-                    setResultMessage(context.getString(R.string.context_correctly_moved))
+                    setResultMessage(
+                        context.getString(
+                            if (it.isSuccess)
+                                R.string.context_correctly_moved
+                            else
+                                R.string.context_no_moved
+                        )
+                    )
                 }
             }.onFailure {
                 Timber.d("Move node failure", it)
@@ -575,7 +582,14 @@ class ImagePreviewViewModel @Inject constructor(
                 }
 
                 result.moveRequestResult?.let {
-                    setResultMessage(context.getString(R.string.context_correctly_copied))
+                    setResultMessage(
+                        context.getString(
+                            if (it.isSuccess)
+                                R.string.context_correctly_copied
+                            else
+                                R.string.context_no_copied
+                        )
+                    )
                 }
             }.onFailure {
                 Timber.e("Error not copied", it)
@@ -639,7 +653,14 @@ class ImagePreviewViewModel @Inject constructor(
                     }
                 }
                 result.moveRequestResult?.let {
-                    setResultMessage(context.getString(R.string.context_correctly_copied))
+                    setResultMessage(
+                        context.getString(
+                            if (it.isSuccess)
+                                R.string.context_correctly_copied
+                            else
+                                R.string.context_no_copied
+                        )
+                    )
                 }
             }.onFailure {
                 Timber.e("Error not copied", it)
