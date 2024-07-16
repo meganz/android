@@ -459,9 +459,7 @@ internal class DefaultTransfersRepository @Inject constructor(
                 completedTransferMapper(event.transfer, event.error, transferPath)
             }
             megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
-            finishEventsAndPaths.keys.forEach {
-                removeInProgressTransfer(it.transfer.tag)
-            }
+            removeInProgressTransfers(finishEventsAndPaths.keys.map { it.transfer.tag }.toSet())
             appEventGateway.broadcastCompletedTransfer()
         }
     }

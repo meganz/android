@@ -86,7 +86,7 @@ class DownloadsWorker @AssistedInject constructor(
         transfersFinishedNotificationMapper(activeTransferTotals)
 
     override suspend fun onTransferEventReceived(event: TransferEvent) {
-        if (event is TransferEvent.TransferFinishEvent) {
+        if (event is TransferEvent.TransferFinishEvent && event.transfer.transferredBytes == event.transfer.totalBytes && event.error == null) {
             runCatching {
                 scanMediaFileUseCase(arrayOf(event.transfer.localPath), arrayOf(""))
             }.onFailure {

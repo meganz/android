@@ -152,9 +152,8 @@ internal interface AppEventGateway {
     fun monitorPushNotificationSettings(): Flow<Boolean>
 
     /**
-     * Broadcast completed transfer
+     * Broadcast an event when there is a new completed transfer
      *
-     * @param transfer the completed transfer to be broadcast
      */
     suspend fun broadcastCompletedTransfer()
 
