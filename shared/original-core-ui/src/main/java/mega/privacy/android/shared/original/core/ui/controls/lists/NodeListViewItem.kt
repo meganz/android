@@ -82,6 +82,7 @@ fun NodeListViewItem(
     showLink: Boolean = false,
     showFavourite: Boolean = false,
     isSensitive: Boolean = false,
+    isMediaType: Boolean = false,
     onMoreClicked: (() -> Unit)? = null,
     onInfoClicked: (() -> Unit)? = null,
     onItemClicked: (() -> Unit)? = null,
@@ -113,7 +114,13 @@ fun NodeListViewItem(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
+                            .then(
+                                if (!isMediaType) {
+                                    Modifier
+                                } else {
+                                    Modifier.blur(16.dp.takeIf { isSensitive } ?: 0.dp)
+                                }
+                            )
                             .testTag(ICON_TAG),
                         data = thumbnailData,
                         defaultImage = icon,

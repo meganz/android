@@ -85,6 +85,7 @@ fun NodeGridViewItem(
     onMenuClick: (() -> Unit)? = null,
     inVisible: Boolean = false,
     isSensitive: Boolean = false,
+    isMediaType: Boolean = false,
 ) {
 
     if (inVisible) {
@@ -122,7 +123,13 @@ fun NodeGridViewItem(
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.Center)
-                            .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
+                            .then(
+                                if (!isMediaType) {
+                                    Modifier
+                                } else {
+                                    Modifier.blur(16.dp.takeIf { isSensitive } ?: 0.dp)
+                                }
+                            )
                             .testTag(THUMBNAIL_FILE_TEST_TAG),
                         contentDescription = name,
                         contentScale = ContentScale.Crop,
@@ -209,7 +216,7 @@ private fun Footer(
                 contentDescription = "Folder",
                 modifier = Modifier
                     .padding(start = 8.dp)
-                    .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
+                    .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
                     .size(24.dp)
                     .testTag(FOLDER_VIEW_ICON_TEST_TAG),
             )

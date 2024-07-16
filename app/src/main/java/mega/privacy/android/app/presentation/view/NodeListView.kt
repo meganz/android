@@ -21,6 +21,9 @@ import mega.privacy.android.app.presentation.view.extension.getSharesIcon
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -135,6 +138,9 @@ fun <T : TypedNode> NodeListView(
                         && nodeSourceType != NodeSourceType.OUTGOING_SHARES
                         && nodeSourceType != NodeSourceType.LINKS
                         && accountType?.isPaid == true && (nodeUiItem.isMarkedSensitive || nodeUiItem.isSensitiveInherited),
+                isMediaType = (nodeUiItem.node as? FileNode)?.type?.let {
+                    it is ImageFileTypeInfo || it is VideoFileTypeInfo
+                } ?: false,
             )
             MegaDivider(dividerType = DividerType.BigStartPadding)
         }
