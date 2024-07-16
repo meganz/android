@@ -6,7 +6,7 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
@@ -25,7 +25,6 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetAlbumPhotoFileUrlByNodeIdUseCase
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
@@ -44,7 +43,6 @@ class AlbumImportPreviewProvider @Inject constructor(
     private val getAlbumPhotoFileUrlByNodeIdUseCase: GetAlbumPhotoFileUrlByNodeIdUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
 ) {
 
@@ -85,7 +83,6 @@ class AlbumImportPreviewProvider @Inject constructor(
         } else {
             startImagePreviewFromMD(
                 activity = activity,
-                photoIds = photoIds,
                 photo = photo,
                 folderNodeId = folderNodeId,
             )
@@ -94,22 +91,21 @@ class AlbumImportPreviewProvider @Inject constructor(
 
     private fun startImagePreviewFromMD(
         activity: Activity,
-        photoIds: List<Long>,
         photo: Photo,
         folderNodeId: Long?,
     ) {
         (activity as LifecycleOwner).lifecycleScope.launch {
             folderNodeId?.let { parentID ->
-                monitorSubFolderMediaDiscoverySettingsUseCase().collectLatest { recursive ->
-                    ImagePreviewActivity.createIntent(
-                        context = activity,
-                        imageSource = ImagePreviewFetcherSource.MEDIA_DISCOVERY,
-                        menuOptionsSource = ImagePreviewMenuSource.MEDIA_DISCOVERY,
-                        anchorImageNodeId = NodeId(photo.id),
-                        params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to recursive),
-                    ).run {
-                        activity.startActivity(this)
-                    }
+                val recursive =
+                    monitorSubFolderMediaDiscoverySettingsUseCase().first()
+                ImagePreviewActivity.createIntent(
+                    context = activity,
+                    imageSource = ImagePreviewFetcherSource.MEDIA_DISCOVERY,
+                    menuOptionsSource = ImagePreviewMenuSource.MEDIA_DISCOVERY,
+                    anchorImageNodeId = NodeId(photo.id),
+                    params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to recursive),
+                ).run {
+                    activity.startActivity(this)
                 }
             }
         }
