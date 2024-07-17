@@ -84,7 +84,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     NewVideoSection(
         "Enable new video section flag",
-        false
+        true
     ),
 
     /**
