@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.qrcode.QRCodeViewModel
@@ -36,6 +35,7 @@ import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
+import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
@@ -82,7 +82,7 @@ class QRCodeViewModelTest {
     private val scanMediaFileUseCase = mock<ScanMediaFileUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
-    private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
+    private val checkFileNameCollisionsUseCase = mock<CheckFileNameCollisionsUseCase>()
 
     private val initialContactLink = "https://contact_link1"
 
@@ -109,7 +109,7 @@ class QRCodeViewModelTest {
             scanMediaFileUseCase = scanMediaFileUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
-            checkNameCollisionUseCase = checkNameCollisionUseCase,
+            checkFileNameCollisionsUseCase = checkFileNameCollisionsUseCase,
         )
     }
 

@@ -4,6 +4,7 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -102,7 +103,9 @@ private fun OfflineListContent(
     onOptionClicked: (OfflineNodeUIItem) -> Unit,
 ) {
     if (uiState.currentViewType == ViewType.LIST || isRootFolderOnly) {
-        LazyColumn {
+        LazyColumn(
+            contentPadding = PaddingValues(bottom = 86.dp)
+        ) {
             items(uiState.offlineNodes) {
                 NodeListViewItem(
                     title = it.offlineNode.name,

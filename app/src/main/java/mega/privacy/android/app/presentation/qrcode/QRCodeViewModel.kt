@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.qrcode
 
 import android.content.Context
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
@@ -25,13 +25,14 @@ import mega.privacy.android.app.presentation.qrcode.model.ScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.scanner.BarcodeScannerModuleIsNotInstalled
-import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
+import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
@@ -77,7 +79,7 @@ class QRCodeViewModel @Inject constructor(
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
+    private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(QRCodeUIState())
@@ -317,20 +319,31 @@ class QRCodeViewModel @Inject constructor(
             }
 
             runCatching {
-                checkNameCollisionUseCase.checkNameCollision(qrFile.name, parentHandle)
-            }.onSuccess { handle: Long ->
-                val collision =
-                    NameCollision.Upload.getUploadCollision(handle, qrFile, parentHandle)
-                _uiState.update { it.copy(showCollision = triggered(collision)) }
-
-            }.onFailure { throwable: Throwable? ->
-                if (throwable is MegaNodeException.ParentDoesNotExistException) {
-                    setResultMessage(R.string.error_upload_qr)
-                } else if (throwable is MegaNodeException.ChildDoesNotExistsException) {
-                    _uiState.update {
-                        it.copy(uploadFile = triggered(Pair(qrFile, parentHandle)))
-                    }
+                checkFileNameCollisionsUseCase(
+                    files = listOf(qrFile.let {
+                        DocumentEntity(
+                            name = it.name,
+                            size = it.length(),
+                            lastModified = it.lastModified(),
+                            uri = UriPath(it.toUri().toString()),
+                            isFolder = it.isDirectory,
+                            numFiles = 0,
+                            numFolders = 0,
+                        )
+                    }),
+                    parentNodeId = NodeId(parentHandle)
+                )
+            }.onSuccess { fileCollisions ->
+                fileCollisions.map {
+                    NameCollision.Upload.getUploadCollision(it)
+                }.firstOrNull()?.let { collision ->
+                    _uiState.update { it.copy(showCollision = triggered(collision)) }
+                } ?: _uiState.update {
+                    it.copy(uploadFile = triggered(Pair(qrFile, parentHandle)))
                 }
+            }.onFailure {
+                Timber.e(it, "Cannot check name collisions")
+                setResultMessage(R.string.error_upload_qr)
             }
         }
     }
