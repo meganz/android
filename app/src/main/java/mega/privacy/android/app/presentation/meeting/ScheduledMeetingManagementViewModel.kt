@@ -36,10 +36,10 @@ import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
-import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
+import mega.privacy.android.domain.usecase.chat.link.RemoveChatLinkUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingOccurrenceUseCase
@@ -68,7 +68,7 @@ import javax.inject.Inject
  * @property getChatRoomUseCase                         [GetChatRoomUseCase]
  * @property getStringFromStringResMapper               [GetStringFromStringResMapper]
  * @property queryChatLink                              [QueryChatLink]
- * @property removeChatLink                             [RemoveChatLink]
+ * @property removeChatLinkUseCase                      [RemoveChatLinkUseCase]
  * @property createChatLink                             [CreateChatLink]
  * @property monitorConnectivityUseCase                 [MonitorConnectivityUseCase]
  * @property monitorChatListItemUpdates                 [MonitorChatListItemUpdates]
@@ -94,7 +94,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val queryChatLink: QueryChatLink,
-    private val removeChatLink: RemoveChatLink,
+    private val removeChatLinkUseCase: RemoveChatLinkUseCase,
     private val createChatLink: CreateChatLink,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -529,7 +529,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
         _state.value.chatId?.let { id ->
             viewModelScope.launch {
                 runCatching {
-                    removeChatLink(id)
+                    removeChatLinkUseCase(id)
                 }.onFailure { exception ->
                     Timber.e(exception)
                     triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))

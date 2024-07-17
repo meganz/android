@@ -16,13 +16,13 @@ import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.QueryChatLink
-import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.RemoveParticipantFromChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetOpenInviteUseCase
+import mega.privacy.android.domain.usecase.chat.link.RemoveChatLinkUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactItem
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -67,7 +67,7 @@ class CreateScheduledMeetingViewModelTest {
     private val createChatroomAndSchedMeetingUseCase: CreateChatroomAndSchedMeetingUseCase = mock()
     private val updateScheduledMeetingUseCase: UpdateScheduledMeetingUseCase = mock()
     private val createChatLink: CreateChatLink = mock()
-    private val removeChatLink: RemoveChatLink = mock()
+    private val removeChatLinkUseCase: RemoveChatLinkUseCase = mock()
     private val queryChatLink: QueryChatLink = mock()
     private val recurrenceDialogOptionMapper: RecurrenceDialogOptionMapper = mock()
     private val weekDayMapper: WeekDayMapper = mock()
@@ -108,7 +108,7 @@ class CreateScheduledMeetingViewModelTest {
             createChatroomAndSchedMeetingUseCase = createChatroomAndSchedMeetingUseCase,
             updateScheduledMeetingUseCase = updateScheduledMeetingUseCase,
             createChatLink = createChatLink,
-            removeChatLink = removeChatLink,
+            removeChatLinkUseCase = removeChatLinkUseCase,
             queryChatLink = queryChatLink,
             recurrenceDialogOptionMapper = recurrenceDialogOptionMapper,
             weekDayMapper = weekDayMapper,
@@ -137,7 +137,7 @@ class CreateScheduledMeetingViewModelTest {
             createChatroomAndSchedMeetingUseCase,
             updateScheduledMeetingUseCase,
             createChatLink,
-            removeChatLink,
+            removeChatLinkUseCase,
             queryChatLink,
             recurrenceDialogOptionMapper,
             weekDayMapper,

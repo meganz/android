@@ -19,7 +19,6 @@ import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
-import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetMyChatFilesFolder
 import mega.privacy.android.domain.usecase.SetOpenInvite
@@ -87,13 +86,6 @@ abstract class ChatModule {
         @Provides
         fun provideCreateChatLink(chatRepository: ChatRepository): CreateChatLink =
             CreateChatLink(chatRepository::createChatLink)
-
-        /**
-         * Provides the Use Case [RemoveChatLink]
-         */
-        @Provides
-        fun provideRemoveChatLink(chatRepository: ChatRepository): RemoveChatLink =
-            RemoveChatLink(chatRepository::removeChatLink)
 
         /**
          * Provides the Use Case [QueryChatLink]
