@@ -69,6 +69,7 @@ fun PhotosGridView(
 
     val context = LocalContext.current
     val uiPhotoList = timelineViewState.photosListItems
+    val currentZoomLevel = timelineViewState.currentZoomLevel
 
     FastScrollLazyVerticalGrid(
         totalItems = uiPhotoList.size,
@@ -76,15 +77,18 @@ fun PhotosGridView(
         modifier = modifier.fillMaxSize(),
         state = lazyGridState,
         tooltipText = { index ->
-            val modificationTime = when (val item = uiPhotoList[index]) {
-                is PhotoListItem.Separator -> item.modificationTime
-                is PhotoListItem.PhotoGridItem -> item.photo.modificationTime
-            }
-            dateText(
-                modificationTime = modificationTime,
-                currentZoomLevel = timelineViewState.currentZoomLevel,
-                locale = context.resources.configuration.locales[0],
-            )
+            val item = uiPhotoList.getOrNull(index)
+            item?.let {
+                val modificationTime = when (it) {
+                    is PhotoListItem.Separator -> it.modificationTime
+                    is PhotoListItem.PhotoGridItem -> it.photo.modificationTime
+                }
+                dateText(
+                    modificationTime = modificationTime,
+                    currentZoomLevel = currentZoomLevel,
+                    locale = context.resources.configuration.locales[0],
+                )
+            } ?: ""
         },
     ) {
         if (timelineViewState.isCameraUploadsLimitedAccess) {

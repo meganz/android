@@ -107,15 +107,18 @@ internal fun PhotosGridView(
         modifier = modifier.fillMaxSize(),
         state = lazyGridState,
         tooltipText = { index ->
-            val modificationTime = when (val item = uiPhotoList[index]) {
-                is UIPhoto.Separator -> item.modificationTime
-                is UIPhoto.PhotoItem -> item.photo.modificationTime
-            }
-            dateText(
-                modificationTime = modificationTime,
-                currentZoomLevel = currentZoomLevel,
-                locale = context.resources.configuration.locales[0],
-            )
+            val item = uiPhotoList.getOrNull(index)
+            item?.let {
+                val modificationTime = when (it) {
+                    is UIPhoto.Separator -> it.modificationTime
+                    is UIPhoto.PhotoItem -> it.photo.modificationTime
+                }
+                dateText(
+                    modificationTime = modificationTime,
+                    currentZoomLevel = currentZoomLevel,
+                    locale = context.resources.configuration.locales[0],
+                )
+            } ?: ""
         },
     ) {
         this.itemsIndexed(

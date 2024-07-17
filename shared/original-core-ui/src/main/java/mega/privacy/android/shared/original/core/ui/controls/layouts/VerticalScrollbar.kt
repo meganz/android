@@ -134,7 +134,9 @@ private fun VerticalScrollbar(
     }
 
     val thumbVisible by remember {
-        derivedStateOf { state.isScrollInProgress || thumbPressed }
+        derivedStateOf {
+            itemCount > 0 && state.isScrollInProgress || thumbPressed
+        }
     }
 
     val tooltipString by remember(thumbVisible) {
@@ -159,14 +161,22 @@ private fun VerticalScrollbar(
                 ) { change, _ ->
                     if (thumbPressed && scrollableHeightPixels > 0) {
                         change.consume()
+
+                        val dragPositionY = change.position.y
+                        val adjustedY = dragPositionY - thumbHeightPixels / 2
+
                         val dragProportion = if (reverseLayout) {
-                            1 - (change.position.y - thumbHeightPixels / 2) / scrollableHeightPixels
+                            1 - (adjustedY / scrollableHeightPixels)
                         } else {
-                            (change.position.y - thumbHeightPixels / 2) / scrollableHeightPixels
+                            adjustedY / scrollableHeightPixels
                         }
-                        val targetIndex = (dragProportion * scrollableItemsAmount)
+
+                        val clampedProportion = dragProportion.coerceIn(0f, 1f)
+
+                        val targetIndex = (clampedProportion * scrollableItemsAmount)
                             .toInt()
                             .coerceIn(0, itemCount - 1)
+
                         coroutineScope.launch {
                             scrollToItem(targetIndex)
                         }
