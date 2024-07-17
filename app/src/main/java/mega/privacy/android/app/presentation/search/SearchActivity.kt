@@ -46,8 +46,6 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -82,10 +80,9 @@ import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDE
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -610,42 +607,13 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         content: NodeContentUri,
         viewType: Int?,
     ) {
-        val intent = when {
-            fileNode.type.isSupported && fileNode.type is VideoFileTypeInfo ->
-                Intent(this, LegacyVideoPlayerActivity::class.java).apply {
-                    putExtra(
-                        Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                        viewModel.state.value.sortOrder
-                    )
-                }
-
-            fileNode.type.isSupported && fileNode.type is AudioFileTypeInfo -> Intent(
-                this,
-                AudioPlayerActivity::class.java
-            ).apply {
-                putExtra(
-                    Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                    viewModel.state.value.sortOrder
-                )
-            }
-
-            else -> Intent(Intent.ACTION_VIEW)
-        }.apply {
-            putExtra(Constants.INTENT_EXTRA_KEY_PLACEHOLDER, 0)
-            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
-            putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
-            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
-            putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, fileNode.parentId.longValue)
-            putExtra(Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK, false)
-            val mimeType =
-                if (fileNode.type.extension == "opus") "audio/*" else fileNode.type.mimeType
-            nodeActionsViewModel.applyNodeContentUri(
-                intent = this,
-                content = content,
-                mimeType = mimeType,
-            )
-        }
-        safeLaunchActivity(intent)
+        megaNavigator.openMediaPlayerActivityByFileNode(
+            context = this,
+            fileNode = fileNode,
+            contentUri = content,
+            viewType = viewType ?: INVALID_VALUE,
+            sortOrder = viewModel.state.value.sortOrder
+        )
     }
 
     private fun openUrlFile(
