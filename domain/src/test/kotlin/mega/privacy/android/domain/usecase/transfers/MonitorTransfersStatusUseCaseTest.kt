@@ -217,6 +217,59 @@ internal class MonitorTransfersStatusUseCaseTest {
             }
         }
 
+    @Test
+    fun `test that upload counter and paused are updated with legacy use cases on each new active transfer and each new transfer event when activeTransfersInCameraUploadsFlag is false`() =
+        runTest {
+            whenever(transferRepository.monitorTransferEvents()).thenReturn(globalTransferFlow)
+            val flowsMap = stubActiveTransfersFlows()
+            stubPendingUploadsAndPausedUseCases(0, false)
+            underTest(
+                uploadsWorkerFlag = true,
+                activeTransfersInCameraUploadsFlag = false
+            ).test {
+                awaitItem().assertPendingUploadsAndPaused(0, false)
+
+                stubPendingUploadsAndPausedUseCases(1, false)
+                flowsMap[TransferType.DOWNLOAD]?.update {
+                    it.copy(
+                        activeTransferTotals = emptyActiveTransferTotals(TransferType.DOWNLOAD),
+                        transfersOverQuota = true,
+                    )
+                }
+                awaitItem().assertPendingUploadsAndPaused(1, false)
+
+                stubPendingUploadsAndPausedUseCases(2, true)
+                flowsMap[TransferType.GENERAL_UPLOAD]?.update {
+                    it.copy(
+                        activeTransferTotals = emptyActiveTransferTotals(TransferType.GENERAL_UPLOAD),
+                        transfersOverQuota = true,
+                    )
+                }
+                awaitItem().assertPendingUploadsAndPaused(2, true)
+
+                stubPendingUploadsAndPausedUseCases(3, false)
+                globalTransferFlow.emit(
+                    TransferEvent.TransferUpdateEvent(
+                        transfer.copy(transferType = TransferType.CU_UPLOAD)
+                    )
+                )
+                awaitItem().assertPendingUploadsAndPaused(3, false)
+            }
+        }
+
+    private suspend fun stubPendingUploadsAndPausedUseCases(uploads: Int, paused: Boolean) {
+        whenever(getNumPendingUploadsUseCase()).thenReturn(uploads)
+        whenever(areTransfersPaused()).thenReturn(paused)
+    }
+
+    private fun TransfersStatusInfo.assertPendingUploadsAndPaused(
+        uploads: Int,
+        paused: Boolean,
+    ) {
+        assertThat(this.pendingUploads).isEqualTo(uploads)
+        assertThat(this.paused).isEqualTo(paused)
+    }
+
     private fun stubActiveTransfersFlows(paused: Boolean = false) =
         TransferType.entries.filterNot { it == TransferType.NONE }.associateWith { type ->
             MutableStateFlow(

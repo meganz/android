@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.yield
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -47,10 +48,11 @@ class MonitorTransfersStatusUseCase @Inject constructor(
             invokeNew(TransferType.entries.filter {
                 it != TransferType.NONE && it != TransferType.CU_UPLOAD
             }).combine(invokeLegacy(onlyCameraUploads = true)) { totals, legacyCuTotals ->
+                yield()
                 totals.copy(
                     totalSizeToTransfer = totals.totalSizeToTransfer + legacyCuTotals.totalSizeToTransfer,
                     totalSizeTransferred = totals.totalSizeTransferred + legacyCuTotals.totalSizeTransferred,
-                    pendingUploads = legacyCuTotals.pendingUploads,
+                    pendingUploads = getNumPendingUploadsUseCase(),
                     paused = areTransfersPaused()
                 )
             }
@@ -113,7 +115,7 @@ class MonitorTransfersStatusUseCase @Inject constructor(
                 totalSizeToTransfer = totalBytes,
                 totalSizeTransferred = totalTransferred,
                 pendingDownloads = if (onlyCameraUploads) 0 else getNumPendingDownloadsNonBackgroundUseCase(),
-                pendingUploads = getNumPendingUploadsUseCase(),
+                pendingUploads = if (onlyCameraUploads) 0 else getNumPendingUploadsUseCase(),
                 paused = if (onlyCameraUploads) false else areTransfersPaused(),
             )
         }.onStart {
