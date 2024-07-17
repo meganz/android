@@ -20,7 +20,7 @@ import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -40,7 +40,7 @@ internal class OpenLinkViewModelTest {
     private val savedStateHandle: SavedStateHandle = mock()
     private val getHandleFromContactLinkUseCase: GetHandleFromContactLinkUseCase = mock()
     private val getChatLinkContentUseCase: GetChatLinkContentUseCase = mock()
-    private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase = mock()
     private val getChatCallUseCase: GetChatCallUseCase = mock()
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
@@ -73,7 +73,7 @@ internal class OpenLinkViewModelTest {
             savedStateHandle,
             getHandleFromContactLinkUseCase,
             getChatLinkContentUseCase,
-            getScheduledMeetingByChat,
+            getScheduledMeetingByChatUseCase,
             getChatCallUseCase,
             startMeetingInWaitingRoomChatUseCase,
             answerChatCallUseCase,

@@ -27,7 +27,6 @@ import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 
 /**
  * Chats module.
@@ -46,13 +45,6 @@ abstract class ChatModule {
 
 
     companion object {
-
-        /**
-         * Provides the Use Case [GetScheduledMeetingByChat]
-         */
-        @Provides
-        fun provideGetScheduledMeetingByChat(callRepository: CallRepository): GetScheduledMeetingByChat =
-            GetScheduledMeetingByChat(callRepository::getScheduledMeetingsByChat)
 
         /**
          * Provides the Use Case [GetScheduledMeeting]

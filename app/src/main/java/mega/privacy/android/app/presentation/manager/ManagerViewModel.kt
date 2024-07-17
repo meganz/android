@@ -84,7 +84,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -170,7 +170,7 @@ import javax.inject.Inject
  * @property dismissPsaUseCase Use case for dismissing PSA.
  * @property getRootNodeUseCase Use case for getting the root node.
  * @property getChatLinkContentUseCase Use case for getting the content of a chat link.
- * @property getScheduledMeetingByChat Use case for getting a scheduled meeting by chat.
+ * @property getScheduledMeetingByChatUseCase Use case for getting a scheduled meeting by chat.
  * @property getChatCallUseCase Use case for getting a chat call.
  * @property startMeetingInWaitingRoomChatUseCase Use case for starting a meeting in waiting room chat.
  * @property answerChatCallUseCase Use case for answering a chat call.
@@ -240,7 +240,7 @@ class ManagerViewModel @Inject constructor(
     private val dismissPsaUseCase: DismissPsaUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getChatLinkContentUseCase: GetChatLinkContentUseCase,
-    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
@@ -1196,7 +1196,7 @@ class ManagerViewModel @Inject constructor(
                 }
                 if (scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted) {
                     runCatching {
-                        getScheduledMeetingByChat(chatId)
+                        getScheduledMeetingByChatUseCase(chatId)
                     }.onSuccess { scheduledMeetingList ->
                         scheduledMeetingList?.first()?.schedId?.let { schedId ->
                             startSchedMeetingWithWaitingRoom(

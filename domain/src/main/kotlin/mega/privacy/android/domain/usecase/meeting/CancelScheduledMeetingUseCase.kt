@@ -6,7 +6,7 @@ import javax.inject.Inject
  * Cancel a scheduled meeting
  */
 class CancelScheduledMeetingUseCase @Inject constructor(
-    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val updateScheduledMeetingUseCase: UpdateScheduledMeetingUseCase,
 ) {
     /**
@@ -15,7 +15,7 @@ class CancelScheduledMeetingUseCase @Inject constructor(
      * @param chatId MegaChatHandle that identifies a chat room
      * */
     suspend operator fun invoke(chatId: Long) {
-        getScheduledMeetingByChat(chatId)
+        getScheduledMeetingByChatUseCase(chatId)
             ?.firstOrNull { !it.isCanceled && it.parentSchedId == -1L }
             ?.let { schedMeeting ->
                 updateScheduledMeetingUseCase(

@@ -104,7 +104,7 @@ import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -200,7 +200,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase,
-    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val getMyFullNameUseCase: GetMyFullNameUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
@@ -616,7 +616,7 @@ class MeetingActivityViewModel @Inject constructor(
     private fun getScheduledMeeting() =
         viewModelScope.launch {
             runCatching {
-                getScheduledMeetingByChat(state.value.chatId)
+                getScheduledMeetingByChatUseCase(state.value.chatId)
             }.onFailure {
                 Timber.d("Scheduled meeting does not exist")
                 _state.update {

@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.chat.GetHandleFromContactLinkUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -38,7 +38,7 @@ internal class OpenLinkViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getHandleFromContactLinkUseCase: GetHandleFromContactLinkUseCase,
     private val getChatLinkContentUseCase: GetChatLinkContentUseCase,
-    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
@@ -130,7 +130,7 @@ internal class OpenLinkViewModel @Inject constructor(
                 }
                 if (scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted) {
                     runCatching {
-                        getScheduledMeetingByChat(chatId)
+                        getScheduledMeetingByChatUseCase(chatId)
                     }.onSuccess { scheduledMeetingList ->
                         scheduledMeetingList?.first()?.schedId?.let { schedId ->
                             startSchedMeetingWithWaitingRoom(

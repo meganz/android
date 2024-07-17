@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactItem
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeetingUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.meeting.UpdateScheduledMeetingUseCase
@@ -60,7 +60,7 @@ class CreateScheduledMeetingViewModelTest {
 
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase = mock()
-    private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase = mock()
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase = mock()
     private val getContactItem: GetContactItem = mock()
     private val getChatRoomUseCase: GetChatRoomUseCase = mock()
@@ -101,7 +101,7 @@ class CreateScheduledMeetingViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             getVisibleContactsUseCase = getVisibleContactsUseCase,
-            getScheduledMeetingByChat = getScheduledMeetingByChat,
+            getScheduledMeetingByChatUseCase = getScheduledMeetingByChatUseCase,
             getContactFromEmailUseCase = getContactFromEmailUseCase,
             getContactItem = getContactItem,
             getChatRoomUseCase = getChatRoomUseCase,
@@ -130,7 +130,7 @@ class CreateScheduledMeetingViewModelTest {
             monitorConnectivityUseCase,
             isConnectedToInternetUseCase,
             getVisibleContactsUseCase,
-            getScheduledMeetingByChat,
+            getScheduledMeetingByChatUseCase,
             getContactFromEmailUseCase,
             getContactItem,
             getChatRoomUseCase,

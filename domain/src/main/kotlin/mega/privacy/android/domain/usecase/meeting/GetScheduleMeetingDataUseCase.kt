@@ -18,7 +18,7 @@ import javax.inject.Inject
  * @property getChatRoomUseCase
  */
 class GetScheduleMeetingDataUseCase @Inject constructor(
-    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChat,
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val getNextSchedMeetingOccurrenceUseCase: GetNextSchedMeetingOccurrenceUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
 ) {

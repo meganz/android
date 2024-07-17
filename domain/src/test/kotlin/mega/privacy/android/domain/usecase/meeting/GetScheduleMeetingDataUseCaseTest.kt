@@ -26,7 +26,7 @@ internal class GetScheduleMeetingDataUseCaseTest {
 
     private lateinit var underTest: GetScheduleMeetingDataUseCase
 
-    private val getScheduledMeetingByChat = mock<GetScheduledMeetingByChat>()
+    private val getScheduledMeetingByChatUseCase = mock<GetScheduledMeetingByChatUseCase>()
     private val fetchScheduledMeetingOccurrencesByChatUseCase =
         mock<FetchScheduledMeetingOccurrencesByChatUseCase>()
     private val getChatRoomUseCase = mock<GetChatRoomUseCase>()
@@ -34,24 +34,18 @@ internal class GetScheduleMeetingDataUseCaseTest {
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(testDispatcher)
         underTest = GetScheduleMeetingDataUseCase(
-            getScheduledMeetingByChat,
+            getScheduledMeetingByChatUseCase,
             GetNextSchedMeetingOccurrenceUseCase(fetchScheduledMeetingOccurrencesByChatUseCase),
             getChatRoomUseCase,
         )
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test(expected = java.lang.IllegalStateException::class)
     fun `test that getMeetingScheduleData return null`() =
         runTest {
             val chatId = 123L
-            whenever(getScheduledMeetingByChat(chatId)).thenReturn(null)
+            whenever(getScheduledMeetingByChatUseCase(chatId)).thenReturn(null)
 
             val result = underTest.invoke(chatId) { _, _ -> "" }
 
@@ -66,7 +60,7 @@ internal class GetScheduleMeetingDataUseCaseTest {
                 on { chatId }.thenReturn(chatId)
             }
             whenever(getChatRoomUseCase(chatId)).thenReturn(chat)
-            whenever(getScheduledMeetingByChat(chatId)).thenReturn(
+            whenever(getScheduledMeetingByChatUseCase(chatId)).thenReturn(
                 listOf(
                     ChatScheduledMeeting(
                         chatId = chatId,
@@ -86,7 +80,7 @@ internal class GetScheduleMeetingDataUseCaseTest {
         runTest {
             val chatId = 123L
             whenever(getChatRoomUseCase(chatId)).thenReturn(null)
-            whenever(getScheduledMeetingByChat(chatId)).thenReturn(
+            whenever(getScheduledMeetingByChatUseCase(chatId)).thenReturn(
                 listOf(
                     ChatScheduledMeeting(
                         chatId = chatId,
@@ -114,7 +108,7 @@ internal class GetScheduleMeetingDataUseCaseTest {
             )
 
             whenever(getChatRoomUseCase(chatId)).thenReturn(mock())
-            whenever(getScheduledMeetingByChat(chatId)).thenReturn(
+            whenever(getScheduledMeetingByChatUseCase(chatId)).thenReturn(
                 listOf(
                     ChatScheduledMeeting(
                         chatId = chatId,

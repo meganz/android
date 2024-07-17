@@ -23,7 +23,7 @@ import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallInProgress
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.KickUsersFromCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -35,7 +35,7 @@ import javax.inject.Inject
  *
  * @property monitorChatCallUpdatesUseCase          [MonitorChatCallUpdatesUseCase]
  * @property getMessageSenderNameUseCase            [GetMessageSenderNameUseCase]
- * @property getScheduledMeetingByChat              [GetScheduledMeetingByChat]
+ * @property getScheduledMeetingByChatUseCase       [GetScheduledMeetingByChatUseCase]
  * @property getChatCallInProgress                  [GetChatCallInProgress]
  * @property monitorScheduledMeetingUpdatesUseCase  [MonitorScheduledMeetingUpdatesUseCase]
  * @property allowUsersJoinCallUseCase              [AllowUsersJoinCallUseCase]
@@ -48,7 +48,7 @@ import javax.inject.Inject
 class WaitingRoomManagementViewModel @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase,
-    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
     private val getChatCallInProgress: GetChatCallInProgress,
     private val allowUsersJoinCallUseCase: AllowUsersJoinCallUseCase,
@@ -309,7 +309,7 @@ class WaitingRoomManagementViewModel @Inject constructor(
      */
     private fun getScheduledMeetingTitle(chatId: Long) = viewModelScope.launch {
         runCatching {
-            getScheduledMeetingByChat(chatId)
+            getScheduledMeetingByChatUseCase(chatId)
         }.onFailure { exception ->
             Timber.e(exception)
             setShowParticipantsInWaitingRoomDialogConsumed()

@@ -53,7 +53,7 @@ import mega.privacy.android.domain.usecase.chat.SetOpenInviteUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactItem
 import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeetingUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.meeting.UpdateScheduledMeetingUseCase
@@ -69,7 +69,7 @@ import javax.inject.Inject
  * CreateScheduledMeetingActivity view model.
  * @property monitorConnectivityUseCase                 [MonitorConnectivityUseCase]
  * @property getVisibleContactsUseCase                  [GetVisibleContactsUseCase]
- * @property getScheduledMeetingByChat                  [GetScheduledMeetingByChat]
+ * @property getScheduledMeetingByChatUseCase           [GetScheduledMeetingByChatUseCase]
  * @property getContactFromEmailUseCase                 [GetContactFromEmailUseCase]
  * @property getContactItem                             [GetContactItem]
  * @property getChatRoomUseCase                         [GetChatRoomUseCase]
@@ -96,7 +96,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
-    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
     private val getContactItem: GetContactItem,
     private val getChatRoomUseCase: GetChatRoomUseCase,
@@ -220,7 +220,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private fun getScheduledMeeting(chatId: Long) =
         viewModelScope.launch {
             runCatching {
-                getScheduledMeetingByChat(chatId)
+                getScheduledMeetingByChatUseCase(chatId)
             }.onFailure { exception ->
                 Timber.e("Scheduled meeting does not exist $exception")
             }.onSuccess { scheduledMeetingList ->

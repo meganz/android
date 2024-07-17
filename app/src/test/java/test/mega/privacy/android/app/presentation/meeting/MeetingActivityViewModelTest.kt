@@ -43,7 +43,7 @@ import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -101,7 +101,7 @@ class MeetingActivityViewModelTest {
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
     private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase = mock()
-    private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase = mock()
     private val getMyFullNameUseCase: GetMyFullNameUseCase = mock()
     private val monitorUserUpdates: MonitorUserUpdates = mock()
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase =
@@ -164,7 +164,7 @@ class MeetingActivityViewModelTest {
             monitorStorageStateEventUseCase,
             hangChatCallUseCase,
             broadcastCallEndedUseCase,
-            getScheduledMeetingByChat,
+            getScheduledMeetingByChatUseCase,
             getMyFullNameUseCase,
             monitorUserUpdates,
             monitorScheduledMeetingUpdatesUseCase,
@@ -219,7 +219,7 @@ class MeetingActivityViewModelTest {
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
             broadcastCallEndedUseCase = broadcastCallEndedUseCase,
-            getScheduledMeetingByChat = getScheduledMeetingByChat,
+            getScheduledMeetingByChatUseCase = getScheduledMeetingByChatUseCase,
             getMyFullNameUseCase = getMyFullNameUseCase,
             monitorUserUpdates = monitorUserUpdates,
             monitorScheduledMeetingUpdatesUseCase = monitorScheduledMeetingUpdatesUseCase,

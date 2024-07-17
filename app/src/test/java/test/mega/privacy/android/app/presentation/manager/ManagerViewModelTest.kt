@@ -93,7 +93,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -304,7 +304,7 @@ class ManagerViewModelTest {
     private val dismissPsaUseCase = mock<DismissPsaUseCase>()
     private val rootNodeUseCase = mock<GetRootNodeUseCase>()
     private val getChatLinkContentUseCase: GetChatLinkContentUseCase = mock()
-    private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase = mock()
     private val getChatCallUseCase: GetChatCallUseCase = mock()
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
@@ -393,7 +393,7 @@ class ManagerViewModelTest {
             dismissPsaUseCase = dismissPsaUseCase,
             getRootNodeUseCase = rootNodeUseCase,
             getChatLinkContentUseCase = getChatLinkContentUseCase,
-            getScheduledMeetingByChat = getScheduledMeetingByChat,
+            getScheduledMeetingByChatUseCase = getScheduledMeetingByChatUseCase,
             getChatCallUseCase = getChatCallUseCase,
             startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
             answerChatCallUseCase = answerChatCallUseCase,
@@ -449,7 +449,7 @@ class ManagerViewModelTest {
             dismissPsaUseCase,
             rootNodeUseCase,
             getChatLinkContentUseCase,
-            getScheduledMeetingByChat,
+            getScheduledMeetingByChatUseCase,
             getChatCallUseCase,
             startMeetingInWaitingRoomChatUseCase,
             answerChatCallUseCase,

@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChatUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -28,7 +28,7 @@ import javax.inject.Inject
 /**
  * RecurringMeetingInfoActivity view model.
  * @property monitorConnectivityUseCase                             [MonitorConnectivityUseCase]
- * @property getScheduledMeetingByChat                              [GetScheduledMeetingByChat]
+ * @property getScheduledMeetingByChatUseCase                       [GetScheduledMeetingByChatUseCase]
  * @property fetchScheduledMeetingOccurrencesByChatUseCase          [FetchScheduledMeetingOccurrencesByChatUseCase]
  * @property fetchNumberOfScheduledMeetingOccurrencesByChat         [FetchNumberOfScheduledMeetingOccurrencesByChat]
  * @property getChatParticipants                                    [GetChatParticipants]
@@ -40,7 +40,7 @@ import javax.inject.Inject
 class RecurringMeetingInfoViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
-    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val fetchScheduledMeetingOccurrencesByChatUseCase: FetchScheduledMeetingOccurrencesByChatUseCase,
     private val fetchNumberOfScheduledMeetingOccurrencesByChat: FetchNumberOfScheduledMeetingOccurrencesByChat,
     private val getChatParticipants: GetChatParticipants,
@@ -90,7 +90,7 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     private fun getScheduledMeeting() =
         viewModelScope.launch {
             runCatching {
-                getScheduledMeetingByChat(state.value.chatId)
+                getScheduledMeetingByChatUseCase(state.value.chatId)
             }.onFailure { exception ->
                 Timber.e("Scheduled meeting does not exist, finish $exception")
                 finishActivity()
