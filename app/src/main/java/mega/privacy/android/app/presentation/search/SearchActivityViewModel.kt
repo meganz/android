@@ -27,7 +27,6 @@ import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMap
 import mega.privacy.android.app.presentation.search.model.DateFilterWithName
 import mega.privacy.android.app.presentation.search.model.FilterOptionEntity
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
-import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.TypeFilterWithName
 import mega.privacy.android.app.presentation.search.navigation.DATE_ADDED
 import mega.privacy.android.app.presentation.search.navigation.DATE_MODIFIED
@@ -47,7 +46,6 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
-import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -61,7 +59,6 @@ import kotlin.coroutines.cancellation.CancellationException
  * SearchActivity View Model
  * @property getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
  * @property monitorNodeUpdatesUseCase [MonitorNodeUpdatesUseCase]
- * @property getSearchCategoriesUseCase [GetSearchCategoriesUseCase]
  * @property searchFilterMapper [SearchFilterMapper]
  * @property nodeSourceTypeToSearchTargetMapper [NodeSourceTypeToSearchTargetMapper]
  * @property typeFilterToSearchMapper [TypeFilterToSearchMapper]
@@ -77,7 +74,6 @@ class SearchActivityViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val searchUseCase: SearchUseCase,
-    private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
     private val searchFilterMapper: SearchFilterMapper,
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     private val typeFilterToSearchMapper: TypeFilterToSearchMapper,
@@ -112,27 +108,12 @@ class SearchActivityViewModel @Inject constructor(
     private var showHiddenItems: Boolean = true
 
     init {
-        checkDropdownChipsFlag()
         checkSearchDescriptionFlag()
         monitorNodeUpdatesForSearch()
         initializeSearch()
         checkViewType()
         monitorAccountDetail()
         monitorShowHiddenItems()
-    }
-
-    private fun checkDropdownChipsFlag() {
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.DropdownChips)
-            }.onSuccess { flag ->
-                _state.update {
-                    it.copy(dropdownChipsEnabled = flag)
-                }
-            }.onFailure {
-                Timber.e("Get feature flag failed $it")
-            }
-        }
     }
 
     private fun checkSearchDescriptionFlag() {
@@ -159,19 +140,8 @@ class SearchActivityViewModel @Inject constructor(
                     dateAddedSelectedFilterOption = null,
                 )
             }
-            runCatching {
-                getSearchCategoriesUseCase().map { searchFilterMapper(it) }
-                    .filterNot { it.filter == SearchCategory.ALL }
-            }.onSuccess { filters ->
-                _state.update {
-                    it.copy(filters = filters, selectedFilter = null)
-                }
-            }.onFailure {
-                Timber.e("Get search categories failed $it")
-            }
         }
     }
-
 
     private fun monitorNodeUpdatesForSearch() {
         viewModelScope.launch {
@@ -199,7 +169,7 @@ class SearchActivityViewModel @Inject constructor(
                         searchTarget = nodeSourceTypeToSearchTargetMapper(nodeSourceType),
                         searchCategory = state.value.typeSelectedFilterOption?.let {
                             typeFilterToSearchMapper(it.type)
-                        } ?: state.value.selectedFilter?.filter ?: SearchCategory.ALL,
+                        } ?: SearchCategory.ALL,
                         modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
                         creationDate = state.value.dateAddedSelectedFilterOption?.date,
                         description = if (state.value.searchDescriptionEnabled == true) getCurrentSearchQuery() else null,
@@ -271,35 +241,12 @@ class SearchActivityViewModel @Inject constructor(
     }
 
     private fun getEmptySearchState() =
-        if (state.value.dropdownChipsEnabled == true) {
-            emptySearchViewMapper(
-                isSearchChipEnabled = true,
-                category = typeFilterToSearchMapper(state.value.typeSelectedFilterOption?.type),
-                searchQuery = state.value.searchQuery,
-                isDateFilterApplied = state.value.dateAddedSelectedFilterOption != null || state.value.dateModifiedSelectedFilterOption != null
-            )
-        } else {
-            emptySearchViewMapper(
-                isSearchChipEnabled = true,
-                category = state.value.selectedFilter?.filter,
-                searchQuery = state.value.searchQuery
-            )
-        }
-
-    /**
-     * Update search filter on selection
-     *
-     * @param selectedChip
-     */
-    fun updateFilter(selectedChip: SearchFilter?) {
-        _state.update {
-            it.copy(
-                selectedFilter = selectedChip.takeIf { selectedChip?.filter != state.value.selectedFilter?.filter },
-                resetScroll = state.value.resetScroll.not()
-            )
-        }
-        viewModelScope.launch { performSearch() }
-    }
+        emptySearchViewMapper(
+            isSearchChipEnabled = true,
+            category = typeFilterToSearchMapper(state.value.typeSelectedFilterOption?.type),
+            searchQuery = state.value.searchQuery,
+            isDateFilterApplied = state.value.dateAddedSelectedFilterOption != null || state.value.dateModifiedSelectedFilterOption != null
+        )
 
     /**
      * Update search query on typing

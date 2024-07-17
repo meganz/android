@@ -9,7 +9,6 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
-import mega.privacy.android.data.mapper.search.SearchCategoryMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -55,7 +54,6 @@ class SearchRepositoryImplTest {
     @BeforeAll
     fun setUp() {
         underTest = SearchRepositoryImpl(
-            searchCategoryMapper = SearchCategoryMapper(),
             nodeMapper = nodeMapper,
             megaApiGateway = megaApiGateway,
             ioDispatcher = ioDispatcher,
@@ -64,20 +62,6 @@ class SearchRepositoryImplTest {
             sortOrderIntMapper = sortOrderIntMapper,
             megaSearchFilterMapper = megsSearchFilterMapper,
             getCloudSortOrder = getCloudSortOrder
-        )
-    }
-
-    @Test
-    fun `test that getSearchCategories returns list of search categories`() {
-        val actual = underTest.getSearchCategories()
-        assertThat(actual.sorted()).isEqualTo(
-            listOf(
-                SearchCategory.ALL,
-                SearchCategory.AUDIO,
-                SearchCategory.VIDEO,
-                SearchCategory.ALL_DOCUMENTS,
-                SearchCategory.IMAGES
-            ).sorted()
         )
     }
 

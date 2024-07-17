@@ -39,7 +39,6 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
-import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -76,8 +75,6 @@ fun SearchComposeView(
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
     onErrorShown: () -> Unit,
-    updateFilter: (SearchFilter) -> Unit,
-    trackAnalytics: (SearchFilter) -> Unit,
     updateSearchQuery: (String) -> Unit,
     onFilterClicked: (String) -> Unit,
     onBackPressed: () -> Unit,
@@ -161,8 +158,6 @@ fun SearchComposeView(
                 FilterChipsView(
                     state = state,
                     onFilterClicked = onFilterClicked,
-                    updateFilter = updateFilter,
-                    trackAnalytics = trackAnalytics
                 )
             }
             if (state.isSearching) {
@@ -240,8 +235,6 @@ private fun PreviewSearchComposeView() {
         onLinkClicked = {},
         onDisputeTakeDownClicked = {},
         onErrorShown = {},
-        updateFilter = {},
-        trackAnalytics = {},
         updateSearchQuery = {},
         onFilterClicked = {},
         onBackPressed = {},

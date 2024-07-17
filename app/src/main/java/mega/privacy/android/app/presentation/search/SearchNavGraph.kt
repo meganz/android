@@ -5,7 +5,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
-import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.cannotOpenFileDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.cannotVerifyUserNavigation
@@ -21,15 +20,14 @@ import mega.privacy.android.app.presentation.search.navigation.renameDialogNavig
 import mega.privacy.android.app.presentation.search.navigation.searchFilterBottomSheetNavigation
 import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.shareFolderDialogNavigation
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 
 
 /**
  * Navigation graph for Search
  *
- * @param trackAnalytics Function to track analytics
  * @param showSortOrderBottomSheet Function to show sort order bottom sheet
  * @param navigateToLink Function to navigate to link
  * @param handleClick Function to handle click
@@ -41,7 +39,6 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
  * @param listToStringWithDelimitersMapper
  */
 internal fun NavGraphBuilder.searchNavGraph(
-    trackAnalytics: (SearchFilter?) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
     navigateToLink: (String) -> Unit,
     navHostController: NavHostController,
@@ -55,7 +52,6 @@ internal fun NavGraphBuilder.searchNavGraph(
 ) {
     composable(searchRoute) {
         SearchScreen(
-            trackAnalytics = trackAnalytics,
             navigateToLink = navigateToLink,
             showSortOrderBottomSheet = showSortOrderBottomSheet,
             navHostController = navHostController,

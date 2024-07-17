@@ -36,7 +36,6 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
@@ -66,7 +65,6 @@ import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToViewTypeMapper
-import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
@@ -91,7 +89,6 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
@@ -99,11 +96,6 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
-import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
-import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
-import mega.privacy.mobile.analytics.event.SearchResetFilterPressedEvent
-import mega.privacy.mobile.analytics.event.SearchVideosFilterPressedEvent
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -291,7 +283,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 nodeActionsViewModel = nodeActionsViewModel,
                                 navigateToLink = ::navigateToLink,
                                 showSortOrderBottomSheet = ::showSortOrderBottomSheet,
-                                trackAnalytics = ::trackAnalytics,
                                 nodeActionHandler = bottomSheetActionHandler,
                                 navHostController = navHostController,
                                 bottomSheetNavigator = bottomSheetNavigator,
@@ -655,21 +646,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         )
     }
 
-    private fun trackAnalytics(selectedFilter: SearchFilter?) {
-        val event = if (viewModel.state.value.selectedFilter?.filter == selectedFilter?.filter) {
-            SearchResetFilterPressedEvent
-        } else {
-            when (selectedFilter?.filter) {
-                SearchCategory.IMAGES -> SearchImageFilterPressedEvent
-                SearchCategory.ALL_DOCUMENTS -> SearchDocsFilterPressedEvent
-                SearchCategory.AUDIO -> SearchAudioFilterPressedEvent
-                SearchCategory.VIDEO -> SearchVideosFilterPressedEvent
-                else -> SearchResetFilterPressedEvent
-            }
-        }
-        Analytics.tracker.trackEvent(event)
-    }
-
     private fun handleNodesNameCollisionResult(result: NodeNameCollisionResult) {
         if (result.conflictNodes.isNotEmpty()) {
             nameCollisionActivityContract
@@ -681,7 +657,9 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 NodeNameCollisionType.MOVE,
                                 -> NameCollision.Movement.fromNodeNameCollision(it)
 
-                                NodeNameCollisionType.COPY -> NameCollision.Copy.fromNodeNameCollision(it)
+                                NodeNameCollisionType.COPY -> NameCollision.Copy.fromNodeNameCollision(
+                                    it
+                                )
                             }
                         },
                     )

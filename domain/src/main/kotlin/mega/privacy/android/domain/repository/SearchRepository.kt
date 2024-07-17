@@ -3,10 +3,7 @@ package mega.privacy.android.domain.repository
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.domain.entity.search.DateFilterOption
-import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchParameters
-import mega.privacy.android.domain.entity.search.SearchTarget
 
 /**
  * Search Repository
@@ -14,14 +11,6 @@ import mega.privacy.android.domain.entity.search.SearchTarget
  * All the methods related to search will be included here
  */
 interface SearchRepository {
-
-    /**
-     * Get all search filters
-     * returns list of search categories available for filtering search
-     * Currently the values are hardcoded from repository in future we will be taking those from API
-     */
-    fun getSearchCategories(): List<SearchCategory>
-
     /**
      * Search node and return list of [UnTypedNode]
      * @param nodeId [NodeId] place to be searched

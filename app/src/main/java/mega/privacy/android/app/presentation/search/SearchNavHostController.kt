@@ -9,11 +9,10 @@ import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
-import mega.privacy.android.app.presentation.search.model.SearchFilter
-import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 
 /**
  * Search nav host controller
@@ -37,7 +36,6 @@ internal fun SearchNavHostController(
     viewModel: SearchActivityViewModel,
     navigateToLink: (String) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
-    trackAnalytics: (SearchFilter?) -> Unit,
     onBackPressed: () -> Unit,
     nodeActionHandler: NodeActionHandler,
     navHostController: NavHostController,
@@ -60,7 +58,6 @@ internal fun SearchNavHostController(
             searchNavGraph(
                 navigateToLink = navigateToLink,
                 showSortOrderBottomSheet = showSortOrderBottomSheet,
-                trackAnalytics = trackAnalytics,
                 navHostController = navHostController,
                 searchActivityViewModel = viewModel,
                 nodeActionHandler = nodeActionHandler,

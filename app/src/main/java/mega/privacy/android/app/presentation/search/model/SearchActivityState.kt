@@ -14,7 +14,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
  * State for SearchActivity
- * @property dropdownChipsEnabled are new dropdown chips enabled via feature flag
  * @property searchDescriptionEnabled is search by description enabled via feature flag
  * @property searchItemList list of search items in [TypedNode]
  * @property isSearching to show loading or not
@@ -23,8 +22,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property searchQuery current typed search query in search activity
  * @property optionsItemInfo options info needed to be displayed on toolbar when any nodes are selected
  * @property errorMessageId error message id to be shown on UI
- * @property filters search filter categories
- * @property selectedFilter selected filter which is enabled on chips
  * @property typeSelectedFilterOption the type selected filter option
  * @property dateModifiedSelectedFilterOption the date modified selected filter option
  * @property dateAddedSelectedFilterOption the date added selected filter option
@@ -39,7 +36,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property accountType account type (free/paid)
  */
 data class SearchActivityState(
-    val dropdownChipsEnabled: Boolean? = null,
     val searchDescriptionEnabled: Boolean? = null,
     val searchItemList: List<NodeUIItem<TypedNode>> = emptyList(),
     val isSearching: Boolean = true,
@@ -49,8 +45,6 @@ data class SearchActivityState(
     val selectedNodes: Set<TypedNode> = emptySet(),
     val optionsItemInfo: OptionsItemInfo? = null,
     @StringRes val errorMessageId: Int? = null,
-    val filters: List<SearchFilter> = emptyList(),
-    val selectedFilter: SearchFilter? = null,
     val typeSelectedFilterOption: TypeFilterWithName? = null,
     val dateModifiedSelectedFilterOption: DateFilterWithName? = null,
     val dateAddedSelectedFilterOption: DateFilterWithName? = null,

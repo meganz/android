@@ -33,7 +33,6 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.DateFilterOption
-import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.search.TypeFilterOption
@@ -43,7 +42,6 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
-import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -67,7 +65,6 @@ class SearchActivityViewModelTest {
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
-    private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase = mock()
     private val searchFilterMapper: SearchFilterMapper = mock()
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper = mock()
     private val typeFilterToSearchMapper: TypeFilterToSearchMapper = mock()
@@ -107,7 +104,6 @@ class SearchActivityViewModelTest {
             stateHandle = stateHandle,
             getCloudSortOrder = getCloudSortOrder,
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
-            getSearchCategoriesUseCase = getSearchCategoriesUseCase,
             searchFilterMapper = searchFilterMapper,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
             typeFilterToSearchMapper = typeFilterToSearchMapper,
@@ -150,7 +146,6 @@ class SearchActivityViewModelTest {
             stateHandle,
             getCloudSortOrder,
             cancelCancelTokenUseCase,
-            getSearchCategoriesUseCase,
             searchFilterMapper,
             nodeSourceTypeToSearchTargetMapper,
             typeFilterToSearchMapper,
@@ -321,39 +316,6 @@ class SearchActivityViewModelTest {
         }
 
     @Test
-    fun `test that the search functionality is performed with an updated filter when update filter is called`() =
-        runTest {
-            val filter = SearchFilter(name = "Images", filter = SearchCategory.IMAGES)
-            val typedFolderNode = mock<TypedFolderNode> {
-                on { id }.thenReturn(NodeId(345L))
-                on { name }.thenReturn("folder node")
-            }
-            val typedFileNode = mock<TypedFileNode> {
-                on { id }.thenReturn(NodeId(123L))
-                on { name }.thenReturn("file node")
-            }
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-            whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-            whenever(
-                searchUseCase(
-                    parentHandle = NodeId(parentHandle),
-                    nodeSourceType = nodeSourceType,
-                    searchParameters = SearchParameters(
-                        query = "",
-                        searchCategory = filter.filter
-                    ),
-                )
-            ).thenReturn(listOf(typedFileNode, typedFolderNode))
-            underTest.updateFilter(filter)
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.selectedFilter).isEqualTo(filter)
-                assertThat(state.searchItemList.size).isEqualTo(2)
-            }
-        }
-
-
-    @Test
     fun `test that the search functionality is performed with an updated filter when update search query is called`() =
         runTest {
             val query = "query"
@@ -389,33 +351,6 @@ class SearchActivityViewModelTest {
                 val state = awaitItem()
                 assertThat(state.searchQuery).isEqualTo(query)
                 assertThat(state.searchItemList.size).isEqualTo(nodeList.size)
-            }
-        }
-
-
-    @Test
-    fun `test that an empty search list is returned when the search functionality throws an exception`() =
-        runTest {
-            val filter = SearchFilter(name = "Images", filter = SearchCategory.IMAGES)
-            val parentHandle = 123456L
-            val nodeSourceType = NodeSourceType.CLOUD_DRIVE
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-            whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-            whenever(
-                searchUseCase(
-                    parentHandle = NodeId(parentHandle),
-                    nodeSourceType = nodeSourceType,
-                    searchParameters = SearchParameters(
-                        query = "",
-                        searchCategory = filter.filter
-                    ),
-                )
-            ).thenThrow(IllegalStateException("Search exception"))
-            underTest.updateFilter(filter)
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.selectedFilter).isEqualTo(filter)
-                assertThat(state.searchItemList).isEmpty()
             }
         }
 

@@ -7,17 +7,14 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
-import mega.privacy.android.data.mapper.search.SearchCategoryMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSearchFilter
@@ -29,7 +26,6 @@ import javax.inject.Inject
  * Implementation of [SearchRepository]
  */
 internal class SearchRepositoryImpl @Inject constructor(
-    private val searchCategoryMapper: SearchCategoryMapper,
     private val nodeMapper: NodeMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val cancelTokenProvider: CancelTokenProvider,
@@ -39,16 +35,6 @@ internal class SearchRepositoryImpl @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SearchRepository {
-    override fun getSearchCategories(): List<SearchCategory> = listOf(
-        MegaApiAndroid.FILE_TYPE_DEFAULT,
-        MegaApiAndroid.FILE_TYPE_PHOTO,
-        MegaApiAndroid.FILE_TYPE_ALL_DOCS,
-        MegaApiAndroid.FILE_TYPE_AUDIO,
-        MegaApiAndroid.FILE_TYPE_VIDEO,
-    ).map {
-        searchCategoryMapper(it)
-    }
-
     override suspend fun search(
         nodeId: NodeId?,
         order: SortOrder,

@@ -156,11 +156,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     MeetingNotificationSettings("Enable Meeting notification settings", false),
 
     /**
-     * Search implementation with dropdown chips
-     */
-    DropdownChips("Search implementation with dropdown chips and bottom sheet", true),
-
-    /**
      * To enable showing promo notifications in Notifications screen
      */
     PromoNotifications("Enable promotional notifications", true),

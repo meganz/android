@@ -23,7 +23,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.NodeActionHandler
-import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRoute
 import mega.privacy.android.app.presentation.search.navigation.searchFilterBottomSheetRoute
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
@@ -36,7 +35,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchScreen(
-    trackAnalytics: (SearchFilter?) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
     navigateToLink: (String) -> Unit,
     navHostController: NavHostController,
@@ -91,8 +89,6 @@ fun SearchScreen(
         onDisputeTakeDownClicked = navigateToLink,
         onLinkClicked = navigateToLink,
         onErrorShown = searchActivityViewModel::errorMessageShown,
-        updateFilter = searchActivityViewModel::updateFilter,
-        trackAnalytics = trackAnalytics,
         updateSearchQuery = searchActivityViewModel::updateSearchQuery,
         onFilterClicked = {
             keyboardController?.hide()
