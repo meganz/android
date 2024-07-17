@@ -497,7 +497,7 @@ class InMeetingViewModel @Inject constructor(
                         handleFreeCallEndWarning()
                         isEphemeralAccount()
                         getMyUserHandle()
-                        if (status == ChatCallStatus.InProgress && state.value.isRaiseToSpeakFeatureFlagEnabled) {
+                        if (status == ChatCallStatus.InProgress && state.value.isRaiseToSpeakFeatureFlagEnabled && _state.value.isOneToOneCall.not()) {
                             Timber.d("Call recovered, check the participants with raised  hand")
                             updateParticipantsWithRaisedHand(call)
                         }
@@ -665,7 +665,7 @@ class InMeetingViewModel @Inject constructor(
                                         Timber.d("Call in progress, get my user information")
                                         isEphemeralAccount()
                                         getMyUserHandle()
-                                        if (state.value.isRaiseToSpeakFeatureFlagEnabled) {
+                                        if (state.value.isRaiseToSpeakFeatureFlagEnabled && _state.value.isOneToOneCall.not()) {
                                             Timber.d("Call in progress, check the participants with raised hand")
                                             updateParticipantsWithRaisedHand(call)
                                         }
@@ -680,7 +680,7 @@ class InMeetingViewModel @Inject constructor(
                             }
 
                             contains(ChatCallChanges.CallWillEnd) -> handleFreeCallEndWarning()
-                            contains(ChatCallChanges.CallRaiseHand) -> if (state.value.isRaiseToSpeakFeatureFlagEnabled) {
+                            contains(ChatCallChanges.CallRaiseHand) -> if (state.value.isRaiseToSpeakFeatureFlagEnabled && _state.value.isOneToOneCall.not()) {
                                 Timber.d("Change in CallRaiseHand, update participants with raised hand")
                                 updateParticipantsWithRaisedHand(call)
                             }
@@ -1195,8 +1195,7 @@ class InMeetingViewModel @Inject constructor(
      *
      *  @return True, if it is a one-to-one chat call. False, otherwise
      */
-    fun isOneToOneCall(): Boolean = inMeetingRepository.getChatRoom(_state.value.currentChatId)
-        ?.let { (!it.isGroup && !it.isMeeting) } ?: run { false }
+    fun isOneToOneCall(): Boolean = state.value.isOneToOneCall
 
     /**
      * Set speaker selection automatic or manual
@@ -3500,7 +3499,7 @@ class InMeetingViewModel @Inject constructor(
      * Set raised hand suggestion shown
      */
     fun setRaisedHandSuggestionShown() {
-        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not()) return
+        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not() || _state.value.isOneToOneCall) return
         viewModelScope.launch {
             runCatching {
                 setRaiseToHandSuggestionShownUseCase()
@@ -3515,7 +3514,7 @@ class InMeetingViewModel @Inject constructor(
      * Hide raise to hand popup
      */
     fun hideRaiseToHandPopup() {
-        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not()) return
+        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not() || _state.value.isOneToOneCall) return
         _state.update {
             it.copy(
                 isRaiseToHandSuggestionShown = true
@@ -3527,7 +3526,7 @@ class InMeetingViewModel @Inject constructor(
      * Check if raise to hand feature tooltip is shown
      */
     fun checkRaiseToHandFeatureTooltipIsShown() {
-        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not()) return
+        if (_state.value.isRaiseToSpeakFeatureFlagEnabled.not() || _state.value.isOneToOneCall) return
         viewModelScope.launch {
             runCatching {
                 val value = isRaiseToHandSuggestionShownUseCase()
