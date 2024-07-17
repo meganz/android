@@ -3,7 +3,6 @@ package mega.privacy.android.app.usecase.call
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -23,7 +22,6 @@ import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_CONNECTING
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_DESTROYED
@@ -50,56 +48,6 @@ class GetCallUseCase @Inject constructor(
     @ApplicationScope private val sharingScope: CoroutineScope,
     @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
-    /**
-     * Get a chat id of another call in progress or on hold
-     *
-     * @param currentChatId Chat ID of the current call
-     * @return Chat ID of the another call or -1 if no exists
-     */
-    fun getChatIdOfAnotherCallInProgress(currentChatId: Long): Single<Long> =
-        Single.fromCallable {
-            var result: Long = MEGACHAT_INVALID_HANDLE
-            val calls = getCallsInProgressAndOnHold()
-
-            for (call in calls) {
-                if (call.chatid != currentChatId) {
-                    result = call.chatid
-                    break
-                }
-            }
-
-            result
-        }
-
-    /**
-     * Method to get the destroyed call
-     *
-     * @return Chat ID of the call
-     */
-    fun getCallEnded(): Flowable<Long> =
-        Flowable.create({ emitter ->
-            sharingScope.launch {
-                monitorChatCallUpdatesUseCase()
-                    .collectLatest { call ->
-                        withContext(mainImmediateDispatcher) {
-                            call.changes?.apply {
-                                Timber.d("Monitor chat call updated, changes $this")
-                                if (contains(ChatCallChanges.Status)) {
-                                    when (call.status) {
-                                        ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.Destroyed -> {
-                                            Timber.d("Terminating user participation")
-                                            emitter.onNext(call.chatId)
-                                        }
-
-                                        else -> {}
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
-        }, BackpressureStrategy.LATEST)
-
     /**
      * Method to get the all calls with status connecting, joining and in progress
      *

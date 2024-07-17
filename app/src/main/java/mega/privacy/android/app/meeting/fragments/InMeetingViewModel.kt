@@ -50,7 +50,6 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChange
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChangeType
-import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase.NumParticipantsChangesResult
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
@@ -100,6 +99,7 @@ import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUse
 import mega.privacy.android.domain.usecase.meeting.JoinMeetingAsGuestUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorParticipatingInAnotherCallUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestLowResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
@@ -128,7 +128,6 @@ import kotlin.time.DurationUnit
  * InMeetingFragment view model.
  *
  * @property inMeetingRepository                [InMeetingRepository]
- * @property getCallUseCase                     [GetCallUseCase]
  * @property startCallUseCase                   [StartCallUseCase]
  * @property monitorCallReconnectingStatusUseCase       [MonitorCallReconnectingStatusUseCase]
  * @property endCallUseCase                     [EndCallUseCase]
@@ -155,7 +154,7 @@ import kotlin.time.DurationUnit
  * @property raiseHandToSpeakUseCase            [RaiseHandToSpeakUseCase]
  * @property lowerHandToStopSpeakUseCase        [LowerHandToStopSpeakUseCase]
  * @property holdChatCallUseCase                [HoldChatCallUseCase]
- * @property monitorParticipatingInACallInOtherChatsUseCase [MonitorParticipatingInACallInOtherChatsUseCase]
+ * @property monitorParticipatingInAnotherCallUseCase [MonitorParticipatingInACallInOtherChatsUseCase]
  * @property getStringFromStringResMapper        [GetStringFromStringResMapper]
  * @property isEphemeralPlusPlusUseCase         [IsEphemeralPlusPlusUseCase]
  * @property isRaiseToHandSuggestionShownUseCase [IsRaiseToHandSuggestionShownUseCase]
@@ -166,7 +165,6 @@ import kotlin.time.DurationUnit
 @SuppressLint("StaticFieldLeak")
 class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository,
-    private val getCallUseCase: GetCallUseCase,
     private val startCallUseCase: StartCallUseCase,
     private val monitorCallReconnectingStatusUseCase: MonitorCallReconnectingStatusUseCase,
     private val endCallUseCase: EndCallUseCase,
@@ -195,7 +193,7 @@ class InMeetingViewModel @Inject constructor(
     private val chatLogoutUseCase: ChatLogoutUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val holdChatCallUseCase: HoldChatCallUseCase,
-    private val monitorParticipatingInACallInOtherChatsUseCase: MonitorParticipatingInACallInOtherChatsUseCase,
+    private val monitorParticipatingInAnotherCallUseCase: MonitorParticipatingInAnotherCallUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     private val raiseHandToSpeakUseCase: RaiseHandToSpeakUseCase,
@@ -791,7 +789,7 @@ class InMeetingViewModel @Inject constructor(
     private fun startMonitorParticipatingInACall(chatId: Long) {
         monitorParticipatingInAnotherCallJob?.cancel()
         monitorParticipatingInAnotherCallJob = viewModelScope.launch {
-            monitorParticipatingInACallInOtherChatsUseCase(chatId)
+            monitorParticipatingInAnotherCallUseCase(chatId)
                 .catch { Timber.e(it) }
                 .collect {
                     val currentCall = it.firstOrNull()

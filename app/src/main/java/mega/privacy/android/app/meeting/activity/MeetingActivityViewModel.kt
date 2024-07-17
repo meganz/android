@@ -15,11 +15,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,11 +52,9 @@ import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringRes
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantMapper
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
-import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
-import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
@@ -109,6 +102,7 @@ import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
+import mega.privacy.android.domain.usecase.meeting.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
@@ -139,7 +133,6 @@ import javax.inject.Inject
  *
  * @property meetingActivityRepository                      [MeetingActivityRepository]
  * @property answerChatCallUseCase                          [AnswerChatCallUseCase]
- * @property getCallUseCase                                 [GetCallUseCase]
  * @property rtcAudioManagerGateway                         [RTCAudioManagerGateway]
  * @property getChatParticipants                            [GetChatParticipants]
  * @property chatManagement                                 [ChatManagement]
@@ -180,7 +173,7 @@ import javax.inject.Inject
 class MeetingActivityViewModel @Inject constructor(
     private val meetingActivityRepository: MeetingActivityRepository,
     private val answerChatCallUseCase: AnswerChatCallUseCase,
-    private val getCallUseCase: GetCallUseCase,
+    private val getCallIdsOfOthersCallsUseCase: GetCallIdsOfOthersCallsUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
@@ -228,9 +221,6 @@ class MeetingActivityViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
-
-    private val composite = CompositeDisposable()
-
     private val _state = MutableStateFlow(
         MeetingState(
             chatId = savedStateHandle[MeetingActivity.MEETING_CHAT_ID]
@@ -406,20 +396,6 @@ class MeetingActivityViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .observeForever(meetingCreatedObserver)
-
-        getCallUseCase.getCallEnded()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { chatIdOfCallEnded ->
-                    if (chatIdOfCallEnded == _state.value.chatId) {
-                        viewModelScope.launch { broadcastCallEndedUseCase(chatIdOfCallEnded) }
-                        finishMeetingActivity()
-                    }
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
 
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
@@ -979,9 +955,16 @@ class MeetingActivityViewModel @Inject constructor(
                                                 )
                                             }
 
-                                            else -> {}
+                                            else -> if (call.status == ChatCallStatus.TerminatingUserParticipation) {
+                                                broadcastCallEndedUseCase(_state.value.chatId)
+                                                finishMeetingActivity()
+                                            }
                                         }
+                                    }
 
+                                    ChatCallStatus.Destroyed -> {
+                                        broadcastCallEndedUseCase(_state.value.chatId)
+                                        finishMeetingActivity()
                                     }
 
                                     else -> {}
@@ -1163,12 +1146,14 @@ class MeetingActivityViewModel @Inject constructor(
      * @param shouldEndCurrentCall if the current call should be finish
      */
     private fun checkAnotherCalls(shouldEndCurrentCall: Boolean) {
-        val chatId =
-            getCallUseCase.getChatIdOfAnotherCallInProgress(_state.value.chatId).blockingGet()
-        if (chatId != MEGACHAT_INVALID_HANDLE && chatId != _state.value.chatId && _switchCall.value != chatId) {
-            _switchCall.value = chatId
-        } else if (shouldEndCurrentCall) {
-            finishMeetingActivity()
+        viewModelScope.launch {
+            val chatId =
+                runCatching { getCallIdsOfOthersCallsUseCase(_state.value.chatId).first() }.getOrElse { MEGACHAT_INVALID_HANDLE }
+            if (chatId != MEGACHAT_INVALID_HANDLE && chatId != _state.value.chatId && _switchCall.value != chatId) {
+                _switchCall.value = chatId
+            } else if (shouldEndCurrentCall) {
+                finishMeetingActivity()
+            }
         }
     }
 
@@ -1522,8 +1507,6 @@ class MeetingActivityViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-
-        composite.clear()
 
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .removeObserver(audioOutputStateObserver)

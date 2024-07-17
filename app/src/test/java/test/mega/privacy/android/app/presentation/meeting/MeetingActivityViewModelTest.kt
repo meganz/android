@@ -13,7 +13,6 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantMapper
-import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.DeviceGateway
@@ -42,6 +41,7 @@ import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
+import mega.privacy.android.domain.usecase.meeting.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
@@ -74,7 +74,7 @@ class MeetingActivityViewModelTest {
     private val scheduler = Schedulers.trampoline()
     private val meetingActivityRepository: MeetingActivityRepository = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
-    private val getCallUseCase: GetCallUseCase = mock()
+    private val getCallIdsOfOthersCallsUseCase: GetCallIdsOfOthersCallsUseCase = mock()
     private val getChatCallUseCase: GetChatCallUseCase = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val chatManagement: ChatManagement = mock()
@@ -136,7 +136,7 @@ class MeetingActivityViewModelTest {
         reset(
             meetingActivityRepository,
             answerChatCallUseCase,
-            getCallUseCase,
+            getCallIdsOfOthersCallsUseCase,
             getChatCallUseCase,
             rtcAudioManagerGateway,
             chatManagement,
@@ -191,7 +191,7 @@ class MeetingActivityViewModelTest {
         underTest = MeetingActivityViewModel(
             meetingActivityRepository = meetingActivityRepository,
             answerChatCallUseCase = answerChatCallUseCase,
-            getCallUseCase = getCallUseCase,
+            getCallIdsOfOthersCallsUseCase = getCallIdsOfOthersCallsUseCase,
             getChatCallUseCase = getChatCallUseCase,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             chatManagement = chatManagement,
@@ -237,7 +237,7 @@ class MeetingActivityViewModelTest {
             enableOrDisableAudioUseCase = enableOrDisableAudioUseCase,
             enableOrDisableVideoUseCase = enableOrDisableVideoUseCase,
             startVideoDeviceUseCase = startVideoDeviceUseCase,
-            monitorCallEndedUseCase = monitorCallEndedUseCase
+            monitorCallEndedUseCase = monitorCallEndedUseCase,
         )
     }
 
