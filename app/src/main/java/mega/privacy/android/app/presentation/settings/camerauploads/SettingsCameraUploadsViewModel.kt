@@ -49,9 +49,8 @@ import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVi
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredToUploadContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsFolderPathExistingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderNodeValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsNewFolderNodeValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderNodeValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathUnrelatedToPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
@@ -112,11 +111,11 @@ import javax.inject.Inject
  * @property isConnectedToInternetUseCase Checks if the User is connected to the Internet or not
  * @property isFolderPathExistingUseCase Checks if the specific Local Folder exists or not
  * @property isMediaUploadsEnabledUseCase Checks if Media Uploads (the Secondary Folder) is enabled or not
- * @property isPrimaryFolderNodeValidUseCase Checks if the Camera Uploads Folder Node is valid or not
+ * @property isNewFolderNodeValidUseCase Checks whether the new Cloud Drive Folder Node selected by
+ * Camera Uploads is valid or not
  * @property isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase Checks if the specific Camera
  * Uploads Primary Folder Path is not the same Folder or a parent Folder or a sub Folder from the
  * current Local Secondary Folder
- * @property isSecondaryFolderNodeValidUseCase Checks if the Media Uploads Folder Node is valid or not
  * @property isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase Checks if the specific Camera
  * Uploads Secondary Folder Path is not the same Folder or a parent Folder or a sub Folder from the
  * current Local Primary Folder
@@ -176,9 +175,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val isFolderPathExistingUseCase: IsFolderPathExistingUseCase,
     private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
-    private val isPrimaryFolderNodeValidUseCase: IsPrimaryFolderNodeValidUseCase,
+    private val isNewFolderNodeValidUseCase: IsNewFolderNodeValidUseCase,
     private val isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase: IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase,
-    private val isSecondaryFolderNodeValidUseCase: IsSecondaryFolderNodeValidUseCase,
     private val isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase: IsSecondaryFolderPathUnrelatedToPrimaryFolderUseCase,
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
@@ -779,7 +777,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     fun onPrimaryFolderNodeSelected(newPrimaryFolderNodeId: NodeId) {
         viewModelScope.launch {
             runCatching {
-                if (isPrimaryFolderNodeValidUseCase(newPrimaryFolderNodeId.longValue)) {
+                if (isNewFolderNodeValidUseCase(newPrimaryFolderNodeId.longValue)) {
                     setupPrimaryFolderUseCase(newPrimaryFolderNodeId.longValue)
                     stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
                 } else {
@@ -844,7 +842,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     fun onSecondaryFolderNodeSelected(newSecondaryFolderNodeId: NodeId) {
         viewModelScope.launch {
             runCatching {
-                if (isSecondaryFolderNodeValidUseCase(newSecondaryFolderNodeId.longValue)) {
+                if (isNewFolderNodeValidUseCase(newSecondaryFolderNodeId.longValue)) {
                     setupSecondaryFolderUseCase(newSecondaryFolderNodeId.longValue)
                     stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
                 } else {

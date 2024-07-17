@@ -51,9 +51,8 @@ import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVi
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredToUploadContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsFolderPathExistingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderNodeValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsNewFolderNodeValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderNodeValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathUnrelatedToPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
@@ -135,10 +134,9 @@ internal class SettingsCameraUploadsViewModelTest {
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val isFolderPathExistingUseCase = mock<IsFolderPathExistingUseCase>()
     private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
-    private val isPrimaryFolderNodeValidUseCase = mock<IsPrimaryFolderNodeValidUseCase>()
+    private val isNewFolderNodeValidUseCase = mock<IsNewFolderNodeValidUseCase>()
     private val isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase =
         mock<IsPrimaryFolderPathUnrelatedToSecondaryFolderUseCase>()
-    private val isSecondaryFolderNodeValidUseCase = mock<IsSecondaryFolderNodeValidUseCase>()
     private val isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase =
         mock<IsSecondaryFolderPathUnrelatedToPrimaryFolderUseCase>()
     private val isSecondaryFolderPathValidUseCase = mock<IsSecondaryFolderPathValidUseCase>()
@@ -203,9 +201,8 @@ internal class SettingsCameraUploadsViewModelTest {
             isConnectedToInternetUseCase,
             isFolderPathExistingUseCase,
             isMediaUploadsEnabledUseCase,
-            isPrimaryFolderNodeValidUseCase,
+            isNewFolderNodeValidUseCase,
             isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase,
-            isSecondaryFolderNodeValidUseCase,
             isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase,
             isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase,
@@ -307,9 +304,8 @@ internal class SettingsCameraUploadsViewModelTest {
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             isFolderPathExistingUseCase = isFolderPathExistingUseCase,
             isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
-            isPrimaryFolderNodeValidUseCase = isPrimaryFolderNodeValidUseCase,
+            isNewFolderNodeValidUseCase = isNewFolderNodeValidUseCase,
             isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase = isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase,
-            isSecondaryFolderNodeValidUseCase = isSecondaryFolderNodeValidUseCase,
             isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase = isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase,
             isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase = listenToNewMediaUseCase,
@@ -1136,7 +1132,7 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that an error snackbar is shown when changing the primary folder node throws an exception`() =
             runTest {
-                whenever(isPrimaryFolderNodeValidUseCase(any())).thenThrow(RuntimeException())
+                whenever(isNewFolderNodeValidUseCase(any())).thenThrow(RuntimeException())
                 initializeUnderTest()
 
                 assertDoesNotThrow { underTest.onPrimaryFolderNodeSelected(NodeId(123456L)) }
@@ -1149,7 +1145,7 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that an error snackbar is shown when the new primary folder node is invalid`() =
             runTest {
-                whenever(isPrimaryFolderNodeValidUseCase(any())).thenReturn(false)
+                whenever(isNewFolderNodeValidUseCase(any())).thenReturn(false)
                 initializeUnderTest()
 
                 underTest.onPrimaryFolderNodeSelected(NodeId(123456L))
@@ -1162,7 +1158,7 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that the new primary folder node is set`() = runTest {
             val primaryFolderNodeId = NodeId(123456L)
-            whenever(isPrimaryFolderNodeValidUseCase(any())).thenReturn(true)
+            whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
             initializeUnderTest()
 
             underTest.onPrimaryFolderNodeSelected(primaryFolderNodeId)
@@ -1173,7 +1169,7 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that setting the new primary folder node also stops the ongoing camera uploads process`() =
             runTest {
-                whenever(isPrimaryFolderNodeValidUseCase(any())).thenReturn(true)
+                whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
                 initializeUnderTest()
 
                 underTest.onPrimaryFolderNodeSelected(NodeId(123456L))
@@ -1188,7 +1184,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 nodeHandle = folderNodeId.longValue,
                 cameraUploadFolderType = CameraUploadFolderType.Primary,
             )
-            whenever(isPrimaryFolderNodeValidUseCase(any())).thenReturn(true)
+            whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
             whenever(getPrimaryFolderNodeUseCase(any())).thenThrow(RuntimeException())
             whenever(monitorCameraUploadsFolderDestinationUseCase()).thenReturn(
                 flow {
@@ -1215,7 +1211,7 @@ internal class SettingsCameraUploadsViewModelTest {
                     cameraUploadFolderType = CameraUploadFolderType.Primary,
                 )
 
-                whenever(isPrimaryFolderNodeValidUseCase(any())).thenReturn(true)
+                whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
                 whenever(getPrimaryFolderNodeUseCase(any())).thenReturn(cameraUploadsNode)
                 whenever(monitorCameraUploadsFolderDestinationUseCase()).thenReturn(
                     flow {
@@ -1510,7 +1506,7 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that an error snackbar is shown when changing the secondary folder node throws an exception`() =
             runTest {
-                whenever(isSecondaryFolderNodeValidUseCase(any())).thenThrow(RuntimeException())
+                whenever(isNewFolderNodeValidUseCase(any())).thenThrow(RuntimeException())
                 initializeUnderTest()
 
                 assertDoesNotThrow { underTest.onSecondaryFolderNodeSelected(NodeId(789012L)) }
@@ -1523,7 +1519,7 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that an error snackbar is shown when the new secondary folder node is invalid`() =
             runTest {
-                whenever(isSecondaryFolderNodeValidUseCase(any())).thenReturn(false)
+                whenever(isNewFolderNodeValidUseCase(any())).thenReturn(false)
                 initializeUnderTest()
 
                 underTest.onSecondaryFolderNodeSelected(NodeId(789012L))
@@ -1536,7 +1532,7 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that the new secondary folder node is set`() = runTest {
             val secondaryFolderNodeId = NodeId(789012L)
-            whenever(isSecondaryFolderNodeValidUseCase(any())).thenReturn(true)
+            whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
             initializeUnderTest()
 
             underTest.onSecondaryFolderNodeSelected(secondaryFolderNodeId)
@@ -1547,7 +1543,7 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that setting the new secondary folder node also stops the ongoing camera uploads process`() =
             runTest {
-                whenever(isSecondaryFolderNodeValidUseCase(any())).thenReturn(true)
+                whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
                 initializeUnderTest()
 
                 underTest.onSecondaryFolderNodeSelected(NodeId(789012L))
@@ -1562,7 +1558,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 nodeHandle = folderNodeId.longValue,
                 cameraUploadFolderType = CameraUploadFolderType.Secondary,
             )
-            whenever(isSecondaryFolderNodeValidUseCase(any())).thenReturn(true)
+            whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
             whenever(getSecondaryFolderNodeUseCase(any())).thenThrow(RuntimeException())
             whenever(monitorCameraUploadsFolderDestinationUseCase()).thenReturn(
                 flow {
@@ -1589,7 +1585,7 @@ internal class SettingsCameraUploadsViewModelTest {
                     cameraUploadFolderType = CameraUploadFolderType.Secondary,
                 )
 
-                whenever(isSecondaryFolderNodeValidUseCase(any())).thenReturn(true)
+                whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
                 whenever(getSecondaryFolderNodeUseCase(any())).thenReturn(mediaUploadsNode)
                 whenever(monitorCameraUploadsFolderDestinationUseCase()).thenReturn(
                     flow {
