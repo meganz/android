@@ -6286,4 +6286,8 @@
         <item quantity="many"></item>
         <item quantity="other"></item>
     </plurals>
+    <!-- Image or Video map location title-->
+    <string name="file_properties_info_map_location">الموقع</string>
+    <!-- Image or Video no map location info-->
+    <string name="file_properties_info_map_location_no_location_info">No location information</string>
 </resources>

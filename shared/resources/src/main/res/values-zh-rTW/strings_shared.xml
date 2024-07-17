@@ -179,7 +179,7 @@
     <!-- Delete option title of the video section playlist bottom sheet -->
     <string name="video_section_playlist_bottom_sheet_option_title_delete">刪除播放列表</string>
     <!-- Remove videos dialog title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_title">要從播放列表中移除？</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">從播放列表中移除？</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
     <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">移除</string>
     <!-- Play all button title of the video section playlist detail -->
@@ -393,13 +393,13 @@
     <!-- label for tag text field in add tags page -->
     <string name="add_tags_text_label_tag">標籤</string>
     <!-- label for add tags page add button -->
-    <string name="add_tags_button_label_add">加入「#%1$s」標籤</string>
+    <string name="add_tags_button_label_add">新增「#%1$s」標籤</string>
     <!-- label for add tags page existing tags label -->
     <string name="add_tags_label_existing_tags">現有標籤</string>
     <!-- error label for add tags page when special characters added -->
     <string name="add_tags_error_special_characters">標籤不能包含空格或非字母數字的符號。使用大寫字母的標籤將以小寫字母顯示。</string>
     <!-- error label for add tags page when tag count is maximum -->
-    <string name="add_tags_error_max_tags">標籤的最大數量為%1$d</string>
+    <string name="add_tags_error_max_tags">標籤最大數量為%1$d</string>
     <!-- error label for add tags page when tag character limit reached -->
     <string name="add_tags_error_max_characters">標籤不得超過%1$d個字元</string>
     <!-- title label for tags page -->

@@ -55,7 +55,7 @@
     <!-- Sync message to access storage permission on device -->
     <string name="sync_access_storage_permission_message">Pentru backup-ul fișierelor dvs., MEGA are nevoie de acces la fișierele și folderele din acest dispozitiv. Datele dvs. sunt întotdeauna în siguranță la noi.</string>
     <!-- Sync dialog continue button -->
-    <string name="sync_dialog_file_permission_positive_button">Continuă</string>
+    <string name="sync_dialog_file_permission_positive_button">Continuați</string>
     <!-- Sync dialog not now button -->
     <string name="sync_dialog_file_permission_negative_button">Nu acum</string>
     <!-- Sync dialog title for storage access -->

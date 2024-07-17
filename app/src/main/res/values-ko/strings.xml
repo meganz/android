@@ -5096,4 +5096,8 @@
     <plurals name="hidden_nodes_items">
         <item quantity="other">숨겨진 항목</item>
     </plurals>
+    <!-- Image or Video map location title-->
+    <string name="file_properties_info_map_location">위치</string>
+    <!-- Image or Video no map location info-->
+    <string name="file_properties_info_map_location_no_location_info">No location information</string>
 </resources>

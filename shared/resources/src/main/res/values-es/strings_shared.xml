@@ -405,7 +405,7 @@
     <!-- Label for the file info information screen tags field -->
     <string name="file_info_information_tags_label">Etiquetas</string>
     <!-- label for tags page tag description -->
-    <string name="add_tags_label_tag_description">Use tags to help you find and organise your data. Try tagging by year, location, project, or subject.</string>
+    <string name="add_tags_label_tag_description">Usa las etiquetas para encontrar y organizar tus datos. Puedes etiquetar por año, ubicación, proyecto o tema.</string>
     <!-- label for tag text field in add tags page -->
     <string name="add_tags_text_label_tag">Tag</string>
     <!-- label for add tags page add button -->
