@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.upload
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,4 +40,20 @@ class UploadDestinationViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Update the list of [Uri] of the files to upload
+     */
+    fun updateUri(fileUriList: List<Uri>) = viewModelScope.launch {
+        Timber.d("Uri updated $fileUriList")
+    }
+
+    /**
+     * Update the text content
+     */
+    fun updateTextContent(text: String, email: String, subject: String) {
+        Timber.d("Text content updated $text $email $subject")
+    }
+
+
 }

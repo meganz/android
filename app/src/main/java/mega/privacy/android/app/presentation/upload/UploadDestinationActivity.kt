@@ -97,20 +97,23 @@ class UploadDestinationActivity : AppCompatActivity() {
     }
 
     private fun handleSendText(intent: Intent) {
-        intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-            Timber.d("Upload activity handleSendText: $it")
+        intent.apply {
+            val text = getStringExtra(Intent.EXTRA_TEXT).orEmpty()
+            val email = getStringExtra(Intent.EXTRA_EMAIL).orEmpty()
+            val subject = getStringExtra(Intent.EXTRA_SUBJECT).orEmpty()
+            uploadDestinationViewModel.updateTextContent(text, email, subject)
         }
     }
 
     private fun handleSendFiles(intent: Intent) {
         (intent.parcelable<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
-            Timber.d("Upload activity handleSendImage: $it")
+            uploadDestinationViewModel.updateUri(listOf(it))
         }
     }
 
     private fun handleSendMultipleFiles(intent: Intent) {
         intent.parcelableArrayList<Parcelable>(Intent.EXTRA_STREAM)?.let {
-            Timber.d("Upload activity handleSendMultipleImages: $it")
+            uploadDestinationViewModel.updateUri(it.mapNotNull { item -> item as? Uri })
         }
     }
 }
