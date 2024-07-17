@@ -80,6 +80,9 @@ pipeline {
                     } else if (triggeredByCreateJiraVersion()) {
                         message = createJiraVersionFailureMessage() +
                                 "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})"
+                    } else if (triggeredBySendCodeFreezeReminder()) {
+                        message = sendCodeFreezeReminderFailureMessage() +
+                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})"
                     }
                     common.sendToMR(message)
                 } else {
@@ -90,7 +93,11 @@ pipeline {
         }
         success {
             script {
-                if (!isOnReleaseBranch()) {
+                if (triggeredByCreateJiraVersion()) {
+                    def message = createJiraVersionSuccessMessage()
+                    common.sendToMR(message)
+                    slackSend color: "good", message: message
+                } else if (!isOnReleaseBranch()) {
                     common.sendToMR(skipMessage("<br/>"))
                 } else if (hasGitLabMergeRequest()) {
                     common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
@@ -159,13 +166,10 @@ pipeline {
                         common.sendToMR(message)
 
                         slackSend color: "good", message: common.uploadSymbolSuccessMessage("\n")
-                    } else if (triggeredByCreateJiraVersion()) {
-                        def message = createJiraVersionSuccessMessage() +
-                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${link})"
+                    } else if (triggeredBySendCodeFreezeReminder()) {
+                        def message = sendCodeFreezeReminderSuccessMessage()
                         common.sendToMR(message)
-
-                        slackSend color: "good", message: ":white_check_mark: Create Jira Version succeeded!"
-
+                        slackSend color: "good", message: message
                     }
                 }
             }
@@ -484,6 +488,28 @@ pipeline {
                 }
             }
         }
+        stage("Send Code Freeze Reminder") {
+            when {
+                expression { triggeredBySendCodeFreezeReminder() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Send Code Freeze Reminder'
+
+                    def parameters = parseSendCodeFreezeReminderParameters(env.gitlabTriggerPhrase)
+                    def currentVersion = parameters[0]
+                    def nextVersion = parameters[1]
+                    withCredentials([
+                            string(credentialsId: 'ANDROID_TEAM_GROUP_ID_IN_SLACK', variable: 'ANDROID_TEAM_GROUP_ID_IN_SLACK'),
+                            string(credentialsId: 'MOBILE_DEV_TEAM_SLACK_CHANNEL_ID', variable: 'MOBILE_DEV_TEAM_SLACK_CHANNEL_ID'),
+                            string(credentialsId: 'RELEASE_ANNOUNCEMENT_SLACK_TOKEN', variable: 'RELEASE_ANNOUNCEMENT_SLACK_TOKEN'),
+                    ]) {
+                        sh("./gradlew sendCodeFreezeReminder --current-version ${currentVersion} --next-version ${nextVersion} --project MEGA")
+                    }
+                }
+            }
+        }
+
     }
 }
 
@@ -592,6 +618,13 @@ private String createJiraVersionSuccessMessage() {
     return ":white_check_mark: Create Jira Version succeeded!(${env.BUILD_NUMBER})"
 }
 
+private String sendCodeFreezeReminderFailureMessage() {
+    return ":x: Send code freeze reminder failed!(${env.BUILD_NUMBER})"
+}
+
+private String sendCodeFreezeReminderSuccessMessage() {
+    return ":white_check_mark: Code freeze remind message sent successfully!(${env.BUILD_NUMBER})"
+}
 
 private def parseCreateJiraVersionParameters(String fullCommand) {
     println("Parsing createJiraVersion parameters")
@@ -625,6 +658,40 @@ private def parseCreateJiraVersionParameters(String fullCommand) {
     println("releaseDate: $releaseDate")
 
     return [releaseVersion, releaseDate]
+}
+
+private def parseSendCodeFreezeReminderParameters(String fullCommand) {
+    println("Parsing createJiraVersion parameters")
+    String[] parameters = fullCommand.split("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*\$)")
+
+    Options options = new Options()
+    Option releaseVersionOption = Option
+            .builder("cv")
+            .longOpt("current-version")
+            .argName("Current version")
+            .hasArg()
+            .desc("Version of current release")
+            .build()
+    Option releaseDateOption = Option
+            .builder("nv")
+            .longOpt("next-version")
+            .argName("Next version")
+            .hasArg()
+            .desc("Version of next release")
+            .build()
+    options.addOption(releaseVersionOption)
+    options.addOption(releaseDateOption)
+
+    CommandLineParser commandLineParser = new DefaultParserWrapper()
+    CommandLine commandLine = commandLineParser.parse(options, parameters)
+
+    String currentVersion = commandLine.getOptionValue("cv")
+    String nextVersion = commandLine.getOptionValue("nv")
+
+    println("current-version: $currentVersion")
+    println("releaseDate: $nextVersion")
+
+    return [currentVersion, nextVersion]
 }
 
 private String skipMessage(String lineBreak) {
@@ -667,7 +734,6 @@ private boolean triggeredByUploadSymbol() {
             env.gitlabTriggerPhrase == "upload_symbol"
 }
 
-
 /**
  * Check if build is triggered by 'upload_symbol' command.
  * @return true if build is triggered by 'upload_symbol' command. Otherwise return false.
@@ -679,10 +745,20 @@ private boolean triggeredByDeleteOldString() {
 }
 
 /**
- * Check if build is triggered by 'upload_symbol' command.
- * @return true if build is triggered by 'upload_symbol' command. Otherwise return false.
+ * Check if build is triggered by 'create_jira_version' command.
+ * @return true if build is triggered by 'create_jira_version' command. Otherwise return false.
  */
 private boolean triggeredByCreateJiraVersion() {
     return env.gitlabTriggerPhrase != null &&
             env.gitlabTriggerPhrase.trim().startsWith("create_jira_version")
+}
+
+/**
+ * Check if build is triggered by 'send_code_freeze_reminder' command.
+ * @return true if build is triggered by 'send_code_freeze_reminder' command. Otherwise return false.
+ */
+private boolean triggeredBySendCodeFreezeReminder() {
+    return isOnReleaseBranch() &&
+            env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase.trim().startsWith("send_code_freeze_reminder")
 }
