@@ -229,7 +229,7 @@
     <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
     <string name="dialog_onboarding_free_account_price">Gratuit</string>
     <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
-    <string name="dialog_onboarding_button_continue">Continuă</string>
+    <string name="dialog_onboarding_button_continue">Continuați</string>
     <!-- Title of navigation bar on Onboarding dialog. -->
     <string name="dialog_onboarding_app_bar_title">Alegeți-vă abonamentul MEGA</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
@@ -437,7 +437,7 @@
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Caracteristică</string>
     <!-- Column header indicating features available with the free plan -->
-    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <string name="account_cancel_account_screen_plan_free_plan">Gratuit</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Spațiu de stocare</string>
     <!-- Storage amount available in the free plan -->
@@ -445,7 +445,7 @@
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Transferuri</string>
     <!-- Transfer limit in the free plan -->
-    <string name="account_cancel_account_screen_plan_free_limited_transfer">Limitat</string>
+    <string name="account_cancel_account_screen_plan_free_limited_transfer">Limitate</string>
     <!-- Feature indicating password protection for links, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_password_protected_links">Linkuri protejate prin parolă</string>
     <!-- Feature indicating expiry dates for links, available in the pro plan -->
@@ -465,17 +465,17 @@
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Până la 1&#160;oră</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
-    <string name="cancel_account_plan_call_meeting_duration_pro">NELIMITATĂ</string>
+    <string name="cancel_account_plan_call_meeting_duration_pro">Nelimitată</string>
     <!-- Row label for call and meeting participants in the comparison table -->
     <string name="account_cancel_account_plan_call_meeting_participants">Participanții la apel și la întâlnire</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Până la 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
-    <string name="account_cancel_account_pro_plan_call_meeting_participants">NELIMITATĂ</string>
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">Nelimitate</string>
     <!-- Button label to keep the current pro plan -->
     <string name="account_cancel_account_plan_keep_pro_plan">Păstrați %1s</string>
     <!-- Button label to continue with the cancellation -->
-    <string name="account_cancel_account_plan_continue_cancellation">Continua anularea</string>
+    <string name="account_cancel_account_plan_continue_cancellation">Continuați anularea</string>
     <!-- error label for add tags page when tag character limit reached -->
     <string name="add_tags_error_maximum_characters">Maximum 32 de caractere</string>
     <!-- Hidden item -->
@@ -485,7 +485,7 @@
     <!-- Share hidden item links description -->
     <string name="share_hidden_item_links_description">Unul sau mai multe dintre aceste elemente sunt setate la ascuns. Odată ce partajați elementele ascunse, oricine are linkul le va putea vedea. Elementele vor fi în continuare ascunse în Unitatea cloud.</string>
     <!-- Title shown when cancelling the subscription -->
-    <string name="account_cancellation_instructions_cancel_subscription_title">Anulează abonamentul</string>
+    <string name="account_cancellation_instructions_cancel_subscription_title">Anulați abonamentul</string>
     <!-- Title shown when reactivating the subscription -->
     <string name="account_cancellation_instructions_reactivate_subscription_title">Reactivați abonamentul</string>
     <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
@@ -543,15 +543,15 @@
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">Fără conexiune la internet</string>
     <!-- Menu option to create a new folder in the file manager -->
-    <string name="general_menu_create_new_folder">Creează un folder nou</string>
+    <string name="general_menu_create_new_folder">Creați un folder nou</string>
     <!-- Create new folder dialog title -->
     <string name="create_new_folder_dialog_title">Folder nou</string>
     <!-- Create new folder dialog hint text (input field description) -->
     <string name="create_new_folder_dialog_hint_text">Numele folderului</string>
     <!-- Create new folder dialog confirm button -->
-    <string name="create_new_folder_dialog_confirm_button">Creează</string>
+    <string name="create_new_folder_dialog_confirm_button">Creați</string>
     <!-- Dialog cancel option -->
-    <string name="general_dialog_cancel_button">Anulează</string>
+    <string name="general_dialog_cancel_button">Anulați</string>
     <!-- Create new folder dialog error message shown when the user tries to an empty folder name -->
     <string name="create_new_folder_dialog_error_message_empty_folder_name">Introduceți un nume de folder</string>
     <!-- Create new folder dialog error message shown when folder cannot be created because there is already one with the same name -->

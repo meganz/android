@@ -9,7 +9,7 @@
     <!-- Answer for confirmation dialog. -->
     <string name="general_no">Nu</string>
     <!-- dialog option cancel in alert dialog -->
-    <string name="general_cancel">Anulează</string>
+    <string name="general_cancel">Anulați</string>
     <!-- When moving a file to a location in MEGA. This is the text of the button after selection the destination -->
     <string name="general_move_to">Mută în</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
@@ -63,7 +63,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Niciun spațiu stocare externă detectat</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Deconectează-te</string>
+    <string name="action_logout">Deconectați-vă</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Încarcă</string>
     <!-- Menu item -->
@@ -95,7 +95,7 @@
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="action_export_master_key">Fă backup cheii de recuperare</string>
     <!-- Menu item to let the user cancel subscriptions -->
-    <string name="action_cancel_subscriptions">Anulează abonamentul</string>
+    <string name="action_cancel_subscriptions">Anulați abonamentul</string>
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Abonamentul a fost anulat</string>
     <!-- error message when the subscription has not been canceled successfully -->
@@ -127,7 +127,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Sigur vreți să anulați procesul actual de autentificare?</string>
     <!-- Login button -->
-    <string name="login_text">Autentifică-te</string>
+    <string name="login_text">Conectați-vă</string>
     <!-- email label -->
     <string name="email_text">E-mail</string>
     <!-- password label -->
@@ -189,7 +189,7 @@
     <!--  -->
     <string name="cancel_all_transfer_confirmation">Anulezi toate transferurile?</string>
     <!-- Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible). -->
-    <string name="cancel_all_action">Anulează toate</string>
+    <string name="cancel_all_action">Anulați toate</string>
     <!-- Warning to confirm remove selected transfers. Plural more than 1 transfer -->
     <plurals name="cancel_selected_transfers">
         <item quantity="one">Transferul selectat va fi anulat.</item>
@@ -485,7 +485,7 @@
     <!-- menu item -->
     <string name="menu_pause_transfers">Pune pe pauză transferurile</string>
     <!-- menu item -->
-    <string name="menu_cancel_all_transfers">Anulează toate transferurile</string>
+    <string name="menu_cancel_all_transfers">Anulați toate transferurile</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="menu_take_picture">Capturează</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -1031,7 +1031,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibrații</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Deconectează-te[/A] pentru a comuta între conturile MEGA</string>
+    <string name="sms_logout">[A]Deconectați-vă[/A] pentru a comuta între conturile MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Sigur vreți să deconectați de la contul curent?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1216,7 +1216,7 @@
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
     <string name="plans_depleted_transfer_overquota">Afișați abonamentele</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
-    <string name="continue_without_account_transfer_overquota">Continuă fără cont</string>
+    <string name="continue_without_account_transfer_overquota">Continuați fără cont</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
     <plurals name="new_general_num_files">
         <item quantity="one">%1$d fișier</item>
@@ -2109,7 +2109,7 @@
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <string name="number_of_participants">%d participanți</string>
     <!-- Label of the button to join a chat by a chat link -->
-    <string name="action_join">Alătură-te</string>
+    <string name="action_join">Alăturați-vă</string>
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">Observatori</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
@@ -2209,9 +2209,9 @@
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">Obiectul participării tale în programul nostru de realizări.</string>
     <!-- dialog option cancel in alert dialog -->
-    <string name="button_cancel">Anulează</string>
+    <string name="button_cancel">Anulați</string>
     <!-- dialog option continue in alert dialog -->
-    <string name="button_continue">Continuă</string>
+    <string name="button_continue">Continuați</string>
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (abonament)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
@@ -2503,15 +2503,15 @@
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
     <string name="hold_and_answer_call_incoming">Pune în așteptare și răspunde</string>
     <!-- The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other. -->
-    <string name="hold_and_join_call_incoming">Pune în așteptare și alătură-te</string>
+    <string name="hold_and_join_call_incoming">Puneți în așteptare și alăturați-vă</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other. -->
     <string name="end_and_answer_call_incoming">Încheie și răspunde</string>
     <!-- The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other. -->
-    <string name="end_and_join_call_incoming">Încheie și alătură-te</string>
+    <string name="end_and_join_call_incoming">Încheiați și alăturați-vă</string>
     <!-- when trying to download a file that is already downloaded in the device and has to copy in another path -->
     <string name="copy_already_downloaded">Fișier deja descărcat. Copiat în calea selectată.</string>
     <!-- Title of the dialog shown when you want to join a group call -->
-    <string name="title_join_call">Alătură-te apelului</string>
+    <string name="title_join_call">Alăturați-vă apelului</string>
     <!-- Text of the dialog shown when you want to join a group call -->
     <string name="text_join_call">Pentru a te alătura acestui apel, trebuie să închei apelul actual.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
@@ -2555,7 +2555,7 @@
         <item quantity="other">%d de fișiere în așteptare.</item>
     </plurals>
     <!-- Title of the login screen -->
-    <string name="login_to_mega">Autentifică-te pe MEGA</string>
+    <string name="login_to_mega">Conectați-vă la MEGA</string>
     <!-- Title of the create account screen -->
     <string name="create_account_title">Creează-ți contul MEGA</string>
     <!-- Label to reference a recents section -->
@@ -2805,7 +2805,7 @@
     <!-- Option to  resume all transfers -->
     <string name="option_resume_transfers">Reia transferurile</string>
     <!-- Option to  cancel a transfer -->
-    <string name="option_cancel_transfer">Anulează transferul</string>
+    <string name="option_cancel_transfer">Anulați transferul</string>
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">Scoate de pe pauză transferurile pentru a continua cu încărcarea.</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
@@ -2921,7 +2921,7 @@
     <!-- Meaning of links decryption key -->
     <string name="decryption_key_explanation">Sistemul nostru de criptare tip zero cunoștințe necesită o cheie unică generată automat pentru acest fișier sau folder. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
     <!-- Reset password label -->
-    <string name="reset_password_label">Resetează parola</string>
+    <string name="reset_password_label">Resetați parola</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
     <string name="share_key_warning">Partajezi cheia pentru acest link?</string>
     <!-- Warning show to the user when has set a password protection of a link and tries to share the link -->
@@ -3135,7 +3135,7 @@
     <!-- Text of the option Backup Recovery Key in My account section -->
     <string name="backup_recovery_key_subtitle">Îți mai aduci aminte parola?\nMEGA nu îți poate reseta parola dacă o uiți.</string>
     <!-- Action to change name -->
-    <string name="change_name_action">Modifică numele</string>
+    <string name="change_name_action">Schimbați numele</string>
     <!-- Action to add photo -->
     <string name="add_photo_action">Schimbați imaginea profilului</string>
     <!-- Action to add phone number -->
@@ -3181,15 +3181,15 @@
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Întâlnire</string>
     <!-- Menu option that allows the user to start/join meeting. -->
-    <string name="start_join_meeting">Începe/Alătură-te unei întâlniri</string>
+    <string name="start_join_meeting">Începeți sau alăturați întâlnirii</string>
     <!-- Label that create a meeting -->
     <string name="new_meeting">Întâlnire nouă</string>
     <!-- Label that join a meeting -->
-    <string name="join_meeting">Alătură-te întâlnirii</string>
+    <string name="join_meeting">Alăturați-vă întâlnirii</string>
     <!-- Button that create a meeting -->
     <string name="btn_start_meeting">Începe o întâlnire</string>
     <!-- Button that join a meeting as guest -->
-    <string name="btn_join_meeting_as_guest">Alătură-te ca invitat</string>
+    <string name="btn_join_meeting_as_guest">Alăturați-vă ca invitat</string>
     <!-- Hint shown to guide user on meeting name -->
     <string name="type_meeting_name">Întâlnirea lui %s</string>
     <!-- General label for reject the call. -->
@@ -3235,9 +3235,9 @@
     <!-- The literal meeting link text-->
     <string name="meeting_link">Link pentru întâlnire</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
-    <string name="join_meeting_as_guest">Alătură-te întâlnirii ca invitat</string>
+    <string name="join_meeting_as_guest">Alăturați-vă întâlnirii ca invitat</string>
     <!-- The title of the paste meeting link dialog for guest-->
-    <string name="paste_meeting_link_guest_dialog_title">Ești invitat(ă) la o întâlnire.</string>
+    <string name="paste_meeting_link_guest_dialog_title">Sunteți invitat la o întâlnire.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Atinge linkul întâlnirii care ți-a fost trimis sau lipește-l aici</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
@@ -3273,7 +3273,7 @@
     <!-- the title of join without account on left meeting page-->
     <string name="left_meeting_join_title">Intimitatea ta contează</string>
     <!-- the content of join without account on left meeting page-->
-    <string name="left_meeting_join_content">Alătură-te celei mai mari platforme de stocare în cloud și colaborare securizate din lume.</string>
+    <string name="left_meeting_join_content">Alăturați-vă celei mai mari platforme securizate de stocare în cloud și colaborare din lume.</string>
     <!-- the bonus title of join without account on left meeting page-->
     <string name="left_meeting_bonus_title">Obține 20&#160;GB gratuit</string>
     <!-- the bonus content of join without account on left meeting page-->
@@ -3507,7 +3507,7 @@
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">Se scanează&#8230;</string>
     <!-- Label cancel transfers. -->
-    <string name="cancel_transfers">Anulează transferurile</string>
+    <string name="cancel_transfers">Anulați transferurile</string>
     <!-- Warning informing what will happen if proceed on cancelling transfers. -->
     <string name="warning_cancel_transfers">Transferurile neprocesate încă vor fi anulate.</string>
     <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
@@ -3967,7 +3967,7 @@
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s a anulat [/A][B] ocurență programată pentru: [/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_message">Acest link nu a fost generat cu contul în care ești autentificat(ă) în prezent. Autentifică-te în contul aferent acestui link pentru a-ți verifica adresa de e-mail.</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_message">Acest link nu a fost generat cu contul la care sunteți conectat în prezent. Conectați-vă la contul legat de acest link pentru a vă confirma adresa de e-mail.</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
     <string name="account_change_email_error_not_logged_with_correct_account_title">Nu se poate actualiza adresa de e-mail</string>
     <!-- Select album cover -->
@@ -4501,11 +4501,11 @@
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
     <string name="cloud_drive_info_taken_down_folder_warning">Acest folder a fost eliminat în conformitate cu [A]Politica pentru ghidul de eliminare [/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
-    <string name="meetings_list_join_scheduled_meeting_option">Alătură-te</string>
+    <string name="meetings_list_join_scheduled_meeting_option">Alăturați-vă</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
     <string name="meetings_chat_room_start_scheduled_meeting_option">Începe o întâlnire</string>
     <!-- Option of a scheduled meeting in chat room to join the meeting -->
-    <string name="meetings_chat_room_join_scheduled_meeting_option">Alătură-te întâlnirii</string>
+    <string name="meetings_chat_room_join_scheduled_meeting_option">Alăturați-vă întâlnirii</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
         <item quantity="one">%1$d&#160;invitație a fost trimisă.&#160;</item>
@@ -5043,17 +5043,17 @@
     <!--Description text from Meeting List screen empty view-->
     <string name="meeting_list_empty_description">Discută securizat și privat în apeluri audio sau video cu prieteni și colegi din întreaga lume.</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
-    <string name="meetings_cancel_scheduled_meeting_dialog_title">Anulează „%1$s”?</string>
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">Anulați „%1$s”?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">Această întâlnire va fi arhivată și toți participanții vor fi anunțați.</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">Această întâlnire va fi plasată în cadrul Întâlniri anterioare și toți participanții vor fi anunțați.</string>
     <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
-    <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">Nu o anula</string>
+    <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">Nu anulați</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">Anulează și arhivează</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">Anulați și arhivează</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">Anulează întâlnirea</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">Anulați întâlnirea</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">Întâlnirea a fost anulată și arhivată</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
@@ -5071,7 +5071,7 @@
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">Ocurență din %1$s a fost anulat</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Anulează ocurența</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Anulați ocurența</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] a actualizat întâlnirea [/B]</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
@@ -5572,4 +5572,8 @@
         <item quantity="few">Elemente ascunse</item>
         <item quantity="other">Elemente ascunse</item>
     </plurals>
+    <!-- Image or Video map location title-->
+    <string name="file_properties_info_map_location">Locație</string>
+    <!-- Image or Video no map location info-->
+    <string name="file_properties_info_map_location_no_location_info">No location information</string>
 </resources>

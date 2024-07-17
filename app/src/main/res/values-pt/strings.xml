@@ -5572,4 +5572,8 @@
         <item quantity="many">itens ocultos</item>
         <item quantity="other">itens ocultos</item>
     </plurals>
+    <!-- Image or Video map location title-->
+    <string name="file_properties_info_map_location">Localização</string>
+    <!-- Image or Video no map location info-->
+    <string name="file_properties_info_map_location_no_location_info">No location information</string>
 </resources>

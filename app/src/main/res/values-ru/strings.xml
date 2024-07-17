@@ -3821,7 +3821,7 @@
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications_text">Проигрывать сигнал, когда кто-то присоединяется к вызову или покидает его.</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
-    <string name="text_editor_creation_success">Файл сохранён в Облачном диске</string>
+    <string name="text_editor_creation_success">Файл сохранён в Облачном диске.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
     <string name="text_editor_creation_error">Файл не сохранён в Облачном диске. Попробуйте ещё раз.</string>
     <!-- Action label to start images slideshow -->
@@ -5810,4 +5810,8 @@
         <item quantity="many">Скрытые элементы</item>
         <item quantity="other">Скрытые элементы</item>
     </plurals>
+    <!-- Image or Video map location title-->
+    <string name="file_properties_info_map_location">Расположение</string>
+    <!-- Image or Video no map location info-->
+    <string name="file_properties_info_map_location_no_location_info">No location information</string>
 </resources>

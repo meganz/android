@@ -2379,7 +2379,7 @@
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
     <string name="hold_and_answer_call_incoming">Tahan dan Jawab</string>
     <!-- The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other. -->
-    <string name="hold_and_join_call_incoming">Tahan dan Gabung</string>
+    <string name="hold_and_join_call_incoming">Tahan dan gabung</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other. -->
     <string name="end_and_answer_call_incoming">Akhiri dan Jawab</string>
     <!-- The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other. -->
@@ -5096,4 +5096,8 @@
     <plurals name="hidden_nodes_items">
         <item quantity="other"></item>
     </plurals>
+    <!-- Image or Video map location title-->
+    <string name="file_properties_info_map_location">Lokasi</string>
+    <!-- Image or Video no map location info-->
+    <string name="file_properties_info_map_location_no_location_info">No location information</string>
 </resources>

@@ -473,13 +473,13 @@
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">До 1 часа</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
-    <string name="cancel_account_plan_call_meeting_duration_pro">НЕОГРАНИЧЕН</string>
+    <string name="cancel_account_plan_call_meeting_duration_pro">Неограниченно</string>
     <!-- Row label for call and meeting participants in the comparison table -->
     <string name="account_cancel_account_plan_call_meeting_participants">Участники звонка и встречи</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">До 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
-    <string name="account_cancel_account_pro_plan_call_meeting_participants">НЕОГРАНИЧЕН</string>
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">Неограниченно</string>
     <!-- Button label to keep the current pro plan -->
     <string name="account_cancel_account_plan_keep_pro_plan">Оставить %1s</string>
     <!-- Button label to continue with the cancellation -->

@@ -5,7 +5,7 @@
     <!-- The name of the Positive Button for the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_positive_button">Redenumește</string>
     <!-- The name of the Negative Button for the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_negative_button">Anulează</string>
+    <string name="device_center_rename_device_dialog_negative_button">Anulați</string>
     <!-- The name of the Header in Device Center which signifies the User's Device that is currently in use -->
     <string name="device_center_list_view_item_header_this_device">Acest dispozitiv</string>
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
