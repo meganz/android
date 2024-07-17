@@ -18,7 +18,7 @@ data class DocumentEntity(
     val size: Long,
     val lastModified: Long,
     val uri: UriPath,
-    val isFolder: Boolean,
-    val numFiles: Int,
-    val numFolders: Int,
+    val isFolder: Boolean = false,
+    val numFiles: Int = 0,
+    val numFolders: Int = 0,
 )

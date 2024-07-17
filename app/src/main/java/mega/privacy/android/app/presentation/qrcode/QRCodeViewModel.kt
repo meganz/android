@@ -326,9 +326,6 @@ class QRCodeViewModel @Inject constructor(
                             size = it.length(),
                             lastModified = it.lastModified(),
                             uri = UriPath(it.toUri().toString()),
-                            isFolder = it.isDirectory,
-                            numFiles = 0,
-                            numFolders = 0,
                         )
                     }),
                     parentNodeId = NodeId(parentHandle)
