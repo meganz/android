@@ -262,6 +262,8 @@ internal fun ImagePreviewScreen(
         BackHandler {
             if (!isMagnifierMode) {
                 onClickBack()
+            } else {
+                viewModel.switchMagnifierMode()
             }
         }
 
@@ -513,6 +515,8 @@ private fun ImagePreviewContent(
     onClickVideoPlay: (ImageNode) -> Unit,
     onCloseMagnifier: () -> Unit,
 ) {
+    var isDraggingMagnifier by remember { mutableStateOf(false) }
+
     Box(modifier = modifier.fillMaxSize()) {
         if (!isMagnifierMode) {
             HorizontalPager(
@@ -546,6 +550,7 @@ private fun ImagePreviewContent(
                         isMagnifierMode = isMagnifierMode,
                         onImageTap = onImageTap,
                         onClickVideoPlay = onClickVideoPlay,
+                        onDragMagnifier = {}
                     )
                 }
             }
@@ -573,6 +578,7 @@ private fun ImagePreviewContent(
                 isMagnifierMode = isMagnifierMode,
                 onImageTap = onImageTap,
                 onClickVideoPlay = onClickVideoPlay,
+                onDragMagnifier = { isDraggingMagnifier = it },
             )
         }
 
@@ -593,23 +599,29 @@ private fun ImagePreviewContent(
         }
 
         if (isMagnifierMode) {
-            Column(Modifier.padding(16.dp)) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(grey_100)
-                        .clickable { onCloseMagnifier() },
-                    contentAlignment = Alignment.Center,
-                    content = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_close),
-                            contentDescription = "",
-                            modifier = Modifier.size(12.dp),
-                            tint = Color.Unspecified,
-                        )
-                    },
-                )
+            AnimatedVisibility(
+                visible = !isDraggingMagnifier,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(grey_100)
+                            .clickable { onCloseMagnifier() },
+                        contentAlignment = Alignment.Center,
+                        content = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_close),
+                                contentDescription = "",
+                                modifier = Modifier.size(12.dp),
+                                tint = Color.Unspecified,
+                            )
+                        },
+                    )
+                }
             }
         }
     }
@@ -626,6 +638,7 @@ private fun ImagePreviewContent(
     isMagnifierMode: Boolean,
     onImageTap: () -> Unit,
     onClickVideoPlay: (ImageNode) -> Unit,
+    onDragMagnifier: (Boolean) -> Unit,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         val isVideo = imageNode.type is VideoFileTypeInfo
@@ -648,6 +661,7 @@ private fun ImagePreviewContent(
             onImageTap = onImageTap,
             enableZoom = !isVideo,
             isMagnifierMode = isMagnifierMode,
+            onDragMagnifier = onDragMagnifier,
         )
         if (isVideo) {
             IconButton(
@@ -682,6 +696,7 @@ private fun ImageContent(
     onImageTap: () -> Unit,
     enableZoom: Boolean,
     isMagnifierMode: Boolean,
+    onDragMagnifier: (Boolean) -> Unit,
 ) {
     PhotoBox(
         modifier = Modifier.fillMaxSize(),
@@ -690,7 +705,8 @@ private fun ImageContent(
         isMagnifierMode = isMagnifierMode,
         onTap = {
             onImageTap()
-        }
+        },
+        onDragMagnifier = onDragMagnifier,
     ) {
         var imagePath by remember(fullSizePath) {
             mutableStateOf(fullSizePath)

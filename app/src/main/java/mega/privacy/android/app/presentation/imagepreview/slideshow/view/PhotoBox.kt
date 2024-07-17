@@ -36,10 +36,12 @@ fun PhotoBox(
     propagateMinConstraints: Boolean = false,
     isMagnifierMode: Boolean = false,
     onTap: ((Offset) -> Unit) = {},
+    onDragMagnifier: (Boolean) -> Unit = {},
     content: @Composable BoxScope.() -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     var offsetMagnifier by remember { mutableStateOf(Offset.Unspecified) }
+    var isDraggingMagnifier by remember { mutableStateOf(false) }
 
     Box(
         modifier = if (!isMagnifierMode) {
@@ -99,13 +101,21 @@ fun PhotoBox(
             modifier
                 .pointerInput(Unit) {
                     detectDragGestures(
+                        onDragEnd = {
+                            onDragMagnifier(false)
+                            isDraggingMagnifier = false
+                        },
+                        onDragStart = {
+                            onDragMagnifier(true)
+                            isDraggingMagnifier = true
+                        },
                         onDrag = { change, _ ->
                             offsetMagnifier = change.position
                         }
                     )
                 }
                 .then(
-                    if (offsetMagnifier == Offset.Unspecified) {
+                    if (offsetMagnifier == Offset.Unspecified || !isDraggingMagnifier) {
                         Modifier
                     } else {
                         Modifier.magnifier(
