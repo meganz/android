@@ -4434,6 +4434,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 return true
             }
         })
+        val enableSelectMenuItem = menu.findItem(R.id.action_enable_select)
         doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb)
         clearRubbishBinMenuItem = menu.findItem(R.id.action_menu_clear_rubbish_bin)
         returnCallMenuItem = menu.findItem(R.id.action_return_call)
@@ -4504,6 +4505,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             searchMenuItem?.isVisible = true
                         }
                     }
+                }
+
+                DrawerItem.TRANSFERS -> if (transferPageViewModel.transferTab == TransfersTab.PENDING_TAB
+                    && transfersViewModel.getActiveTransfers().isNotEmpty()
+                ) {
+                    enableSelectMenuItem.isVisible = true
                 }
 
                 DrawerItem.CHAT -> if (searchExpand) {
