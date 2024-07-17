@@ -1,24 +1,19 @@
 package mega.privacy.android.app.contacts.usecase
 
-import mega.privacy.android.domain.entity.contacts.ContactItem as DomainContact
-import android.net.Uri
-import androidx.core.net.toUri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.contacts.list.data.ContactItem
-import mega.privacy.android.app.contacts.mapper.ContactItemDataMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -26,16 +21,15 @@ import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaChatApi
-import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -57,27 +51,20 @@ import java.time.ZoneOffset
 class GetContactsUseCaseTest {
     private lateinit var underTest: GetContactsUseCase
 
-    private val onlineString = mock<() -> String>()
-    private val getUnformattedLastSeenDate = mock<(Int) -> String>()
-    private val getAliasMap = mock<(MegaRequest) -> Map<Long, String>>()
-    private val getUserUpdates = mock<() -> Flow<UserUpdate>>()
     private val contactsRepository = mock<ContactsRepository>()
-    private val contactItemDataMapper = mock<ContactItemDataMapper>()
     private val chatRepository = mock<ChatRepository>()
+    private val accountRepository = mock<AccountRepository>()
 
     @BeforeEach
     fun setUp() {
         reset(
             chatRepository,
-            onlineString,
-            getUnformattedLastSeenDate,
-            getUserUpdates,
+            accountRepository,
             contactsRepository,
-            contactItemDataMapper,
         )
 
-        getUserUpdates.stub {
-            on { invoke() } doReturn emptyFlow()
+        accountRepository.stub {
+            on { monitorUserUpdates() } doReturn emptyFlow()
         }
 
         contactsRepository.stub {
@@ -88,13 +75,10 @@ class GetContactsUseCaseTest {
         }
     }
 
+
     internal fun initUnderTest() {
         underTest = GetContactsUseCase(
-            onlineString = onlineString,
-            getUnformattedLastSeenDate = getUnformattedLastSeenDate,
-            getAliasMap = getAliasMap,
-            getUserUpdates = getUserUpdates,
-            contactMapper = contactItemDataMapper,
+            accountsRepository = accountRepository,
             contactsRepository = contactsRepository,
             chatRepository = chatRepository
         )
@@ -106,13 +90,9 @@ class GetContactsUseCaseTest {
             onBlocking { getVisibleContacts() } doReturn emptyList()
         }
 
-        val contact = mock<ContactItem.Data>()
-        contactItemDataMapper.stub {
-            on { invoke(any()) } doReturn contact
-        }
         initUnderTest()
 
-        underTest.get().test {
+        underTest().test {
             assertThat(awaitItem()).isEmpty()
         }
     }
@@ -123,7 +103,7 @@ class GetContactsUseCaseTest {
 
         initUnderTest()
 
-        underTest.get().test {
+        underTest().test {
             assertThat(awaitItem()).containsExactly(expected)
         }
     }
@@ -132,7 +112,7 @@ class GetContactsUseCaseTest {
     fun `test that contact is removed if visibility changes`() = runTest {
         val userHandle = 1L
         val userEmail = "email"
-        val contactItem = mock<DomainContact> {
+        val contactItem = mock<ContactItem> {
             on { handle } doReturn userHandle
             on { email } doReturn userEmail
             on { visibility } doReturn UserVisibility.Visible
@@ -148,7 +128,7 @@ class GetContactsUseCaseTest {
 
         initUnderTest()
 
-        underTest.get().test {
+        underTest().test {
             assertThat(awaitItem()).isNotEmpty()
             assertThat(awaitItem()).isEmpty()
         }
@@ -176,7 +156,7 @@ class GetContactsUseCaseTest {
 
         initUnderTest()
 
-        underTest.get().map { it.first().fullName.orEmpty() }.test {
+        underTest().map { it.first().contactData.fullName.orEmpty() }.test {
             assertThat(awaitItem()).isEqualTo(initial.fullName)
             assertThat(awaitItem()).isEqualTo(expected.fullName)
         }
@@ -204,7 +184,7 @@ class GetContactsUseCaseTest {
 
         initUnderTest()
 
-        underTest.get().map { it.first().fullName.orEmpty() }.test {
+        underTest().map { it.first().contactData.fullName.orEmpty() }.test {
             assertThat(awaitItem()).isEqualTo(initial.fullName)
             assertThat(awaitItem()).isEqualTo(expected.fullName)
         }
@@ -233,9 +213,9 @@ class GetContactsUseCaseTest {
 
         initUnderTest()
 
-        underTest.get().test {
-            assertThat(awaitItem().first().avatarUri).isEqualTo(Uri.EMPTY)
-            assertThat(awaitItem().first().avatarUri).isEqualTo(newUri.toUri())
+        underTest().test {
+            assertThat(awaitItem().first().contactData.avatarUri).isEqualTo(null)
+            assertThat(awaitItem().first().contactData.avatarUri).isEqualTo(newUri)
         }
     }
 
@@ -262,9 +242,9 @@ class GetContactsUseCaseTest {
         }
         initUnderTest()
 
-        underTest.get().test {
-            assertThat(awaitItem().first().alias).isEqualTo(oldAlias.alias)
-            assertThat(awaitItem().first().alias).isEqualTo(newAlias.alias)
+        underTest().test {
+            assertThat(awaitItem().first().contactData.alias).isEqualTo(oldAlias.alias)
+            assertThat(awaitItem().first().contactData.alias).isEqualTo(newAlias.alias)
         }
     }
 
@@ -273,7 +253,7 @@ class GetContactsUseCaseTest {
         runTest {
             val userHandle = 1L
             val userEmail = "email"
-            val contactItem = mock<DomainContact> {
+            val contactItem = mock<ContactItem> {
                 on { handle } doReturn userHandle
                 on { email } doReturn userEmail
             }
@@ -288,7 +268,7 @@ class GetContactsUseCaseTest {
 
             initUnderTest()
 
-            underTest.get().test {
+            underTest().test {
                 assertThat(awaitItem()).isEmpty()
                 assertThat(awaitItem()).isNotEmpty()
                 cancelAndIgnoreRemainingEvents()
@@ -298,23 +278,19 @@ class GetContactsUseCaseTest {
     @Test
     fun `test that chat online update with online status updates the contact status`() = runTest {
         val userHandle = 1
-        stubContact(userHandle = userHandle.toLong(), userEmail = "email")
+        val lastSeen = 42
+        stubContact(userHandle = userHandle.toLong(), userEmail = "email", lastSeen = lastSeen)
 
-        val expectedStatus = MegaChatApi.STATUS_ONLINE
-        val expectedLastSeenString = "Online"
+        val expectedStatus = UserChatStatus.Online
         stubOnlineStatusUpdate(userHandle = userHandle, status = expectedStatus)
-
-        onlineString.stub {
-            on { invoke() } doReturn expectedLastSeenString
-        }
 
         initUnderTest()
 
-        underTest.get().test {
+        underTest().test {
             awaitItem()
             val actual = awaitItem().first()
             assertThat(actual.status).isEqualTo(expectedStatus)
-            assertThat(actual.lastSeen).isEqualTo(expectedLastSeenString)
+            assertThat(actual.lastSeen).isEqualTo(lastSeen)
         }
     }
 
@@ -324,18 +300,13 @@ class GetContactsUseCaseTest {
         stubContact(userHandle = userHandle, userEmail = "email")
 
         val expectedLastGreen = 123456
-        val expectedLastSeenString = "Last seen"
         stubLastGreenUpdate(userHandle = userHandle, lastGreen = expectedLastGreen)
-
-        getUnformattedLastSeenDate.stub {
-            on { invoke(expectedLastGreen) } doReturn expectedLastSeenString
-        }
 
         initUnderTest()
 
-        underTest.get().test {
+        underTest().test {
             awaitItem()
-            assertThat(awaitItem().first().lastSeen).isEqualTo(expectedLastSeenString)
+            assertThat(awaitItem().first().lastSeen).isEqualTo(expectedLastGreen)
         }
     }
 
@@ -358,9 +329,9 @@ class GetContactsUseCaseTest {
 
         initUnderTest()
 
-        underTest.get().test {
-            assertThat(awaitItem().first().isNew).isTrue()
-            assertThat(awaitItem().first().isNew).isFalse()
+        underTest().test {
+            assertThat(awaitItem().first().chatroomId).isNull()
+            assertThat(awaitItem().first().chatroomId).isNotNull()
         }
     }
 
@@ -368,7 +339,7 @@ class GetContactsUseCaseTest {
     fun `test that authentication update fetches the contacts again`() = runTest {
         val userHandle = 1L
         val userEmail = "email"
-        val contactItem = mock<DomainContact> {
+        val contactItem = mock<ContactItem> {
             on { handle } doReturn userHandle
             on { email } doReturn userEmail
             on { areCredentialsVerified }.doReturn(false, true)
@@ -386,7 +357,7 @@ class GetContactsUseCaseTest {
 
         verifyNoInteractions(contactsRepository)
 
-        underTest.get().test { cancelAndIgnoreRemainingEvents()}
+        underTest().test { cancelAndIgnoreRemainingEvents() }
 
         verifyBlocking(contactsRepository, times(2)) { getVisibleContacts() }
     }
@@ -425,13 +396,13 @@ class GetContactsUseCaseTest {
         }
     }
 
-    private fun stubOnlineStatusUpdate(userHandle: Int, status: Int) {
+    private fun stubOnlineStatusUpdate(userHandle: Int, status: UserChatStatus) {
         contactsRepository.stub {
             on { monitorChatOnlineStatusUpdates() } doReturn flow {
                 emit(
                     OnlineStatus(
                         userHandle = userHandle.toLong(),
-                        status = getStatusFromInt(status),
+                        status = status,
                         inProgress = false
                     )
                 )
@@ -446,8 +417,8 @@ class GetContactsUseCaseTest {
         changes: List<Int>,
         userVisibility: UserVisibility = UserVisibility.Visible,
     ) {
-        getUserUpdates.stub {
-            on { invoke() } doReturn flow {
+        accountRepository.stub {
+            on { monitorUserUpdates() } doReturn flow {
                 emit(
                     UserUpdate(
                         changes = stubChangesList(userHandle, changes, userVisibility),
@@ -507,27 +478,9 @@ class GetContactsUseCaseTest {
         }
     }
 
-    private fun stubContactsList(list: List<DomainContact>, vararg lists: List<DomainContact>) {
+    private fun stubContactsList(list: List<ContactItem>, vararg lists: List<ContactItem>) {
         contactsRepository.stub {
             onBlocking { getVisibleContacts() }.doReturn(list, *lists)
-        }
-
-        contactItemDataMapper.stub {
-            on { invoke(any()) }.doAnswer {
-                val domain = it.getArgument(0) as DomainContact
-                val newLastSeen =
-                    if (domain.status == UserChatStatus.Online) onlineString() else domain.lastSeen?.let { it1 ->
-                        getUnformattedLastSeenDate(it1)
-                    }
-                ContactItem.Data(
-                    handle = domain.handle,
-                    email = domain.email,
-                    lastSeen = newLastSeen,
-                    status = getIntFromStatus(domain.status),
-                    isNew = domain.timestamp > 0 && domain.chatroomId == null,
-                    placeholder = mock(),
-                )
-            }
         }
     }
 
@@ -537,36 +490,9 @@ class GetContactsUseCaseTest {
         fullName: String? = "name",
         alias: String = "alias",
         isNew: Boolean = false,
-    ): ContactItem.Data {
-
-        val item = ContactItem.Data(
-            handle = userHandle,
-            email = userEmail,
-            placeholder = mock(),
-            fullName = fullName,
-            avatarUri = Uri.EMPTY,
-            alias = alias,
-            status = MegaChatApi.STATUS_OFFLINE,
-            isNew = isNew,
-        )
-        contactItemDataMapper.stub {
-            on { invoke(any()) }.doAnswer {
-                val domain = it.getArgument(0) as DomainContact
-                val newLastSeen =
-                    if (domain.status == UserChatStatus.Online) onlineString() else domain.lastSeen?.let { it1 ->
-                        getUnformattedLastSeenDate(it1)
-                    }
-                item.copy(
-                    lastSeen = newLastSeen,
-                    status = getIntFromStatus(domain.status),
-                    isNew = domain.timestamp > 0 && domain.chatroomId == null,
-                    fullName = domain.contactData.fullName,
-                    alias = domain.contactData.alias ?: alias,
-                )
-            }
-        }
-
-        val domainContact = DomainContact(
+        lastSeen: Int? = null,
+    ): ContactItem {
+        val domainContact = ContactItem(
             handle = userHandle,
             email = userEmail,
             contactData = ContactData(
@@ -574,7 +500,7 @@ class GetContactsUseCaseTest {
             ),
             defaultAvatarColor = null,
             visibility = UserVisibility.Visible,
-            lastSeen = null,
+            lastSeen = lastSeen,
             timestamp = if (isNew) LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(0)) else 0L,
             status = UserChatStatus.Offline,
             areCredentialsVerified = false,
@@ -584,21 +510,6 @@ class GetContactsUseCaseTest {
             onBlocking { getVisibleContacts() } doReturn listOf(domainContact)
         }
 
-        return item
+        return domainContact
     }
-
-    private val statusMap = mapOf(
-        MegaChatApi.STATUS_ONLINE to UserChatStatus.Online,
-        MegaChatApi.STATUS_AWAY to UserChatStatus.Away,
-        MegaChatApi.STATUS_BUSY to UserChatStatus.Busy,
-        MegaChatApi.STATUS_OFFLINE to UserChatStatus.Offline,
-        MegaChatApi.STATUS_INVALID to UserChatStatus.Invalid,
-    )
-
-    private fun getIntFromStatus(status: UserChatStatus) =
-        statusMap.entries.firstOrNull { it.value == status }?.key ?: MegaChatApi.STATUS_INVALID
-
-    private fun getStatusFromInt(status: Int): UserChatStatus =
-        statusMap[status] ?: UserChatStatus.Invalid
-
 }
