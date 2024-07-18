@@ -1381,7 +1381,7 @@ class DefaultTransfersRepositoryTest {
             val transfer = mock<Transfer> {
                 on { this.tag } doReturn tag
             }
-            val expected = mock<InProgressTransfer> {
+            val expected = mock<InProgressTransfer.Upload> {
                 on { this.tag } doReturn tag
             }
 
@@ -1414,13 +1414,13 @@ class DefaultTransfersRepositoryTest {
             val transfer4 = mock<Transfer> {
                 on { this.tag } doReturn tag4
             }
-            val inProgressTransfer1 = mock<InProgressTransfer> {
+            val inProgressTransfer1 = mock<InProgressTransfer.Download> {
                 on { this.tag } doReturn tag1
             }
-            val inProgressTransfer2 = mock<InProgressTransfer> {
+            val inProgressTransfer2 = mock<InProgressTransfer.Upload> {
                 on { this.tag } doReturn tag2
             }
-            val inProgressTransfer3 = mock<InProgressTransfer> {
+            val inProgressTransfer3 = mock<InProgressTransfer.Download> {
                 on { this.tag } doReturn tag3
             }
 
@@ -1460,7 +1460,7 @@ class DefaultTransfersRepositoryTest {
             val transfer = mock<Transfer> {
                 on { it.tag } doReturn tag
             }
-            val inProgressTransfer = mock<InProgressTransfer> {
+            val inProgressTransfer = mock<InProgressTransfer.Download> {
                 on { it.tag } doReturn tag
             }
             whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)

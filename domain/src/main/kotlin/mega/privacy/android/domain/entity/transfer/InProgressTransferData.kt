@@ -7,10 +7,6 @@ import java.math.BigInteger
  * In progress transfer data interface.
  */
 interface InProgressTransferData {
-    /**
-     * Transferred bytes during this transfer.
-     */
-    val transferredBytes: Long
 
     /**
      * Name of the file that is being transferred.

@@ -10,11 +10,6 @@ interface TypedTransfer {
     val tag: Int
 
     /**
-     * [TransferType] of this transfer.
-     */
-    val transferType: TransferType
-
-    /**
      * The total amount of bytes that will be transferred
      */
     val totalBytes: Long

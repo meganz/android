@@ -6,6 +6,11 @@ package mega.privacy.android.domain.entity.transfer
 interface ActiveTransfer : TypedTransfer {
 
     /**
+     * [TransferType] of this transfer.
+     */
+    val transferType: TransferType
+
+    /**
      * True if the transfer has already finished but it's still part of the current
      */
     val isFinished: Boolean

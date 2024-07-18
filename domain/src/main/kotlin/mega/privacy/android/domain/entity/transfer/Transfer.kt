@@ -45,7 +45,7 @@ import java.math.BigInteger
  */
 data class Transfer(
     override val transferType: TransferType,
-    override val transferredBytes: Long,
+    val transferredBytes: Long,
     override val totalBytes: Long,
     val localPath: String,
     val parentPath: String,

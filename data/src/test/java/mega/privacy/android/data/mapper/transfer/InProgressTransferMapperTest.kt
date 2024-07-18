@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper.transfer
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -29,18 +30,31 @@ internal class InProgressTransferMapperTest {
             on { progress } doReturn Progress(1f)
         }
         val expected = with(transfer) {
-            InProgressTransfer(
-                tag = tag,
-                transferType = transferType,
-                transferredBytes = transferredBytes,
-                totalBytes = totalBytes,
-                fileName = fileName,
-                speed = speed,
-                state = state,
-                priority = priority,
-                isPaused = isPaused,
-                progress = progress,
-            )
+            if (transferType.isDownloadType()) {
+                InProgressTransfer.Download(
+                    tag = tag,
+                    totalBytes = totalBytes,
+                    fileName = fileName,
+                    speed = speed,
+                    state = state,
+                    priority = priority,
+                    isPaused = isPaused,
+                    progress = progress,
+                    nodeId = NodeId(nodeHandle),
+                )
+            } else {
+                InProgressTransfer.Upload(
+                    tag = tag,
+                    totalBytes = totalBytes,
+                    fileName = fileName,
+                    speed = speed,
+                    state = state,
+                    priority = priority,
+                    isPaused = isPaused,
+                    progress = progress,
+                    localPath = localPath,
+                )
+            }
         }
         assertThat(InProgressTransferMapper().invoke(transfer)).isEqualTo(expected)
     }
