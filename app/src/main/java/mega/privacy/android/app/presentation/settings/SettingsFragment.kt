@@ -50,6 +50,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_SETTINGS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CALLS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CAMERA_UPLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CHAT
+import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_SYNC
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_CENTRE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_SEND_FEEDBACK
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HIDDEN_ITEMS
@@ -77,6 +78,7 @@ import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActi
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -140,9 +142,6 @@ class SettingsFragment :
                             getString(if (state.cameraUploadsOn) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
                     }
 
-                    findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
-                    findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
-
                     findPreference<SwitchPreferenceCompat>(KEY_2FA)?.apply {
                         isVisible = state.multiFactorVisible
                         isChecked = state.multiFactorAuthChecked
@@ -172,6 +171,7 @@ class SettingsFragment :
                             state.mediaDiscoveryViewState != MediaDiscoveryViewSettings.DISABLED.ordinal
                     }
 
+                    findPreference<Preference>(KEY_FEATURES_SYNC)?.isEnabled = state.isSyncEnabled
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
                     findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
                     updatePasscodeLockSummary(state.passcodeLock)
@@ -256,6 +256,10 @@ class SettingsFragment :
         when (key) {
             KEY_FEATURES_CAMERA_UPLOAD -> {
                 startActivity(Intent(context, SettingsCameraUploadsActivity::class.java))
+            }
+
+            KEY_FEATURES_SYNC -> {
+                startActivity(Intent(context, SettingsSyncActivity::class.java))
             }
 
             KEY_FEATURES_CHAT ->

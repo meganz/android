@@ -550,4 +550,6 @@
     <string name="create_new_folder_dialog_error_existing_folder">There is already a folder with the same name</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">The following characters are not allowed: %1$s</string>
+    <!-- Sync settings section title-->
+    <string name="settings_section_sync">Sync</string>
 </resources>

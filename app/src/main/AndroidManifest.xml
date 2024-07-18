@@ -439,6 +439,10 @@
             android:label="@string/section_photo_sync"
             android:launchMode="singleTop" />
         <activity
+            android:name="mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity"
+            android:label="@string/settings_section_sync"
+            android:launchMode="singleTop" />
+        <activity
             android:name=".activities.settingsActivities.ChatNotificationsPreferencesActivity"
             android:label="@string/title_properties_chat_notifications_contact"
             android:launchMode="singleTop" />

@@ -15,12 +15,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
-import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
-import mega.privacy.android.feature.sync.ui.views.SyncOptionsDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
@@ -34,8 +32,6 @@ import mega.privacy.mobile.analytics.event.AndroidSyncRenameAllItemsEvent
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogUpgradeButtonPressedEvent
-import mega.privacy.mobile.analytics.event.SyncOptionSelected
-import mega.privacy.mobile.analytics.event.SyncOptionSelectedEvent
 
 @Composable
 internal fun SyncListRoute(
@@ -51,8 +47,6 @@ internal fun SyncListRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
-
-    var showSyncOptionsDialog by rememberSaveable { mutableStateOf(false) }
 
     var showUpgradeDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -124,10 +118,6 @@ internal fun SyncListRoute(
                     Analytics.tracker.trackEvent(AndroidSyncClearResolvedIssuesEvent)
                     viewModel.onClearSyncOptionsPressed()
                 }
-
-                is SyncListMenuAction.SyncOptions -> {
-                    showSyncOptionsDialog = true
-                }
             }
         },
         onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
@@ -136,33 +126,6 @@ internal fun SyncListRoute(
         syncStalledIssuesViewModel = syncStalledIssuesViewModel,
         syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
     )
-
-    if (showSyncOptionsDialog) {
-        SyncOptionsDialog(
-            onDismiss = {
-                showSyncOptionsDialog = false
-            },
-            selectedOption = state.selectedSyncOption,
-            onSyncOptionsClicked = {
-                when (it) {
-                    SyncOption.WI_FI_OR_MOBILE_DATA -> {
-                        Analytics.tracker.trackEvent(
-                            SyncOptionSelectedEvent(SyncOptionSelected.SelectionType.SyncOptionWifiAndMobileSelected)
-                        )
-                    }
-
-                    SyncOption.WI_FI_ONLY -> {
-                        Analytics.tracker.trackEvent(
-                            SyncOptionSelectedEvent(SyncOptionSelected.SelectionType.SyncOptionWifiOnlySelected)
-                        )
-                    }
-                }
-
-                viewModel.handleAction(SyncListAction.SyncOptionsSelected(it))
-                showSyncOptionsDialog = false
-            },
-        )
-    }
 
     if (showUpgradeDialog) {
         Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogDisplayedEvent)
@@ -196,9 +159,6 @@ internal fun SyncListRoute(
 private fun prepareMenuActions(state: SyncListState): List<MenuAction> {
     val menuActionList = mutableListOf<MenuAction>()
     menuActionList.add(SyncListMenuAction.AddNewSync)
-    if (state.shouldShowSyncOptionsMenuItem) {
-        menuActionList.add(SyncListMenuAction.SyncOptions)
-    }
     if (state.shouldShowCleanSolvedIssueMenuItem) {
         menuActionList.add(SyncListMenuAction.ClearSyncOptions)
     }

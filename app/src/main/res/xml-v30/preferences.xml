@@ -37,6 +37,13 @@
             app:iconSpaceReserved="false" />
 
         <androidx.preference.Preference
+            android:key="settings_features_sync"
+            android:title="@string/settings_section_sync"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+
+        <androidx.preference.Preference
             android:key="settings_features_chat"
             android:title="@string/section_chat"
             app:allowDividerAbove="true"

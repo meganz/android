@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -162,15 +161,7 @@ class SyncFragment : Fragment() {
         )
     }
 
-    /**
-     * Is current theme mode a dark theme
-     */
-    @Composable
-    fun ThemeMode.isDarkMode() = when (this) {
-        ThemeMode.Light -> false
-        ThemeMode.Dark -> true
-        ThemeMode.System -> isSystemInDarkTheme()
-    }
+
 }
 
 internal const val SYNC_NO_NETWORK_STATE = "sync:no_network_state"

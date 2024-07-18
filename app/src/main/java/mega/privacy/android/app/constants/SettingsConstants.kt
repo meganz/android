@@ -7,6 +7,7 @@ object SettingsConstants {
     /* General settings */
 
     const val KEY_FEATURES_CAMERA_UPLOAD = "settings_features_camera_upload"
+    const val KEY_FEATURES_SYNC = "settings_features_sync"
     const val KEY_FEATURES_CHAT = "settings_features_chat"
     const val KEY_STORAGE_DOWNLOAD = "settings_nested_download_location"
     const val KEY_STORAGE_FILE_MANAGEMENT = "settings_storage_file_management"

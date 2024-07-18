@@ -18,7 +18,6 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncB
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.ClearSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueItemMapper
@@ -34,7 +33,6 @@ internal class SyncListViewModel @Inject constructor(
     private val stalledIssueItemMapper: StalledIssueItemMapper,
     private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase,
     private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase,
-    private val setSyncByWiFiUseCase: SetSyncByWiFiUseCase,
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
     private val getAccountTypeUseCase: GetAccountTypeUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
@@ -135,22 +133,6 @@ internal class SyncListViewModel @Inject constructor(
             SyncListAction.SnackBarShown -> {
                 _state.update { state ->
                     state.copy(snackbarMessage = null)
-                }
-            }
-
-            is SyncListAction.SyncOptionsSelected -> {
-                _state.update { state ->
-                    state.copy(
-                        selectedSyncOption = action.selectedOption,
-                        snackbarMessage = if (action.selectedOption == SyncOption.WI_FI_ONLY) {
-                            R.string.sync_options_changed_to_wifi_only
-                        } else {
-                            R.string.sync_options_changed_to_wifi_and_mobile_data
-                        }
-                    )
-                }
-                viewModelScope.launch {
-                    setSyncByWiFiUseCase(action.selectedOption == SyncOption.WI_FI_ONLY)
                 }
             }
         }

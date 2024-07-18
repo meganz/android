@@ -19,14 +19,6 @@ internal sealed interface SyncListMenuAction : MenuAction {
     ), SyncListMenuAction
 
     /**
-     * Sync options
-     */
-    object SyncOptions : MenuActionWithoutIcon(
-        descriptionRes = R.string.sync_menu_sync_options,
-        testTag = SYNC_OPTIONS_ACTION_TEST_TAG,
-    ), SyncListMenuAction
-
-    /**
      * Clear resolved issues
      */
     object ClearSyncOptions : MenuActionWithoutIcon(
@@ -39,11 +31,6 @@ internal sealed interface SyncListMenuAction : MenuAction {
          * Test Tag Add New Sync Action
          */
         const val ADD_NEW_SYNC_ACTION_TEST_TAG = "sync:action_add_new_sync_test_tag"
-
-        /**
-         * Test Tag Sync Options Action
-         */
-        const val SYNC_OPTIONS_ACTION_TEST_TAG = "sync:action_sync_options_test_tag"
 
         /**
          * Test Tag Clear Resolved Issues Action
