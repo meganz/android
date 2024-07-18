@@ -1070,6 +1070,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.hasLocalAudio }
+            .distinctUntilChanged()) { audio ->
+            showMuteBanner()
+        }
+
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInAVFlagsInSession }
             .distinctUntilChanged()) {
             it?.let { chatSession ->
@@ -1410,7 +1415,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         viewLifecycleOwner.collectFlow(inMeetingViewModel.updateCallId) {
             if (it != MEGACHAT_INVALID_HANDLE) {
                 checkButtonsStatus()
-                showMuteBanner()
                 inMeetingViewModel.getCall()
                     ?.let { isCallOnHold(inMeetingViewModel.isCallOnHold()) }
             }
@@ -2332,8 +2336,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun updateLocalAudio(isMicOn: Boolean) {
         bottomFloatingPanelViewHolder?.updateMicIcon(isMicOn)
         updateParticipantsBottomPanel()
-        showMuteBanner()
-        floatingWindowFragment?.showLocalFloatingViewMicroMutedIcon(!inMeetingViewModel.state.value.hasLocalAudio)
     }
 
     /**

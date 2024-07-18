@@ -136,7 +136,9 @@ data class InMeetingUiState(
      * Has local audio
      */
     val hasLocalAudio
-        get():Boolean = call?.hasLocalAudio == true
+        get():Boolean = call?.let {
+            it.hasLocalAudio
+        } ?: run { false }
 
     /**
      * Check session is on hold in one to one call

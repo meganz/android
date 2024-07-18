@@ -148,6 +148,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     videoListener?.setAlpha(videoAlphaFloating)
                 }
             }
+
             showLocalFloatingViewMicroMutedIcon(!inMeetingViewModel.state.value.hasLocalAudio)
         } else {
             videoListener?.setAlpha(videoAlpha)
@@ -210,6 +211,11 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 Timber.d("Check changes in call on hold")
                 checkChangesInOnHold(isOnHold)
             }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.hasLocalAudio }
+            .distinctUntilChanged()) {
+            showLocalFloatingViewMicroMutedIcon(!it)
         }
 
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInHiResInSession }
@@ -350,7 +356,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
      *
      * @param show Indicates if the call has local audio or not
      */
-    fun showLocalFloatingViewMicroMutedIcon(show: Boolean) {
+    private fun showLocalFloatingViewMicroMutedIcon(show: Boolean) {
         microOffImageView?.isVisible = show
     }
 

@@ -482,6 +482,7 @@ class InMeetingViewModel @Inject constructor(
                     Timber.d("Call id ${call.callId} and chat id ${call.chatId} and call users limit ${call.callUsersLimit}")
                     Timber.d("Call limit ${call.callDurationLimit} Call Duration ${call.duration} and initial timestamp ${call.initialTimestamp}")
                     Timber.d("Call user limit ${call.callUsersLimit} and users in call ${call.peerIdParticipants?.size}")
+
                     _state.update { it.copy(call = call) }
                     call.status?.let { status ->
                         checkSubtitleToolbar()
@@ -1515,7 +1516,7 @@ class InMeetingViewModel @Inject constructor(
         }
 
         //Check mute call or session
-        state.value.call?.let { call ->
+        state.value.call?.run {
             if (isOneToOneCall()) {
                 getSessionOneToOneCall()?.let { session ->
                     if (!session.hasAudio && session.peerId != MEGACHAT_INVALID_HANDLE) {
@@ -1535,7 +1536,7 @@ class InMeetingViewModel @Inject constructor(
                 }
             }
 
-            if (!call.hasLocalAudio) {
+            if (!state.value.hasLocalAudio) {
                 bannerIcon?.let {
                     it.isVisible = false
                 }
