@@ -431,7 +431,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 underTest.uiState.test {
                     val state = awaitItem()
-                    assertThat(state.requestPermissions).isEqualTo(triggered)
+                    assertThat(state.requestMediaPermissions).isEqualTo(triggered)
                 }
             }
 
@@ -471,23 +471,24 @@ internal class SettingsCameraUploadsViewModelTest {
                 ).invoke(CameraUploadsRestartMode.StopAndDisable)
             }
 
-        @ParameterizedTest(name = "new request permissions state event: {0}")
-        @MethodSource("provideNewRequestPermissionsStateEventParams")
-        fun `test that the request permissions state is updated`(newState: StateEvent) =
+        @ParameterizedTest(name = "new request media permissions state event: {0}")
+        @MethodSource("provideNewRequestMediaPermissionsStateEventParams")
+        fun `test that the request media permissions state is updated`(newState: StateEvent) =
             runTest {
                 initializeUnderTest()
 
-                underTest.onRequestPermissionsStateChanged(newState = newState)
+                underTest.onRequestMediaPermissionsStateChanged(newState = newState)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().requestPermissions).isEqualTo(newState)
+                    assertThat(awaitItem().requestMediaPermissions).isEqualTo(newState)
                 }
             }
 
         /**
-         * Provides arguments for the Test that checks if the Request Permissions State is updated
+         * Provides arguments for the Test that checks if the Request Media Permissions State is
+         * updated
          */
-        private fun provideNewRequestPermissionsStateEventParams() = Stream.of(
+        private fun provideNewRequestMediaPermissionsStateEventParams() = Stream.of(
             consumed, triggered,
         )
 
@@ -862,35 +863,90 @@ internal class SettingsCameraUploadsViewModelTest {
     @DisplayName("Include Location Tags")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     internal inner class IncludeLocationTagsTestGroup {
+
         @Test
-        fun `test that an error snackbar is displayed when changing the include location tags state throws an exception`() =
+        fun `test that an error snackbar is displayed when disabling the option throws an exception`() =
             runTest {
                 initializeUnderTest()
-                whenever(setLocationTagsEnabledUseCase(any())).thenThrow(RuntimeException())
+                whenever(setLocationTagsEnabledUseCase(false)).thenThrow(RuntimeException())
 
-                assertDoesNotThrow { underTest.onIncludeLocationTagsStateChanged(false) }
+                underTest.onIncludeLocationTagsStateChanged(false)
 
                 underTest.uiState.test {
                     assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
                 }
             }
 
-        @ParameterizedTest(name = "new include location tags state: {0}")
-        @ValueSource(booleans = [true, false])
-        fun `test that changing the include location tags state stops camera uploads`(
-            shouldIncludeLocationTags: Boolean,
-        ) = runTest {
+        @Test
+        fun `test that location tags are no longer included in uploaded photos when disabling the option`() =
+            runTest {
+                initializeUnderTest()
+
+                underTest.onIncludeLocationTagsStateChanged(false)
+
+                verify(setLocationTagsEnabledUseCase).invoke(false)
+                underTest.uiState.test {
+                    assertThat(awaitItem().shouldIncludeLocationTags).isFalse()
+                }
+            }
+
+        @Test
+        fun `test that disabling the option stops camera uploads`() = runTest {
             initializeUnderTest()
 
-            underTest.onIncludeLocationTagsStateChanged(shouldIncludeLocationTags)
+            underTest.onIncludeLocationTagsStateChanged(false)
 
-            verify(setLocationTagsEnabledUseCase).invoke(shouldIncludeLocationTags)
             verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
-            underTest.uiState.test {
-                assertThat(awaitItem().shouldIncludeLocationTags).isEqualTo(
-                    shouldIncludeLocationTags
-                )
+        }
+
+        @Test
+        fun `test that the media location permission is requested when enabling the option`() =
+            runTest {
+                initializeUnderTest()
+
+                underTest.onIncludeLocationTagsStateChanged(true)
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().requestLocationPermission).isEqualTo(triggered)
+                }
             }
+
+        @Test
+        fun `test that an error snackbar is displayed when successfully enabling the option throws an exception`() =
+            runTest {
+                initializeUnderTest()
+                whenever(setLocationTagsEnabledUseCase(true)).thenThrow(RuntimeException())
+
+                underTest.onIncludeLocationTagsStateChanged(true)
+                underTest.onLocationPermissionGranted()
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                }
+            }
+
+        @Test
+        fun `test that location tags are now included in uploaded photos when the media location permission is granted`() =
+            runTest {
+                initializeUnderTest()
+
+                underTest.onIncludeLocationTagsStateChanged(true)
+                underTest.onLocationPermissionGranted()
+
+                verify(setLocationTagsEnabledUseCase).invoke(true)
+                underTest.uiState.test {
+                    assertThat(awaitItem().shouldIncludeLocationTags).isTrue()
+                }
+            }
+
+        @Test
+        fun `test that successfully enabling the option stops camera uploads`() = runTest {
+            initializeUnderTest()
+
+            underTest.onIncludeLocationTagsStateChanged(true)
+            underTest.onLocationPermissionGranted()
+
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
         }
     }
 

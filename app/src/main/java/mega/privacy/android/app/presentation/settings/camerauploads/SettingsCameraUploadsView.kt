@@ -91,6 +91,8 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
  * Local Primary Folder
  * @param onLocalSecondaryFolderSelected Lambda to execute when selecting the new Media Uploads
  * Local Secondary Folder
+ * @param onLocationPermissionGranted Lambda to execute when the User has granted the Location
+ * Permission
  * @param onMediaPermissionsGranted Lambda to execute when the User has granted the Media Permissions
  * @param onMediaUploadsStateChanged Lambda to execute when the Media Uploads state changes
  * @param onNewVideoCompressionSizeLimitProvided Lambda to execute upon providing a new maximum
@@ -102,8 +104,10 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
  * in Camera Uploads
  * @param onRelatedNewLocalFolderWarningDismissed Lambda to execute when the User dismisses the
  * Warning on the related new Local Primary / Secondary Folder
- * @param onRequestPermissionsStateChanged Lambda to execute whether a Camera Uploads permissions
+ * @param onRequestLocationPermissionStateChanged Lambda to execute whether a Location Permission
  * request should be done (triggered) or not (consumed)
+ * @param onRequestMediaPermissionsStateChanged Lambda to execute whether a Media Permissions request
+ * should be done (triggered) or not (consumed)
  * @param onSecondaryFolderNodeSelected Lambda to execute when selecting the new Media Uploads
  * Secondary Folder Node
  * @param onSnackbarMessageConsumed Lambda to execute when the Snackbar has been shown with the
@@ -127,13 +131,15 @@ internal fun SettingsCameraUploadsView(
     onKeepFileNamesStateChanged: (Boolean) -> Unit,
     onLocalPrimaryFolderSelected: (String?) -> Unit,
     onLocalSecondaryFolderSelected: (String?) -> Unit,
+    onLocationPermissionGranted: () -> Unit,
     onMediaPermissionsGranted: () -> Unit,
     onMediaUploadsStateChanged: (Boolean) -> Unit,
     onNewVideoCompressionSizeLimitProvided: (Int) -> Unit,
     onPrimaryFolderNodeSelected: (NodeId) -> Unit,
     onRegularBusinessAccountSubUserPromptAcknowledged: () -> Unit,
     onRelatedNewLocalFolderWarningDismissed: () -> Unit,
-    onRequestPermissionsStateChanged: (StateEvent) -> Unit,
+    onRequestLocationPermissionStateChanged: (StateEvent) -> Unit,
+    onRequestMediaPermissionsStateChanged: (StateEvent) -> Unit,
     onSecondaryFolderNodeSelected: (NodeId) -> Unit,
     onSnackbarMessageConsumed: () -> Unit,
     onUploadOptionUiItemSelected: (UploadOptionUiItem) -> Unit,
@@ -220,9 +226,12 @@ internal fun SettingsCameraUploadsView(
         content = { padding ->
             CameraUploadsPermissionsHandler(
                 modifier = Modifier.padding(padding),
-                requestPermissions = uiState.requestPermissions,
+                requestLocationPermission = uiState.requestLocationPermission,
+                requestMediaPermissions = uiState.requestMediaPermissions,
+                onLocationPermissionGranted = onLocationPermissionGranted,
                 onMediaPermissionsGranted = onMediaPermissionsGranted,
-                onRequestPermissionsStateChanged = onRequestPermissionsStateChanged,
+                onRequestLocationPermissionStateChanged = onRequestLocationPermissionStateChanged,
+                onRequestMediaPermissionsStateChanged = onRequestMediaPermissionsStateChanged,
             )
             BusinessAccountPromptHandler(
                 businessAccountPromptType = uiState.businessAccountPromptType,
@@ -407,13 +416,15 @@ private fun SettingsCameraUploadsViewPreview(
             onKeepFileNamesStateChanged = {},
             onLocalPrimaryFolderSelected = {},
             onLocalSecondaryFolderSelected = {},
+            onLocationPermissionGranted = {},
             onMediaPermissionsGranted = {},
             onMediaUploadsStateChanged = {},
             onNewVideoCompressionSizeLimitProvided = {},
             onPrimaryFolderNodeSelected = {},
             onRegularBusinessAccountSubUserPromptAcknowledged = {},
             onRelatedNewLocalFolderWarningDismissed = {},
-            onRequestPermissionsStateChanged = {},
+            onRequestLocationPermissionStateChanged = {},
+            onRequestMediaPermissionsStateChanged = {},
             onSecondaryFolderNodeSelected = {},
             onSnackbarMessageConsumed = {},
             onUploadOptionUiItemSelected = {},

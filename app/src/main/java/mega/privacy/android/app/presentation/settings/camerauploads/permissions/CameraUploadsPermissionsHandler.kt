@@ -1,11 +1,13 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.permissions
 
+import android.Manifest.permission.ACCESS_MEDIA_LOCATION
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
 import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.Q
 import android.os.Build.VERSION_CODES.TIRAMISU
 import android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -29,24 +31,40 @@ import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.Medi
 /**
  * A Composable that checks the Camera Uploads permissions necessary to run the feature
  *
- * @param requestPermissions State Event to request the Camera Uploads permissions
+ * @param requestLocationPermission State Event to request the Location Permission
+ * @param requestMediaPermissions State Event to request the Media Permissions
+ * @param onLocationPermissionGranted Lambda to execute when the User has granted the Location
+ * Permission
  * @param onMediaPermissionsGranted Lambda to execute when the User has granted the Media Permissions
- * @param onRequestPermissionsStateChanged Lambda to execute whether a Camera Uploads permissions
+ * @param onRequestLocationPermissionStateChanged Lambda to execute whether a Location Permission
+ * request should be done (triggered) or not (consumed)
+ * @param onRequestMediaPermissionsStateChanged Lambda to execute whether a Media Permissions
  * request should be done (triggered) or not (consumed)
  * @param modifier The [Modifier] class
  */
 @Composable
 internal fun CameraUploadsPermissionsHandler(
-    requestPermissions: StateEvent,
+    requestLocationPermission: StateEvent,
+    requestMediaPermissions: StateEvent,
+    onLocationPermissionGranted: () -> Unit,
     onMediaPermissionsGranted: () -> Unit,
-    onRequestPermissionsStateChanged: (StateEvent) -> Unit,
+    onRequestLocationPermissionStateChanged: (StateEvent) -> Unit,
+    onRequestMediaPermissionsStateChanged: (StateEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showMediaPermissionsRationale by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
     var requestPermissionsTimestamp by remember { mutableLongStateOf(0L) }
-    val permissionsLauncher = rememberLauncherForActivityResult(
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        // ACCESS_MEDIA_LOCATION automatically grants the permission; no Permission Popup is shown
+        onLocationPermissionGranted.invoke()
+    }
+
+    val mediaPermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
         if (it.areMediaPermissionsGranted()) {
@@ -64,9 +82,21 @@ internal fun CameraUploadsPermissionsHandler(
     }
 
     EventEffect(
-        event = requestPermissions,
-        onConsumed = { onRequestPermissionsStateChanged.invoke(consumed) },
-        action = { permissionsLauncher.launch(getCameraUploadsPermissions().toTypedArray()) }
+        event = requestLocationPermission,
+        onConsumed = { onRequestLocationPermissionStateChanged.invoke(consumed) },
+        action = {
+            if (SDK_INT >= Q) {
+                locationPermissionLauncher.launch(ACCESS_MEDIA_LOCATION)
+            } else {
+                // The Location Permission is automatically granted
+                onLocationPermissionGranted.invoke()
+            }
+        },
+    )
+    EventEffect(
+        event = requestMediaPermissions,
+        onConsumed = { onRequestMediaPermissionsStateChanged.invoke(consumed) },
+        action = { mediaPermissionsLauncher.launch(getCameraUploadsPermissions().toTypedArray()) }
     )
 
     if (showMediaPermissionsRationale) {
@@ -74,7 +104,7 @@ internal fun CameraUploadsPermissionsHandler(
             modifier = modifier,
             onMediaAccessGranted = {
                 requestPermissionsTimestamp = System.currentTimeMillis()
-                onRequestPermissionsStateChanged.invoke(triggered)
+                onRequestMediaPermissionsStateChanged.invoke(triggered)
                 showMediaPermissionsRationale = false
             },
             onMediaAccessDenied = { showMediaPermissionsRationale = false },

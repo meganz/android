@@ -404,7 +404,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     if (enabled) {
                         // Check if the Media Permissions have been granted before continuing the
                         // process of enabling Camera Uploads
-                        _uiState.update { it.copy(requestPermissions = triggered) }
+                        _uiState.update { it.copy(requestMediaPermissions = triggered) }
                     } else {
                         // Disable Camera Uploads
                         setCameraUploadsEnabled(false)
@@ -507,13 +507,23 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsUiState.requestPermissions]
+     * Updates the value of [SettingsCameraUploadsUiState.requestLocationPermission]
      *
-     * @param newState The new State Event. If triggered, this will perform a Camera Uploads
-     * permissions request
+     * @param newState The new State Event. If triggered, this will perform a request to grant the
+     * Location Permission
      */
-    fun onRequestPermissionsStateChanged(newState: StateEvent) {
-        _uiState.update { it.copy(requestPermissions = newState) }
+    fun onRequestLocationPermissionStateChanged(newState: StateEvent) {
+        _uiState.update { it.copy(requestLocationPermission = newState) }
+    }
+
+    /**
+     * Updates the value of [SettingsCameraUploadsUiState.requestMediaPermissions]
+     *
+     * @param newState The new State Event. If triggered, this will perform a request to grant
+     * Media Permissions
+     */
+    fun onRequestMediaPermissionsStateChanged(newState: StateEvent) {
+        _uiState.update { it.copy(requestMediaPermissions = newState) }
     }
 
     /**
@@ -617,24 +627,43 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
+     * When the User has granted the Location Permission, enable the "Include location tags" Option
+     */
+    fun onLocationPermissionGranted() {
+        includeLocationTags(true)
+    }
+
+    /**
      * Configures whether Location Tags should be added / removed when uploading Photos. Doing this
      * stops the ongoing Camera Uploads process
+     *
+     * @param isEnabled true if the feature should be enabled
+     */
+    private fun includeLocationTags(isEnabled: Boolean) {
+        viewModelScope.launch {
+            runCatching {
+                setLocationTagsEnabledUseCase(isEnabled)
+                stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                _uiState.update { it.copy(shouldIncludeLocationTags = isEnabled) }
+            }.onFailure {
+                Timber.e("An exception occurred when changing the Include Location Tags state to $isEnabled")
+                showGenericErrorSnackbar()
+            }
+        }
+    }
+
+    /**
+     * Performs certain actions when the "Include location tags" State changes
      *
      * @param newState The new Include Location Tags state
      */
     fun onIncludeLocationTagsStateChanged(newState: Boolean) {
-        viewModelScope.launch {
-            runCatching {
-                setLocationTagsEnabledUseCase(newState)
-                stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
-                _uiState.update { it.copy(shouldIncludeLocationTags = newState) }
-            }.onFailure { exception ->
-                Timber.e(
-                    "An error occurred when changing the Include Location Tags state",
-                    exception
-                )
-                showGenericErrorSnackbar()
-            }
+        if (newState) {
+            // Check if the Location Permission has been granted before continuing the process of
+            // enabling the Option
+            _uiState.update { it.copy(requestLocationPermission = triggered) }
+        } else {
+            includeLocationTags(false)
         }
     }
 
