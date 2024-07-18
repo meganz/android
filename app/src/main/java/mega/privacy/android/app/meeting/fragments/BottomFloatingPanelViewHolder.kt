@@ -82,7 +82,6 @@ class BottomFloatingPanelViewHolder(
 
     init {
         initButtonsState()
-        setupBottomSheet()
         listenButtons()
         setupRecyclerView()
         updatePanel()
@@ -192,6 +191,7 @@ class BottomFloatingPanelViewHolder(
      * @param shouldExpand determine if should expand panel when update
      */
     fun updatePanel(shouldExpand: Boolean = true) {
+        setupBottomSheet()
         if (shouldExpand) {
             collapse()
         }
