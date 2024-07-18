@@ -36,6 +36,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -63,7 +64,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -115,6 +119,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -836,6 +841,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         runBlocking {
             enableOfflineCompose =
