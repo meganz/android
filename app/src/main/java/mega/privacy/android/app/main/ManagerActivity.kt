@@ -136,6 +136,7 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ChatManagementCallback
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener
 import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
@@ -243,6 +244,8 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesCompo
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
+import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
@@ -385,6 +388,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val transferPageViewModel: TransferPageViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by viewModels()
+    private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
     private val searchResultLauncher =
@@ -972,6 +976,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         setContentView(R.layout.activity_manager)
         initialiseViews()
         addStartTransferView()
+        addNodeAttachmentView()
         findViewById<ComposeView>(R.id.transfers_widget).setTransfersWidgetContent(
             transfersInfoFlow = transfersManagementViewModel.state.map { it.transfersInfo },
             visibleFlow = transfersManagementViewModel.state.map { it.widgetVisible },
@@ -1022,13 +1027,25 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun addStartTransferView() {
         findViewById<ViewGroup>(R.id.root_content_layout).addView(
             createStartTransferView(
-                this,
-                startDownloadViewModel.state,
-                {
+                activity = this,
+                transferEventState = startDownloadViewModel.state,
+                onConsumeEvent = {
                     if ((startDownloadViewModel.state.value as StateEventWithContentTriggered).content is TransferTriggerEvent.StartUpload) {
                         viewModel.consumeUploadEvent()
                     }
                     startDownloadViewModel.consumeDownloadEvent()
+                }
+            )
+        )
+    }
+
+    private fun addNodeAttachmentView() {
+        findViewById<ViewGroup>(R.id.root_content_layout).addView(
+            createNodeAttachmentView(
+                activity = this,
+                viewModel = nodeAttachmentViewModel,
+                showMessage = { message, id ->
+                    showSnackbarWithChat(message, id)
                 }
             )
         )
@@ -5671,7 +5688,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param node node to attach
      */
     fun attachNodeToChats(node: MegaNode?) {
-        node?.let { nodeAttacher.attachNode(it) }
+        node?.let { nodeAttachmentViewModel.startAttachNodes(listOf(NodeId(it.handle))) }
     }
 
     /**
@@ -5680,7 +5697,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param nodes nodes to attach
      */
     fun attachNodesToChats(nodes: List<MegaNode?>?) {
-        nodes?.let { nodeAttacher.attachNodes(it.filterNotNull()) }
+        nodes.orEmpty().filterNotNull().map { NodeId(it.handle) }.let {
+            nodeAttachmentViewModel.startAttachNodes(it)
+        }
     }
 
     override fun confirmLeaveChat(chatId: Long) {
