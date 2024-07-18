@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.extension
 
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 
 /**
  * Is started

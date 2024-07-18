@@ -4,8 +4,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.usecase.meeting.GetChatCallInProgress
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.usecase.call.GetChatCallInProgress
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach

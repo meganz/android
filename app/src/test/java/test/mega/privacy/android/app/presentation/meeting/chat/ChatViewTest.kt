@@ -38,7 +38,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransf
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.shared.original.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import org.junit.Rule
 import org.junit.Test

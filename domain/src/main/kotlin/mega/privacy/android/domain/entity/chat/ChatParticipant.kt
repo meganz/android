@@ -3,7 +3,7 @@ package mega.privacy.android.domain.entity.chat
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.meeting.CallParticipantData
+import mega.privacy.android.domain.entity.call.CallParticipantData
 import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallStatus
 
 /**

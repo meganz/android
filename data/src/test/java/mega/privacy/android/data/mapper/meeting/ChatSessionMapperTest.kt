@@ -1,8 +1,8 @@
 package mega.privacy.android.data.mapper.meeting
 
 import com.google.common.truth.Truth
-import mega.privacy.android.domain.entity.meeting.ChatSessionStatus
-import mega.privacy.android.domain.entity.meeting.ChatSessionTermCode
+import mega.privacy.android.domain.entity.call.ChatSessionStatus
+import mega.privacy.android.domain.entity.call.ChatSessionTermCode
 import nz.mega.sdk.MegaChatSession
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

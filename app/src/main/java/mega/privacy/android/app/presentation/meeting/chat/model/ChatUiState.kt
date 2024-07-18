@@ -6,7 +6,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting

@@ -5,10 +5,10 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.meeting.ChatCallChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

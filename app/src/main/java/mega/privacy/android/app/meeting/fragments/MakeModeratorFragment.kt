@@ -9,11 +9,9 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.MaterialToolbar
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -22,7 +20,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.twemoji.EmojiTextView
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.MakeModeratorFragmentBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.adapter.AssignParticipantsAdapter
@@ -31,10 +28,9 @@ import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.entity.meeting.ChatSessionStatus
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatSessionStatus
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatRoom
 import org.jetbrains.anko.displayMetrics
 import timber.log.Timber

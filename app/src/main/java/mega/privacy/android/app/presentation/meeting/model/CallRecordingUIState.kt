@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.model
 
-import mega.privacy.android.domain.entity.meeting.CallRecordingEvent
+import mega.privacy.android.domain.entity.call.CallRecordingEvent
 
 /**
  * UI state for call recording

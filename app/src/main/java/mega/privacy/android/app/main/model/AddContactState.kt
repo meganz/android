@@ -1,8 +1,8 @@
 package mega.privacy.android.app.main.model
 
 import mega.privacy.android.domain.entity.Feature
-import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 
 /**
  * State for Add Contact

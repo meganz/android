@@ -15,10 +15,10 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
-import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentEventUseCase
-import mega.privacy.android.domain.usecase.meeting.HangChatCallByChatIdUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorCallSessionOnRecordingUseCase
+import mega.privacy.android.domain.usecase.call.BroadcastCallRecordingConsentEventUseCase
+import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
+import mega.privacy.android.domain.usecase.call.MonitorCallRecordingConsentEventUseCase
+import mega.privacy.android.domain.usecase.call.MonitorCallSessionOnRecordingUseCase
 import timber.log.Timber
 import javax.inject.Inject
 

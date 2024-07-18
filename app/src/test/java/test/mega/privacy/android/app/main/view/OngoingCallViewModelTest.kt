@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.main.view.OngoingCallViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.chat.MonitorOngoingCallUseCase
 import org.junit.jupiter.api.BeforeAll

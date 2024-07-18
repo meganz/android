@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
-import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository

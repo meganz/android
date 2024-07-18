@@ -56,7 +56,7 @@ import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagement
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
-import mega.privacy.android.domain.entity.meeting.CallType
+import mega.privacy.android.domain.entity.call.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.legacy.core.ui.controls.chips.CallTextButtonChip
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton

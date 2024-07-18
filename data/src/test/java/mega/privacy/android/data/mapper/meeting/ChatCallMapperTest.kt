@@ -2,12 +2,12 @@ package mega.privacy.android.data.mapper.meeting
 
 import com.google.common.truth.Truth
 import mega.privacy.android.data.mapper.handles.HandleListMapper
-import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.EndCallReason
+import mega.privacy.android.domain.entity.call.CallCompositionChanges
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.call.EndCallReason
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
-import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
+import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatWaitingRoom
 import nz.mega.sdk.MegaHandleList

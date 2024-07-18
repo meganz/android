@@ -18,11 +18,11 @@ import mega.privacy.android.domain.entity.statistics.EnableSoundNotification
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallsMeetingInvitationsUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallsMeetingRemindersUseCase
-import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.SetCallsMeetingInvitationsUseCase
 import mega.privacy.android.domain.usecase.meeting.SetCallsMeetingRemindersUseCase
-import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.call.SetCallsSoundNotifications
 import javax.inject.Inject
 
 /**

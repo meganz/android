@@ -3,12 +3,12 @@ package mega.privacy.android.app.presentation.meeting.model
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.meeting.AnotherCallType
-import mega.privacy.android.domain.entity.meeting.CallOnHoldType
-import mega.privacy.android.domain.entity.meeting.CallUIStatusType
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.ChatSession
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.AnotherCallType
+import mega.privacy.android.domain.entity.call.CallOnHoldType
+import mega.privacy.android.domain.entity.call.CallUIStatusType
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatSession
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 
 /**

@@ -12,9 +12,9 @@ import mega.privacy.android.app.presentation.meeting.chat.view.BottomCallButton
 import mega.privacy.android.app.presentation.meeting.chat.view.TEST_TAG_BOTTOM_ANSWER_CALL_BUTTON
 import mega.privacy.android.app.presentation.meeting.chat.view.TEST_TAG_BOTTOM_CALL_ON_HOLD_BUTTON
 import mega.privacy.android.app.presentation.meeting.chat.view.TEST_TAG_BOTTOM_JOIN_CALL_BUTTON
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

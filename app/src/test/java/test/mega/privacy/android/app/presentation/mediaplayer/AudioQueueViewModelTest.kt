@@ -10,7 +10,7 @@ import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

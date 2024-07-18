@@ -11,7 +11,7 @@ import androidx.viewpager2.widget.ViewPager2
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.domain.entity.meeting.ChatSession
+import mega.privacy.android.domain.entity.call.ChatSession
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
 import timber.log.Timber
 

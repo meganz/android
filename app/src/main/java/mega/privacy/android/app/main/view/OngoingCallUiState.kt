@@ -1,7 +1,7 @@
 package mega.privacy.android.app.main.view
 
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds

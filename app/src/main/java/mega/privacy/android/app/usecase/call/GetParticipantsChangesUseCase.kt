@@ -14,10 +14,10 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
-import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.CallCompositionChanges
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase

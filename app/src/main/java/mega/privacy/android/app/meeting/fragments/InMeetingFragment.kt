@@ -117,11 +117,11 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.entity.meeting.AnotherCallType
-import mega.privacy.android.domain.entity.meeting.CallUIStatusType
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.ChatSession
-import mega.privacy.android.domain.entity.meeting.ChatSessionStatus
+import mega.privacy.android.domain.entity.call.AnotherCallType
+import mega.privacy.android.domain.entity.call.CallUIStatusType
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatSession
+import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange

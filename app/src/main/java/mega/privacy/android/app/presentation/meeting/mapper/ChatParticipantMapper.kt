@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.meeting.mapper
 
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.entity.meeting.CallParticipantData
+import mega.privacy.android.domain.entity.call.CallParticipantData
 import javax.inject.Inject
 
 /**

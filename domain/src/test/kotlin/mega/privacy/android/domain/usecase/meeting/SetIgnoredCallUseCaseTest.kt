@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.meeting
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.CallRepository
+import mega.privacy.android.domain.usecase.call.SetIgnoredCallUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

@@ -62,8 +62,8 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
-import mega.privacy.android.domain.entity.meeting.CallParticipantData
-import mega.privacy.android.domain.entity.meeting.CallType
+import mega.privacy.android.domain.entity.call.CallParticipantData
+import mega.privacy.android.domain.entity.call.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 
 /**

@@ -25,7 +25,7 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.domain.entity.statistics.EndedEmptyCallTimeout
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.chat.BroadcastJoinedSuccessfullyUseCase
-import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava

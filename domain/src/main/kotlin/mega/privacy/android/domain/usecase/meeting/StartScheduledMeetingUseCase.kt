@@ -1,7 +1,11 @@
 package mega.privacy.android.domain.usecase.meeting
 
-import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.call.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatCallByCallIdUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatCallIdsUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase

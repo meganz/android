@@ -1,7 +1,7 @@
 package mega.privacy.android.data.mapper.meeting
 
 import com.google.common.truth.Truth
-import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
+import mega.privacy.android.domain.entity.call.ChatSessionChanges
 import nz.mega.sdk.MegaChatSession
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance

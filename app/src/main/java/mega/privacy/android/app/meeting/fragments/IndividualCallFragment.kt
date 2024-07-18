@@ -24,11 +24,9 @@ import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getCurrentOrientation
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.ChatSessionStatus
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
 import timber.log.Timber
 
 @AndroidEntryPoint

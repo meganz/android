@@ -12,7 +12,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
 import mega.privacy.android.shared.original.core.ui.controls.chat.ReturnToCallBanner
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable

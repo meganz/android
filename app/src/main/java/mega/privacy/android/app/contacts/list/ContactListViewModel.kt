@@ -38,8 +38,8 @@ import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContact
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
-import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
+import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
+import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber

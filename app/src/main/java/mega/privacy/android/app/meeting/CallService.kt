@@ -26,7 +26,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -41,13 +40,13 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.call.CallCompositionChanges
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
-import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
+import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
-import mega.privacy.android.domain.usecase.meeting.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava

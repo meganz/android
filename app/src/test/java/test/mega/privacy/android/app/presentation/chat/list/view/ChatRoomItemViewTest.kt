@@ -13,10 +13,10 @@ import mega.privacy.android.app.presentation.chat.list.view.TEST_TAG_BOTTOM_TEXT
 import mega.privacy.android.app.presentation.chat.list.view.TEST_TAG_MIDDLE_TEXT
 import mega.privacy.android.app.presentation.chat.list.view.TEST_TAG_MIDDLE_TEXT_CALL_CHRONOMETER
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import org.junit.Rule
 import org.junit.Test

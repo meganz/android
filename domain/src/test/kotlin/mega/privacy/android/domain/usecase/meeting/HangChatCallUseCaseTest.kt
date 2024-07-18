@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRequestType
 import mega.privacy.android.domain.repository.CallRepository
+import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever

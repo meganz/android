@@ -6,7 +6,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.view.OngoingCallBannerContent
 import mega.privacy.android.app.main.view.OngoingCallUiState
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

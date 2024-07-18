@@ -84,6 +84,7 @@ import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
 import mega.privacy.android.app.presentation.openlink.OpenLinkActivity;
 import mega.privacy.android.domain.entity.StorageState;
+import mega.privacy.android.domain.usecase.call.AreThereOngoingVideoCallsUseCase;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -761,7 +762,7 @@ public class CallUtil {
      * This function determines whether there are ongoing video calls.
      *
      * @return Long. The chat ID.
-     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.meeting.AreThereOngoingVideoCallsUseCase} instead.
+     * @deprecated <p> Use {@link AreThereOngoingVideoCallsUseCase} instead.
      */
     @Deprecated
     public static long isNecessaryDisableLocalCamera() {

@@ -1,6 +1,6 @@
 package mega.privacy.android.data.mapper.meeting
 
-import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
+import mega.privacy.android.domain.entity.call.CallCompositionChanges
 import nz.mega.sdk.MegaChatCall
 import javax.inject.Inject
 

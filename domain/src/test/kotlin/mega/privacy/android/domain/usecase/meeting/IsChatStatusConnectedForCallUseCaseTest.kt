@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.usecase.call.IsChatStatusConnectedForCallUseCase
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

@@ -1,6 +1,6 @@
 package mega.privacy.android.data.mapper.meeting
 
-import mega.privacy.android.domain.entity.meeting.ChatSessionStatus
+import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import nz.mega.sdk.MegaChatSession
 import javax.inject.Inject
 

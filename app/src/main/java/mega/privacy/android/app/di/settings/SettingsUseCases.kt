@@ -26,8 +26,8 @@ import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
-import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.call.SetCallsSoundNotifications
 
 /**
  * Settings use cases module

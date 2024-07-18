@@ -3,15 +3,15 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.ChatRequest
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
 import mega.privacy.android.domain.entity.featureflag.Flag
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.ChatSessionUpdatesResult
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 
 /**

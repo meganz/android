@@ -26,7 +26,7 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnot
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.domain.entity.meeting.CallRecordingEvent
+import mega.privacy.android.domain.entity.call.CallRecordingEvent
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**

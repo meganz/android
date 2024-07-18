@@ -2,15 +2,15 @@ package mega.privacy.android.domain.usecase.contact
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
-import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times

@@ -28,7 +28,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartScheduledMeetingUseCase
 import nz.mega.sdk.MegaApiAndroid

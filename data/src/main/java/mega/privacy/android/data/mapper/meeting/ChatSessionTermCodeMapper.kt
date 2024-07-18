@@ -1,6 +1,6 @@
 package mega.privacy.android.data.mapper.meeting
 
-import mega.privacy.android.domain.entity.meeting.ChatSessionTermCode
+import mega.privacy.android.domain.entity.call.ChatSessionTermCode
 import nz.mega.sdk.MegaChatSession
 import javax.inject.Inject
 

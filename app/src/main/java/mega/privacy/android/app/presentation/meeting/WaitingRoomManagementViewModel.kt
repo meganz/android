@@ -17,12 +17,12 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.meeting.AllowUsersJoinCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCallInProgress
+import mega.privacy.android.domain.usecase.call.AllowUsersJoinCallUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallInProgress
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.KickUsersFromCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase

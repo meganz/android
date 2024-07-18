@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCallInProgress
+import mega.privacy.android.domain.usecase.call.GetChatCallInProgress
 import timber.log.Timber
 import javax.inject.Inject
 

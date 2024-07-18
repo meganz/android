@@ -2,8 +2,10 @@ package mega.privacy.android.domain.usecase.meeting
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.repository.CallRepository
+import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
+import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance

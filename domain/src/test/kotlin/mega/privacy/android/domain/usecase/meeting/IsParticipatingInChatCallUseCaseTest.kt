@@ -4,6 +4,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.CallRepository
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock

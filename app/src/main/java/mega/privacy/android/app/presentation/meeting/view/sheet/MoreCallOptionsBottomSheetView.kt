@@ -33,8 +33,8 @@ import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.shared.original.core.ui.theme.black
-import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.meeting.CallOnHoldType
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.CallOnHoldType
 
 /**
  * Recurring Meeting Occurrence bottom sheet view

@@ -48,10 +48,10 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenU
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
-import mega.privacy.android.domain.usecase.meeting.IsChatConnectedToInitiateCallUseCase
+import mega.privacy.android.domain.usecase.call.IsChatConnectedToInitiateCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
+import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase

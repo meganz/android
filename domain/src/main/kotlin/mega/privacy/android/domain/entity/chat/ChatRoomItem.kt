@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat
 
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import java.time.Instant

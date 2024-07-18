@@ -15,8 +15,8 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.OnChatListItemUpdate
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.meeting.ChatCallChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase

@@ -27,9 +27,9 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.openMeetingWithAudioOrVideo
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
-import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.meeting.ChatCallChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
@@ -37,11 +37,11 @@ import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
+import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
-import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
+import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaChatRoom

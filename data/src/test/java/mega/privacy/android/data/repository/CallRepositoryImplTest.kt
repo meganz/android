@@ -30,10 +30,10 @@ import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingRulesMap
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.domain.entity.ChatRequest
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.repository.CallRepository
 import nz.mega.sdk.MegaChatCall

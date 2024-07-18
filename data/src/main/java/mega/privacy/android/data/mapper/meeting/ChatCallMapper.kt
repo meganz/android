@@ -1,8 +1,8 @@
 package mega.privacy.android.data.mapper.meeting
 
 import mega.privacy.android.data.mapper.handles.HandleListMapper
-import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.meeting.ChatSession
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatSession
 import nz.mega.sdk.MegaChatCall
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds

@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.chat
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import mega.privacy.android.domain.entity.meeting.isCallFinished
+import mega.privacy.android.domain.entity.call.isCallFinished
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import javax.inject.Inject

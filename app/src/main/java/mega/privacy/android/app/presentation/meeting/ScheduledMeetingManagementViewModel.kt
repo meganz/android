@@ -29,8 +29,8 @@ import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
-import mega.privacy.android.domain.entity.meeting.ChatCallChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -44,7 +44,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.meeting.BroadcastScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingOccurrenceUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase

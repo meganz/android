@@ -29,7 +29,7 @@ import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalC
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailsUseCase
 import mega.privacy.android.domain.usecase.contact.ValidateEmailInputForInvitationUseCase
-import mega.privacy.android.domain.usecase.meeting.AreThereOngoingVideoCallsUseCase
+import mega.privacy.android.domain.usecase.call.AreThereOngoingVideoCallsUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

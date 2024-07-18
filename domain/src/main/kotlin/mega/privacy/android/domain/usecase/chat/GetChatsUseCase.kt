@@ -20,7 +20,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.data.mapper.chat.ChatRoomItemMapper
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
@@ -38,7 +38,7 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.ChatRoomItemStatusMapper
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
-import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdatesUseCase

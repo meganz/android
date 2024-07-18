@@ -9,9 +9,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.TopCallButton
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

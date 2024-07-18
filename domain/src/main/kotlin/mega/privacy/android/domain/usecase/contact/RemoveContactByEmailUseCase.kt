@@ -4,8 +4,8 @@ import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
-import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import javax.inject.Inject
 
 /**

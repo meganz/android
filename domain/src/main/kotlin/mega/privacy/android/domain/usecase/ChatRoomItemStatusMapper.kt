@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase
 
-import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import javax.inject.Inject
 

@@ -39,7 +39,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.meeting.CallParticipantData
+import mega.privacy.android.domain.entity.call.CallParticipantData
 import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaButtonWithIcon

@@ -1,7 +1,7 @@
 package mega.privacy.android.data.mapper.meeting
 
 import com.google.common.truth.Truth
-import mega.privacy.android.domain.entity.meeting.CallNotificationType
+import mega.privacy.android.domain.entity.call.CallNotificationType
 import nz.mega.sdk.MegaChatCall
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
