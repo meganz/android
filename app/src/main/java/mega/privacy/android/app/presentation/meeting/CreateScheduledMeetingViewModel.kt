@@ -40,11 +40,11 @@ import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
 import mega.privacy.android.domain.entity.user.UserId
-import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.RemoveParticipantFromChatUseCase
@@ -75,7 +75,7 @@ import javax.inject.Inject
  * @property getChatRoomUseCase                         [GetChatRoomUseCase]
  * @property createChatroomAndSchedMeetingUseCase       [CreateChatroomAndSchedMeetingUseCase]
  * @property updateScheduledMeetingUseCase              [UpdateScheduledMeetingUseCase]
- * @property createChatLink                             [CreateChatLink]
+ * @property createChatLinkUseCase                      [CreateChatLinkUseCase]
  * @property removeChatLinkUseCase                      [RemoveChatLinkUseCase]
  * @property recurrenceDialogOptionMapper               [RecurrenceDialogOptionMapper]
  * @property weekDayMapper                              [WeekDayMapper]
@@ -102,7 +102,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val createChatroomAndSchedMeetingUseCase: CreateChatroomAndSchedMeetingUseCase,
     private val updateScheduledMeetingUseCase: UpdateScheduledMeetingUseCase,
-    private val createChatLink: CreateChatLink,
+    private val createChatLinkUseCase: CreateChatLinkUseCase,
     private val removeChatLinkUseCase: RemoveChatLinkUseCase,
     private val queryChatLink: QueryChatLink,
     private val recurrenceDialogOptionMapper: RecurrenceDialogOptionMapper,
@@ -961,7 +961,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private fun createMeetingLink(chatId: Long) =
         viewModelScope.launch {
             runCatching {
-                createChatLink(chatId)
+                createChatLinkUseCase(chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
             }

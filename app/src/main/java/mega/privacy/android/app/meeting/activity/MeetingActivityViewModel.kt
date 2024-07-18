@@ -78,7 +78,6 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
-import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -87,6 +86,7 @@ import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
@@ -148,7 +148,7 @@ import javax.inject.Inject
  * @property monitorChatRoomUpdatesUseCase                  [MonitorChatRoomUpdatesUseCase]
  * @property queryChatLink                                  [QueryChatLink]
  * @property isEphemeralPlusPlusUseCase                     [IsEphemeralPlusPlusUseCase]
- * @property createChatLink                                 [CreateChatLink]
+ * @property createChatLinkUseCase                          [CreateChatLinkUseCase]
  * @property inviteContactWithHandleUseCase                           [InviteContactWithHandleUseCase]
  * @property updateChatPermissionsUseCase                   [UpdateChatPermissionsUseCase]
  * @property removeFromChaUseCase                           [RemoveFromChat]
@@ -191,7 +191,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val setOpenInvite: SetOpenInvite,
     private val chatParticipantMapper: ChatParticipantMapper,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
-    private val createChatLink: CreateChatLink,
+    private val createChatLinkUseCase: CreateChatLinkUseCase,
     private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase,
     private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase,
     private val removeFromChaUseCase: RemoveFromChat,
@@ -1804,7 +1804,7 @@ class MeetingActivityViewModel @Inject constructor(
         _state.value.chatId.let { id ->
             viewModelScope.launch {
                 runCatching {
-                    createChatLink(id)
+                    createChatLinkUseCase(id)
                 }.onFailure { exception ->
                     Timber.e(exception)
                 }.onSuccess { request ->

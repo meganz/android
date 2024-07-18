@@ -8,6 +8,7 @@ import javax.inject.Inject
  */
 class CreateGroupChatRoomUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
+    private val createChatLinkUseCase: CreateChatLinkUseCase,
 ) {
 
     /**
@@ -41,6 +42,6 @@ class CreateGroupChatRoomUseCase @Inject constructor(
             speakRequest = false,
             waitingRoom = false,
             openInvite = addParticipants,
-        ).also { if (chatLink) chatRepository.createChatLink(it) }
+        ).also { if (chatLink) createChatLinkUseCase(it) }
     }
 }

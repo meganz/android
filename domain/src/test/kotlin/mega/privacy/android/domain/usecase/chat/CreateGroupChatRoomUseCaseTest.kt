@@ -1,21 +1,27 @@
 package mega.privacy.android.domain.usecase.chat
 
-import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.ChatRepository
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.random.Random
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class CreateGroupChatRoomUseCaseTest {
     private val chatRepository = mock<ChatRepository>()
-    private val underTest = CreateGroupChatRoomUseCase(chatRepository)
+    private val createChatLinkUseCase = mock<CreateChatLinkUseCase>()
+    private val underTest = CreateGroupChatRoomUseCase(chatRepository, createChatLinkUseCase)
     private val userHandle = Random.nextLong()
     private val chatId = Random.nextLong()
+
+    @AfterEach
+    fun tearDown() {
+        reset(chatRepository, createChatLinkUseCase)
+    }
 
     @Test
     fun `test that create EKR chatroom use-case returns chat id`() = runTest {
@@ -39,7 +45,7 @@ class CreateGroupChatRoomUseCaseTest {
 
         val actual = underTest.invoke(emails, title, isEkr, addParticipants, chatLink)
 
-        Truth.assertThat(actual).isEqualTo(chatId)
+        assertThat(actual).isEqualTo(chatId)
     }
 
     @Test
@@ -64,7 +70,7 @@ class CreateGroupChatRoomUseCaseTest {
 
         val actual = underTest.invoke(emails, title, isEkr, addParticipants, chatLink)
 
-        verify(chatRepository).createChatLink(chatId)
-        Truth.assertThat(actual).isEqualTo(chatId)
+        verify(createChatLinkUseCase).invoke(chatId)
+        assertThat(actual).isEqualTo(chatId)
     }
 }

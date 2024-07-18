@@ -17,7 +17,6 @@ import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
-import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
@@ -92,7 +92,7 @@ class MeetingActivityViewModelTest {
     private val setOpenInvite: SetOpenInvite = mock()
     private val chatParticipantMapper: ChatParticipantMapper = mock()
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase = mock()
-    private val createChatLink: CreateChatLink = mock()
+    private val createChatLinkUseCase: CreateChatLinkUseCase = mock()
     private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase = mock()
     private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase = mock()
     private val removeFromChaUseCase: RemoveFromChat = mock()
@@ -155,7 +155,7 @@ class MeetingActivityViewModelTest {
             setOpenInvite,
             chatParticipantMapper,
             isEphemeralPlusPlusUseCase,
-            createChatLink,
+            createChatLinkUseCase,
             inviteContactWithHandleUseCase,
             updateChatPermissionsUseCase,
             removeFromChaUseCase,
@@ -210,7 +210,7 @@ class MeetingActivityViewModelTest {
             setOpenInvite = setOpenInvite,
             chatParticipantMapper = chatParticipantMapper,
             isEphemeralPlusPlusUseCase = isEphemeralPlusPlusUseCase,
-            createChatLink = createChatLink,
+            createChatLinkUseCase = createChatLinkUseCase,
             inviteContactWithHandleUseCase = inviteContactWithHandleUseCase,
             updateChatPermissionsUseCase = updateChatPermissionsUseCase,
             removeFromChaUseCase = removeFromChaUseCase,

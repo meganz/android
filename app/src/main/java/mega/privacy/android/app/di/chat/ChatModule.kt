@@ -13,7 +13,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.InviteToChat
@@ -79,13 +78,6 @@ abstract class ChatModule {
         @Provides
         fun provideSetPublicChatToPrivate(chatRepository: ChatRepository): SetPublicChatToPrivate =
             SetPublicChatToPrivate(chatRepository::setPublicChatToPrivate)
-
-        /**
-         * Provides the Use Case [CreateChatLink]
-         */
-        @Provides
-        fun provideCreateChatLink(chatRepository: ChatRepository): CreateChatLink =
-            CreateChatLink(chatRepository::createChatLink)
 
         /**
          * Provides the Use Case [QueryChatLink]
