@@ -69,7 +69,9 @@ CRYPTOPP=cryptopp
 CRYPTOPP_VERSION=820
 CRYPTOPP_SOURCE_FILE=cryptopp${CRYPTOPP_VERSION}.zip
 CRYPTOPP_SOURCE_FOLDER=${CRYPTOPP}/${CRYPTOPP}
-CRYPTOPP_DOWNLOAD_URL=http://www.cryptopp.com/${CRYPTOPP_SOURCE_FILE}
+#CRYPTOPP_DOWNLOAD_URL=http://www.cryptopp.com/${CRYPTOPP_SOURCE_FILE}
+# www.cryptopp.com is not reachable on July 18, 2024. Use Artifactory instead.
+CRYPTOPP_DOWNLOAD_URL=${ARTIFACTORY_BASE_URL}:443/artifactory/android-mega/cicd/build-sdk/cryptopp820.zip
 CRYPTOPP_SHA1="b042d2f0c93410abdec7c12bcd92787d019f8da1"
 
 SQLITE=sqlite
