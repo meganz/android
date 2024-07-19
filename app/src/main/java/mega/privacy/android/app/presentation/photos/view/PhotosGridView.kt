@@ -102,7 +102,7 @@ internal fun PhotosGridView(
     val context = LocalContext.current
 
     FastScrollLazyVerticalGrid(
-        totalItems = uiPhotoList.size,
+        totalItems = uiPhotoList.size + 1,
         columns = GridCells.Fixed(spanCount),
         modifier = modifier.fillMaxSize(),
         state = lazyGridState,

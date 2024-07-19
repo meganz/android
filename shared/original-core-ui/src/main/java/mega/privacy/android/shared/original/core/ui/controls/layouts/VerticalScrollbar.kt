@@ -113,17 +113,21 @@ private fun VerticalScrollbar(
 
     var thumbPressed by remember { mutableStateOf(false) }
     // scrollableItemsAmount is item count minus visible items, approximately the first visible item when fully scrolled
-    val scrollableItemsAmount by remember {
+    val scrollableItemsAmount by remember(
+        itemCount,
+        lastVisibleItemIndex.value,
+        firstVisibleItemIndex.value
+    ) {
         derivedStateOf {
             val visibleItems = lastVisibleItemIndex.value - firstVisibleItemIndex.value
             itemCount - visibleItems - 1
         }
     }
 
-    val thumbOffset by remember {
+    val thumbOffset by remember(itemCount) {
         derivedStateOf {
             val isScrollToEnd =
-                firstVisibleItemIndex.value == lastVisibleItemIndex.value || scrollableItemsAmount == 0
+                lastVisibleItemIndex.value == itemCount - 1 || scrollableItemsAmount == 0
             val scrollProportion = when {
                 isScrollToEnd -> if (reverseLayout) 0f else 1f
                 reverseLayout -> 1 - firstVisibleItemIndex.value.toFloat() / scrollableItemsAmount
@@ -133,7 +137,7 @@ private fun VerticalScrollbar(
         }
     }
 
-    val thumbVisible by remember {
+    val thumbVisible by remember(itemCount) {
         derivedStateOf {
             itemCount > 0 && state.isScrollInProgress || thumbPressed
         }
@@ -159,7 +163,7 @@ private fun VerticalScrollbar(
                         thumbPressed = false
                     }
                 ) { change, _ ->
-                    if (thumbPressed && scrollableHeightPixels > 0) {
+                    if (thumbPressed && scrollableHeightPixels > 0 && itemCount > 0) {
                         change.consume()
 
                         val dragPositionY = change.position.y

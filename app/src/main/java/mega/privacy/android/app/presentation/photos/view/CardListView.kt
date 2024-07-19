@@ -60,7 +60,7 @@ fun CardListView(
         }
 
     FastScrollLazyVerticalGrid(
-        totalItems = dateCards.size,
+        totalItems = dateCards.size + 2,
         columns = GridCells.Fixed(spanCount),
         modifier = Modifier.fillMaxSize(),
         state = state,

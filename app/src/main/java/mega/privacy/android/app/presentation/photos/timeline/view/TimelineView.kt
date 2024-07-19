@@ -283,7 +283,8 @@ private fun HandlePhotosGridView(
 ) {
     LaunchedEffect(
         timelineViewState.scrollStartIndex,
-        timelineViewState.scrollStartOffset
+        timelineViewState.scrollStartOffset,
+        timelineViewState.selectedTimeBarTab,
     ) {
         lazyGridState.scrollToItem(
             timelineViewState.scrollStartIndex,

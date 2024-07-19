@@ -67,12 +67,21 @@ fun PhotosGridView(
         }
     }
 
+    val enableCameraUploadsBanner =
+        timelineViewState.enableCameraUploadButtonShowing
+                && !timelineViewState.showCameraUploadsWarning
+                && timelineViewState.selectedPhotoCount == 0
+    val isCameraUploadsLimitedAccess = timelineViewState.isCameraUploadsLimitedAccess
+
     val context = LocalContext.current
     val uiPhotoList = timelineViewState.photosListItems
     val currentZoomLevel = timelineViewState.currentZoomLevel
+    val potentialItems =
+        if (enableCameraUploadsBanner) 1 else 0 + if (isCameraUploadsLimitedAccess) 1 else 0
+    val totalItems = potentialItems + uiPhotoList.size + 1
 
     FastScrollLazyVerticalGrid(
-        totalItems = uiPhotoList.size,
+        totalItems = totalItems,
         columns = GridCells.Fixed(spanCount),
         modifier = modifier.fillMaxSize(),
         state = lazyGridState,
@@ -91,7 +100,7 @@ fun PhotosGridView(
             } ?: ""
         },
     ) {
-        if (timelineViewState.isCameraUploadsLimitedAccess) {
+        if (isCameraUploadsLimitedAccess) {
             item(
                 key = "camera-uploads-limited-access-banner",
                 span = { GridItemSpan(maxLineSpan) },
@@ -103,7 +112,7 @@ fun PhotosGridView(
             }
         }
 
-        if (timelineViewState.enableCameraUploadButtonShowing && !timelineViewState.showCameraUploadsWarning && timelineViewState.selectedPhotoCount == 0) {
+        if (enableCameraUploadsBanner) {
             item(
                 key = "enable-camera-uploads-banner",
                 span = { GridItemSpan(maxLineSpan) },
