@@ -33,7 +33,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.internal.verification.Times
-import org.mockito.kotlin.any
+import org.mockito.kotlin.anyVararg
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -275,7 +275,7 @@ class UploadFilesUseCaseTest {
             verify(
                 handleTransferEventUseCase,
                 Times(fileNodesAndNullNames.size * 3)
-            ).invoke(any())
+            ).invoke(anyVararg())
         }
 
     @Test

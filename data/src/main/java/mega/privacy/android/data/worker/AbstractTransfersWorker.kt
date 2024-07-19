@@ -12,7 +12,6 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +22,7 @@ import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.collectChunked
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
@@ -39,6 +39,8 @@ import timber.log.Timber
 import java.time.Instant
 import java.time.Instant.MIN
 import java.time.Instant.now
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Abstract CoroutineWorker to share common implementation of transfers workers
@@ -110,7 +112,6 @@ abstract class AbstractTransfersWorker(
     protected open fun hasCompleted(activeTransferTotals: ActiveTransferTotals) =
         activeTransferTotals.hasCompleted()
 
-    @OptIn(FlowPreview::class)
     override suspend fun doWork() = withContext(ioDispatcher) {
         Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Started")
         crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Started")
@@ -209,15 +210,24 @@ abstract class AbstractTransfersWorker(
     internal open suspend fun doWorkInternal(scope: CoroutineScope) {
         monitorTransferEventsUseCase()
             .filter { it.transfer.transferType == type }
-            .collect { transferEvent ->
-                onTransferEventReceived(transferEvent)
-                withContext(NonCancellable) {
-                    //handling events can update Active transfers and ends the monitorOngoingActiveTransfers flow that triggers the cancelling of this job, so we need to launch it in a non cancellable context
-                    launch {
-                        handleTransferEventUseCase(transferEvent)
-                    }
+            .collectChunked(
+                chunkDuration = 2.seconds,
+                flushOnIdleDuration = 200.milliseconds
+            ) { transferEvents ->
+                transferEvents.forEach {
+                    onTransferEventReceived(it)
                 }
+                handleTransferEvents(transferEvents)
             }
+    }
+
+    private suspend fun handleTransferEvents(transferEvents: List<TransferEvent>) {
+        withContext(NonCancellable) {
+            //handling events can update Active transfers and ends the monitorOngoingActiveTransfers flow that triggers the cancelling of this job, so we need to launch it in a non cancellable context
+            launch {
+                handleTransferEventUseCase(events = transferEvents.toTypedArray())
+            }
+        }
     }
 
     private suspend fun stopWork(performWorkJob: Job) {

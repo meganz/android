@@ -39,6 +39,10 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":shared:sync"))
     implementation("com.google.guava:guava:33.0.0-jre")
+
+    //Test Modules
+    testImplementation(project(":core-test"))
+
     preBuiltSdkDependency(rootProject.extra)
 
     implementation(lib.coroutines.core)

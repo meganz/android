@@ -45,6 +45,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.internal.verification.Times
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.anyVararg
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -292,7 +293,7 @@ class DownloadNodesUseCaseTest {
             verify(
                 handleTransferEventUseCase,
                 Times(nodeIds.size * flow.count())
-            ).invoke(any())
+            ).invoke(anyVararg())
         }
 
     @Test
