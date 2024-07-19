@@ -11,12 +11,12 @@ import androidx.core.view.updateLayoutParams
  * Enable edge to edge and consume insets for the activity used XML layout.
  *
  */
-fun ComponentActivity.enableEdgeToEdgeAndConsumeInsets() {
+fun ComponentActivity.enableEdgeToEdgeAndConsumeInsets(type: Int = WindowInsetsCompat.Type.systemBars()) {
     // we need condition to check if the device running Android 15 when we target sdk to 35
     // because it will enable edge to edge by default
     enableEdgeToEdge()
     ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, windowInsets ->
-        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+        val insets = windowInsets.getInsets(type)
         v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             leftMargin = insets.left
             bottomMargin = insets.bottom
