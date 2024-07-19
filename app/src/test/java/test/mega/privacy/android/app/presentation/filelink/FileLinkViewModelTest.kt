@@ -13,6 +13,7 @@ import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.GetFileLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
@@ -56,7 +58,8 @@ class FileLinkViewModelTest {
     private val httpServerIsRunning = mock<MegaApiHttpServerIsRunningUseCase>()
     private val getFileUrlByPublicLinkUseCase = mock<GetFileUrlByPublicLinkUseCase>()
     private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase>()
-    private val fileTypeIconMapper: FileTypeIconMapper = mock()
+    private val fileTypeIconMapper = mock<FileTypeIconMapper>()
+    private val getFileLinkNodeContentUriUseCase = mock<GetFileLinkNodeContentUriUseCase>()
 
     private val url = "https://mega.co.nz/abc"
     private val filePreviewPath = "data/cache/xyz.jpg"
@@ -77,7 +80,8 @@ class FileLinkViewModelTest {
             httpServerStart,
             httpServerIsRunning,
             getFileUrlByPublicLinkUseCase,
-            mapNodeToPublicLinkUseCase
+            mapNodeToPublicLinkUseCase,
+            getFileLinkNodeContentUriUseCase
         )
         initViewModel()
     }
@@ -94,7 +98,8 @@ class FileLinkViewModelTest {
             httpServerIsRunning = httpServerIsRunning,
             getFileUrlByPublicLinkUseCase = getFileUrlByPublicLinkUseCase,
             mapNodeToPublicLinkUseCase = mapNodeToPublicLinkUseCase,
-            fileTypeIconMapper = fileTypeIconMapper
+            fileTypeIconMapper = fileTypeIconMapper,
+            getFileLinkNodeContentUriUseCase = getFileLinkNodeContentUriUseCase
         )
     }
 
@@ -404,4 +409,18 @@ class FileLinkViewModelTest {
                 )
             )
         }
+
+    @Test
+    fun `test that getNodeContentUri returns as expected`() = runTest {
+        val expectedNodeContentUri = mock<NodeContentUri.RemoteContentUri>()
+
+        whenever(getFileLinkNodeContentUriUseCase(anyOrNull())).thenReturn(expectedNodeContentUri)
+        assertThat(underTest.getNodeContentUri()).isEqualTo(expectedNodeContentUri)
+    }
+
+    @Test
+    fun `test that getNodeContentUri returns null if throw an exception`() = runTest {
+        whenever(getFileLinkNodeContentUriUseCase(anyOrNull())).thenThrow(IllegalStateException())
+        assertThat(underTest.getNodeContentUri()).isEqualTo(null)
+    }
 }

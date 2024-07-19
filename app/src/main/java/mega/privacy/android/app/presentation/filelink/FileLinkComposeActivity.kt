@@ -30,8 +30,6 @@ import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
-import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -49,10 +47,14 @@ import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDE
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * FileLinkActivity with compose view
@@ -60,6 +62,12 @@ import timber.log.Timber
 @AndroidEntryPoint
 class FileLinkComposeActivity : TransfersManagementActivity(),
     DecryptAlertDialog.DecryptDialogListener {
+
+    /**
+     * MegaNavigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel: FileLinkViewModel by viewModels()
 
@@ -300,23 +308,25 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                 }
 
                 nameType.isVideoMimeType || nameType.isAudio -> {
-                    val intent =
-                        if (nameType.isVideoNotSupported || nameType.isAudioNotSupported) {
-                            Intent(Intent.ACTION_VIEW)
-                        } else {
-                            if (nameType.isAudio) {
-                                Intent(
+                    lifecycleScope.launch {
+                        if (fileNode is TypedFileNode) {
+                            val contentUri = viewModel.getNodeContentUri()
+                                ?: return@launch
+                            megaNavigator.openMediaPlayerActivityByFileNode(
+                                context = this@FileLinkComposeActivity,
+                                contentUri = contentUri,
+                                fileNode = fileNode,
+                                isFolderLink = true,
+                                viewType = FILE_LINK_ADAPTER,
+                            ) {
+                                Toast.makeText(
                                     this@FileLinkComposeActivity,
-                                    AudioPlayerActivity::class.java
-                                )
-                            } else {
-                                Intent(
-                                    this@FileLinkComposeActivity,
-                                    LegacyVideoPlayerActivity::class.java
-                                )
+                                    getString(R.string.intent_not_available),
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
-                    viewModel.updateAudioVideoIntent(intent, nameType)
+                    }
                 }
 
                 nameType.isPdf -> {

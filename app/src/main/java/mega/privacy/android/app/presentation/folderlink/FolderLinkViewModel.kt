@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
@@ -43,6 +42,7 @@ import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
@@ -71,6 +71,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUse
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -110,6 +111,7 @@ class FolderLinkViewModel @Inject constructor(
     private val getFileUriUseCase: GetFileUriUseCase,
     private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
+    private val getFolderLinkNodeContentUriUseCase: GetFolderLinkNodeContentUriUseCase,
 ) : ViewModel() {
 
     /**
@@ -681,56 +683,6 @@ class FolderLinkViewModel @Inject constructor(
     }
 
     /**
-     * Update intent values for audio/video
-     */
-    fun updateAudioVideoIntent(intent: Intent, fileNode: FileNode, nameType: MimeTypeList) {
-        viewModelScope.launch {
-            runCatching {
-                intent.apply {
-                    putExtra(Constants.INTENT_EXTRA_KEY_PLACEHOLDER, 0)
-                    putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FOLDER_LINK_ADAPTER)
-                    putExtra(Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK, true)
-                    putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
-                    putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
-                    putExtra(
-                        Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                        fileNode.parentId.longValue
-                    )
-                }
-
-                getLocalFileForNodeUseCase(fileNode)?.let {
-                    val path = it.path
-                    if (path.contains(Environment.getExternalStorageDirectory().path)) {
-                        val uri = getFileUriUseCase(it, Constants.AUTHORITY_STRING_FILE_PROVIDER)
-                        intent.setDataAndType(Uri.parse(uri), nameType.type)
-                    } else {
-                        intent.setDataAndType(Uri.fromFile(it), nameType.type)
-                    }
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                } ?: run {
-                    setStreamingIntentParams(
-                        intent,
-                        state.value.hasDbCredentials,
-                        fileNode.id.longValue,
-                        nameType.type
-                    )
-                }
-                if (nameType.isVideoNotSupported || nameType.isAudioNotSupported) {
-                    val s = fileNode.name.split("\\.".toRegex())
-                    if (s.size > 1 && s[s.size - 1] == "opus") {
-                        intent.setDataAndType(intent.data, "audio/*")
-                    }
-                }
-                intent
-            }.onSuccess { intent ->
-                intent.let { _state.update { it.copy(openFile = triggered(intent)) } }
-            }.onFailure {
-                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
-            }
-        }
-    }
-
-    /**
      * Update intent values for pdf
      */
     fun updatePdfIntent(pdfIntent: Intent, fileNode: FileNode, mimeType: String) {
@@ -932,4 +884,11 @@ class FolderLinkViewModel @Inject constructor(
             }
         }
     }
+
+    internal suspend fun getNodeContentUri(fileNode: TypedFileNode) = runCatching {
+        getFolderLinkNodeContentUriUseCase(fileNode)
+    }.recover {
+        Timber.e(it)
+        null
+    }.getOrNull()
 }

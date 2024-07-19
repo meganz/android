@@ -37,8 +37,6 @@ import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
-import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
@@ -63,13 +61,16 @@ import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -86,6 +87,12 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
      */
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
+
+    /**
+     * MegaNavigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private lateinit var binding: ActivityFolderLinkComposeBinding
 
@@ -298,23 +305,25 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                     }
 
                     nameType.isVideoMimeType || nameType.isAudio -> {
-                        val intent =
-                            if (nameType.isVideoNotSupported || nameType.isAudioNotSupported) {
-                                Intent(Intent.ACTION_VIEW)
-                            } else {
-                                if (nameType.isAudio) {
-                                    Intent(
+                        lifecycleScope.launch {
+                            if (fileNode is TypedFileNode) {
+                                val contentUri = viewModel.getNodeContentUri(fileNode = fileNode)
+                                    ?: return@launch
+                                megaNavigator.openMediaPlayerActivityByFileNode(
+                                    context = this@FolderLinkComposeActivity,
+                                    contentUri = contentUri,
+                                    fileNode = fileNode,
+                                    isFolderLink = true,
+                                    viewType = FOLDER_LINK_ADAPTER,
+                                ) {
+                                    Toast.makeText(
                                         this@FolderLinkComposeActivity,
-                                        AudioPlayerActivity::class.java
-                                    )
-                                } else {
-                                    Intent(
-                                        this@FolderLinkComposeActivity,
-                                        LegacyVideoPlayerActivity::class.java
-                                    )
+                                        getString(R.string.intent_not_available),
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
                             }
-                        viewModel.updateAudioVideoIntent(intent, fileNode, nameType)
+                        }
                     }
 
                     nameType.isPdf -> {
