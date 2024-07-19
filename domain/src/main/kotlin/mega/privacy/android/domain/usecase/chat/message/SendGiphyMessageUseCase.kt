@@ -37,8 +37,8 @@ class SendGiphyMessageUseCase @Inject constructor(
     ) {
         val sentMessage = chatMessageRepository.sendGiphy(
             chatId = chatId,
-            srcMp4 = srcMp4,
-            srcWebp = srcWebp,
+            srcMp4 = srcMp4.toGiphySrc(),
+            srcWebp = srcWebp.toGiphySrc(),
             sizeMp4 = sizeMp4,
             sizeWebp = sizeWebp,
             width = width,
@@ -48,4 +48,27 @@ class SendGiphyMessageUseCase @Inject constructor(
         val request = createSaveSentMessageRequestUseCase(sentMessage, chatId)
         chatRepository.storeMessages(listOf(request))
     }
+
+    /**
+     * Modifies the original src of a Giphy by replacing the endpoint to GIPHY_URL.
+     *
+     * @return The final src with GIPHY_URL.
+     */
+    private fun String?.toGiphySrc() = when {
+        this?.contains(BASE_URL) == true -> {
+            replace(BASE_URL, GIPHY_URL)
+        }
+
+        this?.contains(TEST_URL) == true -> {
+            replace(TEST_URL, GIPHY_URL)
+        }
+
+        else -> {
+            this
+        }
+    }
 }
+
+internal const val TEST_URL = "https://giphy-sandbox3.developers.mega.co.nz/"
+internal const val BASE_URL = "https://giphy.mega.nz/"
+internal const val GIPHY_URL = "giphy://"

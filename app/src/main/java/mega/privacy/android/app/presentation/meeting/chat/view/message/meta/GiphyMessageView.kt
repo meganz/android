@@ -24,9 +24,9 @@ import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.services.GiphyService
+import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.GiphyMessagePlaceHolder
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 import timber.log.Timber
 
 
@@ -65,7 +65,7 @@ fun GiphyMessageView(
                 .clip(RoundedCornerShape(12.dp)),
         ) {
             if (autoPlay) {
-                val url = webpSrc?.toUri()?.toString()
+                val url = webpSrc?.toGiphyUri()?.toString()
                 AsyncImage(
                     model = ImageRequest.Builder(context)
                         .crossfade(true)
@@ -100,7 +100,12 @@ fun GiphyMessageView(
     }
 }
 
-private fun String.toUri(): Uri? =
+/**
+ * Gets the original src of a Giphy by replacing GIPHY_URL to the endpoint.
+ *
+ * @return The final src with real endpoint.
+ */
+fun String.toGiphyUri(): Uri? =
     when {
         !isNullOrEmpty() && this.contains(GiphyService.GIPHY_URL) -> {
             Uri.parse(this.replace(GiphyService.GIPHY_URL, GiphyService.BASE_URL))

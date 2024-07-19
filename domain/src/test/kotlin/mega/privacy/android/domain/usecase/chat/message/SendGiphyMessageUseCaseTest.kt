@@ -89,6 +89,93 @@ class SendGiphyMessageUseCaseTest {
             )
         }
 
+    @Test
+    fun `test that src are sent correctly if original source contains BASE_URL`() = runTest {
+        val message = mock<ChatMessage>()
+        val originalSrcMp4 = "${BASE_URL}srcMp4"
+        val originalSrcWebp = "${BASE_URL}srcWebp"
+        val expectedSrcMp4 = "${GIPHY_URL}srcMp4"
+        val expectedSrcWebp = "${GIPHY_URL}srcWebp"
+
+        whenever(
+            chatMessageRepository.sendGiphy(
+                chatId = chatId,
+                srcMp4 = expectedSrcMp4,
+                srcWebp = expectedSrcWebp,
+                sizeMp4 = sizeMp4,
+                sizeWebp = sizeWebp,
+                width = width,
+                height = height,
+                title = title
+            )
+        ).thenReturn(message)
+
+        underTest.invoke(
+            chatId = chatId,
+            srcMp4 = originalSrcMp4,
+            srcWebp = originalSrcWebp,
+            sizeMp4 = sizeMp4,
+            sizeWebp = sizeWebp,
+            width = width,
+            height = height,
+            title = title
+        )
+
+        verify(chatMessageRepository).sendGiphy(
+            chatId = chatId,
+            srcMp4 = expectedSrcMp4,
+            srcWebp = expectedSrcWebp,
+            sizeMp4 = sizeMp4,
+            sizeWebp = sizeWebp,
+            width = width,
+            height = height,
+            title = title
+        )
+    }
+
+    @Test
+    fun `test that src are sent correctly if original source contains TEST_URL`() = runTest {
+        val message = mock<ChatMessage>()
+        val originalSrcMp4 = "${TEST_URL}srcMp4"
+        val originalSrcWebp = "${TEST_URL}srcWebp"
+        val expectedSrcMp4 = "${GIPHY_URL}srcMp4"
+        val expectedSrcWebp = "${GIPHY_URL}srcWebp"
+
+        whenever(
+            chatMessageRepository.sendGiphy(
+                chatId = chatId,
+                srcMp4 = expectedSrcMp4,
+                srcWebp = expectedSrcWebp,
+                sizeMp4 = sizeMp4,
+                sizeWebp = sizeWebp,
+                width = width,
+                height = height,
+                title = title
+            )
+        ).thenReturn(message)
+
+        underTest.invoke(
+            chatId = chatId,
+            srcMp4 = originalSrcMp4,
+            srcWebp = originalSrcWebp,
+            sizeMp4 = sizeMp4,
+            sizeWebp = sizeWebp,
+            width = width,
+            height = height,
+            title = title
+        )
+
+        verify(chatMessageRepository).sendGiphy(
+            chatId = chatId,
+            srcMp4 = expectedSrcMp4,
+            srcWebp = expectedSrcWebp,
+            sizeMp4 = sizeMp4,
+            sizeWebp = sizeWebp,
+            width = width,
+            height = height,
+            title = title
+        )
+    }
 
     @Test
     fun `test that message is stored`() = runTest {

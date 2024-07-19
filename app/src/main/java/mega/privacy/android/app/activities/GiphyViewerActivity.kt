@@ -13,9 +13,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
 import mega.privacy.android.app.databinding.ActivityGiphyViewerBinding
 import mega.privacy.android.app.objects.GifData
+import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.toGiphyUri
 import mega.privacy.android.app.utils.Constants.ACTION_PREVIEW_GIPHY
 import mega.privacy.android.app.utils.FrescoUtils.loadGif
-import mega.privacy.android.app.utils.GiphyUtil.Companion.getOriginalGiphySrc
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
 
@@ -84,7 +84,13 @@ class GiphyViewerActivity : PasscodeActivity() {
 
         updateGifDimensionsView()
 
-        loadGif(binding.gifImage, binding.gifProgressBar, false, null, getOriginalGiphySrc(gifData?.webpUrl))
+        loadGif(
+            binding.gifImage,
+            binding.gifProgressBar,
+            false,
+            null,
+            gifData?.webpUrl?.toGiphyUri()
+        )
     }
 
     /**
