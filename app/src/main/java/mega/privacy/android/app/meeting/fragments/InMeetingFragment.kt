@@ -1185,6 +1185,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             when {
                 state.shouldParticipantInCallListBeShown -> {
+                    onPageClick()
                     sharedModel.showParticipantsList(shouldBeShown = false)
                     sharedModel.onHandRaisedSnackbarMsgConsumed()
                     if (bottomFloatingPanelViewHolder?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
