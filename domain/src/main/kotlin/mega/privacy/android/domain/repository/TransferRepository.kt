@@ -219,7 +219,7 @@ interface TransferRepository {
      * @param finishEventsAndPaths
      */
     suspend fun addCompletedTransfers(
-        finishEventsAndPaths: Map<TransferEvent.TransferFinishEvent, String>,
+        finishEventsAndPaths: Map<TransferEvent.TransferFinishEvent, String?>,
     )
 
     /**

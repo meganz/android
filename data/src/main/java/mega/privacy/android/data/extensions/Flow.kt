@@ -43,6 +43,7 @@ private class TimeChunkedFlow<T>(
                 launch {
                     try {
                         delay(chunkDuration)
+                        noEventsFlushJob?.cancel()
                         flushEvents(collector)
                     } catch (e: CancellationException) {
                         _pendingValues = values

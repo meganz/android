@@ -452,7 +452,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     }
 
     override suspend fun addCompletedTransfers(
-        finishEventsAndPaths: Map<TransferEvent.TransferFinishEvent, String>,
+        finishEventsAndPaths: Map<TransferEvent.TransferFinishEvent, String?>,
     ) {
         withContext(ioDispatcher) {
             val completedTransfers = finishEventsAndPaths.map { (event, transferPath) ->

@@ -60,11 +60,9 @@ class HandleTransferEventUseCase @Inject internal constructor(
 
         val completedEventsMap = transferEvents
             .filterNot { it.transfer.isFolderTransfer }
-            .filterByType(finish = true)
-            ?.filterIsInstance<TransferEvent.TransferFinishEvent>()
-            ?.associateWith { eventsWithDestinationMap[it]?.toString() ?: "" }
-            ?.filterValues { it.isNotEmpty() }
-        if (completedEventsMap?.isNotEmpty() == true) {
+            .filterIsInstance<TransferEvent.TransferFinishEvent>()
+            .associateWith { eventsWithDestinationMap[it]?.toString() }
+        if (completedEventsMap.isNotEmpty()) {
             transferRepository.addCompletedTransfers(completedEventsMap)
         }
     }
