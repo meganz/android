@@ -28,6 +28,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
 
 @Composable
 internal fun CancelAccountPlanView(
@@ -103,7 +104,10 @@ internal fun CancelAccountPlanView(
                     cellAlignment = TableCell.CellAlignment.Start,
                 ),
                 TableCell.TextCell(
-                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_free_storage),
+                    text = context.getString(
+                        SharedR.string.account_cancel_account_screen_plan_free_storage,
+                        accountDetailsUI.freeStorageQuota
+                    ),
                     style = TableCell.TextCellStyle.Normal,
                     cellAlignment = TableCell.CellAlignment.Center,
                 ),
@@ -163,7 +167,10 @@ internal fun CancelAccountPlanView(
                     cellAlignment = TableCell.CellAlignment.Center,
                 ),
                 TableCell.TextCell(
-                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_rewind_current),
+                    text = context.getString(
+                        SharedR.string.account_cancel_account_screen_plan_rewind_current,
+                        accountDetailsUI.rewindDaysQuota
+                    ),
                     style = TableCell.TextCellStyle.Normal,
                     cellAlignment = TableCell.CellAlignment.Center,
                 ),
@@ -219,26 +226,28 @@ internal fun CancelAccountPlanView(
             numOfColumn = 3,
             tableCells = cells,
         )
-        RaisedDefaultMegaButton(
-            modifier = Modifier
-                .padding(top = 20.dp)
-                .fillMaxWidth()
-                .testTag(KEEP_PRO_PLAN_BUTTON_TEST_TAG),
-            text = stringResource(
-                id = SharedR.string.account_cancel_account_plan_keep_pro_plan,
-                accountDetailsUI.accountType
-            ),
-            onClick = onKeepPlanButtonClicked,
-        )
-        OutlinedMegaButton(
-            textId = SharedR.string.account_cancel_account_plan_continue_cancellation,
-            onClick = onContinueCancellationButtonClicked,
-            rounded = false,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-                .testTag(CONTINUE_CANCELLATION_BUTTON_TEST_TAG),
-        )
+        Column(Modifier.padding(horizontal = if (isScreenOrientationLandscape()) 80.dp else 0.dp)) {
+            RaisedDefaultMegaButton(
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .fillMaxWidth()
+                    .testTag(KEEP_PRO_PLAN_BUTTON_TEST_TAG),
+                text = stringResource(
+                    id = SharedR.string.account_cancel_account_plan_keep_pro_plan,
+                    accountDetailsUI.accountType
+                ),
+                onClick = onKeepPlanButtonClicked,
+            )
+            OutlinedMegaButton(
+                textId = SharedR.string.account_cancel_account_plan_continue_cancellation,
+                onClick = onContinueCancellationButtonClicked,
+                rounded = false,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .testTag(CONTINUE_CANCELLATION_BUTTON_TEST_TAG),
+            )
+        }
     }
 }
 
@@ -249,6 +258,8 @@ private fun CancelAccountPlanViewPreview() {
         CancelAccountPlanView(
             accountDetailsUI = UIAccountDetails(
                 accountType = "Pro Lite",
+                freeStorageQuota = "1 GB",
+                rewindDaysQuota = "90",
                 usedStorageSize = "1 TB",
                 storageQuotaSize = "3 TB",
                 transferQuotaSize = "1 TB",

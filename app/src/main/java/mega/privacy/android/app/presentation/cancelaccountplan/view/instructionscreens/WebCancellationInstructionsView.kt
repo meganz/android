@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.cancelaccountplan.view.instruction
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -34,8 +36,11 @@ import mega.privacy.android.shared.resources.R
 internal fun WebCancellationInstructionsView(
     onMegaUrlClicked: (url: String) -> Unit,
 ) {
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
+            .verticalScroll(scrollState)
             .padding(20.dp)
             .testTag(WEB_CANCELLATION_INSTRUCTIONS_VIEW_TEST_TAG)
     ) {
@@ -45,7 +50,6 @@ internal fun WebCancellationInstructionsView(
             style = MaterialTheme.typography.h6Medium,
             modifier = Modifier
                 .padding(top = 10.dp)
-                .testTag(WEB_CANCELLATION_INSTRUCTIONS_TITLE_TEST_TAG),
         )
         MegaText(
             text = stringResource(id = R.string.account_cancellation_instructions_web_browser_description),
@@ -54,7 +58,6 @@ internal fun WebCancellationInstructionsView(
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .padding(top = 20.dp)
-                .testTag(WEB_CANCELLATION_INSTRUCTIONS_SUBTITLE_TEST_TAG),
         )
 
         //computer instructions
@@ -64,17 +67,13 @@ internal fun WebCancellationInstructionsView(
             style = MaterialTheme.typography.subtitle1medium,
             modifier = Modifier
                 .padding(top = 30.dp, end = 8.dp)
-                .testTag(WEB_CANCELLATION_INSTRUCTIONS_HEADER_TEST_TAG),
         )
 
         MegaSpannedClickableText(
             value = stringResource(id = R.string.account_cancellation_instructions_visit_website),
             styles = hashMapOf(
                 SpanIndicator('A') to MegaSpanStyleWithAnnotation(
-                    megaSpanStyle = MegaSpanStyle(
-                        SpanStyle(textDecoration = TextDecoration.None),
-                        color = TextColor.Accent,
-                    ),
+                    megaSpanStyle = MegaSpanStyle(color = TextColor.Accent),
                     annotation = MEGA_URL
                 )
             ),
@@ -99,7 +98,6 @@ internal fun WebCancellationInstructionsView(
             style = MaterialTheme.typography.subtitle1medium,
             modifier = Modifier
                 .padding(top = 30.dp, end = 8.dp)
-                .testTag(WEB_CANCELLATION_INSTRUCTIONS_MOBILE_HEADER_TEST_TAG),
         )
 
         MegaSpannedClickableText(
@@ -138,14 +136,6 @@ private fun WebCancellationInstructionsViewPreview() {
 }
 
 internal const val WEB_CANCELLATION_INSTRUCTIONS_VIEW_TEST_TAG = "web_cancellation_instructions"
-internal const val WEB_CANCELLATION_INSTRUCTIONS_TITLE_TEST_TAG =
-    "web_cancellation_instructions:title_text"
-internal const val WEB_CANCELLATION_INSTRUCTIONS_SUBTITLE_TEST_TAG =
-    "web_cancellation_instructions:subtitle_text"
-internal const val WEB_CANCELLATION_INSTRUCTIONS_HEADER_TEST_TAG =
-    "web_cancellation_instructions:instructions_header_text"
-internal const val WEB_CANCELLATION_INSTRUCTIONS_MOBILE_HEADER_TEST_TAG =
-    "web_cancellation_instructions:instructions_mobile_header_text"
 internal const val WEB_CANCELLATION_INSTRUCTIONS_COMPUTER_STEP_WITH_URL_TEST_TAG =
     "web_cancellation_instructions:instruction_computer_step_with_url_text"
 internal const val WEB_CANCELLATION_INSTRUCTIONS_MOBILE_STEP_WITH_URL_TEST_TAG =

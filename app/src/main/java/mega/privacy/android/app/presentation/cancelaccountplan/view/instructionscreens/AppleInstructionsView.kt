@@ -3,9 +3,10 @@ package mega.privacy.android.app.presentation.cancelaccountplan.view.instruction
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -14,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.cancelaccountplan.view.GenericInstructionStep
+import mega.privacy.android.app.presentation.cancelaccountplan.view.InstructionStepWithBoldText
 import mega.privacy.android.app.utils.APPLE_SUPPORT_URL
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -32,8 +34,12 @@ import mega.privacy.android.shared.resources.R
  */
 @Composable
 internal fun AppleInstructionsView(onCancelSubsFromOtherDeviceClicked: (url: String) -> Unit) {
+
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
+            .verticalScroll(scrollState)
             .padding(20.dp)
             .testTag(APPLE_INSTRUCTIONS_VIEW_TEST_TAG)
     ) {
@@ -63,19 +69,13 @@ internal fun AppleInstructionsView(onCancelSubsFromOtherDeviceClicked: (url: Str
                 .padding(top = 30.dp, end = 8.dp)
                 .testTag(APPLE_INSTRUCTIONS_HEADER_TEST_TAG),
         )
-        val instructionsList = remember {
-            listOf(
-                R.string.account_cancellation_instructions_open_settings,
-                R.string.account_cancellation_instructions_tap_on_name,
-                R.string.account_cancellation_instructions_select_subscriptions,
-                R.string.account_cancellation_instructions_select_mega_subscription,
-                R.string.account_cancellation_instructions_open_select_cancel_subscription
-            )
-        }
 
-        instructionsList.forEach { instruction ->
-            GenericInstructionStep(stepResId = instruction)
-        }
+        InstructionStepWithBoldText(stepResId = R.string.account_cancellation_instructions_open_settings)
+        GenericInstructionStep(stepResId = R.string.account_cancellation_instructions_tap_on_name)
+        InstructionStepWithBoldText(stepResId = R.string.account_cancellation_instructions_select_subscriptions)
+        GenericInstructionStep(stepResId = R.string.account_cancellation_instructions_select_mega_subscription)
+        InstructionStepWithBoldText(stepResId = R.string.account_cancellation_instructions_open_select_cancel_subscription)
+
 
         MegaSpannedClickableText(
             value = stringResource(id = R.string.account_cancellation_instructions_detailed_instructions),

@@ -45,6 +45,10 @@ class CancelAccountPlanActivity : AppCompatActivity() {
 
     }
 
+    private val REWIND_DAYS_QUOTA_PRO_LITE = "90"
+    private val REWIND_DAYS_QUOTA_OTHERS = "180"
+    private val FREE_STORAGE_QUOTA = "20"
+
     @Inject
     lateinit var getThemeMode: GetThemeMode
     private val viewModel: CancelAccountPlanViewModel by viewModels()
@@ -81,6 +85,12 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                                 storageQuotaSize = storageQuota,
                                 usedStorageSize = usedStorage,
                                 transferQuotaSize = transferQuota,
+                                rewindDaysQuota = if (accountType == Constants.PRO_LITE) {
+                                    REWIND_DAYS_QUOTA_PRO_LITE
+                                } else {
+                                    REWIND_DAYS_QUOTA_OTHERS
+                                },
+                                freeStorageQuota = FREE_STORAGE_QUOTA
                             ),
                             onKeepPlanButtonClicked = {
                                 Analytics.tracker.trackEvent(

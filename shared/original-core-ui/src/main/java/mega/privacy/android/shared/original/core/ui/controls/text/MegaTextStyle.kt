@@ -55,7 +55,7 @@ fun megaTextStyle(
     textDecoration: TextDecoration? = null,
     shadow: Shadow? = null,
     drawStyle: DrawStyle? = null,
-) = baseStyle.copy(
+) = baseStyle.merge(
     color = MegaOriginalTheme.textColor(textColor = color),
     fontSize = fontSize,
     fontWeight = fontWeight,

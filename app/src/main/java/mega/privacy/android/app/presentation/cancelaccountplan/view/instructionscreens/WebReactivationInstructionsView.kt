@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.cancelaccountplan.view.instruction
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -34,8 +36,11 @@ import mega.privacy.android.shared.resources.R
 internal fun WebReactivationInstructionsView(
     onMegaUrlClicked: (url: String) -> Unit,
 ) {
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
+            .verticalScroll(scrollState)
             .padding(20.dp)
             .testTag(WEB_REACTIVATION_INSTRUCTIONS_VIEW_TEST_TAG)
     ) {
@@ -45,7 +50,6 @@ internal fun WebReactivationInstructionsView(
             style = MaterialTheme.typography.h6Medium,
             modifier = Modifier
                 .padding(top = 10.dp)
-                .testTag(WEB_REACTIVATION_INSTRUCTIONS_TITLE_TEST_TAG),
         )
         MegaText(
             text = stringResource(id = R.string.account_cancellation_instructions_reactivation_web_browser_description),
@@ -54,7 +58,6 @@ internal fun WebReactivationInstructionsView(
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .padding(top = 20.dp)
-                .testTag(WEB_REACTIVATION_INSTRUCTIONS_SUBTITLE_TEST_TAG),
         )
 
         //computer instructions
@@ -64,7 +67,6 @@ internal fun WebReactivationInstructionsView(
             style = MaterialTheme.typography.subtitle1medium,
             modifier = Modifier
                 .padding(top = 30.dp, end = 8.dp)
-                .testTag(WEB_REACTIVATION_INSTRUCTIONS_HEADER_TEST_TAG),
         )
 
         MegaSpannedClickableText(
@@ -106,12 +108,6 @@ private fun WebReactivationInstructionsViewPreview() {
 }
 
 internal const val WEB_REACTIVATION_INSTRUCTIONS_VIEW_TEST_TAG = "web_reactivation_instructions"
-internal const val WEB_REACTIVATION_INSTRUCTIONS_TITLE_TEST_TAG =
-    "web_reactivation_instructions:title_text"
-internal const val WEB_REACTIVATION_INSTRUCTIONS_SUBTITLE_TEST_TAG =
-    "web_reactivation_instructions:subtitle_text"
-internal const val WEB_REACTIVATION_INSTRUCTIONS_HEADER_TEST_TAG =
-    "web_reactivation_instructions:instructions_header_text"
 internal const val WEB_REACTIVATION_INSTRUCTIONS_COMPUTER_STEP_WITH_URL_TEST_TAG =
     "web_reactivation_instructions:instruction_computer_step_with_url_text"
 

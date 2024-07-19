@@ -7,7 +7,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
@@ -19,7 +21,7 @@ internal fun GenericInstructionStep(stepResId: Int) {
     MegaText(
         text = stringResource(id = stepResId),
         textColor = TextColor.Secondary,
-        style = MaterialTheme.typography.subtitle1,
+        style = MaterialTheme.typography.subtitle1.copy(textIndent = TextIndent(restLine = 18.sp)),
         textAlign = TextAlign.Start,
         modifier = Modifier
             .padding(top = 4.dp, start = 4.dp)

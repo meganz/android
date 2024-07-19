@@ -8,7 +8,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
@@ -26,7 +28,7 @@ internal fun InstructionStepWithBoldText(stepResId: Int) {
                 spanStyle = SpanStyle(fontWeight = FontWeight.Bold),
             )
         ),
-        baseStyle = MaterialTheme.typography.subtitle1,
+        baseStyle = MaterialTheme.typography.subtitle1.copy(textIndent = TextIndent(restLine = 18.sp)),
         color = TextColor.Secondary,
         modifier = Modifier
             .padding(top = 4.dp, start = 4.dp)

@@ -38,7 +38,9 @@ class CancelAccountPlanViewTest {
             accountType = "PRO I",
             storageQuotaSize = "200 GB",
             usedStorageSize = "100 GB",
-            transferQuotaSize = "1 TB"
+            transferQuotaSize = "1 TB",
+            freeStorageQuota = "1 GB",
+            rewindDaysQuota = "90",
         )
         composeTestRule.setContent {
             CancelAccountPlanView(

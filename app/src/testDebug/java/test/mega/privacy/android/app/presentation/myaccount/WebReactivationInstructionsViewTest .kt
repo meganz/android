@@ -9,8 +9,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.cancelaccountplan.view.INSTRUCTIONS_STEP_WITH_BOLD_TEXT_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.APPLE_INSTRUCTIONS_DETAILED_INSTRUCTIONS_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.AppleInstructionsView
+import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.WEB_REACTIVATION_INSTRUCTIONS_COMPUTER_STEP_WITH_URL_TEST_TAG
+import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.WebReactivationInstructionsView
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
@@ -21,29 +21,29 @@ import test.mega.privacy.android.app.fromId
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w720dp-h1280dp-xhdpi")
-class AppleInstructionsViewTest {
+class WebReactivationInstructionsViewTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `test that all apple instructions views are showing`() {
+    fun `test that all web cancellation instructions views are showing`() {
         composeTestRule.setContent {
-            AppleInstructionsView(onCancelSubsFromOtherDeviceClicked = { })
+            WebReactivationInstructionsView(onMegaUrlClicked = { })
         }
-        composeTestRule.onNodeWithText(fromId(R.string.account_cancellation_instructions_not_managed_by_google))
+        composeTestRule.onNodeWithText(fromId(R.string.account_cancellation_instructions_reactivation_web_browser_needed))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(fromId(R.string.account_cancellation_instructions_message_apple_description))
+        composeTestRule.onNodeWithText(fromId(R.string.account_cancellation_instructions_reactivation_web_browser_description))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(fromId(R.string.account_cancellation_instructions_ios_device))
+        composeTestRule.onNodeWithText(fromId(R.string.account_cancellation_instructions_on_computer))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(fromId(R.string.account_cancellation_instructions_tap_on_name))
+        composeTestRule.onNodeWithText(fromId(R.string.account_cancellation_instructions_login_account))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(fromId(R.string.account_cancellation_instructions_select_mega_subscription))
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(APPLE_INSTRUCTIONS_DETAILED_INSTRUCTIONS_TEST_TAG)
+        composeTestRule.onNodeWithText(fromId(R.string.account_cancellation_instructions_click_main_menu))
             .assertIsDisplayed()
         composeTestRule.onAllNodesWithTag(INSTRUCTIONS_STEP_WITH_BOLD_TEXT_TEST_TAG)
             .assertCountEquals(3)
+        composeTestRule.onNodeWithTag(WEB_REACTIVATION_INSTRUCTIONS_COMPUTER_STEP_WITH_URL_TEST_TAG)
+            .assertIsDisplayed()
     }
 }
