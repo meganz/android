@@ -49,18 +49,20 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityPdfviewerBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
+import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -157,7 +159,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     private var renamed = false
     private var path: String? = null
     private var pathNavigation: String? = null
-    private val nodeAttacher = MegaAttacher(this)
 
     // it's only used for enter animation
     private val dragToExit = DragToExitSupport(this, lifecycleScope, null, null)
@@ -183,6 +184,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     private val viewModel by viewModels<PdfViewerViewModel>()
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
+    private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
 
     private var isHiddenNodesEnabled: Boolean = false
     private var tempNodeId: NodeId? = null
@@ -236,7 +238,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             isToolbarVisible = savedInstanceState.getBoolean("toolbarVisible", isToolbarVisible)
             password = savedInstanceState.getString("password")
             maxIntents = savedInstanceState.getInt("maxIntents", 3)
-            nodeAttacher.restoreState(savedInstanceState)
         } else {
             currentPage = 1
             isDeleteDialogShow = false
@@ -455,6 +456,17 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             setToolbarVisibilityHide(0L)
         }
         addStartDownloadTransferView()
+        addNodeAttachmentView()
+    }
+
+    private fun addNodeAttachmentView() {
+        binding.root.addView(
+            createNodeAttachmentView(
+                this,
+                nodeAttachmentViewModel,
+                ::showSnackbarWithChat
+            )
+        )
     }
 
     private fun addStartDownloadTransferView() {
@@ -620,7 +632,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             putString("password", password)
             putInt("maxIntents", maxIntents)
         }
-        nodeAttacher.saveState(outState)
     }
 
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {}
@@ -1215,7 +1226,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
             R.id.pdf_viewer_download -> download()
 
-            R.id.pdf_viewer_chat -> nodeAttacher.attachNode(handle)
+            R.id.pdf_viewer_chat -> nodeAttachmentViewModel.startAttachNodes(listOf(NodeId(handle)))
 
             R.id.pdf_viewer_properties -> showPropertiesActivity()
 
@@ -1466,9 +1477,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
         Timber.d("onActivityResult: ${requestCode}____$resultCode")
-        if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
-            return
-        }
         if (intent == null) {
             return
         }
