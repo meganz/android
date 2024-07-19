@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.attach
 
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
@@ -40,8 +41,8 @@ class NodeAttachmentViewModelTest {
         underTest.startAttachNodes(nodeIds)
         underTest.uiState.test {
             val state = awaitItem()
-            assert(state.event is NodeAttachmentEvent.AttachNode)
-            assert((state.event as NodeAttachmentEvent.AttachNode).nodeIds == nodeIds)
+            assertThat(state.event).isInstanceOf(NodeAttachmentEvent.AttachNode::class.java)
+            assertThat((state.event as NodeAttachmentEvent.AttachNode).nodeIds).isEqualTo(nodeIds)
         }
     }
 
@@ -54,7 +55,7 @@ class NodeAttachmentViewModelTest {
         underTest.getNodesToAttach(nodeIds)
         underTest.uiState.test {
             val state = awaitItem()
-            assert(state.event is NodeAttachmentEvent.ShowOverDiskQuotaPaywall)
+            assertThat(state.event).isInstanceOf(NodeAttachmentEvent.ShowOverDiskQuotaPaywall::class.java)
         }
     }
 
@@ -67,8 +68,11 @@ class NodeAttachmentViewModelTest {
             underTest.getNodesToAttach(nodeIds)
             underTest.uiState.test {
                 val state = awaitItem()
-                assert(state.event is NodeAttachmentEvent.SelectChat)
-                assert((state.event as NodeAttachmentEvent.SelectChat).nodeIds == copiedNodeIds)
+                assertThat(state.event)
+                    .isInstanceOf(NodeAttachmentEvent.SelectChat::class.java)
+                assertThat((state.event as NodeAttachmentEvent.SelectChat).nodeIds).isEqualTo(
+                    copiedNodeIds
+                )
             }
         }
 
@@ -80,8 +84,11 @@ class NodeAttachmentViewModelTest {
             underTest.attachNodesToChat(nodeIds, chatIds)
             underTest.uiState.test {
                 val state = awaitItem()
-                assert(state.event is NodeAttachmentEvent.AttachNodeSuccess)
-                assert((state.event as NodeAttachmentEvent.AttachNodeSuccess).chatIds == chatIds.toList())
+                assertThat(state.event)
+                    .isInstanceOf(NodeAttachmentEvent.AttachNodeSuccess::class.java)
+                assertThat((state.event as NodeAttachmentEvent.AttachNodeSuccess).chatIds).isEqualTo(
+                    chatIds.toList()
+                )
             }
         }
 }

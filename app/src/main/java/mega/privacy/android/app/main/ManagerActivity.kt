@@ -36,7 +36,6 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -64,10 +63,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -116,7 +112,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
@@ -477,7 +472,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     var rootNode: MegaNode? = null
     val nodeController: NodeController by lazy { NodeController(this) }
     private val contactController: ContactController by lazy { ContactController(this) }
-    private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
 
     private val badgeDrawable: BadgeDrawerArrowDrawable by lazy {
         BadgeDrawerArrowDrawable(
@@ -792,7 +786,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 )
             }
         }
-        nodeAttacher.saveState(outState)
         uploadBottomSheetDialogActionHandler.onSaveInstanceState(outState)
         outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog))
         outState.putBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, isInAlbumContent)
@@ -1860,7 +1853,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             )
         }
         isInFilterPage = savedInstanceState.getBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, false)
-        nodeAttacher.restoreState(savedInstanceState)
 
         //upload from device, progress dialog should show when screen orientation changes.
         if (savedInstanceState.getBoolean(PROCESS_FILE_DIALOG_SHOWN, false)) {
@@ -5993,9 +5985,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     @SuppressLint("CheckResult")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         Timber.d("Request code: %d, Result code:%d", requestCode, resultCode)
-        if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
-            return
-        }
         if (resultCode == Activity.RESULT_FIRST_USER) {
             showSnackbar(
                 Constants.SNACKBAR_TYPE,
@@ -6042,15 +6031,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         MEGACHAT_INVALID_HANDLE
                     )
                 }
-            }
-
-            requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == Activity.RESULT_OK -> {
-                Timber.d("requestCode == REQUEST_CODE_SELECT_FILE")
-                if (intent == null) {
-                    Timber.w("Intent NULL")
-                    return
-                }
-                nodeAttacher.handleSelectFileResult(intent, this)
             }
 
             requestCode == Constants.REQUEST_CODE_SELECT_CONTACT && resultCode == Activity.RESULT_OK -> {
