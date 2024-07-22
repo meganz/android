@@ -1,6 +1,7 @@
 package mega.privacy.android.data.extensions
 
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
 
@@ -57,10 +59,14 @@ private class TimeChunkedFlow<T>(
     private suspend fun flushEvents(collector: FlowCollector<List<T>>) {
         flushScheduled = false
         mutex.withLock {
-            if (values.isNotEmpty()) {
-                collector.emit(values.toList())
+            withContext(NonCancellable) {
+                val toEmit = values.toList()
+                values.clear()
+                _pendingValues = emptyList()
+                if (toEmit.isNotEmpty()) {
+                    collector.emit(toEmit.toList())
+                }
             }
-            values.clear()
         }
     }
 }

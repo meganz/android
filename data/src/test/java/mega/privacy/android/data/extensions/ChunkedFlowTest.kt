@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -261,6 +262,37 @@ class ChunkedFlowTest {
 
             println(actual)
             assertThat(actual.flatten()).isEqualTo(emittedValues)
+        }
+
+    @Test
+    internal fun `test that canceled flow during the emission does not emit duplicated last chunk`() =
+        runTest {
+            val itemsForChunk = 3
+            val itemDelay = 5.0
+            val chunkDuration = itemDelay * itemsForChunk
+            val actual = mutableListOf<List<Int>>()
+            val cancelFlagFlow = MutableStateFlow(false)
+            val job = launch {
+                (1..10).asFlow().onEach {
+                    delay(5)
+                }.collectChunked(chunkDuration.milliseconds) { chunk ->
+                    actual.add(chunk)
+                    cancelFlagFlow.value = true
+                    delay(100) //simulate a slow collector to receive the cancel while emitting
+                }
+            }
+            launch {
+                cancelFlagFlow.collect {
+                    if (it) {
+                        job.cancel()
+                        cancel()
+                    }
+                }
+            }
+            advanceTimeBy((chunkDuration * 2).milliseconds)
+
+            println(actual)
+            assertThat(actual.flatten()).isEqualTo((1..itemsForChunk).toList())
         }
 
 
