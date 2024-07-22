@@ -86,7 +86,6 @@ import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showSnackbar
-import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
@@ -1487,7 +1486,7 @@ object MegaNodeUtil {
     }
 
     /**
-     * Launch [ZipBrowserActivity] to preview a zip file.
+     * Launch ZipBrowserActivity to preview a zip file.
      *
      * @param context Android context.
      * @param activityLauncher interface to launch activity.

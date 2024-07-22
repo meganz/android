@@ -40,7 +40,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILD
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
-import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
@@ -160,20 +159,12 @@ internal class MegaNavigatorImpl @Inject constructor(
         onError: () -> Unit,
     ) {
         applicationScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.NewZipBrowser)) {
-                if (ZipBrowserComposeActivity.zipFileFormatCheck(context, zipFilePath)) {
-                    ZipBrowserComposeActivity::class.java
-                } else null
-            } else {
-                if (ZipBrowserActivity.zipFileFormatCheck(context, zipFilePath)) {
-                    ZipBrowserActivity::class.java
-                } else null
-            }?.let { activity ->
-                context.startActivity(Intent(context, activity).apply {
+            if (ZipBrowserComposeActivity.zipFileFormatCheck(context, zipFilePath)) {
+                context.startActivity(Intent(context, ZipBrowserComposeActivity::class.java).apply {
                     putExtra(EXTRA_PATH_ZIP, zipFilePath)
                     putExtra(EXTRA_HANDLE_ZIP, nodeHandle)
                 })
-            } ?: run {
+            } else {
                 onError()
             }
         }

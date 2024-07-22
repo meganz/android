@@ -34,14 +34,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * Enables new video queue
      */
-    NewZipBrowser(
-        "Enable new zip browser",
-        true,
-    ),
-
-    /**
-     * Enables new video queue
-     */
     NewVideoQueue(
         "Enable new video queue",
         true,
