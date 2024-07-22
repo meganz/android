@@ -21,6 +21,7 @@ import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
+import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_INSERT_LIST_SIZE
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.data.mapper.backup.BackupModelMapper
@@ -437,7 +438,7 @@ internal class MegaLocalRoomFacadeTest {
             )
             underTest.deleteOldestCompletedTransfers()
             verify(completedTransferDao).deleteCompletedTransferByIds(deletedTransfers.mapNotNull { it.id }
-                .sortedDescending())
+                .sortedDescending(), MAX_INSERT_LIST_SIZE)
         }
 
     @Test
@@ -601,7 +602,10 @@ internal class MegaLocalRoomFacadeTest {
 
         underTest.addCompletedTransfers(completedTransfers)
 
-        verify(completedTransferDao).insertOrUpdateCompletedTransfers(expected)
+        verify(completedTransferDao).insertOrUpdateCompletedTransfers(
+            expected,
+            MAX_INSERT_LIST_SIZE
+        )
     }
 
     @Test
@@ -617,6 +621,6 @@ internal class MegaLocalRoomFacadeTest {
 
         underTest.insertOrUpdateActiveTransfers(activeTransfers)
 
-        verify(activeTransferDao).insertOrUpdateActiveTransfers(expected)
+        verify(activeTransferDao).insertOrUpdateActiveTransfers(expected, MAX_INSERT_LIST_SIZE)
     }
 }

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -24,7 +25,20 @@ internal interface ActiveTransferDao {
     suspend fun insertOrUpdateActiveTransfer(entity: ActiveTransferEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdateActiveTransfers(entity: List<ActiveTransferEntity>)
+    suspend fun insertOrUpdateActiveTransfers(entities: List<ActiveTransferEntity>)
+
+    /**
+     * Transaction to insert a list of entities but splitting the insert to avoid SQLiteException too many SQL variables
+     */
+    @Transaction
+    suspend fun insertOrUpdateActiveTransfers(
+        entities: List<ActiveTransferEntity>,
+        chunkSize: Int,
+    ) {
+        entities.chunked(chunkSize).forEach {
+            insertOrUpdateActiveTransfers(it)
+        }
+    }
 
     @Query("DELETE FROM active_transfers WHERE transfer_type = :transferType")
     suspend fun deleteAllActiveTransfersByType(transferType: TransferType)

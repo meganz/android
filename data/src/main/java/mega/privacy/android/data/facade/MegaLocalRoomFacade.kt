@@ -145,9 +145,12 @@ internal class MegaLocalRoomFacade @Inject constructor(
     }
 
     override suspend fun addCompletedTransfers(transfers: List<CompletedTransfer>) {
-        completedTransferDao.insertOrUpdateCompletedTransfers(
-            transfers.map { completedTransferEntityMapper(it) }
-        )
+        transfers.map { completedTransferEntityMapper(it) }.let { mappedTransfers ->
+            completedTransferDao.insertOrUpdateCompletedTransfers(
+                mappedTransfers,
+                MAX_INSERT_LIST_SIZE
+            )
+        }
     }
 
     override suspend fun getCompletedTransfersCount() =
@@ -206,9 +209,12 @@ internal class MegaLocalRoomFacade @Inject constructor(
         activeTransferDao.insertOrUpdateActiveTransfer(activeTransferEntityMapper(activeTransfer))
 
     override suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>) =
-        activeTransferDao.insertOrUpdateActiveTransfers(
-            activeTransfers.map { activeTransferEntityMapper(it) }
-        )
+        activeTransfers.map { activeTransferEntityMapper(it) }.let { mappedActiveTransfers ->
+            activeTransferDao.insertOrUpdateActiveTransfers(
+                mappedActiveTransfers,
+                MAX_INSERT_LIST_SIZE
+            )
+        }
 
     override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
         activeTransferDao.deleteAllActiveTransfersByType(transferType)
@@ -412,9 +418,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
     }
 
     private suspend fun deleteCompletedTransferBatch(ids: List<Int>) {
-        ids.chunked(50).forEach {
-            completedTransferDao.deleteCompletedTransferByIds(it)
-        }
+        completedTransferDao.deleteCompletedTransferByIds(
+            ids,
+            MAX_INSERT_LIST_SIZE
+        )
     }
 
     override suspend fun setChatPendingChanges(chatPendingChanges: ChatPendingChanges) {
@@ -429,5 +436,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     companion object {
         private const val MAX_COMPLETED_TRANSFER_ROWS = 100
+        internal const val MAX_INSERT_LIST_SIZE = 200
     }
 }
