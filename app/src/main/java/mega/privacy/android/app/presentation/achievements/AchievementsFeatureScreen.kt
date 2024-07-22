@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.achievements
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
@@ -51,7 +52,9 @@ fun AchievementsFeatureScreen(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding(),
         scaffoldState = rememberScaffoldState(),
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
