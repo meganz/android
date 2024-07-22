@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -61,7 +62,7 @@ class ConfirmEmailFragmentV2 : Fragment() {
 
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 ConfirmEmailRoute(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.systemBarsPadding().fillMaxSize(),
                     email = emailTemp.orEmpty(),
                     fullName = firstNameTemp,
                     onShowPendingFragment = {

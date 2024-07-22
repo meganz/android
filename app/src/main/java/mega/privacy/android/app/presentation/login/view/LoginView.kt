@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -69,21 +70,21 @@ import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationField
+import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
+import mega.privacy.android.domain.entity.login.FetchNodesUpdate
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.textfields.LabelTextField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_white_alpha_087
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.domain.entity.Progress
-import mega.privacy.android.domain.entity.account.AccountSession
-import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
-import mega.privacy.android.domain.entity.login.FetchNodesUpdate
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Login fragment view.
@@ -131,6 +132,7 @@ fun LoginView(
 
     Scaffold(
         modifier = modifier
+            .systemBarsPadding()
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
         scaffoldState = scaffoldState,

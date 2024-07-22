@@ -23,6 +23,7 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.databinding.FragmentCreateAccountBinding
+import mega.privacy.android.app.extensions.consumeInsets
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel
@@ -185,6 +186,7 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d("onViewCreated")
         super.onViewCreated(view, savedInstanceState)
+        consumeInsets()
         setupView()
         loginActivity?.setKeyboardVisibilityListener(this)
     }

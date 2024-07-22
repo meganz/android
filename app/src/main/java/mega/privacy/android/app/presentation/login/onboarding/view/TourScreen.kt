@@ -143,7 +143,7 @@ internal fun TourScreen(
             }
         }
 
-    Box(modifier = modifier) {
+    Box(modifier = modifier.navigationBarsPadding()) {
         Column(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
