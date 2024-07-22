@@ -1,5 +1,7 @@
 package mega.privacy.android.shared.original.core.ui.controls.text
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
@@ -30,6 +32,7 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  * @param style Text style
  * @param overflow Overflow option
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HighlightedText(
     text: String,
@@ -65,7 +68,7 @@ fun HighlightedText(
 
     Text(
         text = annotatedText,
-        modifier = modifier,
+        modifier = modifier.basicMarquee(),
         overflow = overflow,
         maxLines = maxLines,
         style = style,
