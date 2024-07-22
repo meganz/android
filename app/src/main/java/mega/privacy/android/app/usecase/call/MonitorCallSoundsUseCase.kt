@@ -318,12 +318,13 @@ class MonitorCallSoundsUseCase @Inject constructor(
      * Method to start the countdown to hang up the call
      *
      */
-    private fun startFinishCallCountDown(
+    private suspend fun startFinishCallCountDown(
         chat: ChatRoom,
         callId: Long,
         participant: ParticipantInfo,
         seconds: Long,
-    ) {
+    ) = withContext(mainImmediateDispatcher) {
+
         if (!chat.isGroup && !chat.isMeeting && participants.contains(participant)) {
             if (finishCallCountDownTimer == null) {
                 participants.remove(participant)

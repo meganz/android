@@ -9,6 +9,7 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatVideoListenerInterface
+import timber.log.Timber
 import java.nio.ByteBuffer
 
 /**
@@ -18,7 +19,7 @@ class IndividualCallVideoListener(
     private val textureView: TextureView,
     outMetrics: DisplayMetrics?,
     clientId: Long,
-    isFloatingWindow: Boolean = true
+    isFloatingWindow: Boolean = true,
 ) : MegaChatVideoListenerInterface {
 
     var width = 0
@@ -37,28 +38,32 @@ class IndividualCallVideoListener(
         chatid: Long,
         width: Int,
         height: Int,
-        byteBuffer: ByteArray
+        byteBuffer: ByteArray,
     ) {
-        if (width == 0 || height == 0) {
-            return
-        }
-
-        if (this.width != width || this.height != height) {
-            this.width = width
-            this.height = height
-            val viewWidth = textureView.width
-            val viewHeight = textureView.height
-            if (viewWidth != 0 && viewHeight != 0) {
-                bitmap = renderer.createBitmap(width, height)
-            } else {
-                this.width = Constants.INVALID_DIMENSION
-                this.height = Constants.INVALID_DIMENSION
+        runCatching {
+            if (width == 0 || height == 0) {
+                return
             }
-        }
 
-        (bitmap ?: return).copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
-        if (VideoCaptureUtils.isVideoAllowed()) {
-            renderer.drawBitmap(isLocal)
+            if (this.width != width || this.height != height) {
+                this.width = width
+                this.height = height
+                val viewWidth = textureView.width
+                val viewHeight = textureView.height
+                if (viewWidth != 0 && viewHeight != 0) {
+                    bitmap = renderer.createBitmap(width, height)
+                } else {
+                    this.width = Constants.INVALID_DIMENSION
+                    this.height = Constants.INVALID_DIMENSION
+                }
+            }
+
+            (bitmap ?: return).copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
+            if (VideoCaptureUtils.isVideoAllowed()) {
+                renderer.drawBitmap(isLocal)
+            }
+        }.onFailure {
+            Timber.e(it)
         }
     }
 

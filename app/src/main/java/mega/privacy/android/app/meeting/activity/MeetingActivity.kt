@@ -209,10 +209,10 @@ class MeetingActivity : PasscodeActivity() {
         isInPictureInPictureMode: Boolean,
         newConfig: Configuration,
     ) {
-        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         if (meetingViewModel.state.value.isPictureInPictureFeatureFlagEnabled) {
             meetingViewModel.updateIsInPipMode(isInPipMode = isInPictureInPictureMode)
         }
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
     }
 
     /**
@@ -224,6 +224,7 @@ class MeetingActivity : PasscodeActivity() {
         if (currentFragment is InMeetingFragment) {
             enterPipModeIfPossible()
         }
+        super.onUserLeaveHint()
     }
 
     private fun enterPipModeIfPossible(): Boolean {
@@ -401,7 +402,6 @@ class MeetingActivity : PasscodeActivity() {
 
     override fun onDestroy() {
         navController?.removeOnDestinationChangedListener(destinationChangedListener)
-
         super.onDestroy()
     }
 

@@ -1760,9 +1760,8 @@ class InMeetingViewModel @Inject constructor(
      * Remove screen shared participant
      *
      * @param list  List of [Participant]
-     * @param context   Context
      */
-    fun removeScreenShareParticipant(list: List<Participant>?, context: Context): Int {
+    fun removeScreenShareParticipant(list: List<Participant>?): Int {
         _state.update { state -> state.copy(removeScreensSharedParticipantsList = null) }
         list?.forEach { user ->
             participants.value?.indexOf(user)?.let { position ->
@@ -1790,10 +1789,9 @@ class InMeetingViewModel @Inject constructor(
      * Add screen shared participant
      *
      * @param list  List of [Participant]
-     * @param context   Context
      * @return  Position of the screen shared
      */
-    fun addScreenShareParticipant(list: List<Participant>?, context: Context): Int? {
+    fun addScreenShareParticipant(list: List<Participant>?): Int? {
         _state.update { state -> state.copy(addScreensSharedParticipantsList = null) }
         list?.forEach { participant ->
             getSessionByClientId(participant.clientId)?.let { session ->
@@ -1999,7 +1997,6 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method for removing a participant
      *
-     * @param clientId Client id of a participant
      * @return the position of the participant
      */
     fun removeParticipant(session: ChatSession): Int {
@@ -2185,6 +2182,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun getFirstParticipant(peerId: Long, clientId: Long): Participant? {
         participants.value?.let { participantsList ->
+            Timber.d("Current Participant list $participantsList")
             if (participantsList.isEmpty()) return null
 
             when {
@@ -3543,6 +3541,9 @@ class InMeetingViewModel @Inject constructor(
      */
     fun updateIsInPipMode(isInPipMode: Boolean) {
         viewModelScope.launch {
+            if (isInPipMode) {
+                setStatus(newStatus = CallUIStatusType.PictureInPictureView)
+            }
             _state.update {
                 it.copy(isInPipMode = isInPipMode)
             }

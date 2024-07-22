@@ -63,6 +63,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             clientId = it.getLong(Constants.CLIENT_ID, MEGACHAT_INVALID_HANDLE)
             isFloatingWindow = it.getBoolean(Constants.IS_FLOATING_WINDOW, false)
         }
+        Timber.d("Chat ID: $chatId, Peer ID: $peerId, Client ID: $clientId")
 
         if (chatId == MEGACHAT_INVALID_HANDLE) {
             Timber.e("Error. Chat doesn't exist")

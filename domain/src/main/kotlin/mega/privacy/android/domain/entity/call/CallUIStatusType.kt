@@ -24,6 +24,12 @@ enum class CallUIStatusType {
      */
     SpeakerView,
 
+
+    /**
+     * PictureInPicture view
+     */
+    PictureInPictureView,
+
     /**
      * None
      */
