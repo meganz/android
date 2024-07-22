@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -11,6 +12,7 @@ import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
@@ -22,23 +24,23 @@ private const val TITLE_TAG = "settingsActivityTitle"
 
 @AndroidEntryPoint
 class SettingsActivity : BaseActivity(),
-        PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+    PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
 
+    @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         if (shouldRefreshSessionDueToSDK(true)) return
         setContentView(R.layout.settings_activity)
         setSupportActionBar(findViewById(R.id.settings_toolbar))
         if (savedInstanceState == null) {
-            supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.settings, SettingsFragment().apply {
-                        arguments = intent.extras
-                    })
-                    .commit()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.settings, SettingsFragment().apply {
+                    arguments = intent.extras
+                }).commit()
         } else {
             title = savedInstanceState.getCharSequence(TITLE_TAG)
         }
@@ -49,11 +51,15 @@ class SettingsActivity : BaseActivity(),
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = when (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars =
+            shouldDisplayLightModeStatusBars()
+    }
+
+    private fun shouldDisplayLightModeStatusBars() =
+        when (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
             Configuration.UI_MODE_NIGHT_YES -> false
             else -> true
         }
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -69,43 +75,42 @@ class SettingsActivity : BaseActivity(),
     }
 
     override fun onPreferenceStartFragment(
-            caller: PreferenceFragmentCompat,
-            pref: Preference
-    ): Boolean {
+        caller: PreferenceFragmentCompat,
+        pref: Preference
+    ): Boolean =
         // Instantiate the new Fragment
-        return pref.fragment?.let {
+        pref.fragment?.let {
             val args = pref.extras
             val fragment = supportFragmentManager.fragmentFactory.instantiate(
-                    classLoader,
-                    it
+                classLoader,
+                it
             ).apply {
                 arguments = args
             }
             // Replace the existing Fragment with the new Fragment
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.settings, fragment, pref.key)
-                    .addToBackStack(null)
-                    .commit()
+                .replace(R.id.settings, fragment, pref.key)
+                .addToBackStack(null)
+                .commit()
 
             if (caller is FragmentResultListener) {
                 supportFragmentManager.setFragmentResultListener(pref.key, this, caller)
 //            In the calling fragment, implement FragmentResultListener to handle results for a specific preference key
 //            In the Called Fragment, setFragmentResult using the tag to pass back any results, use the fragment name for the bundle key
-        }
-
+            }
             title = pref.title
             true
         } ?: false
-    }
 
     companion object {
+        /**
+         * Get an intent to launch the SettingsActivity
+         */
         fun getIntent(context: Context, targetPreference: TargetPreference? = null): Intent {
             return Intent(context, SettingsActivity::class.java).apply {
                 putExtra(INITIAL_PREFERENCE, targetPreference?.preferenceId)
                 putExtra(NAVIGATE_TO_INITIAL_PREFERENCE, targetPreference?.requiresNavigation)
             }
         }
-
     }
-
 }

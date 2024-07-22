@@ -18,6 +18,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
@@ -112,6 +113,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
      * Perform initialization of the activity for verifying two factor authentication code
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         binding = ActivityVerifyTwoFactorBinding.inflate(layoutInflater)
         setContentView(binding.root)

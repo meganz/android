@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
@@ -68,6 +69,10 @@ import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSW
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.SNACKBAR_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.TNC_CHECKBOX_TEST_TAG
+import mega.privacy.android.domain.entity.changepassword.PasswordStrength
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.theme.black
@@ -75,10 +80,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.white
-import mega.privacy.android.domain.entity.changepassword.PasswordStrength
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import nz.mega.sdk.MegaApiJava
 
 internal object Constants {
@@ -161,6 +162,7 @@ fun ChangePasswordView(
     val onBackPressedDispatcherOwner = LocalOnBackPressedDispatcherOwner.current
 
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
             SimpleTopAppBar(

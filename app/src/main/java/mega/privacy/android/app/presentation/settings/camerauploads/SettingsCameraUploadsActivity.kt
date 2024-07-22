@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.components.session.SessionContainer
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
@@ -37,6 +38,7 @@ class SettingsCameraUploadsActivity : ComponentActivity() {
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
 
         setContent {

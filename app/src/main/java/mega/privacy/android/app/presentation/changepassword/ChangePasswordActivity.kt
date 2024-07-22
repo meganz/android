@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
@@ -28,9 +29,9 @@ import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActi
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHANGE_PASSWORD_2FA
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 import javax.inject.Inject
@@ -58,6 +59,7 @@ class ChangePasswordActivity : PasscodeActivity() {
      * Activity On Create
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         init()
 

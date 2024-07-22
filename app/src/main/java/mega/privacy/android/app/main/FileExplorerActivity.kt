@@ -38,6 +38,7 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -395,6 +396,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
+        enableEdgeToEdgeAndConsumeInsets()
         Timber.d("onCreate first")
         super.onCreate(savedInstanceState)
         credentials = runBlocking {

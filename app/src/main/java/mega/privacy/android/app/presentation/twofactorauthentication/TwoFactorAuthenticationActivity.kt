@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -29,9 +30,9 @@ import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFac
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -111,6 +112,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
