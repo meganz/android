@@ -16,6 +16,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.contacts.list.ContactListFragment
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
 import mega.privacy.android.app.databinding.ActivityContactsBinding
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.CallUtil.checkCameraPermission
 import mega.privacy.android.app.utils.Constants
@@ -95,6 +96,7 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
