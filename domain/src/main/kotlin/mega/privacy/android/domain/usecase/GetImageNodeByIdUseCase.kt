@@ -21,6 +21,7 @@ class GetImageNodeByIdUseCase @Inject constructor(
     suspend operator fun invoke(id: NodeId): ImageNode? {
         return photosRepository.getImageNodeFromCache(id) ?: photosRepository.fetchImageNode(
             nodeId = id,
+            includeRubbishBin = true,
         )
     }
 }

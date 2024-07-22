@@ -94,6 +94,30 @@ private fun LocationMap(latitude: Double, longitude: Double, address: Address) {
         position = CameraPosition.fromLatLngZoom(location, 10f)
     }
 
+    val featureName = address.featureName?.takeIf { it.isNotBlank() }
+    val thoroughfare = address.thoroughfare?.takeIf { it.isNotBlank() }
+    val subLocality = address.subLocality?.takeIf { it.isNotBlank() }
+    val locality = address.locality?.takeIf { it.isNotBlank() }
+    val adminArea = address.adminArea?.takeIf { it.isNotBlank() }
+    val countryName = address.countryName?.takeIf { it.isNotBlank() }
+
+    val titleText = listOfNotNull(
+        featureName,
+        thoroughfare
+    ).joinToString(", ")
+
+    val snippetText = listOfNotNull(
+        subLocality,
+        locality
+    ).joinToString(", ")
+
+    val addressText = listOfNotNull(
+        subLocality,
+        locality,
+        adminArea,
+        countryName
+    ).joinToString(", ")
+
     GoogleMap(
         modifier = Modifier
             .fillMaxWidth()
@@ -116,8 +140,8 @@ private fun LocationMap(latitude: Double, longitude: Double, address: Address) {
     ) {
         Marker(
             state = markerState,
-            title = "${address.featureName}, ${address.thoroughfare}",
-            snippet = "${address.subLocality}, ${address.locality}",
+            title = titleText,
+            snippet = snippetText,
         )
     }
 
@@ -127,8 +151,9 @@ private fun LocationMap(latitude: Double, longitude: Double, address: Address) {
             .height(16.dp),
         contentAlignment = Alignment.CenterEnd
     ) {
+
         Text(
-            text = "${address.subLocality}, ${address.locality}, ${address.adminArea}, ${address.countryName}",
+            text = addressText,
             style = typography.caption.copy(color = MaterialTheme.colors.textColorPrimary),
             modifier = Modifier.testTag(TEST_TAG_MAP_LOCATION_ADDRESS)
         )

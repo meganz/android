@@ -143,8 +143,7 @@ internal data class FileInfoViewState(
     /**
      * Check Conditions to enable gis field
      */
-    fun canEnableMapLocation() = mapLocationEnabled && !isNodeInRubbish &&
-            accessPermission == AccessPermission.OWNER
+    fun canEnableMapLocation() = mapLocationEnabled && accessPermission == AccessPermission.OWNER
 
     /**
      * Check Conditions to enable tags field
