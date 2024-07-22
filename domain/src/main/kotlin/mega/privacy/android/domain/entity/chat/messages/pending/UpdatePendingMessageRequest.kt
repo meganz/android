@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
  */
 sealed interface UpdatePendingMessageRequest {
     val pendingMessageId: Long
+    val state: PendingMessageState
 }
 
 /**
@@ -17,7 +18,7 @@ sealed interface UpdatePendingMessageRequest {
  */
 data class UpdatePendingMessageStateRequest(
     override val pendingMessageId: Long,
-    val state: PendingMessageState,
+    override val state: PendingMessageState,
 ) : UpdatePendingMessageRequest
 
 
@@ -29,7 +30,7 @@ data class UpdatePendingMessageStateRequest(
  */
 data class UpdatePendingMessageStateAndNodeHandleRequest(
     override val pendingMessageId: Long,
-    val state: PendingMessageState,
+    override val state: PendingMessageState,
     val nodeHandle: Long,
 ) : UpdatePendingMessageRequest
 
@@ -42,7 +43,7 @@ data class UpdatePendingMessageStateAndNodeHandleRequest(
 data class UpdatePendingMessageTransferTagRequest(
     override val pendingMessageId: Long,
     val transferTag: Int,
-    val state: PendingMessageState,
+    override val state: PendingMessageState,
 ) : UpdatePendingMessageRequest
 
 /**
@@ -53,6 +54,6 @@ data class UpdatePendingMessageTransferTagRequest(
  */
 data class UpdatePendingMessageStateAndPathRequest(
     override val pendingMessageId: Long,
-    val state: PendingMessageState,
+    override val state: PendingMessageState,
     val filePath: String
 ) : UpdatePendingMessageRequest

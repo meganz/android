@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
@@ -128,25 +129,39 @@ class ChatUploadsWorker @AssistedInject constructor(
             emit(ongoingActiveTransfersResult)
             Timber.d("Chat upload progress emitted: $pendingMessagesCount ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
             //keep monitoring if and only if there are work to do or transfers in progress
-            return@transformWhile pendingMessagesCount > 0 || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota && !ongoingActiveTransfersResult.storageOverQuota)
-        }.onCompletion {
-            clearPendingMessagesCompressionProgressUseCase()
+            val keepMonitoring =
+                pendingMessagesCount > 0 || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota && !ongoingActiveTransfersResult.storageOverQuota)
+            if (!keepMonitoring) {
+                Timber.d("ChatUploadsWorker keep monitoring false due to no more work or transfers: $pendingMessagesCount, ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
+            }
+            return@transformWhile keepMonitoring
         }
+            .catch { Timber.e(it) }
+            .onCompletion {
+                Timber.d("ChatUploadsWorker monitor progress finished $it")
+                clearPendingMessagesCompressionProgressUseCase()
+            }
 
     override suspend fun doWorkInternal(scope: CoroutineScope) {
         scope.launch {
             super.doWorkInternal(this)
         }
         scope.launch {
-            prepareAllPendingMessagesUseCase().collect {}
+            prepareAllPendingMessagesUseCase()
+                .catch { Timber.e(it) }
+                .collect { Timber.d("Chat Upload Preparing $it attachments") }
         }
         scope.launch {
-            compressPendingMessagesUseCase().collect {
-                chatCompressionProgress.value = it
-            }
+            compressPendingMessagesUseCase()
+                .catch { Timber.e(it) }
+                .collect {
+                    chatCompressionProgress.value = it
+                }
         }
         scope.launch {
-            startUploadingAllPendingMessagesUseCase().collect {}
+            startUploadingAllPendingMessagesUseCase()
+                .catch { Timber.e(it) }
+                .collect { Timber.d("Chat Upload Uploading $it attachments") }
         }
     }
 
