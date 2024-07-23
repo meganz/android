@@ -13,7 +13,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.presentation.cancelaccountplan.view.GenericInstructionStep
 import mega.privacy.android.app.presentation.cancelaccountplan.view.InstructionStepWithBoldText
 import mega.privacy.android.app.utils.MEGA_URL
@@ -81,7 +83,7 @@ internal fun WebReactivationInstructionsView(
                 )
             ),
             onAnnotationClick = onMegaUrlClicked,
-            baseStyle = MaterialTheme.typography.subtitle1,
+            baseStyle = MaterialTheme.typography.subtitle1.copy(textIndent = TextIndent(restLine = 18.sp)),
             color = TextColor.Secondary,
             modifier = Modifier
                 .padding(top = 4.dp, start = 4.dp)
