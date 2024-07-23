@@ -12,7 +12,6 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property canVerifyPhoneNumber Can verify phone number
  * @property isRootNodeExist Is root node exist
  * @property isConnected Is connected
- * @property enabledFlags Enabled flags
  * @property showPromoTag Boolean to show promo tag for promo notifications
  */
 data class ManagerDrawerUiState(
@@ -22,6 +21,5 @@ data class ManagerDrawerUiState(
     val canVerifyPhoneNumber: Boolean = false,
     val isRootNodeExist: Boolean = false,
     val isConnected: Boolean = false,
-    val enabledFlags: Set<Feature> = emptySet(),
     val showPromoTag: Boolean = false,
 )

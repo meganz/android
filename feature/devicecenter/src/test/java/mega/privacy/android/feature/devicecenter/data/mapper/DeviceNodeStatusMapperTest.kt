@@ -26,25 +26,11 @@ internal class DeviceNodeStatusMapperTest {
     }
 
     @Test
-    fun `test that a no camera uploads device status is returned if the current device camera uploads is disabled`() {
-        assertThat(
-            underTest(
-                folders = listOf(mock(), mock()),
-                isCameraUploadsEnabled = false,
-                isCurrentDevice = true,
-                isSyncFeatureFlagEnabled = false,
-            )
-        ).isEqualTo(DeviceCenterNodeStatus.NoCameraUploads)
-    }
-
-    @Test
     fun `test that a nothing set up device status is returned if nothing has been set up yet`() {
         assertThat(
             underTest(
                 folders = emptyList(),
-                isCameraUploadsEnabled = false,
                 isCurrentDevice = true,
-                isSyncFeatureFlagEnabled = true,
             )
         ).isEqualTo(DeviceCenterNodeStatus.NothingSetUp)
     }
@@ -58,9 +44,7 @@ internal class DeviceNodeStatusMapperTest {
         assertThat(
             underTest(
                 folders = folders,
-                isCameraUploadsEnabled = true,
                 isCurrentDevice = true,
-                isSyncFeatureFlagEnabled = false,
             )
         ).isEqualTo(expectedDeviceStatus)
     }
@@ -74,12 +58,25 @@ internal class DeviceNodeStatusMapperTest {
         assertThat(
             underTest(
                 folders = folders,
-                isCameraUploadsEnabled = false,
                 isCurrentDevice = false,
-                isSyncFeatureFlagEnabled = false,
             )
         ).isEqualTo(expectedDeviceStatus)
     }
+
+    @ParameterizedTest(name = "expected other device status: {1}")
+    @MethodSource("provideParameters")
+    fun `test that unknown device status is returned for other devices when folders are empty`(
+        folders: List<DeviceFolderNode>,
+        expectedDeviceStatus: DeviceCenterNodeStatus,
+    ) {
+        assertThat(
+            underTest(
+                folders = emptyList(),
+                isCurrentDevice = false,
+            )
+        ).isEqualTo(DeviceCenterNodeStatus.Unknown)
+    }
+
 
     private fun provideParameters() = Stream.of(
         Arguments.of(
@@ -162,6 +159,5 @@ internal class DeviceNodeStatusMapperTest {
             listOf<DeviceFolderNode>(mock { on { status }.thenReturn(DeviceCenterNodeStatus.Unknown) }),
             DeviceCenterNodeStatus.Unknown,
         ),
-        Arguments.of(emptyList<DeviceFolderNode>(), DeviceCenterNodeStatus.Unknown)
     )
 }

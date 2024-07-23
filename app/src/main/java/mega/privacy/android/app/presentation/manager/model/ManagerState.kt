@@ -39,7 +39,6 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * @property usersCallLimitReminders                    [UsersCallLimitReminders]
  * @property searchQuery                                Search query
- * @property isSyncFeatureFlagEnabled                   True if Android Sync feature flag is enabled. False otherwise.
  * @property uploadEvent                                Event to trigger upload actions
  */
 data class ManagerState(
@@ -67,6 +66,5 @@ data class ManagerState(
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
     val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled,
     val searchQuery: String = "",
-    val isSyncFeatureFlagEnabled: Boolean = false,
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
 )

@@ -2644,7 +2644,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId)
                 }
             }
-            intent.action = null
+            intent?.action = null
             intent = null
         }
         resetNavigationViewMenu(bottomNavigationView.menu)
@@ -4899,11 +4899,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
             handleCloudDriveBackNavigation(performBackNavigation = true)
         } else if (drawerItem == DrawerItem.SYNC) {
-            if (viewModel.state.value.isSyncFeatureFlagEnabled) {
-                selectDrawerItem(item = DrawerItem.DEVICE_CENTER)
-            } else {
-                goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-            }
+            selectDrawerItem(item = DrawerItem.DEVICE_CENTER)
         } else if (drawerItem == DrawerItem.DEVICE_CENTER) {
             handleDeviceCenterBackNavigation()
         } else if (drawerItem == DrawerItem.RUBBISH_BIN) {

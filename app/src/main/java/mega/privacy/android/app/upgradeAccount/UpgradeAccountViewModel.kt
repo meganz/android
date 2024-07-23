@@ -32,7 +32,6 @@ import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.sync.featuretoggle.SyncABTestFeatures
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -163,19 +162,6 @@ class UpgradeAccountViewModel @Inject constructor(
                 }
             }.onFailure {
                 Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
-            }
-        }
-        viewModelScope.launch {
-            runCatching {
-                val showAndroidSyncString =
-                    getFeatureFlagValueUseCase(SyncABTestFeatures.asyc)
-                _state.update { state ->
-                    state.copy(
-                        showAndroidSyncString = showAndroidSyncString
-                    )
-                }
-            }.onFailure {
-                Timber.e("Failed to fetch feature flag ShowStringsForNewFeatures with error: ${it.message}")
             }
         }
     }

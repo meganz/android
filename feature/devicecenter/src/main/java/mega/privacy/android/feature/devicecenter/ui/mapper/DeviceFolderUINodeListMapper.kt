@@ -23,15 +23,13 @@ internal class DeviceFolderUINodeListMapper @Inject constructor(
      * Invocation function
      *
      * @param folders a list of [DeviceFolderNode] objects
-     * @param isSyncFeatureFlagEnabled True if Sync feature flag is enabled. False otherwise
      *
      * @return a list of [DeviceFolderUINode] objects
      */
     operator fun invoke(
         folders: List<DeviceFolderNode>,
-        isSyncFeatureFlagEnabled: Boolean,
     ): List<DeviceFolderUINode> =
-        folders.filter { !isSyncFeatureFlagEnabled || (it.type != BackupInfoType.CAMERA_UPLOADS && it.type != BackupInfoType.MEDIA_UPLOADS) }
+        folders.filter { it.type != BackupInfoType.CAMERA_UPLOADS && it.type != BackupInfoType.MEDIA_UPLOADS }
             .map { folder ->
                 if (folder.type == BackupInfoType.BACKUP_UPLOAD) {
                     BackupDeviceFolderUINode(

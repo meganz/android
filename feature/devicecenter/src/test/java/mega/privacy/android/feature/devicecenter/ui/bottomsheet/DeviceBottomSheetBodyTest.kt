@@ -36,7 +36,6 @@ internal class DeviceBottomSheetBodyTest {
             DeviceBottomSheetBody(
                 device = ownDeviceUINode,
                 isCameraUploadsEnabled = true,
-                onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
                 onAddNewSyncClicked = {},
@@ -62,7 +61,6 @@ internal class DeviceBottomSheetBodyTest {
             DeviceBottomSheetBody(
                 device = otherDeviceUINode,
                 isCameraUploadsEnabled = true,
-                onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
                 onAddNewSyncClicked = {},

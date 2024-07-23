@@ -288,7 +288,6 @@ fun UpgradeAccountView(
 
                 FeaturesOfPlans(
                     showNoAdsFeature = state.showNoAdsFeature,
-                    showAndroidSyncString = state.showAndroidSyncString,
                 )
                 if (state.localisedSubscriptionsList.isNotEmpty()) {
                     SubscriptionDetails(
@@ -519,7 +518,6 @@ fun EmptySubscriptionPlansInfoCards(brush: Brush) {
 @Composable
 private fun FeaturesOfPlans(
     showNoAdsFeature: Boolean,
-    showAndroidSyncString: Boolean,
 ) {
     val modifier = Modifier.padding(
         start = 10.dp,
@@ -560,14 +558,12 @@ private fun FeaturesOfPlans(
                 style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
                 modifier = modifier
             )
-            if (showAndroidSyncString) {
-                MegaText(
-                    text = stringResource(id = sharedR.string.account_upgrade_account_description_feature_sync),
-                    textColor = TextColor.Primary,
-                    style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
-                    modifier = modifier
-                )
-            }
+            MegaText(
+                text = stringResource(id = sharedR.string.account_upgrade_account_description_feature_sync),
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                modifier = modifier
+            )
             MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_description_feature_rewind),
                 textColor = TextColor.Primary,

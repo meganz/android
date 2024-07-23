@@ -164,9 +164,6 @@ class DeviceCenterFragment : Fragment() {
                                 openNewSync = true,
                             )
                         },
-                        onCameraUploadsClicked = {
-                            megaNavigator.openSettingsCameraUploads(requireActivity())
-                        },
                         onRenameDeviceOptionClicked = viewModel::setDeviceToRename,
                         onRenameDeviceCancelled = viewModel::resetDeviceToRename,
                         onRenameDeviceSuccessful = {

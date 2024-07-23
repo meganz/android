@@ -52,7 +52,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
-import mega.privacy.android.shared.sync.featuretoggle.SyncABTestFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -110,7 +109,6 @@ class SettingsViewModel @Inject constructor(
             deleteAccountVisible = false,
             deleteEnabled = false,
             cameraUploadsEnabled = true,
-            isSyncEnabled = false,
             cameraUploadsOn = false,
             chatEnabled = true,
             callsEnabled = true,
@@ -211,9 +209,6 @@ class SettingsViewModel @Inject constructor(
                     .map { accountDetail ->
                         { state: SettingsState -> state.copy(accountDetail = accountDetail) }
                     },
-                flow { emit(getFeatureFlagValueUseCase(SyncABTestFeatures.asyc)) }.map { enabled ->
-                    { state: SettingsState -> state.copy(isSyncEnabled = enabled) }
-                },
             ).catch {
                 Timber.e(it)
             }.collect {

@@ -23,13 +23,11 @@ internal class DeviceUINodeListMapper @Inject constructor(
      * Invocation function
      *
      * @param deviceNodes a list of [DeviceNode] objects
-     * @param isSyncFeatureFlagEnabled True if Sync feature flag is enabled. False otherwise
      *
      * @return a list of Device UI Node objects
      */
     operator fun invoke(
         deviceNodes: List<DeviceNode>,
-        isSyncFeatureFlagEnabled: Boolean,
     ) = deviceNodes.map { deviceNode ->
         if (deviceNode is OwnDeviceNode) {
             OwnDeviceUINode(
@@ -39,7 +37,6 @@ internal class DeviceUINodeListMapper @Inject constructor(
                 status = deviceCenterUINodeStatusMapper(deviceNode.status),
                 folders = deviceFolderUINodeListMapper(
                     folders = deviceNode.folders,
-                    isSyncFeatureFlagEnabled = isSyncFeatureFlagEnabled,
                 ),
             )
         } else {
@@ -50,7 +47,6 @@ internal class DeviceUINodeListMapper @Inject constructor(
                 status = deviceCenterUINodeStatusMapper(deviceNode.status),
                 folders = deviceFolderUINodeListMapper(
                     folders = deviceNode.folders,
-                    isSyncFeatureFlagEnabled = isSyncFeatureFlagEnabled,
                 ),
             )
         }

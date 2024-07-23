@@ -23,55 +23,15 @@ internal class OwnDeviceBottomSheetBodyTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `test that the bottom sheet body is displayed with the correct tiles when camera uploads is enabled`() {
+    fun `test that the bottom sheet body is displayed with the correct tiles`() {
         composeTestRule.setContent {
             OwnDeviceBottomSheetBody(
                 isCameraUploadsEnabled = true,
                 hasSyncedFolders = true,
-                onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
                 onAddNewSyncClicked = {},
                 isFreeAccount = false,
-            )
-        }
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_BODY_OWN_DEVICE).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_CAMERA_UPLOADS).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_RENAME_DEVICE).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_INFO).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that the bottom sheet body is displayed with the correct tiles when camera uploads is disabled`() {
-        composeTestRule.setContent {
-            OwnDeviceBottomSheetBody(
-                isCameraUploadsEnabled = false,
-                hasSyncedFolders = true,
-                onCameraUploadsClicked = {},
-                onRenameDeviceClicked = {},
-                onInfoClicked = {},
-                onAddNewSyncClicked = {},
-                isFreeAccount = false,
-            )
-        }
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_BODY_OWN_DEVICE).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_CAMERA_UPLOADS).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_RENAME_DEVICE).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_INFO).assertDoesNotExist()
-    }
-
-    @Test
-    fun `test that the bottom sheet body is displayed with the correct tiles when sync feature flag is enabled`() {
-        composeTestRule.setContent {
-            OwnDeviceBottomSheetBody(
-                isCameraUploadsEnabled = true,
-                hasSyncedFolders = true,
-                onCameraUploadsClicked = {},
-                onRenameDeviceClicked = {},
-                onInfoClicked = {},
-                onAddNewSyncClicked = {},
-                isFreeAccount = false,
-                isSyncFeatureFlagEnabled = true,
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_BODY_OWN_DEVICE).assertIsDisplayed()

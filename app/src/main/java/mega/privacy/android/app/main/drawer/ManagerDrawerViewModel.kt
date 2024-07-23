@@ -27,7 +27,6 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.GetEnabledNotificationsUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
-import mega.privacy.android.shared.sync.featuretoggle.SyncABTestFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -75,14 +74,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
         monitorNodeUpdatesEvent()
         observerVerificationStatus()
         observerConnectivityEvent()
-        loadFeatureFlags()
         shouldShowPromoTag()
-    }
-
-    private fun loadFeatureFlags() {
-        viewModelScope.launch {
-            _state.update { it.copy(enabledFlags = getEnabledFeatures()) }
-        }
     }
 
     private fun observerConnectivityEvent() {
@@ -175,12 +167,6 @@ internal class ManagerDrawerViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
-    }
-
-    private suspend fun getEnabledFeatures(): Set<Feature> {
-        return setOfNotNull(
-            SyncABTestFeatures.asyc.takeIf { getFeatureFlagValueUseCase(it) },
-        )
     }
 
     private fun shouldShowPromoTag() {

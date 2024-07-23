@@ -117,15 +117,11 @@ internal class DeviceCenterViewModelTest {
     private suspend fun setupDefaultMocks() {
         whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
         whenever(
-            getDevicesUseCase(
-                isCameraUploadsEnabled = any(),
-                isSyncFeatureFlagEnabled = any()
-            )
+            getDevicesUseCase()
         ).thenReturn(listOf(mock<OwnDeviceNode>()))
         whenever(
             deviceUINodeListMapper(
                 deviceNodes = any(),
-                isSyncFeatureFlagEnabled = anyBoolean(),
             )
         ).thenReturn(listOf(ownDeviceUINode))
     }
@@ -206,7 +202,6 @@ internal class DeviceCenterViewModelTest {
                 whenever(
                     deviceUINodeListMapper(
                         deviceNodes = any(),
-                        isSyncFeatureFlagEnabled = anyBoolean(),
                     )
                 ).thenReturn(listOf(updatedOwnDeviceUINode))
 
@@ -241,7 +236,6 @@ internal class DeviceCenterViewModelTest {
                 whenever(
                     deviceUINodeListMapper(
                         deviceNodes = any(),
-                        isSyncFeatureFlagEnabled = anyBoolean(),
                     )
                 ).thenReturn(listOf(updatedOwnDeviceUINode))
 
@@ -270,7 +264,6 @@ internal class DeviceCenterViewModelTest {
                 whenever(
                     deviceUINodeListMapper(
                         deviceNodes = any(),
-                        isSyncFeatureFlagEnabled = anyBoolean(),
                     )
                 ).thenReturn(listOf(updatedOwnDeviceUINode))
 
@@ -429,15 +422,11 @@ internal class DeviceCenterViewModelTest {
         )
         whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
         whenever(
-            getDevicesUseCase(
-                isCameraUploadsEnabled = false,
-                isSyncFeatureFlagEnabled = false
-            )
+            getDevicesUseCase()
         ).thenReturn(deviceEntities)
         whenever(
             deviceUINodeListMapper(
                 deviceNodes = deviceEntities,
-                isSyncFeatureFlagEnabled = false,
             )
         ).thenReturn(itemsToDisplay)
 
@@ -472,15 +461,11 @@ internal class DeviceCenterViewModelTest {
             )
             whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
             whenever(
-                getDevicesUseCase(
-                    isCameraUploadsEnabled = false,
-                    isSyncFeatureFlagEnabled = false
-                )
+                getDevicesUseCase()
             ).thenReturn(deviceEntities)
             whenever(
                 deviceUINodeListMapper(
                     deviceNodes = deviceEntities,
-                    isSyncFeatureFlagEnabled = false,
                 )
             ).thenReturn(itemsToDisplay)
 

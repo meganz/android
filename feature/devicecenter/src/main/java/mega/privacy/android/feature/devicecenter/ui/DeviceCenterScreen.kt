@@ -89,7 +89,6 @@ internal const val TEST_TAG_DEVICE_CENTER_SCREEN_UPGRADE_DIALOG =
  * @param onDeviceMenuClicked Lambda that performs a specific action when a Device's Menu Icon is clicked
  * @param onBackupFolderClicked Lambda that performs a specific action when a Backup Folder is clicked
  * @param onNonBackupFolderClicked Lambda that performs a specific action when a Non Backup Folder is clicked
- * @param onCameraUploadsClicked Lambda that performs a specific action when the User clicks the "Camera uploads" Bottom Dialog Option
  * @param onInfoOptionClicked Lambda that performs a specific action when the User clicks the "Info" Bottom Dialog Option
  * @param onAddNewSyncOptionClicked Lambda that performs a specific action when the User clicks the "Add new sync" Bottom Dialog Option
  * @param onRenameDeviceOptionClicked Lambda that performs a specific action when the User clicks the "Rename" Bottom Dialog Option
@@ -109,7 +108,6 @@ internal fun DeviceCenterScreen(
     onDeviceMenuClicked: (DeviceUINode) -> Unit,
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit,
     onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit,
-    onCameraUploadsClicked: () -> Unit,
     onInfoOptionClicked: (DeviceCenterUINode) -> Unit,
     onAddNewSyncOptionClicked: (DeviceUINode) -> Unit,
     onRenameDeviceOptionClicked: (DeviceUINode) -> Unit,
@@ -172,7 +170,6 @@ internal fun DeviceCenterScreen(
             DeviceBottomSheetBody(
                 device = uiState.menuClickedDevice ?: return@BottomSheet,
                 isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
-                onCameraUploadsClicked = onCameraUploadsClicked,
                 onRenameDeviceClicked = onRenameDeviceOptionClicked,
                 onInfoClicked = onInfoOptionClicked,
                 onAddNewSyncClicked = {
@@ -186,7 +183,6 @@ internal fun DeviceCenterScreen(
                     coroutineScope.launch { modalSheetState.hide() }
                 },
                 isFreeAccount = uiState.isFreeAccount,
-                isSyncFeatureFlagEnabled = uiState.isSyncFeatureFlagEnabled,
             )
         },
         content = {
@@ -340,9 +336,6 @@ private fun DeviceCenterAppBar(
                     is OwnDeviceUINode -> {
                         if (uiState.isCameraUploadsEnabled) {
                             list.add(DeviceMenuAction.Info)
-                        }
-                        if (!uiState.isSyncFeatureFlagEnabled) {
-                            list.add(DeviceMenuAction.CameraUploads)
                         }
                     }
 
@@ -498,7 +491,6 @@ private fun DeviceCenterNoNetworkStatePreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
-            onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -532,7 +524,6 @@ private fun DeviceCenterNoItemsFoundPreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
-            onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -563,7 +554,6 @@ private fun DeviceCenterInInitialLoadingPreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
-            onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -604,7 +594,6 @@ private fun DeviceCenterInDeviceViewPreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
-            onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -642,7 +631,6 @@ private fun DeviceCenterInFolderViewEmptyStatePreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
-            onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -679,7 +667,6 @@ private fun DeviceCenterInFolderViewPreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
-            onCameraUploadsClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},

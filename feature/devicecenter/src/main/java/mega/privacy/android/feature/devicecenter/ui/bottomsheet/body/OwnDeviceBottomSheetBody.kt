@@ -26,39 +26,28 @@ internal const val BOTTOM_SHEET_BODY_OWN_DEVICE =
  *
  * @param isCameraUploadsEnabled true if Camera Uploads is Enabled, and false if otherwise
  * @param hasSyncedFolders True if the device has synced folders. False otherwise
- * @param onCameraUploadsClicked Lambda that is executed when the "Camera uploads" Tile is selected
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
  * @param onAddNewSyncClicked Lambda that is executed when the "Add new sync" Tile is selected
  * @param isFreeAccount True if is a Free account or False otherwise
- * @param isSyncFeatureFlagEnabled True if Sync feature flag is enabled. False otherwise
  */
 @Composable
 internal fun OwnDeviceBottomSheetBody(
     isCameraUploadsEnabled: Boolean,
     hasSyncedFolders: Boolean,
-    onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: () -> Unit,
     onInfoClicked: () -> Unit,
     onAddNewSyncClicked: () -> Unit,
     isFreeAccount: Boolean,
-    isSyncFeatureFlagEnabled: Boolean = false,
 ) {
     Column(modifier = Modifier.testTag(BOTTOM_SHEET_BODY_OWN_DEVICE)) {
-        if ((isSyncFeatureFlagEnabled && hasSyncedFolders) || isCameraUploadsEnabled) {
+        if (hasSyncedFolders || isCameraUploadsEnabled) {
             InfoBottomSheetTile(onActionClicked = onInfoClicked)
         }
-        if (isSyncFeatureFlagEnabled) {
-            AddNewSyncBottomSheetTile(
-                isFreeAccount = isFreeAccount,
-                onActionClicked = onAddNewSyncClicked,
-            )
-        } else {
-            CameraUploadsBottomSheetTile(
-                isCameraUploadsEnabled = isCameraUploadsEnabled,
-                onActionClicked = onCameraUploadsClicked,
-            )
-        }
+        AddNewSyncBottomSheetTile(
+            isFreeAccount = isFreeAccount,
+            onActionClicked = onAddNewSyncClicked,
+        )
         RenameDeviceBottomSheetTile(onActionClicked = onRenameDeviceClicked)
     }
 }
@@ -78,7 +67,6 @@ private fun PreviewOwnDeviceBottomSheet(
         OwnDeviceBottomSheetBody(
             isCameraUploadsEnabled = isCameraUploadsEnabled,
             hasSyncedFolders = true,
-            onCameraUploadsClicked = {},
             onRenameDeviceClicked = {},
             onInfoClicked = {},
             onAddNewSyncClicked = {},

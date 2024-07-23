@@ -15,7 +15,6 @@ interface DeviceCenterRepository {
      * @param currentDeviceId The Device ID of the Current Device being used
      * @param deviceIdAndNameMap A [Map] whose Key-Value Pair consists of the Device ID and Device Name
      * @param isCameraUploadsEnabled true if Camera Uploads is enabled, and false if otherwise
-     * @param isSyncFeatureFlagEnabled True if Sync feature flag is enabled. False otherwise
      *
      * @return A list of [DeviceNode] objects
      */
@@ -23,7 +22,5 @@ interface DeviceCenterRepository {
         backupInfoList: List<BackupInfo>,
         currentDeviceId: String,
         deviceIdAndNameMap: Map<String, String>,
-        isCameraUploadsEnabled: Boolean,
-        isSyncFeatureFlagEnabled: Boolean,
     ): List<DeviceNode>
 }

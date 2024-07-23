@@ -15,9 +15,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -30,7 +28,6 @@ import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
-import mega.privacy.android.shared.sync.featuretoggle.SyncABTestFeatures
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -66,7 +63,6 @@ internal class DeviceCenterViewModel @Inject constructor(
 
     init {
         monitorNetworkConnectivity()
-        loadFeatureFlags()
         monitorAccountDetail()
     }
 
@@ -109,15 +105,8 @@ internal class DeviceCenterViewModel @Inject constructor(
     fun getBackupInfo() = viewModelScope.launch {
         runCatching {
             val isCameraUploadsEnabled = isCameraUploadsEnabledUseCase()
-            val isSyncFeatureFlagEnabled = runBlocking {
-                getEnabledFeatures().contains(SyncABTestFeatures.asyc)
-            }
             val devices = deviceUINodeListMapper(
-                deviceNodes = getDevicesUseCase(
-                    isCameraUploadsEnabled = isCameraUploadsEnabled,
-                    isSyncFeatureFlagEnabled = isSyncFeatureFlagEnabled,
-                ),
-                isSyncFeatureFlagEnabled = isSyncFeatureFlagEnabled,
+                deviceNodes = getDevicesUseCase(),
             )
             val selectedDevice = getSelectedDevice(devices)
             _state.update {
@@ -162,8 +151,7 @@ internal class DeviceCenterViewModel @Inject constructor(
         )
     }
 
-    fun shouldNavigateToSyncs(deviceUINode: DeviceUINode) =
-        _state.value.enabledFlags.contains(SyncABTestFeatures.asyc) && deviceUINode is OwnDeviceUINode
+    fun shouldNavigateToSyncs(deviceUINode: DeviceUINode) = deviceUINode is OwnDeviceUINode
 
     /**
      * Handles specific Back Press behavior
@@ -279,22 +267,6 @@ internal class DeviceCenterViewModel @Inject constructor(
 
     fun onInfoBackPressHandle() =
         _state.update { it.copy(infoSelectedItem = null) }
-
-    private fun loadFeatureFlags() {
-        runCatching {
-            viewModelScope.launch {
-                _state.update { it.copy(enabledFlags = getEnabledFeatures()) }
-            }
-        }.onFailure {
-            Timber.e(it)
-        }
-    }
-
-    private suspend fun getEnabledFeatures(): Set<Feature> {
-        return setOfNotNull(
-            SyncABTestFeatures.asyc.takeIf { getFeatureFlagValueUseCase(it) },
-        )
-    }
 
     companion object {
         /**

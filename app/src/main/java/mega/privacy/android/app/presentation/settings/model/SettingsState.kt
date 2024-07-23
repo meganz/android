@@ -14,7 +14,6 @@ import mega.privacy.android.domain.entity.account.AccountDetail
  * @property deleteEnabled
  * @property cameraUploadsEnabled
  * @property cameraUploadsOn
- * @property isSyncEnabled
  * @property chatEnabled
  * @property callsEnabled
  * @property startScreen
@@ -40,7 +39,6 @@ data class SettingsState(
     val deleteEnabled: Boolean,
     val cameraUploadsEnabled: Boolean,
     val cameraUploadsOn: Boolean,
-    val isSyncEnabled: Boolean,
     val chatEnabled: Boolean,
     val callsEnabled: Boolean,
     val startScreen: Int,
