@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
@@ -15,7 +16,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.ExportRecoveryKeyView
@@ -56,7 +56,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
      * Perform Activity initialization
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         if (shouldRefreshSessionDueToSDK(true)) return

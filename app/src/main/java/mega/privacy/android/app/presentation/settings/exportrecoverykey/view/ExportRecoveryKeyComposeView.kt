@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
@@ -92,6 +93,7 @@ fun ExportRecoveryKeyView(
     }
 
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         scaffoldState = rememberScaffoldState(),
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState) { data ->
@@ -102,7 +104,7 @@ fun ExportRecoveryKeyView(
                 )
             }
         },
-    ) {
+    ) { paddingValues ->
         uiState.message?.let {
             LaunchedEffect(it) {
                 snackBarHostState.showSnackbar(it)
@@ -111,6 +113,7 @@ fun ExportRecoveryKeyView(
         }
 
         ExportRecoveryKeyCompose(
+            modifier = Modifier.padding(paddingValues),
             isActionGroupVertical = uiState.isActionGroupVertical,
             onButtonOverflow = onButtonOverflow,
             onClickPrint = onClickPrint,
@@ -134,15 +137,16 @@ fun ExportRecoveryKeyView(
  * Main Compose View for Export Recovery Key Activity
  */
 @Composable
-fun ExportRecoveryKeyCompose(
+private fun ExportRecoveryKeyCompose(
     isActionGroupVertical: Boolean,
     onButtonOverflow: ExportRecoveryAction,
     onClickPrint: ExportRecoveryAction,
     onClickCopy: ExportRecoveryAction,
     onClickSave: ExportRecoveryAction,
+    modifier: Modifier,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp)
