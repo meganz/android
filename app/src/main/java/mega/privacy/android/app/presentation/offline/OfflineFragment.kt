@@ -69,15 +69,11 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownlo
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
@@ -91,12 +87,10 @@ import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
-import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.autoCleared
 import mega.privacy.android.app.utils.callManager
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -818,79 +812,36 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
 
             mime.isVideoMimeType || mime.isAudio -> {
                 Timber.d("Video/Audio file")
-
-                val mediaIntent: Intent
-                val internalIntent: Boolean
-                var opusFile = false
-                if (mime.isVideoNotSupported || mime.isAudioNotSupported) {
-                    mediaIntent = Intent(Intent.ACTION_VIEW)
-                    internalIntent = false
-                    val s: Array<String> = file.name.split("\\.".toRegex()).toTypedArray()
-                    if (s.size > 1 && s[s.size - 1] == "opus") {
-                        opusFile = true
-                    }
-                } else {
-                    internalIntent = true
-                    mediaIntent = getMediaIntent(context, file.name)
-                }
-
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle.toLong())
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.node.name)
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_POSITION, position)
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
-
-                putThumbnailLocation(
-                    launchIntent = mediaIntent,
-                    rv = recyclerView ?: return,
-                    position = position,
-                    viewerFrom = VIEWER_FROM_OFFLINE,
-                    thumbnailGetter = adapter ?: return,
-                )
-
-                mediaIntent.putExtra(
-                    INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList((adapter ?: return).getOfflineNodes())
-                )
-                mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-                if (!setLocalIntentParams(
-                        context, node.node, mediaIntent, file.absolutePath,
-                        false, requireActivity() as ManagerActivity
-                    )
-                ) {
-                    return
-                }
-
-                if (opusFile) {
-                    mediaIntent.setDataAndType(mediaIntent.data, "audio/*")
-                }
-
-                if (internalIntent) {
-                    startActivity(mediaIntent)
-                    requireActivity().overridePendingTransition(0, 0)
-                } else if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
-                    startActivity(mediaIntent)
-                } else {
-                    callManager {
-                        it.showSnackbar(
-                            SNACKBAR_TYPE,
-                            getString(R.string.intent_not_available),
-                            MEGACHAT_INVALID_HANDLE
-                        )
-                    }
-
-                    val intentShare = Intent(Intent.ACTION_SEND)
-                    if (setLocalIntentParams(
-                            context, node.node, intentShare, file.absolutePath,
-                            false, requireActivity() as ManagerActivity
-                        )
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val fileTypeInfo = viewModel.getFileTypeInfo(file)
+                    megaNavigator.openMediaPlayerActivityByLocalFile(
+                        context = requireContext(),
+                        localFile = file,
+                        fileTypeInfo = fileTypeInfo,
+                        viewType = OFFLINE_ADAPTER,
+                        handle = node.node.handle.toLong(),
+                        parentId = INVALID_HANDLE,
+                        sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
                     ) {
-                        intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
-                            Timber.d("Call to startActivity(intentShare)")
-                            startActivity(intentShare)
+                        callManager {
+                            it.showSnackbar(
+                                SNACKBAR_TYPE,
+                                getString(R.string.intent_not_available),
+                                MEGACHAT_INVALID_HANDLE
+                            )
+                        }
+
+                        val intentShare = Intent(Intent.ACTION_SEND)
+                        if (setLocalIntentParams(
+                                context, node.node, intentShare, file.absolutePath,
+                                false, requireActivity() as ManagerActivity
+                            )
+                        ) {
+                            intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
+                                Timber.d("Call to startActivity(intentShare)")
+                                startActivity(intentShare)
+                            }
                         }
                     }
                 }

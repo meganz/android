@@ -40,6 +40,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import timber.log.Timber
@@ -57,6 +58,7 @@ class OfflineViewModel @Inject constructor(
     private val getThumbnailUseCase: GetThumbnailUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+    private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
 ) : ViewModel() {
 
     private val composite = CompositeDisposable()
@@ -539,4 +541,6 @@ class OfflineViewModel @Inject constructor(
         Consumer { throwable: Throwable? ->
             Timber.e(throwable, "$context onError")
         }
+
+    internal suspend fun getFileTypeInfo(file: File) = getFileTypeInfoUseCase(file)
 }

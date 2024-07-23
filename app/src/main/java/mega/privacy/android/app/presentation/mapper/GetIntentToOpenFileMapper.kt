@@ -24,22 +24,19 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_APP
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
 import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -48,6 +45,8 @@ import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
 import java.io.File
 import java.io.FileReader
@@ -79,6 +78,8 @@ class GetIntentToOpenFileMapper @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val addNodeType: AddNodeType,
     private val getCloudSortOrder: GetCloudSortOrder,
+    private val getFolderLinkNodeContentUriUseCase: GetFolderLinkNodeContentUriUseCase,
+    private val megaNavigator: MegaNavigator,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -107,7 +108,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                 putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
                 putExtra(
                     INTENT_EXTRA_KEY_IS_FOLDER_LINK,
-                    viewType == Constants.FOLDER_LINK_ADAPTER
+                    viewType == FOLDER_LINK_ADAPTER
                 )
                 putExtra(INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
                 putExtra(INTENT_EXTRA_KEY_INSIDE, true)
@@ -185,66 +186,24 @@ class GetIntentToOpenFileMapper @Inject constructor(
         } else if (MimeTypeList.typeForName(fileNode.name).isVideoMimeType ||
             MimeTypeList.typeForName(fileNode.name).isAudio
         ) {
-            val mimeType = MimeTypeList.typeForName(fileNode.name).type
-            var opusFile = false
-            val intentInternalIntentPair =
-                if (MimeTypeList.typeForName(fileNode.name).isVideoNotSupported ||
-                    MimeTypeList.typeForName(fileNode.name).isAudioNotSupported
-                ) {
-                    val s = fileNode.name.split("\\.".toRegex())
-                    if (s.size > 1 && s[s.size - 1] == "opus") {
-                        opusFile = true
-                    }
-                    Pair(Intent(Intent.ACTION_VIEW), false)
-                } else {
-                    Pair(Util.getMediaIntent(activity, fileNode.name), true)
-                }
-
-            intentInternalIntentPair.first.putExtra(INTENT_EXTRA_KEY_PLACEHOLDER, 0)
-            intentInternalIntentPair.first.apply {
-                putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
-                putExtra(
-                    INTENT_EXTRA_KEY_IS_FOLDER_LINK,
-                    viewType == Constants.FOLDER_LINK_ADAPTER
-                )
-                putExtra(INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
-                putExtra(INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
-                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, fileNode.parentId.longValue)
-                putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, getCloudSortOrder.invoke())
-            }
-            getLocalFileForNodeUseCase(fileNode)?.let {
-                val path = it.path
-                if (path.contains(Environment.getExternalStorageDirectory().path)) {
-                    intentInternalIntentPair.first.setDataAndType(
-                        FileProvider.getUriForFile(
-                            activity,
-                            AUTHORITY_STRING_FILE_PROVIDER,
-                            it
-                        ),
-                        MimeTypeList.typeForName(fileNode.name).type
+            val typedNode = addNodeType(fileNode) as? TypedFileNode
+            typedNode?.let { node ->
+                runCatching {
+                    getFolderLinkNodeContentUriUseCase(node)
+                }.onSuccess { contentUri ->
+                    megaNavigator.openMediaPlayerActivityByFileNode(
+                        context = activity,
+                        contentUri = contentUri,
+                        fileNode = node,
+                        viewType = viewType,
+                        isFolderLink = viewType == FOLDER_LINK_ADAPTER,
+                        sortOrder = getCloudSortOrder()
                     )
-                } else {
-                    intentInternalIntentPair.first.setDataAndType(
-                        Uri.fromFile(it),
-                        MimeTypeList.typeForName(fileNode.name).type
-                    )
+                }.onFailure {
+                    Timber.e(it)
                 }
-                intentInternalIntentPair.first.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            } ?: run {
-                startHttpServer(intentInternalIntentPair.first)
-                val path =
-                    getFileUrlByNodeHandleUseCase(fileNode.id.longValue)
-                        ?: throw UrlDownloadException()
-                intentInternalIntentPair.first.setDataAndType(Uri.parse(path), mimeType)
+                null
             }
-            if (opusFile) {
-                intentInternalIntentPair.first.setDataAndType(
-                    intentInternalIntentPair.first.data,
-                    "audio/*"
-                )
-            }
-            intentInternalIntentPair.first
-
         } else if (MimeTypeList.typeForName(fileNode.name).isImage) {
             when (viewType) {
                 FILE_BROWSER_ADAPTER -> {
@@ -301,7 +260,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                 }
             }
         } else {
-            if (viewType == Constants.FOLDER_LINK_ADAPTER) {
+            if (viewType == FOLDER_LINK_ADAPTER) {
                 (activity as FolderLinkComposeActivity).downloadNodes(listOf(addNodeType(fileNode)))
             } else {
                 getNodeByHandle(fileNode.id.longValue)?.let { node ->
