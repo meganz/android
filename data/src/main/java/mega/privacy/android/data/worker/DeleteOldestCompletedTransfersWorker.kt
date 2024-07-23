@@ -20,6 +20,7 @@ class DeleteOldestCompletedTransfersWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         runCatching {
+            megaLocalRoomGateway.migrateLegacyCompletedTransfers()
             megaLocalRoomGateway.deleteOldestCompletedTransfers()
         }.onFailure {
             Timber.e(it)

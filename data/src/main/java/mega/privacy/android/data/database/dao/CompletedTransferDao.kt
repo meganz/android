@@ -6,17 +6,20 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS
+import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS_LEGACY
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
+import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 
 @Dao
 internal interface CompletedTransferDao {
-    @Query("SELECT * FROM completedtransfers")
+    @Query("SELECT * FROM $TABLE_COMPLETED_TRANSFERS")
     fun getAllCompletedTransfers(): Flow<List<CompletedTransferEntity>>
 
-    @Query("SELECT * FROM completedtransfers WHERE transferstate IN(:states)")
+    @Query("SELECT * FROM $TABLE_COMPLETED_TRANSFERS WHERE transferstate IN(:states)")
     fun getCompletedTransfersByState(states: List<String>): List<CompletedTransferEntity>
 
-    @Query("SELECT * FROM completedtransfers WHERE id = :id")
+    @Query("SELECT * FROM $TABLE_COMPLETED_TRANSFERS WHERE id = :id")
     suspend fun getCompletedTransferById(id: Int): CompletedTransferEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -38,10 +41,13 @@ internal interface CompletedTransferDao {
         }
     }
 
-    @Query("DELETE FROM completedtransfers")
+    @Query("DELETE FROM $TABLE_COMPLETED_TRANSFERS")
     suspend fun deleteAllCompletedTransfers()
 
-    @Query("DELETE FROM completedtransfers WHERE id IN(:ids)")
+    @Query("DELETE FROM $TABLE_COMPLETED_TRANSFERS_LEGACY")
+    suspend fun deleteAllLegacyCompletedTransfers()
+
+    @Query("DELETE FROM $TABLE_COMPLETED_TRANSFERS WHERE id IN(:ids)")
     suspend fun deleteCompletedTransferByIds(ids: List<Int>)
 
     /**
@@ -54,6 +60,9 @@ internal interface CompletedTransferDao {
         }
     }
 
-    @Query("SELECT COUNT(id) FROM completedtransfers")
+    @Query("SELECT COUNT(id) FROM $TABLE_COMPLETED_TRANSFERS")
     suspend fun getCompletedTransfersCount(): Int
+
+    @Query("SELECT * FROM $TABLE_COMPLETED_TRANSFERS_LEGACY")
+    suspend fun getAllLegacyCompletedTransfers(): List<CompletedTransferEntityLegacy>
 }

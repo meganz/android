@@ -27,6 +27,7 @@ import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
+import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLegacyModelMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
@@ -53,6 +54,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val activeTransferDao: ActiveTransferDao,
     private val completedTransferModelMapper: CompletedTransferModelMapper,
     private val completedTransferEntityMapper: CompletedTransferEntityMapper,
+    private val completedTransferLegacyModelMapper: CompletedTransferLegacyModelMapper,
     private val activeTransferEntityMapper: ActiveTransferEntityMapper,
     private val sdTransferDao: SdTransferDao,
     private val sdTransferModelMapper: SdTransferModelMapper,
@@ -192,6 +194,18 @@ internal class MegaLocalRoomFacade @Inject constructor(
                 deleteCompletedTransferBatch(deletedTransfers)
             }
         }
+    }
+
+    override suspend fun migrateLegacyCompletedTransfers() {
+        completedTransferDao.getAllLegacyCompletedTransfers()
+            .takeIf { it.isNotEmpty() }
+            ?.let { legacyEntities ->
+                val firstHundred = legacyEntities
+                    .sortedWith(compareByDescending { it.timestamp })
+                    .take(100)
+                addCompletedTransfers(firstHundred.map { completedTransferLegacyModelMapper(it) })
+                completedTransferDao.deleteAllLegacyCompletedTransfers()
+            }
     }
 
     override suspend fun getActiveTransferByTag(tag: Int) =

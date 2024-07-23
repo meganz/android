@@ -37,20 +37,7 @@ class CompletedTransferDaoTest {
     @Test
     fun test_that_getAll_returns_all_items() = runTest {
         val entities = (1..10).map {
-            val entity = CompletedTransferEntity(
-                fileName = "2023-03-24 00.13.20_1.jpg",
-                type = "1",
-                state = "6",
-                size = "3.57 MB",
-                handle = "27169983390750",
-                path = "Cloud drive/Camera uploads",
-                isOffline = "false",
-                timestamp = "1684228012974",
-                error = "No error",
-                originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-                parentHandle = "11622336899311",
-                appData = "appData"
-            )
+            val entity = createCompletedTransferEntity()
             completedTransferDao.insertOrUpdateCompletedTransfer(entity)
             entity
         }
@@ -73,20 +60,7 @@ class CompletedTransferDaoTest {
 
     @Test
     fun test_that_getById_returns_the_corresponding_item() = runTest {
-        val entity = CompletedTransferEntity(
-            fileName = "2023-03-24 00.13.20_1.jpg",
-            type = "1",
-            state = "6",
-            size = "3.57 MB",
-            handle = "27169983390750",
-            path = "Cloud drive/Camera uploads",
-            isOffline = "false",
-            timestamp = "1684228012974",
-            error = "No error",
-            originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-            parentHandle = "11622336899311",
-            appData = null
-        )
+        val entity = createCompletedTransferEntity()
         completedTransferDao.insertOrUpdateCompletedTransfer(entity)
         val id = completedTransferDao.getAllCompletedTransfers().first().first().id
 
@@ -108,20 +82,7 @@ class CompletedTransferDaoTest {
 
     @Test
     fun test_that_insertOrUpdate_insert_the_corresponding_item() = runTest {
-        val entity = CompletedTransferEntity(
-            fileName = "2023-03-24 00.13.20_1.jpg",
-            type = "1",
-            state = "6",
-            size = "3.57 MB",
-            handle = "27169983390750",
-            path = "Cloud drive/Camera uploads",
-            isOffline = "false",
-            timestamp = "1684228012974",
-            error = "No error",
-            originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-            parentHandle = "11622336899311",
-            appData = "appData"
-        )
+        val entity = createCompletedTransferEntity()
         completedTransferDao.insertOrUpdateCompletedTransfer(entity)
 
         assertThat(completedTransferDao.getAllCompletedTransfers().first().size).isEqualTo(1)
@@ -130,19 +91,8 @@ class CompletedTransferDaoTest {
     @Test
     fun test_that_insertOrUpdateCompletedTransfers_insert_the_corresponding_items() = runTest {
         val expected = (1..10).map {
-            CompletedTransferEntity(
+            createCompletedTransferEntity(
                 fileName = "2023-03-24 00.13.20_$it.jpg",
-                type = "1",
-                state = "6",
-                size = "3.57 MB",
-                handle = "27169983390750",
-                path = "Cloud drive/Camera uploads",
-                isOffline = "false",
-                timestamp = "1684228012974",
-                error = "No error",
-                originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-                parentHandle = "11622336899311",
-                appData = "appData"
             )
         }
         completedTransferDao.insertOrUpdateCompletedTransfers(expected)
@@ -156,19 +106,8 @@ class CompletedTransferDaoTest {
     fun test_that_insertOrUpdateCompletedTransfers_chunked_insert_the_corresponding_items() =
         runTest {
             val expected = (1..15).map {
-                CompletedTransferEntity(
+                createCompletedTransferEntity(
                     fileName = "2023-03-24 00.13.20_$it.jpg",
-                    type = "1",
-                    state = "6",
-                    size = "3.57 MB",
-                    handle = "27169983390750",
-                    path = "Cloud drive/Camera uploads",
-                    isOffline = "false",
-                    timestamp = "1684228012974",
-                    error = "No error",
-                    originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-                    parentHandle = "11622336899311",
-                    appData = "appData"
                 )
             }
             completedTransferDao.insertOrUpdateCompletedTransfers(expected, 10)
@@ -181,20 +120,7 @@ class CompletedTransferDaoTest {
     @Test
     fun test_that_deleteAll_delete_all_items() = runTest {
         (1..10).map {
-            val entity = CompletedTransferEntity(
-                fileName = "2023-03-24 00.13.20_1.jpg",
-                type = "1",
-                state = "6",
-                size = "3.57 MB",
-                handle = "27169983390750",
-                path = "Cloud drive/Camera uploads",
-                isOffline = "false",
-                timestamp = "1684228012974",
-                error = "No error",
-                originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-                parentHandle = "11622336899311",
-                appData = "appData"
-            )
+            val entity = createCompletedTransferEntity()
             completedTransferDao.insertOrUpdateCompletedTransfer(entity)
             entity
         }
@@ -207,20 +133,7 @@ class CompletedTransferDaoTest {
     @Test
     fun test_that_deleteById_delete_the_corresponding_item() = runTest {
         (1..10).map {
-            val entity = CompletedTransferEntity(
-                fileName = "2023-03-24 00.13.20_1.jpg",
-                type = "1",
-                state = "6",
-                size = "3.57 MB",
-                handle = "27169983390750",
-                path = "Cloud drive/Camera uploads",
-                isOffline = "false",
-                timestamp = "1684228012974",
-                error = "No error",
-                originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-                parentHandle = "11622336899311",
-                appData = "appData"
-            )
+            val entity = createCompletedTransferEntity()
             completedTransferDao.insertOrUpdateCompletedTransfer(entity)
             entity
         }
@@ -240,19 +153,8 @@ class CompletedTransferDaoTest {
     fun test_that_deleteCompletedTransfers_chunked_deletes_the_corresponding_items() =
         runTest {
             val entities = (1..15).map {
-                CompletedTransferEntity(
+                createCompletedTransferEntity(
                     fileName = "2023-03-24 00.13.20_$it.jpg",
-                    type = "1",
-                    state = "6",
-                    size = "3.57 MB",
-                    handle = "27169983390750",
-                    path = "Cloud drive/Camera uploads",
-                    isOffline = "false",
-                    timestamp = "1684228012974",
-                    error = "No error",
-                    originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-                    parentHandle = "11622336899311",
-                    appData = "appData"
                 )
             }
 
@@ -271,24 +173,27 @@ class CompletedTransferDaoTest {
     fun test_that_getCount_returns_the_items_count() = runTest {
         val expected = 10
         (1..expected).map {
-            val entity = CompletedTransferEntity(
-                fileName = "2023-03-24 00.13.20_1.jpg",
-                type = "1",
-                state = "6",
-                size = "3.57 MB",
-                handle = "27169983390750",
-                path = "Cloud drive/Camera uploads",
-                isOffline = "false",
-                timestamp = "1684228012974",
-                error = "No error",
-                originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-                parentHandle = "11622336899311",
-                appData = "appData"
-            )
+            val entity = createCompletedTransferEntity()
             completedTransferDao.insertOrUpdateCompletedTransfer(entity)
             entity
         }
 
         assertThat(completedTransferDao.getCompletedTransfersCount()).isEqualTo(expected)
     }
+
+    private fun createCompletedTransferEntity(fileName: String = "2023-03-24 00.13.20_1.jpg") =
+        CompletedTransferEntity(
+            fileName = fileName,
+            type = 1,
+            state = 6,
+            size = "3.57 MB",
+            handle = 27169983390750L,
+            path = "Cloud drive/Camera uploads",
+            isOffline = false,
+            timestamp = 1684228012974L,
+            error = "No error",
+            originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
+            parentHandle = 11622336899311L,
+            appData = "appData"
+        )
 }

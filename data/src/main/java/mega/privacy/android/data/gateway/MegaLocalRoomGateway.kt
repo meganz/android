@@ -170,6 +170,11 @@ interface MegaLocalRoomGateway {
     suspend fun deleteOldestCompletedTransfers()
 
     /**
+     * Migrate legacy completed transfers
+     */
+    suspend fun migrateLegacyCompletedTransfers()
+
+    /**
      * Get active transfer by tag
      */
     suspend fun getActiveTransferByTag(tag: Int): ActiveTransfer?

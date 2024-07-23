@@ -23,6 +23,7 @@ import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
+import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
@@ -36,6 +37,7 @@ import timber.log.Timber
     entities = [
         ContactEntity::class,
         CompletedTransferEntity::class,
+        CompletedTransferEntityLegacy::class,
         ActiveTransferEntity::class,
         SdTransferEntity::class,
         BackupEntity::class,
@@ -60,6 +62,7 @@ import timber.log.Timber
         AutoMigration(84, 85),
         AutoMigration(86, 87),
         AutoMigration(87, 88),
+        AutoMigration(88, 89),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {

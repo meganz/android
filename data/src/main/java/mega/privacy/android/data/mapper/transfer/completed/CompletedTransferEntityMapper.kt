@@ -1,26 +1,23 @@
 package mega.privacy.android.data.mapper.transfer.completed
 
-import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import javax.inject.Inject
 
-internal class CompletedTransferEntityMapper @Inject constructor(
-    private val encryptData: EncryptData,
-) {
+internal class CompletedTransferEntityMapper @Inject constructor() {
     suspend operator fun invoke(completedTransfer: CompletedTransfer) = CompletedTransferEntity(
         id = completedTransfer.id?.takeIf { it > 0 },
-        fileName = encryptData(completedTransfer.fileName),
-        type = encryptData(completedTransfer.type.toString()),
-        state = encryptData(completedTransfer.state.toString()),
-        size = encryptData(completedTransfer.size),
-        handle = encryptData(completedTransfer.handle.toString()),
-        path = encryptData(completedTransfer.path),
-        isOffline = encryptData(completedTransfer.isOffline.toString()),
-        timestamp = encryptData(completedTransfer.timestamp.toString()),
-        error = encryptData(completedTransfer.error),
-        originalPath = encryptData(completedTransfer.originalPath),
-        parentHandle = encryptData(completedTransfer.parentHandle.toString()),
-        appData = encryptData(completedTransfer.appData),
+        fileName = completedTransfer.fileName,
+        type = completedTransfer.type,
+        state = completedTransfer.state,
+        size = completedTransfer.size,
+        handle = completedTransfer.handle,
+        path = completedTransfer.path,
+        isOffline = completedTransfer.isOffline,
+        timestamp = completedTransfer.timestamp,
+        error = completedTransfer.error,
+        originalPath = completedTransfer.originalPath,
+        parentHandle = completedTransfer.parentHandle,
+        appData = completedTransfer.appData,
     )
 }
