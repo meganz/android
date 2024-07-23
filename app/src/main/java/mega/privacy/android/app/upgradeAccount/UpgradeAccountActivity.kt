@@ -3,6 +3,7 @@ package mega.privacy.android.app.upgradeAccount
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -20,6 +21,7 @@ class UpgradeAccountActivity : AppCompatActivity() {
      */
     @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_upgrade_account)
