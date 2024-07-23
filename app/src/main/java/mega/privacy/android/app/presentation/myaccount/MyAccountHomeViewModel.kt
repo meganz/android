@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
@@ -57,8 +58,9 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
+    private val accountNameMapper: AccountNameMapper,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(MyAccountHomeUIState())
+    private val _uiState = MutableStateFlow(MyAccountHomeUIState(accountTypeNameResource = accountNameMapper(null)))
 
     /**
      * My Account Home Fragment Ui State
@@ -190,6 +192,7 @@ class MyAccountHomeViewModel @Inject constructor(
                         isBusinessAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
                         isProFlexiAccount = accountDetails.accountTypeIdentifier == AccountType.PRO_FLEXI,
                         isMasterBusinessAccount = accountDetails.isMasterBusinessAccount,
+                        accountTypeNameResource = accountNameMapper(accountDetails.accountTypeIdentifier)
                     )
                 }
 

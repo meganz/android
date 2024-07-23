@@ -3,15 +3,16 @@ package mega.privacy.android.app.upgradeAccount.view
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.PaymentPlatformType
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 
 @Composable
 fun BuyNewSubscriptionDialog(
-    upgradeTypeInt: Int,
+    upgradeType: AccountType,
     paymentMethod: PaymentMethod,
-    onDialogPositiveButtonClicked: (Int) -> Unit,
+    onDialogPositiveButtonClicked: (AccountType) -> Unit,
     onDialogDismissButtonClicked: () -> Unit,
 ) {
     ConfirmationDialog(
@@ -19,7 +20,7 @@ fun BuyNewSubscriptionDialog(
         text = chooseCorrectBodyString(paymentMethod),
         confirmButtonText = stringResource(id = R.string.button_buy_new_subscription),
         cancelButtonText = stringResource(id = R.string.general_dismiss),
-        onConfirm = { onDialogPositiveButtonClicked(upgradeTypeInt) },
+        onConfirm = { onDialogPositiveButtonClicked(upgradeType) },
         onDismiss = { onDialogDismissButtonClicked() })
 }
 

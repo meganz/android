@@ -30,7 +30,6 @@ import mega.privacy.android.app.upgradeAccount.view.ChooseAccountView
 import mega.privacy.android.app.upgradeAccount.view.VariantAOnboardingDialogView
 import mega.privacy.android.app.upgradeAccount.view.VariantBOnboardingDialogView
 import mega.privacy.android.app.utils.billing.PaymentUtils
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
@@ -38,6 +37,7 @@ import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantAViewProPlansButtonEvent
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantBFreePlanContinueButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantBProIIIPlanContinueButtonPressedEvent
@@ -66,7 +66,7 @@ class ChooseAccountFragment : Fragment() {
 
     private val billingViewModel by activityViewModels<BillingViewModel>()
 
-    internal lateinit var chooseAccountActivity: ChooseAccountActivity
+    private lateinit var chooseAccountActivity: ChooseAccountActivity
 
 
     @Inject
@@ -119,14 +119,12 @@ class ChooseAccountFragment : Fragment() {
                     onBackPressed = chooseAccountActivity::onFreeClick,
                     onContinueClicked = {
                         callContinueButtonAnalytics(uiState.chosenPlan)
-                        val chosenPlan =
-                            UpgradeAccountFragment.convertAccountTypeToInt(uiState.chosenPlan)
                         if (uiState.chosenPlan === AccountType.FREE) {
                             chooseAccountActivity.onFreeClick()
                         } else {
                             billingViewModel.startPurchase(
                                 chooseAccountActivity,
-                                getProductId(uiState.isMonthlySelected, chosenPlan),
+                                getProductId(uiState.isMonthlySelected, uiState.chosenPlan),
                             )
                         }
                     },

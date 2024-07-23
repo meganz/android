@@ -71,7 +71,6 @@ import mega.privacy.android.app.upgradeAccount.view.components.MonthlyYearlyTabs
 import mega.privacy.android.app.upgradeAccount.view.components.ProPlanInfoCard
 import mega.privacy.android.app.upgradeAccount.view.components.SaveUpToLabel
 import mega.privacy.android.app.upgradeAccount.view.components.SubscriptionDetails
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.PRICING_PAGE_URL
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
@@ -111,7 +110,7 @@ fun UpgradeAccountView(
     onChoosingPlanType: (chosenPlan: AccountType) -> Unit,
     hideBillingWarning: () -> Unit,
     showBillingWarning: () -> Unit,
-    onDialogConfirmButtonClicked: (Int) -> Unit,
+    onDialogConfirmButtonClicked: (AccountType) -> Unit,
     onDialogDismissButtonClicked: () -> Unit,
     showUpgradeWarningBanner: Boolean,
     modifier: Modifier = Modifier,
@@ -302,7 +301,7 @@ fun UpgradeAccountView(
     }
     if (state.showBuyNewSubscriptionDialog) {
         BuyNewSubscriptionDialog(
-            upgradeTypeInt = state.currentPayment.upgradeType,
+            upgradeType = state.currentPayment.upgradeType,
             paymentMethod = state.currentPayment.currentPayment ?: return,
             onDialogPositiveButtonClicked = onDialogConfirmButtonClicked,
             onDialogDismissButtonClicked = { onDialogDismissButtonClicked() }
@@ -682,7 +681,7 @@ private class UpgradeAccountPreviewProvider :
                 showBillingWarning = false,
                 showBuyNewSubscriptionDialog = false,
                 currentPayment = UpgradePayment(
-                    upgradeType = INVALID_VALUE,
+                    upgradeType = AccountType.UNKNOWN,
                     currentPayment = null,
                 ),
             )

@@ -51,7 +51,6 @@ import mega.privacy.android.app.utils.Constants.ACTION_REFRESH
 import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
-import mega.privacy.android.app.utils.Constants.FREE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
@@ -499,14 +498,20 @@ class MyAccountViewModel @Inject constructor(
      *
      * @return
      */
-    fun getAccountType(): Int = myAccountInfo.accountType
+    fun getAccountType(): AccountType = when (myAccountInfo.accountType) {
+        Constants.PRO_LITE -> AccountType.PRO_LITE
+        Constants.PRO_I -> AccountType.PRO_I
+        Constants.PRO_II -> AccountType.PRO_II
+        Constants.PRO_III -> AccountType.PRO_III
+        else -> AccountType.UNKNOWN
+    }
 
     /**
      * Is free account
      *
      * @return
      */
-    fun isFreeAccount(): Boolean = getAccountType() == FREE
+    fun isFreeAccount(): Boolean = getAccountType().isPaid.not()
 
     /**
      * Get used storage

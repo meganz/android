@@ -64,7 +64,6 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
-import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.mobile.analytics.event.CancelSubscriptionMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ToolbarOverflowMenuItemEvent
 import nz.mega.sdk.MegaApiJava
@@ -509,7 +508,7 @@ class MyAccountActivity : PasscodeActivity(),
         startActivity(
             Intent(this, CancelAccountPlanActivity::class.java)
                 .putExtra(
-                    CancelAccountPlanActivity.EXTRA_ACCOUNT_TYPE, accountType
+                    CancelAccountPlanActivity.EXTRA_ACCOUNT_TYPE, accountType.name
                 ).putExtra(
                     CancelAccountPlanActivity.EXTRA_TRANSFER_QUOTA, totalTransfer
                 ).putExtra(

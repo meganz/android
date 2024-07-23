@@ -29,7 +29,6 @@ import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion.getProductId
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.billing.PaymentUtils
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
@@ -103,12 +102,11 @@ class UpgradeAccountFragment : Fragment() {
                 state = uiState,
                 onBackPressed = { trackAndFinish() },
                 onBuyClicked = {
-                    val chosenPlan = convertAccountTypeToInt(uiState.chosenPlan)
-                    upgradeAccountViewModel.currentPaymentCheck(chosenPlan)
+                    upgradeAccountViewModel.currentPaymentCheck(uiState.chosenPlan)
                     if (uiState.currentPayment == UpgradePayment() ||
                         PaymentPlatformType.SUBSCRIPTION_FROM_GOOGLE_PLATFORM == uiState.currentPayment.currentPayment?.platformType
                     ) {
-                        startPurchase(uiState.isMonthlySelected, chosenPlan)
+                        startPurchase(uiState.isMonthlySelected, uiState.chosenPlan)
                     }
                     Analytics.tracker.trackEvent(UpgradeAccountBuyButtonPressedEvent)
                 },
@@ -133,7 +131,7 @@ class UpgradeAccountFragment : Fragment() {
                     )
                     startPurchase(
                         uiState.isMonthlySelected,
-                        convertAccountTypeToInt(uiState.chosenPlan)
+                        uiState.chosenPlan
                     )
                 },
                 onDialogDismissButtonClicked = {
@@ -153,7 +151,7 @@ class UpgradeAccountFragment : Fragment() {
 
     private fun startPurchase(
         isMonthlySelected: Boolean,
-        chosenPlan: Int,
+        chosenPlan: AccountType,
     ) {
         billingViewModel.startPurchase(
             upgradeAccountActivity,
@@ -215,20 +213,6 @@ class UpgradeAccountFragment : Fragment() {
             upgradeAccountActivity.startActivity(intent)
         } else {
             upgradeAccountActivity.onBackPressedDispatcher.onBackPressed()
-        }
-    }
-
-    companion object {
-        const val PRIVACY_POLICY_URL = "https://mega.nz/privacy"
-
-        internal fun convertAccountTypeToInt(accountType: AccountType): Int {
-            return when (accountType) {
-                AccountType.PRO_LITE -> Constants.PRO_LITE
-                AccountType.PRO_I -> Constants.PRO_I
-                AccountType.PRO_II -> Constants.PRO_II
-                AccountType.PRO_III -> Constants.PRO_III
-                else -> Constants.INVALID_VALUE
-            }
         }
     }
 }

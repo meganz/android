@@ -14,7 +14,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountFragment
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider.Companion.localisedSubscriptionsList
 import mega.privacy.android.app.upgradeAccount.view.GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG
@@ -22,17 +21,17 @@ import mega.privacy.android.app.upgradeAccount.view.SUBSCRIPTION_DETAILS_DESCRIP
 import mega.privacy.android.app.upgradeAccount.view.SUBSCRIPTION_DETAILS_TITLE_TAG
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.PLAY_STORE_SUBSCRIPTION_URL
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import java.util.Locale
 
 /**
@@ -168,10 +167,11 @@ internal fun SubscriptionDetails(
                     ), Constants.TERMS_OF_SERVICE_URL
                 ),
                 SpanIndicator('C') to MegaSpanStyleWithAnnotation(
-                    MegaSpanStyle(
-                        SpanStyle(textDecoration = TextDecoration.None),
+                    megaSpanStyle = MegaSpanStyle(
+                        spanStyle = SpanStyle(textDecoration = TextDecoration.None),
                         color = TextColor.Accent,
-                    ), UpgradeAccountFragment.PRIVACY_POLICY_URL
+                    ),
+                    annotation = "https://mega.nz/privacy"
                 ),
             ),
             onAnnotationClick = onLinkClick,

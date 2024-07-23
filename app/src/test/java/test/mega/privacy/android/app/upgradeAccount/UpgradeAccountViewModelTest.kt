@@ -18,7 +18,6 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
@@ -191,7 +190,7 @@ class UpgradeAccountViewModelTest {
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
             initViewModel()
-            underTest.currentPaymentCheck(Constants.PRO_II)
+            underTest.currentPaymentCheck(AccountType.PRO_II)
 
             underTest.state.map { it.currentPayment }.distinctUntilChanged().test {
                 assertThat(awaitItem()).isEqualTo(expectedCurrentPaymentUpdated)
@@ -335,9 +334,9 @@ class UpgradeAccountViewModelTest {
     private val expectedCurrentPlan = AccountType.PRO_I
     private val expectedShowBuyNewSubscriptionDialog = true
     private val expectedCurrentPayment =
-        UpgradePayment(Constants.INVALID_VALUE, PaymentMethod.ITUNES)
+        UpgradePayment(AccountType.UNKNOWN, PaymentMethod.ITUNES)
     private val expectedCurrentPaymentUpdated =
-        UpgradePayment(Constants.PRO_II, PaymentMethod.ITUNES)
+        UpgradePayment(AccountType.PRO_II, PaymentMethod.ITUNES)
     private val expectedAccountDetailWithMonthlySubscription = AccountDetail(
         storageDetail = null,
         sessionDetail = null,

@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.myaccount.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -117,6 +117,7 @@ import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.amber_700_amber_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
@@ -134,7 +135,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPr
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.white
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import org.jetbrains.anko.displayMetrics
 import java.io.File
 
@@ -499,7 +499,7 @@ private fun AccountInfoSection(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 8.dp),
-            accountType = uiState.accountType,
+            accountDescription = uiState.accountTypeNameResource,
             showUpgradeButton = isUpgradeButtonEnabled,
             onButtonClickListener = {
                 uiActions.onUpgradeAccount()
@@ -657,35 +657,14 @@ private fun AccountInfoSection(
     }
 }
 
-/**
- * Get the account description based on the account type
- * @param accountType Account type
- */
-private fun getAccountDescriptionResId(accountType: AccountType?): Int =
-    when (accountType) {
-        AccountType.FREE -> R.string.free_account
-        AccountType.PRO_LITE -> R.string.prolite_account
-        AccountType.PRO_I -> R.string.pro1_account
-        AccountType.PRO_II -> R.string.pro2_account
-        AccountType.PRO_III -> R.string.pro3_account
-        AccountType.PRO_FLEXI -> R.string.pro_flexi_account
-        AccountType.BUSINESS -> R.string.business_label
-        AccountType.STARTER -> sharedR.string.general_low_tier_plan_starter_label
-        AccountType.BASIC -> sharedR.string.general_low_tier_plan_basic_label
-        AccountType.ESSENTIAL -> sharedR.string.general_low_tier_plan_essential_label
-        else -> R.string.recovering_info
-    }
-
 @Composable
 internal fun AccountTypeSection(
-    accountType: AccountType?,
+    @StringRes accountDescription: Int,
     showUpgradeButton: Boolean,
     onButtonClickListener: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
-    val accountDescription =
-        remember(accountType) { getAccountDescriptionResId(accountType = accountType) }
     ConstraintLayout(
         modifier = modifier
             .testTag(ACCOUNT_TYPE_SECTION)
@@ -988,20 +967,21 @@ internal fun MyAccountHomePreview() {
                 verifiedPhoneNumber = null,
                 avatarColor = R.color.dark_grey,
                 accountType = AccountType.BUSINESS,
-                usedTransfer = 100,
-                totalTransfer = 1000,
-                usedStorage = 500,
-                totalStorage = 1000,
-                usedStoragePercentage = 130,
-                usedTransferPercentage = 10,
                 isBusinessAccount = true,
-                hasExpireAbleSubscription = true,
-                hasRenewableSubscription = true,
                 isMasterBusinessAccount = true,
                 isBusinessProFlexiStatusActive = false,
+                businessProFlexiStatus = BusinessAccountStatus.Expired,
+                hasRenewableSubscription = true,
+                hasExpireAbleSubscription = true,
+                usedStorage = 500,
+                usedStoragePercentage = 130,
+                usedTransfer = 100,
+                usedTransferPercentage = 10,
+                totalStorage = 1000,
+                totalTransfer = 1000,
                 subscriptionRenewTime = 1000000,
                 proExpirationTime = 150000,
-                businessProFlexiStatus = BusinessAccountStatus.Expired
+                accountTypeNameResource = 0
             ),
             uiActions = object : MyAccountHomeViewActions {
                 override val isPhoneNumberDialogShown: Boolean

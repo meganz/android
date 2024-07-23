@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewModel
+import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
@@ -116,6 +117,7 @@ class MyAccountHomeViewModelTest {
             getCurrentUserEmail,
             getUserFullNameUseCase,
             getMyAvatarFileUseCase,
+            accountNameMapper = AccountNameMapper(),
         )
     }
 

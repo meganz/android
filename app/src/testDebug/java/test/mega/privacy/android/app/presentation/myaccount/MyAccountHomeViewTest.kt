@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.myaccount
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -17,8 +18,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewActions
+import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.app.presentation.myaccount.view.AccountTypeSection
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACCOUNT_TYPE_SECTION
@@ -47,7 +48,16 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRAN
 import mega.privacy.android.app.presentation.myaccount.view.MyAccountHeader
 import mega.privacy.android.app.presentation.myaccount.view.MyAccountHomeView
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.AccountType.*
+import mega.privacy.android.domain.entity.AccountType.BASIC
+import mega.privacy.android.domain.entity.AccountType.BUSINESS
+import mega.privacy.android.domain.entity.AccountType.ESSENTIAL
+import mega.privacy.android.domain.entity.AccountType.FREE
+import mega.privacy.android.domain.entity.AccountType.PRO_FLEXI
+import mega.privacy.android.domain.entity.AccountType.PRO_I
+import mega.privacy.android.domain.entity.AccountType.PRO_II
+import mega.privacy.android.domain.entity.AccountType.PRO_III
+import mega.privacy.android.domain.entity.AccountType.PRO_LITE
+import mega.privacy.android.domain.entity.AccountType.STARTER
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import org.junit.Rule
 import org.junit.Test
@@ -71,7 +81,13 @@ class MyAccountHomeViewTest {
         navController.navigatorProvider.addNavigator(ComposeNavigator())
     }
 
-    private fun initMyAccountWithDefaults(uiState: MyAccountHomeUIState = MyAccountHomeUIState()) {
+    private val defaultAccountNameResource = AccountNameMapper()(null)
+
+    private fun initMyAccountWithDefaults(
+        uiState: MyAccountHomeUIState = MyAccountHomeUIState(
+            accountTypeNameResource = defaultAccountNameResource
+        ),
+    ) {
         composeTestRule.setContent {
             initNavHostController()
 
@@ -172,7 +188,8 @@ class MyAccountHomeViewTest {
             MyAccountHomeUIState(
                 accountType = BUSINESS,
                 isBusinessAccount = true,
-                isMasterBusinessAccount = true
+                isMasterBusinessAccount = true,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -185,6 +202,7 @@ class MyAccountHomeViewTest {
             MyAccountHomeUIState(
                 accountType = PRO_FLEXI,
                 isBusinessAccount = true,
+                accountTypeNameResource = defaultAccountNameResource,
             )
         )
 
@@ -193,7 +211,12 @@ class MyAccountHomeViewTest {
 
     @Test
     fun `test that account type button text should render with correct text when account not business account`() {
-        initMyAccountWithDefaults(MyAccountHomeUIState(accountType = PRO_I))
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                accountType = PRO_I,
+                accountTypeNameResource = defaultAccountNameResource
+            )
+        )
 
         composeTestRule.onNodeWithTag(UPGRADE_BUTTON).assertIsDisplayed()
             .assert(hasText(fromId(R.string.my_account_upgrade_pro)))
@@ -204,7 +227,8 @@ class MyAccountHomeViewTest {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
-                isBusinessProFlexiStatusActive = false
+                isBusinessProFlexiStatusActive = false,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -216,7 +240,8 @@ class MyAccountHomeViewTest {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
-                isBusinessProFlexiStatusActive = false
+                isBusinessProFlexiStatusActive = false,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -229,7 +254,8 @@ class MyAccountHomeViewTest {
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
                 isBusinessProFlexiStatusActive = false,
-                businessProFlexiStatus = BusinessAccountStatus.Expired
+                businessProFlexiStatus = BusinessAccountStatus.Expired,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -244,7 +270,8 @@ class MyAccountHomeViewTest {
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
                 isBusinessProFlexiStatusActive = false,
-                businessProFlexiStatus = BusinessAccountStatus.GracePeriod
+                businessProFlexiStatus = BusinessAccountStatus.GracePeriod,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -259,7 +286,8 @@ class MyAccountHomeViewTest {
             MyAccountHomeUIState(
                 isMasterBusinessAccount = true,
                 isBusinessProFlexiStatusActive = true,
-                businessProFlexiStatus = BusinessAccountStatus.Active
+                businessProFlexiStatus = BusinessAccountStatus.Active,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -273,7 +301,8 @@ class MyAccountHomeViewTest {
                 isMasterBusinessAccount = true,
                 isBusinessProFlexiStatusActive = true,
                 hasRenewableSubscription = true,
-                hasExpireAbleSubscription = true
+                hasExpireAbleSubscription = true,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -287,7 +316,8 @@ class MyAccountHomeViewTest {
                 isBusinessAccount = false,
                 isMasterBusinessAccount = false,
                 hasRenewableSubscription = true,
-                hasExpireAbleSubscription = true
+                hasExpireAbleSubscription = true,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -301,7 +331,8 @@ class MyAccountHomeViewTest {
                 isBusinessAccount = false,
                 isMasterBusinessAccount = false,
                 hasRenewableSubscription = false,
-                hasExpireAbleSubscription = false
+                hasExpireAbleSubscription = false,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -312,7 +343,8 @@ class MyAccountHomeViewTest {
     fun `test that usage transfer should be invisible when account type is FREE`() {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
-                accountType = FREE
+                accountType = FREE,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -322,7 +354,10 @@ class MyAccountHomeViewTest {
     @Test
     fun `test that usage transfer should be visible when account type is not FREE`() {
         initMyAccountWithDefaults(
-            MyAccountHomeUIState(accountType = PRO_I)
+            MyAccountHomeUIState(
+                accountType = PRO_I,
+                accountTypeNameResource = defaultAccountNameResource
+            )
         )
 
         composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_SECTION, useUnmergedTree = true)
@@ -333,8 +368,9 @@ class MyAccountHomeViewTest {
     fun `test that usage progress bar should be invisible and usage meter layout for Business or Pro Flexi is shown instead when account is BUSINESS`() {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
+                accountType = BUSINESS,
                 isBusinessAccount = true,
-                accountType = BUSINESS
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -352,6 +388,7 @@ class MyAccountHomeViewTest {
             MyAccountHomeUIState(
                 accountType = PRO_FLEXI,
                 isProFlexiAccount = true,
+                accountTypeNameResource = defaultAccountNameResource,
             )
         )
 
@@ -370,7 +407,12 @@ class MyAccountHomeViewTest {
             .filter { it != PRO_FLEXI }
             .filter { it != FREE }
             .random()
-        initMyAccountWithDefaults(MyAccountHomeUIState(accountType = randomAccountType))
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                accountType = randomAccountType,
+                accountTypeNameResource = defaultAccountNameResource
+            )
+        )
 
         composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_PROGRESS, useUnmergedTree = true)
             .assertIsDisplayed()
@@ -393,8 +435,9 @@ class MyAccountHomeViewTest {
     fun `test that add phone number menu should be visible when phone number can be verified`() {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
+                verifiedPhoneNumber = null,
                 canVerifyPhoneNumber = true,
-                verifiedPhoneNumber = null
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -405,8 +448,9 @@ class MyAccountHomeViewTest {
     fun `test that add phone number section should be invisible when phone number existed`() {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
+                verifiedPhoneNumber = "1231231231",
                 canVerifyPhoneNumber = false,
-                verifiedPhoneNumber = "1231231231"
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -418,7 +462,10 @@ class MyAccountHomeViewTest {
         val randomContact = Random.nextInt(from = 1, until = 100)
 
         initMyAccountWithDefaults(
-            MyAccountHomeUIState(visibleContacts = randomContact)
+            MyAccountHomeUIState(
+                visibleContacts = randomContact,
+                accountTypeNameResource = defaultAccountNameResource
+            )
         )
 
         composeTestRule.onNodeWithTag(testTag = "${CONTACTS}_description", useUnmergedTree = true)
@@ -429,7 +476,11 @@ class MyAccountHomeViewTest {
     @Test
     fun `test that achievements should not be visible if account type is BUSINESS`() {
         initMyAccountWithDefaults(
-            MyAccountHomeUIState(isBusinessAccount = true, accountType = BUSINESS)
+            MyAccountHomeUIState(
+                accountType = BUSINESS,
+                isBusinessAccount = true,
+                accountTypeNameResource = defaultAccountNameResource
+            )
         )
 
         composeTestRule.onNodeWithTag(ACHIEVEMENTS).assertDoesNotExist()
@@ -440,6 +491,7 @@ class MyAccountHomeViewTest {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 canVerifyPhoneNumber = true,
+                accountTypeNameResource = defaultAccountNameResource,
             )
         )
 
@@ -458,7 +510,8 @@ class MyAccountHomeViewTest {
                 isMasterBusinessAccount = true,
                 isBusinessProFlexiStatusActive = false,
                 hasRenewableSubscription = true,
-                subscriptionRenewTime = dueDateInSeconds
+                subscriptionRenewTime = dueDateInSeconds,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -475,7 +528,8 @@ class MyAccountHomeViewTest {
                 isMasterBusinessAccount = true,
                 isBusinessProFlexiStatusActive = false,
                 hasRenewableSubscription = true,
-                subscriptionRenewTime = dueDateInSeconds
+                subscriptionRenewTime = dueDateInSeconds,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -490,7 +544,8 @@ class MyAccountHomeViewTest {
             MyAccountHomeUIState(
                 isBusinessAccount = false,
                 hasRenewableSubscription = true,
-                subscriptionRenewTime = dueDateInSeconds
+                subscriptionRenewTime = dueDateInSeconds,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -506,7 +561,8 @@ class MyAccountHomeViewTest {
             MyAccountHomeUIState(
                 isBusinessAccount = false,
                 hasRenewableSubscription = true,
-                subscriptionRenewTime = dueDateInSeconds
+                subscriptionRenewTime = dueDateInSeconds,
+                accountTypeNameResource = defaultAccountNameResource
             )
         )
 
@@ -520,7 +576,10 @@ class MyAccountHomeViewTest {
         val maxScreenWidth = 720.dp
 
         initMyAccountWithDefaults(
-            MyAccountHomeUIState(name = sampleText)
+            MyAccountHomeUIState(
+                name = sampleText,
+                accountTypeNameResource = defaultAccountNameResource
+            )
         )
 
         val maxWidth = composeTestRule.onNodeWithTag(NAME_TEXT)
@@ -540,7 +599,7 @@ class MyAccountHomeViewTest {
     ) {
         composeTestRule.setContent {
             AccountTypeSection(
-                accountType = accountType,
+                accountDescription = AccountNameMapper()(accountType),
                 showUpgradeButton = true,
                 onButtonClickListener = {}
             )

@@ -14,15 +14,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
 import mega.privacy.android.app.presentation.cancelaccountplan.model.UIAccountDetails
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.CancellationInstructionsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion.getProductId
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MANAGE_PLAY_STORE_SUBSCRIPTION_URL
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -51,12 +51,17 @@ class CancelAccountPlanActivity : AppCompatActivity() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var accountNameMapper: AccountNameMapper
+
     private val viewModel: CancelAccountPlanViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val accountType = intent.getIntExtra(EXTRA_ACCOUNT_TYPE, 0)
+        val accountType = intent.getStringExtra(EXTRA_ACCOUNT_TYPE)?.let { AccountType.valueOf(it) }
+            ?: AccountType.UNKNOWN
         val usedStorage = intent.getStringExtra(EXTRA_USED_STORAGE) ?: ""
         val transferQuota = intent.getStringExtra(EXTRA_TRANSFER_QUOTA) ?: ""
         val storageQuota = intent.getStringExtra(EXTRA_STORAGE_QUOTA) ?: ""
@@ -72,7 +77,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 NavHost(
                     navController = navController,
-                    startDestination = if (accountType == Constants.PRO_FLEXI) {
+                    startDestination = if (accountType == AccountType.PRO_FLEXI) {
                         cancellationInstructionsRoute
                     } else {
                         cancelAccountPlanRoute
@@ -81,11 +86,11 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                     composable(cancelAccountPlanRoute) {
                         CancelAccountPlanView(
                             accountDetailsUI = UIAccountDetails(
-                                accountType = getString(getAccountNameRes(accountType)),
+                                accountType = getString(accountNameMapper(accountType)),
                                 storageQuotaSize = storageQuota,
                                 usedStorageSize = usedStorage,
                                 transferQuotaSize = transferQuota,
-                                rewindDaysQuota = if (accountType == Constants.PRO_LITE) {
+                                rewindDaysQuota = if (accountType == AccountType.PRO_LITE) {
                                     REWIND_DAYS_QUOTA_PRO_LITE
                                 } else {
                                     REWIND_DAYS_QUOTA_OTHERS
@@ -131,7 +136,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                                 navigateToBrowser(url)
                             },
                             onBackPressed = {
-                                if (accountType == Constants.PRO_FLEXI) {
+                                if (accountType == AccountType.PRO_FLEXI) {
                                     finish()
                                 } else {
                                     navController.popBackStack()
@@ -154,19 +159,8 @@ class CancelAccountPlanActivity : AppCompatActivity() {
         )
     }
 
-    private fun getAccountNameRes(accountTypeInt: Int): Int {
-        return when (accountTypeInt) {
-            Constants.PRO_LITE -> R.string.prolite_account
-            Constants.PRO_I -> R.string.pro1_account
-            Constants.PRO_II -> R.string.pro2_account
-            Constants.PRO_III -> R.string.pro3_account
-            Constants.PRO_FLEXI -> R.string.pro_flexi_account
-            else -> R.string.free_account
-        }
-    }
-
     private fun redirectToCancelPlayStoreSubscription(
-        accountType: Int,
+        accountType: AccountType,
         isMonthly: Boolean,
     ) {
         val appPackage = applicationContext.packageName

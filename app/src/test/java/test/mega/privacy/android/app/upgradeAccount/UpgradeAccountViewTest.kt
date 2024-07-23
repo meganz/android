@@ -38,7 +38,6 @@ import mega.privacy.android.app.upgradeAccount.view.components.MONTHLY_TAB_TAG
 import mega.privacy.android.app.upgradeAccount.view.components.RECOMMENDED_PLAN_TAG
 import mega.privacy.android.app.upgradeAccount.view.components.YEARLY_CHECK_ICON_TAG
 import mega.privacy.android.app.upgradeAccount.view.components.YEARLY_TAB_TAG
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.PaymentMethod
@@ -472,11 +471,12 @@ class UpgradeAccountViewTest {
 
     @Test
     fun `test that clicking the positive dialog button calls the correct function`() {
-        val onDialogPositiveButtonClicked = org.mockito.kotlin.mock<(Int) -> Unit>()
+        val onDialogPositiveButtonClicked = org.mockito.kotlin.mock<(AccountType) -> Unit>()
 
+        val expectedAccountType = AccountType.PRO_LITE
         composeRule.setContent {
             BuyNewSubscriptionDialog(
-                upgradeTypeInt = 2,
+                upgradeType = expectedAccountType,
                 paymentMethod = PaymentMethod.HUAWEI_WALLET,
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 onDialogDismissButtonClicked = org.mockito.kotlin.mock(),
@@ -485,7 +485,7 @@ class UpgradeAccountViewTest {
 
         composeRule.onNodeWithText(R.string.button_buy_new_subscription).performClick()
 
-        org.mockito.kotlin.verify(onDialogPositiveButtonClicked).invoke(2)
+        org.mockito.kotlin.verify(onDialogPositiveButtonClicked).invoke(expectedAccountType)
     }
 
     @Test
@@ -494,7 +494,7 @@ class UpgradeAccountViewTest {
 
         composeRule.setContent {
             BuyNewSubscriptionDialog(
-                upgradeTypeInt = 2,
+                upgradeType = AccountType.PRO_LITE,
                 paymentMethod = PaymentMethod.ITUNES,
                 onDialogPositiveButtonClicked = org.mockito.kotlin.mock(),
                 onDialogDismissButtonClicked = onDialogDismissButtonClicked,
@@ -691,7 +691,7 @@ class UpgradeAccountViewTest {
             currentSubscriptionPlan = accountType,
             showBillingWarning = showBillingWarning,
             currentPayment = UpgradePayment(
-                upgradeType = Constants.INVALID_VALUE,
+                upgradeType = AccountType.UNKNOWN,
                 currentPayment = null
             ),
             isPaymentMethodAvailable = isPaymentMethodAvailable,
