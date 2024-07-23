@@ -1137,7 +1137,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .distinctUntilChanged()) { session ->
             session?.let {
                 showMuteBanner()
-                when (inMeetingViewModel.state.value.isOneToOneCall) {
+                when (inMeetingViewModel.isOneToOneCall()) {
                     true -> if (inMeetingViewModel.state.value.hasLocalVideo && inMeetingViewModel.state.value.isCallOnHold == true) {
                         sharedModel.clickCamera(false)
                     }
@@ -1181,11 +1181,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->
-            Timber.d("Chat has changed")
-            inMeetingViewModel.setChatId(state.chatId)
-            callRecordingViewModel.setChatId(state.chatId)
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.chatId }
+            .distinctUntilChanged()) {
+            inMeetingViewModel.setChatId(it)
+            callRecordingViewModel.setChatId(it)
+        }
 
+        viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->
             when {
                 state.shouldParticipantInCallListBeShown -> {
                     if (floatingBottomSheet.isShown.not()) {
@@ -2770,7 +2772,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
             val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
             dialog.show(childFragmentManager, dialog.tag)
-        } else if (ChatUtil.areAllMyContactsChatParticipants(inMeetingViewModel.getChat())) {
+        } else if (ChatUtil.areAllMyContactsChatParticipants(inMeetingViewModel.state.value.currentChatId)) {
             val dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
             dialog.show(childFragmentManager, dialog.tag)
         } else {

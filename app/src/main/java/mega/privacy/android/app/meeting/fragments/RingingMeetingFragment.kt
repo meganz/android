@@ -153,9 +153,9 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         var bitmap: Bitmap?
 
         // Set caller's name and avatar
-        inMeetingViewModel.getChat()?.let {
+        inMeetingViewModel.state.value.chat?.let {
             if (inMeetingViewModel.isOneToOneCall()) {
-                val callerId = it.getPeerHandle(0)
+                val callerId = it.peerHandlesList[0]
 
                 bitmap = getImageAvatarCall(callerId)
                 if (bitmap == null) {
@@ -164,7 +164,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             } else {
                 bitmap = getDefaultAvatar(
                     getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR),
-                    getTitleChat(it),
+                    it.title,
                     AVATAR_SIZE,
                     true,
                     true

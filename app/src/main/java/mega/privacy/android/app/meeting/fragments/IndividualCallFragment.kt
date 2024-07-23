@@ -74,14 +74,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         inMeetingViewModel = inMeetingFragment.inMeetingViewModel
 
-        inMeetingViewModel.setChatId(chatId)
-
-        if (inMeetingViewModel.getCall() == null || peerId == MEGACHAT_INVALID_HANDLE) {
-            Timber.e("Error. Call doesn't exist")
-            return
-        }
-
-        if (!inMeetingViewModel.isMe(peerId) && clientId == MEGACHAT_INVALID_HANDLE) {
+        if (peerId == MEGACHAT_INVALID_HANDLE || !inMeetingViewModel.isMe(peerId) && clientId == MEGACHAT_INVALID_HANDLE) {
             Timber.e("Error. Client id invalid")
             return
         }
@@ -159,6 +152,11 @@ class IndividualCallFragment : MeetingBaseFragment() {
     }
 
     private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.chatId }
+            .distinctUntilChanged()) {
+            inMeetingViewModel.setChatId(it)
+        }
+
         viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->
             raisedHandIcon?.isVisible =
                 state.isRaiseToSpeakFeatureFlagEnabled && state.isMyHandRaisedToSpeak
@@ -175,7 +173,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.sessionOnHoldChanges }
             .distinctUntilChanged()) { session ->
             session?.apply {
-                if (inMeetingViewModel.state.value.isOneToOneCall && isAdded) {
+                if (inMeetingViewModel.isOneToOneCall() && isAdded) {
                     Timber.d("Check changes in session on hold")
                     checkChangesInOnHold(isOnHold)
                 }
@@ -387,7 +385,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Method to control the Call on hold icon visibility
      */
     private fun showCallOnHoldIcon() {
-        val isOneToOneCall = inMeetingViewModel.state.value.isOneToOneCall
+        val isOneToOneCall = inMeetingViewModel.isOneToOneCall()
         val isCallOnHold = inMeetingViewModel.state.value.isCallOnHold == true
         val isSessionOnHold = inMeetingViewModel.state.value.isSessionOnHold == true
 
