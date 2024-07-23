@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.ui.synclist.folders
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedResR
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -22,10 +23,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.analytics.Analytics
@@ -82,7 +85,7 @@ internal fun SyncFoldersScreen(
                         addFolderClicked = addFolderClicked,
                         upgradeNowClicked = upgradeAccountClicked,
                         modifier = Modifier
-                            .fillParentMaxHeight(0.8f)
+                            .fillParentMaxHeight()
                             .fillParentMaxWidth()
                             .testTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS)
                     )
@@ -179,6 +182,10 @@ private fun SyncFoldersScreenEmptyState(
                 style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
             )
         }
+
+        val isLandscape =
+            LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
         RaisedDefaultMegaButton(
             textId = if (isFreeAccount) sharedResR.string.general_upgrade_now_label else sharedResR.string.device_center_sync_add_new_syn_button_option,
             onClick = if (isFreeAccount) {
@@ -188,7 +195,7 @@ private fun SyncFoldersScreenEmptyState(
                 addFolderClicked
             },
             modifier = Modifier
-                .padding(top = if (isFreeAccount) 108.dp else 162.dp)
+                .padding(top = if (isLandscape) 32.dp else if (isFreeAccount) 108.dp else 162.dp)
                 .defaultMinSize(minWidth = 232.dp)
                 .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON),
         )
@@ -217,6 +224,8 @@ private fun SyncFoldersScreenLoadingState() {
 
 @CombinedThemePreviews
 @Composable
+@Preview(name = "5-inch Device Portrait", widthDp = 360, heightDp = 640)
+@Preview(name = "5-inch Device Portrait", widthDp = 640, heightDp = 360)
 private fun SyncFoldersScreenEmptyStatePreview(
     @PreviewParameter(BooleanProvider::class) isFreeAccount: Boolean,
 ) {
