@@ -15,14 +15,12 @@ interface OpenFileWrapper {
      * @param context Context
      * @param node mega node
      * @param isText isText
-     * @param availablePlaylist play list if is available
      * @param snackbarShower SnackbarShower
      */
     fun getIntentForOpenFile(
         context: Context,
         node: MegaNode,
         isText: Boolean,
-        availablePlaylist: Boolean,
         snackbarShower: SnackbarShower
     ): Intent?
 }

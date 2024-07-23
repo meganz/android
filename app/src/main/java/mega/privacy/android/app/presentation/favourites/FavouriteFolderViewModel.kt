@@ -32,12 +32,15 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMa
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -65,6 +68,8 @@ class FavouriteFolderViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
+    private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     savedStateHandle: SavedStateHandle,
 ) :
     ViewModel() {
@@ -258,6 +263,20 @@ class FavouriteFolderViewModel @Inject constructor(
             )
         }
     }
+
+    internal fun getFileTypeInfo(name: String) = runCatching {
+        getFileTypeInfoByNameUseCase(name)
+    }.recover {
+        Timber.e(it)
+        null
+    }.getOrNull()
+
+    internal suspend fun getNodeContentUri(fileNode: TypedFileNode) = runCatching {
+        getNodeContentUriUseCase(fileNode)
+    }.recover {
+        Timber.e(it)
+        null
+    }.getOrNull()
 
     companion object {
 

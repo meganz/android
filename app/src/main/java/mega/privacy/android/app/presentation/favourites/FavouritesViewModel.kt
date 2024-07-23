@@ -32,10 +32,10 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -43,6 +43,8 @@ import mega.privacy.android.domain.usecase.favourites.MapFavouriteSortOrderUseCa
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -80,6 +82,8 @@ class FavouritesViewModel @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
+    private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
+    private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
 ) : ViewModel() {
 
     private val query = MutableStateFlow<String?>(null)
@@ -398,4 +402,18 @@ class FavouritesViewModel @Inject constructor(
      */
     suspend fun isHidingActionAllowed(nodeId: NodeId): Boolean =
         isHidingActionAllowedUseCase(nodeId)
+
+    internal fun getFileTypeInfo(name: String) = runCatching {
+        getFileTypeInfoByNameUseCase(name)
+    }.recover {
+        Timber.e(it)
+        null
+    }.getOrNull()
+
+    internal suspend fun getNodeContentUri(fileNode: TypedFileNode) = runCatching {
+        getNodeContentUriUseCase(fileNode)
+    }.recover {
+        Timber.e(it)
+        null
+    }.getOrNull()
 }

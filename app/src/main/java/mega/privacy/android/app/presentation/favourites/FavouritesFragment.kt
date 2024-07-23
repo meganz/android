@@ -60,15 +60,19 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImage
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -101,6 +105,12 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    /**
+     * MegaNavigator injection
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private var actionMode: ActionMode? = null
     private var actionModeCallback: FavouriteActionModeCallback? = null
@@ -363,53 +373,72 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
      * @param favourite FavouriteFile
      */
     private fun openNode(favourite: FavouriteFile) {
-        MimeTypeList.typeForName(favourite.typedNode.name).apply {
-            when {
-                isImage || (isVideoMimeType || isAudio) || isPdf -> viewLifecycleOwner.lifecycleScope.launch {
-                    if (isImage) {
-                        val handle = favourite.node.handle
-                        launchIntent(
-                            ImagePreviewActivity.createIntent(
-                                context = requireContext(),
-                                imageSource = ImagePreviewFetcherSource.FAVOURITE,
-                                menuOptionsSource = ImagePreviewMenuSource.FAVOURITE,
-                                anchorImageNodeId = NodeId(handle),
-                                params = mapOf(FavouriteImageNodeFetcher.NODE_ID to handle),
+        val fileTypeInfo = viewModel.getFileTypeInfo(favourite.typedNode.name) ?: return
+        if (fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is AudioFileTypeInfo) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val contentUri = viewModel.getNodeContentUri(favourite.typedNode) ?: return@launch
+                megaNavigator.openMediaPlayerActivityByFileNode(
+                    context = requireContext(),
+                    contentUri = contentUri,
+                    fileNode = favourite.typedNode,
+                    viewType = FAVOURITES_ADAPTER,
+                    isMediaQueueAvailable = false
+                ) {
+                    Snackbar.make(
+                        requireView(),
+                        getString(R.string.intent_not_available),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } else {
+            MimeTypeList.typeForName(favourite.typedNode.name).apply {
+                when {
+                    isImage || isPdf -> viewLifecycleOwner.lifecycleScope.launch {
+                        if (isImage) {
+                            val handle = favourite.node.handle
+                            launchIntent(
+                                ImagePreviewActivity.createIntent(
+                                    context = requireContext(),
+                                    imageSource = ImagePreviewFetcherSource.FAVOURITE,
+                                    menuOptionsSource = ImagePreviewMenuSource.FAVOURITE,
+                                    anchorImageNodeId = NodeId(handle),
+                                    params = mapOf(FavouriteImageNodeFetcher.NODE_ID to handle),
+                                )
                             )
-                        )
-                    } else {
-                        launchIntent(
-                            openFileWrapper.getIntentForOpenFile(
-                                context = requireContext(),
-                                node = favourite.node,
-                                isText = false,
-                                availablePlaylist = false,
-                                snackbarShower = activity as ManagerActivity
+                        } else {
+                            launchIntent(
+                                openFileWrapper.getIntentForOpenFile(
+                                    context = requireContext(),
+                                    node = favourite.node,
+                                    isText = false,
+                                    snackbarShower = activity as ManagerActivity
+                                )
                             )
+                        }
+                    }
+
+                    isURL -> {
+                        megaUtilWrapper.manageURLNode(requireContext(), favourite.node)
+                    }
+
+                    isOpenableTextFile(favourite.typedNode.size) -> {
+                        MegaNodeUtil.manageTextFileIntent(
+                            requireContext(),
+                            favourite.node,
+                            FAVOURITES_ADAPTER
                         )
                     }
-                }
 
-                isURL -> {
-                    megaUtilWrapper.manageURLNode(requireContext(), favourite.node)
-                }
-
-                isOpenableTextFile(favourite.typedNode.size) -> {
-                    MegaNodeUtil.manageTextFileIntent(
-                        requireContext(),
-                        favourite.node,
-                        Constants.FAVOURITES_ADAPTER
-                    )
-                }
-
-                else -> {
-                    MegaNodeUtil.onNodeTapped(
-                        context = requireActivity(),
-                        node = favourite.node,
-                        nodeDownloader = (activity as ManagerActivity)::saveNodeByTap,
-                        activityLauncher = activity as ManagerActivity,
-                        snackbarShower = activity as ManagerActivity
-                    )
+                    else -> {
+                        MegaNodeUtil.onNodeTapped(
+                            context = requireActivity(),
+                            node = favourite.node,
+                            nodeDownloader = (activity as ManagerActivity)::saveNodeByTap,
+                            activityLauncher = activity as ManagerActivity,
+                            snackbarShower = activity as ManagerActivity
+                        )
+                    }
                 }
             }
         }

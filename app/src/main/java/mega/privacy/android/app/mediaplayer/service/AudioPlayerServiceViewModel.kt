@@ -40,6 +40,7 @@ import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
+import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
@@ -411,6 +412,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                     INCOMING_SHARES_ADAPTER,
                     OUTGOING_SHARES_ADAPTER,
                     CONTACT_FILE_ADAPTER,
+                    FAVOURITES_ADAPTER,
                     -> {
                         val parentHandle = intent.getLongExtra(
                             INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,

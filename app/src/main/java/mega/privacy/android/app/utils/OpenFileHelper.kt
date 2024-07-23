@@ -10,7 +10,6 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNo
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiAndroid
@@ -28,7 +27,6 @@ class OpenFileHelper @Inject constructor(
         context: Context,
         node: MegaNode,
         isText: Boolean,
-        availablePlaylist: Boolean,
         snackbarShower: SnackbarShower,
     ): Intent? {
         var intent: Intent? = null
@@ -37,17 +35,6 @@ class OpenFileHelper @Inject constructor(
             when {
                 isImage -> {
                     intent = getIntentForOpenImage(context, node)
-                }
-
-                isVideoMimeType || isAudio -> {
-                    intent = getIntentForOpenMedia(
-                        context = context,
-                        node = node,
-                        localPath = localPath,
-                        isText = isText,
-                        availablePlaylist = availablePlaylist,
-                        snackbarShower = snackbarShower
-                    )
                 }
 
                 isPdf -> {
@@ -105,54 +92,6 @@ class OpenFileHelper @Inject constructor(
             isText = isText,
             snackbarShower = snackbarShower
         )
-        if (paramsSetSuccessfully && MegaApiUtils.isIntentAvailable(context, intent)) {
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)
-            return intent
-        }
-        return null
-    }
-
-    /**
-     * Get intent to open media file
-     * @param context Context
-     * @param node mage node
-     * @param localPath local path of current node
-     * @param isText isText
-     * @param availablePlaylist play list if is available
-     * @param snackbarShower SnackbarShower
-     */
-    private fun getIntentForOpenMedia(
-        context: Context,
-        node: MegaNode,
-        localPath: String?,
-        isText: Boolean,
-        availablePlaylist: Boolean,
-        snackbarShower: SnackbarShower,
-    ): Intent? {
-        val intent = if (FileUtil.isInternalIntent(node)) {
-            Util.getMediaIntent(context, node.name)
-        } else {
-            Intent(Intent.ACTION_VIEW)
-        }.apply {
-            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, FAVOURITES_ADAPTER)
-            putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, node.name)
-            if (availablePlaylist) {
-                putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, node.parentHandle)
-            }
-            putExtra(Constants.INTENT_EXTRA_KEY_IS_PLAYLIST, availablePlaylist)
-        }
-
-        val paramsSetSuccessfully = getParamsSetSuccessfully(
-            context = context,
-            intent = intent,
-            node = node,
-            localPath = localPath,
-            isText = isText,
-            snackbarShower = snackbarShower
-        )
-        if (paramsSetSuccessfully && FileUtil.isOpusFile(node)) {
-            intent.setDataAndType(intent.data, "audio/*")
-        }
         if (paramsSetSuccessfully && MegaApiUtils.isIntentAvailable(context, intent)) {
             intent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)
             return intent

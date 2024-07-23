@@ -198,6 +198,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         viewType: Int,
         sortOrder: SortOrder,
         isFolderLink: Boolean,
+        isMediaQueueAvailable: Boolean,
         searchedItems: List<Long>?,
         mediaQueueTitle: String?,
         onError: () -> Unit,
@@ -214,6 +215,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                     handle = fileNode.id.longValue,
                     parentHandle = fileNode.parentId.longValue,
                     isFolderLink = isFolderLink,
+                    isMediaQueueAvailable = isMediaQueueAvailable,
                     searchedItems = searchedItems,
                     mediaQueueTitle = mediaQueueTitle
                 )
@@ -234,6 +236,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         handle: Long,
         parentHandle: Long,
         isFolderLink: Boolean,
+        isMediaQueueAvailable: Boolean,
         path: String? = null,
         offlineParent: String? = null,
         searchedItems: List<Long>? = null,
@@ -245,8 +248,11 @@ internal class MegaNavigatorImpl @Inject constructor(
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, name)
             putExtra(INTENT_EXTRA_KEY_HANDLE, handle)
-            putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentHandle)
             putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, isFolderLink)
+            if (isMediaQueueAvailable) {
+                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentHandle)
+            }
+            putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, isMediaQueueAvailable)
             path?.let {
                 putExtra(INTENT_EXTRA_KEY_PATH, path)
             }
@@ -286,6 +292,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         parentId: Long,
         sortOrder: SortOrder,
         isFolderLink: Boolean,
+        isMediaQueueAvailable: Boolean,
         searchedItems: List<Long>?,
         onError: () -> Unit,
     ) {
@@ -301,6 +308,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                 handle = handle,
                 parentHandle = parentId,
                 isFolderLink = isFolderLink,
+                isMediaQueueAvailable = isMediaQueueAvailable,
                 path = localFile.absolutePath,
                 offlineParent = localFile.parent,
                 searchedItems = searchedItems

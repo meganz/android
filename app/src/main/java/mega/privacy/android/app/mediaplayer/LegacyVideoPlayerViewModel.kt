@@ -66,6 +66,7 @@ import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
+import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
@@ -793,6 +794,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                     FROM_MEDIA_DISCOVERY,
                     FROM_IMAGE_VIEWER,
                     FROM_ALBUM_SHARING,
+                    FAVOURITES_ADAPTER,
                     -> {
                         val parentHandle =
                             intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
