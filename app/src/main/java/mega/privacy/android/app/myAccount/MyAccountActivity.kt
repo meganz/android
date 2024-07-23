@@ -254,6 +254,7 @@ class MyAccountActivity : PasscodeActivity(),
     override fun onResume() {
         super.onResume()
         viewModel.refreshAccountInfo()
+        refreshMenuOptionsVisibility()
     }
 
     override fun onPostResume() {

@@ -66,6 +66,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
@@ -94,6 +95,7 @@ import mega.privacy.android.domain.usecase.account.ConfirmChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
@@ -151,6 +153,7 @@ import javax.inject.Inject
  * @property monitorVerificationStatus
  * @property snackBarHandler Handler used to display a Snackbar
  * @property getBusinessStatusUseCase
+ * @property monitorAccountDetailUseCase
  */
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
@@ -194,6 +197,7 @@ class MyAccountViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val snackBarHandler: SnackBarHandler,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -274,6 +278,17 @@ class MyAccountViewModel @Inject constructor(
                                 }
                             }
                         }.onFailure { Timber.w(it) }
+                    }
+                }
+        }
+        viewModelScope.launch {
+            monitorAccountDetailUseCase()
+                .catch { Timber.w("Exception monitoring account details: $it") }
+                .collectLatest { accountDetail ->
+                    _state.update {
+                        it.copy(
+                            subscriptionDetails = accountDetail.levelDetail,
+                        )
                     }
                 }
         }
@@ -1308,15 +1323,18 @@ class MyAccountViewModel @Inject constructor(
 
                 val businessProFlexiStatus = getBusinessStatusUseCase()
 
+                val subscriptionDetails = state.value.subscriptionDetails
                 _state.update { state ->
                     state.copy(
                         isBusinessAccount = accountDetails.isBusinessAccount &&
                                 accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
                         isProFlexiAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.PRO_FLEXI,
                         businessProFlexiStatus = businessProFlexiStatus,
-                        isStandardProAccount = accountDetails.accountTypeIdentifier?.let {
-                            isStandardProAccountCheck(it)
-                        } ?: false
+                        isStandardProAccount = if (subscriptionDetails?.subscriptionStatus == SubscriptionStatus.VALID) {
+                            accountDetails.accountTypeIdentifier?.let {
+                                isStandardProAccountCheck(it)
+                            } ?: false
+                        } else false
                     )
                 }
             }.onFailure {

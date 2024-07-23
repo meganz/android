@@ -7,6 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -18,8 +19,12 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.node.NodeId
@@ -48,6 +53,7 @@ import mega.privacy.android.domain.usecase.account.ConfirmChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
@@ -128,6 +134,8 @@ internal class MyAccountViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private val snackBarHandler: SnackBarHandler = mock()
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
+    private val accountDetailFlow = MutableStateFlow(AccountDetail())
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
 
     private val userUpdatesFlow = MutableSharedFlow<UserChanges>()
     private val verificationStatusFlow = MutableSharedFlow<VerificationStatus>()
@@ -165,6 +173,7 @@ internal class MyAccountViewModelTest {
         whenever(getPaymentMethodUseCase(anyBoolean())).thenReturn(PaymentMethodFlags(0L))
         whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
         whenever(myAccountInfo.usedFormatted).thenReturn("")
+        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
 
     }
 
@@ -209,6 +218,7 @@ internal class MyAccountViewModelTest {
             ioDispatcher = testDispatcher,
             snackBarHandler = snackBarHandler,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         )
     }
 
@@ -547,22 +557,27 @@ internal class MyAccountViewModelTest {
     )
 
     private fun provideAccountTypeIdentifierParameters() = Stream.of(
-        Arguments.of(AccountType.PRO_I, true),
-        Arguments.of(AccountType.PRO_II, true),
-        Arguments.of(AccountType.PRO_III, true),
-        Arguments.of(AccountType.PRO_LITE, true),
-        Arguments.of(AccountType.PRO_FLEXI, false),
-        Arguments.of(AccountType.BUSINESS, false),
-        Arguments.of(AccountType.STARTER, false),
-        Arguments.of(AccountType.BASIC, false),
-        Arguments.of(AccountType.ESSENTIAL, false),
-        Arguments.of(AccountType.UNKNOWN, false),
+        Arguments.of(AccountType.PRO_I, accountDetailsWithValidSubscription, true),
+        Arguments.of(AccountType.PRO_II, accountDetailsWithValidSubscription, true),
+        Arguments.of(AccountType.PRO_III, accountDetailsWithValidSubscription, true),
+        Arguments.of(AccountType.PRO_LITE, accountDetailsWithValidSubscription, true),
+        Arguments.of(AccountType.PRO_I, accountDetailsWithInvalidSubscription, false),
+        Arguments.of(AccountType.PRO_II, accountDetailsWithInvalidSubscription, false),
+        Arguments.of(AccountType.PRO_III, accountDetailsWithInvalidSubscription, false),
+        Arguments.of(AccountType.PRO_LITE, accountDetailsWithInvalidSubscription, false),
+        Arguments.of(AccountType.PRO_FLEXI, accountDetailsWithValidSubscription, false),
+        Arguments.of(AccountType.BUSINESS, accountDetailsWithInvalidSubscription, false),
+        Arguments.of(AccountType.STARTER, accountDetailsWithValidSubscription, false),
+        Arguments.of(AccountType.BASIC, accountDetailsWithValidSubscription, false),
+        Arguments.of(AccountType.ESSENTIAL, accountDetailsWithValidSubscription, false),
+        Arguments.of(AccountType.UNKNOWN, AccountDetail(), false),
     )
 
-    @ParameterizedTest(name = "when account type is {0} isStandardProAccount is {1}")
+    @ParameterizedTest(name = "when account type is {0} and account details are {1}, then isStandardProAccount is {2}")
     @MethodSource("provideAccountTypeIdentifierParameters")
     fun `test that isStandardProAccount is updated correctly when account details are provided`(
         accountType: AccountType,
+        accountDetails: AccountDetail,
         expected: Boolean,
     ) = runTest {
         val userAccount = UserAccount(
@@ -576,6 +591,10 @@ internal class MyAccountViewModelTest {
         )
 
         whenever(getAccountDetailsUseCase(anyBoolean())).thenReturn(userAccount)
+        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
+
+        accountDetailFlow.emit(accountDetails)
+
         underTest.refreshAccountInfo()
         underTest.state.test {
             assertThat(awaitItem().isStandardProAccount).isEqualTo(expected)
@@ -593,6 +612,46 @@ internal class MyAccountViewModelTest {
                 assertThat(awaitItem().businessProFlexiStatus).isEqualTo(expectedValue)
             }
         }
+
+    @Test
+    fun `test that subscriptionDetails is updated when monitorAccountDetailUseCase return the correct value`() =
+        runTest {
+            whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
+
+            accountDetailFlow.emit(accountDetailsWithValidSubscription)
+            initializeViewModel()
+            underTest.state.test {
+                assertThat(awaitItem().subscriptionDetails).isEqualTo(
+                    accountDetailsWithValidSubscription.levelDetail
+                )
+            }
+        }
+
+    private val accountDetailsWithValidSubscription = AccountDetail(
+        storageDetail = null,
+        sessionDetail = null,
+        transferDetail = null,
+        levelDetail = AccountLevelDetail(
+            accountType = AccountType.PRO_I,
+            subscriptionStatus = SubscriptionStatus.VALID,
+            subscriptionRenewTime = 1873874783274L,
+            accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+            proExpirationTime = 378672463728467L,
+        )
+    )
+
+    private val accountDetailsWithInvalidSubscription = AccountDetail(
+        storageDetail = null,
+        sessionDetail = null,
+        transferDetail = null,
+        levelDetail = AccountLevelDetail(
+            accountType = AccountType.PRO_I,
+            subscriptionStatus = SubscriptionStatus.INVALID,
+            subscriptionRenewTime = 1873874783274L,
+            accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+            proExpirationTime = 378672463728467L,
+        )
+    )
 
     @AfterEach
     fun resetMocks() {
@@ -636,6 +695,7 @@ internal class MyAccountViewModelTest {
             getFeatureFlagValueUseCase,
             snackBarHandler,
             getBusinessStatusUseCase,
+            monitorAccountDetailUseCase,
         )
     }
 }
