@@ -46,6 +46,7 @@ class UploadDestinationViewModel @Inject constructor(
      */
     fun updateUri(fileUriList: List<Uri>) = viewModelScope.launch {
         Timber.d("Uri updated $fileUriList")
+        _uiState.update { it.copy(fileUriList = fileUriList) }
     }
 
     /**
@@ -54,6 +55,4 @@ class UploadDestinationViewModel @Inject constructor(
     fun updateTextContent(text: String, email: String, subject: String) {
         Timber.d("Text content updated $text $email $subject")
     }
-
-
 }

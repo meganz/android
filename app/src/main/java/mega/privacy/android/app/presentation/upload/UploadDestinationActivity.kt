@@ -67,7 +67,11 @@ class UploadDestinationActivity : AppCompatActivity() {
                             PasscodeContainer(
                                 passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                                 content = {
-                                    UploadView()
+                                    UploadDestinationView(
+                                        fileList = uploadActivityUiState.fileUriList.map { uri ->
+                                            Pair(uri.toString(), uri.path.orEmpty())
+                                        },
+                                    )
                                 }
                             )
                         }
@@ -84,16 +88,14 @@ class UploadDestinationActivity : AppCompatActivity() {
 
     private fun handleIntent() = when (intent?.action) {
         Intent.ACTION_SEND -> when {
-            intent.type == Constants.TYPE_TEXT_PLAIN
-                    && intent.extras?.containsKey(Intent.EXTRA_STREAM)?.not() ?: true ->
+            intent.type == Constants.TYPE_TEXT_PLAIN && !intent.hasExtra(Intent.EXTRA_STREAM) ->
                 handleSendText(intent)
 
             else -> handleSendFiles(intent)
         }
 
         Intent.ACTION_SEND_MULTIPLE -> handleSendMultipleFiles(intent) // Handle multiple images being sent
-        else ->
-            Timber.e("handleIntent: No action ${intent.action}")
+        else -> Timber.e("handleIntent: No action ${intent.action}")
     }
 
     private fun handleSendText(intent: Intent) {
