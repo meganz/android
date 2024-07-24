@@ -67,6 +67,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.monitoring.CrashReporter
@@ -113,6 +114,8 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
@@ -132,6 +135,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.UUID
@@ -218,6 +222,8 @@ internal class CameraUploadsWorkerTest {
     private val getFileByPathUseCase: GetFileByPathUseCase = mock()
     private val loginMutex: Mutex = mock()
     private val crashReporter: CrashReporter = mock()
+    private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
+    private val handleTransferEventUseCase: HandleTransferEventUseCase = mock()
 
     private val foregroundInfo = ForegroundInfo(1, mock())
     private val primaryNodeHandle = 1111L
@@ -309,6 +315,8 @@ internal class CameraUploadsWorkerTest {
                 disableCameraUploadsUseCase = disableCameraUploadsUseCase,
                 getFileByPathUseCase = getFileByPathUseCase,
                 crashReporter = crashReporter,
+                monitorTransferEventsUseCase = monitorTransferEventsUseCase,
+                handleTransferEventUseCase = handleTransferEventUseCase,
             )
         )
     }
@@ -331,9 +339,9 @@ internal class CameraUploadsWorkerTest {
         whenever(monitorBatteryInfoUseCase()).thenReturn(emptyFlow())
         whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(emptyFlow())
         whenever(monitorPausedTransfersUseCase()).thenReturn(emptyFlow())
+        whenever(monitorTransferEventsUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
         whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
-        whenever(getPendingCameraUploadsRecordsUseCase()).thenReturn(emptyList())
 
         // mock check preconditions
         whenever(hasMediaPermissionUseCase()).thenReturn(true)
@@ -354,6 +362,7 @@ internal class CameraUploadsWorkerTest {
             .thenReturn(primaryNodeHandle)
         whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
             .thenReturn(secondaryNodeHandle)
+        whenever(getPendingCameraUploadsRecordsUseCase()).thenReturn(emptyList())
     }
 
     /**
@@ -1344,6 +1353,45 @@ internal class CameraUploadsWorkerTest {
         underTest.doWork()
 
         verify(scheduleCameraUploadUseCase).invoke()
+    }
+
+    @Test
+    fun `test that only camera uploads transfer events are being handled`() = runTest {
+        setupDefaultCheckConditionMocks()
+        val cameraUploadsTransferEvent = TransferEvent.TransferStartEvent(
+            mock<Transfer> { on { transferType }.thenReturn(TransferType.CU_UPLOAD) }
+        )
+        val chatTransferEvent = TransferEvent.TransferStartEvent(
+            mock<Transfer> { on { transferType }.thenReturn(TransferType.CHAT_UPLOAD) }
+        )
+        val generalUploadTransferEvent = TransferEvent.TransferStartEvent(
+            mock<Transfer> { on { transferType }.thenReturn(TransferType.GENERAL_UPLOAD) }
+        )
+        whenever(monitorTransferEventsUseCase()).thenReturn(
+            flowOf(cameraUploadsTransferEvent, chatTransferEvent, generalUploadTransferEvent)
+        )
+
+        underTest.doWork()
+
+        verify(handleTransferEventUseCase).invoke(events = listOf(cameraUploadsTransferEvent).toTypedArray())
+    }
+
+    @Test
+    fun `test that no camera uploads transfer events are not handled`() = runTest {
+        setupDefaultCheckConditionMocks()
+        val chatTransferEvent = TransferEvent.TransferStartEvent(
+            mock<Transfer> { on { transferType }.thenReturn(TransferType.CHAT_UPLOAD) }
+        )
+        val generalUploadTransferEvent = TransferEvent.TransferStartEvent(
+            mock<Transfer> { on { transferType }.thenReturn(TransferType.GENERAL_UPLOAD) }
+        )
+        whenever(monitorTransferEventsUseCase()).thenReturn(
+            flowOf(chatTransferEvent, generalUploadTransferEvent)
+        )
+
+        underTest.doWork()
+
+        verifyNoInteractions(handleTransferEventUseCase)
     }
 
     @Ignore("This Test is flaky as it sometimes fails in the Gitlab pipeline. Check the test implementation again")

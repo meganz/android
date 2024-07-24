@@ -44,7 +44,6 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPr
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
 import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
 import java.io.File
@@ -88,7 +87,6 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     private val deletePreviewUseCase: DeletePreviewUseCase,
     private val compressVideoUseCase: CompressVideoUseCase,
     private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
-    private val addCompletedTransferUseCase: AddCompletedTransferUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
@@ -593,26 +591,9 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                     nodeId = nodeId,
                 ).onFailure { trySend(it) }
             },
-            launch {
-                addCompletedTransfer(transferEvent)
-                    .onFailure { trySend(it) }
-            }
         ).joinAll()
         close()
     }.cancellable()
-
-    /**
-     * Add the transfer to the completed transfer list
-     *
-     * @param transferEvent
-     */
-    private suspend fun addCompletedTransfer(
-        transferEvent: TransferEvent.TransferFinishEvent,
-    ) = runCatching {
-        with(transferEvent) {
-            addCompletedTransferUseCase(transfer, error)
-        }
-    }
 
     /**
      * Copy a node and set the gps coordinates to the node

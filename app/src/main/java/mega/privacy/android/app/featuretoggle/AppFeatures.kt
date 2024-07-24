@@ -210,7 +210,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     ActiveTransfersInCameraUploads(
         "Camera Uploads uses Active transfers to monitor the transfer progress",
-        false,
+        true,
     ),
 
     /**

@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
@@ -53,6 +54,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
+import mega.privacy.android.data.extensions.collectChunked
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BackupState
@@ -68,6 +70,8 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferPro
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -76,15 +80,12 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
-import mega.privacy.android.domain.usecase.camerauploads.CreateCameraUploadsTemporaryRootDirectoryUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckOrCreateCameraUploadsNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.CreateCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
@@ -98,10 +99,11 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUs
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorIsChargingRequiredToUploadContentUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
@@ -119,12 +121,18 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import timber.log.Timber
 import java.time.Instant
 import java.util.Hashtable
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Worker to run Camera Uploads
@@ -185,6 +193,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val fileSystemRepository: FileSystemRepository,
     private val timeSystemRepository: TimeSystemRepository,
     private val crashReporter: CrashReporter,
+    private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
+    private val handleTransferEventUseCase: HandleTransferEventUseCase,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -267,6 +277,11 @@ class CameraUploadsWorker @AssistedInject constructor(
     private var monitorBatteryLevelAndChargingStatusesJob: Job? = null
 
     /**
+     * Job to monitor Camera Uploads Transfers
+     */
+    private var monitorCameraUploadsTransfers: Job? = null
+
+    /**
      * Job to monitor transfer over quota status flow
      */
     private var monitorStorageOverQuotaStatusJob: Job? = null
@@ -308,6 +323,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             monitorBatteryLevelAndChargingStatusesJob = monitorBatteryLevelAndChargingStatusesJob()
             monitorStorageOverQuotaStatusJob = monitorStorageOverQuotaStatus()
             monitorParentNodesDeletedJob = monitorParentNodesDeleted()
+            monitorCameraUploadsTransfers = monitorCameraUploadsTransfers()
 
             handleLocalIpChangeUseCase(shouldRetryChatConnections = false)
 
@@ -488,6 +504,34 @@ class CameraUploadsWorker @AssistedInject constructor(
                     reason = CameraUploadsFinishedReason.TARGET_NODES_DELETED,
                     restartMode = CameraUploadsRestartMode.RestartImmediately,
                 )
+            }
+        }
+    }
+
+    /**
+     * Monitors and processes only the Camera Uploads Transfers
+     */
+    private fun CoroutineScope.monitorCameraUploadsTransfers() = launch {
+        monitorTransferEventsUseCase()
+            .filter { it.transfer.transferType == TransferType.CU_UPLOAD }
+            .collectChunked(
+                chunkDuration = 2.seconds,
+                flushOnIdleDuration = 200.milliseconds,
+            ) { transferEvents ->
+                handleCameraUploadsTransferEvents(transferEvents)
+            }
+    }
+
+    /**
+     * Processes the Camera Uploads Transfer events. The operation is marked as [NonCancellable] so
+     * that Transfer handling operations will complete, even when [MonitorTransferEventsUseCase] ends
+     *
+     * @param transferEvents a list of Camera Uploads Transfer Events
+     */
+    private suspend fun handleCameraUploadsTransferEvents(transferEvents: List<TransferEvent>) {
+        withContext(NonCancellable) {
+            launch {
+                handleTransferEventUseCase(events = transferEvents.toTypedArray())
             }
         }
     }
@@ -1260,6 +1304,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             monitorStorageOverQuotaStatusJob,
             monitorParentNodesDeletedJob,
             sendBackupHeartbeatJob,
+            monitorCameraUploadsTransfers,
         ).forEach { it?.cancelAndJoin() }
     }
 

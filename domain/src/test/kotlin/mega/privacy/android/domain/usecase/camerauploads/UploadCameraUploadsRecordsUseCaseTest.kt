@@ -38,7 +38,6 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPr
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeletePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
 import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -59,10 +58,12 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.util.stream.Stream
 
-
+/**
+ * Test class for [UploadCameraUploadsRecordsUseCase]
+ */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UploadCameraUploadsRecordsUseCaseTest {
+internal class UploadCameraUploadsRecordsUseCaseTest {
     private lateinit var underTest: UploadCameraUploadsRecordsUseCase
 
     private val copyNodeUseCase = mock<CopyNodeUseCase>()
@@ -85,7 +86,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
     private val compressVideoUseCase = mock<CompressVideoUseCase>()
     private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
-    private val addCompletedTransferUseCase = mock<AddCompletedTransferUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val monitorBatteryInfoUseCase = mock<MonitorBatteryInfoUseCase>()
     private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase =
@@ -139,7 +139,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             compressVideoUseCase = compressVideoUseCase,
             getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
             fileSystemRepository = fileSystemRepository,
-            addCompletedTransferUseCase = addCompletedTransferUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
@@ -168,7 +167,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
             compressVideoUseCase,
             getUploadVideoQualityUseCase,
             fileSystemRepository,
-            addCompletedTransferUseCase,
             getNodeByIdUseCase,
             monitorConcurrentUploadsLimitUseCase,
             getAvailableProcessorsUseCase,
@@ -763,30 +761,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
 
         @ParameterizedTest(name = "when folder type is {0}")
         @MethodSource("provideParameters")
-        fun `test that if record is uploaded and the transfer finished then the completed transfer is added`(
-            cameraUploadFolderType: CameraUploadFolderType,
-        ) = runTest {
-            setInput(cameraUploadFolderType)
-            whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
-            whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
-            whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
-            mockStartUploadUseCase()
-            whenever(deleteThumbnailUseCase(transferFinished.nodeHandle)).thenReturn(true)
-            whenever(deletePreviewUseCase(transferFinished.nodeHandle)).thenReturn(true)
-            whenever(getNodeByIdUseCase(NodeId(transferFinished.nodeHandle)))
-                .thenReturn(transferFinishedNode)
-
-            executeUnderTest().collect()
-
-            verify(addCompletedTransferUseCase).invoke(
-                transferFinishedEvent.transfer,
-                transferFinishedEvent.error
-            )
-        }
-
-        @ParameterizedTest(name = "when folder type is {0}")
-        @MethodSource("provideParameters")
-        fun `test that no post transfer operations are done if node is not retrieved in the cloud after a transfer finish`(
+        fun `test that no post transfer operations are done if node is not retrieved in the cloud after a transfer finishes`(
             cameraUploadFolderType: CameraUploadFolderType,
         ) = runTest {
             setInput(cameraUploadFolderType)
@@ -821,10 +796,6 @@ class UploadCameraUploadsRecordsUseCaseTest {
                 timestamp = record.timestamp,
                 folderType = record.folderType,
                 uploadStatus = CameraUploadsRecordUploadStatus.UPLOADED,
-            )
-            verify(addCompletedTransferUseCase, never()).invoke(
-                transferFinishedEvent.transfer,
-                transferFinishedEvent.error
             )
         }
 
