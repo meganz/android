@@ -12,13 +12,16 @@ import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowInsets
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -244,13 +247,6 @@ class MeetingActivity : PasscodeActivity() {
         return isSystemPipEnabledAndAvailable() && isInPictureInPictureMode
     }
 
-
-    private fun View.setMarginTop(marginTop: Int) {
-        val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
-        menuLayoutParams.setMargins(0, marginTop, 0, 0)
-        this.layoutParams = menuLayoutParams
-    }
-
     override fun onNewIntent(newIntent: Intent) {
         super.onNewIntent(newIntent)
         intent = newIntent
@@ -261,7 +257,9 @@ class MeetingActivity : PasscodeActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
         initializePictureInPictureParams()
 
         // Setup the Back Press dispatcher to receive Back Press events
@@ -484,24 +482,22 @@ class MeetingActivity : PasscodeActivity() {
         }
     }
 
-    @Suppress("DEPRECATION")
     private fun setStatusBarTranslucent() {
-        val decorView: View = window.decorView
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = insets.top
+            }
 
-        decorView.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets? ->
-            val defaultInsets = v.onApplyWindowInsets(insets)
+            binding.navHostFragment.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = insets.top
+                leftMargin = insets.left
+                rightMargin = insets.right
+                bottomMargin = insets.bottom
+            }
 
-            binding.toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
-
-            defaultInsets.replaceSystemWindowInsets(
-                defaultInsets.systemWindowInsetLeft,
-                0,
-                defaultInsets.systemWindowInsetRight,
-                defaultInsets.systemWindowInsetBottom
-            )
+            WindowInsetsCompat.CONSUMED
         }
-
-        ViewCompat.requestApplyInsets(decorView)
     }
 
     /**

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.megachat;
 
+import static mega.privacy.android.app.extensions.EdgeToEdgeExtensionsKt.enableEdgeToEdgeAndConsumeInsets;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
 
@@ -84,6 +85,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        enableEdgeToEdgeAndConsumeInsets(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 

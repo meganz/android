@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main.megachat.chat.explorer;
 
 
+import static mega.privacy.android.app.extensions.EdgeToEdgeExtensionsKt.enableEdgeToEdgeAndConsumeInsets;
 import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
 import static mega.privacy.android.app.utils.Constants.ACTION_FORWARD_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
@@ -95,6 +96,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         Timber.d("onCreate first");
+        enableEdgeToEdgeAndConsumeInsets(this);
         super.onCreate(savedInstanceState);
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
  * Enable edge to edge and consume insets for the activity used XML layout.
  *
  */
+@JvmOverloads
 fun ComponentActivity.enableEdgeToEdgeAndConsumeInsets(type: Int = WindowInsetsCompat.Type.systemBars()) {
     // we need condition to check if the device running Android 15 when we target sdk to 35
     // because it will enable edge to edge by default
@@ -34,6 +35,7 @@ fun ComponentActivity.enableEdgeToEdgeAndConsumeInsets(type: Int = WindowInsetsC
  *
  * @param type The type of insets to consume. default is systemBars.
  */
+@JvmOverloads
 fun Fragment.consumeInsets(type: Int = WindowInsetsCompat.Type.systemBars()) {
     // we need condition to check if the device running Android 15 when we target sdk to 35
     // because it will enable edge to edge by default

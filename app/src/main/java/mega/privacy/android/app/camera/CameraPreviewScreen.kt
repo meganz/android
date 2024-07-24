@@ -3,6 +3,7 @@ package mega.privacy.android.app.camera
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,6 +28,7 @@ internal fun CameraPreviewScreen(
         onBackPressed()
     }
     MegaScaffold(
+        modifier = Modifier.systemBarsPadding(),
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.CLOSE,
