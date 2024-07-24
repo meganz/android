@@ -9,8 +9,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
@@ -19,6 +21,7 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
@@ -27,9 +30,9 @@ import mega.privacy.android.app.activities.contract.DeleteVersionsHistoryActivit
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
-import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.FileContactListActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogListener
@@ -45,6 +48,8 @@ import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.tags.TagsActivity
 import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.NODE_ID
+import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
+import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -94,10 +99,10 @@ class FileInfoActivity : BaseActivity() {
     private lateinit var moveLauncher: ActivityResultLauncher<LongArray>
 
     private val viewModel: FileInfoViewModel by viewModels()
+    private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
     private var adapterType = 0
     private var fileBackupManager: FileBackupManager? = null
     private val nodeController: NodeController by lazy { NodeController(this) }
-    private val nodeAttacher by lazy { MegaAttacher(this) }
 
     private var bottomSheetDialogFragment: FileContactsListBottomSheetDialogFragment? = null
 
@@ -124,9 +129,6 @@ class FileInfoActivity : BaseActivity() {
             finish()
             return
         })
-        savedInstanceState?.apply {
-            nodeAttacher.restoreState(this)
-        }
         configureActivityResultLaunchers()
         initFileBackupManager()
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
@@ -136,6 +138,7 @@ class FileInfoActivity : BaseActivity() {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val snackBarHostState = remember { SnackbarHostState() }
+            val coroutineScope = rememberCoroutineScope()
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 EventEffect(
                     event = uiState.oneOffViewEvent,
@@ -184,6 +187,27 @@ class FileInfoActivity : BaseActivity() {
                     { viewModel.consumeDownloadEvent() },
                     snackBarHostState = snackBarHostState,
                 )
+                NodeAttachmentView(
+                    nodeAttachmentViewModel
+                ) { message, chatId ->
+                    coroutineScope.launch {
+                        val result = snackBarHostState.showSnackbar(
+                            message = message.ifBlank { getString(R.string.sent_as_message) },
+                            actionLabel = getString(R.string.action_see)
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            startActivity(
+                                Intent(this@FileInfoActivity, ManagerActivity::class.java).apply {
+                                    action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
+                                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                    putExtra(Constants.CHAT_ID, chatId)
+                                    putExtra(Constants.EXTRA_MOVE_TO_CHAT_SECTION, true)
+                                },
+                            )
+                            finish()
+                        }
+                    }
+                }
                 updateContactShareBottomSheet(uiState)
             }
         }
@@ -216,26 +240,6 @@ class FileInfoActivity : BaseActivity() {
         val intent = Intent(this, AuthenticityCredentialsActivity::class.java)
         intent.putExtra(Constants.EMAIL, email)
         startActivity(intent)
-    }
-
-    /**
-     * Listen an propagate results to node saver.
-     */
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (nodeAttacher.handleActivityResult(requestCode, resultCode, data, this)) {
-            return
-        }
-    }
-
-
-    /**
-     * Called to retrieve per-instance state from an activity before being killed so that the state can be restored
-     */
-    public override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        nodeAttacher.saveState(outState)
     }
 
     private fun readExtrasAndGetHandle() = intent.extras?.let { extras ->
@@ -345,7 +349,10 @@ class FileInfoActivity : BaseActivity() {
             FileInfoMenuAction.RemoveLink -> viewModel.initiateRemoveLink()
             FileInfoMenuAction.ShareFolder -> showShareFolderDialog()
             FileInfoMenuAction.Leave -> showConfirmLeaveDialog()
-            FileInfoMenuAction.SendToChat -> navigateToSendToChat()
+            FileInfoMenuAction.SendToChat -> nodeAttachmentViewModel.startAttachNodes(
+                listOf(NodeId(viewModel.node.handle))
+            )
+
             FileInfoMenuAction.DisputeTakedown -> navigateToDisputeTakeDown()
             FileInfoMenuAction.SelectionModeAction.ChangePermission -> {
                 viewModel.initiateChangePermission(null)
@@ -396,11 +403,6 @@ class FileInfoActivity : BaseActivity() {
 
     private fun navigateToCopy() = copyLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
     private fun navigateToMove() = moveLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
-
-    private fun navigateToSendToChat() {
-        Timber.d("Send chat option")
-        nodeAttacher.attachNode(viewModel.node)
-    }
 
     private fun navigateToDisputeTakeDown() =
         startActivity(
