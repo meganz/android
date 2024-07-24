@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables document scanner
+     */
+    DocumentScanner(
+        "Enable new document scanner implementation",
+        false
+    ),
+
+    /**
      * Enables Map location
      */
     MapLocation(
