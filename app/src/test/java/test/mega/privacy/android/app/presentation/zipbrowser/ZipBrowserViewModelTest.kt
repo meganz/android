@@ -14,8 +14,10 @@ import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserViewModel
 import mega.privacy.android.app.presentation.zipbrowser.mapper.ZipInfoUiEntityMapper
 import mega.privacy.android.app.presentation.zipbrowser.model.ZipInfoUiEntity
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 import mega.privacy.android.domain.entity.zipbrowser.ZipTreeNode
+import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.zipbrowser.GetZipTreeMapUseCase
 import mega.privacy.android.domain.usecase.zipbrowser.UnzipFileUseCase
 import org.junit.jupiter.api.AfterAll
@@ -27,8 +29,10 @@ import org.junit.jupiter.api.io.TempDir
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -42,6 +46,7 @@ class ZipBrowserViewModelTest {
     private val zipInfoUiEntityMapper = mock<ZipInfoUiEntityMapper>()
     private val unzipFileUseCase = mock<UnzipFileUseCase>()
     private val savedStateHandle = mock<SavedStateHandle>()
+    private val getFileTypeInfoUseCase = mock<GetFileTypeInfoUseCase>()
 
     private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
@@ -96,7 +101,8 @@ class ZipBrowserViewModelTest {
             getZipTreeMapUseCase = getZipTreeMapUseCase,
             zipInfoUiEntityMapper = zipInfoUiEntityMapper,
             unzipFileUseCase = unzipFileUseCase,
-            savedStateHandle = savedStateHandle
+            savedStateHandle = savedStateHandle,
+            getFileTypeInfoUseCase = getFileTypeInfoUseCase
         )
     }
 
@@ -106,7 +112,8 @@ class ZipBrowserViewModelTest {
             getZipTreeMapUseCase,
             zipInfoUiEntityMapper,
             unzipFileUseCase,
-            savedStateHandle
+            savedStateHandle,
+            getFileTypeInfoUseCase
         )
     }
 
@@ -347,5 +354,25 @@ class ZipBrowserViewModelTest {
                 underTest.updateShowSnackBar(false)
                 assertThat(awaitItem().showSnackBar).isFalse()
             }
+        }
+
+    @Test
+    fun `test that getFileTypeInfoUseCase function is invoked and returns as expected`() =
+        runTest {
+            val mockFile = mock<File>()
+            val expectedFileTypeInfo = VideoFileTypeInfo("", "", 10.seconds)
+            whenever(getFileTypeInfoUseCase(mockFile)).thenReturn(expectedFileTypeInfo)
+            val actual = underTest.getFileTypeInfo(mockFile)
+            assertThat(actual is VideoFileTypeInfo).isTrue()
+            verify(getFileTypeInfoUseCase).invoke(mockFile)
+        }
+
+    @Test
+    fun `test that getFileTypeInfoUseCase returns null when an exception is thrown`() =
+        runTest {
+            val mockFile = mock<File>()
+            whenever(getFileTypeInfoUseCase(mockFile)).thenThrow(NullPointerException())
+            val actual = underTest.getFileTypeInfo(mockFile)
+            assertThat(actual).isNull()
         }
 }

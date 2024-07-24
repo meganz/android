@@ -169,10 +169,10 @@ interface AppNavigator {
     fun openMediaPlayerActivityByLocalFile(
         context: Context,
         localFile: File,
-        fileTypeInfo: FileTypeInfo,
-        viewType: Int,
         handle: Long,
-        parentId: Long,
+        viewType: Int? = null,
+        parentId: Long = -1L,
+        fileTypeInfo: FileTypeInfo? = null,
         sortOrder: SortOrder = SortOrder.ORDER_NONE,
         isFolderLink: Boolean = false,
         isMediaQueueAvailable: Boolean = true,

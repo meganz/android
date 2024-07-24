@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.zipbrowser.model.ZipItemClickedEven
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 import mega.privacy.android.domain.entity.zipbrowser.ZipTreeNode
+import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.zipbrowser.GetZipTreeMapUseCase
 import mega.privacy.android.domain.usecase.zipbrowser.UnzipFileUseCase
 import timber.log.Timber
@@ -31,6 +32,7 @@ class ZipBrowserViewModel @Inject constructor(
     private val getZipTreeMapUseCase: GetZipTreeMapUseCase,
     private val zipInfoUiEntityMapper: ZipInfoUiEntityMapper,
     private val unzipFileUseCase: UnzipFileUseCase,
+    private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private var zipNodeTree: Map<String, ZipTreeNode>? = null
@@ -212,6 +214,13 @@ class ZipBrowserViewModel @Inject constructor(
         _uiState.update { it.copy(showSnackBar = value) }
 
     internal fun clearOpenedFile() = _uiState.update { it.copy(openedFile = null) }
+
+    internal suspend fun getFileTypeInfo(file: File) =
+        runCatching { getFileTypeInfoUseCase(file) }
+            .recover {
+                Timber.e(it)
+                null
+            }.getOrNull()
 
     companion object {
         private const val TITLE_ZIP = "ZIP "

@@ -50,6 +50,7 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
 import java.io.File
@@ -64,6 +65,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
+    private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
 ) : MegaNavigator,
     AppNavigatorImpl {
     override fun openSettingsCameraUploads(activity: Activity) {
@@ -231,12 +233,12 @@ internal class MegaNavigatorImpl @Inject constructor(
         contentUri: NodeContentUri,
         fileTypeInfo: FileTypeInfo,
         sortOrder: SortOrder,
-        viewType: Int,
         name: String,
         handle: Long,
         parentHandle: Long,
         isFolderLink: Boolean,
         isMediaQueueAvailable: Boolean,
+        viewType: Int? = null,
         path: String? = null,
         offlineParent: String? = null,
         searchedItems: List<Long>? = null,
@@ -245,10 +247,12 @@ internal class MegaNavigatorImpl @Inject constructor(
         val intent = getIntent(context, fileTypeInfo).apply {
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
             putExtra(INTENT_EXTRA_KEY_PLACEHOLDER, 0)
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, name)
             putExtra(INTENT_EXTRA_KEY_HANDLE, handle)
             putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, isFolderLink)
+            viewType?.let {
+                putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
+            }
             if (isMediaQueueAvailable) {
                 putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentHandle)
             }
@@ -286,36 +290,39 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openMediaPlayerActivityByLocalFile(
         context: Context,
         localFile: File,
-        fileTypeInfo: FileTypeInfo,
-        viewType: Int,
         handle: Long,
+        viewType: Int?,
         parentId: Long,
+        fileTypeInfo: FileTypeInfo?,
         sortOrder: SortOrder,
         isFolderLink: Boolean,
         isMediaQueueAvailable: Boolean,
         searchedItems: List<Long>?,
         onError: () -> Unit,
     ) {
-        runCatching {
-            val contentUri = NodeContentUri.LocalContentUri(localFile)
-            manageMediaIntent(
-                context = context,
-                contentUri = contentUri,
-                fileTypeInfo = fileTypeInfo,
-                sortOrder = sortOrder,
-                viewType = viewType,
-                name = localFile.name,
-                handle = handle,
-                parentHandle = parentId,
-                isFolderLink = isFolderLink,
-                isMediaQueueAvailable = isMediaQueueAvailable,
-                path = localFile.absolutePath,
-                offlineParent = localFile.parent,
-                searchedItems = searchedItems
-            )
-        }.onFailure {
-            Timber.e(it)
-            onError()
+        applicationScope.launch {
+            runCatching {
+                val contentUri = NodeContentUri.LocalContentUri(localFile)
+                val info = fileTypeInfo ?: getFileTypeInfoUseCase(localFile)
+                manageMediaIntent(
+                    context = context,
+                    contentUri = contentUri,
+                    fileTypeInfo = info,
+                    sortOrder = sortOrder,
+                    viewType = viewType,
+                    name = localFile.name,
+                    handle = handle,
+                    parentHandle = parentId,
+                    isFolderLink = isFolderLink,
+                    isMediaQueueAvailable = isMediaQueueAvailable,
+                    path = localFile.absolutePath,
+                    offlineParent = localFile.parent,
+                    searchedItems = searchedItems
+                )
+            }.onFailure {
+                Timber.e(it)
+                onError()
+            }
         }
     }
 

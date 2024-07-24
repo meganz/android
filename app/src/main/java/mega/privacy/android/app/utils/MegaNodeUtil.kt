@@ -52,7 +52,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FRAGMENT_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_URL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_LOCATION_FILE_INFO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
@@ -82,10 +81,10 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER_CHILD
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
-import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showSnackbar
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
@@ -1409,45 +1408,15 @@ object MegaNodeUtil {
             }
 
             mime.isVideoMimeType || mime.isAudio -> {
-                val mediaIntent: Intent
-                val internalIntent: Boolean
-                var opusFile = false
-                if (mime.isVideoNotSupported || mime.isAudioNotSupported
-                ) {
-                    mediaIntent = Intent(Intent.ACTION_VIEW)
-                    internalIntent = false
-                    val parts = autoPlayInfo.nodeName.split("\\.")
-                    if (parts.size > 1 && parts.last() == "opus") {
-                        opusFile = true
-                    }
-                } else {
-                    internalIntent = true
-                    mediaIntent = getMediaIntent(context, autoPlayInfo.nodeName)
-                }
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, autoPlayInfo.nodeHandle)
-
-                if (!setLocalIntentParams(
-                        context, autoPlayInfo.nodeName, mediaIntent, autoPlayInfo.localPath,
-                        false, snackbarShower
-                    )
-                ) {
-                    return
-                }
-
-                mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-
-                if (opusFile) {
-                    mediaIntent.setDataAndType(mediaIntent.data, "audio/*")
-                }
-
-                if (internalIntent) {
-                    activityLauncher.launchActivity(mediaIntent)
-                } else {
-                    if (isIntentAvailable(context, mediaIntent)) {
-                        activityLauncher.launchActivity(mediaIntent)
-                    } else {
+                val file = File(autoPlayInfo.localPath)
+                if (file.exists().not()) return
+                EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
+                    .megaNavigator().openMediaPlayerActivityByLocalFile(
+                        context = context,
+                        localFile = file,
+                        handle = autoPlayInfo.nodeHandle,
+                        sortOrder = SortOrder.ORDER_NONE
+                    ) {
                         sendFile(
                             context,
                             autoPlayInfo.nodeName,
@@ -1456,7 +1425,6 @@ object MegaNodeUtil {
                             snackbarShower
                         )
                     }
-                }
             }
 
             else -> {
