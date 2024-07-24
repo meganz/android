@@ -13,12 +13,21 @@ internal class OptionalMegaTransferListenerInterface(
     private val onTransferFinish: ((MegaTransfer, MegaError) -> Unit)? = null,
     private val onTransferUpdate: ((MegaTransfer) -> Unit)? = null,
     private val onTransferTemporaryError: ((MegaTransfer, MegaError) -> Unit)? = null,
-    private val onTransferData: ((MegaTransfer, ByteArray) -> Unit)? = null
+    private val onTransferData: ((MegaTransfer, ByteArray) -> Unit)? = null,
+    private val onFolderTransferUpdate: ((
+        transfer: MegaTransfer,
+        stage: Int,
+        folderCount: Int,
+        createdFolderCount: Int,
+        fileCount: Int,
+        currentFolder: String,
+        currentFileLeafName: String,
+    ) -> Unit)? = null,
 ) : MegaTransferListenerInterface {
 
     override fun onTransferStart(
         api: MegaApiJava,
-        transfer: MegaTransfer
+        transfer: MegaTransfer,
     ) {
         onTransferStart?.invoke(transfer)
     }
@@ -26,14 +35,14 @@ internal class OptionalMegaTransferListenerInterface(
     override fun onTransferFinish(
         api: MegaApiJava,
         transfer: MegaTransfer,
-        error: MegaError
+        e: MegaError,
     ) {
-        onTransferFinish?.invoke(transfer, error)
+        onTransferFinish?.invoke(transfer, e)
     }
 
     override fun onTransferUpdate(
         api: MegaApiJava,
-        transfer: MegaTransfer
+        transfer: MegaTransfer,
     ) {
         onTransferUpdate?.invoke(transfer)
     }
@@ -41,17 +50,38 @@ internal class OptionalMegaTransferListenerInterface(
     override fun onTransferTemporaryError(
         api: MegaApiJava,
         transfer: MegaTransfer,
-        error: MegaError
+        e: MegaError,
     ) {
-        onTransferTemporaryError?.invoke(transfer, error)
+        onTransferTemporaryError?.invoke(transfer, e)
     }
 
     override fun onTransferData(
         api: MegaApiJava,
         transfer: MegaTransfer,
-        buffer: ByteArray
+        buffer: ByteArray,
     ): Boolean {
         onTransferData?.invoke(transfer, buffer)
         return onTransferData != null
+    }
+
+    override fun onFolderTransferUpdate(
+        api: MegaApiJava,
+        transfer: MegaTransfer,
+        stage: Int,
+        folderCount: Int,
+        createdFolderCount: Int,
+        fileCount: Int,
+        currentFolder: String,
+        currentFileLeafName: String,
+    ) {
+        onFolderTransferUpdate?.invoke(
+            transfer,
+            stage,
+            folderCount,
+            createdFolderCount,
+            fileCount,
+            currentFolder,
+            currentFileLeafName
+        )
     }
 }

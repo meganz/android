@@ -1720,6 +1720,18 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         buffer: ByteArray,
     ): Boolean = false
 
+    override fun onFolderTransferUpdate(
+        api: MegaApiJava,
+        transfer: MegaTransfer,
+        stage: Int,
+        folderCount: Int,
+        createdFolderCount: Int,
+        fileCount: Int,
+        currentFolder: String,
+        currentFileLeafName: String,
+    ) {
+    }
+
     private fun handleHideNodeClick(playingHandle: Long) {
         val (isPaid, isHiddenNodesOnboarded) = with(viewModel.uiState.value) {
             (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded

@@ -263,7 +263,7 @@ class DefaultTransfersRepositoryTest {
                 (it.arguments.last() as OptionalMegaTransferListenerInterface).onTransferFinish(
                     api = mock(),
                     transfer = mock(),
-                    error = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
+                    e = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
                 )
             }
             if (isUpload) {
@@ -289,7 +289,7 @@ class DefaultTransfersRepositoryTest {
                 (it.arguments.last() as OptionalMegaTransferListenerInterface).onTransferFinish(
                     api = mock(),
                     transfer = mock(),
-                    error = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
+                    e = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
                 )
             }
             if (isUpload) {
@@ -338,7 +338,7 @@ class DefaultTransfersRepositoryTest {
                 (it.arguments.last() as OptionalMegaTransferListenerInterface).onTransferTemporaryError(
                     api = mock(),
                     transfer = mock(),
-                    error = mock { on { errorCode }.thenReturn(MegaError.API_OK + 1) },
+                    e = mock { on { errorCode }.thenReturn(MegaError.API_OK + 1) },
                 )
             }
             if (isUpload) {

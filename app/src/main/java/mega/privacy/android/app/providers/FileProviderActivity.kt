@@ -1646,6 +1646,18 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
         return false
     }
 
+    override fun onFolderTransferUpdate(
+        api: MegaApiJava,
+        transfer: MegaTransfer,
+        stage: Int,
+        folderCount: Int,
+        createdFolderCount: Int,
+        fileCount: Int,
+        currentFolder: String,
+        currentFileLeafName: String,
+    ) {
+    }
+
     override fun onAccountUpdate(api: MegaApiJava) {}
     override fun onContactRequestsUpdate(
         api: MegaApiJava,
