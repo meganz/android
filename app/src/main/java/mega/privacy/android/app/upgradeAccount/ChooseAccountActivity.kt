@@ -3,6 +3,7 @@ package mega.privacy.android.app.upgradeAccount
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.enableEdgeToEdge
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.IntentConstants
@@ -11,7 +12,9 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 
 open class ChooseAccountActivity : PasscodeActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
 

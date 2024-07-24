@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -99,6 +100,11 @@ class ChooseAccountFragment : Fragment() {
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         OriginalTempTheme(isDark = mode.isDarkMode()) {
+            val modifier = Modifier
+                .semantics {
+                    testTagsAsResourceId = true
+                }
+                .systemBarsPadding()
             if (uiState.enableVariantAUI) {
                 VariantAOnboardingDialogView(
                     state = uiState,
@@ -109,9 +115,7 @@ class ChooseAccountFragment : Fragment() {
                         )
                         chooseAccountActivity.onPlanClicked(AccountType.PRO_I)
                     },
-                    modifier = Modifier.semantics {
-                        testTagsAsResourceId = true
-                    },
+                    modifier = modifier,
                 )
             } else if (uiState.enableVariantBUI) {
                 VariantBOnboardingDialogView(
@@ -136,18 +140,14 @@ class ChooseAccountFragment : Fragment() {
                             OnboardingUpsellingDialogVariantBProPlanIIIDisplayedEvent
                         )
                     },
-                    modifier = Modifier.semantics {
-                        testTagsAsResourceId = true
-                    },
+                    modifier = modifier,
                 )
             } else {
                 ChooseAccountView(
                     state = uiState,
                     onBackPressed = chooseAccountActivity::onFreeClick,
                     onPlanClicked = chooseAccountActivity::onPlanClicked,
-                    modifier = Modifier.semantics {
-                        testTagsAsResourceId = true
-                    },
+                    modifier = modifier,
                 )
             }
         }

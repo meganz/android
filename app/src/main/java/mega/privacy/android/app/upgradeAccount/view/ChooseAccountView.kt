@@ -41,9 +41,14 @@ import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.body2
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
@@ -53,11 +58,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_500_gr
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_600_grey_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_500_red_300
 import mega.privacy.android.shared.original.core.ui.theme.subtitle2
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.Currency
-import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import java.util.Locale
 
 /**
@@ -73,6 +73,7 @@ fun ChooseAccountView(
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
+        modifier = modifier,
         topBar = {
             SimpleTopAppBar(
                 titleId = R.string.choose_account_fragment,

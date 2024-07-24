@@ -43,12 +43,12 @@ import mega.privacy.android.app.upgradeAccount.view.components.MonthlyYearlyTabs
 import mega.privacy.android.app.upgradeAccount.view.components.ProPlanInfoCard
 import mega.privacy.android.app.upgradeAccount.view.components.SaveUpToLabel
 import mega.privacy.android.app.upgradeAccount.view.components.SubscriptionDetails
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 
@@ -70,6 +70,7 @@ fun VariantBOnboardingDialogView(
     val scrollState = rememberScrollState()
 
     MegaScaffold(
+        modifier = modifier,
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
