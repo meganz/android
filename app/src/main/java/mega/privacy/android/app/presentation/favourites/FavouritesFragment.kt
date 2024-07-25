@@ -377,13 +377,15 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         if (fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is AudioFileTypeInfo) {
             viewLifecycleOwner.lifecycleScope.launch {
                 val contentUri = viewModel.getNodeContentUri(favourite.typedNode) ?: return@launch
-                megaNavigator.openMediaPlayerActivityByFileNode(
-                    context = requireContext(),
-                    contentUri = contentUri,
-                    fileNode = favourite.typedNode,
-                    viewType = FAVOURITES_ADAPTER,
-                    isMediaQueueAvailable = false
-                ) {
+                runCatching {
+                    megaNavigator.openMediaPlayerActivityByFileNode(
+                        context = requireContext(),
+                        contentUri = contentUri,
+                        fileNode = favourite.typedNode,
+                        viewType = FAVOURITES_ADAPTER,
+                        isMediaQueueAvailable = false
+                    )
+                }.onFailure {
                     Snackbar.make(
                         requireView(),
                         getString(R.string.intent_not_available),

@@ -195,7 +195,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         }.let(context::startActivity)
     }
 
-    override fun openMediaPlayerActivityByFileNode(
+    override suspend fun openMediaPlayerActivityByFileNode(
         context: Context,
         contentUri: NodeContentUri,
         fileNode: TypedFileNode,
@@ -205,29 +205,21 @@ internal class MegaNavigatorImpl @Inject constructor(
         isMediaQueueAvailable: Boolean,
         searchedItems: List<Long>?,
         mediaQueueTitle: String?,
-        onError: () -> Unit,
     ) {
-        applicationScope.launch {
-            runCatching {
-                manageMediaIntent(
-                    context = context,
-                    contentUri = contentUri,
-                    fileTypeInfo = fileNode.type,
-                    sortOrder = sortOrder,
-                    viewType = viewType,
-                    name = fileNode.name,
-                    handle = fileNode.id.longValue,
-                    parentHandle = fileNode.parentId.longValue,
-                    isFolderLink = isFolderLink,
-                    isMediaQueueAvailable = isMediaQueueAvailable,
-                    searchedItems = searchedItems,
-                    mediaQueueTitle = mediaQueueTitle
-                )
-            }.onFailure {
-                Timber.e(it)
-                onError()
-            }
-        }
+        manageMediaIntent(
+            context = context,
+            contentUri = contentUri,
+            fileTypeInfo = fileNode.type,
+            sortOrder = sortOrder,
+            viewType = viewType,
+            name = fileNode.name,
+            handle = fileNode.id.longValue,
+            parentHandle = fileNode.parentId.longValue,
+            isFolderLink = isFolderLink,
+            isMediaQueueAvailable = isMediaQueueAvailable,
+            searchedItems = searchedItems,
+            mediaQueueTitle = mediaQueueTitle
+        )
     }
 
     private fun manageMediaIntent(

@@ -598,13 +598,19 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         content: NodeContentUri,
         viewType: Int?,
     ) {
-        megaNavigator.openMediaPlayerActivityByFileNode(
-            context = this,
-            fileNode = fileNode,
-            contentUri = content,
-            viewType = viewType ?: INVALID_VALUE,
-            sortOrder = viewModel.state.value.sortOrder
-        )
+        lifecycleScope.launch {
+            runCatching {
+                megaNavigator.openMediaPlayerActivityByFileNode(
+                    context = this@SearchActivity,
+                    fileNode = fileNode,
+                    contentUri = content,
+                    viewType = viewType ?: INVALID_VALUE,
+                    sortOrder = viewModel.state.value.sortOrder
+                )
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     private fun openUrlFile(

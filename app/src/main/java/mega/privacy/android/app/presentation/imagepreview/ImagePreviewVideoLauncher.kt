@@ -75,12 +75,16 @@ class ImagePreviewVideoLauncher @Inject constructor(
                     null
                 }.getOrNull()
             }?.let { contentUri ->
-                megaNavigator.openMediaPlayerActivityByFileNode(
-                    context = context,
-                    contentUri = contentUri,
-                    fileNode = typedFileNode,
-                    viewType = viewType
-                )
+                runCatching {
+                    megaNavigator.openMediaPlayerActivityByFileNode(
+                        context = context,
+                        contentUri = contentUri,
+                        fileNode = typedFileNode,
+                        viewType = viewType
+                    )
+                }.onFailure {
+                    Timber.e(it)
+                }
             }
         }
     }

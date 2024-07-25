@@ -237,20 +237,21 @@ private suspend fun openVideoOrAudioFile(
     viewType: Int,
     coroutineScope: CoroutineScope,
 ) {
-    EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
-        .megaNavigator().openMediaPlayerActivityByFileNode(
-            context = context,
-            contentUri = content,
-            fileNode = fileNode,
-            sortOrder = sortOrder,
-            viewType = viewType,
-            isFolderLink = false,
-            onError = {
-                coroutineScope.launch {
-                    snackBarHostState?.showSnackbar(context.getString(R.string.intent_not_available))
-                }
-            }
-        )
+    coroutineScope.launch {
+        runCatching {
+            EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
+                .megaNavigator().openMediaPlayerActivityByFileNode(
+                    context = context,
+                    contentUri = content,
+                    fileNode = fileNode,
+                    sortOrder = sortOrder,
+                    viewType = viewType,
+                    isFolderLink = false
+                )
+        }.onFailure {
+            snackBarHostState?.showSnackbar(context.getString(R.string.intent_not_available))
+        }
+    }
 }
 
 private suspend fun openUrlFile(

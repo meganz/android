@@ -312,13 +312,15 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                         if (fileNode is TypedFileNode) {
                             val contentUri = viewModel.getNodeContentUri()
                                 ?: return@launch
-                            megaNavigator.openMediaPlayerActivityByFileNode(
-                                context = this@FileLinkComposeActivity,
-                                contentUri = contentUri,
-                                fileNode = fileNode,
-                                isFolderLink = true,
-                                viewType = FILE_LINK_ADAPTER,
-                            ) {
+                            runCatching {
+                                megaNavigator.openMediaPlayerActivityByFileNode(
+                                    context = this@FileLinkComposeActivity,
+                                    contentUri = contentUri,
+                                    fileNode = fileNode,
+                                    isFolderLink = true,
+                                    viewType = FILE_LINK_ADAPTER,
+                                )
+                            }.onFailure {
                                 Toast.makeText(
                                     this@FileLinkComposeActivity,
                                     getString(R.string.intent_not_available),

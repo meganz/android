@@ -167,21 +167,25 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
             fileNode?.let {
                 val uiState = audioSectionViewModel.state.value
                 viewLifecycleOwner.lifecycleScope.launch {
-                    val nodeContentUri =
-                        audioSectionViewModel.getNodeContentUri(it) ?: return@launch
-                    megaNavigator.openMediaPlayerActivityByFileNode(
-                        context = requireContext(),
-                        contentUri = nodeContentUri,
-                        fileNode = it,
-                        sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
-                        viewType = if (uiState.searchMode)
-                            SEARCH_BY_ADAPTER
-                        else
-                            AUDIO_BROWSE_ADAPTER,
-                        isFolderLink = false,
-                        searchedItems = uiState.allAudios.map { it.id.longValue }
-                    )
-                    audioSectionViewModel.updateClickedItem(null)
+                    runCatching {
+                        val nodeContentUri =
+                            audioSectionViewModel.getNodeContentUri(it) ?: return@launch
+                        megaNavigator.openMediaPlayerActivityByFileNode(
+                            context = requireContext(),
+                            contentUri = nodeContentUri,
+                            fileNode = it,
+                            sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
+                            viewType = if (uiState.searchMode)
+                                SEARCH_BY_ADAPTER
+                            else
+                                AUDIO_BROWSE_ADAPTER,
+                            isFolderLink = false,
+                            searchedItems = uiState.allAudios.map { it.id.longValue }
+                        )
+                        audioSectionViewModel.updateClickedItem(null)
+                    }.onFailure {
+                        Timber.e(it)
+                    }
                 }
             }
         }

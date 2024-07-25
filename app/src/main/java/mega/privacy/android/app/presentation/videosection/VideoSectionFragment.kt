@@ -58,6 +58,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -286,25 +287,29 @@ class VideoSectionFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             val nodeContentUri = videoSectionViewModel.getNodeContentUri(node) ?: return@launch
-            megaNavigator.openMediaPlayerActivityByFileNode(
-                context = requireContext(),
-                contentUri = nodeContentUri,
-                fileNode = node,
-                sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
-                viewType = if (isSearchMode) {
-                    SEARCH_BY_ADAPTER
-                } else {
-                    VIDEO_BROWSE_ADAPTER
-                },
-                isFolderLink = false,
-                searchedItems =
-                if (uiState.currentDestinationRoute == videoSectionRoute && isSearchMode) {
-                    uiState.allVideos.map { it.id.longValue }
-                } else {
-                    null
-                },
-            )
-            videoSectionViewModel.updateClickedItem(null)
+            runCatching {
+                megaNavigator.openMediaPlayerActivityByFileNode(
+                    context = requireContext(),
+                    contentUri = nodeContentUri,
+                    fileNode = node,
+                    sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
+                    viewType = if (isSearchMode) {
+                        SEARCH_BY_ADAPTER
+                    } else {
+                        VIDEO_BROWSE_ADAPTER
+                    },
+                    isFolderLink = false,
+                    searchedItems =
+                    if (uiState.currentDestinationRoute == videoSectionRoute && isSearchMode) {
+                        uiState.allVideos.map { it.id.longValue }
+                    } else {
+                        null
+                    },
+                )
+                videoSectionViewModel.updateClickedItem(null)
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 
@@ -312,17 +317,21 @@ class VideoSectionFragment : Fragment() {
         val uiState = videoSectionViewModel.state.value
         viewLifecycleOwner.lifecycleScope.launch {
             val nodeContentUri = videoSectionViewModel.getNodeContentUri(node) ?: return@launch
-            megaNavigator.openMediaPlayerActivityByFileNode(
-                context = requireContext(),
-                contentUri = nodeContentUri,
-                fileNode = node,
-                sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
-                viewType = SEARCH_BY_ADAPTER,
-                isFolderLink = false,
-                searchedItems = uiState.currentVideoPlaylist?.videos?.map { it.id.longValue },
-                mediaQueueTitle = uiState.currentVideoPlaylist?.title
-            )
-            videoSectionViewModel.updateClickedPlaylistDetailItem(null)
+            runCatching {
+                megaNavigator.openMediaPlayerActivityByFileNode(
+                    context = requireContext(),
+                    contentUri = nodeContentUri,
+                    fileNode = node,
+                    sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
+                    viewType = SEARCH_BY_ADAPTER,
+                    isFolderLink = false,
+                    searchedItems = uiState.currentVideoPlaylist?.videos?.map { it.id.longValue },
+                    mediaQueueTitle = uiState.currentVideoPlaylist?.title
+                )
+                videoSectionViewModel.updateClickedPlaylistDetailItem(null)
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 

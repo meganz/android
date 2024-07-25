@@ -189,8 +189,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
             val typedNode = addNodeType(fileNode) as? TypedFileNode
             typedNode?.let { node ->
                 runCatching {
-                    getFolderLinkNodeContentUriUseCase(node)
-                }.onSuccess { contentUri ->
+                    val contentUri = getFolderLinkNodeContentUriUseCase(node)
                     megaNavigator.openMediaPlayerActivityByFileNode(
                         context = activity,
                         contentUri = contentUri,

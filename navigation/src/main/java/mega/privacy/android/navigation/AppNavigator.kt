@@ -136,9 +136,8 @@ interface AppNavigator {
      * @param isMediaQueueAvailable whether the media queue is available
      * @param searchedItems the list of searched items, this is only used under the search mode
      * @param mediaQueueTitle the title of the media queue
-     * @param onError Callback called when error occurs
      */
-    fun openMediaPlayerActivityByFileNode(
+    suspend fun openMediaPlayerActivityByFileNode(
         context: Context,
         contentUri: NodeContentUri,
         fileNode: TypedFileNode,
@@ -147,8 +146,7 @@ interface AppNavigator {
         isFolderLink: Boolean = false,
         isMediaQueueAvailable: Boolean = true,
         searchedItems: List<Long>? = null,
-        mediaQueueTitle: String? = null,
-        onError: () -> Unit = {},
+        mediaQueueTitle: String? = null
     )
 
     /**
