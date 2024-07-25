@@ -10,7 +10,10 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,7 +29,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
-import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -44,6 +46,8 @@ import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowAct
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
+import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
@@ -98,7 +102,7 @@ class ImagePreviewActivity : BaseActivity() {
         )
 
     private val viewModel: ImagePreviewViewModel by viewModels()
-    private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
+    private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
 
     private var tempNodeId: NodeId? = null
 
@@ -106,16 +110,18 @@ class ImagePreviewActivity : BaseActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
-        if (savedInstanceState != null) {
-            nodeAttacher.restoreState(savedInstanceState)
-        }
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val snackbarHostState: SnackbarHostState = remember {
+                SnackbarHostState()
+            }
+            val coroutineScope = rememberCoroutineScope()
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 PasscodeContainer(
                     passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                     content = {
                         ImagePreviewScreen(
+                            snackbarHostState = snackbarHostState,
                             onClickBack = ::finish,
                             onClickVideoPlay = ::playVideo,
                             onClickSlideshow = ::playSlideshow,
@@ -127,7 +133,9 @@ class ImagePreviewActivity : BaseActivity() {
                             onClickImport = ::importNode,
                             onSwitchAvailableOffline = ::setAvailableOffline,
                             onClickGetLink = ::getNodeLink,
-                            onClickSendTo = ::sendNodeToChat,
+                            onClickSendTo = {
+                                nodeAttachmentViewModel.startAttachNodes(listOf(it.id))
+                            },
                             onClickShare = ::shareNode,
                             onClickRename = ::renameNode,
                             onClickHide = ::hideNode,
@@ -138,6 +146,11 @@ class ImagePreviewActivity : BaseActivity() {
                             onClickRestore = ::restoreNode,
                             onClickRemove = ::removeNode,
                             onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
+                        )
+
+                        NodeAttachmentView(
+                            viewModel = nodeAttachmentViewModel,
+                            snackbarHostState = snackbarHostState,
                         )
                     }
                 )
@@ -250,10 +263,6 @@ class ImagePreviewActivity : BaseActivity() {
         )
     }
 
-    private fun sendNodeToChat(imageNode: ImageNode) {
-        nodeAttacher.attachNode(MegaNode.unserialize(imageNode.serializedData))
-    }
-
     private fun getNodeLink(imageNode: ImageNode) {
         LinksUtil.showGetLinkActivity(this, imageNode.id.longValue)
     }
@@ -345,20 +354,6 @@ class ImagePreviewActivity : BaseActivity() {
                 this@ImagePreviewActivity,
                 imageNode = imageNode,
             )
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        nodeAttacher.saveState(outState)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        when {
-            nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this) ->
-                return
-
-            else -> super.onActivityResult(requestCode, resultCode, intent)
         }
     }
 

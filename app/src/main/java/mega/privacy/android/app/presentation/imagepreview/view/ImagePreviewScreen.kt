@@ -39,6 +39,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
@@ -103,11 +104,12 @@ import mega.privacy.mobile.analytics.event.ImagePreviewHideNodeMenuToolBarEvent
 
 @Composable
 internal fun ImagePreviewScreen(
-    viewModel: ImagePreviewViewModel = viewModel(),
     onClickBack: () -> Unit,
     onClickVideoPlay: (ImageNode) -> Unit,
     onClickSlideshow: () -> Unit,
     onClickInfo: (ImageNode) -> Unit,
+    snackbarHostState: SnackbarHostState,
+    viewModel: ImagePreviewViewModel = viewModel(),
     onClickFavourite: (ImageNode) -> Unit = {},
     onClickLabel: (ImageNode) -> Unit = {},
     onClickOpenWith: (ImageNode) -> Unit = {},
@@ -159,7 +161,7 @@ internal fun ImagePreviewScreen(
             )
         }
 
-        val scaffoldState = rememberScaffoldState()
+        val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
         val isLight = MaterialTheme.colors.isLight
         val context = LocalContext.current
         val photoState = rememberPhotoState()
