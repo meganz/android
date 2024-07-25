@@ -5,7 +5,7 @@ accompanist-systemui = "0.23.1"
 autovalue = "1.10.4"
 firebase = "33.1.1"
 firebase-app-distribution = "16.0.0-beta13"
-flexbox = "2.0.1"
+flexbox = "3.0.0"
 gson = "2.10.1"
 hilt = "2.51"
 material = "1.12.0"
@@ -39,7 +39,7 @@ firebase-crashlytics-ndk = { group = "com.google.firebase", name = "firebase-cra
 firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
 firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
 firebase-perf-ktx = { group = "com.google.firebase", name = "firebase-perf-ktx" }
-flexbox = { module = "com.google.android:flexbox", version.ref = "flexbox" }
+flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
