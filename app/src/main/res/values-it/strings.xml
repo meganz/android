@@ -643,7 +643,7 @@
     <!-- Preference screen item action button -->
     <string name="settings_about_privacy_policy">Politica sulla privacy</string>
     <!--  -->
-    <string name="settings_about_terms_of_service">Termini di servizio</string>
+    <string name="settings_about_terms_of_service">Termini di Servizio</string>
     <!-- App means “Application” -->
     <string name="settings_about_app_version">Versione</string>
     <!-- Title of the label where the SDK version is shown -->
@@ -3431,11 +3431,11 @@
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">Hai inserito la tua password corrente</string>
     <!-- Title of pop-up error message for taken down file -->
-    <string name="error_file_not_available">File nomn più disponibile</string>
+    <string name="error_file_not_available">File non più disponibile</string>
     <!-- Body of pop-up error message for taken down file. -->
     <string name="error_takendown_file">File rimosso perché viola i nostri Termini di servizio.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
-    <string name="error_download_takendown_file">Termini di servizio violati</string>
+    <string name="error_download_takendown_file">Termini di Servizio violati</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_warning_no_picker">Questo dispositivo non ha app per selezionare le cartelle.</string>
     <!-- Next audios to be played in the audio playlist -->
@@ -5573,5 +5573,5 @@
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">Posizione</string>
     <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">No location information</string>
+    <string name="file_properties_info_map_location_no_location_info">Nessuna informazione sulla posizione</string>
 </resources>

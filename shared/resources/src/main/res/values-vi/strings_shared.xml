@@ -424,8 +424,8 @@
     <string name="account_cancel_account_screen_plan_free_plan">Free</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Lưu trữ</string>
-    <!-- Storage amount available in the free plan -->
-    <string name="account_cancel_account_screen_plan_free_storage">20&#160;GB</string>
+    <!-- Storage amount available in the free plan. %1s represents the amount of storage in GB. -->
+    <string name="account_cancel_account_screen_plan_free_storage">%1s&#160;GB</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Truyền Tải</string>
     <!-- Transfer limit in the free plan -->
@@ -440,8 +440,8 @@
     <string name="account_cancel_account_screen_plan_rewind">Tua lại</string>
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">Lên đến 30 ngày (chỉ được xem)</string>
-    <!-- Rewind duration available in the current plan -->
-    <string name="account_cancel_account_screen_plan_rewind_current">Lên đến 180 ngày</string>
+    <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
+    <string name="account_cancel_account_screen_plan_rewind_current">Up to %1s days</string>
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
@@ -449,13 +449,13 @@
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Lên đến 1 tiếng</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
-    <string name="cancel_account_plan_call_meeting_duration_pro">KHÔNG GIỚI HẠN</string>
+    <string name="cancel_account_plan_call_meeting_duration_pro">Không giới&#160;hạn</string>
     <!-- Row label for call and meeting participants in the comparison table -->
     <string name="account_cancel_account_plan_call_meeting_participants">Số người tham&#160;gia cuộc&#160;gọi $ cuộc&#160;họp</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Lên đến 100 người</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
-    <string name="account_cancel_account_pro_plan_call_meeting_participants">KHÔNG GIỚI HẠN</string>
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">Không giới&#160;hạn</string>
     <!-- Button label to keep the current pro plan -->
     <string name="account_cancel_account_plan_keep_pro_plan">Giữ %1s</string>
     <!-- Button label to continue with the cancellation -->
@@ -471,59 +471,59 @@
     <!-- Title shown when cancelling the subscription -->
     <string name="account_cancellation_instructions_cancel_subscription_title">Hủy Gói Đăng Ký Dịch Vụ</string>
     <!-- Title shown when reactivating the subscription -->
-    <string name="account_cancellation_instructions_reactivate_subscription_title">Reactivate subscription</string>
+    <string name="account_cancellation_instructions_reactivate_subscription_title">Kích&#160;hoạt lại gói đăng&#160;ký</string>
     <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
-    <string name="account_cancellation_instructions_not_managed_by_google">Your subscription is not managed by Google</string>
+    <string name="account_cancellation_instructions_not_managed_by_google">Gói đăng&#160;ký của bạn không có quản&#160;lý bởi Google.</string>
     <!-- Message shown when cancelling the current plan in the instructions screen, informing the user about how to cancel subscription -->
-    <string name="account_cancellation_instructions_message_apple_description">This is because you subscribed to MEGA via Apple. To cancel your subscription, you will need to:</string>
+    <string name="account_cancellation_instructions_message_apple_description">Điều này là do bạn đã đăng&#160;ký MEGA thông qua Apple. Để hủy gói đăng&#160;ký, bạn sẽ cần:</string>
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
-    <string name="account_cancellation_instructions_ios_device">On a iOS Device</string>
+    <string name="account_cancellation_instructions_ios_device">Trên thiết&#160;bị iOS</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
-    <string name="account_cancellation_instructions_open_settings">1. Open the Settings app.</string>
+    <string name="account_cancellation_instructions_open_settings">1. Open the [A]Settings[/A] app.</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
-    <string name="account_cancellation_instructions_tap_on_name">2. Tap on your name.</string>
+    <string name="account_cancellation_instructions_tap_on_name">2. Chạm vào tên của bạn.</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
-    <string name="account_cancellation_instructions_select_subscriptions">3. Tap Subscriptions.</string>
+    <string name="account_cancellation_instructions_select_subscriptions">3. Tap [A]Subscriptions[/A].</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
-    <string name="account_cancellation_instructions_select_mega_subscription">4. Tap your MEGA subscription.</string>
+    <string name="account_cancellation_instructions_select_mega_subscription">4. Chạm vào gói đăng&#160;ký MEGA.</string>
     <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
-    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tap Cancel subscription.</string>
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tap [A]Cancel subscription[/A].</string>
     <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
-    <string name="account_cancellation_instructions_detailed_instructions">[A]Tap here[/A] for detailed instructions on how to cancel your subscription on a computer or other device.</string>
+    <string name="account_cancellation_instructions_detailed_instructions">[A]Chạm vào đây[/A] để được hướng&#160;dẫn chi&#160;tiết về cách hủy gói đăng&#160;ký của bạn trên máy&#160;tính hoặc loại thiết&#160;bị khác.</string>
     <!-- Title shown when needing to cancel the subscription using a web browser -->
     <string name="account_cancellation_instructions_cancellation_web_browser_needed">Bạn cần phải hủy gói đăng&#160;ký của mình bằng trình&#160;duyệt web</string>
     <!-- Title shown when needing to reactivate the subscription using a web browser -->
-    <string name="account_cancellation_instructions_reactivation_web_browser_needed">You need to reactivate your subscription using a web browser</string>
+    <string name="account_cancellation_instructions_reactivation_web_browser_needed">Bạn cần phải sử&#160;dụng trình&#160;duyệt web để kích&#160;hoạt lại gói đăng&#160;ký của mình</string>
     <!-- Message shown when reactivating the current plan in the instructions screen, informing the user about how to reactivate the subscription -->
-    <string name="account_cancellation_instructions_reactivation_web_browser_description">This is because you subscribed to MEGA in your web browser. To reactivate your subscription, you will need to:</string>
+    <string name="account_cancellation_instructions_reactivation_web_browser_description">Điều này là do bạn đã đăng&#160;ký gói MEGA bằng trình&#160;duyệt web. Để hủy gói đăng&#160;ký, bạn sẽ cần:</string>
     <!-- Description explaining why the subscription needs to be canceled using a web browser -->
     <string name="account_cancellation_instructions_web_browser_description">Điều này là do bạn đã đăng&#160;ký gói MEGA trong trình&#160;duyệt web của mình. Để hủy gói đăng&#160;ký, bạn sẽ cần:</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">Trên máy tính</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]www.mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website">1. Ghé trang [A]www.mega.nz[/A] trong trình&#160;duyệt web của bạn.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Đăng&#160;nhập vào tài&#160;khoản MEGA của bạn.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_main_menu">3. Click the main menu.</string>
+    <string name="account_cancellation_instructions_click_main_menu">3. Click vào menu chính.</string>
     <!-- Step 4: instruction step no.4 to Click Settings of the MEGA account on MEGA website -->
-    <string name="account_cancellation_instructions_click_settings">4. Click [A]Settings.[/A]</string>
+    <string name="account_cancellation_instructions_click_settings">4. Click vào [A]Thiết&#160;Đặt.[/A]</string>
     <!-- Step 5: instruction step no.5 to Click on Plan section of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_plan">5. Click [A]Plan[/A].</string>
+    <string name="account_cancellation_instructions_click_plan">5. Click vào [A]Gói[/A].</string>
     <!-- Step 6: instruction step no.6 Click Cancel subscription of the MEGA account on MEGA website -->
-    <string name="account_cancellation_instructions_click_cancel_subscription">6. Click [A]Cancel subscription[/A].</string>
+    <string name="account_cancellation_instructions_click_cancel_subscription">6. Click vào [A]Hủy đăng&#160;ký[/A].</string>
     <!-- Alternative Step 6: instruction step no.5 Click Reactivate subscription when user's subscription has expired of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_reactivate_subscription">6. Click [A]Reactivate subscription[/A].</string>
+    <string name="account_cancellation_instructions_click_reactivate_subscription">6. Click vào [A]Kích&#160;hoạt lại gói đăng&#160;ký[/A].</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">Trên thiết&#160;bị di&#160;động</string>
     <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. Visit [A]www.mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_mobile_visit_website">1. Ghé trang [A]www.mega.nz[/A] trong trình&#160;duyệt web của bạn.</string>
     <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
     <string name="account_cancellation_instructions_mobile_login_account">2. Đăng&#160;nhập vào tài&#160;khoản MEGA của bạn.</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. Chạm vào ảnh đại&#160;diện của bạn.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
-    <string name="account_cancellation_instructions_tap_cancel_subscription">4. Tap [A]Cancel subscription[/A].</string>
+    <string name="account_cancellation_instructions_tap_cancel_subscription">4. Chạm vào [A]Hủy đăng&#160;ký[/A].</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">Không có kết nối internet</string>
     <!-- Menu option to create a new folder in the file manager -->
@@ -542,4 +542,6 @@
     <string name="create_new_folder_dialog_error_existing_folder">Đã có một thư mục với cái tên này rồi</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">Các ký&#160;tự này không&#160;được phép sử&#160;dụng: %1$s</string>
+    <!-- Sync settings section title-->
+    <string name="settings_section_sync">Đồng bộ</string>
 </resources>

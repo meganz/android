@@ -5,7 +5,7 @@
     <!-- Screen title for saving current scan (Document scanner) -->
     <string name="scan_title_save_scan">Scan opslaan</string>
     <!-- Label of the button to add a new page to the current document scan -->
-    <string name="scan_action_add">Voeg toe</string>
+    <string name="scan_action_add">Toevoegen</string>
     <!-- Action of a button to save something -->
     <string name="scan_action_save">Opslaan</string>
     <!-- Action text to retake current scan picture (Document scanner) -->

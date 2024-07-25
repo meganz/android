@@ -147,7 +147,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Nicio conexiune la rețea</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">Ai fost deconectat de pe acest dispozitiv dintr-o altă locație</string>
+    <string name="error_server_expired_session">Ai fost deconectat de pe acest aparat dintr-o altă locație</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Se generează cheile de criptare</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -273,7 +273,7 @@
     <!-- Adding new relationships (contacts) using the actions. -->
     <string name="contacts_list_empty_text">Adaugă contacte noi folosind butonul de mai jos</string>
     <!-- Error message -->
-    <string name="error_not_enough_free_space">Spațiu liber insuficient pe dispozitiv</string>
+    <string name="error_not_enough_free_space">Spațiu liber insuficient pe aparat</string>
     <!-- Alert Dialog to get link -->
     <string name="option_decryption_key">Cheie de decriptare</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
@@ -293,9 +293,9 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Vezi transferurile</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
-    <string name="intent_not_available">Nu există nicio aplicație disponibilă pentru a executa acest fișier pe dispozitiv</string>
+    <string name="intent_not_available">Nu există nicio aplicație disponibilă pentru a executa acest fișier pe aparat</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
-    <string name="intent_not_available_location">Nu există aplicații disponibile pe dispozitiv pentru a deschide această locație</string>
+    <string name="intent_not_available_location">Nu există aplicații disponibile pe aparat pentru a deschide această locație</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Este posibil să nu ai instalate aplicații care acceptă acest tip de fișiere</string>
     <!-- create a link of a file and send it using an app from the device -->
@@ -335,7 +335,7 @@
     <!-- while copying a file or folder -->
     <string name="context_copying">Se copiază</string>
     <!-- menu item -->
-    <string name="context_move_to_trash">Mută în Coșul de gunoi</string>
+    <string name="context_move_to_trash">Mutați în Coșul de gunoi</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Elimină de pe MEGA</string>
     <!-- Input field description in the create folder dialog. -->
@@ -515,7 +515,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Opțiuni pentru codul de acces</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Comprimarea video folosește cantități considerabile de electricitate. Conectați dispozitivul la priză pentru încărcare dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Comprimarea video folosește cantități considerabile de electricitate. Conectați aparatul la priză pentru încărcare dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">Dacă este activată, informațiile despre locație vor fi incluse în imaginile dvs. Vă rugăm să aveți grijă când le împărtășiți.</string>
     <!-- Settings category title for cache and offline files -->
@@ -591,9 +591,9 @@
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">Include etichetele locațiilor</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
-    <string name="settings_camera_upload_require_plug_in">Solicită-mi încărcarea activă a dispozitivului</string>
+    <string name="settings_camera_upload_require_plug_in">Solicită-mi încărcarea activă a aparatului</string>
     <!-- Option to choose that the camera sync will maintain the local file names when uploading -->
-    <string name="settings_keep_file_names">Păstrează numele fișierelor precum în dispozitiv</string>
+    <string name="settings_keep_file_names">Păstrează numele fișierelor precum în aparat</string>
     <!-- The location of where the user photos or videos are stored in the device. -->
     <string name="settings_local_camera_upload_folder">Folder local pentru cameră</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
@@ -1358,13 +1358,13 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Eliminarea contactului de la folderul partajat</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">Muți în Coșul de gunoi?</string>
+    <string name="confirmation_move_to_rubbish">Mutați în Coșul de gunoi?</string>
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">Doriți să mutați acest folder în Coșul de gunoi? Un nou folder va fi creat automat pentru încărcările camere.</string>
     <!-- Confirmation message before removing MU folder -->
     <string name="confirmation_move_mu_folder_to_rubbish">Doriți să mutați acest folder în Coșul de gunoi? Un nou folder va fi creat automat pentru încărcările media.</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">Muți în Coșul de gunoi?</string>
+    <string name="confirmation_move_to_rubbish_plural">Mutați în Coșul de gunoi?</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Ștergi de pe MEGA?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -1440,7 +1440,7 @@
     <!-- mail body -->
     <string name="setting_feedback_body">Vă rugăm să furnizați feedback-ul dvs. aici:</string>
     <!-- mail body -->
-    <string name="settings_feedback_body_device_model">Modelul dispozitivului</string>
+    <string name="settings_feedback_body_device_model">Modelul aparatului</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Versiunea Android</string>
     <!-- Title of the dialog to create a new text file by inserting the name -->
@@ -1550,7 +1550,7 @@
     <!-- Create QR code -->
     <string name="button_create_qr">Creează cod QR</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
-    <string name="qrcode_scan_help">Aliniați codul QR pentru a-l digitaliza cu camera dispozitivului dvs.</string>
+    <string name="qrcode_scan_help">Aliniați codul QR pentru a-l digitaliza cu camera aparatului dvs.</string>
     <!-- positive button on dialog to view a contact -->
     <string name="contact_view">Vezi</string>
     <!-- Item menu option to reproduce audio or video in external reproductors -->
@@ -1707,7 +1707,7 @@
     <!-- The subtitle of fragment Turn on Notifications -->
     <string name="turn_on_notifications_subtitle">În acest fel, vei vedea instantaneu mesaje noi\npe telefonul Android.</string>
     <!-- First step to turn on notifications -->
-    <string name="turn_on_notifications_first_step">Deschide [A]Setările[/A] de pe dispozitivul Android</string>
+    <string name="turn_on_notifications_first_step">Deschide [A]Setările[/A] de pe aparatul Android</string>
     <!-- Second step to turn on notifications -->
     <string name="turn_on_notifications_second_step">Deschide [A]Aplicații și notificări[/A]</string>
     <!-- Third step to turn on notifications -->
@@ -1825,7 +1825,7 @@
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
     <string name="explain_qr_seed_2fa_1">Scanează sau copiază sămânța în aplicația de autentificare.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
-    <string name="explain_qr_seed_2fa_2">Asigură-te că faci backupul acestei sămânțe într-un loc sigur în cazul în care îți pierzi aparatul.</string>
+    <string name="explain_qr_seed_2fa_2">Asigurați-vă că faceți backupul acestei semințe într-un loc sigur în cazul în care vă pierdeți aparatul.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Vă rugăm să introduceți codul din 6 cifre generat de aplicația dvs. de autentificare.</string>
     <!-- Text button -->
@@ -1841,7 +1841,7 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Cod nevalid</string>
     <!-- Title of screen Lost authenticator decive -->
-    <string name="lost_your_authenticator_device">Ți-ai pierdut dispozitivul pentru autentificare?</string>
+    <string name="lost_your_authenticator_device">Ți-ai pierdut aparatul pentru autentificare?</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">Verificarea autentificării</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
@@ -1863,7 +1863,7 @@
     <!-- Text of the button which action is to show the authentication apps -->
     <string name="open_app_button">Deschide în</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
-    <string name="intent_not_available_2fa">Nu există nicio aplicație disponibilă care să permită autentificarea cu doi factori pe dispozitiv</string>
+    <string name="intent_not_available_2fa">Nu există nicio aplicație disponibilă care să permită autentificarea cu doi factori pe aparat</string>
     <!-- Text button -->
     <string name="general_close">Închide</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
@@ -2131,7 +2131,7 @@
     <!-- General label for files -->
     <string name="general_files">Fișiere</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Salvează pe dispozitiv</string>
+    <string name="general_save_to_device">Salvează pe aparat</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Încarcă pe MEGA</string>
     <!-- Label choose destination -->
@@ -2229,7 +2229,7 @@
     <!-- the title of the notification that displays when compression larger than setting -->
     <string name="title_compression_size_over_limit">Dimensiunea comprimării video este prea mare</string>
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
-    <string name="message_compression_size_over_limit">Dimensiunea totală a videoclipurilor de comprimat depășește %s, vă rugăm să puneți dispozitivul la taxarea pentru a continua.</string>
+    <string name="message_compression_size_over_limit">Dimensiunea totală a videoclipurilor de comprimat depășește %s, vă rugăm să puneți aparatul la taxarea pentru a continua.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
     <string name="message_keep_device_name">Această setare se va aplica data viitoare când rulează Încărcări cameră</string>
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
@@ -2389,7 +2389,7 @@
     <!-- Info shown in the subtitle of each row of the shared files to chat: sender name . date -->
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
-    <string name="on_permanently_denied">Încă îi poți acorda lui MEGA permisiuni în setările dispozitivului</string>
+    <string name="on_permanently_denied">Încă îi poți acorda lui MEGA permisiuni în setările aparatului</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="one">Mesaj redirecționat</item>
@@ -2463,7 +2463,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Fotografiile dvs. în cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Încărcările camerelor sunt o caracteristică esențială pentru orice dispozitiv mobil și vă asigurăm. Creează-ți contul acum.</string>
+    <string name="content_tour_four">Încărcările camerelor sunt o caracteristică esențială pentru orice aparat mobil și vă asigurăm. Creează-ți contul acum.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Introduceți parola dvs.</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2627,11 +2627,11 @@
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text_2">Contactează administratorul contului business pentru a rezolva problema și a-ți activa contul.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
-    <string name="logout_warning_offline">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe dispozitiv.</string>
+    <string name="logout_warning_offline">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe aparat.</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
     <string name="logout_warning_transfers">Când te deconectezi, transferurile în curs vor fi anulate.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files and transfers in progress. -->
-    <string name="logout_warning_offline_and_transfers">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe dispozitiv și transferurile în curs vor fi anulate.</string>
+    <string name="logout_warning_offline_and_transfers">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe aparat și transferurile în curs vor fi anulate.</string>
     <!-- Label to indicate that a name has not been possible to obtain for some reason -->
     <string name="unknown_name_label">Nume necunoscut</string>
     <!-- Error when renaming a chat title and it is too long -->
@@ -2909,7 +2909,7 @@
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="key_copied_clipboard">Cheie copiată în clipboard</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">Parolă copiată în clipboard</string>
+    <string name="password_copied_clipboard">Parolă a fost copiată în clipboard</string>
     <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
     <string name="link_and_key_sent">Link și cheie trimise</string>
     <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
@@ -3141,7 +3141,7 @@
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Adaugă un număr de telefon</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
-    <string name="denied_write_permissions">MEGA are nevoie de permisiuni de scriere în spațiul de stocare al dispozitivului pentru a continua.</string>
+    <string name="denied_write_permissions">MEGA are nevoie de permisiuni de scriere în spațiul de stocare al aparatului pentru a continua.</string>
     <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
     <string name="tomorrow_date">Mâine, %1$s</string>
     <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
@@ -3277,7 +3277,7 @@
     <!-- the bonus title of join without account on left meeting page-->
     <string name="left_meeting_bonus_title">Obține 20&#160;GB gratuit</string>
     <!-- the bonus content of join without account on left meeting page-->
-    <string name="left_meeting_bonus_content">Înscrie-te acum și bucură-te gratuit de funcțiile avansate de colaborare.</string>
+    <string name="left_meeting_bonus_content">Înscrieți-vă acum și bucurați-vă gratuit de funcții avansate de colaborare.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
     <string name="ongoing_call_content">Un alt apel în desfășurare. Vă rugăm să încheiați apelul curent înainte de a efectua altul.</string>
     <!-- The hint text when changing meeting name-->
@@ -3399,7 +3399,7 @@
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Aveți deja un abonament. Dacă cumpărați altul, veți fi taxat de două ori. Pentru a evita acest lucru, anulați abonamentul curent accesând MEGA într-un browser web desktop sau mobil. Vizitați Centrul nostru de ajutor pentru mai multe informații.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">Accesați Setări pentru a permite MEGA permisiunea de a accesa dispozitivele din apropiere utilizând Bluetooth.</string>
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Accesați Setări pentru a permite MEGA permisiunea de a accesa aparatele din apropiere utilizând Bluetooth.</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">Nu putem continua cu facturarea. Dacă utilizați o aplicație duală, vă rugăm să luați în considerare conectarea la MEGA fără ea. Dacă nu, încercați să actualizați prin browserul dvs. web.</string>
     <!-- Title for subscription dialog that shows before delete account -->
@@ -3437,7 +3437,7 @@
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
     <string name="error_download_takendown_file">A încălcat Termenii de utilizare a serviciului</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_warning_no_picker">Acest dispozitiv nu are o aplicație care să selecteze foldere.</string>
+    <string name="general_warning_no_picker">Acest aparat nu are o aplicație care să selecteze foldere.</string>
     <!-- Next audios to be played in the audio playlist -->
     <string name="media_player_audio_playlist_next">Următorul fișier audio</string>
     <!-- Previous audios have been already played in the audio playlist -->
@@ -3715,7 +3715,7 @@
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Începe să chatuiești acum</string>
     <!--Description text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_description">Chatuiește securizat și privat, cu oricine și de pe orice dispozitiv, știind că nimeni nu îți poate citi chaturile, nici măcar MEGA.</string>
+    <string name="chat_recent_list_empty_description">Chatuiește securizat și privat, cu oricine și de pe orice aparat, știind că nimeni nu îți poate citi chaturile, nici măcar MEGA.</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">Începe întâlnirea acum</string>
     <!-- Label for call option on settings -->
@@ -3805,7 +3805,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">Ați adăugat deja toate contactele dvs. la acest chat. Dacă doriți să adăugați mai mulți participanți, invitați-i mai întâi la lista dvs. de contacte.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Imagine salvată în galeria dispozitivului</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Imagine salvată în galeria aparatului</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Introduceți numele albumului</string>
     <!-- Album creation input name placeholder -->
@@ -3895,7 +3895,7 @@
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">Elimini din album?</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">Pentru a activa încărcările camerei, permiteți MEGA accesul la fotografiile și alte suporturi media de pe dispozitiv.</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">Pentru a activa încărcările camerei, permiteți MEGA accesul la fotografiile și alte suporturi media de pe aparat.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">Activează accesul</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
@@ -3933,7 +3933,7 @@
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">Acces refuzat</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_content_media_permissions_denied">Ați refuzat accesul MEGA la fișierele de stocare și media ale dispozitivului dvs. Dacă doriți să continuați partajarea, permiteți permisiunea MEGA.</string>
+    <string name="dialog_content_media_permissions_denied">Ați refuzat accesul MEGA la fișierele de stocare și media ale aparatului dvs. Dacă doriți să continuați partajarea, permiteți permisiunea MEGA.</string>
     <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
     <string name="dialog_positive_button_allow_permission">Acordă permisiunea</string>
     <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
@@ -4633,7 +4633,7 @@
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_send_calendar_invite_label">Trimite invitația pentru calendar</string>
     <!-- Title of option to add description in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_add_description_label">Adaugă o descriere</string>
+    <string name="meetings_schedule_meeting_add_description_label">Adăugați o descriere</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Este necesar numele întâlnirii</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
@@ -4759,7 +4759,7 @@
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">Amintiți-vă preferințele</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title">Centrul dispozitivului</string>
+    <string name="home_side_menu_device_center_title">Centrul de aparate</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">În fiecare zi</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -5267,7 +5267,7 @@
     <!-- Title of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_title">Acest apel este înregistrat</string>
     <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">Rămânând în apel, dați permisiunea de a fi înregistrat. Înregistrarea este stocată numai pe dispozitivul persoanei care o înregistrează.</string>
+    <string name="meetings_call_recording_consent_dialog_message">Rămânând în apel, dați permisiunea de a fi înregistrat. Înregistrarea este stocată numai pe aparatul persoanei care o înregistrează.</string>
     <!-- Label for the positive or confirm button of the call recording consent dialog -->
     <string name="meetings_call_recording_consent_dialog_positive_button">Bine, am înțeles</string>
     <!-- Label for the negative or cancel button of the call recording consent dialog -->
@@ -5575,5 +5575,5 @@
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">Locație</string>
     <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">No location information</string>
+    <string name="file_properties_info_map_location_no_location_info">Nicio informație despre locație</string>
 </resources>

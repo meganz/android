@@ -183,7 +183,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">As senhas não coincidem</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Já existe uma conta no MEGA com esse e-mail</string>
+    <string name="error_email_registered">Já existe uma conta no MEGA com este email</string>
     <!--  -->
     <string name="create_account_creating_account">Conectando-se ao servidor: criando conta</string>
     <!--  -->
@@ -465,7 +465,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problema no sistema de arquivos</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Erro aconteceu quando executar a ação</string>
+    <string name="general_error">Aconteceu um erro ao executar esta ação</string>
     <!-- menu item -->
     <string name="my_account_change_password">Alterar senha</string>
     <!-- Dialog text overquota error -->
@@ -1107,7 +1107,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">Continuidade do status</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">Mostrar sempre a aparência de status selecionada, mesmo quando eu estiver desconectado</string>
+    <string name="settings_persistence_subtitle">Mostrar sempre o status selecionado, mesmo quando eu estiver desconectado</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">Estabelecer o limite de tempo</string>
     <!-- Button to set a value -->
@@ -1238,7 +1238,7 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s já foi convidado. Revise as suas solicitações pendentes.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Se você errou ao digitar o seu e-mail, corrija e pressione [A]Reenviar[A].</string>
+    <string name="confirm_email_misspelled">Se você errou ao digitar o seu email, corrija e pressione [A]Reenviar[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Reenviar</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -2219,7 +2219,7 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">nome do arquivo</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">Mostrar último acesso</string>
+    <string name="option_enable_last_green_chat">Mostrar o último acesso</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
     <string name="subtitle_option_enable_last_green_chat">Permitir que seus contatos vejam o seu último acesso ao MEGA</string>
     <!-- title of notification when device is out of storage during camera upload -->
@@ -4783,9 +4783,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Não foi possível abrir o arquivo</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_folder_description">Esta pasta foi removida de acordo com a nossa [A]Política do guia de remoção[/A]. Você pode disputar esta remoção se acreditar que cometemos um erro.</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_file_description">Este arquivo foi removido de acordo com a nossa [A]Política do guia de remoção[/A]. Você pode disputar esta remoção se acreditar que cometemos um erro.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Somente para usuários Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -4917,7 +4917,7 @@
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Monday -->
     <string name="meetings_custom_recurrence_monday_option">S</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Tuesday -->
-    <string name="meetings_custom_recurrence_tuesday_option">Q</string>
+    <string name="meetings_custom_recurrence_tuesday_option">T</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Wednesday -->
     <string name="meetings_custom_recurrence_wednesday_option">Q</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Thursday -->
@@ -4925,7 +4925,7 @@
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Friday -->
     <string name="meetings_custom_recurrence_friday_option">S</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Saturday -->
-    <string name="meetings_custom_recurrence_saturday_option">D</string>
+    <string name="meetings_custom_recurrence_saturday_option">S</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Sunday -->
     <string name="meetings_custom_recurrence_sunday_option">D</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
@@ -5575,5 +5575,5 @@
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">Localização</string>
     <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">No location information</string>
+    <string name="file_properties_info_map_location_no_location_info">Não há informação de localização</string>
 </resources>

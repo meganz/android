@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- Title of the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_title">Redenumire dispozitivul</string>
+    <string name="device_center_rename_device_dialog_title">Redenumire aparatul</string>
     <!-- The name of the Positive Button for the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_positive_button">Redenumește</string>
     <!-- The name of the Negative Button for the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_negative_button">Anulați</string>
     <!-- The name of the Header in Device Center which signifies the User's Device that is currently in use -->
-    <string name="device_center_list_view_item_header_this_device">Acest dispozitiv</string>
+    <string name="device_center_list_view_item_header_this_device">Acest aparat</string>
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
-    <string name="device_center_list_view_item_header_other_devices">Alte dispozitive</string>
+    <string name="device_center_list_view_item_header_other_devices">Alte aparate</string>
     <!-- The name of the Device or Folder Status when no matching Status is found-->
     <string name="device_center_list_view_item_status_unknown_status">Stare necunoscută</string>
     <!-- The name of the Device if the SDK cannot retrieve the name for that Device -->
-    <string name="device_center_list_view_item_title_unknown_device">Dispozitiv necunoscut</string>
+    <string name="device_center_list_view_item_title_unknown_device">Aparat necunoscut</string>
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">La zi</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
@@ -41,7 +41,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is blocked due to a certain issue -->
     <string name="device_center_list_view_item_status_blocked">Blocat</string>
     <!-- The title of the Device Center feature -->
-    <string name="device_center_top_app_bar_title">Centrul dispozitivului</string>
+    <string name="device_center_top_app_bar_title">Centrul de aparate</string>
     <!-- The name of one of the Device Center Bottom Sheet items which takes the User to the Camera uploads feature when clicked -->
     <string name="device_center_bottom_sheet_item_camera_uploads">Încărcări cameră</string>
     <!-- The enabled Camera uploads status that is shown alongside the "Camera uploads" Device Center Bottom Sheet item -->
@@ -59,7 +59,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="device_center_list_view_item_sub_state_no_sync_error">Nicio eroare de sincronizare</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA nu poate sincroniza sau backup pentru acest folder deoarece sistemul de fișiere de pe dispozitiv nu este acceptat</string>
+    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA nu poate sincroniza sau backup pentru acest folder deoarece sistemul de fișiere de pe aparat nu este acceptat</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">Folderul ales nu poate fi sincronizat</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -111,9 +111,9 @@
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Folderul nu poate fi sincronizat sau backup-uite, deoarece folderul MEGA se află în Coșul de gunoi</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Folderul din dispozitiv nu poate fi localizat acum, încercați din nou mai târziu.</string>
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Folderul din aparat nu poate fi localizat acum, încercați din nou mai târziu.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Folderul din dispozitiv dvs. nu poate fi localizat</string>
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Folderul din aparat dvs. nu poate fi localizat</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problemă la sincronizarea sau backup a acestui folder din cauza modificărilor aduse folderului MEGA. Opriți sincronizarea sau backupul și încercați să o configurați din nou în aplicația desktop sau contactați asistența.</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
@@ -123,13 +123,13 @@
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">Încărcări camere sunt dezactivate</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
-    <string name="device_center_rename_device_dialog_error_message_empty_device_name">Introduceți un nume de dispozitiv.</string>
+    <string name="device_center_rename_device_dialog_error_message_empty_device_name">Introduceți un nume de aparat.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->
-    <string name="device_center_rename_device_dialog_error_message_name_already_exists">Un dispozitiv cu acest nume există deja. Introduceți un alt nume.</string>
+    <string name="device_center_rename_device_dialog_error_message_name_already_exists">Un aparat cu acest nume există deja. Introduceți un alt nume.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name with invalid characters -->
     <string name="device_center_rename_device_dialog_error_message_invalid_characters">Următoarele caractere nu sunt permise: %1$s</string>
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
-    <string name="device_center_snackbar_message_rename_device_successful">Dispozitiv a fost redenumit</string>
+    <string name="device_center_snackbar_message_rename_device_successful">Aparat a fost redenumit</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
     <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">Maximum 32 de caractere</string>
     <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the Camera uploads feature settings -->
@@ -145,7 +145,7 @@
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
     <string name="device_center_nothing_setup_state">Nimic nu este încă configurat</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->
-    <string name="device_center_top_app_bar_search_devices_hint">Căutarea dispozitivelor</string>
+    <string name="device_center_top_app_bar_search_devices_hint">Căutarea aparatelor</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Syncs -->
     <string name="device_center_top_app_bar_search_syncs_hint">Căutarea sincronizării</string>
     <!-- Text to show in the Device Center when no search results are found -->
