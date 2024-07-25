@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -239,25 +240,28 @@ class FileExplorerViewModel @Inject constructor(
         _uiState.update { uiState -> uiState.copy(urisAndNames = urisAndNames) }
     }
 
-    private fun getFileName(uri: Uri, context: Context): String? = runCatching {
-        context.contentResolver?.acquireContentProviderClient(uri)
-            ?.let { client ->
-                client.query(uri, null, null, null, null)?.let { cursor ->
-                    if (cursor.count == 0) {
-                        cursor.close()
-                        client.close()
-                        null
-                    } else {
-                        cursor.moveToFirst()
-                        val columnIndex = cursor.getColumnIndex("_display_name")
-                        cursor.getString(columnIndex)
+    private suspend fun getFileName(uri: Uri, context: Context): String? =
+        withContext(ioDispatcher) {
+            runCatching {
+                context.contentResolver?.acquireContentProviderClient(uri)
+                    ?.let { client ->
+                        client.query(uri, null, null, null, null)?.let { cursor ->
+                            if (cursor.count == 0) {
+                                cursor.close()
+                                client.close()
+                                null
+                            } else {
+                                cursor.moveToFirst()
+                                val columnIndex = cursor.getColumnIndex("_display_name")
+                                cursor.getString(columnIndex)
+                            }
+                        } ?: run {
+                            client.close()
+                            null
+                        }
                     }
-                } ?: run {
-                    client.close()
-                    null
-                }
-            }
-    }.getOrNull()
+            }.getOrNull()
+        }
 
     /**
      * Get share info list
