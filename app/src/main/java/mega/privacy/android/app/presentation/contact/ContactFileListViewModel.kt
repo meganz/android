@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import timber.log.Timber
@@ -39,6 +40,7 @@ class ContactFileListViewModel @Inject constructor(
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val moveNodesUseCase: MoveNodesUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
+    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ContactFileListUiState())
 
@@ -224,6 +226,13 @@ class ContactFileListViewModel @Inject constructor(
             )
         }
     }
+
+    internal suspend fun getNodeContentUri(handle: Long) = runCatching {
+        getNodeContentUriByHandleUseCase(handle)
+    }.recover {
+        Timber.e(it)
+        null
+    }.getOrNull()
 
     /**
      * Consume upload event

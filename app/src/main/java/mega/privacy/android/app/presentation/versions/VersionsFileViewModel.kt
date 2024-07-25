@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.versions.model.VersionsFileState
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -20,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class VersionsFileViewModel @Inject constructor(
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
+    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(VersionsFileState())
@@ -74,4 +77,11 @@ class VersionsFileViewModel @Inject constructor(
 
             else -> false
         }
+
+    internal suspend fun getNodeContentUri(handle: Long) = runCatching {
+        getNodeContentUriByHandleUseCase(handle)
+    }.recover {
+        Timber.e(it)
+        null
+    }.getOrNull()
 }

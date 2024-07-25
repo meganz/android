@@ -196,4 +196,37 @@ interface AppNavigator {
         fileNode: FileNode,
         onError: (Throwable) -> Unit = {},
     )
+
+    /**
+     * Open media player by file node
+     *
+     * @param context Context
+     * @param contentUri NodeContentUri
+     * @param name the name of the node
+     * @param handle the handle of the node
+     * @param parentId the parent id of the node
+     * @param fileTypeInfo FileTypeInfo
+     * @param sortOrder SortOrder
+     * @param viewType the adapter type of the view
+     * @param isFolderLink whether the file is a folder link
+     * @param isMediaQueueAvailable whether the media queue is available
+     * @param searchedItems the list of searched items, this is only used under the search mode
+     * @param mediaQueueTitle the title of the media queue
+     * @param onError Callback called when error occurs
+     */
+    fun openMediaPlayerActivity(
+        context: Context,
+        contentUri: NodeContentUri,
+        name: String,
+        handle: Long,
+        viewType: Int? = null,
+        parentId: Long = -1L,
+        fileTypeInfo: FileTypeInfo? = null,
+        sortOrder: SortOrder = SortOrder.ORDER_NONE,
+        isFolderLink: Boolean = false,
+        isMediaQueueAvailable: Boolean = true,
+        searchedItems: List<Long>? = null,
+        mediaQueueTitle: String? = null,
+        onError: () -> Unit = {},
+    )
 }

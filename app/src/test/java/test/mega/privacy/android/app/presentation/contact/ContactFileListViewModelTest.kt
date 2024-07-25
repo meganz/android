@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.presentation.contact
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -14,14 +14,17 @@ import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -30,9 +33,11 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -46,6 +51,7 @@ internal class ContactFileListViewModelTest {
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
     private val moveNodesUseCase: MoveNodesUseCase = mock()
     private val copyNodesUseCase: CopyNodesUseCase = mock()
+    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase = mock()
     private val nodeNameCollision = mock<NodeNameCollision.Default> {
         on { nodeHandle }.thenReturn(2L)
         on { collisionHandle }.thenReturn(123L)
@@ -69,6 +75,7 @@ internal class ContactFileListViewModelTest {
             checkNodesNameCollisionUseCase,
             moveNodesUseCase,
             copyNodesUseCase,
+            getNodeContentUriByHandleUseCase
         )
     }
 
@@ -80,6 +87,7 @@ internal class ContactFileListViewModelTest {
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase
         )
     }
 
@@ -91,12 +99,12 @@ internal class ContactFileListViewModelTest {
             whenever(isConnectedToInternetUseCase()).thenReturn(false)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.moveRequestResult).isNull()
+                assertThat(state.moveRequestResult).isNull()
                 underTest.copyOrMoveNodes(nodes = nodes, targetNode = targetNode, type = type)
                 val state1 = awaitItem()
-                Truth.assertThat(state1.snackBarMessage).isNotNull()
+                assertThat(state1.snackBarMessage).isNotNull()
                 underTest.onConsumeSnackBarMessageEvent()
-                Truth.assertThat(awaitItem().snackBarMessage).isNull()
+                assertThat(awaitItem().snackBarMessage).isNull()
             }
         }
 
@@ -111,11 +119,11 @@ internal class ContactFileListViewModelTest {
             ).thenThrow(RuntimeException::class.java)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.moveRequestResult).isNull()
+                assertThat(state.moveRequestResult).isNull()
                 underTest.copyOrMoveNodes(nodes = nodes, targetNode = targetNode, type = type)
                 val copyStartedState = awaitItem()
-                Truth.assertThat(copyStartedState.copyMoveAlertTextId).isNotNull()
-                Truth.assertThat(awaitItem().copyMoveAlertTextId).isNull()
+                assertThat(copyStartedState.copyMoveAlertTextId).isNotNull()
+                assertThat(awaitItem().copyMoveAlertTextId).isNull()
             }
         }
 
@@ -144,12 +152,12 @@ internal class ContactFileListViewModelTest {
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.moveRequestResult).isNull()
+                assertThat(state.moveRequestResult).isNull()
                 underTest.copyOrMoveNodes(nodes, targetNode, type)
-                Truth.assertThat(awaitItem().copyMoveAlertTextId).isNotNull()
+                assertThat(awaitItem().copyMoveAlertTextId).isNotNull()
                 val updatedState = awaitItem()
-                Truth.assertThat(updatedState.moveRequestResult).isNotNull()
-                Truth.assertThat(updatedState.moveRequestResult?.isFailure).isTrue()
+                assertThat(updatedState.moveRequestResult).isNotNull()
+                assertThat(updatedState.moveRequestResult?.isFailure).isTrue()
             }
         }
 
@@ -182,12 +190,12 @@ internal class ContactFileListViewModelTest {
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.moveRequestResult).isNull()
+                assertThat(state.moveRequestResult).isNull()
                 underTest.copyOrMoveNodes(nodes, targetNode, type)
-                Truth.assertThat(awaitItem().copyMoveAlertTextId).isNotNull()
+                assertThat(awaitItem().copyMoveAlertTextId).isNotNull()
                 val updatedState = awaitItem()
-                Truth.assertThat(updatedState.moveRequestResult).isNotNull()
-                Truth.assertThat(updatedState.moveRequestResult?.isSuccess).isTrue()
+                assertThat(updatedState.moveRequestResult).isNotNull()
+                assertThat(updatedState.moveRequestResult?.isSuccess).isTrue()
             }
         }
 
@@ -216,12 +224,12 @@ internal class ContactFileListViewModelTest {
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.nodeNameCollisionResult).isEmpty()
+                assertThat(state.nodeNameCollisionResult).isEmpty()
                 underTest.copyOrMoveNodes(nodes, targetNode, type)
-                Truth.assertThat(awaitItem().copyMoveAlertTextId).isNotNull()
-                Truth.assertThat(awaitItem().nodeNameCollisionResult).isNotEmpty()
+                assertThat(awaitItem().copyMoveAlertTextId).isNotNull()
+                assertThat(awaitItem().nodeNameCollisionResult).isNotEmpty()
                 underTest.markHandleNodeNameCollisionResult()
-                Truth.assertThat(awaitItem().nodeNameCollisionResult).isEmpty()
+                assertThat(awaitItem().nodeNameCollisionResult).isEmpty()
             }
         }
 
@@ -248,15 +256,15 @@ internal class ContactFileListViewModelTest {
             ).thenReturn(result)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.moveRequestResult).isNull()
+                assertThat(state.moveRequestResult).isNull()
                 underTest.copyOrMoveNodes(nodes, targetNode, type)
-                Truth.assertThat(awaitItem().copyMoveAlertTextId).isNotNull()
+                assertThat(awaitItem().copyMoveAlertTextId).isNotNull()
                 val movementComplete = awaitItem()
-                Truth.assertThat(movementComplete.nodeNameCollisionResult).isNotEmpty()
-                Truth.assertThat(movementComplete.moveRequestResult).isNotNull()
-                Truth.assertThat(movementComplete.moveRequestResult?.isSuccess).isTrue()
+                assertThat(movementComplete.nodeNameCollisionResult).isNotEmpty()
+                assertThat(movementComplete.moveRequestResult).isNotNull()
+                assertThat(movementComplete.moveRequestResult?.isSuccess).isTrue()
                 underTest.markHandleMoveRequestResult()
-                Truth.assertThat(awaitItem().moveRequestResult).isNull()
+                assertThat(awaitItem().moveRequestResult).isNull()
             }
         }
 
@@ -276,42 +284,42 @@ internal class ContactFileListViewModelTest {
             )
         )
         val state = underTest.getStorageState()
-        Truth.assertThat(state).isEqualTo(StorageState.Red)
+        assertThat(state).isEqualTo(StorageState.Red)
     }
 
     @Test
-    fun `test that test that moveRequestResult updated correctly when calling moveNodesToRubbish failed`() =
+    fun `test that moveRequestResult is updated correctly when calling moveNodesToRubbish failed`() =
         runTest {
             initTestClass()
             whenever(moveNodesToRubbishUseCase(nodes)).thenThrow(RuntimeException::class.java)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.moveRequestResult).isNull()
+                assertThat(state.moveRequestResult).isNull()
                 underTest.moveNodesToRubbish(nodes)
                 val updatedState = awaitItem()
-                Truth.assertThat(updatedState.moveRequestResult).isNotNull()
-                Truth.assertThat(updatedState.moveRequestResult?.isFailure).isTrue()
+                assertThat(updatedState.moveRequestResult).isNotNull()
+                assertThat(updatedState.moveRequestResult?.isFailure).isTrue()
             }
         }
 
     @Test
-    fun `test that test that moveRequestResult updated correctly when calling moveNodesToRubbish completed successfully`() =
+    fun `test that moveRequestResult is updated correctly when calling moveNodesToRubbish completed successfully`() =
         runTest {
             initTestClass()
             val result = mock<MoveRequestResult.RubbishMovement>()
             whenever(moveNodesToRubbishUseCase(nodes)).thenReturn(result)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.moveRequestResult).isNull()
+                assertThat(state.moveRequestResult).isNull()
                 underTest.moveNodesToRubbish(nodes)
                 val updatedState = awaitItem()
-                Truth.assertThat(updatedState.moveRequestResult).isNotNull()
-                Truth.assertThat(updatedState.moveRequestResult?.isSuccess).isTrue()
+                assertThat(updatedState.moveRequestResult).isNotNull()
+                assertThat(updatedState.moveRequestResult?.isSuccess).isTrue()
             }
         }
 
     @Test
-    fun `test that state is updated correctly if upload a File`() = runTest {
+    fun `test that state is updated correctly if a File is uploaded`() = runTest {
         val file = File("path")
         val parentHandle = 123L
         val expected = triggered(
@@ -323,12 +331,12 @@ internal class ContactFileListViewModelTest {
 
         underTest.uploadFile(file, parentHandle)
         underTest.state.map { it.uploadEvent }.test {
-            Truth.assertThat(awaitItem()).isEqualTo(expected)
+            assertThat(awaitItem()).isEqualTo(expected)
         }
     }
 
     @Test
-    fun `test that state is updated correctly if upload a ShareInfo`() = runTest {
+    fun `test that state is updated correctly if a ShareInfo is uploaded`() = runTest {
         val file = File("path")
         val path = file.absolutePath
         val shareInfo = mock<ShareInfo> {
@@ -344,7 +352,27 @@ internal class ContactFileListViewModelTest {
 
         underTest.uploadShareInfo(listOf(shareInfo), parentHandle)
         underTest.state.map { it.uploadEvent }.test {
-            Truth.assertThat(awaitItem()).isEqualTo(expected)
+            assertThat(awaitItem()).isEqualTo(expected)
         }
     }
+
+    @Test
+    fun `test that getNodeContentUriByHandleUseCase is invoked and returns as expected`() =
+        runTest {
+            val paramHandle = 1L
+            val expectedContentUri = NodeContentUri.RemoteContentUri("", false)
+            whenever(getNodeContentUriByHandleUseCase(paramHandle)).thenReturn(expectedContentUri)
+            val actual = underTest.getNodeContentUri(paramHandle)
+            assertThat(actual).isEqualTo(expectedContentUri)
+            verify(getNodeContentUriByHandleUseCase).invoke(paramHandle)
+        }
+
+    @Test
+    fun `test that getNodeContentUriByHandleUseCase returns null when an exception is thrown`() =
+        runTest {
+            val paramHandle = 1L
+            whenever(getNodeContentUriByHandleUseCase(any())).thenThrow(IllegalStateException())
+            val actual = underTest.getNodeContentUri(paramHandle)
+            assertThat(actual).isNull()
+        }
 }

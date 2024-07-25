@@ -49,6 +49,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -66,6 +67,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
+    private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
 ) : MegaNavigator,
     AppNavigatorImpl {
     override fun openSettingsCameraUploads(activity: Activity) {
@@ -349,6 +351,45 @@ internal class MegaNavigatorImpl @Inject constructor(
             context.startActivity(intent)
         }.onFailure {
             onError(it)
+        }
+    }
+
+    override fun openMediaPlayerActivity(
+        context: Context,
+        contentUri: NodeContentUri,
+        name: String,
+        handle: Long,
+        viewType: Int?,
+        parentId: Long,
+        fileTypeInfo: FileTypeInfo?,
+        sortOrder: SortOrder,
+        isFolderLink: Boolean,
+        isMediaQueueAvailable: Boolean,
+        searchedItems: List<Long>?,
+        mediaQueueTitle: String?,
+        onError: () -> Unit,
+    ) {
+        applicationScope.launch {
+            runCatching {
+                val info = fileTypeInfo ?: getFileTypeInfoByNameUseCase(name)
+                manageMediaIntent(
+                    context = context,
+                    contentUri = contentUri,
+                    fileTypeInfo = info,
+                    sortOrder = sortOrder,
+                    viewType = viewType,
+                    name = name,
+                    handle = handle,
+                    parentHandle = parentId,
+                    isFolderLink = isFolderLink,
+                    isMediaQueueAvailable = isMediaQueueAvailable,
+                    searchedItems = searchedItems,
+                    mediaQueueTitle = mediaQueueTitle
+                )
+            }.onFailure {
+                Timber.e(it)
+                onError()
+            }
         }
     }
 }

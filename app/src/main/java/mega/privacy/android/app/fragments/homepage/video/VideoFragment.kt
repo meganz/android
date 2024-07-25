@@ -5,7 +5,6 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,9 +25,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
-import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
-import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentVideoBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
@@ -44,29 +41,21 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.CLOUD_DRIVE_MODE
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.SEARCH_MODE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIEWER_FROM_VIDEOS
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -102,6 +91,12 @@ class VideoFragment : Fragment(), HomepageSearchable {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
+
+    /**
+     * [MegaNavigator] injection
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     /**
      * onSaveInstanceState
@@ -488,7 +483,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
             val node = it.node
             if (node != null) {
-                openNode(node, it.index)
+                openNode(node)
             }
         })
 
@@ -537,84 +532,42 @@ class VideoFragment : Fragment(), HomepageSearchable {
      * Opens a Node
      *
      * @param node The [MegaNode] to be opened
-     * @param index The [MegaNode] index
      */
-    private fun openNode(node: MegaNode, index: Int) {
-        val file: MegaNode = node
-
-        val internalIntent = FileUtil.isInternalIntent(node)
-        val intent = if (internalIntent) {
-            getMediaIntent(context, node.name)
-        } else {
-            Intent(Intent.ACTION_VIEW)
-        }
-
-        intent.putExtra(INTENT_EXTRA_KEY_POSITION, index)
-        intent.putExtra(
-            INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-            sortByHeaderViewModel.cloudSortOrder.value
-        )
-        intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
-        intent.putExtra(INTENT_EXTRA_KEY_HANDLE, file.handle)
-
-        if (viewModel.searchMode) {
-            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, VIDEO_SEARCH_ADAPTER)
-            intent.putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, viewModel.getHandlesOfVideo())
-        } else {
-            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, VIDEO_BROWSE_ADAPTER)
-        }
-
-        (listView.adapter as? DragThumbnailGetter)?.let {
-            putThumbnailLocation(intent, listView, index, VIEWER_FROM_VIDEOS, it)
-        }
-
-        val localPath = FileUtil.getLocalFile(file)
-        var paramsSetSuccessfully = if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-            FileUtil.setLocalIntentParams(
-                context, node, intent, localPath, false,
-                requireActivity() as ManagerActivity
-            )
-        } else {
-            FileUtil.setStreamingIntentParams(
-                context, node, megaApi, intent,
-                requireActivity() as ManagerActivity
-            )
-        }
-
-        if (paramsSetSuccessfully && FileUtil.isOpusFile(node)) {
-            intent.setDataAndType(intent.data, "audio/*")
-        }
-
-        if (!MegaApiUtils.isIntentAvailable(context, intent)) {
-            paramsSetSuccessfully = false
-            Util.showSnackbar(
-                context,
-                SNACKBAR_TYPE,
-                getString(R.string.intent_not_available),
-                MEGACHAT_INVALID_HANDLE
-            )
-        }
-
-        if (paramsSetSuccessfully) {
-            startActivity(intent)
-            if (internalIntent) {
-                requireActivity().overridePendingTransition(0, 0)
-            }
-        } else {
-            Timber.w("itemClick:noAvailableIntent")
-            Util.showSnackbar(
-                context,
-                SNACKBAR_TYPE,
-                getString(R.string.intent_not_available),
-                MEGACHAT_INVALID_HANDLE
-            )
-            callManager {
-                it.saveNodesToDevice(
-                    nodes = listOf(node),
-                    highPriority = true,
-                    isFolderLink = false,
-                    fromChat = false
+    private fun openNode(node: MegaNode) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val contentUri = viewModel.getContentUri(node.handle) ?: return@launch
+            megaNavigator.openMediaPlayerActivity(
+                context = requireContext(),
+                contentUri = contentUri,
+                name = node.name,
+                handle = node.handle,
+                parentId = node.parentHandle,
+                viewType = if (viewModel.searchMode) {
+                    VIDEO_SEARCH_ADAPTER
+                } else {
+                    VIDEO_BROWSE_ADAPTER
+                },
+                searchedItems = if (viewModel.searchMode) {
+                    viewModel.getHandlesOfVideo()?.toList()
+                } else {
+                    null
+                }
+            ) {
+                Timber.w("itemClick:noAvailableIntent")
+                Util.showSnackbar(
+                    context,
+                    SNACKBAR_TYPE,
+                    getString(R.string.intent_not_available),
+                    MEGACHAT_INVALID_HANDLE
                 )
+                callManager {
+                    it.saveNodesToDevice(
+                        nodes = listOf(node),
+                        highPriority = true,
+                        isFolderLink = false,
+                        fromChat = false
+                    )
+                }
             }
         }
     }

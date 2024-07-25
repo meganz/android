@@ -22,12 +22,14 @@ import androidx.appcompat.view.ActionMode
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
@@ -50,12 +52,14 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -81,6 +85,12 @@ class ContactFileListFragment : ContactFileBaseFragment() {
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
+
+    /**
+     * [MegaNavigator] injection
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private var startDownloadViewModel: StartDownloadViewModel? = null
 
@@ -314,7 +324,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         Timber.d("onCreateView")
         var v: View? = null
@@ -562,98 +572,52 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                         contactNodes[position].name
                     ).isAudio
                 ) {
-                    val file = contactNodes[position]
-                    val mimeType = typeForName(file.name).type
-                    Timber.d("Node Handle: %s", file.handle)
-
-                    val mediaIntent: Intent
-                    val internalIntent: Boolean
-                    var opusFile = false
-                    if (typeForName(file.name).isVideoNotSupported || typeForName(file.name).isAudioNotSupported) {
-                        mediaIntent = Intent(Intent.ACTION_VIEW)
-                        internalIntent = false
-                        val s = file.name.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }
-                            .toTypedArray()
-                        if (s != null && s.size > 1 && s[s.size - 1] == "opus") {
-                            opusFile = true
-                        }
-                    } else {
-                        internalIntent = true
-                        mediaIntent = Util.getMediaIntent(context, contactNodes[position].name)
-                    }
-                    mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL, contact.email)
-                    mediaIntent.putExtra("position", position)
-                    mediaIntent.putExtra("adapterType", Constants.CONTACT_FILE_ADAPTER)
-                    if (megaApi.getParentNode(contactNodes[position])!!.type == MegaNode.TYPE_ROOT) {
-                        mediaIntent.putExtra("parentNodeHandle", -1L)
-                    } else {
-                        mediaIntent.putExtra(
-                            "parentNodeHandle", megaApi.getParentNode(contactNodes[position])!!
-                                .handle
-                        )
-                    }
-                    mediaIntent.putExtra("orderGetChildren", orderGetChildren)
-                    putThumbnailLocation(
-                        mediaIntent,
-                        listView,
-                        position,
-                        Constants.VIEWER_FROM_CONTACT_FILE_LIST,
-                        adapter
-                    )
-                    mediaIntent.putExtra("HANDLE", file.handle)
-                    mediaIntent.putExtra("FILENAME", file.name)
-
-                    val localPath = FileUtil.getLocalFile(file)
-                    if (localPath != null) {
-                        val mediaFile = File(localPath)
-                        if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
-                            mediaIntent.setDataAndType(
-                                FileProvider.getUriForFile(
-                                    context,
-                                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                                    mediaFile
-                                ), typeForName(file.name).type
-                            )
-                        } else {
-                            mediaIntent.setDataAndType(
-                                Uri.fromFile(mediaFile),
-                                typeForName(file.name).type
-                            )
-                        }
-                        mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    } else {
-                        if (megaApi.httpServerIsRunning() == 0) {
-                            megaApi.httpServerStart()
-                            mediaIntent.putExtra(
-                                Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER,
-                                true
-                            )
-                        }
-
-                        val url = megaApi.httpServerGetLocalLink(file)
-                        mediaIntent.setDataAndType(Uri.parse(url), mimeType)
-                    }
-                    if (opusFile) {
-                        mediaIntent.setDataAndType(mediaIntent.data, "audio/*")
-                    }
-                    if (internalIntent) {
-                        startActivity(mediaIntent)
-                    } else {
-                        if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
-                            startActivity(mediaIntent)
-                        } else {
-                            (context as ContactFileListActivity).showSnackbar(
-                                Constants.SNACKBAR_TYPE, context.resources.getString(
-                                    R.string.intent_not_available
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        val megaNode = contactNodes[position]
+                        val contentUri = viewModel?.getNodeContentUri(megaNode.handle) ?: return@launch
+                        val localPath = FileUtil.getLocalFile(megaNode)
+                        if (localPath != null) {
+                            val file = File(localPath)
+                            megaNavigator.openMediaPlayerActivityByLocalFile(
+                                context = requireContext(),
+                                localFile = file,
+                                handle = megaNode.handle,
+                                parentId = megaNode.parentHandle,
+                                viewType = CONTACT_FILE_ADAPTER,
+                                sortOrder = orderGetChildren,
+                            ) {
+                                (context as ContactFileListActivity).showSnackbar(
+                                    Constants.SNACKBAR_TYPE, context.resources.getString(
+                                        R.string.intent_not_available
+                                    )
                                 )
-                            )
-                            adapter.notifyDataSetChanged()
-                            (context as ContactFileListActivity).downloadFile(
-                                listOf(contactNodes[position])
-                            )
+                                adapter.notifyDataSetChanged()
+                                (context as ContactFileListActivity).downloadFile(
+                                    listOf(contactNodes[position])
+                                )
+                            }
+                        } else {
+                            megaNavigator.openMediaPlayerActivity(
+                                context = requireContext(),
+                                contentUri = contentUri,
+                                name = megaNode.name,
+                                handle = megaNode.handle,
+                                parentId = megaNode.parentHandle,
+                                viewType = CONTACT_FILE_ADAPTER,
+                                sortOrder = orderGetChildren
+                            ) {
+                                (context as ContactFileListActivity).showSnackbar(
+                                    Constants.SNACKBAR_TYPE, context.resources.getString(
+                                        R.string.intent_not_available
+                                    )
+                                )
+                                adapter.notifyDataSetChanged()
+                                (context as ContactFileListActivity).downloadFile(
+                                    listOf(contactNodes[position])
+                                )
+                            }
                         }
                     }
-                    (context as ContactFileListActivity).overridePendingTransition(0, 0)
                 } else if (typeForName(contactNodes[position].name).isPdf) {
                     val file = contactNodes[position]
 

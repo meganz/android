@@ -6,6 +6,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.versions.VersionsFileViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,6 +20,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
@@ -33,13 +36,15 @@ class VersionsFileViewModelTest {
     private lateinit var underTest: VersionsFileViewModel
 
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
+    private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
 
     @BeforeEach
     fun reset() {
         underTest = VersionsFileViewModel(
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
+            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase
         )
-        reset(isNodeInBackupsUseCase)
+        reset(isNodeInBackupsUseCase, getNodeContentUriByHandleUseCase)
     }
 
     @Test
@@ -172,5 +177,25 @@ class VersionsFileViewModelTest {
                 isCurrentVersionSelected = false,
             )
             assertThat(expected).isFalse()
+        }
+
+    @Test
+    fun `test that getNodeContentUriByHandleUseCase is invoked and returns as expected`() =
+        runTest {
+            val paramHandle = 1L
+            val expectedContentUri = NodeContentUri.RemoteContentUri("", false)
+            whenever(getNodeContentUriByHandleUseCase(paramHandle)).thenReturn(expectedContentUri)
+            val actual = underTest.getNodeContentUri(paramHandle)
+            assertThat(actual).isEqualTo(expectedContentUri)
+            verify(getNodeContentUriByHandleUseCase).invoke(paramHandle)
+        }
+
+    @Test
+    fun `test that getNodeContentUriByHandleUseCase returns null when an exception is thrown`() =
+        runTest {
+            val paramHandle = 1L
+            whenever(getNodeContentUriByHandleUseCase(any())).thenThrow(IllegalStateException())
+            val actual = underTest.getNodeContentUri(paramHandle)
+            assertThat(actual).isNull()
         }
 }
