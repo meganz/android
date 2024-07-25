@@ -4913,7 +4913,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Tải lên bị tạm dừng vì pin ở dưới %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Đăng tải camêra đã dừng hoạt&#160;động. Hãy thử bật lại đăng tải camêra để giải&#160;quyết. Nếu vấn&#160;đề tiếp diễn, vui lòng liên&#160;hệ với support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">Việc đăng&#160;tải camêra đang được thực hiện, %1$d tệp đang chờ</item>
@@ -5099,5 +5099,5 @@
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">Vị&#160;trí</string>
     <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">No location information</string>
+    <string name="file_properties_info_map_location_no_location_info">Không có thông&#160;tin vị&#160;trí</string>
 </resources>

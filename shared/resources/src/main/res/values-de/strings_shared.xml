@@ -151,7 +151,7 @@
     <!-- Shared items option of the video section location filter  -->
     <string name="video_section_videos_location_option_shared_items">Freigaben</string>
     <!-- Duration filter title of the video section  -->
-    <string name="video_section_videos_duration_filter_title">Dauer</string>
+    <string name="video_section_videos_duration_filter_title">Länge</string>
     <!-- All Duration option of the video section duration filter  -->
     <string name="video_section_videos_duration_option_all_duration">Alle Längen</string>
     <!-- Less than 10 seconds option of the video section duration filter  -->
@@ -223,7 +223,7 @@
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
     <string name="dialog_onboarding_transfer_quota_free_limited">Begrenzt</string>
     <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
-    <string name="dialog_onboarding_free_account_price">Free</string>
+    <string name="dialog_onboarding_free_account_price">Kostenlos</string>
     <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
     <string name="dialog_onboarding_button_continue">Fortfahren</string>
     <!-- Title of navigation bar on Onboarding dialog. -->
@@ -432,8 +432,8 @@
     <string name="account_cancel_account_screen_plan_free_plan">Free</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Speicher</string>
-    <!-- Storage amount available in the free plan -->
-    <string name="account_cancel_account_screen_plan_free_storage">20&#160;GB</string>
+    <!-- Storage amount available in the free plan. %1s represents the amount of storage in GB. -->
+    <string name="account_cancel_account_screen_plan_free_storage">%1s&#160;GB</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Transfer</string>
     <!-- Transfer limit in the free plan -->
@@ -448,8 +448,8 @@
     <string name="account_cancel_account_screen_plan_rewind">Wiederherstellen</string>
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">Bis zu 30 Tage (nur Ansicht)</string>
-    <!-- Rewind duration available in the current plan -->
-    <string name="account_cancel_account_screen_plan_rewind_current">Bis zu 180 Tage</string>
+    <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
+    <string name="account_cancel_account_screen_plan_rewind_current">Bis zu %1s Tage</string>
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
@@ -457,13 +457,13 @@
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Bis zu 1 Stunde</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
-    <string name="cancel_account_plan_call_meeting_duration_pro">UNBEGRENZT</string>
+    <string name="cancel_account_plan_call_meeting_duration_pro">Unbegrenzt</string>
     <!-- Row label for call and meeting participants in the comparison table -->
     <string name="account_cancel_account_plan_call_meeting_participants">Anruf- und Meeting-Teilnehmer</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Bis zu 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
-    <string name="account_cancel_account_pro_plan_call_meeting_participants">UNBEGRENZT</string>
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">Unbegrenzt</string>
     <!-- Button label to keep the current pro plan -->
     <string name="account_cancel_account_plan_keep_pro_plan">%1s behalten</string>
     <!-- Button label to continue with the cancellation -->
@@ -487,15 +487,15 @@
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
     <string name="account_cancellation_instructions_ios_device">Auf einem iOS-Gerät</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
-    <string name="account_cancellation_instructions_open_settings">1. Öffnen Sie die App Einstellungen.</string>
+    <string name="account_cancellation_instructions_open_settings">1. Öffnen Sie die App [A]Einstellungen[/A].</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
     <string name="account_cancellation_instructions_tap_on_name">2. Tippen Sie auf Ihren Namen.</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
-    <string name="account_cancellation_instructions_select_subscriptions">3. Tippen Sie auf Abos.</string>
+    <string name="account_cancellation_instructions_select_subscriptions">3. Tippen Sie auf [A]Abos[/A].</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
     <string name="account_cancellation_instructions_select_mega_subscription">4. Tippen Sie auf Ihr MEGA-Abonnement.</string>
     <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
-    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tippen Sie auf Abonnement kündigen.</string>
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tippen Sie auf [A]Abonnement kündigen[/A].</string>
     <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
     <string name="account_cancellation_instructions_detailed_instructions">[A]Tippen Sie hier[/A] für detaillierte Anweisungen zum Kündigen Ihres Abonnements auf einem Computer oder einem anderen Gerät.</string>
     <!-- Title shown when needing to cancel the subscription using a web browser -->
@@ -550,4 +550,6 @@
     <string name="create_new_folder_dialog_error_existing_folder">Ein Ordner dieses Namens existiert bereits</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">Die folgenden Zeichen sind nicht zulässig: %1$s</string>
+    <!-- Sync settings section title-->
+    <string name="settings_section_sync">Synchronisierung</string>
 </resources>

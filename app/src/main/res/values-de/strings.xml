@@ -3796,7 +3796,7 @@
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
     <string name="settings_camera_uploads_grant_media_permissions_body">Um die Kamera-Uploads zu aktivieren, gewähren Sie MEGA Zugriff auf Fotos und andere Medien auf Ihrem Gerät.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
-    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Zugriff freigeben</string>
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Zugriff erlauben</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Nicht gewähren</string>
     <!--  -->
@@ -5122,7 +5122,7 @@
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Gewähren Sie Zugriff auf Ihre Galerie</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
-    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Zugriff freigeben</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Zugriff erlauben</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Update erforderlich</string>
     <!-- The Body of the Dialog shown to Update the application from playstore -->
@@ -5268,7 +5268,7 @@
     <!-- Search drop down chips filter type date added -->
     <string name="search_dropdown_chip_filter_type_date_added">Hinzugefügt</string>
     <!-- Search drop down chips filter type last modified -->
-    <string name="search_dropdown_chip_filter_type_last_modified">Zuletzt bearbeitet am</string>
+    <string name="search_dropdown_chip_filter_type_last_modified">Letzte Änderung</string>
     <!-- Search drop down chips filter type date modified today -->
     <string name="search_dropdown_chip_filter_type_date_today">Heute</string>
     <!-- Search drop down chips filter type date modified last 7 days -->
@@ -5337,5 +5337,5 @@
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">Ort</string>
     <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">No location information</string>
+    <string name="file_properties_info_map_location_no_location_info">Keine Standortdaten</string>
 </resources>

@@ -424,8 +424,8 @@
     <string name="account_cancel_account_screen_plan_free_plan">免费</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">存储空间</string>
-    <!-- Storage amount available in the free plan -->
-    <string name="account_cancel_account_screen_plan_free_storage">20&#160;GB</string>
+    <!-- Storage amount available in the free plan. %1s represents the amount of storage in GB. -->
+    <string name="account_cancel_account_screen_plan_free_storage">%1s&#160;GB</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">传输</string>
     <!-- Transfer limit in the free plan -->
@@ -440,8 +440,8 @@
     <string name="account_cancel_account_screen_plan_rewind">还原</string>
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">最多30天（仅限查看）</string>
-    <!-- Rewind duration available in the current plan -->
-    <string name="account_cancel_account_screen_plan_rewind_current">最长可达180天</string>
+    <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
+    <string name="account_cancel_account_screen_plan_rewind_current">长达%1s天</string>
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
@@ -479,15 +479,15 @@
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
     <string name="account_cancellation_instructions_ios_device">在iOS设备上</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
-    <string name="account_cancellation_instructions_open_settings">1. 打开应用程序的设置。</string>
+    <string name="account_cancellation_instructions_open_settings">1.打开应用程序的[A]设置[/A]。</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
     <string name="account_cancellation_instructions_tap_on_name">2. 点按您的名字。</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
-    <string name="account_cancellation_instructions_select_subscriptions">3. 点按订阅。</string>
+    <string name="account_cancellation_instructions_select_subscriptions">3.点按[A]订阅[/A]。</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
     <string name="account_cancellation_instructions_select_mega_subscription">4. 点按您的MEGA订阅。</string>
     <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
-    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. 点按取消订阅。</string>
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5.点按[A]取消订阅[/A]。</string>
     <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
     <string name="account_cancellation_instructions_detailed_instructions">[A]点按这里[/A]了解有关如何在计算机或其它设备上取消订阅的详细说明。</string>
     <!-- Title shown when needing to cancel the subscription using a web browser -->
@@ -542,4 +542,6 @@
     <string name="create_new_folder_dialog_error_existing_folder">已经有一个相同名称的文件夹</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">不允许使用这些字符：%1$s</string>
+    <!-- Sync settings section title-->
+    <string name="settings_section_sync">同步</string>
 </resources>

@@ -485,7 +485,7 @@
     <!-- Message shown when cancelling the current plan in the instructions screen, informing the user about how to cancel subscription -->
     <string name="account_cancellation_instructions_message_apple_description">This is because you subscribed to MEGA via Apple. To cancel your subscription, you will need to:</string>
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
-    <string name="account_cancellation_instructions_ios_device">On a iOS Device</string>
+    <string name="account_cancellation_instructions_ios_device">On an iOS Device</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
     <string name="account_cancellation_instructions_open_settings">1. Open the [A]Settings[/A] app.</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
