@@ -52,5 +52,5 @@ internal class CreateChatLogEntry @Inject constructor(
         }
 
 
-    private suspend fun getFormattedTime() = getCurrentTimeString("dd-MM HH:mm:ss", "UTC")
+    private suspend fun getFormattedTime() = getCurrentTimeString("MM-dd HH:mm:ss", "UTC")
 }
