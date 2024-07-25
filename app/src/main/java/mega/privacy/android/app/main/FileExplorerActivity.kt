@@ -18,6 +18,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
@@ -69,9 +70,7 @@ import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
-import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollision.Upload.Companion.getUploadCollision
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
@@ -79,8 +78,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.usecase.exception.MegaNodeException.ChildDoesNotExistsException
-import mega.privacy.android.app.usecase.exception.MegaNodeException.ParentDoesNotExistException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.ChatUtil
@@ -106,10 +103,13 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.User
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -143,7 +143,6 @@ import javax.inject.Inject
  *
  * @property filePrepareUseCase        [FilePrepareUseCase]
  * @property getChatChangesUseCase     [GetChatChangesUseCase]
- * @property checkNameCollisionUseCase [CheckNameCollisionUseCase]
  * @property uploadUseCase             [UploadUseCase]
  * @property copyNodeUseCase           [CopyNodeUseCase]
  * @property getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
@@ -170,7 +169,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     lateinit var getChatChangesUseCase: GetChatChangesUseCase
 
     @Inject
-    lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
+    lateinit var checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase
 
     @Inject
     lateinit var uploadUseCase: UploadUseCase
@@ -1639,58 +1638,73 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 parentHandle = parentNode?.handle ?: INVALID_HANDLE
             }
 
-            checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { (collisions, withoutCollisions): Pair<ArrayList<NameCollision>, List<ShareInfo>> ->
-                        dismissAlertDialogIfExists(statusDialog)
-
-                        if (collisions.isNotEmpty()) {
-                            (nameCollisionActivityContract ?: return@subscribe).launch(collisions)
+            lifecycleScope.launch {
+                runCatching {
+                    checkFileNameCollisionsUseCase(
+                        files = infos.map {
+                            DocumentEntity(
+                                name = it.originalFileName,
+                                size = it.size,
+                                lastModified = it.lastModified,
+                                uri = UriPath(it.fileAbsolutePath),
+                            )
+                        },
+                        parentNodeId = NodeId(parentHandle)
+                    )
+                }.onSuccess { collisions ->
+                    dismissAlertDialogIfExists(statusDialog)
+                    if (collisions.isNotEmpty()) {
+                        collisions.map {
+                            getUploadCollision(it)
+                        }.let {
+                            nameCollisionActivityContract?.launch(ArrayList(it))
                         }
-
-                        if (withoutCollisions.isNotEmpty()) {
-                            lifecycleScope.launch {
-                                if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                                    viewModel.uploadFiles((parentNode ?: return@launch).handle)
-                                } else {
-                                    checkNotificationsPermission(this@FileExplorerActivity)
-
-                                    val text =
-                                        resources.getQuantityString(
-                                            R.plurals.upload_began,
-                                            withoutCollisions.size,
-                                            withoutCollisions.size
-                                        )
-
-                                    uploadUseCase.uploadInfos(
-                                        this@FileExplorerActivity,
-                                        infos,
-                                        HashMap(viewModel.uiState.value.fileNames),
-                                        (parentNode ?: return@launch).handle
+                    }
+                    val collidedSharesPath = collisions.map { it.path.value }.toSet()
+                    val sharesWithoutCollision = infos.filter {
+                        collidedSharesPath.contains(it.fileAbsolutePath).not()
+                    }
+                    if (sharesWithoutCollision.isNotEmpty()) {
+                        lifecycleScope.launch {
+                            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                                viewModel.uploadFiles(parentHandle)
+                            } else {
+                                checkNotificationsPermission(this@FileExplorerActivity)
+                                val text =
+                                    resources.getQuantityString(
+                                        R.plurals.upload_began,
+                                        sharesWithoutCollision.size,
+                                        sharesWithoutCollision.size
                                     )
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe({
-                                            showSnackbar(text)
-                                            backToCloud(parentNode.handle, infos.size, null)
-                                            filePreparedInfos = null
-                                            Timber.d("Processing for start uploading ShareInfos finished.")
-                                            finishAndRemoveTask()
-                                        }) { t: Throwable? -> Timber.e(t) }
-                                        .addTo(composite)
-                                }
+                                uploadUseCase
+                                    .uploadInfos(
+                                        context = this@FileExplorerActivity,
+                                        infos = infos,
+                                        nameFiles = HashMap(viewModel.uiState.value.fileNames),
+                                        parentHandle = parentHandle
+                                    )
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe({
+                                        showSnackbar(text)
+                                        backToCloud(parentHandle, infos.size, null)
+                                        filePreparedInfos = null
+                                        Timber.d("Processing for start uploading ShareInfos finished.")
+                                        finishAndRemoveTask()
+                                    }) { t: Throwable? -> Timber.e(t) }
+                                    .addTo(composite)
                             }
                         }
-                    },
-                    { throwable: Throwable ->
-                        dismissAlertDialogIfExists(statusDialog)
-                        showSnackbar(getString(R.string.error_temporary_unavaible))
-                        Timber.e(throwable)
                     }
-                )
-                .addTo(composite)
+                }.onFailure {
+                    dismissAlertDialogIfExists(statusDialog)
+                    Util.showErrorAlertDialog(
+                        getString(R.string.error_temporary_unavaible),
+                        false,
+                        this@FileExplorerActivity
+                    )
+                }
+            }
         }
     }
 
@@ -1926,18 +1940,28 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
         parentHandle = parentNode?.handle ?: megaApi.rootNode?.handle ?: INVALID_HANDLE
         lifecycleScope.launch {
-            runCatching { checkNameCollisionUseCase.checkAsync(file.name, parentNode) }
-                .onSuccess { handle: Long ->
-                    val list = ArrayList<NameCollision>()
-                    list.add(getUploadCollision(handle, file, parentHandle))
-                    nameCollisionActivityContract?.launch(list)
-                }.onFailure { throwable: Throwable? ->
-                    if (throwable is ParentDoesNotExistException) {
-                        showSnackbar(getString(R.string.general_text_error))
-                    } else if (throwable is ChildDoesNotExistsException) {
-                        uploadFile(file)
-                    }
-                }
+            runCatching {
+                checkFileNameCollisionsUseCase(
+                    files = listOf(file.let {
+                        DocumentEntity(
+                            name = it.name,
+                            size = it.length(),
+                            lastModified = it.lastModified(),
+                            uri = UriPath(it.toUri().toString()),
+                        )
+                    }),
+                    parentNodeId = NodeId(parentHandle)
+                )
+            }.onSuccess { collisions ->
+                collisions.map {
+                    getUploadCollision(it)
+                }.firstOrNull()?.let {
+                    nameCollisionActivityContract?.launch(arrayListOf(it))
+                } ?: uploadFile(file)
+            }.onFailure {
+                Timber.e(it, "Cannot check name collisions")
+                showSnackbar(getString(R.string.general_text_error))
+            }
         }
     }
 
