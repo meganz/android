@@ -67,6 +67,7 @@ import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaShare.ACCESS_READ
+import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -179,6 +180,7 @@ class NodeRepositoryImplTest {
             cancelTokenProvider = cancelTokenProvider,
             megaSearchFilterMapper = megaSearchFilterMapper,
             workManagerGateway = workManagerGateway,
+            stringListMapper = stringListMapper,
         )
     }
 
@@ -1438,6 +1440,19 @@ class NodeRepositoryImplTest {
             assertThat(result.size).isEqualTo(1)
             assertThat(result.first().name).isEqualTo(firstNodeName)
         }
+
+    @Test
+    fun `test that getAllNodeTags returns all tags from gateway`() = runTest {
+        val searchString = "searchString"
+        val tags = listOf("tag1", "tag2")
+        val token = mock<MegaCancelToken>()
+        val megaStringList = mock<MegaStringList>()
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+        whenever(megaApiGateway.getAllNodeTags(searchString, token)).thenReturn(megaStringList)
+        whenever(stringListMapper(megaStringList)).thenReturn(tags)
+        val actual = underTest.getAllNodeTags(searchString)
+        assertThat(actual).isEqualTo(tags)
+    }
 
     private fun provideNodeId() = Stream.of(
         Arguments.of(null),

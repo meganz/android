@@ -32,6 +32,7 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineInformationMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
@@ -120,6 +121,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val workManagerGateway: WorkManagerGateway,
+    private val stringListMapper: StringListMapper,
 ) : NodeRepository {
 
     override suspend fun getNodeOutgoingShares(nodeId: NodeId) =
@@ -886,9 +888,9 @@ internal class NodeRepositoryImpl @Inject constructor(
             offlineNodeInformationMapper(it)
         }
 
-    override suspend fun getOfflineFolderInfo(parentId: Int): OfflineFolderInfo? =
+    override suspend fun getOfflineFolderInfo(parentId: Int): OfflineFolderInfo =
         withContext(ioDispatcher) {
-            megaLocalRoomGateway.getOfflineInfoByParentId(parentId)?.let { offlineNodes ->
+            megaLocalRoomGateway.getOfflineInfoByParentId(parentId).let { offlineNodes ->
                 val numberOfFolders = offlineNodes.count { it.isFolder }
                 OfflineFolderInfo(numberOfFolders, offlineNodes.size - numberOfFolders)
             }
@@ -958,7 +960,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
 
     private suspend fun getAllOfflineNodeHandle() =
-        megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
+        megaLocalRoomGateway.getAllOfflineInfo().associateBy { it.handle }
 
     private suspend fun getOfflineNode(handle: Long) =
         megaLocalRoomGateway.getOfflineInformation(handle)
@@ -1146,5 +1148,13 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
                 megaApiGateway.isSensitiveInherited(it)
             } ?: false
+        }
+
+    override suspend fun getAllNodeTags(searchString: String): List<String>? =
+        withContext(ioDispatcher) {
+            val token = cancelTokenProvider.getOrCreateCancelToken()
+            megaApiGateway.getAllNodeTags(searchString, token)?.let {
+                stringListMapper(it)
+            }
         }
 }

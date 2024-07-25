@@ -1514,4 +1514,9 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface?,
     ): MegaFlag? =
         megaApi.getFlag(flagName, commit, listener)
+
+    override fun getAllNodeTags(
+        searchString: String,
+        cancelToken: MegaCancelToken?,
+    ): MegaStringList? = megaApi.getAllNodeTags(searchString, cancelToken)
 }

@@ -792,4 +792,11 @@ interface NodeRepository {
      * @param nodeId [NodeId]
      */
     suspend fun hasSensitiveInherited(nodeId: NodeId): Boolean
+
+    /**
+     * Get all node tags
+     *
+     * @param searchString [String]
+     */
+    suspend fun getAllNodeTags(searchString: String): List<String>?
 }
