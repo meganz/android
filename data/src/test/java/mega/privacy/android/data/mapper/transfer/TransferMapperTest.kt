@@ -10,7 +10,9 @@ import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import java.math.BigInteger
 import kotlin.random.Random
@@ -29,6 +31,9 @@ internal class TransferMapperTest {
 
         val transferStateMapper = mock<TransferStateMapper> {
             on { invoke(MegaTransfer.STATE_COMPLETED) }.thenReturn(TransferState.STATE_COMPLETED)
+        }
+        val transferStageMapper = mock<TransferStageMapper>{
+            on { invoke(any()) } doReturn TransferStage.STAGE_SCANNING
         }
         val megaTransfer = mockMegaTransfer()
 
@@ -56,8 +61,12 @@ internal class TransferMapperTest {
             priority = megaTransfer.priority,
             notificationNumber = megaTransfer.notificationNumber,
         )
+
         assertThat(
-            TransferMapper(transferAppDataMapper, transferTypeMapper, transferStateMapper)
+            TransferMapper(
+                transferAppDataMapper, transferTypeMapper, transferStateMapper,
+                transferStageMapper
+            )
                 .invoke(megaTransfer)
         ).isEqualTo(expected)
     }
@@ -78,9 +87,17 @@ internal class TransferMapperTest {
         val transferStateMapper = mock<TransferStateMapper> {
             on { invoke(MegaTransfer.STATE_COMPLETED) }.thenReturn(TransferState.STATE_COMPLETED)
         }
+        val transferStageMapper = mock<TransferStageMapper>{
+            on { invoke(any()) } doReturn TransferStage.STAGE_SCANNING
+        }
 
         assertThat(
-            TransferMapper(transferAppDataMapper, transferTypeMapper, transferStateMapper).invoke(
+            TransferMapper(
+                transferAppDataMapper,
+                transferTypeMapper,
+                transferStateMapper,
+                transferStageMapper
+            ).invoke(
                 mockMegaTransfer(folderTransferTag)
             ).folderTransferTag
         ).isNull()

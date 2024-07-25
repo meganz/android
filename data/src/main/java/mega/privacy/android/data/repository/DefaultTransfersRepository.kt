@@ -217,6 +217,29 @@ internal class DefaultTransfersRepository @Inject constructor(
         onTransferData = { transfer, buffer ->
             channel.trySend(transferEventMapper(GlobalTransfer.OnTransferData(transfer, buffer)))
         },
+        onFolderTransferUpdate = {
+                transfer,
+                stage,
+                folderCount,
+                createdFolderCount,
+                fileCount,
+                currentFolder,
+                currentFileLeafName,
+            ->
+            channel.trySend(
+                transferEventMapper(
+                    GlobalTransfer.OnFolderTransferUpdate(
+                        transfer,
+                        stage,
+                        folderCount,
+                        createdFolderCount,
+                        fileCount,
+                        currentFolder,
+                        currentFileLeafName
+                    )
+                )
+            )
+        },
     )
 
     override fun startDownload(

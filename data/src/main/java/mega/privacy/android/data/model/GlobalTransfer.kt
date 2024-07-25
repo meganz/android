@@ -53,4 +53,25 @@ sealed interface GlobalTransfer {
      */
     data class OnTransferData(override val transfer: MegaTransfer, val buffer: ByteArray?) :
         GlobalTransfer
+
+    /**
+     * On folder transfer update
+     *
+     * @property transfer
+     * @property stage
+     * @property folderCount
+     * @property createdFolderCount
+     * @property fileCount
+     * @property currentFolder
+     * @property currentFileLeafName
+     */
+    data class OnFolderTransferUpdate(
+        override val transfer: MegaTransfer,
+        val stage: Int,
+        val folderCount: Int,
+        val createdFolderCount: Int,
+        val fileCount: Int,
+        val currentFolder: String,
+        val currentFileLeafName: String,
+    ) : GlobalTransfer
 }

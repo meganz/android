@@ -13,6 +13,7 @@ internal class TransferEventMapper @Inject constructor(
     private val transferMapper: TransferMapper,
     private val exceptionMapper: MegaExceptionMapper,
     private val errorContextMapper: ErrorContextMapper,
+    private val transferStageMapper: TransferStageMapper,
 ) {
     operator fun invoke(
         event: GlobalTransfer,
@@ -53,6 +54,16 @@ internal class TransferEventMapper @Inject constructor(
                 exception
             )
         }
+
+        is GlobalTransfer.OnFolderTransferUpdate -> TransferEvent.FolderTransferUpdateEvent(
+            transfer = transferMapper(event.transfer),
+            stage = transferStageMapper(event.stage),
+            createdFolderCount = event.createdFolderCount,
+            currentFileLeafName = event.currentFileLeafName,
+            currentFolder = event.currentFolder,
+            fileCount = event.fileCount,
+            folderCount = event.folderCount,
+        )
 
         is GlobalTransfer.OnTransferUpdate -> TransferEvent.TransferUpdateEvent(
             transferMapper(event.transfer)

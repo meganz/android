@@ -293,7 +293,28 @@ internal class MegaApiFacade @Inject constructor(
             },
             onTransferData = { transfer, buffer ->
                 trySend(GlobalTransfer.OnTransferData(transfer, buffer))
-            }
+            },
+            onFolderTransferUpdate = {
+                    transfer,
+                    stage,
+                    folderCount,
+                    createdFolderCount,
+                    fileCount,
+                    currentFolder,
+                    currentFileLeafName,
+                ->
+                trySend(
+                    GlobalTransfer.OnFolderTransferUpdate(
+                        transfer,
+                        stage,
+                        folderCount,
+                        createdFolderCount,
+                        fileCount,
+                        currentFolder,
+                        currentFileLeafName
+                    )
+                )
+            },
         )
 
         megaApi.addTransferListener(listener)

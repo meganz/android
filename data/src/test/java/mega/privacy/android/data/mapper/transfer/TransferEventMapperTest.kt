@@ -5,6 +5,7 @@ import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import nz.mega.sdk.MegaError
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -29,6 +31,7 @@ internal class TransferEventMapperTest {
     private val errorContextMapper = mock<ErrorContextMapper>()
     private val mockTransfer = mock<Transfer>()
     private val megaTransfer = mock<MegaTransfer>()
+    private val transferStageMapper = mock<TransferStageMapper>()
 
     val megaError = mock<MegaError> {
         on { errorCode }.thenReturn(MegaError.API_OK)
@@ -48,12 +51,15 @@ internal class TransferEventMapperTest {
 
     @BeforeAll
     fun setup() {
-        underTest = TransferEventMapper(transferMapper, exceptionMapper, errorContextMapper)
+        underTest = TransferEventMapper(
+            transferMapper, exceptionMapper, errorContextMapper,
+            transferStageMapper
+        )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(exceptionMapper, transferMapper)
+        reset(exceptionMapper, transferMapper, transferStageMapper)
     }
 
     @ParameterizedTest(name = "invoked with {0} and returns {1}")
@@ -63,6 +69,7 @@ internal class TransferEventMapperTest {
         transferEvent: TransferEvent,
     ) {
         whenever(transferMapper(megaTransfer)).thenReturn(mockTransfer)
+        whenever(transferStageMapper(any())).thenReturn(TransferStage.STAGE_NONE)
 
         val actual = underTest.invoke(globalTransfer)
         when (actual) {
@@ -141,7 +148,19 @@ internal class TransferEventMapperTest {
         Arguments.of(
             GlobalTransfer.OnTransferFinish(megaTransfer, megaError),
             TransferEvent.TransferFinishEvent(mockTransfer, null)
-        )
+        ),
+        Arguments.of(
+            GlobalTransfer.OnFolderTransferUpdate(megaTransfer, 1, 5, 1, 2, "folder", "leaf"),
+            TransferEvent.FolderTransferUpdateEvent(
+                mockTransfer,
+                TransferStage.STAGE_NONE,
+                5,
+                1,
+                2,
+                "folder",
+                "leaf"
+            )
+        ),
     )
 
     private fun provideExceptionParameters() = Stream.of(

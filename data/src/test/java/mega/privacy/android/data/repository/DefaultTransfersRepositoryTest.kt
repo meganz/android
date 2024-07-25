@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaError
@@ -62,6 +63,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -323,7 +325,38 @@ class DefaultTransfersRepositoryTest {
                 whenever(megaNodeMapper(any())).thenReturn(mock())
             }
             val expected = mock<TransferEvent.TransferUpdateEvent>()
-            whenever(transferEventMapper.invoke(any())).thenReturn(expected)
+            whenever(transferEventMapper.invoke(argThat { this is GlobalTransfer.OnTransferUpdate }))
+                .thenReturn(expected)
+            startFlow().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideUploadAndDownloadParameters")
+        fun `test that onFolderTransferUpdate is returned when the ongoing upload receives an onFolderTransferUpdate`(
+            mockStart: () -> Unit, startFlow: () -> Flow<TransferEvent>, isUpload: Boolean,
+        ) = runTest {
+            whenever(mockStart()).thenAnswer {
+                (it.arguments.last() as OptionalMegaTransferListenerInterface).onFolderTransferUpdate(
+                    api = mock(),
+                    transfer = mock(),
+                    stage = 0,
+                    folderCount = 0,
+                    createdFolderCount = 0,
+                    fileCount = 0,
+                    currentFolder = "",
+                    currentFileLeafName = ""
+                )
+            }
+            if (isUpload) {
+                whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            } else {
+                whenever(megaNodeMapper(any())).thenReturn(mock())
+            }
+            val expected = mock<TransferEvent.TransferUpdateEvent>()
+            whenever(transferEventMapper.invoke(argThat { this is GlobalTransfer.OnFolderTransferUpdate }))
+                .thenReturn(expected)
             startFlow().test {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
@@ -945,16 +978,32 @@ class DefaultTransfersRepositoryTest {
     @Test
     fun `test that monitorTransferEvents emits transfer events`() = runTest {
         val start = GlobalTransfer.OnTransferStart(mock())
+        val update = GlobalTransfer.OnTransferUpdate(mock())
+        val folderUpdate = GlobalTransfer.OnFolderTransferUpdate(mock(), 1, 1, 1, 1, "", "")
         val finish = GlobalTransfer.OnTransferFinish(mock(), mock())
         val startEvent = TransferEvent.TransferStartEvent(mock())
+        val updateEvent = TransferEvent.TransferUpdateEvent(mock())
+        val folderUpdateEvent = TransferEvent.FolderTransferUpdateEvent(
+            mock(),
+            TransferStage.STAGE_NONE,
+            1,
+            1,
+            1,
+            "",
+            ""
+        )
         val finishEvent = TransferEvent.TransferFinishEvent(mock(), mock())
-        val globalTransferEventsFlow = flowOf(start, finish)
+        val globalTransferEventsFlow = flowOf(start, update, folderUpdate, finish)
         whenever(transferEventMapper(start)).thenReturn(startEvent)
+        whenever(transferEventMapper(update)).thenReturn(updateEvent)
+        whenever(transferEventMapper(folderUpdate)).thenReturn(folderUpdateEvent)
         whenever(transferEventMapper(finish)).thenReturn(finishEvent)
         whenever(megaApiGateway.globalRequestEvents).thenReturn(emptyFlow())
         whenever(megaApiGateway.globalTransfer).thenReturn(globalTransferEventsFlow)
         underTest.monitorTransferEvents().test {
             assertThat(awaitItem()).isEqualTo(startEvent)
+            assertThat(awaitItem()).isEqualTo(updateEvent)
+            assertThat(awaitItem()).isEqualTo(folderUpdateEvent)
             assertThat(awaitItem()).isEqualTo(finishEvent)
             cancelAndIgnoreRemainingEvents()
         }

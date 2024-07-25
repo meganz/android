@@ -63,4 +63,26 @@ sealed interface TransferEvent {
      * @param paused
      */
     data class TransferPaused(override val transfer: Transfer, val paused: Boolean) : TransferEvent
+
+
+    /**
+     * Folder transfer update
+     *
+     * @property transfer
+     * @property stage
+     * @property folderCount
+     * @property createdFolderCount
+     * @property fileCount
+     * @property currentFolder
+     * @property currentFileLeafName
+     */
+    data class FolderTransferUpdateEvent(
+        override val transfer: Transfer,
+        val stage: TransferStage,
+        val folderCount: Int,
+        val createdFolderCount: Int,
+        val fileCount: Int,
+        val currentFolder: String,
+        val currentFileLeafName: String,
+    ) : TransferEvent
 }
