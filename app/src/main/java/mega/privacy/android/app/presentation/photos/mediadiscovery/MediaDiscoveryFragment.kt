@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.getValue
@@ -95,7 +96,12 @@ class MediaDiscoveryFragment : Fragment() {
 
                 OriginalTempTheme(isDark = mode.isDarkMode()) {
                     Box(
-                        modifier = Modifier.background(MaterialTheme.colors.background)
+                        modifier = Modifier
+                            .background(MaterialTheme.colors.background)
+                            .clickable(
+                                enabled = false,
+                                onClick = {}
+                            )
                     ) {
                         MediaDiscoveryView(
                             mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,
