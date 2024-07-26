@@ -31,7 +31,6 @@ class UploadFolderViewModelTest {
     fun setup() {
         underTest = UploadFolderViewModel(
             getFolderContentUseCase = mock(),
-            checkNameCollisionUseCase = mock(),
             getFilesInDocumentFolderUseCase = mock(),
             applySortOrderToDocumentFolderUseCase = mock(),
             transfersManagement = mock(),

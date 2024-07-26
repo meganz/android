@@ -30,7 +30,6 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
@@ -55,13 +54,11 @@ import kotlin.time.Duration.Companion.milliseconds
  * ViewModel which manages data of [UploadFolderActivity].
  *
  * @property getFolderContentUseCase    Required for getting folder content.
- * @property checkNameCollisionUseCase  Required for checking name collisions.
  * @property transfersManagement        Required for checking transfers status.
  */
 @HiltViewModel
 class UploadFolderViewModel @Inject constructor(
     private val getFolderContentUseCase: GetFolderContentUseCase,
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val getFilesInDocumentFolderUseCase: GetFilesInDocumentFolderUseCase,
     private val applySortOrderToDocumentFolderUseCase: ApplySortOrderToDocumentFolderUseCase,
     private val transfersManagement: TransfersManagement,

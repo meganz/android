@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.document
 
 import mega.privacy.android.domain.entity.uri.UriPath
+import java.io.File
 
 /**
  * Document entity
@@ -21,4 +22,14 @@ data class DocumentEntity(
     val isFolder: Boolean = false,
     val numFiles: Int = 0,
     val numFolders: Int = 0,
+)
+
+/**
+ * Creates DocumentEntity from file
+ */
+fun File.toDocumentEntity() = DocumentEntity(
+    name = name,
+    size = length(),
+    lastModified = lastModified(),
+    uri = UriPath(absolutePath),
 )

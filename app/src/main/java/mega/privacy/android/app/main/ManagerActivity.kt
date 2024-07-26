@@ -160,7 +160,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.namecollision.data.NameCollision.Upload.Companion.getUploadCollision
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_HOME_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
@@ -287,6 +287,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.UploadUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.model.MegaAttributes
@@ -298,6 +299,8 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
+import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.entity.document.toDocumentEntity
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -307,6 +310,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -318,6 +322,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
+import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncFragment
@@ -406,7 +411,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     lateinit var getChatChangesUseCase: GetChatChangesUseCase
 
     @Inject
-    lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
+    lateinit var checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase
 
     @Inject
     lateinit var uploadUseCase: UploadUseCase
@@ -6277,28 +6282,23 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun addPhotoToParent(file: File, parentHandle: Long) {
         lifecycleScope.launch {
             runCatching {
-                checkNameCollisionUseCase.checkNameCollision(file.name, parentHandle)
-            }.onSuccess { handle: Long ->
-                val list: ArrayList<NameCollision> = ArrayList()
-                list.add(
-                    NameCollision.Upload.getUploadCollision(
-                        handle,
-                        file,
-                        parentHandle,
-                    )
+                checkFileNameCollisionsUseCase(
+                    files = listOf(file.toDocumentEntity()),
+                    parentNodeId = NodeId(parentHandle)
                 )
-                nameCollisionActivityContract?.launch(list)
+            }.onSuccess { collisions ->
+                collisions.map {
+                    getUploadCollision(it)
+                }.firstOrNull()?.let {
+                    nameCollisionActivityContract?.launch(arrayListOf(it))
+                } ?: uploadFile(file, parentHandle)
             }.onFailure { throwable: Throwable? ->
-                if (throwable is MegaNodeException.ParentDoesNotExistException) {
-                    Timber.e(throwable)
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.general_error),
-                        MEGACHAT_INVALID_HANDLE
-                    )
-                } else if (throwable is MegaNodeException.ChildDoesNotExistsException) {
-                    uploadFile(file, parentHandle)
-                }
+                Timber.e(throwable)
+                showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    getString(R.string.general_error),
+                    MEGACHAT_INVALID_HANDLE
+                )
             }
         }
     }
@@ -6567,6 +6567,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             )
             return
         }
+        val parentHandle = parentNode.handle
         if (infoList == null) {
             dismissAlertDialogIfExists(statusDialog)
             dismissAlertDialogIfExists(processFileDialog)
@@ -6583,68 +6584,83 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             showOverDiskQuotaPaywallWarning()
             return
         }
-        checkNameCollisionUseCase.checkShareInfoList(infoList, parentNode)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { (collisions, withoutCollisions): Pair<ArrayList<NameCollision>, List<ShareInfo>> ->
-                    dismissAlertDialogIfExists(statusDialog)
-                    dismissAlertDialogIfExists(processFileDialog)
 
-                    if (collisions.isNotEmpty()) {
-                        nameCollisionActivityContract?.launch(collisions)
+        lifecycleScope.launch {
+            runCatching {
+                checkFileNameCollisionsUseCase(
+                    files = infoList.map {
+                        DocumentEntity(
+                            name = it.originalFileName,
+                            size = it.size,
+                            lastModified = it.lastModified,
+                            uri = UriPath(it.fileAbsolutePath),
+                        )
+                    },
+                    parentNodeId = NodeId(parentHandle)
+                )
+            }.onSuccess { collisions ->
+                dismissAlertDialogIfExists(statusDialog)
+                dismissAlertDialogIfExists(processFileDialog)
+                if (collisions.isNotEmpty()) {
+                    collisions.map {
+                        getUploadCollision(it)
+                    }.let {
+                        nameCollisionActivityContract?.launch(ArrayList(it))
                     }
-                    if (withoutCollisions.isNotEmpty()) {
-                        applicationScope.launch {
-                            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                                withoutCollisions.filter { it.isContact }.forEach {
-                                    requestContactsPermissions(it, parentNode)
-                                }
-                                val shareInfo = withoutCollisions.filter { !it.isContact }
-                                viewModel.uploadShareInfo(shareInfo, parentNode.handle)
-                            } else {
-                                showSnackbar(
-                                    Constants.SNACKBAR_TYPE,
-                                    resources.getQuantityString(
-                                        R.plurals.upload_began,
-                                        withoutCollisions.size,
-                                        withoutCollisions.size
-                                    ),
-                                    MEGACHAT_INVALID_HANDLE
-                                )
-                                for (info in withoutCollisions) {
-                                    if (info.isContact) {
-                                        requestContactsPermissions(info, parentNode)
-                                    } else {
-                                        uploadUseCase.upload(
-                                            this@ManagerActivity,
-                                            info,
-                                            null,
-                                            parentNode.handle
-                                        )
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(
-                                                { Timber.d("Upload started") },
-                                                { t: Throwable? -> Timber.e(t) })
-                                            .addTo(composite)
-                                    }
+                }
+                val collidedSharesPath = collisions.map { it.path.value }.toSet()
+                val sharesWithoutCollision = infoList.filter {
+                    collidedSharesPath.contains(it.fileAbsolutePath).not()
+                }
+                if (sharesWithoutCollision.isNotEmpty()) {
+                    lifecycleScope.launch {
+                        if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
+                            sharesWithoutCollision.filter { it.isContact }.forEach {
+                                requestContactsPermissions(it, parentNode)
+                            }
+                            val shareInfo = sharesWithoutCollision.filter { !it.isContact }
+                            viewModel.uploadShareInfo(shareInfo, parentNode.handle)
+                        } else {
+                            showSnackbar(
+                                Constants.SNACKBAR_TYPE,
+                                resources.getQuantityString(
+                                    R.plurals.upload_began,
+                                    sharesWithoutCollision.size,
+                                    sharesWithoutCollision.size
+                                ),
+                                MEGACHAT_INVALID_HANDLE
+                            )
+                            for (info in sharesWithoutCollision) {
+                                if (info.isContact) {
+                                    requestContactsPermissions(info, parentNode)
+                                } else {
+                                    uploadUseCase.upload(
+                                        this@ManagerActivity,
+                                        info,
+                                        null,
+                                        parentNode.handle
+                                    )
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(
+                                            { Timber.d("Upload started") },
+                                            { t: Throwable? -> Timber.e(t) })
+                                        .addTo(composite)
                                 }
                             }
                         }
                     }
-                },
-                {
-                    dismissAlertDialogIfExists(statusDialog)
-                    dismissAlertDialogIfExists(processFileDialog)
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.error_temporary_unavaible),
-                        MEGACHAT_INVALID_HANDLE
-                    )
                 }
-            )
-            .addTo(composite)
+            }.onFailure {
+                dismissAlertDialogIfExists(statusDialog)
+                dismissAlertDialogIfExists(processFileDialog)
+                Util.showErrorAlertDialog(
+                    getString(R.string.error_temporary_unavaible),
+                    false,
+                    this@ManagerActivity
+                )
+            }
+        }
     }
 
     private fun requestContactsPermissions(info: ShareInfo?, parentNode: MegaNode?) {
@@ -6764,29 +6780,27 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         }
         if (parentNode == null) return
+        val parentHandle = parentNode.handle
         lifecycleScope.launch {
-            runCatching { checkNameCollisionUseCase.checkAsync(file.name, parentNode) }
-                .onSuccess { handle: Long ->
-                    val list: ArrayList<NameCollision> = ArrayList()
-                    list.add(
-                        NameCollision.Upload.getUploadCollision(
-                            handle,
-                            file,
-                            parentNode.handle,
-                        )
-                    )
-                    nameCollisionActivityContract?.launch(list)
-                }.onFailure { throwable: Throwable? ->
-                    if (throwable is MegaNodeException.ParentDoesNotExistException) {
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.general_error),
-                            MEGACHAT_INVALID_HANDLE
-                        )
-                    } else if (throwable is MegaNodeException.ChildDoesNotExistsException) {
-                        uploadFile(file, parentNode.handle)
-                    }
-                }
+            runCatching {
+                checkFileNameCollisionsUseCase(
+                    files = listOf(file.toDocumentEntity()),
+                    parentNodeId = NodeId(parentHandle)
+                )
+            }.onSuccess { collisions ->
+                collisions.map {
+                    getUploadCollision(it)
+                }.firstOrNull()?.let {
+                    nameCollisionActivityContract?.launch(arrayListOf(it))
+                } ?: uploadFile(file, parentHandle)
+            }.onFailure { throwable: Throwable? ->
+                Timber.e(throwable)
+                showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    getString(R.string.general_error),
+                    MEGACHAT_INVALID_HANDLE
+                )
+            }
         }
     }
 
