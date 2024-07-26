@@ -7,7 +7,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,6 +34,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.ZipImageNodeFe
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.zipbrowser.view.ZipBrowserScreen
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
@@ -84,7 +90,28 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
                 initialValue = ThemeMode.System
             )
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
-                ZipBrowserScreen(viewModel = viewModel)
+                ConstraintLayout(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    val (audioPlayer, audioSectionComposeView) = createRefs()
+                    MiniAudioPlayerView(
+                        modifier = Modifier
+                            .constrainAs(audioPlayer) {
+                                bottom.linkTo(parent.bottom)
+                            }
+                            .fillMaxWidth(),
+                        lifecycle = lifecycle,
+                    )
+                    ZipBrowserScreen(
+                        modifier = Modifier
+                            .constrainAs(audioSectionComposeView) {
+                                top.linkTo(parent.top)
+                                bottom.linkTo(audioPlayer.top)
+                                height = Dimension.fillToConstraints
+                            }
+                            .fillMaxWidth(),
+                        viewModel = viewModel)
+                }
             }
         }
 
