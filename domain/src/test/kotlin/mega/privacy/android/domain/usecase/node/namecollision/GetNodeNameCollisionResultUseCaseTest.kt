@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -34,7 +33,8 @@ class GetNodeNameCollisionResultUseCaseTest {
 
     private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
-    private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
+    private val getNodeNameCollisionRenameNameUseCase =
+        mock<GetNodeNameCollisionRenameNameUseCase>()
     private val getChildNodeUseCase = mock<GetChildNodeUseCase>()
     private val nodeRepository = mock<NodeRepository>()
 
@@ -62,8 +62,7 @@ class GetNodeNameCollisionResultUseCaseTest {
         underTest = GetNodeNameCollisionResultUseCase(
             getNodeByHandleUseCase = getNodeByHandleUseCase,
             getThumbnailUseCase = getThumbnailUseCase,
-            getRootNodeUseCase = getRootNodeUseCase,
-            getChildNodeUseCase = getChildNodeUseCase,
+            getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase,
             nodeRepository = nodeRepository
         )
     }
@@ -72,7 +71,6 @@ class GetNodeNameCollisionResultUseCaseTest {
     fun resetMocks() {
         reset(
             getThumbnailUseCase,
-            getRootNodeUseCase,
             getChildNodeUseCase,
             getNodeByHandleUseCase,
             getThumbnailUseCase
@@ -120,6 +118,8 @@ class GetNodeNameCollisionResultUseCaseTest {
                     "${defaultNodeNameCollision.name} (1)"
                 )
             ) doReturn null
+            whenever(getNodeNameCollisionRenameNameUseCase(defaultNodeNameCollision)) doReturn
+                    "${defaultNodeNameCollision.name} (1)"
 
             val result = underTest(nameCollision = defaultNodeNameCollision)
 
@@ -159,6 +159,8 @@ class GetNodeNameCollisionResultUseCaseTest {
                 )
             ) doReturn null
             whenever(nodeRepository.getFolderTreeInfo(folderNode)) doReturn mock<FolderTreeInfo>()
+            whenever(getNodeNameCollisionRenameNameUseCase(defaultNodeNameCollision)) doReturn
+                    "${defaultNodeNameCollision.name} (1)"
 
             val result = underTest(
                 nameCollision = defaultNodeNameCollision
@@ -203,70 +205,4 @@ class GetNodeNameCollisionResultUseCaseTest {
             verify(getThumbnailUseCase, never()).invoke(123L)
             verify(getThumbnailUseCase).invoke(355L)
         }
-
-    @Test
-    fun `test root node is fetched when parent handle is -1L`() = runTest {
-        val nodeNameCollision = defaultNodeNameCollision.copy(
-            parentHandle = -1L
-        )
-        val collidedNode = mock<FileNode> {
-            on { name } doReturn nodeNameCollision.name
-            on { id.longValue } doReturn nodeNameCollision.collisionHandle
-            on { modificationTime } doReturn 123456L
-            on { size } doReturn 100L
-        }
-        val folderNode = mock<FolderNode> {
-            on { id } doReturn NodeId(nodeNameCollision.parentHandle)
-        }
-        whenever(getNodeByHandleUseCase(123L, true)).thenReturn(collidedNode)
-        whenever(getRootNodeUseCase()).thenReturn(mock())
-        whenever(getNodeByHandleUseCase(nodeNameCollision.parentHandle, false)).thenReturn(
-            folderNode
-        )
-        whenever(getThumbnailUseCase(nodeNameCollision.nodeHandle)) doReturn thumbFile
-        whenever(getThumbnailUseCase(nodeNameCollision.collisionHandle)) doReturn thumbFile2
-        whenever(
-            getChildNodeUseCase(
-                folderNode.id,
-                "${nodeNameCollision.name} (1)"
-            )
-        ) doReturn null
-
-        underTest(nameCollision = nodeNameCollision)
-
-        verify(getRootNodeUseCase).invoke()
-    }
-
-    @Test
-    fun `test exception is thrown when parent doesn't found`() = runTest {
-        val nodeNameCollision = defaultNodeNameCollision.copy(
-            parentHandle = -1L
-        )
-        val collidedNode = mock<FileNode> {
-            on { name } doReturn nodeNameCollision.name
-            on { id.longValue } doReturn nodeNameCollision.collisionHandle
-            on { modificationTime } doReturn 123456L
-            on { size } doReturn 100L
-        }
-        val folderNode = mock<FolderNode> {
-            on { id } doReturn NodeId(nodeNameCollision.parentHandle)
-        }
-        whenever(getNodeByHandleUseCase(123L, true)).thenReturn(collidedNode)
-        whenever(getRootNodeUseCase()).thenThrow(NodeDoesNotExistsException())
-        whenever(getNodeByHandleUseCase(nodeNameCollision.parentHandle, false)).thenReturn(
-            folderNode
-        )
-        whenever(getThumbnailUseCase(nodeNameCollision.nodeHandle)) doReturn thumbFile
-        whenever(getThumbnailUseCase(nodeNameCollision.collisionHandle)) doReturn thumbFile2
-        whenever(
-            getChildNodeUseCase(
-                folderNode.id,
-                "${nodeNameCollision.name} (1)"
-            )
-        ) doReturn null
-
-        assertThrows<NodeDoesNotExistsException> {
-            underTest(nameCollision = nodeNameCollision)
-        }
-    }
 }
