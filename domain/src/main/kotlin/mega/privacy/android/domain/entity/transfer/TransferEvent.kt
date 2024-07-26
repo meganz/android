@@ -79,10 +79,10 @@ sealed interface TransferEvent {
     data class FolderTransferUpdateEvent(
         override val transfer: Transfer,
         val stage: TransferStage,
-        val folderCount: Int,
-        val createdFolderCount: Int,
-        val fileCount: Int,
-        val currentFolder: String,
-        val currentFileLeafName: String,
+        val folderCount: Long,
+        val createdFolderCount: Long,
+        val fileCount: Long,
+        val currentFolder: String?,
+        val currentFileLeafName: String?,
     ) : TransferEvent
 }

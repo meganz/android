@@ -114,11 +114,11 @@ class OptionalMegaListenerInterface(
         api: MegaApiJava,
         transfer: MegaTransfer,
         stage: Int,
-        folderCount: Int,
-        createdFolderCount: Int,
-        fileCount: Int,
-        currentFolder: String,
-        currentFileLeafName: String,
+        folderCount: Long,
+        createdFolderCount: Long,
+        fileCount: Long,
+        currentFolder: String?,
+        currentFileLeafName: String?,
     ) {
 
     }

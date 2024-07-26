@@ -17,11 +17,11 @@ internal class OptionalMegaTransferListenerInterface(
     private val onFolderTransferUpdate: ((
         transfer: MegaTransfer,
         stage: Int,
-        folderCount: Int,
-        createdFolderCount: Int,
-        fileCount: Int,
-        currentFolder: String,
-        currentFileLeafName: String,
+        folderCount: Long,
+        createdFolderCount: Long,
+        fileCount: Long,
+        currentFolder: String?,
+        currentFileLeafName: String?,
     ) -> Unit)? = null,
 ) : MegaTransferListenerInterface {
 
@@ -68,11 +68,11 @@ internal class OptionalMegaTransferListenerInterface(
         api: MegaApiJava,
         transfer: MegaTransfer,
         stage: Int,
-        folderCount: Int,
-        createdFolderCount: Int,
-        fileCount: Int,
-        currentFolder: String,
-        currentFileLeafName: String,
+        folderCount: Long,
+        createdFolderCount: Long,
+        fileCount: Long,
+        currentFolder: String?,
+        currentFileLeafName: String?,
     ) {
         onFolderTransferUpdate?.invoke(
             transfer,
