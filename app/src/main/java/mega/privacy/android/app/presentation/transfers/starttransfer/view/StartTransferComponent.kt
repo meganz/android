@@ -279,7 +279,7 @@ private fun StartTransferComponent(
             showPromptSaveDestinationDialog = it
         }
     )
-    MinimumTimeVisibility(visible = uiState.jobInProgressState == StartTransferJobInProgress.ScanningTransfers) {
+    MinimumTimeVisibility(visible = uiState.jobInProgressState is StartTransferJobInProgress.ScanningTransfers) {
         TransferInProgressDialog(onCancelConfirmed = onCancelledConfirmed)
     }
     if (showOfflineAlertDialog) {

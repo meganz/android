@@ -32,6 +32,8 @@ import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
@@ -360,7 +362,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             .onFailure { Timber.e(it) }
         monitorDownloadFinish()
         _uiState.update {
-            it.copy(jobInProgressState = StartTransferJobInProgress.ScanningTransfers)
+            it.copy(
+                jobInProgressState = StartTransferJobInProgress.ScanningTransfers(
+                    TransferStage.STAGE_NONE
+                )
+            )
         }
         var lastError: Throwable? = null
         var startMessageShown = false
@@ -378,14 +384,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     isHighPriority = isHighPriority,
                 ).onEach { event ->
                     val singleTransferEvent = (event as? MultiTransferEvent.SingleTransferEvent)
-                    // clear scanning transfers state
-                    if (_uiState.value.jobInProgressState == StartTransferJobInProgress.ScanningTransfers &&
-                        singleTransferEvent?.scanningFinished == true
-                    ) {
-                        _uiState.update {
-                            it.copy(jobInProgressState = null)
-                        }
-                    }
+                    // update scanning transfers state
+                    updateScanningFoldersProgress(singleTransferEvent)
                     //show start message as soon as an event with all transfers updated is received
                     if (!startMessageShown && singleTransferEvent?.allTransfersUpdated == true) {
                         startMessageShown = true
@@ -415,6 +415,30 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 nodes.size,
                 lastError?.takeIf { terminalEvent == null },
             )
+        }
+    }
+
+    private fun updateScanningFoldersProgress(
+        event: MultiTransferEvent.SingleTransferEvent?,
+    ) {
+        if (event != null && _uiState.value.jobInProgressState is StartTransferJobInProgress.ScanningTransfers) {
+            val folderTransferEvent = event.transferEvent
+            if (event.scanningFinished) {
+                _uiState.update {
+                    it.copy(jobInProgressState = null)
+                }
+            } else if (folderTransferEvent is TransferEvent.FolderTransferUpdateEvent) {
+                _uiState.update {
+                    it.copy(
+                        jobInProgressState = StartTransferJobInProgress.ScanningTransfers(
+                            stage = folderTransferEvent.stage,
+                            fileCount = folderTransferEvent.fileCount.toInt(),
+                            folderCount = folderTransferEvent.folderCount.toInt(),
+                            createdFolderCount = folderTransferEvent.createdFolderCount.toInt()
+                        )
+                    )
+                }
+            }
         }
     }
 
@@ -682,7 +706,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         lastTransferStartedHere = true
         monitorUploadFinish()
         _uiState.update {
-            it.copy(jobInProgressState = StartTransferJobInProgress.ScanningTransfers)
+            it.copy(
+                jobInProgressState = StartTransferJobInProgress.ScanningTransfers(
+                    TransferStage.STAGE_NONE
+                )
+            )
         }
         var startMessageShown = false
         startUploadWithWorkerUseCase(
@@ -714,6 +742,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                             triggerEvent = transferTriggerEvent,
                         )
                     } else {
+                        // update scanning transfers state
+                        updateScanningFoldersProgress(event)
                         null
                     }
                 }

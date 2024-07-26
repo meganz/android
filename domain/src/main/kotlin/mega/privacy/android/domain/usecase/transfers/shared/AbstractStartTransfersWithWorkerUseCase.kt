@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
@@ -39,7 +40,8 @@ abstract class AbstractStartTransfersWithWorkerUseCase(
         var workerStarted = false
         doTransfers()
             .filter {
-                it !is MultiTransferEvent.SingleTransferEvent
+                (it as? MultiTransferEvent.SingleTransferEvent)?.transferEvent is TransferEvent.FolderTransferUpdateEvent
+                        || it !is MultiTransferEvent.SingleTransferEvent
                         || (it.scanningFinished || it.allTransfersUpdated)
             }.transformWhile { event ->
                 val singleTransferEvent = event as? MultiTransferEvent.SingleTransferEvent

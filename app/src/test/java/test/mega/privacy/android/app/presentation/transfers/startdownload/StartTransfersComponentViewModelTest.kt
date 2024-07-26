@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
@@ -23,6 +25,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
@@ -275,7 +279,7 @@ class StartTransfersComponentViewModelTest {
         }
 
     @Test
-    fun `test that job in progress is set to ProcessingFiles when start download use case starts`() =
+    fun `test that job in progress is set to ScanningTransfersProgress when start download use case starts`() =
         runTest {
             commonStub()
             stubStartDownload(flow {
@@ -283,7 +287,47 @@ class StartTransfersComponentViewModelTest {
             })
             underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
             assertThat(underTest.uiState.value.jobInProgressState)
-                .isEqualTo(StartTransferJobInProgress.ScanningTransfers)
+                .isInstanceOf(StartTransferJobInProgress.ScanningTransfers::class.java)
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that ScanningTransfersProgress is updated when start download use case emits new folder update values`() =
+        runTest {
+            commonStub()
+            val expectedList = listOf(
+                TransferStage.STAGE_NONE,
+                TransferStage.STAGE_SCANNING,
+                TransferStage.STAGE_CREATING_TREE,
+            )
+            stubStartDownload(flow {
+                expectedList.map {
+                    MultiTransferEvent.SingleTransferEvent(
+                        transferEvent = TransferEvent.FolderTransferUpdateEvent(
+                            mock(),
+                            it,
+                            0, 0, 0, null, null,
+                        ), 0, 0
+                    )
+                }.forEach {
+                    emit(it)
+                    yield()
+                }
+                awaitCancellation()
+            })
+            underTest.uiState.test {
+                println(awaitItem())//ignore initial
+                underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
+                expectedList.forEach { expected ->
+                    val actual =
+                        (awaitItem().jobInProgressState as? StartTransferJobInProgress.ScanningTransfers)?.stage
+                    println(actual)
+                    assertThat(actual).isEqualTo(expected)
+                }
+            }
+
+            assertThat(underTest.uiState.value.jobInProgressState)
+                .isInstanceOf(StartTransferJobInProgress.ScanningTransfers::class.java)
         }
 
     @Test
@@ -487,7 +531,7 @@ class StartTransfersComponentViewModelTest {
             underTest.startTransfer(startUploadFilesEvent)
 
             assertThat(underTest.uiState.value.jobInProgressState)
-                .isEqualTo(StartTransferJobInProgress.ScanningTransfers)
+                .isInstanceOf(StartTransferJobInProgress.ScanningTransfers::class.java)
         }
 
     @ParameterizedTest

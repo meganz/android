@@ -17,6 +17,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -316,6 +318,27 @@ class StartDownloadsWithWorkerUseCaseTest {
             }
             verify(downloadNodesUseCase)
                 .invoke(any(), anyOrNull(), eq(expectedAppData), any())
+        }
+
+    @Test
+    fun `test that folder transfer update events are not filtered out`() =
+        runTest {
+            val expected = MultiTransferEvent.SingleTransferEvent(
+                transferEvent = TransferEvent.FolderTransferUpdateEvent(
+                    mock(),
+                    TransferStage.STAGE_SCANNING,
+                    0, 0, 0, null, null,
+                ), 0, 0
+            )
+            whenever(
+                downloadNodesUseCase(any(), any(), anyOrNull(), any())
+            ).thenAnswer {
+                flowOf(expected)
+            }
+            underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
+                assertThat(awaitItem()).isEqualTo(expected)
+                awaitComplete()
+            }
         }
 
     private fun mockNodes() = nodeIds.map { mock<TypedFileNode>() }
