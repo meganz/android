@@ -94,6 +94,9 @@ internal fun VideoPlaylistsView(
         if (showRenameVideoPlaylistDialog) {
             showRenameVideoPlaylistDialog = false
         }
+        if (showCreateVideoPlaylistDialog) {
+            showCreateVideoPlaylistDialog = false
+        }
     }
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -182,7 +185,6 @@ internal fun VideoPlaylistsView(
                     },
                     onDialogPositiveButtonClicked = { titleOfNewVideoPlaylist ->
                         onCreateDialogPositiveButtonClicked(titleOfNewVideoPlaylist)
-                        showCreateVideoPlaylistDialog = false
                     },
                 ) {
                     isInputTitleValid
