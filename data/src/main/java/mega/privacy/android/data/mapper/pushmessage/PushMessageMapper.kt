@@ -49,6 +49,19 @@ class PushMessageMapper @Inject constructor() {
                 )
             }
 
+            PUSH_TYPE_PROMO -> {
+                PushMessage.PromoPushMessage(
+                    id = data.getString(KEY_PUSH_PARAM_ID)?.toIntOrNull()
+                        ?: MegaChatApiJava.MEGACHAT_INVALID_HANDLE.toInt(),
+                    title = data.getString(KEY_PUSH_PARAM_TITLE) ?: "",
+                    subtitle = data.getString(KEY_PUSH_PARAM_SUBTITLE),
+                    description = data.getString(KEY_PUSH_PARAM_DESCRIPTION) ?: "",
+                    redirectLink = data.getString(KEY_PUSH_PARAM_TARGET_URL) ?: "",
+                    imagePath = data.getString(KEY_PUSH_PARAM_IMAGE_PATH),
+                    sound = data.getString(KEY_PUSH_PARAM_SOUND),
+                )
+            }
+
             else -> null
         }
 
@@ -62,6 +75,7 @@ class PushMessageMapper @Inject constructor() {
         const val PUSH_TYPE_CALL = "4"
         const val PUSH_TYPE_ACCEPTANCE = "5"
         const val PUSH_TYPE_SCHED_MEETING = "7"
+        const val PUSH_TYPE_PROMO = "8"
 
         private const val KEY_CHAT_ROOM_HANDLE = "chatid"
         private const val KEY_MSG_HANDLE = "msgid"
@@ -76,6 +90,13 @@ class PushMessageMapper @Inject constructor() {
         private const val KEY_SCHED_MEETING_START_TIME = "s"
         private const val KEY_SCHED_MEETING_END_TIME = "e"
         private const val KEY_SCHED_MEETING_START_REMINDER = "f"
+        private const val KEY_PUSH_PARAM_TARGET_URL = "generic_href"
+        private const val KEY_PUSH_PARAM_SUBTITLE = "generic_subtitle"
+        private const val KEY_PUSH_PARAM_DESCRIPTION = "generic_desc"
+        private const val KEY_PUSH_PARAM_TITLE = "generic_title"
+        private const val KEY_PUSH_PARAM_ID = "generic_id"
+        private const val KEY_PUSH_PARAM_IMAGE_PATH = "generic_img"
+        private const val KEY_PUSH_PARAM_SOUND = "sound"
 
         private const val VALUE_NO_BEEP = "0"
         private const val VALUE_START_REMINDER = "0"

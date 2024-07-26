@@ -20,7 +20,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.fcm.PushMessageWorker
-import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotification
+import mega.privacy.android.app.notifications.ChatMessageNotificationManager
+import mega.privacy.android.app.notifications.PromoPushNotificationManager
+import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotificationManager
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
@@ -64,8 +66,10 @@ class PushMessageWorkerTest {
     private val retryPendingConnectionsUseCase = mock<RetryPendingConnectionsUseCase>()
     private val pushMessageMapper = mock<PushMessageMapper>()
     private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
-    private val scheduledMeetingPushMessageNotification =
-        mock<ScheduledMeetingPushMessageNotification>()
+    private val scheduledMeetingPushMessageNotificationManager =
+        mock<ScheduledMeetingPushMessageNotificationManager>()
+    private val promoPushNotificationManager = mock<PromoPushNotificationManager>()
+    private val chatMessageNotificationManager = mock<ChatMessageNotificationManager>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
     private val notificationManager = mock<NotificationManagerCompat>()
     private val isChatNotifiableUseCase = mock<IsChatNotifiableUseCase>()
@@ -107,13 +111,15 @@ class PushMessageWorkerTest {
             retryPendingConnectionsUseCase = retryPendingConnectionsUseCase,
             pushMessageMapper = pushMessageMapper,
             initialiseMegaChatUseCase = initialiseMegaChatUseCase,
-            scheduledMeetingPushMessageNotification = scheduledMeetingPushMessageNotification,
+            scheduledMeetingPushMessageNotificationManager = scheduledMeetingPushMessageNotificationManager,
             callsPreferencesGateway = callsPreferencesGateway,
             notificationManager = notificationManager,
             isChatNotifiableUseCase = isChatNotifiableUseCase,
             getChatRoomUseCase = getChatRoomUseCase,
             fileDurationMapper = fileDurationMapper,
+            promoPushNotificationManager = promoPushNotificationManager,
             getChatMessageNotificationDataUseCase = getChatMessageNotificationDataUseCase,
+            chatMessageNotificationManager = chatMessageNotificationManager,
             ioDispatcher = ioDispatcher,
             loginMutex = mock()
         )
@@ -212,7 +218,28 @@ class PushMessageWorkerTest {
             val result = underTest.doWork()
 
             verify(getChatRoomUseCase).invoke(-1L)
-            verify(scheduledMeetingPushMessageNotification).show(context, pushMessage)
+            verify(scheduledMeetingPushMessageNotificationManager).show(context, pushMessage)
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+    }
+
+    @Test
+    fun `test that PromoPushMessage are triggered as expected`() {
+        runTest {
+            val pushMessage = PushMessage.PromoPushMessage(
+                id = 1,
+                title = "Test title",
+                description = "Test description",
+                redirectLink = "https://mega.io",
+                imagePath = null,
+                subtitle = null,
+                sound = null,
+            )
+            whenever(pushMessageMapper(any())).thenReturn(pushMessage)
+            whenever(notificationManager.areNotificationsEnabled()).thenReturn(true)
+            val result = underTest.doWork()
+
+            verify(promoPushNotificationManager).show(context, pushMessage)
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
     }

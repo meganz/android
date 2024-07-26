@@ -25,14 +25,18 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotification
-import mega.privacy.android.app.presentation.notifications.chat.ChatMessageNotification
+import mega.privacy.android.app.notifications.ChatMessageNotificationManager
+import mega.privacy.android.app.notifications.PromoPushNotificationManager
+import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotificationManager
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.pushes.PushMessage
-import mega.privacy.android.domain.entity.pushes.PushMessage.*
+import mega.privacy.android.domain.entity.pushes.PushMessage.CallPushMessage
+import mega.privacy.android.domain.entity.pushes.PushMessage.ChatPushMessage
+import mega.privacy.android.domain.entity.pushes.PushMessage.PromoPushMessage
+import mega.privacy.android.domain.entity.pushes.PushMessage.ScheduledMeetingPushMessage
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
@@ -48,10 +52,22 @@ import timber.log.Timber
 /**
  * Worker class to manage push notifications.
  *
- * @property backgroundFastLoginUseCase        Required for performing a complete login process with an existing session.
- * @property pushReceivedUseCase                      Required for notifying received pushes.
- * @property retryPendingConnectionsUseCase    Required for retrying pending connections.
- * @property pushMessageMapper                 [PushMessageMapper].
+ *  @property backgroundFastLoginUseCase  Use case to login to the server
+ *  @property pushReceivedUseCase        Use case to manage push notifications
+ *  @property retryPendingConnectionsUseCase Use case to retry pending connections
+ *  @property pushMessageMapper         Mapper to convert worker data to PushMessage
+ *  @property initialiseMegaChatUseCase Use case to initialise MegaChat
+ *  @property scheduledMeetingPushMessageNotificationManager Use case to show a device Notification given a [ScheduledMeetingPushMessage]
+ *  @property promoPushNotificationManager     Use case to show a device Notification given a [PromoPushMessage]
+ *  @property callsPreferencesGateway  Gateway to manage calls preferences
+ *  @property notificationManager      Notification manager
+ *  @property isChatNotifiableUseCase  Use case to check if a chat is notifiable
+ *  @property getChatRoomUseCase       Use case to get a chat room
+ *  @property fileDurationMapper      Mapper to convert file duration
+ *  @property getChatMessageNotificationDataUseCase Use case to get chat message notification data
+ *  @property chatMessageNotificationManager Use case to show a device Notification given a [ChatMessageNotificationData]
+ *  @property ioDispatcher            Dispatcher to perform work in background
+ *  @property loginMutex               Mutex to avoid multiple logins at the same time
  */
 @HiltWorker
 class PushMessageWorker @AssistedInject constructor(
@@ -62,13 +78,15 @@ class PushMessageWorker @AssistedInject constructor(
     private val retryPendingConnectionsUseCase: RetryPendingConnectionsUseCase,
     private val pushMessageMapper: PushMessageMapper,
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
-    private val scheduledMeetingPushMessageNotification: ScheduledMeetingPushMessageNotification,
+    private val scheduledMeetingPushMessageNotificationManager: ScheduledMeetingPushMessageNotificationManager,
+    private val promoPushNotificationManager: PromoPushNotificationManager,
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val notificationManager: NotificationManagerCompat,
     private val isChatNotifiableUseCase: IsChatNotifiableUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val fileDurationMapper: FileDurationMapper,
     private val getChatMessageNotificationDataUseCase: GetChatMessageNotificationDataUseCase,
+    private val chatMessageNotificationManager: ChatMessageNotificationManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
@@ -125,7 +143,7 @@ class PushMessageWorker @AssistedInject constructor(
                             runCatching { DEFAULT_NOTIFICATION_URI.toString() }.getOrNull()
                         ) ?: return@withContext Result.failure()
 
-                        ChatMessageNotification.show(
+                        chatMessageNotificationManager.show(
                             applicationContext,
                             data,
                             fileDurationMapper
@@ -140,7 +158,7 @@ class PushMessageWorker @AssistedInject constructor(
             is ScheduledMeetingPushMessage -> {
                 if (areNotificationsEnabled() && areMeetingRemindersEnabled()) {
                     runCatching {
-                        scheduledMeetingPushMessageNotification.show(
+                        scheduledMeetingPushMessageNotificationManager.show(
                             applicationContext,
                             pushMessage.updateTitle()
                         )
@@ -149,6 +167,14 @@ class PushMessageWorker @AssistedInject constructor(
                         return@withContext Result.failure()
                     }
                 }
+            }
+
+            is PromoPushMessage -> {
+                runCatching { promoPushNotificationManager.show(applicationContext, pushMessage) }
+                    .onFailure { error ->
+                        Timber.e(error)
+                        return@withContext Result.failure()
+                    }
             }
 
             else -> {
@@ -228,9 +254,10 @@ class PushMessageWorker @AssistedInject constructor(
                 CallsMeetingReminders.Enabled
 
     private suspend fun ScheduledMeetingPushMessage.updateTitle(): ScheduledMeetingPushMessage =
-        runCatching { getChatRoomUseCase(chatRoomHandle)?.title }.getOrNull()?.let { chatRoomTitle ->
-            copy(title = chatRoomTitle)
-        } ?: this
+        runCatching { getChatRoomUseCase(chatRoomHandle)?.title }.getOrNull()
+            ?.let { chatRoomTitle ->
+                copy(title = chatRoomTitle)
+            } ?: this
 
     companion object {
         const val NOTIFICATION_CHANNEL_ID = 1086

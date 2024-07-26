@@ -53,4 +53,25 @@ sealed class PushMessage {
         val timezone: String?,
         val isStartReminder: Boolean,
     ) : PushMessage()
+
+    /**
+     *  Promo notification push message
+     *
+     *  @property id
+     *  @property title
+     *  @property subtitle
+     *  @property description
+     *  @property redirectLink
+     *  @property imagePath
+     *  @property sound
+     */
+    data class PromoPushMessage(
+        val id: Int,
+        val title: String,
+        val subtitle: String?,
+        val description: String,
+        val redirectLink: String,
+        val imagePath: String?,
+        val sound: String?,
+    ) : PushMessage()
 }

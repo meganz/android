@@ -348,6 +348,8 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID = "ChatUploadServiceNotification";
     public static final String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
     public static final String NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID = "AudioPlayerNotification";
+    public static final String NOTIFICATION_CHANNEL_PROMO_ID = "PromoNotification";
+    public static final String NOTIFICATION_CHANNEL_PROMO_NAME = "MEGA Promotions";
     public static final String CHAT_FOLDER = "My chat files";
     public static final String AUTHORITY_STRING_FILE_PROVIDER = APPLICATION_ID + ".providers.fileprovider";
     public static final String TYPE_TEXT_PLAIN = "text/plain";

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.globalmanagement
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.pm.PackageManager
 import android.os.Build
@@ -10,7 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.presentation.notifications.chat.ChatMessageNotification
+import mega.privacy.android.app.notifications.ChatMessageNotificationManager
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -42,6 +43,7 @@ class MegaChatNotificationHandler @Inject constructor(
     private val pushReceivedUseCase: PushReceivedUseCase,
     private val isChatNotifiableUseCase: IsChatNotifiableUseCase,
     private val getChatMessageNotificationDataUseCase: GetChatMessageNotificationDataUseCase,
+    private val chatMessageNotificationManager: ChatMessageNotificationManager,
     private val fileDurationMapper: FileDurationMapper,
     private val chatMessageMapper: @JvmSuppressWildcards suspend (@JvmSuppressWildcards MegaChatMessage) -> @JvmSuppressWildcards ChatMessage,
     private val saveChatMessagesUseCase: SaveChatMessagesUseCase,
@@ -54,6 +56,7 @@ class MegaChatNotificationHandler @Inject constructor(
      * @param chatId
      * @param msg
      */
+    @SuppressLint("MissingPermission")
     override fun onChatNotification(api: MegaChatApiJava?, chatId: Long, msg: MegaChatMessage?) {
         Timber.d("onChatNotification")
 
@@ -113,7 +116,7 @@ class MegaChatNotificationHandler @Inject constructor(
                         runCatching { DEFAULT_NOTIFICATION_URI.toString() }.getOrNull()
                     ) ?: return@launch
 
-                    ChatMessageNotification.show(
+                    chatMessageNotificationManager.show(
                         application,
                         data,
                         fileDurationMapper

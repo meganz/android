@@ -7,6 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.pushes.PushMessage
 import org.junit.Before
 import org.junit.Rule
@@ -17,13 +18,12 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.core.test.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
-class ScheduledMeetingPushMessageNotificationTest {
+class ScheduledMeetingPushMessageNotificationManagerTest {
 
-    private lateinit var underTest: ScheduledMeetingPushMessageNotification
+    private lateinit var underTest: ScheduledMeetingPushMessageNotificationManager
 
     private lateinit var context: Context
     private val notificationManagerCompat: NotificationManagerCompat = mock()
@@ -34,7 +34,7 @@ class ScheduledMeetingPushMessageNotificationTest {
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
-        underTest = ScheduledMeetingPushMessageNotification(
+        underTest = ScheduledMeetingPushMessageNotificationManager(
             notificationManagerCompat,
         )
     }
@@ -77,12 +77,5 @@ class ScheduledMeetingPushMessageNotificationTest {
         verify(notificationManagerCompat).notify(any(), argThat { arg: Notification ->
             arg.extras.getString("android.title").equals(pushMessage.title)
         })
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun `test that CallPushMessage causes an exception`() = runTest {
-        val pushMessage = PushMessage.CallPushMessage
-
-        underTest.show(context, pushMessage)
     }
 }

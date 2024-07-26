@@ -1,12 +1,15 @@
-package mega.privacy.android.app.presentation.notifications.chat
+package mega.privacy.android.app.notifications
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import android.Manifest
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -29,26 +32,37 @@ import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationD
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Object for showing chat message notifications.
+ * Manager class to show a chat message Notification
+ *
+ * @property notificationManagerCompat    [NotificationManagerCompat]
+ *
  */
-internal object ChatMessageNotification {
+class ChatMessageNotificationManager @Inject constructor(
+    private val notificationManagerCompat: NotificationManagerCompat,
+) {
+    companion object {
+        private const val GROUP_KEY = "Karere"
+    }
 
-    private const val GROUP_KEY = "Karere"
-
+    /**
+     * Show Notification given a [ChatMessageNotificationData]
+     * @param context                   [Context]
+     * @param chatMessageNotificationData   [ChatMessageNotificationData]
+     */
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun show(
         context: Context,
         chatMessageNotificationData: ChatMessageNotificationData,
         fileDurationMapper: FileDurationMapper,
     ) = with(chatMessageNotificationData) {
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationId = MegaApiJava.userHandleToBase64(msg.messageId).hashCode()
 
         if (msg.isDeleted || msg.status == ChatMessageStatus.SEEN) {
-            notificationManager.cancel(notificationId)
+            notificationManagerCompat.cancel(notificationId)
             return@with
         }
 
@@ -116,7 +130,7 @@ internal object ChatMessageNotification {
                     largeIcon?.let { setLargeIcon(it) }
                 }
 
-        notificationManager.notify(notificationId, builder.build())
+        notificationManagerCompat.notify(notificationId, builder.build())
     }
 
     private fun getMsgContent(

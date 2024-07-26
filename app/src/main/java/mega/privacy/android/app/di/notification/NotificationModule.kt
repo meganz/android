@@ -14,7 +14,6 @@ import javax.inject.Singleton
 internal object NotificationModule {
 
     @Provides
-    @Singleton
     internal fun provideNotificationManager(@ApplicationContext context: Context): NotificationManagerCompat =
         NotificationManagerCompat.from(context)
 }

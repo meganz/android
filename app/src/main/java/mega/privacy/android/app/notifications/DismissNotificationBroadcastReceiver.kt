@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.notifications
+package mega.privacy.android.app.notifications
 
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
