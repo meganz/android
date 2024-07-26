@@ -47,7 +47,14 @@ class CheckPublicNodesNameCollisionUseCase @Inject constructor(
         } else {
             nodes.forEach { currentNode ->
                 getChildNodeUseCase(NodeId(targetHandle), currentNode.name)?.let { conflictNode ->
-                    conflictNodes.add(createNodeNameCollision(currentNode, parent, conflictNode))
+                    conflictNodes.add(
+                        createNodeNameCollision(
+                            currentNode = currentNode,
+                            parent = parent,
+                            conflictNode = conflictNode,
+                            type = type
+                        )
+                    )
                 } ?: run {
                     noConflictNodes.add(currentNode)
                 }
@@ -60,6 +67,7 @@ class CheckPublicNodesNameCollisionUseCase @Inject constructor(
         currentNode: UnTypedNode,
         parent: Node,
         conflictNode: UnTypedNode,
+        type: NodeNameCollisionType,
     ) = NodeNameCollision.Default(
         collisionHandle = conflictNode.id.longValue,
         nodeHandle = currentNode.id.longValue,
@@ -70,7 +78,8 @@ class CheckPublicNodesNameCollisionUseCase @Inject constructor(
         childFileCount = (parent as? FolderNode)?.childFileCount ?: 0,
         lastModified = if (currentNode is FileNode) currentNode.modificationTime else currentNode.creationTime,
         isFile = currentNode is FileNode,
-        serializedData = currentNode.serializedData
+        serializedData = currentNode.serializedData,
+        type = type
     )
 
     private suspend fun getParentOrRootNode(parentHandle: Long) =

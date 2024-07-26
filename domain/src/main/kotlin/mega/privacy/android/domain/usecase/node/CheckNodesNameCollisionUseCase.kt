@@ -52,7 +52,8 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
                     conflictNodes[nodeHandle] = createNodeNameCollision(
                         currentNode = currentNode,
                         parent = parent,
-                        conflictNode = conflictNode
+                        conflictNode = conflictNode,
+                        type = type
                     )
                 } ?: run {
                     noConflictNodes[nodeHandle] = parentNodeHandle
@@ -67,6 +68,7 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
         currentNode: UnTypedNode,
         parent: Node,
         conflictNode: UnTypedNode,
+        type: NodeNameCollisionType
     ) = NodeNameCollision.Default(
         collisionHandle = conflictNode.id.longValue,
         nodeHandle = currentNode.id.longValue,
@@ -76,7 +78,8 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
         childFolderCount = (parent as? FolderNode)?.childFolderCount ?: 0,
         childFileCount = (parent as? FolderNode)?.childFileCount ?: 0,
         lastModified = if (currentNode is FileNode) currentNode.modificationTime else currentNode.creationTime,
-        isFile = currentNode is FileNode
+        isFile = currentNode is FileNode,
+        type = type
     )
 
     private suspend fun getParentOrRootNode(parentHandle: Long) =

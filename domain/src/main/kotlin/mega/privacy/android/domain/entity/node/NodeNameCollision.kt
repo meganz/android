@@ -14,6 +14,7 @@ sealed interface NodeNameCollision : NameCollision {
 
     /**
      * General node name collision
+     * @param type [NodeNameCollisionType]
      */
     data class Default(
         override val collisionHandle: Long,
@@ -27,6 +28,7 @@ sealed interface NodeNameCollision : NameCollision {
         override val isFile: Boolean,
         override val serializedData: String? = null,
         override val renameName: String? = null,
+        val type: NodeNameCollisionType = NodeNameCollisionType.COPY
     ) : NodeNameCollision
 
     /**

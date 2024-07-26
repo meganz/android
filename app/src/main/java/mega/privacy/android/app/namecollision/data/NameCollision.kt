@@ -3,6 +3,8 @@ package mega.privacy.android.app.namecollision.data
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollision
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.uri.UriPath
 import nz.mega.sdk.MegaNode
 import java.io.File
 import java.io.Serializable
@@ -383,3 +385,69 @@ fun NodeNameCollision.toLegacyMove() = NameCollision.Movement.fromNodeNameCollis
  * Should be removed when [GetNameCollisionResultUseCase] is refactored
  */
 fun NodeNameCollision.toLegacyCopy() = NameCollision.Copy.fromNodeNameCollision(this)
+
+
+/**
+ * Temporary mapper to create a domain module's [mega.privacy.android.domain.entity.node.NameCollision] from app module's [NameCollision]
+ * Should be removed when all features are refactored
+ */
+fun NameCollision.toDomainEntity(): mega.privacy.android.domain.entity.node.NameCollision =
+    when (this) {
+        is NameCollision.Copy -> NodeNameCollision.Default(
+            collisionHandle = collisionHandle,
+            nodeHandle = nodeHandle,
+            name = name,
+            size = size ?: -1L,
+            childFolderCount = childFileCount,
+            childFileCount = childFileCount,
+            lastModified = lastModified,
+            parentHandle = parentHandle,
+            isFile = isFile,
+            serializedData = null,
+            renameName = null,
+            type = NodeNameCollisionType.COPY
+        )
+
+        is NameCollision.Movement -> NodeNameCollision.Default(
+            collisionHandle = collisionHandle,
+            nodeHandle = nodeHandle,
+            name = name,
+            size = size ?: -1L,
+            childFolderCount = childFileCount,
+            childFileCount = childFileCount,
+            lastModified = lastModified,
+            parentHandle = parentHandle,
+            isFile = isFile,
+            serializedData = null,
+            renameName = null,
+            type = NodeNameCollisionType.MOVE
+        )
+
+        is NameCollision.Import -> NodeNameCollision.Chat(
+            collisionHandle = collisionHandle,
+            nodeHandle = nodeHandle,
+            name = name,
+            size = size ?: -1L,
+            childFolderCount = childFileCount,
+            childFileCount = childFileCount,
+            lastModified = lastModified,
+            parentHandle = parentHandle,
+            isFile = isFile,
+            serializedData = null,
+            renameName = null,
+            chatId = chatId,
+            messageId = messageId
+        )
+
+        is NameCollision.Upload -> FileNameCollision(
+            collisionHandle = collisionHandle,
+            name = name,
+            size = size ?: 0L,
+            childFolderCount = childFileCount,
+            childFileCount = childFileCount,
+            lastModified = lastModified,
+            parentHandle = parentHandle ?: -1L,
+            isFile = isFile,
+            path = UriPath(absolutePath)
+        )
+    }

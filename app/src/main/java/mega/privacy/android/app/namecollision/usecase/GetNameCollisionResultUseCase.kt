@@ -213,6 +213,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
      * @param collisions    List to reorder.
      * @return Single with the reordered list.
      */
+    @Deprecated("Use ReorderNodeNameCollisionsUseCase")
     fun reorder(collisions: List<NameCollision>): Single<Triple<MutableList<NameCollision>, Int, Int>> =
         Single.create { emitter ->
             val fileCollisions = mutableListOf<NameCollision>()

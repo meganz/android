@@ -132,7 +132,8 @@ internal class CheckNodesNameCollisionUseCaseTest {
                         childFolderCount = parentConflictNode.childFolderCount,
                         childFileCount = parentConflictNode.childFileCount,
                         lastModified = currentNode.modificationTime,
-                        isFile = true
+                        isFile = true,
+                        type = NodeNameCollisionType.RESTORE
                     )
                 ),
                 NodeNameCollisionType.RESTORE,
