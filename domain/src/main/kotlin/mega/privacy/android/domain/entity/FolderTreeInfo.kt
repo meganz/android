@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity
 
+import kotlinx.serialization.Serializable
+
 /**
  * Encapsulates folder info related to the entire tree of this folder and its sub-folders
  *
@@ -9,6 +11,7 @@ package mega.privacy.android.domain.entity
  * @property numberOfVersions the total amount of versions files in this folder and its sub-folders have
  * @property sizeOfPreviousVersionsInBytes the size of the versions contained in this folder and its sub-folders
  */
+@Serializable
 data class FolderTreeInfo(
     val numberOfFiles: Int,
     val numberOfFolders: Int,

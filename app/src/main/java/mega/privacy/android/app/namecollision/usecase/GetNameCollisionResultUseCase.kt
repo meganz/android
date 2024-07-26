@@ -36,6 +36,7 @@ import javax.inject.Inject
  * @property getThumbnailUseCase    Required for getting thumbnails.
  * @property getChatMessageUseCase  Required for getting chat [MegaNode]s.
  */
+@Deprecated("Use GetNodeNameCollisionResultUseCase")
 class GetNameCollisionResultUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context,
