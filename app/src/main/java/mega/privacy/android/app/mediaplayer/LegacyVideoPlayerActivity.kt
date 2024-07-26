@@ -141,7 +141,6 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
-import org.jetbrains.anko.configuration
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -257,7 +256,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             nodeAttacher.restoreState(savedInstanceState)
         }
 
-        currentOrientation = configuration.orientation
+        currentOrientation = resources.configuration.orientation
         observeRotationSettingsChange()
 
         binding = ActivityVideoPlayerBinding.inflate(layoutInflater)
@@ -1345,7 +1344,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
      */
     internal fun updateToolbarTitleBasedOnOrientation(metadata: Metadata) {
         setToolbarTitle(
-            if (configuration.orientation == ORIENTATION_LANDSCAPE) {
+            if (resources.configuration.orientation == ORIENTATION_LANDSCAPE) {
                 metadata.title ?: metadata.nodeName
             } else {
                 ""

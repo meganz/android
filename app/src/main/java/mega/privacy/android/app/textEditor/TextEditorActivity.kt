@@ -93,7 +93,6 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
-import org.jetbrains.anko.configuration
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -259,8 +258,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      * Get original text size for setting text size based on system font scale
      */
     private fun getOriginalTextSize() {
-        originalContentTextSize = binding.contentText.textSize / configuration.fontScale
-        originalNameTextSize = binding.nameText.textSize / configuration.fontScale
+        val fontScale = resources.configuration.fontScale
+        originalContentTextSize = binding.contentText.textSize / fontScale
+        originalNameTextSize = binding.nameText.textSize / fontScale
     }
 
     override fun onDestroy() {

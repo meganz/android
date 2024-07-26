@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
-import org.jetbrains.anko.configuration
+import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
 private const val TITLE_TAG = "settingsActivityTitle"
@@ -28,6 +28,9 @@ class SettingsActivity : BaseActivity(),
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
+
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
 
     @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +59,7 @@ class SettingsActivity : BaseActivity(),
     }
 
     private fun shouldDisplayLightModeStatusBars() =
-        when (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+        when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
             Configuration.UI_MODE_NIGHT_YES -> false
             else -> true
         }
