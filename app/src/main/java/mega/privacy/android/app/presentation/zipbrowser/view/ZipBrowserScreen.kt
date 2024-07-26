@@ -2,11 +2,13 @@ package mega.privacy.android.app.presentation.zipbrowser.view
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserViewModel
 
 @Composable
 internal fun ZipBrowserScreen(
+    modifier: Modifier,
     viewModel: ZipBrowserViewModel,
 ) {
 
@@ -14,6 +16,7 @@ internal fun ZipBrowserScreen(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     ZipBrowserView(
+        modifier = modifier,
         items = uiState.items,
         parentFolderName = uiState.parentFolderName,
         folderDepth = uiState.folderDepth,
