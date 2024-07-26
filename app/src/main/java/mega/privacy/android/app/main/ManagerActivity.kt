@@ -2606,7 +2606,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId)
                 }
             }
-            intent.action = null
+            intent?.action = null
             intent = null
         }
         resetNavigationViewMenu(bottomNavigationView.menu)
