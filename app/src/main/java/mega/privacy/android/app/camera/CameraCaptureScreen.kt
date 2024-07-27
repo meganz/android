@@ -1,6 +1,7 @@
 package mega.privacy.android.app.camera
 
 import android.Manifest
+import android.content.Intent
 import android.net.Uri
 import android.view.OrientationEventListener
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -90,7 +91,10 @@ internal fun CameraCaptureScreen(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.PickVisualMedia()
         ) {
-            it?.let(onFinish)
+            it?.let {
+                context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                onFinish(it)
+            }
         }
 
     LaunchedEffect(isRecording) {
