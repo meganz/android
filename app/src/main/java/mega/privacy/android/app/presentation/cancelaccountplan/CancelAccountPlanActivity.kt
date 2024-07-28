@@ -170,6 +170,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
         val launchBrowser = Intent(ACTION_VIEW, uriUrl)
         runCatching {
             startActivity(launchBrowser)
+            finish()
         }.onFailure {
             Timber.e("Failed to open play store subscription page with error: ${it.message}")
         }
