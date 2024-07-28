@@ -612,13 +612,16 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         val localPath = FileUtil.getLocalFile(vNode)
                         if (localPath != null) {
                             val file = File(localPath)
-                            megaNavigator.openMediaPlayerActivityByLocalFile(
-                                context = this@VersionsFileActivity,
-                                localFile = file,
-                                handle = vNode.handle,
-                                parentId = vNode.parentHandle,
-                                viewType = VERSIONS_ADAPTER
-                            ) {
+                            runCatching {
+                                megaNavigator.openMediaPlayerActivityByLocalFile(
+                                    context = this@VersionsFileActivity,
+                                    localFile = file,
+                                    handle = vNode.handle,
+                                    parentId = vNode.parentHandle,
+                                    viewType = VERSIONS_ADAPTER
+                                )
+                            }.onFailure { exception ->
+                                Timber.e(exception)
                                 showSnackbar(
                                     Constants.SNACKBAR_TYPE,
                                     getString(R.string.intent_not_available),

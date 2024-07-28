@@ -21,6 +21,8 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -1373,6 +1375,7 @@ object MegaNodeUtil {
         autoPlayInfo: AutoPlayInfo,
         activityLauncher: ActivityLauncher,
         snackbarShower: SnackbarShower,
+        coroutineScope: CoroutineScope,
     ) {
         val mime = MimeTypeList.typeForName(autoPlayInfo.nodeName)
         when {
@@ -1410,13 +1413,18 @@ object MegaNodeUtil {
             mime.isVideoMimeType || mime.isAudio -> {
                 val file = File(autoPlayInfo.localPath)
                 if (file.exists().not()) return
-                EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
-                    .megaNavigator().openMediaPlayerActivityByLocalFile(
-                        context = context,
-                        localFile = file,
-                        handle = autoPlayInfo.nodeHandle,
-                        sortOrder = SortOrder.ORDER_NONE
-                    ) {
+                coroutineScope.launch {
+                    runCatching {
+                        EntryPointAccessors.fromApplication(
+                            context, MegaNavigatorEntryPoint::class.java
+                        ).megaNavigator().openMediaPlayerActivityByLocalFile(
+                            context = context,
+                            localFile = file,
+                            handle = autoPlayInfo.nodeHandle,
+                            sortOrder = SortOrder.ORDER_NONE
+                        )
+                    }.onFailure {
+                        Timber.e(it)
                         sendFile(
                             context,
                             autoPlayInfo.nodeName,
@@ -1425,6 +1433,7 @@ object MegaNodeUtil {
                             snackbarShower
                         )
                     }
+                }
             }
 
             else -> {

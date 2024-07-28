@@ -48,14 +48,16 @@ class ImagePreviewVideoLauncher @Inject constructor(
         isLocalFile(imageNode, source)?.let { localPath ->
             val file = File(localPath)
             val fileTypeInfo = getFileTypeInfoUseCase(file)
-            megaNavigator.openMediaPlayerActivityByLocalFile(
-                context = context,
-                localFile = file,
-                fileTypeInfo = fileTypeInfo,
-                viewType = viewType,
-                handle = imageNode.id.longValue,
-                parentId = imageNode.parentId.longValue,
-            )
+            runCatching {
+                megaNavigator.openMediaPlayerActivityByLocalFile(
+                    context = context,
+                    localFile = file,
+                    fileTypeInfo = fileTypeInfo,
+                    viewType = viewType,
+                    handle = imageNode.id.longValue,
+                    parentId = imageNode.parentId.longValue,
+                )
+            }.onFailure { Timber.e(it) }
         } ?: run {
             val typedFileNode = addImageTypeUseCase(imageNode)
             if (source == ImagePreviewFetcherSource.CHAT) {

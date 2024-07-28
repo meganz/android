@@ -574,18 +574,22 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 ) {
                     viewLifecycleOwner.lifecycleScope.launch {
                         val megaNode = contactNodes[position]
-                        val contentUri = viewModel?.getNodeContentUri(megaNode.handle) ?: return@launch
+                        val contentUri =
+                            viewModel?.getNodeContentUri(megaNode.handle) ?: return@launch
                         val localPath = FileUtil.getLocalFile(megaNode)
                         if (localPath != null) {
                             val file = File(localPath)
-                            megaNavigator.openMediaPlayerActivityByLocalFile(
-                                context = requireContext(),
-                                localFile = file,
-                                handle = megaNode.handle,
-                                parentId = megaNode.parentHandle,
-                                viewType = CONTACT_FILE_ADAPTER,
-                                sortOrder = orderGetChildren,
-                            ) {
+                            runCatching {
+                                megaNavigator.openMediaPlayerActivityByLocalFile(
+                                    context = requireContext(),
+                                    localFile = file,
+                                    handle = megaNode.handle,
+                                    parentId = megaNode.parentHandle,
+                                    viewType = CONTACT_FILE_ADAPTER,
+                                    sortOrder = orderGetChildren,
+                                )
+                            }.onFailure { exception ->
+                                Timber.e(exception)
                                 (context as ContactFileListActivity).showSnackbar(
                                     Constants.SNACKBAR_TYPE, context.resources.getString(
                                         R.string.intent_not_available

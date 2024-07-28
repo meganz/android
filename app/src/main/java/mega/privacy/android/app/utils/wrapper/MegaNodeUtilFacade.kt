@@ -178,8 +178,15 @@ class MegaNodeUtilFacade @Inject constructor(
         autoPlayInfo: AutoPlayInfo,
         activityLauncher: ActivityLauncher,
         snackbarShower: SnackbarShower,
+        coroutineScope: CoroutineScope,
     ) {
-        MegaNodeUtil.autoPlayNode(context, autoPlayInfo, activityLauncher, snackbarShower)
+        MegaNodeUtil.autoPlayNode(
+            context,
+            autoPlayInfo,
+            activityLauncher,
+            snackbarShower,
+            coroutineScope
+        )
     }
 
     override fun openZip(

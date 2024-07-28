@@ -281,7 +281,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         else -> Intent(Intent.ACTION_VIEW)
     }
 
-    override fun openMediaPlayerActivityByLocalFile(
+    override suspend fun openMediaPlayerActivityByLocalFile(
         context: Context,
         localFile: File,
         handle: Long,
@@ -292,32 +292,25 @@ internal class MegaNavigatorImpl @Inject constructor(
         isFolderLink: Boolean,
         isMediaQueueAvailable: Boolean,
         searchedItems: List<Long>?,
-        onError: () -> Unit,
     ) {
-        applicationScope.launch {
-            runCatching {
-                val contentUri = NodeContentUri.LocalContentUri(localFile)
-                val info = fileTypeInfo ?: getFileTypeInfoUseCase(localFile)
-                manageMediaIntent(
-                    context = context,
-                    contentUri = contentUri,
-                    fileTypeInfo = info,
-                    sortOrder = sortOrder,
-                    viewType = viewType,
-                    name = localFile.name,
-                    handle = handle,
-                    parentHandle = parentId,
-                    isFolderLink = isFolderLink,
-                    isMediaQueueAvailable = isMediaQueueAvailable,
-                    path = localFile.absolutePath,
-                    offlineParent = localFile.parent,
-                    searchedItems = searchedItems
-                )
-            }.onFailure {
-                Timber.e(it)
-                onError()
-            }
-        }
+        val contentUri = NodeContentUri.LocalContentUri(localFile)
+        val info = fileTypeInfo ?: getFileTypeInfoUseCase(localFile)
+        manageMediaIntent(
+            context = context,
+            contentUri = contentUri,
+            fileTypeInfo = info,
+            sortOrder = sortOrder,
+            viewType = viewType,
+            name = localFile.name,
+            handle = handle,
+            parentHandle = parentId,
+            isFolderLink = isFolderLink,
+            isMediaQueueAvailable = isMediaQueueAvailable,
+            path = localFile.absolutePath,
+            offlineParent = localFile.parent,
+            searchedItems = searchedItems
+        )
+
     }
 
     override fun openMediaPlayerActivityFromChat(

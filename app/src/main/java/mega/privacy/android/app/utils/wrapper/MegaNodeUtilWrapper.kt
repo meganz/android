@@ -6,6 +6,7 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -367,12 +368,14 @@ interface MegaNodeUtilWrapper {
      * @param autoPlayInfo auto play info
      * @param activityLauncher interface to launch activity
      * @param snackbarShower interface to show snackbar
+     * @param coroutineScope CoroutineScope
      */
     fun autoPlayNode(
         context: Context,
         autoPlayInfo: AutoPlayInfo,
         activityLauncher: ActivityLauncher,
         snackbarShower: SnackbarShower,
+        coroutineScope: CoroutineScope,
     )
 
     /**

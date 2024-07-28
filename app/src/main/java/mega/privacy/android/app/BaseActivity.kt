@@ -624,10 +624,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     private fun openDownloadedFile() {
         autoPlayNode(
-            this@BaseActivity,
-            autoPlayInfo ?: return,
-            this@BaseActivity,
-            this@BaseActivity
+            context = this@BaseActivity,
+            autoPlayInfo = autoPlayInfo ?: return,
+            activityLauncher = this@BaseActivity,
+            snackbarShower = this@BaseActivity,
+            coroutineScope = lifecycleScope
         )
 
         autoPlayInfo = null

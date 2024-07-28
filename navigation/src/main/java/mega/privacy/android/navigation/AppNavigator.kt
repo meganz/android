@@ -162,9 +162,8 @@ interface AppNavigator {
      * @param isFolderLink whether the file is a folder link
      * @param isMediaQueueAvailable whether the media queue is available
      * @param searchedItems the list of searched items, this is only used under the search mode
-     * @param onError Callback called when error occurs
      */
-    fun openMediaPlayerActivityByLocalFile(
+    suspend fun openMediaPlayerActivityByLocalFile(
         context: Context,
         localFile: File,
         handle: Long,
@@ -175,7 +174,6 @@ interface AppNavigator {
         isFolderLink: Boolean = false,
         isMediaQueueAvailable: Boolean = true,
         searchedItems: List<Long>? = null,
-        onError: () -> Unit = {},
     )
 
     /**

@@ -814,15 +814,18 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
                 Timber.d("Video/Audio file")
                 viewLifecycleOwner.lifecycleScope.launch {
                     val fileTypeInfo = viewModel.getFileTypeInfo(file)
-                    megaNavigator.openMediaPlayerActivityByLocalFile(
-                        context = requireContext(),
-                        localFile = file,
-                        fileTypeInfo = fileTypeInfo,
-                        viewType = OFFLINE_ADAPTER,
-                        handle = node.node.handle.toLong(),
-                        parentId = INVALID_HANDLE,
-                        sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
-                    ) {
+                    runCatching {
+                        megaNavigator.openMediaPlayerActivityByLocalFile(
+                            context = requireContext(),
+                            localFile = file,
+                            fileTypeInfo = fileTypeInfo,
+                            viewType = OFFLINE_ADAPTER,
+                            handle = node.node.handle.toLong(),
+                            parentId = INVALID_HANDLE,
+                            sortOrder = sortByHeaderViewModel.cloudSortOrder.value,
+                        )
+                    }.onFailure { exception ->
+                        Timber.e(exception)
                         callManager {
                             it.showSnackbar(
                                 SNACKBAR_TYPE,

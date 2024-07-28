@@ -311,20 +311,23 @@ private suspend fun openVideoOrAudioFile(
     sortOrder: SortOrder,
     coroutineScope: CoroutineScope,
 ) {
-    EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
-        .megaNavigator().openMediaPlayerActivityByLocalFile(
-            context = context,
-            localFile = content.file,
-            fileTypeInfo = content.fileTypeInfo,
-            viewType = Constants.OFFLINE_ADAPTER,
-            handle = content.nodeId.longValue,
-            parentId = content.parentId.toLong(),
-            sortOrder = sortOrder,
-        ) {
-            coroutineScope.launch {
-                snackBarHostState?.showSnackbar(message = context.getString(R.string.intent_not_available))
-            }
+    coroutineScope.launch {
+        runCatching {
+            EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
+                .megaNavigator().openMediaPlayerActivityByLocalFile(
+                    context = context,
+                    localFile = content.file,
+                    fileTypeInfo = content.fileTypeInfo,
+                    viewType = Constants.OFFLINE_ADAPTER,
+                    handle = content.nodeId.longValue,
+                    parentId = content.parentId.toLong(),
+                    sortOrder = sortOrder,
+                )
+        }.onFailure {
+            Timber.e(it)
+            snackBarHostState?.showSnackbar(message = context.getString(R.string.intent_not_available))
         }
+    }
 }
 
 private suspend fun safeLaunchActivity(
