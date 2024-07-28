@@ -278,7 +278,6 @@ dependencies {
     implementation(lib.bannerviewpager)
     implementation(lib.parallaxscroll)
     implementation(lib.vdurmont.emoji)
-    implementation(lib.code.scanner)
     implementation(lib.stickyheader)
     implementation(lib.shimmerlayout)
     implementation(lib.namedregexp)
