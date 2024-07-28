@@ -7,7 +7,7 @@
     android:layout_height="168dp"
     android:fitsSystemWindows="true">
 
-    <net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
+    <com.google.android.material.appbar.CollapsingToolbarLayout
         android:id="@+id/collapse_toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,7 +19,6 @@
         app:expandedTitleMarginStart="72dp"
         app:expandedTitleMarginTop="86dp"
         app:layout_scrollFlags="scroll|exitUntilCollapsed"
-        app:lineSpacingMultiplier="1.2"
         app:maxLines="2">
 
         <FrameLayout
@@ -92,6 +91,6 @@
 
         </RelativeLayout>
 
-    </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
 
 </com.google.android.material.appbar.AppBarLayout>

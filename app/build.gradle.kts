@@ -281,7 +281,6 @@ dependencies {
     implementation(lib.code.scanner)
     implementation(lib.stickyheader)
     implementation(lib.shimmerlayout)
-    implementation(lib.collapsingtoolbar)
     implementation(lib.namedregexp)
     implementation(lib.blurry)
     implementation(lib.documentscanner)
