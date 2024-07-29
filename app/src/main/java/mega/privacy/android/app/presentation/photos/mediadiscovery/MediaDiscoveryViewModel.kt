@@ -76,7 +76,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
-import org.jetbrains.anko.collections.forEachWithIndex
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -317,7 +316,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         val currentZoomLevel = _state.value.currentZoomLevel
         val uiPhotoList = mutableListOf<UIPhoto>()
 
-        sortedPhotos.forEachWithIndex { index, photo ->
+        sortedPhotos.forEachIndexed { index, photo ->
             val shouldShowDate = if (index == 0)
                 true
             else

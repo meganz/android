@@ -66,7 +66,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomState
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.ToggleMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
@@ -74,13 +73,13 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDi
 import mega.privacy.android.shared.original.core.ui.controls.text.AutoSizeText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.controls.video.MegaVideoTextureView
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.grey_900
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import mega.privacy.mobile.analytics.event.ScheduledMeetingJoinGuestButtonEvent
 import mega.privacy.mobile.analytics.event.WaitingRoomLeaveButtonEvent
-import org.jetbrains.anko.landscape
 import kotlin.random.Random
 
 
@@ -98,7 +97,7 @@ internal fun WaitingRoomView(
     onGuestNameChange: (String, String) -> Unit,
     videoStream: Flow<Pair<Size, ByteArray>>,
 ) {
-    val isLandscape = LocalConfiguration.current.landscape
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val focusRequester = remember { FocusRequester() }
     var showLeaveDialog by rememberSaveable { mutableStateOf(false) }
     var firstName by rememberSaveable { mutableStateOf(state.guestFirstName ?: "") }
@@ -352,7 +351,7 @@ private fun ToggleControlsRow(
     onMicToggleChange: (Boolean) -> Unit,
     onCameraToggleChange: (Boolean) -> Unit,
     onSpeakerToggleChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val micPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)

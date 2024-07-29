@@ -135,7 +135,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPr
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.white
-import org.jetbrains.anko.displayMetrics
 import java.io.File
 
 internal object Constants {
@@ -201,7 +200,7 @@ fun MyAccountHomeView(
     ) { padding ->
         val context = LocalContext.current
         val density = LocalDensity.current
-        val displayMetrics = context.displayMetrics
+        val displayMetrics = context.resources.displayMetrics
         val screenHeight = displayMetrics.heightPixels / displayMetrics.density
         var headerHeight by remember { mutableStateOf(0.dp) }
         var accountTypeHeight by remember { mutableStateOf(0.dp) }

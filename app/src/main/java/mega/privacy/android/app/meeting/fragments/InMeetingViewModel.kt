@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.view.TextureView
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.preference.PreferenceManager
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -119,7 +121,6 @@ import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
 import nz.mega.sdk.MegaChatVideoListenerInterface
 import nz.mega.sdk.MegaHandleList
-import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -377,7 +378,7 @@ class InMeetingViewModel @Inject constructor(
             .subscribeBy(
                 onNext = { (chatId, typeChange, peers) ->
                     if (_state.value.currentChatId == chatId) {
-                        state.value.chat?.let {chat ->
+                        state.value.chat?.let { chat ->
                             if (chat.isMeeting || chat.isGroup) {
                                 peers?.let { list ->
                                     getParticipantChanges(list, typeChange)
@@ -2922,6 +2923,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return True, if tips must be shown. False, if not.
      */
+
     fun shouldShowTips(): Boolean =
         !MegaApplication.getInstance().applicationContext.defaultSharedPreferences
             .getBoolean(IS_SHOWED_TIPS, false)
@@ -2933,6 +2935,9 @@ class InMeetingViewModel @Inject constructor(
         MegaApplication.getInstance().applicationContext.defaultSharedPreferences.edit()
             .putBoolean(IS_SHOWED_TIPS, true).apply()
     }
+
+    private inline val Context.defaultSharedPreferences: SharedPreferences
+        get() = PreferenceManager.getDefaultSharedPreferences(this)
 
     companion object {
         const val IS_SHOWED_TIPS = "is_showed_meeting_bottom_tips"

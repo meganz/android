@@ -8,7 +8,6 @@ import mega.privacy.android.app.databinding.ItemSelectedParticipantBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.utils.Util
-import org.jetbrains.anko.displayMetrics
 
 /**
  * The view holder for the participant view on the Make moderator screen.
@@ -29,7 +28,7 @@ class AssignParticipantViewHolder(
         binding.participantListNameRl.setPadding(
             0,
             0,
-            Util.scaleWidthPx(16, MegaApplication.getInstance().displayMetrics),
+            Util.scaleWidthPx(16, MegaApplication.getInstance().resources.displayMetrics),
             0
         )
 

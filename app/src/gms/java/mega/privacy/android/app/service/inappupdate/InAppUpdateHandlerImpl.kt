@@ -2,6 +2,7 @@ package mega.privacy.android.app.service.inappupdate
 
 import android.app.Activity
 import android.content.Context
+import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -36,7 +37,6 @@ import mega.privacy.mobile.analytics.event.InAppUpdateCancelButtonPressedEvent
 import mega.privacy.mobile.analytics.event.InAppUpdateDownloadSuccessMessageDisplayedEvent
 import mega.privacy.mobile.analytics.event.InAppUpdateRestartButtonPressedEvent
 import mega.privacy.mobile.analytics.event.InAppUpdateUpdateButtonPressedEvent
-import org.jetbrains.anko.contentView
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume
@@ -170,7 +170,9 @@ class InAppUpdateHandlerImpl @Inject constructor(
         }
 
     private fun popupSnackBarForCompleteUpdate(duration: Int) {
-        (context as? Activity)?.contentView?.let { view ->
+        val contentView =
+            (context as? Activity)?.findViewById<ViewGroup>((android.R.id.content))?.getChildAt(0)
+        contentView?.let { view ->
             Snackbar.make(
                 view,
                 context.getString(R.string.general_app_update_message_download_success),

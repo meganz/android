@@ -31,7 +31,6 @@ mega-core-ui = "2.10.20240531102524"
 kotlinx-collections-immutable = "0.3.7"
 
 [libraries]
-anko-commons = { module = "org.jetbrains.anko:anko-commons", version.ref = "anko" }
 bannerviewpager = { module = "com.github.zhpanvip:BannerViewPager", version.ref = "bannerviewpager" }
 billing-client = { module = "com.android.billingclient:billing", version.ref = "billing-client" }
 billing-client-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billing-client" }

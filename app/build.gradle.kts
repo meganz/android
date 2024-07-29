@@ -172,7 +172,6 @@ dependencies {
     testImplementation(project(":core-ui-test"))
 
     // Jetbrains
-    implementation(lib.anko.commons)
     implementation(lib.coroutines.android)
     implementation(lib.coroutines.core)
     implementation(lib.kotlin.ktx)

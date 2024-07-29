@@ -32,7 +32,6 @@ import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
-import org.jetbrains.anko.displayMetrics
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -177,7 +176,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
             SelectedParticipantsAdapter(sharedModel, deleteCallback)
 
         itemDecoration =
-            PositionDividerItemDecoration(context, MegaApplication.getInstance().displayMetrics)
+            PositionDividerItemDecoration(context, MegaApplication.getInstance().resources.displayMetrics)
         itemDecoration.setDrawAllDividers(true)
 
         binding.participantList.apply {
