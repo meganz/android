@@ -85,15 +85,12 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.brandongogetap.stickyheaders.StickyLayoutManager;
-import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.ListIterator;
 
 import javax.inject.Inject;
@@ -109,7 +106,6 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
@@ -148,7 +144,9 @@ import nz.mega.sdk.MegaUserAlert;
 import timber.log.Timber;
 
 @AndroidEntryPoint
-public class AddContactActivity extends PasscodeActivity implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
+public class AddContactActivity extends PasscodeActivity implements View.OnClickListener,
+        RecyclerView.OnItemTouchListener, TextWatcher, TextView.OnEditorActionListener,
+        MegaRequestListenerInterface, MegaGlobalListenerInterface {
 
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
@@ -198,7 +196,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private RelativeLayout containerContacts;
     private RecyclerView recyclerViewList;
     private LinearLayoutManager linearLayoutManager;
-    private StickyLayoutManager stickyLayoutManager;
     private ImageView emptyImageView;
     private TextView emptyTextView;
     private TextView emptySubTextView;
@@ -337,15 +334,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     }
 
     @Override
-    public List<ShareContactInfo> getAdapterData() {
-        if (inputString != null && !inputString.equals("")) {
-            return queryContactsShare;
-        } else {
-            return filteredContactsShare;
-        }
-    }
-
-    @Override
     public void onGlobalSyncStateChanged(@NonNull MegaApiJava api) {
     }
 
@@ -371,7 +359,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             }
 
             if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
-                shareContacts.add(new ShareContactInfoHeader(true, false, true));
+                shareContacts.add(new ShareContactInfo(true, false, true));
                 for (int i = 0; i < filteredContactsPhone.size(); i++) {
                     found = false;
                     contactPhone = filteredContactsPhone.get(i);
@@ -576,7 +564,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 shareContacts.clear();
 
                 if (filteredContactMEGA != null && !filteredContactMEGA.isEmpty()) {
-                    shareContacts.add(new ShareContactInfoHeader(true, true, false));
+                    shareContacts.add(new ShareContactInfo(true, true, false));
                     for (int i = 0; i < filteredContactMEGA.size(); i++) {
                         contactMEGA = filteredContactMEGA.get(i);
                         contact = new ShareContactInfo(null, contactMEGA, null);
@@ -584,7 +572,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     }
                 }
                 if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
-                    shareContacts.add(new ShareContactInfoHeader(true, false, true));
+                    shareContacts.add(new ShareContactInfo(true, false, true));
                     for (int i = 0; i < filteredContactsPhone.size(); i++) {
                         found = false;
                         contactPhone = filteredContactsPhone.get(i);
@@ -1565,7 +1553,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         fastScroller = (FastScroller) findViewById(R.id.fastscroll);
 
-        stickyLayoutManager = new TopSnappedStickyLayoutManager(addContactActivity, this);
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerViewList = (RecyclerView) findViewById(R.id.add_contact_list);
         recyclerViewList.setClipToPadding(false);
@@ -1592,7 +1579,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 scanQRButton.setVisibility(View.VISIBLE);
             }
-            recyclerViewList.setLayoutManager(stickyLayoutManager);
+            recyclerViewList.setLayoutManager(linearLayoutManager);
             recyclerViewList.addItemDecoration(new HeaderItemDecoration(this));
             showHeader(false);
         }
@@ -2159,7 +2146,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             int i = filteredContactMEGA.indexOf(contact);
             ShareContactInfo contactToAdd = new ShareContactInfo(null, contact, null);
             if (filteredContactMEGA.size() == 1) {
-                filteredContactsShare.add(0, new ShareContactInfoHeader(true, true, false));
+                filteredContactsShare.add(0, new ShareContactInfo(true, true, false));
                 filteredContactsShare.add(1, contactToAdd);
             } else {
                 filteredContactsShare.add(i + 1, contactToAdd);
@@ -2170,7 +2157,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             } else {
                 adapterShareHeader.setContacts(filteredContactsShare);
                 if (index >= 0 && index < adapterShareHeader.getItemCount()) {
-                    stickyLayoutManager.scrollToPosition(index);
+                    linearLayoutManager.scrollToPosition(index);
                 }
             }
             if (adapterShareHeader.getItemCount() != 0) {
@@ -2216,7 +2203,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         if (contactType == CONTACT_TYPE_BOTH) {
             if (filteredContactsPhone.size() == 1) {
-                filteredContactsShare.add(filteredContactsShare.size(), new ShareContactInfoHeader(true, false, true));
+                filteredContactsShare.add(filteredContactsShare.size(), new ShareContactInfo(true, false, true));
                 filteredContactsShare.add(filteredContactsShare.size(), new ShareContactInfo(contact, null, null));
                 position = filteredContactsShare.size();
             } else {
@@ -2231,7 +2218,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             } else {
                 adapterShareHeader.setContacts(filteredContactsShare);
                 if (position >= 0 && position < adapterShareHeader.getItemCount()) {
-                    stickyLayoutManager.scrollToPosition(position);
+                    linearLayoutManager.scrollToPosition(position);
                 }
             }
             if (adapterShareHeader.getItemCount() != 0) {
@@ -2955,7 +2942,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 filteredContactsShare.clear();
 
                 if (filteredContactMEGA != null && !filteredContactMEGA.isEmpty()) {
-                    shareContacts.add(new ShareContactInfoHeader(true, true, false));
+                    shareContacts.add(new ShareContactInfo(true, true, false));
                     for (int i = 0; i < filteredContactMEGA.size(); i++) {
                         contactMEGA = filteredContactMEGA.get(i);
                         contact = new ShareContactInfo(null, contactMEGA, null);

@@ -67,7 +67,6 @@ rx-java = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rx-java" }
 rx-kotlin = { module = "io.reactivex.rxjava3:rxkotlin", version.ref = "rx-kotlin" }
 shimmerlayout = 'io.supercharge:shimmerlayout:2.1.0'
 simplestorage = { module = "com.anggrayudi:storage", version.ref = "simplestorage" }
-stickyheader = 'com.brandongogetap:stickyheaders:0.6.1'
 vdurmont-emoji = 'com.vdurmont:emoji-java:4.0.0'
 compose-state-events = { module = "com.github.leonard-palm:compose-state-events", version.ref = "compose-state-events" }
 mega-analytics = "mega.privacy.mobile:analytics-events-android:+"
