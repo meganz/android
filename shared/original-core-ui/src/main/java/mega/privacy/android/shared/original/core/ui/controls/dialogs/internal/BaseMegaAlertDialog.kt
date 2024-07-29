@@ -55,7 +55,7 @@ internal fun BaseMegaAlertDialog(
 
 @Composable
 internal fun BaseMegaAlertDialog(
-    confirmButtonText: String,
+    confirmButtonText: String?,
     cancelButtonText: String?,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
@@ -79,12 +79,14 @@ internal fun BaseMegaAlertDialog(
                     enabled = cancelEnabled
                 )
             }
-            TextMegaButton(
-                modifier = Modifier.testTag(CONFIRM_TAG),
-                text = confirmButtonText,
-                onClick = onConfirm,
-                enabled = confirmEnabled
-            )
+            confirmButtonText?.let {
+                TextMegaButton(
+                    modifier = Modifier.testTag(CONFIRM_TAG),
+                    text = confirmButtonText,
+                    onClick = onConfirm,
+                    enabled = confirmEnabled
+                )
+            }
         }
     },
     onDismiss = onDismiss,

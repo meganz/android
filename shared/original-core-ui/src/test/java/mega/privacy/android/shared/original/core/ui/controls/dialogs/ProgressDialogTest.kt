@@ -1,6 +1,5 @@
-package test.mega.privacy.android.app.presentation.settings.reportissue.view
+package mega.privacy.android.shared.original.core.ui.controls.dialogs
 
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
@@ -10,8 +9,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.R
-import mega.privacy.android.legacy.core.ui.controls.dialogs.ProgressDialog
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,7 +46,7 @@ class ProgressDialogTest {
         val cancelButtonText = "Cancel"
         composeTestRule.setContent {
             ProgressDialog(
-                title = stringResource(id = R.string.settings_help_report_issue_uploading_log_file),
+                title = "title",
                 progress = 0.5f,
                 onCancel = onCancel,
                 cancelButtonText = cancelButtonText

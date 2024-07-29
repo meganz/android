@@ -27,8 +27,8 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaBut
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.BaseMegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.preview.PreviewStringParameters
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 /**
  * Test Tags for the Confirmation Dialog with Illustration
@@ -79,14 +79,14 @@ fun ConfirmationDialogWithIllustration(
     onCancel: () -> Unit = onDismiss,
 ) = BaseMegaAlertDialog(
     content = {
-        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
                 modifier = Modifier
                     .testTag(CONFIRMATION_DIALOG_WITH_ILLUSTRATION_TITLE)
                     .fillMaxWidth(),
                 text = title,
                 style = MaterialTheme.typography.h6,
-                color = MaterialTheme.colors.onSurface,
+                color = MegaOriginalTheme.colors.text.primary,
             )
             Image(
                 imageVector = ImageVector.vectorResource(illustrationId),
@@ -100,7 +100,7 @@ fun ConfirmationDialogWithIllustration(
                 modifier = Modifier.testTag(CONFIRMATION_DIALOG_WITH_ILLUSTRATION_BODY),
                 text = body,
                 style = MaterialTheme.typography.subtitle1,
-                color = MaterialTheme.colors.textColorSecondary,
+                color = MegaOriginalTheme.colors.text.secondary,
             )
         }
     },
