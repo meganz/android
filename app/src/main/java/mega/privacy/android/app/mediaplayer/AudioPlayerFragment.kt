@@ -154,7 +154,11 @@ class AudioPlayerFragment : Fragment() {
                     viewLifecycleOwner.collectFlow(it.playlistUpdate()) { info ->
                         Timber.d("MediaPlayerService observed playlist ${info.first.size} items")
 
-                        playerViewHolder?.togglePlaylistEnabled(requireContext(), info.first)
+                        playerViewHolder?.togglePlaylistEnabled(
+                            requireContext(),
+                            info.first,
+                            it.shuffleEnabled()
+                        )
                     }
 
                     viewLifecycleOwner.collectFlow(it.retryUpdate()) { isRetry ->
@@ -196,7 +200,11 @@ class AudioPlayerFragment : Fragment() {
             }
 
             serviceViewModelGateway?.run {
-                viewHolder.setupPlaylistButton(requireContext(), getPlaylistItems()) {
+                viewHolder.setupPlaylistButton(
+                    requireContext(),
+                    getPlaylistItems(),
+                    shuffleEnabled()
+                ) {
                     findNavController().let {
                         viewLifecycleOwner.lifecycleScope.launch {
                             if (it.currentDestination?.id == R.id.audio_main_player) {
