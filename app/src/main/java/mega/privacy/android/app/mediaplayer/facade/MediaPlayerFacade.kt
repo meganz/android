@@ -226,7 +226,13 @@ class MediaPlayerFacade @Inject constructor(
     }
 
     override fun setShuffleOrder(newShuffleOrder: ShuffleOrder) {
-        exoPlayer.setShuffleOrder(newShuffleOrder)
+        if (exoPlayer.shuffleModeEnabled && newShuffleOrder.length > 2) {
+            runCatching {
+                exoPlayer.setShuffleOrder(newShuffleOrder)
+            }.recover {
+                Timber.e(it)
+            }
+        }
     }
 
     override fun getCurrentPlayingPosition(): Long = exoPlayer.currentPosition

@@ -143,9 +143,10 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     fun setupPlaylistButton(
         context: Context,
         playlistItems: List<PlaylistItem>,
+        shuffleEnabled: Boolean,
         openPlaylist: () -> Unit,
     ) {
-        togglePlaylistEnabled(context, playlistItems)
+        togglePlaylistEnabled(context, playlistItems, shuffleEnabled)
 
         playlist.setOnClickListener {
             openPlaylist()
@@ -158,7 +159,11 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      * @param context Context
      * @param playlistItems the new playlist
      */
-    fun togglePlaylistEnabled(context: Context, playlistItems: List<PlaylistItem>) {
+    fun togglePlaylistEnabled(
+        context: Context,
+        playlistItems: List<PlaylistItem>,
+        shuffleEnabled: Boolean,
+    ) {
         playlist.isEnabled = playlistItems.size > SINGLE_PLAYLIST_SIZE
         playlist.setColorFilter(
             context.getColor(
@@ -170,6 +175,20 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
             )
         )
         shuffle.isEnabled = playlist.isEnabled
+        shuffle.setColorFilter(
+            context.getColor(
+                when {
+                    !playlist.isEnabled ->
+                        R.color.grey_050_grey_800
+
+                    shuffleEnabled ->
+                        R.color.teal_300_teal_600
+
+                    else ->
+                        R.color.dark_grey_white
+                }
+            )
+        )
     }
 
     /**
