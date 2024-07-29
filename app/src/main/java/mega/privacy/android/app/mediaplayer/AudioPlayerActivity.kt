@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
@@ -89,6 +90,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.AudioPlayerHideNodeMenuItemEvent
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -455,6 +457,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.hide -> {
+                    Analytics.tracker.trackEvent(AudioPlayerHideNodeMenuItemEvent)
                     handleHideNodeClick(playingHandle = playingHandle)
                 }
 

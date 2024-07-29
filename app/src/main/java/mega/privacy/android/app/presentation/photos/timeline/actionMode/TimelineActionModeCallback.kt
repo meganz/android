@@ -6,9 +6,11 @@ import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.PhotosFragment
+import mega.privacy.mobile.analytics.event.TimelineHideNodeMenuItemEvent
 
 class TimelineActionModeCallback(
     private val fragment: PhotosFragment,
@@ -85,6 +87,7 @@ class TimelineActionModeCallback(
             }
 
             R.id.cab_menu_hide -> {
+                Analytics.tracker.trackEvent(TimelineHideNodeMenuItemEvent)
                 fragment.handleHideNodeClick()
                 fragment.destroyActionMode()
             }

@@ -36,6 +36,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
@@ -90,6 +91,7 @@ import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.TextEditorHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
@@ -300,6 +302,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             R.id.action_rename -> renameNode()
             R.id.action_hide -> {
+                Analytics.tracker.trackEvent(TextEditorHideNodeMenuItemEvent)
                 handleHideNodeClick(handle = viewModel.getNode()?.handle ?: 0)
             }
 

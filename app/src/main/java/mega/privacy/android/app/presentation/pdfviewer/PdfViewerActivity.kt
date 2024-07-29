@@ -43,6 +43,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -86,6 +87,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.DocumentPreviewHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -1257,6 +1259,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             }
 
             R.id.pdf_viewer_hide -> {
+                Analytics.tracker.trackEvent(DocumentPreviewHideNodeMenuItemEvent)
                 handleHideNodeClick(playingHandle = handle)
             }
 

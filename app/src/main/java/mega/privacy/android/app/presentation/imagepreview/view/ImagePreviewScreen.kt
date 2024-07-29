@@ -76,6 +76,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.PhotoBox
@@ -96,6 +97,7 @@ import mega.privacy.android.shared.original.core.ui.theme.teal_200
 import mega.privacy.android.shared.original.core.ui.theme.teal_300
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.mobile.analytics.event.ImagePreviewHideNodeMenuToolBarEvent
 
 @Composable
 internal fun ImagePreviewScreen(
@@ -446,6 +448,7 @@ internal fun ImagePreviewScreen(
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickHide = {
+                        Analytics.tracker.trackEvent(ImagePreviewHideNodeMenuToolBarEvent)
                         onClickHide(currentImageNode, accountDetail, isHiddenNodesOnboarded)
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },

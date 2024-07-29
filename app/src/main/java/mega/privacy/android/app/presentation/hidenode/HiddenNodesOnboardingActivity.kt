@@ -9,11 +9,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.HiddenNodeOnboardingCloseButtonPressedEvent
+import mega.privacy.mobile.analytics.event.HiddenNodeOnboardingContinueButtonPressedEvent
+import mega.privacy.mobile.analytics.event.HiddenNodeUpgradeCloseButtonPressedEvent
+import mega.privacy.mobile.analytics.event.HiddenNodeUpgradeUpgradeButtonPressedEvent
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -44,6 +49,10 @@ class HiddenNodesOnboardingActivity : AppCompatActivity() {
     }
 
     private fun handleContinue() {
+        Analytics.tracker.trackEvent(
+            if (isOnboarding) HiddenNodeOnboardingContinueButtonPressedEvent
+            else HiddenNodeUpgradeUpgradeButtonPressedEvent
+        )
         if (isOnboarding) {
             setResult(RESULT_OK)
         } else {
@@ -52,6 +61,14 @@ class HiddenNodesOnboardingActivity : AppCompatActivity() {
         }
 
         finish()
+    }
+
+    override fun finish() {
+        Analytics.tracker.trackEvent(
+            if (isOnboarding) HiddenNodeOnboardingCloseButtonPressedEvent
+            else HiddenNodeUpgradeCloseButtonPressedEvent
+        )
+        super.finish()
     }
 
     companion object {

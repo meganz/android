@@ -130,6 +130,7 @@ import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerInfoMenuItemEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
@@ -662,6 +663,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.hide -> {
+                    Analytics.tracker.trackEvent(VideoPlayerHideNodeMenuItemEvent)
                     handleHideNodeClick(playingHandle = playingHandle)
                 }
 

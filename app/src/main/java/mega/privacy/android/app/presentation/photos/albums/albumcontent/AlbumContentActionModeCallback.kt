@@ -11,6 +11,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.mobile.analytics.event.AlbumContentHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.AlbumContentRemoveItemsEvent
 
 class AlbumContentActionModeCallback(
@@ -57,6 +58,7 @@ class AlbumContentActionModeCallback(
             }
 
             R.id.cab_menu_hide -> {
+                Analytics.tracker.trackEvent(AlbumContentHideNodeMenuItemEvent)
                 val isPaid =
                     fragment.albumContentViewModel.state.value.accountType?.isPaid ?: false
                 val isHiddenNodesOnboarded =
