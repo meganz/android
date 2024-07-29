@@ -85,7 +85,8 @@ data class NodeAttachmentUiMessage(
                         is FileNodeContent.AudioOrVideo -> openVideoOrAudioFile(
                             context,
                             message,
-                            content.uri
+                            content.uri,
+                            coroutineScope
                         )
 
                         is FileNodeContent.Other -> openOtherFiles(
@@ -137,17 +138,22 @@ data class NodeAttachmentUiMessage(
         context: Context,
         message: NodeAttachmentMessage,
         uri: NodeContentUri,
+        coroutineScope: CoroutineScope,
     ) {
-        val fileNode = message.fileNode
-        EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
-            .megaNavigator().openMediaPlayerActivityFromChat(
-                context = context,
-                contentUri = uri,
-                fileNode = fileNode,
-                message = message,
-            ) {
+        coroutineScope.launch {
+            runCatching {
+                val fileNode = message.fileNode
+                EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
+                    .megaNavigator().openMediaPlayerActivityFromChat(
+                        context = context,
+                        contentUri = uri,
+                        fileNode = fileNode,
+                        message = message,
+                    )
+            }.onFailure {
                 Timber.e(it, "No activity found to open file")
             }
+        }
     }
 
     private fun openPdfActivity(

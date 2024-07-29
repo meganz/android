@@ -536,24 +536,26 @@ class VideoFragment : Fragment(), HomepageSearchable {
     private fun openNode(node: MegaNode) {
         viewLifecycleOwner.lifecycleScope.launch {
             val contentUri = viewModel.getContentUri(node.handle) ?: return@launch
-            megaNavigator.openMediaPlayerActivity(
-                context = requireContext(),
-                contentUri = contentUri,
-                name = node.name,
-                handle = node.handle,
-                parentId = node.parentHandle,
-                viewType = if (viewModel.searchMode) {
-                    VIDEO_SEARCH_ADAPTER
-                } else {
-                    VIDEO_BROWSE_ADAPTER
-                },
-                searchedItems = if (viewModel.searchMode) {
-                    viewModel.getHandlesOfVideo()?.toList()
-                } else {
-                    null
-                }
-            ) {
-                Timber.w("itemClick:noAvailableIntent")
+            runCatching {
+                megaNavigator.openMediaPlayerActivity(
+                    context = requireContext(),
+                    contentUri = contentUri,
+                    name = node.name,
+                    handle = node.handle,
+                    parentId = node.parentHandle,
+                    viewType = if (viewModel.searchMode) {
+                        VIDEO_SEARCH_ADAPTER
+                    } else {
+                        VIDEO_BROWSE_ADAPTER
+                    },
+                    searchedItems = if (viewModel.searchMode) {
+                        viewModel.getHandlesOfVideo()?.toList()
+                    } else {
+                        null
+                    }
+                )
+            }.onFailure { exception ->
+                Timber.e(exception, "itemClick:noAvailableIntent")
                 Util.showSnackbar(
                     context,
                     SNACKBAR_TYPE,

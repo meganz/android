@@ -601,15 +601,18 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                                 )
                             }
                         } else {
-                            megaNavigator.openMediaPlayerActivity(
-                                context = requireContext(),
-                                contentUri = contentUri,
-                                name = megaNode.name,
-                                handle = megaNode.handle,
-                                parentId = megaNode.parentHandle,
-                                viewType = CONTACT_FILE_ADAPTER,
-                                sortOrder = orderGetChildren
-                            ) {
+                            runCatching {
+                                megaNavigator.openMediaPlayerActivity(
+                                    context = requireContext(),
+                                    contentUri = contentUri,
+                                    name = megaNode.name,
+                                    handle = megaNode.handle,
+                                    parentId = megaNode.parentHandle,
+                                    viewType = CONTACT_FILE_ADAPTER,
+                                    sortOrder = orderGetChildren
+                                )
+                            }.onFailure {
+                                Timber.e(it)
                                 (context as ContactFileListActivity).showSnackbar(
                                     Constants.SNACKBAR_TYPE, context.resources.getString(
                                         R.string.intent_not_available

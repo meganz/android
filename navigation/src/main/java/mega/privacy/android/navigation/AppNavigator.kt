@@ -183,14 +183,12 @@ interface AppNavigator {
      * @param contentUri [NodeContentUri]
      * @param message [NodeAttachmentMessage]
      * @param fileNode [FileNode]
-     * @param onError Callback called when error occurs
      */
-    fun openMediaPlayerActivityFromChat(
+    suspend fun openMediaPlayerActivityFromChat(
         context: Context,
         contentUri: NodeContentUri,
         message: NodeAttachmentMessage,
         fileNode: FileNode,
-        onError: (Throwable) -> Unit = {},
     )
 
     /**
@@ -208,9 +206,8 @@ interface AppNavigator {
      * @param isMediaQueueAvailable whether the media queue is available
      * @param searchedItems the list of searched items, this is only used under the search mode
      * @param mediaQueueTitle the title of the media queue
-     * @param onError Callback called when error occurs
      */
-    fun openMediaPlayerActivity(
+    suspend fun openMediaPlayerActivity(
         context: Context,
         contentUri: NodeContentUri,
         name: String,
@@ -223,6 +220,5 @@ interface AppNavigator {
         isMediaQueueAvailable: Boolean = true,
         searchedItems: List<Long>? = null,
         mediaQueueTitle: String? = null,
-        onError: () -> Unit = {},
     )
 }

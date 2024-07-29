@@ -630,14 +630,17 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                                 downloadNodes(listOf(vNode))
                             }
                         } else {
-                            megaNavigator.openMediaPlayerActivity(
-                                context = this@VersionsFileActivity,
-                                contentUri = contentUri,
-                                name = vNode.name,
-                                handle = vNode.handle,
-                                parentId = vNode.parentHandle,
-                                viewType = VERSIONS_ADAPTER
-                            ) {
+                            runCatching {
+                                megaNavigator.openMediaPlayerActivity(
+                                    context = this@VersionsFileActivity,
+                                    contentUri = contentUri,
+                                    name = vNode.name,
+                                    handle = vNode.handle,
+                                    parentId = vNode.parentHandle,
+                                    viewType = VERSIONS_ADAPTER
+                                )
+                            }.onFailure { exception ->
+                                Timber.e(exception)
                                 showSnackbar(
                                     Constants.SNACKBAR_TYPE,
                                     getString(R.string.intent_not_available),

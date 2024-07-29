@@ -313,33 +313,28 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     }
 
-    override fun openMediaPlayerActivityFromChat(
+    override suspend fun openMediaPlayerActivityFromChat(
         context: Context,
         contentUri: NodeContentUri,
         message: NodeAttachmentMessage,
         fileNode: FileNode,
-        onError: (Throwable) -> Unit,
     ) {
-        runCatching {
-            val intent = getIntent(context, fileNode.type).apply {
-                putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
-                putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
-                putExtra(INTENT_EXTRA_KEY_MSG_ID, message.msgId)
-                putExtra(INTENT_EXTRA_KEY_CHAT_ID, message.chatId)
-                putExtra(INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
-                putExtra(INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
-            }
-
-            val mimeType =
-                if (fileNode.type.extension == "opus") "audio/*" else fileNode.type.mimeType
-            nodeContentUriIntentMapper(intent, contentUri, mimeType, fileNode.type.isSupported)
-            context.startActivity(intent)
-        }.onFailure {
-            onError(it)
+        val intent = getIntent(context, fileNode.type).apply {
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
+            putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
+            putExtra(INTENT_EXTRA_KEY_MSG_ID, message.msgId)
+            putExtra(INTENT_EXTRA_KEY_CHAT_ID, message.chatId)
+            putExtra(INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
+            putExtra(INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
         }
+
+        val mimeType =
+            if (fileNode.type.extension == "opus") "audio/*" else fileNode.type.mimeType
+        nodeContentUriIntentMapper(intent, contentUri, mimeType, fileNode.type.isSupported)
+        context.startActivity(intent)
     }
 
-    override fun openMediaPlayerActivity(
+    override suspend fun openMediaPlayerActivity(
         context: Context,
         contentUri: NodeContentUri,
         name: String,
@@ -352,29 +347,21 @@ internal class MegaNavigatorImpl @Inject constructor(
         isMediaQueueAvailable: Boolean,
         searchedItems: List<Long>?,
         mediaQueueTitle: String?,
-        onError: () -> Unit,
     ) {
-        applicationScope.launch {
-            runCatching {
-                val info = fileTypeInfo ?: getFileTypeInfoByNameUseCase(name)
-                manageMediaIntent(
-                    context = context,
-                    contentUri = contentUri,
-                    fileTypeInfo = info,
-                    sortOrder = sortOrder,
-                    viewType = viewType,
-                    name = name,
-                    handle = handle,
-                    parentHandle = parentId,
-                    isFolderLink = isFolderLink,
-                    isMediaQueueAvailable = isMediaQueueAvailable,
-                    searchedItems = searchedItems,
-                    mediaQueueTitle = mediaQueueTitle
-                )
-            }.onFailure {
-                Timber.e(it)
-                onError()
-            }
-        }
+        val info = fileTypeInfo ?: getFileTypeInfoByNameUseCase(name)
+        manageMediaIntent(
+            context = context,
+            contentUri = contentUri,
+            fileTypeInfo = info,
+            sortOrder = sortOrder,
+            viewType = viewType,
+            name = name,
+            handle = handle,
+            parentHandle = parentId,
+            isFolderLink = isFolderLink,
+            isMediaQueueAvailable = isMediaQueueAvailable,
+            searchedItems = searchedItems,
+            mediaQueueTitle = mediaQueueTitle
+        )
     }
 }
