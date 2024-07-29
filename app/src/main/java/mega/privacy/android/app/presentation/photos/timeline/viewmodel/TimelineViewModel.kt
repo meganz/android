@@ -490,9 +490,9 @@ class TimelineViewModel @Inject constructor(
 
     private fun sortPhotos(photos: List<Photo>): List<Photo> {
         return if (_state.value.currentSort == Sort.NEWEST) {
-            photos.sortedByDescending { it.modificationTime }
+            photos.sortedWith(compareByDescending<Photo> { it.modificationTime }.thenByDescending { it.id })
         } else {
-            photos.sortedBy { it.modificationTime }
+            photos.sortedWith(compareBy<Photo> { it.modificationTime }.thenByDescending { it.id })
         }
     }
 

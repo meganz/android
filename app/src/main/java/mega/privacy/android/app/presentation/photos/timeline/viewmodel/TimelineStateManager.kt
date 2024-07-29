@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 
 import kotlinx.coroutines.flow.update
+import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
@@ -75,6 +76,10 @@ fun TimelineViewModel.handleEnableZoomAndSortOptions() {
 }
 
 fun TimelineViewModel.getCurrentSort(): Sort = _state.value.currentSort
+
+fun TimelineViewModel.getFilterType(): FilterMediaType = _state.value.currentFilterMediaType
+
+fun TimelineViewModel.getMediaSource(): TimelinePhotosSource = _state.value.currentMediaSource
 
 fun TimelineViewModel.setCurrentSort(sort: Sort) {
     _state.update {

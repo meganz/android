@@ -35,7 +35,7 @@ import javax.inject.Inject
 /**
  * AlbumImport Preview help class
  */
-class AlbumImportPreviewProvider @Inject constructor(
+class ImagePreviewProvider @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,

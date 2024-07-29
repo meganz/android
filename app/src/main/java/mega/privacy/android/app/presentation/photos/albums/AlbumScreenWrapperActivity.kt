@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumC
 import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
-import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportPreviewProvider
+import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
@@ -57,7 +57,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
     private val getLinkViewModel: GetLinkViewModel by viewModels()
 
     @Inject
-    lateinit var albumImportPreviewProvider: AlbumImportPreviewProvider
+    lateinit var imagePreviewProvider: ImagePreviewProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,7 +159,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                                 startActivity(shareIntent)
                             },
                             onPreviewPhoto = {
-                                albumImportPreviewProvider.onPreviewPhoto(
+                                imagePreviewProvider.onPreviewPhoto(
                                     activity = this,
                                     photo = it,
                                 )

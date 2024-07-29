@@ -49,6 +49,7 @@ import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
@@ -69,6 +70,8 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewS
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getCurrentSort
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getFilterType
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getMediaSource
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCurrentSort
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
@@ -699,6 +702,11 @@ class PhotosFragment : Fragment() {
                 imageSource = ImagePreviewFetcherSource.TIMELINE,
                 menuOptionsSource = ImagePreviewMenuSource.TIMELINE,
                 anchorImageNodeId = NodeId(photo.id),
+                params = mapOf(
+                    TimelineImageNodeFetcher.TIMELINE_SORT_TYPE to timelineViewModel.getCurrentSort(),
+                    TimelineImageNodeFetcher.TIMELINE_FILTER_TYPE to timelineViewModel.getFilterType(),
+                    TimelineImageNodeFetcher.TIMELINE_MEDIA_SOURCE to timelineViewModel.getMediaSource(),
+                ),
             )
             startActivity(intent)
         }

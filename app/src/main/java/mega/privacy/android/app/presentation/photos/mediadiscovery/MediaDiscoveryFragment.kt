@@ -37,7 +37,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
-import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportPreviewProvider
+import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
 import mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode.MediaDiscoveryActionModeCallback
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryView
@@ -74,7 +74,7 @@ class MediaDiscoveryFragment : Fragment() {
     private lateinit var actionModeCallback: MediaDiscoveryActionModeCallback
 
     @Inject
-    lateinit var albumImportPreviewProvider: AlbumImportPreviewProvider
+    lateinit var imagePreviewProvider: ImagePreviewProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -245,7 +245,7 @@ class MediaDiscoveryFragment : Fragment() {
 
     private fun onClick(photo: Photo) {
         if (mediaDiscoveryViewModel.state.value.selectedPhotoIds.isEmpty()) {
-            albumImportPreviewProvider.onPreviewPhotoFromMD(
+            imagePreviewProvider.onPreviewPhotoFromMD(
                 activity = this.requireActivity(),
                 photo = photo,
                 photoIds = mediaDiscoveryViewModel.getAllPhotoIds(),
