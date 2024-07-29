@@ -7,6 +7,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_DIMENSION
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatVideoListenerInterface
+import timber.log.Timber
 import java.nio.ByteBuffer
 
 class GroupVideoListener(
@@ -14,7 +15,7 @@ class GroupVideoListener(
     peerId: Long,
     clientId: Long,
     isMe: Boolean,
-    isScreenShared: Boolean
+    isScreenShared: Boolean,
 ) : MegaChatVideoListenerInterface {
 
     var width = 0
@@ -29,30 +30,33 @@ class GroupVideoListener(
         chatid: Long,
         width: Int,
         height: Int,
-        byteBuffer: ByteArray
+        byteBuffer: ByteArray,
     ) {
-
-        if (width == 0 || height == 0) {
-            return
-        }
-
-        if (this.width != width || this.height != height) {
-            this.width = width
-            this.height = height
-            val viewWidth = textureView!!.width
-            val viewHeight = textureView!!.height
-            if (viewWidth != 0 && viewHeight != 0) {
-                bitmap = localRenderer!!.createBitmap(width, height)
-            } else {
-                this.width = INVALID_DIMENSION
-                this.height = INVALID_DIMENSION
+        kotlin.runCatching {
+            if (width == 0 || height == 0) {
+                return
             }
-        }
 
-        (bitmap ?: return).copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
+            if (this.width != width || this.height != height) {
+                this.width = width
+                this.height = height
+                val viewWidth = textureView!!.width
+                val viewHeight = textureView!!.height
+                if (viewWidth != 0 && viewHeight != 0) {
+                    bitmap = localRenderer!!.createBitmap(width, height)
+                } else {
+                    this.width = INVALID_DIMENSION
+                    this.height = INVALID_DIMENSION
+                }
+            }
 
-        if (!isLocal || VideoCaptureUtils.isVideoAllowed()) {
-            localRenderer!!.drawBitmap(isLocal)
+            (bitmap ?: return).copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
+
+            if (!isLocal || VideoCaptureUtils.isVideoAllowed()) {
+                localRenderer!!.drawBitmap(isLocal)
+            }
+        }.onFailure {
+            Timber.e("Error drawing video: $it")
         }
     }
 

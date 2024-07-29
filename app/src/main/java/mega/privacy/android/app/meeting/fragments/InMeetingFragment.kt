@@ -1776,6 +1776,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 it.removeTextureView()
             }
         }
+        removePictureInPictureListener()
+        inMeetingViewModel.removeListeners()
+    }
+
+    private fun removePictureInPictureListener() {
         inMeetingViewModel.state.value.run {
             if (isPictureInPictureFeatureFlagEnabled && !isInPipMode) {
                 pictureCallFragment?.let {
@@ -1785,9 +1790,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
-
-
-        inMeetingViewModel.removeListeners()
     }
 
     /**
@@ -1823,10 +1825,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 speakerViewCallFragment = null
             }
         }
+        removePictureInPictureFragment()
+    }
+
+    private fun removePictureInPictureFragment() {
         inMeetingViewModel.state.value.run {
+            Timber.d("Remove Picture Call Fragment isInPipMode = $isInPipMode")
             if (isPictureInPictureFeatureFlagEnabled && !isInPipMode) {
                 pictureCallFragment?.let {
-                    if (it.isAdded) {
+                    if (isAdded) {
+                        Timber.d("Removing Pip Fragment")
                         removeChildFragment(it)
                         pictureCallFragment = null
                     }
@@ -1868,34 +1876,39 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
+     * hide views that are not necessary for Picture in Picture Mode
+     * show views when not in Picture in Picture Mode
+     */
+    private fun hideOrShowHelperViews(shouldHide: Boolean) {
+        val visibility = if (shouldHide) View.GONE else View.VISIBLE
+        toolbar.visibility = visibility
+        binding.selfFeedFloatingWindowContainer.visibility = visibility
+        binding.meetingContainer.visibility = visibility
+        binding.bottomFloatingPanel.meetingActionButtons.visibility = visibility
+        binding.bottomFloatingPanel.backgroundMask.visibility = visibility
+        binding.bottomFloatingPanel.participantsComposeView.visibility = visibility
+        binding.bottomFloatingPanel.indicator.visibility = visibility
+        if (shouldHide.not()) {
+            removePictureInPictureFragment()
+        }
+    }
+
+    /**
      * Control the UI of the call, whether one-to-one or meeting
      */
     private fun checkChildFragments() {
-        if (inMeetingViewModel.state.value.isInPipMode) {
+        if (inMeetingViewModel.state.value.isPictureInPictureFeatureFlagEnabled && inMeetingViewModel.state.value.isInPipMode) {
             if (pictureCallFragment == null) {
                 removeListenersAndFragments()
                 pictureCallFragment = PictureInPictureCallFragment.newInstance().apply {
                     loadChildFragment(R.id.pip_container, this, PictureInPictureCallFragment.TAG)
                 }
             }
-            toolbar.visibility = View.GONE
-            binding.recIndicator.visibility = View.GONE
-            binding.selfFeedFloatingWindowContainer.visibility = View.GONE
-            binding.meetingContainer.visibility = View.GONE
-            binding.bottomFloatingPanel.meetingActionButtons.visibility = View.GONE
-            binding.bottomFloatingPanel.backgroundMask.visibility = View.GONE
-            binding.bottomFloatingPanel.participantsComposeView.visibility = View.GONE
-            binding.bottomFloatingPanel.indicator.visibility = View.GONE
+            hideOrShowHelperViews(shouldHide = true)
         } else {
-            toolbar.visibility = View.VISIBLE
-            binding.recIndicator.visibility = View.VISIBLE
-            binding.selfFeedFloatingWindowContainer.visibility = View.VISIBLE
-            binding.meetingContainer.visibility = View.VISIBLE
-            binding.meetingContainer.visibility = View.VISIBLE
-            binding.bottomFloatingPanel.meetingActionButtons.visibility = View.VISIBLE
-            binding.bottomFloatingPanel.backgroundMask.visibility = View.VISIBLE
-            binding.bottomFloatingPanel.participantsComposeView.visibility = View.VISIBLE
-            binding.bottomFloatingPanel.indicator.visibility = View.VISIBLE
+            if (inMeetingViewModel.state.value.isPictureInPictureFeatureFlagEnabled) {
+                hideOrShowHelperViews(shouldHide = false)
+            }
             inMeetingViewModel.state.value.call?.apply {
                 binding.reconnecting.isVisible = false
                 when (status) {

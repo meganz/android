@@ -63,16 +63,16 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.call.ChatCall
-import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.entity.chat.ChatRoomChange
-import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
-import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.call.CallType
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.call.ChatSessionChanges
+import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.node.NodeId
@@ -86,6 +86,14 @@ import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.call.AllowUsersJoinCallUseCase
+import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
+import mega.privacy.android.domain.usecase.call.GetCallIdsOfOthersCallsUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.call.MonitorCallEndedUseCase
+import mega.privacy.android.domain.usecase.call.RingIndividualInACallUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
@@ -97,22 +105,14 @@ import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCas
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
-import mega.privacy.android.domain.usecase.call.AllowUsersJoinCallUseCase
-import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
-import mega.privacy.android.domain.usecase.call.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
-import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.call.MonitorCallEndedUseCase
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MuteAllPeersUseCase
 import mega.privacy.android.domain.usecase.meeting.MutePeersUseCase
-import mega.privacy.android.domain.usecase.call.RingIndividualInACallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -1349,13 +1349,12 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun enableVideo(enable: Boolean) {
         state.value.currentCall?.apply {
-            val enableVideo = enable && !hasLocalVideo
             if (enable && hasLocalVideo) {
                 return
             }
             viewModelScope.launch {
                 runCatching {
-                    enableOrDisableVideoUseCase(chatId = chatId, enable = enableVideo)
+                    enableOrDisableVideoUseCase(chatId = chatId, enable = enable)
                 }.onFailure { exception ->
                     Timber.e(exception)
                 }.onSuccess { chatRequest ->
@@ -1376,10 +1375,9 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun enableAudio(enable: Boolean) {
         state.value.currentCall?.apply {
-            val enableAudio = enable && !hasLocalAudio
             viewModelScope.launch {
                 runCatching {
-                    enableOrDisableAudioUseCase(chatId, enableAudio)
+                    enableOrDisableAudioUseCase(chatId, enable)
                 }.onFailure { exception ->
                     Timber.e(exception)
                 }
