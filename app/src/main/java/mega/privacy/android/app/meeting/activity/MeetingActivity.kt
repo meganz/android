@@ -256,10 +256,14 @@ class MeetingActivity : PasscodeActivity() {
         initNavigation()
     }
 
+    override fun attachBaseContext(newBase: Context?) {
+        delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
+        super.attachBaseContext(newBase)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
         initializePictureInPictureParams()
 
         // Setup the Back Press dispatcher to receive Back Press events
@@ -399,6 +403,7 @@ class MeetingActivity : PasscodeActivity() {
     }
 
     override fun onDestroy() {
+        Timber.d("onDestroy")
         navController?.removeOnDestinationChangedListener(destinationChangedListener)
         super.onDestroy()
     }

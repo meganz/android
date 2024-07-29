@@ -508,7 +508,7 @@
             android:launchMode="singleTop" />
         <activity
             android:name=".meeting.activity.MeetingActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden|uiMode"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:supportsPictureInPicture="true"
