@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.node.namecollision
 
+import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -39,9 +40,17 @@ class GetNodeNameCollisionResultUseCase @Inject constructor(
             collidedNode.id.longValue
         )?.let { UriPath(it.absolutePath) } else null
 
+        val renameName = getNodeNameCollisionRenameNameUseCase(nameCollision)
+
         return with(collidedNode) {
             NodeNameCollisionResult(
-                nameCollision = nameCollision,
+                nameCollision = when (nameCollision) {
+                    is NodeNameCollision.Default -> nameCollision.copy(renameName = renameName)
+
+                    is NodeNameCollision.Chat -> nameCollision.copy(renameName = renameName)
+
+                    is FileNameCollision -> nameCollision
+                },
                 collisionName = name,
                 collisionSize = (this as? FileNode)?.size,
                 collisionFolderContent = (this as? FolderNode)?.let {

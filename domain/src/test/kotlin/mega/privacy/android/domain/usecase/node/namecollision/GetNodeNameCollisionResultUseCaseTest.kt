@@ -127,7 +127,7 @@ class GetNodeNameCollisionResultUseCaseTest {
             assertThat(result.thumbnail?.value).isEqualTo("path1")
             assertThat(result.collisionThumbnail?.value).isEqualTo("path2")
             assertThat(result.collisionSize).isEqualTo(100L)
-            assertThat(result.nameCollision).isEqualTo(defaultNodeNameCollision)
+            assertThat(result.nameCollision.collisionHandle).isEqualTo(defaultNodeNameCollision.collisionHandle)
             assertThat(result.collisionLastModified).isEqualTo(123456L)
             assertThat(result.collisionName).isEqualTo(defaultNodeNameCollision.name)
         }
@@ -170,7 +170,7 @@ class GetNodeNameCollisionResultUseCaseTest {
             assertThat(result.thumbnail).isNull()
             assertThat(result.collisionThumbnail).isNull()
             assertThat(result.collisionSize).isNull()
-            assertThat(result.nameCollision).isEqualTo(defaultNodeNameCollision)
+            assertThat(result.nameCollision.collisionHandle).isEqualTo(defaultNodeNameCollision.collisionHandle)
             assertThat(result.collisionLastModified).isEqualTo(123456L)
             assertThat(result.collisionName).isEqualTo(defaultNodeNameCollision.name)
         }

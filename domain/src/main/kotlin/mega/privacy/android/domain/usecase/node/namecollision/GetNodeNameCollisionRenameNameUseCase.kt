@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase.node.namecollision
 
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
@@ -29,44 +28,41 @@ class GetNodeNameCollisionRenameNameUseCase @Inject constructor(
             -1L -> getRootNodeUseCase()
             else -> getNodeByHandleUseCase(nameCollision.parentHandle)
         } ?: throw NodeDoesNotExistsException()
-
-        var newName = nameCollision.name
-        var newCollision: UnTypedNode?
-        do {
-            newName = newName.getPossibleRenameName()
-            newCollision = getChildNodeUseCase(parentNode.id, newName)
-        } while (newCollision != null)
-        return newName
+        return generateSequence(nameCollision.name) {
+            it.getPossibleRenameName()
+        }.first { newName ->
+            getChildNodeUseCase(parentNode.id, newName) == null
+        }
     }
+}
 
-    /**
-     * Gets a possible name for rename a collision item in case the user wants to rename it.
-     *
-     * @return The rename name.
-     */
-    private fun String.getPossibleRenameName(): String {
-        var extension = substringAfterLast('.', "")
-        val pointIndex = if (extension.isEmpty())
-            length
-        else
-            (lastIndexOf(extension) - 1).coerceAtLeast(0)
-        val name = substring(0, pointIndex)
-        extension = substring(pointIndex, length)
-        val pattern = "\\(\\d+\\)".toRegex()
-        val matches = pattern.findAll(name)
+/**
+ * Gets a possible name for rename a collision item in case the user wants to rename it.
+ *
+ * @return The rename name.
+ */
+internal fun String.getPossibleRenameName(): String {
+    var extension = substringAfterLast('.', "")
+    val pointIndex = if (extension.isEmpty())
+        length
+    else
+        (lastIndexOf(extension) - 1).coerceAtLeast(0)
+    val name = substring(0, pointIndex)
+    extension = substring(pointIndex, length)
+    val pattern = "\\(\\d+\\)".toRegex()
+    val matches = pattern.findAll(name)
 
-        val renameName = when {
-            matches.count() > 0 -> {
-                val result = matches.last().value
-                val number = result.replace("(", "").replace(")", "")
-                val newNumber = number.toInt() + 1
-                val firstIndex = lastIndexOf('(')
-                name.substring(0, firstIndex + 1).plus("$newNumber)")
-            }
-
-            else -> name.plus(" (1)")
+    val renameName = when {
+        matches.count() > 0 -> {
+            val result = matches.last().value
+            val number = result.replace("(", "").replace(")", "")
+            val newNumber = number.toInt() + 1
+            val firstIndex = lastIndexOf('(')
+            name.substring(0, firstIndex + 1).plus("$newNumber)")
         }
 
-        return renameName.plus(extension)
+        else -> name.plus(" (1)")
     }
+
+    return renameName.plus(extension)
 }

@@ -16,6 +16,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -107,43 +109,51 @@ class GetNodeNameCollisionRenameNameUseCaseTest {
         }
     }
 
+    @ParameterizedTest
+    @CsvSource(
+        "file.txt, file (1).txt",
+        "image.jpg, image (1).jpg",
+        "document (5).pdf, document (6).pdf",
+        "noextension, noextension (1)",
+        "folder, folder (1)",
+    )
+    fun `test possible rename name is generated correctly`(fileName: String, newName: String) =
+        runTest {
+            val parentNodeId = NodeId(789L)
+            val nodeNameCollision = NodeNameCollision.Default(
+                collisionHandle = 123L,
+                nodeHandle = 456L,
+                name = fileName,
+                size = 789L,
+                childFolderCount = 0,
+                childFileCount = 0,
+                lastModified = 123456L,
+                parentHandle = parentNodeId.longValue,
+                isFile = true,
+                type = NodeNameCollisionType.COPY
+            )
+            val folderNode = mock<FolderNode> {
+                on { id } doReturn parentNodeId
+            }
+            whenever(getNodeByHandleUseCase(parentNodeId.longValue)).thenReturn(
+                folderNode
+            )
+            whenever(
+                getChildNodeUseCase(
+                    parentNodeId,
+                    fileName
+                )
+            ) doReturn mock<FileNode>()
+            whenever(
+                getChildNodeUseCase(
+                    parentNodeId,
+                    newName
+                )
+            ) doReturn null
 
-    @Test
-    fun `test possible rename name is generated correctly`() = runTest {
-        val parentNodeId = NodeId(789L)
-        val nodeNameCollision = NodeNameCollision.Default(
-            collisionHandle = 123L,
-            nodeHandle = 456L,
-            name = "file (1).jpg",
-            size = 789L,
-            childFolderCount = 0,
-            childFileCount = 0,
-            lastModified = 123456L,
-            parentHandle = parentNodeId.longValue,
-            isFile = true,
-            type = NodeNameCollisionType.COPY
-        )
-        val folderNode = mock<FolderNode> {
-            on { id } doReturn parentNodeId
+            val result = underTest(nameCollision = nodeNameCollision)
+
+            assertThat(result).isEqualTo(newName)
         }
-        whenever(getNodeByHandleUseCase(parentNodeId.longValue)).thenReturn(
-            folderNode
-        )
-        whenever(
-            getChildNodeUseCase(
-                parentNodeId,
-                "file (1).jpg"
-            )
-        ) doReturn mock<FileNode>()
-        whenever(
-            getChildNodeUseCase(
-                parentNodeId,
-                "file (2).jpg"
-            )
-        ) doReturn null
 
-        val result = underTest(nameCollision = nodeNameCollision)
-
-        assertThat(result).isEqualTo("file (2).jpg")
-    }
 }
