@@ -67,7 +67,8 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/testhooks.cpp \
     sdk/src/heartbeats.cpp \
     sdk/src/textchat.cpp \
-    sdk/src/setandelement.cpp
+    sdk/src/setandelement.cpp \
+    sdk/src/pwm_file_parser.cpp
 
 C_SOURCES = sdk/src/mega_glob.c
 
@@ -129,7 +130,9 @@ HEADERS= sdk/include/mega.h \
 		sdk/include/mega/testhooks.h \
 		sdk/include/mega/heartbeats.h \
 		sdk/include/mega/textchat.h \
-		sdk/include/mega/setandelement.h
+		sdk/include/mega/setandelement.h \
+		sdk/include/mega/mega_csv.h \
+		sdk/include/mega/pwm_file_parser.h
 
 # FUSE (Common headers.)
 HEADERS += \
