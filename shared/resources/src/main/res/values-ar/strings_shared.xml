@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">تعذرت قراءة موقع المزامنة. تحقق من إمكانية الوصول إلى الموقع ومن منح الأذونات لموقع المجلد.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">حدث خطأ غير معروف. تواصل مع الدعم.</string>
+    <string name="general_sync_message_unknown_error">حدث خطأ غير معروف. تواصل مع support@mega.nz.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">حدث خطأ ما.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
@@ -563,7 +563,7 @@
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. انقر على الصورة الرمزية avatar الخاصة بك.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
-    <string name="account_cancellation_instructions_tap_cancel_subscription">4. Tap [A]Cancel subscription[/A].</string>
+    <string name="account_cancellation_instructions_tap_cancel_subscription">4. انقر على [A]إلغاء الاشتراك[/A].</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">لا يوجد اتصال بالإنترنت</string>
     <!-- Menu option to create a new folder in the file manager -->

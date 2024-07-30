@@ -5552,15 +5552,17 @@
     <string name="meeting_your_hand_is_raised_message">Hai alzato la tua mano</string>
     <!-- The snackbar message of you and others raised your hands -->
     <plurals name="meeting_you_and_others_raised_your_hands_message">
-        <item quantity="one">You and %1$d other raised your hands</item>
-        <item quantity="other">You and %1$d others raised your hands</item>
+        <item quantity="one">Tu e %1$d altra persona avete alzato la mano</item>
+        <item quantity="many">Tu e %1$d di altre persone avete alzato la mano</item>
+        <item quantity="other">Tu e altre %1$d persone avete alzato la mano</item>
     </plurals>
     <!-- The snackbar message of another participant raised their hand -->
     <string name="meetings_one_participant_raised_their_hand_message">%1$s ha alzato la mano</string>
     <!-- The snackbar message two or more participants raised their hands -->
     <plurals name="meetings_other_participants_raised_their_hands_message">
-        <item quantity="one">%1$s and %2$d other raised their hands</item>
-        <item quantity="other">%1$s and %2$d others raised their hands</item>
+        <item quantity="one">%1$s e %2$d altra persona hanno alzato la mano</item>
+        <item quantity="many">%1$s e %2$d di altre persone hanno alzato la mano</item>
+        <item quantity="other">%1$s e altre %2$d persone hanno alzato la mano</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
     <string name="hidden_nodes_sharing_album">Ci sono oggetti nascosti in questo album. Condividere l\’album significa che gli oggetti nascosti saranno visibili alle persone con cui condividi. Gli oggetti saranno comunque nascosti nel tuo Cloud drive.</string>

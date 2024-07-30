@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">同期の場所を読み取れませんでした。場所がアクセス可能であること、およびフォルダの場所に対するアクセス許可が付与されていることを確認してください。</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">不明なエラーが発生しました。サポートにご連絡ください。</string>
+    <string name="general_sync_message_unknown_error">不明なエラーが発生しました。support@mega.nzにご連絡ください。</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">何か問題が発生しました。</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
