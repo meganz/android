@@ -48,12 +48,9 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.recentactions.RecentActionsComposeViewModel
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
-import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
@@ -65,13 +62,13 @@ import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.mutateIconSecondary
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -94,6 +91,12 @@ class RecentActionBucketFragment : Fragment() {
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
+
+    /**
+     * [MegaNavigator] injection
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel by viewModels<RecentActionBucketViewModel>()
 
@@ -267,14 +270,14 @@ class RecentActionBucketFragment : Fragment() {
         (activity as ManagerActivity).changeAppBarElevation(canScroll)
     }
 
-    private fun getNodesHandles(isImageViewerValid: Boolean): LongArray =
+    private fun getNodesHandles(isImageViewerValid: Boolean): List<Long> =
         viewModel.items.value.filter {
             if (isImageViewerValid) {
                 it.node?.isValidForImageViewer() ?: false
             } else {
                 FileUtil.isAudioOrVideo(it.node) && FileUtil.isInternalIntent(it.node)
             }
-        }.map { it.node?.handle ?: 0L }.toLongArray()
+        }.map { it.node?.handle ?: 0L }
 
     private fun MegaNode.isValidForImageViewer(): Boolean =
         isFile && (isImage() || isGif() || isVideo())
@@ -295,7 +298,7 @@ class RecentActionBucketFragment : Fragment() {
             }
 
             FileUtil.isAudioOrVideo(node) -> {
-                openAudioVideo(index, node, isMedia, localPath)
+                openAudioVideo(node)
             }
 
             mime.isURL -> {
@@ -354,51 +357,28 @@ class RecentActionBucketFragment : Fragment() {
         openOrDownload(intent, paramsSetSuccessfully, node.handle)
     }
 
-    private fun openAudioVideo(
-        index: Int,
-        node: MegaNode,
-        isMedia: Boolean,
-        localPath: String?,
-    ) {
-        val intent = if (FileUtil.isInternalIntent(node)) {
-            getMediaIntent(activity, node.name)
-        } else {
-            Intent(Intent.ACTION_VIEW)
-        }
-
-        intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
-        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter ?: return)
-        intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
-
-        if (isMedia) {
-            intent.putExtra(NODE_HANDLES, getNodesHandles(false))
-            intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)
-        } else {
-            intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
-        }
-
-        val paramsSetSuccessfully =
-            if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-                FileUtil.setLocalIntentParams(
-                    activity, node, intent, localPath, false,
-                    requireActivity() as ManagerActivity
+    private fun openAudioVideo(node: MegaNode) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            runCatching {
+                val contentUri = viewModel.getNodeContentUri(node.handle) ?: return@launch
+                megaNavigator.openMediaPlayerActivity(
+                    context = requireContext(),
+                    contentUri = contentUri,
+                    name = node.name,
+                    handle = node.handle,
+                    viewType = RECENTS_BUCKET_ADAPTER,
+                    parentId = node.parentHandle,
+                    nodeHandles = getNodesHandles(false)
                 )
-            } else {
-                FileUtil.setStreamingIntentParams(
-                    activity, node, megaApi, intent,
-                    requireActivity() as ManagerActivity
+            }.onFailure {
+                (activity as ManagerActivity).showSnackbar(
+                    SNACKBAR_TYPE,
+                    getString(R.string.intent_not_available),
+                    MEGACHAT_INVALID_HANDLE
                 )
-            }
-
-        if (paramsSetSuccessfully) {
-            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
-
-            if (FileUtil.isOpusFile(node)) {
-                intent.setDataAndType(intent.data, "audio/*")
+                download(node.handle)
             }
         }
-
-        openOrDownload(intent, paramsSetSuccessfully, node.handle)
     }
 
     private fun openOrDownload(

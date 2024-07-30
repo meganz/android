@@ -14,12 +14,14 @@ import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.backups.BackupsViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.FakeMonitorViewType
 import nz.mega.sdk.MegaNode
@@ -36,6 +38,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
 import java.util.stream.Stream
@@ -59,6 +62,7 @@ internal class BackupsViewModelTest {
         on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
     }
     private val monitorViewType = FakeMonitorViewType()
+    private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -70,6 +74,7 @@ internal class BackupsViewModelTest {
             getCloudSortOrder,
             getNodeByHandle,
             getParentNodeUseCase,
+            getNodeContentUriByHandleUseCase
         )
     }
 
@@ -87,6 +92,7 @@ internal class BackupsViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorViewType = monitorViewType,
             savedStateHandle = savedStateHandle,
+            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase
         )
     }
 
@@ -525,5 +531,25 @@ internal class BackupsViewModelTest {
                 assertThat(state.nodes).isEqualTo(childBackupsNodeList)
                 assertThat(state.triggerBackPress).isTrue()
             }
+        }
+
+    @Test
+    fun `test that getNodeContentUriByHandleUseCase is invoked and returns as expected`() =
+        runTest {
+            val paramHandle = 1L
+            val expectedContentUri = NodeContentUri.RemoteContentUri("", false)
+            whenever(getNodeContentUriByHandleUseCase(paramHandle)).thenReturn(expectedContentUri)
+            val actual = underTest.getNodeContentUri(paramHandle)
+            assertThat(actual).isEqualTo(expectedContentUri)
+            verify(getNodeContentUriByHandleUseCase).invoke(paramHandle)
+        }
+
+    @Test
+    fun `test that getNodeContentUriByHandleUseCase returns null when an exception is thrown`() =
+        runTest {
+            val paramHandle = 1L
+            whenever(getNodeContentUriByHandleUseCase(any())).thenThrow(IllegalStateException())
+            val actual = underTest.getNodeContentUri(paramHandle)
+            assertThat(actual).isNull()
         }
 }

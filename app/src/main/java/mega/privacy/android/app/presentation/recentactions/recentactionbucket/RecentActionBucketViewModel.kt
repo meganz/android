@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.UpdateRecentAction
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -45,6 +46,7 @@ class RecentActionBucketViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val getRootParentNodeUseCase: GetRootParentNodeUseCase,
+    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
 
@@ -287,4 +289,13 @@ class RecentActionBucketViewModel @Inject constructor(
             it.copy(isHiddenNodesOnboarded = true)
         }
     }
+
+    internal suspend fun getNodeContentUri(handle: Long) =
+        runCatching { getNodeContentUriByHandleUseCase(handle) }
+            .recover {
+                Timber.e(it)
+                null
+            }.getOrNull()
+
+
 }

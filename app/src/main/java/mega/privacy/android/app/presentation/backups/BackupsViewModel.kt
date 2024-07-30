@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import nz.mega.sdk.MegaApiJava
@@ -48,6 +49,7 @@ class BackupsViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorViewType: MonitorViewType,
     private val savedStateHandle: SavedStateHandle,
+    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
 ) : ViewModel() {
 
     /**
@@ -333,4 +335,11 @@ class BackupsViewModel @Inject constructor(
     fun markHandledPendingRefresh() {
         _state.update { it.copy(isPendingRefresh = false) }
     }
+
+    internal suspend fun getNodeContentUri(handle: Long) =
+        runCatching { getNodeContentUriByHandleUseCase(handle) }
+            .recover {
+                Timber.e(it)
+                null
+            }.getOrNull()
 }

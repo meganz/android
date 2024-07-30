@@ -40,6 +40,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILD
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
+import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
@@ -53,7 +54,6 @@ import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -237,6 +237,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         offlineParent: String? = null,
         searchedItems: List<Long>? = null,
         mediaQueueTitle: String? = null,
+        nodeHandles: List<Long>? = null,
     ) {
         val intent = getIntent(context, fileTypeInfo).apply {
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
@@ -262,6 +263,9 @@ internal class MegaNavigatorImpl @Inject constructor(
             }
             mediaQueueTitle?.let {
                 putExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE, it)
+            }
+            nodeHandles?.let {
+                putExtra(NODE_HANDLES, it.toLongArray())
             }
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
@@ -347,6 +351,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         isMediaQueueAvailable: Boolean,
         searchedItems: List<Long>?,
         mediaQueueTitle: String?,
+        nodeHandles: List<Long>?,
     ) {
         val info = fileTypeInfo ?: getFileTypeInfoByNameUseCase(name)
         manageMediaIntent(
@@ -361,7 +366,8 @@ internal class MegaNavigatorImpl @Inject constructor(
             isFolderLink = isFolderLink,
             isMediaQueueAvailable = isMediaQueueAvailable,
             searchedItems = searchedItems,
-            mediaQueueTitle = mediaQueueTitle
+            mediaQueueTitle = mediaQueueTitle,
+            nodeHandles = nodeHandles
         )
     }
 }

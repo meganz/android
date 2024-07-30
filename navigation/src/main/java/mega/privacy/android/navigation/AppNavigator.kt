@@ -206,6 +206,7 @@ interface AppNavigator {
      * @param isMediaQueueAvailable whether the media queue is available
      * @param searchedItems the list of searched items, this is only used under the search mode
      * @param mediaQueueTitle the title of the media queue
+     * @param nodeHandles node handle list
      */
     suspend fun openMediaPlayerActivity(
         context: Context,
@@ -220,5 +221,6 @@ interface AppNavigator {
         isMediaQueueAvailable: Boolean = true,
         searchedItems: List<Long>? = null,
         mediaQueueTitle: String? = null,
+        nodeHandles: List<Long>? = null,
     )
 }

@@ -56,6 +56,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.Util
@@ -66,6 +67,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -95,6 +97,12 @@ class BackupsFragment : RotatableFragment() {
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
+
+    /**
+     * [MegaNavigator] injection
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     /**
      * Retrieves the UI state from [BackupsViewModel]
@@ -342,6 +350,7 @@ class BackupsFragment : RotatableFragment() {
 
         return true
     }
+
     /**
      * Establishes the Toolbar
      */
@@ -373,7 +382,7 @@ class BackupsFragment : RotatableFragment() {
             emptyList(),
             state().currentBackupsFolderNodeId.longValue,
             binding?.backupsRecyclerView,
-            Constants.BACKUPS_ADAPTER,
+            BACKUPS_ADAPTER,
             if (state().currentViewType == ViewType.LIST) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
             sortByHeaderViewModel,
         )
@@ -563,91 +572,22 @@ class BackupsFragment : RotatableFragment() {
         } else if (MimeTypeList.typeForName(node.name).isVideoMimeType ||
             MimeTypeList.typeForName(node.name).isAudio
         ) {
-            val mimeType = MimeTypeList.typeForName(node.name).type
-            val mediaIntent: Intent
-            val internalIntent: Boolean
-            var opusFile = false
-
-            if (MimeTypeList.typeForName(node.name).isVideoNotSupported || MimeTypeList.typeForName(
-                    node.name
-                ).isAudioNotSupported
-            ) {
-                mediaIntent = Intent(Intent.ACTION_VIEW)
-                internalIntent = false
-                val s = node.name.split("\\.".toRegex()).toTypedArray()
-                if (s.size > 1 && s[s.size - 1] == "opus") {
-                    opusFile = true
-                }
-            } else {
-                internalIntent = true
-                mediaIntent = Util.getMediaIntent(requireActivity(), node.name)
-            }
-
-            mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_POSITION, position)
-            if (megaApi.getParentNode(node)?.type == MegaNode.TYPE_INCOMING) {
-                mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
-            } else {
-                mediaIntent.putExtra(
-                    Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                    megaApi.getParentNode(node)?.handle
-                )
-            }
-            mediaIntent.putExtra(
-                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                viewModel.getOrder()
-            )
-            putThumbnailLocation(
-                launchIntent = mediaIntent,
-                rv = binding?.backupsRecyclerView,
-                position = position,
-                viewerFrom = Constants.VIEWER_FROM_BACKUPS,
-                thumbnailGetter = megaNodeAdapter
-            )
-
-            mediaIntent.putExtra(
-                Constants.INTENT_EXTRA_KEY_PLACEHOLDER,
-                megaNodeAdapter?.placeholderCount
-            )
-            mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)
-            mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, node.name)
-            mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.BACKUPS_ADAPTER)
-
-            val localPath = FileUtil.getLocalFile(node)
-            if (localPath != null) {
-                val mediaFile = File(localPath)
-                if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
-                    mediaIntent.setDataAndType(
-                        FileProvider.getUriForFile(
-                            requireActivity(),
-                            Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                            mediaFile
-                        ),
-                        MimeTypeList.typeForName(node.name).type
+            viewLifecycleOwner.lifecycleScope.launch {
+                runCatching {
+                    val contentUri = viewModel.getNodeContentUri(node.handle) ?: return@launch
+                    megaNavigator.openMediaPlayerActivity(
+                        context = requireContext(),
+                        contentUri = contentUri,
+                        name = node.name,
+                        handle = node.handle,
+                        viewType = BACKUPS_ADAPTER,
+                        parentId = if (megaApi.getParentNode(node)?.type == MegaNode.TYPE_INCOMING)
+                            -1L
+                        else
+                            node.parentHandle,
+                        sortOrder = viewModel.getOrder(),
                     )
-                } else {
-                    mediaIntent.setDataAndType(
-                        Uri.fromFile(mediaFile),
-                        MimeTypeList.typeForName(node.name).type
-                    )
-                }
-                mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            } else {
-                if (megaApi.httpServerIsRunning() == 0) {
-                    megaApi.httpServerStart()
-                    mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
-                }
-                val url = megaApi.httpServerGetLocalLink(node)
-                mediaIntent.setDataAndType(Uri.parse(url), mimeType)
-            }
-            if (opusFile) {
-                mediaIntent.setDataAndType(mediaIntent.data, "audio/*")
-            }
-            if (internalIntent) {
-                startActivity(mediaIntent)
-            } else {
-                if (MegaApiUtils.isIntentAvailable(requireActivity(), mediaIntent)) {
-                    startActivity(mediaIntent)
-                } else {
+                }.onFailure {
                     (requireActivity() as ManagerActivity).showSnackbar(
                         type = Constants.SNACKBAR_TYPE,
                         content = getString(R.string.intent_not_available),
@@ -662,12 +602,11 @@ class BackupsFragment : RotatableFragment() {
                     )
                 }
             }
-            (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
         } else if (MimeTypeList.typeForName(node.name).isPdf) {
             val mimeType = MimeTypeList.typeForName(node.name).type
             val pdfIntent = Intent(requireActivity(), PdfViewerActivity::class.java)
             pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-            pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.BACKUPS_ADAPTER)
+            pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, BACKUPS_ADAPTER)
             val localPath = FileUtil.getLocalFile(node)
             if (localPath != null) {
                 val mediaFile = File(localPath)
@@ -725,7 +664,7 @@ class BackupsFragment : RotatableFragment() {
         } else if (MimeTypeList.typeForName(node.name).isURL) {
             megaNodeUtilWrapper.manageURLNode(requireActivity(), megaApi, node)
         } else if (MimeTypeList.typeForName(node.name).isOpenableTextFile(node.size)) {
-            megaNodeUtilWrapper.manageTextFileIntent(requireContext(), node, Constants.BACKUPS_ADAPTER)
+            megaNodeUtilWrapper.manageTextFileIntent(requireContext(), node, BACKUPS_ADAPTER)
         } else {
             megaNodeAdapter?.notifyDataSetChanged()
             megaNodeUtilWrapper.onNodeTapped(
