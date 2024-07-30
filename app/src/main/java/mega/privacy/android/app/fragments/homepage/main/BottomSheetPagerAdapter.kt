@@ -2,21 +2,16 @@ package mega.privacy.android.app.fragments.homepage.main
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import mega.privacy.android.app.presentation.offline.OfflineFragment
 import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment
 import mega.privacy.android.app.presentation.recentactions.RecentActionsComposeFragment
 
 class BottomSheetPagerAdapter(
     fragment: Fragment,
-    enableOfflineCompose: Boolean,
 ) : FragmentStateAdapter(fragment) {
 
     private val tabFragmentMap = hashMapOf(
         RECENT_INDEX to RecentActionsComposeFragment::class.java,
-        OFFLINE_INDEX to if (enableOfflineCompose)
-            OfflineComposeFragment::class.java
-        else
-            OfflineFragment::class.java
+        OFFLINE_INDEX to OfflineComposeFragment::class.java
     )
 
     override fun getItemCount(): Int {

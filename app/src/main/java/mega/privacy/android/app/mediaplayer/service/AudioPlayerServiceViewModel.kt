@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
@@ -78,7 +77,6 @@ import mega.privacy.android.app.utils.FileUtil.getUriForFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.MegaNodeUtil.isInRootLinksLevel
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.OfflineUtils.getOfflineFolderName
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.data.model.MimeTypeList
@@ -362,10 +360,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
             if (displayNodeNameFirst) firstPlayNodeName else null
         )
 
-        val isOfflineComposeEnabled = runCatching {
-            getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
-        }.getOrDefault(false)
-
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
             if (type != OFFLINE_ADAPTER && type != ZIP_ADAPTER) {
                 needStopStreamingServer =
@@ -375,25 +369,21 @@ class AudioPlayerServiceViewModel @Inject constructor(
             val buildPlayerSourcesJob = sharingScope.launch(ioDispatcher) {
                 when (type) {
                     OFFLINE_ADAPTER -> {
-                        if (isOfflineComposeEnabled) {
-                            val parentId = intent.getIntExtra(INTENT_EXTRA_KEY_PARENT_ID, -1)
-                            playlistTitle.postValue(
-                                if (parentId == -1) {
-                                    context.getString(R.string.section_saved_for_offline_new)
-                                } else {
-                                    runCatching {
-                                        getOfflineNodeInformationByIdUseCase(parentId)
-                                    }.getOrNull()?.name ?: ""
-                                }
-                            )
-                            buildPlaylistFromOfflineNodes(
-                                parentId = parentId,
-                                firstPlayHandle = firstPlayHandle
-                            )
-                        } else {
-                            playlistTitle.postValue(getOfflineFolderName(context, firstPlayHandle))
-                            buildPlaylistFromLegacyOfflineNodes(intent, firstPlayHandle)
-                        }
+                        val parentId = intent.getIntExtra(INTENT_EXTRA_KEY_PARENT_ID, -1)
+                        playlistTitle.postValue(
+                            if (parentId == -1) {
+                                context.getString(R.string.section_saved_for_offline_new)
+                            } else {
+                                runCatching {
+                                    getOfflineNodeInformationByIdUseCase(parentId)
+                                }.getOrNull()?.name ?: ""
+                            }
+                        )
+                        buildPlaylistFromOfflineNodes(
+                            parentId = parentId,
+                            firstPlayHandle = firstPlayHandle
+                        )
+
                     }
 
                     AUDIO_BROWSE_ADAPTER -> {
@@ -578,20 +568,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
             val node = getAudioNodeByHandleUseCase(firstPlayHandle)
             val thumbnail = when {
-                type == OFFLINE_ADAPTER -> {
-                    if (isOfflineComposeEnabled) {
-                        getThumbnailUseCase(firstPlayHandle)
-                    } else {
-                        offlineThumbnailFileWrapper.getThumbnailFile(
-                            context,
-                            firstPlayHandle.toString()
-                        )
-                    }
-                }
+                type == OFFLINE_ADAPTER -> getThumbnailUseCase(firstPlayHandle)
 
-                node == null -> {
-                    null
-                }
+                node == null -> null
 
                 else -> {
                     File(getThumbFolder(context), node.base64Id.plus(JPG_EXTENSION))

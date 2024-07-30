@@ -202,7 +202,6 @@ import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageM
 import mega.privacy.android.app.presentation.node.NodeSourceTypeMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
-import mega.privacy.android.app.presentation.offline.OfflineFragment
 import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
@@ -570,8 +569,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var bottomItemBeforeOpenFullscreenOffline = Constants.INVALID_VALUE
     private var fullscreenOfflineComposeFragment: OfflineComposeFragment? = null
     private var pagerOfflineComposeFragment: OfflineComposeFragment? = null
-    private var fullscreenOfflineFragment: OfflineFragment? = null
-    private var pagerOfflineFragment: OfflineFragment? = null
 
     var statusDialog: AlertDialog? = null
     private var processFileDialog: AlertDialog? = null
@@ -644,11 +641,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    /**
-     * Feature Flag for OfflineCompose
-     */
-    private var enableOfflineCompose: Boolean = false
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -715,8 +707,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             Util.checkTakePicture(this, Constants.TAKE_PHOTO_CODE)
                             typesCameraPermission = Constants.INVALID_TYPE_PERMISSIONS
                         }
-                    } else {
-                        refreshOfflineNodes()
                     }
                 }
             }
@@ -845,10 +835,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         Timber.d("onCreate")
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
-        runBlocking {
-            enableOfflineCompose =
-                getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
-        }
 
         Timber.d("onCreate after call super")
         registerViewModelObservers()
@@ -3601,7 +3587,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     hideAdsView()
                 }
 
-                R.id.fullscreen_offline,
                 R.id.offlineFragmentCompose,
                 -> {
                     homepageScreen = HomepageScreen.FULLSCREEN_OFFLINE
@@ -4004,45 +3989,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         drawerItem = DrawerItem.HOMEPAGE
         path?.let {
             navController?.navigate(
-                if (enableOfflineCompose) {
-                    HomepageFragmentDirections.actionHomepageToFullscreenOfflineCompose(
-                        path = it,
-                        rootFolderOnly = false
-                    )
-                } else {
-                    HomepageFragmentDirections.actionHomepageToFullscreenOffline(
-                        path = it,
-                        rootFolderOnly = false
-                    )
-                },
+                HomepageFragmentDirections.actionHomepageToFullscreenOfflineCompose(
+                    path = it,
+                    rootFolderOnly = false
+                ),
                 NavOptions.Builder().setLaunchSingleTop(true).build()
             )
-        }
-    }
-
-    fun fullscreenOfflineFragmentOpened(fragment: OfflineFragment?) {
-        fullscreenOfflineFragment = fragment
-        showFabButton()
-        setBottomNavigationMenuItemChecked(HOME_BNV)
-        appBarLayout.visibility = View.VISIBLE
-        setToolbarTitle()
-        supportInvalidateOptionsMenu()
-    }
-
-    fun fullscreenOfflineFragmentClosed(fragment: OfflineFragment) {
-        if (fragment === fullscreenOfflineFragment) {
-            fullscreenOfflineFragment = null
-            if (bottomItemBeforeOpenFullscreenOffline != Constants.INVALID_VALUE && !mStopped) {
-                goBackToBottomNavigationItem(bottomItemBeforeOpenFullscreenOffline)
-                bottomItemBeforeOpenFullscreenOffline = Constants.INVALID_VALUE
-            }
-            pathNavigationOffline = "/"
-            // workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
-            // offline, and hide AppBarLayout when immediately on go back, we will see the flicker
-            // of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
-            if (isInMainHomePage) {
-                appBarLayout.visibility = View.GONE
-            }
         }
     }
 
@@ -4078,17 +4030,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun pagerOfflineComposeFragmentClosed(fragment: OfflineComposeFragment) {
         if (fragment == pagerOfflineComposeFragment) {
-            pagerOfflineFragment = null
-        }
-    }
-
-    fun pagerOfflineFragmentOpened(fragment: OfflineFragment?) {
-        pagerOfflineFragment = fragment
-    }
-
-    fun pagerOfflineFragmentClosed(fragment: OfflineFragment) {
-        if (fragment == pagerOfflineFragment) {
-            pagerOfflineFragment = null
+            pagerOfflineComposeFragment = null
         }
     }
 
@@ -4219,12 +4161,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         }
         when (drawerItem) {
-            DrawerItem.HOMEPAGE -> {
-                if (enableOfflineCompose.not()) {
-                    fullscreenOfflineFragment?.checkScroll()
-                }
-            }
-
             DrawerItem.BACKUPS -> {
                 backupsFragment?.checkScroll()
             }
@@ -4419,16 +4355,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             override fun onQueryTextSubmit(query: String): Boolean {
                 if (drawerItem === DrawerItem.CHAT) {
                     Util.hideKeyboard(this@ManagerActivity, 0)
-                } else if (drawerItem === DrawerItem.HOMEPAGE) {
-                    if (homepageScreen === HomepageScreen.FULLSCREEN_OFFLINE) {
-                        if (!enableOfflineCompose) {
-                            searchExpand = false
-                            Util.hideKeyboard(this@ManagerActivity, 0)
-                            fullscreenOfflineFragment?.onSearchQuerySubmitted()
-                            setToolbarTitle()
-                            supportInvalidateOptionsMenu()
-                        }
-                    } else {
+                } else if (drawerItem == DrawerItem.HOMEPAGE) {
+                    if (homepageScreen != HomepageScreen.FULLSCREEN_OFFLINE) {
                         Util.hideKeyboard(this@ManagerActivity)
                     }
                 } else {
@@ -4568,43 +4496,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun setFullscreenOfflineFragmentSearchQuery(searchQuery: String?) {
-        if (enableOfflineCompose) {
-            fullscreenOfflineComposeFragment?.setSearchQuery(searchQuery)
-        } else {
-            fullscreenOfflineFragment?.setSearchQuery(searchQuery)
-        }
+        fullscreenOfflineComposeFragment?.setSearchQuery(searchQuery)
     }
 
     fun updateFullscreenOfflineFragmentOptionMenu(openSearchView: Boolean) {
-        if (enableOfflineCompose) {
-            if (fullscreenOfflineComposeFragment == null) return
-            if (searchExpand && openSearchView) {
-                openSearchView()
-            } else if (!searchExpand) {
-                if (viewModel.isConnected) {
-                    if (fullscreenOfflineComposeFragment?.isInSearchMode() == false) {
-                        searchMenuItem?.isVisible = true
-                    }
-                } else {
-                    supportInvalidateOptionsMenu()
+        if (fullscreenOfflineComposeFragment == null) return
+        if (searchExpand && openSearchView) {
+            openSearchView()
+        } else if (!searchExpand) {
+            if (viewModel.isConnected) {
+                if (fullscreenOfflineComposeFragment?.isInSearchMode() == false) {
+                    searchMenuItem?.isVisible = true
                 }
-            }
-        } else {
-            if (fullscreenOfflineFragment == null) return
-            if (searchExpand && openSearchView) {
-                openSearchView()
-            } else if (!searchExpand) {
-                if (viewModel.isConnected) {
-                    if (((fullscreenOfflineFragment?.getItemCount() ?: 0) > 0) &&
-                        fullscreenOfflineFragment?.searchMode() == false &&
-                        searchMenuItem != null
-                    ) {
-                        searchMenuItem?.isVisible = true
-                    }
-                } else {
-                    supportInvalidateOptionsMenu()
-                }
-                fullscreenOfflineFragment?.refreshActionBarTitle()
+            } else {
+                supportInvalidateOptionsMenu()
             }
         }
     }
@@ -4756,10 +4661,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
 
                     DrawerItem.SHARED_ITEMS -> onSelectAllSharedItems()
-
-                    DrawerItem.HOMEPAGE -> if (fullscreenOfflineFragment != null) {
-                        fullscreenOfflineFragment?.selectAll()
-                    }
 
                     DrawerItem.BACKUPS -> backupsFragment?.selectAll()
 
@@ -5076,14 +4977,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun handleBackPressIfFullscreenOfflineFragmentOpened() {
-        if (enableOfflineCompose) {
-            if (fullscreenOfflineComposeFragment == null || fullscreenOfflineComposeFragment?.onBackPressed() == 0) {
-                handleOfflineBackClick()
-            }
-        } else {
-            if (fullscreenOfflineFragment == null || fullscreenOfflineFragment?.onBackPressed() == 0) {
-                handleOfflineBackClick()
-            }
+        if (fullscreenOfflineComposeFragment == null || fullscreenOfflineComposeFragment?.onBackPressed() == 0) {
+            handleOfflineBackClick()
         }
     }
 
@@ -5205,7 +5100,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             R.id.bottom_navigation_item_homepage -> {
                 drawerItem = DrawerItem.HOMEPAGE
-                if (fullscreenOfflineFragment != null) {
+                if (fullscreenOfflineComposeFragment != null) {
                     handleSuperBackPressed()
                     return true
                 } else {
@@ -6540,15 +6435,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun refreshOfflineNodes() {
-        Timber.d("updateOfflineView")
-        if (fullscreenOfflineFragment != null) {
-            fullscreenOfflineFragment?.refreshNodes()
-        } else if (pagerOfflineFragment != null) {
-            pagerOfflineFragment?.refreshNodes()
-        }
-    }
-
     /**
      * Handle processed upload intent.
      *
@@ -7190,7 +7076,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     fun onNodesCloudDriveUpdate() {
         Timber.d("onNodesCloudDriveUpdate")
         refreshRubbishBin()
-        pagerOfflineFragment?.refreshNodes()
         refreshCloudDrive()
     }
 
@@ -7818,8 +7703,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 refreshOutgoingShares()
                 refreshIncomingShares()
             }
-
-            DrawerItem.HOMEPAGE -> refreshOfflineNodes()
             else -> {}
         }
     }

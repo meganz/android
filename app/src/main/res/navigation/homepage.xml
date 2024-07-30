@@ -10,9 +10,6 @@
         android:label="fragment_homepage"
         tools:layout="@layout/fragment_homepage">
         <action
-            android:id="@+id/action_homepage_to_fullscreen_offline"
-            app:destination="@id/fullscreen_offline" />
-        <action
             android:id="@+id/action_homepage_to_fullscreen_offline_compose"
             app:destination="@id/offlineFragmentCompose" />
         <action
@@ -45,27 +42,8 @@
         android:id="@+id/recentBucketFragment"
         android:name="mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment">
         <action
-            android:id="@+id/action_homepage_to_fullscreen_offline"
-            app:destination="@id/fullscreen_offline" />
-        <action
             android:id="@+id/action_homepage_to_fullscreen_offline_compose"
             app:destination="@id/offlineFragmentCompose" />
-    </fragment>
-    <fragment
-        android:id="@+id/fullscreen_offline"
-        android:name="mega.privacy.android.app.presentation.offline.OfflineFragment"
-        tools:layout="@layout/fragment_offline">
-        <argument
-            android:name="path"
-            android:defaultValue="/"
-            app:argType="string" />
-        <argument
-            android:name="rootFolderOnly"
-            android:defaultValue="true"
-            app:argType="boolean" />
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline"
-            app:destination="@id/fullscreen_offline" />
     </fragment>
 
     <fragment
@@ -75,17 +53,11 @@
         <argument
             android:name="handle"
             app:argType="long" />
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline"
-            app:destination="@id/fullscreen_offline" />
     </fragment>
     <fragment
         android:id="@+id/documentSectionFragment"
         android:name="mega.privacy.android.app.presentation.documentsection.DocumentSectionFragment"
         android:label="DocumentSectionFragment">
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline"
-            app:destination="@id/fullscreen_offline" />
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline_compose"
             app:destination="@id/offlineFragmentCompose" />
@@ -95,9 +67,6 @@
         android:name="mega.privacy.android.app.presentation.audiosection.AudioSectionFragment"
         android:label="AudioSectionFragment">
         <action
-            android:id="@+id/action_homepage_to_fullscreen_offline"
-            app:destination="@id/fullscreen_offline" />
-        <action
             android:id="@+id/action_homepage_to_fullscreen_offline_compose"
             app:destination="@id/offlineFragmentCompose" />
     </fragment>
@@ -105,9 +74,6 @@
         android:id="@+id/videoFragment"
         android:name="mega.privacy.android.app.fragments.homepage.video.VideoFragment"
         android:label="VideoFragment">
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline"
-            app:destination="@id/fullscreen_offline" />
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline_compose"
             app:destination="@id/offlineFragmentCompose" />
@@ -117,9 +83,6 @@
         android:id="@+id/videoSectionFragment"
         android:name="mega.privacy.android.app.presentation.videosection.VideoSectionFragment"
         android:label="VideoSectionFragment">
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline"
-            app:destination="@id/fullscreen_offline" />
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline_compose"
             app:destination="@id/offlineFragmentCompose" />

@@ -373,15 +373,10 @@ class HomepageFragment : Fragment() {
      * Set up the view pager, tab layout and fragments contained in the Homepage main bottom sheet
      */
     private fun setupBottomSheetUI() {
-        var enableOfflineCompose: Boolean
-        runBlocking {
-            enableOfflineCompose = getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
-        }
         viewPager = viewDataBinding.homepageBottomSheet.viewPager
         val adapter =
             BottomSheetPagerAdapter(
                 fragment = this@HomepageFragment,
-                enableOfflineCompose = enableOfflineCompose,
             )
         // By setting this will make BottomSheetPagerAdapter create all the fragments on initialization.
         viewPager.offscreenPageLimit = adapter.itemCount

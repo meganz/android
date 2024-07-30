@@ -735,10 +735,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
             _playerSourcesState.value = playSource
         }
 
-        val isOfflineComposeEnabled = runCatching {
-            getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
-        }.getOrDefault(false)
-
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
             if (type != OFFLINE_ADAPTER && type != ZIP_ADAPTER) {
                 needStopStreamingServer =
@@ -747,30 +743,20 @@ class LegacyVideoPlayerViewModel @Inject constructor(
             viewModelScope.launch(ioDispatcher) {
                 when (type) {
                     OFFLINE_ADAPTER -> {
-                        if (isOfflineComposeEnabled) {
-                            val parentId = intent.getIntExtra(INTENT_EXTRA_KEY_PARENT_ID, -1)
-                            _playlistTitleState.update {
-                                if (parentId == -1) {
-                                    context.getString(R.string.section_saved_for_offline_new)
-                                } else {
-                                    runCatching {
-                                        getOfflineNodeInformationByIdUseCase(parentId)
-                                    }.getOrNull()?.name ?: ""
-                                }
+                        val parentId = intent.getIntExtra(INTENT_EXTRA_KEY_PARENT_ID, -1)
+                        _playlistTitleState.update {
+                            if (parentId == -1) {
+                                context.getString(R.string.section_saved_for_offline_new)
+                            } else {
+                                runCatching {
+                                    getOfflineNodeInformationByIdUseCase(parentId)
+                                }.getOrNull()?.name ?: ""
                             }
-                            buildPlaylistFromOfflineNodes(
-                                parentId = parentId,
-                                firstPlayHandle = firstPlayHandle
-                            )
-                        } else {
-                            _playlistTitleState.update {
-                                OfflineUtils.getOfflineFolderName(
-                                    context,
-                                    firstPlayHandle
-                                )
-                            }
-                            buildPlaylistFromLegacyOfflineNodes(intent, firstPlayHandle)
                         }
+                        buildPlaylistFromOfflineNodes(
+                            parentId = parentId,
+                            firstPlayHandle = firstPlayHandle
+                        )
                     }
 
                     VIDEO_BROWSE_ADAPTER -> {
@@ -978,20 +964,9 @@ class LegacyVideoPlayerViewModel @Inject constructor(
 
             val node = getVideoNodeByHandleUseCase(firstPlayHandle)
             val thumbnail = when {
-                type == OFFLINE_ADAPTER -> {
-                    if (isOfflineComposeEnabled) {
-                        getThumbnailUseCase(firstPlayHandle)
-                    } else {
-                        offlineThumbnailFileWrapper.getThumbnailFile(
-                            context,
-                            firstPlayHandle.toString()
-                        )
-                    }
-                }
+                type == OFFLINE_ADAPTER -> getThumbnailUseCase(firstPlayHandle)
 
-                node == null -> {
-                    null
-                }
+                node == null -> null
 
                 else -> {
                     File(
