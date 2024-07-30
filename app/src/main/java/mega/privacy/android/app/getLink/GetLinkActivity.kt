@@ -1,14 +1,15 @@
 package mega.privacy.android.app.getLink
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -62,6 +63,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = GetLinkActivityLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)

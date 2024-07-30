@@ -14,6 +14,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.Window
 import android.widget.FrameLayout
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -306,6 +307,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     override fun onCreate(savedInstanceState: Bundle?) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         Timber.d("onCreate first")
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return

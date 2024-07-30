@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.text.HtmlCompat
+import androidx.core.view.WindowInsetsCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -19,6 +20,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.overdisk.OverDiskQuotaPaywallViewModel
 import mega.privacy.android.app.utils.ColorUtils
@@ -58,6 +60,7 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
     override fun shouldSetStatusBarTextColor() = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets(WindowInsetsCompat.Type.navigationBars())
         super.onCreate(savedInstanceState)
 
         registerReceiver(

@@ -1,17 +1,19 @@
 package mega.privacy.android.app
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityBusinessExpiredAlertBinding
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
-import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * The class for showing the business or pro flexi expired alert
@@ -27,6 +29,7 @@ class BusinessExpiredAlertActivity : PasscodeActivity() {
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets(WindowInsetsCompat.Type.navigationBars())
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityCountryCodePickerBinding
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.adapters.CountryListAdapter
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Util
@@ -44,6 +45,7 @@ class CountryCodePickerActivity : PasscodeActivity() {
      * OnCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         binding = ActivityCountryCodePickerBinding.inflate(layoutInflater)
         setContentView(binding.root)
