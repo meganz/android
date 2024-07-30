@@ -15,7 +15,7 @@ buildscript {
     repositories {
         google()
         maven { url = uri("https://plugins.gradle.org/m2/") }
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath(plugin.build.tools)
@@ -41,7 +41,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        jcenter()
         maven {
             url = uri("https://jitpack.io")
         }
