@@ -32,6 +32,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -89,6 +90,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
@@ -1240,6 +1242,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         accountType: AccountType?,
         isHiddenNodesOnboarded: Boolean?,
     ) {
+        if (drawerItem == DrawerItem.CLOUD_DRIVE && !node.isMarkedSensitive) {
+            // We only want to send analytics for when the action is hiding
+            Analytics.tracker.trackEvent(CloudDriveHideNodeMenuItemEvent)
+        }
         val isPaid = accountType?.isPaid ?: false
         val isHiddenNodesOnboarded = isHiddenNodesOnboarded ?: false
 
