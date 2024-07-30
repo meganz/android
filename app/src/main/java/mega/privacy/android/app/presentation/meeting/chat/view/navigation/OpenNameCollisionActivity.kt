@@ -4,12 +4,12 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import mega.privacy.android.app.namecollision.NameCollisionActivity
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.utils.Constants
 
 internal fun openNameCollisionActivity(
     context: Context,
-    collisions: List<NameCollision>,
+    collisions: List<LegacyNameCollision>,
     launcher: ActivityResultLauncher<Intent>,
 ) {
     val intent =

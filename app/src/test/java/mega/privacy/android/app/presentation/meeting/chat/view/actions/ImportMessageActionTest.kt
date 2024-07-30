@@ -8,7 +8,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuEvent
@@ -38,7 +38,7 @@ class ImportMessageActionTest {
 
     private val folderPicker = mock<(Context, ActivityResultLauncher<Intent>) -> Unit>()
     private val collisionsActivity =
-        mock<(Context, List<NameCollision>, ActivityResultLauncher<Intent>) -> Unit>()
+        mock<(Context, List<LegacyNameCollision>, ActivityResultLauncher<Intent>) -> Unit>()
 
     @Before
     fun setUp() {

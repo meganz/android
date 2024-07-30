@@ -886,7 +886,7 @@ class ManagerViewModel @Inject constructor(
                     NodeNameCollisionType.RESTORE
                 )
             }.onSuccess { result ->
-                _state.update { it.copy(nodeNameCollisionResult = result) }
+                _state.update { it.copy(nodeNameCollisionsResult = result) }
             }.onFailure {
                 Timber.e(it)
             }
@@ -911,7 +911,7 @@ class ManagerViewModel @Inject constructor(
                     type
                 )
             }.onSuccess { result ->
-                _state.update { it.copy(nodeNameCollisionResult = result) }
+                _state.update { it.copy(nodeNameCollisionsResult = result) }
             }.onFailure {
                 Timber.e(it)
             }
@@ -959,7 +959,7 @@ class ManagerViewModel @Inject constructor(
      *
      */
     fun markHandleNodeNameCollisionResult() {
-        _state.update { it.copy(nodeNameCollisionResult = null) }
+        _state.update { it.copy(nodeNameCollisionsResult = null) }
     }
 
     private fun updateContactRequests(requests: List<ContactRequest>) {

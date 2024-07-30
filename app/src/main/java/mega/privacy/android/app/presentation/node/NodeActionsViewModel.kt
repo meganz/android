@@ -123,7 +123,7 @@ class NodeActionsViewModel @Inject constructor(
                     type
                 )
             }.onSuccess { result ->
-                _state.update { it.copy(nodeNameCollisionResult = triggered(result)) }
+                _state.update { it.copy(nodeNameCollisionsResult = triggered(result)) }
             }.onFailure {
                 Timber.e(it)
             }
@@ -205,7 +205,7 @@ class NodeActionsViewModel @Inject constructor(
      * Mark handle node name collision result
      */
     fun markHandleNodeNameCollisionResult() {
-        _state.update { it.copy(nodeNameCollisionResult = consumed()) }
+        _state.update { it.copy(nodeNameCollisionsResult = consumed()) }
     }
 
     /**

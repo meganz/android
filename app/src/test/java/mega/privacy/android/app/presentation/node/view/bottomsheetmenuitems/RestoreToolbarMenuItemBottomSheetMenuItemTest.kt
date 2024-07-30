@@ -9,7 +9,7 @@ import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.RestoreMenuAction
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -81,7 +81,7 @@ class RestoreToolbarMenuItemBottomSheetMenuItemTest {
         )
         val nodeMap = mapOf(Pair(1234L, 2345L))
         whenever(checkNodesNameCollisionUseCase(nodeMap, NodeNameCollisionType.RESTORE)).thenReturn(
-            NodeNameCollisionResult(
+            NodeNameCollisionsResult(
                 conflictNodes = emptyMap(),
                 noConflictNodes = nodeMap,
                 type = NodeNameCollisionType.RESTORE

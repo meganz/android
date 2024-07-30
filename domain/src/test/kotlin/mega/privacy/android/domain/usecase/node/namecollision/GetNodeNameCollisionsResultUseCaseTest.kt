@@ -27,7 +27,7 @@ import org.mockito.kotlin.whenever
 import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetNodeNameCollisionResultUseCaseTest {
+class GetNodeNameCollisionsResultUseCaseTest {
 
     private lateinit var underTest: GetNodeNameCollisionResultUseCase
 

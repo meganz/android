@@ -159,8 +159,8 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollision.Upload.Companion.getUploadCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision.Upload.Companion.getUploadCollision
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_HOME_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
@@ -256,7 +256,6 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogS
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -286,7 +285,6 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.UploadUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.model.MegaAttributes
@@ -303,7 +301,7 @@ import mega.privacy.android.domain.entity.document.toDocumentEntity
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
@@ -1868,7 +1866,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             viewModel.state,
             Lifecycle.State.STARTED
         ) { managerState: ManagerState ->
-            val nodeNameCollisionResult = managerState.nodeNameCollisionResult
+            val nodeNameCollisionResult = managerState.nodeNameCollisionsResult
             if (nodeNameCollisionResult != null) {
                 handleNodesNameCollisionResult(nodeNameCollisionResult)
                 viewModel.markHandleNodeNameCollisionResult()
@@ -2048,16 +2046,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun handleNodesNameCollisionResult(result: NodeNameCollisionResult) {
+    private fun handleNodesNameCollisionResult(result: NodeNameCollisionsResult) {
         if (result.conflictNodes.isNotEmpty()) {
             nameCollisionActivityContract
                 ?.launch(ArrayList(result.conflictNodes.values.map {
                     when (result.type) {
                         NodeNameCollisionType.RESTORE,
                         NodeNameCollisionType.MOVE,
-                        -> NameCollision.Movement.fromNodeNameCollision(it)
+                        -> LegacyNameCollision.Movement.fromNodeNameCollision(it)
 
-                        NodeNameCollisionType.COPY -> NameCollision.Copy.fromNodeNameCollision(it)
+                        NodeNameCollisionType.COPY -> LegacyNameCollision.Copy.fromNodeNameCollision(it)
                     }
                 }))
         }

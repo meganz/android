@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 /**
  * Data class containing all the required to present a name collision for an upload, copy or movement.
  *
- * @property nameCollision          [NameCollision]
+ * @property nameCollision          [LegacyNameCollision]
  * @property collisionName          The node name with which there is a name collision.
  * @property collisionSize          The node size with which there is a name collision if is a file, null otherwise.
  * @property collisionFolderContent The folder content of the node with which there is a name collision if is a folder, null otherwise.
@@ -18,8 +18,9 @@ import kotlinx.parcelize.Parcelize
  * @property choice                 [NameCollisionChoice] with the collision resolution.
  */
 @Parcelize
+@Deprecated("Use NodeNameCollisionResult instead")
 data class NameCollisionResult(
-    val nameCollision: NameCollision,
+    val nameCollision: LegacyNameCollision,
     var collisionName: String? = null,
     var collisionSize: Long? = null,
     var collisionFolderContent: String? = null,

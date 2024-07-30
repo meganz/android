@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.photos.mediadiscovery.model
 import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
@@ -64,7 +64,7 @@ data class MediaDiscoveryViewState(
     val showSortByDialog: Boolean = false,
     val showFilterDialog: Boolean = false,
     val showSlidersPopup: Boolean = false,
-    val collisions: List<NameCollision> = emptyList(),
+    val collisions: List<LegacyNameCollision> = emptyList(),
     val copyThrowable: Throwable? = null,
     val copyResultText: String? = null,
     val isConnectedToNetwork: Boolean = true,

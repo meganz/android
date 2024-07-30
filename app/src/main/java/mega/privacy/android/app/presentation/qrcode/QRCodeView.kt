@@ -68,7 +68,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.R
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
@@ -124,7 +124,7 @@ internal fun QRCodeView(
     onInviteContactDialogDismiss: () -> Unit,
     onCloudDriveClicked: () -> Unit,
     onFileSystemClicked: () -> Unit,
-    onShowCollision: (NameCollision) -> Unit,
+    onShowCollision: (LegacyNameCollision) -> Unit,
     onShowCollisionConsumed: () -> Unit,
     onUploadFile: (Pair<File, Long>) -> Unit,
     onUploadFileConsumed: () -> Unit,

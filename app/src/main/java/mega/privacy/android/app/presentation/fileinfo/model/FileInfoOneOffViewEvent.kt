@@ -4,7 +4,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 
 /**
  * Represents events in the File info screen
@@ -94,6 +94,6 @@ sealed interface FileInfoOneOffViewEvent {
      * A collision is detected while moving or copying
      * @param collision the name collision detected
      */
-    data class CollisionDetected(val collision: NameCollision) : FileInfoOneOffViewEvent
+    data class CollisionDetected(val collision: LegacyNameCollision) : FileInfoOneOffViewEvent
 }
 

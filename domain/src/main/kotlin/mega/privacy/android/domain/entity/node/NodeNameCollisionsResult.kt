@@ -7,7 +7,7 @@ package mega.privacy.android.domain.entity.node
  * @property conflictNodes map of node handle and [NodeNameCollision]
  * @property type [NodeNameCollisionType]
  */
-data class NodeNameCollisionResult(
+data class NodeNameCollisionsResult(
     val noConflictNodes: Map<Long, Long>,
     val conflictNodes: Map<Long, NodeNameCollision>,
     val type: NodeNameCollisionType,
@@ -15,11 +15,11 @@ data class NodeNameCollisionResult(
 
 /**
  * Node name collision with action result
- * @property collisionResult [NodeNameCollisionResult]
+ * @property collisionResult [NodeNameCollisionsResult]
  * @property moveRequestResult [MoveRequestResult] null if no action was performed
  */
 data class NodeNameCollisionWithActionResult(
-    val collisionResult: NodeNameCollisionResult,
+    val collisionResult: NodeNameCollisionsResult,
     val moveRequestResult: MoveRequestResult? = null,
 ) {
     /**

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.namecollision.data.toLegacyImport
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
@@ -39,10 +39,10 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
      */
     val copyResultFlow = _copyResultFlow.asStateFlow()
 
-    private val _collisionsFlow = MutableStateFlow<List<NameCollision>>(emptyList())
+    private val _collisionsFlow = MutableStateFlow<List<LegacyNameCollision>>(emptyList())
 
     /**
-     * Flow of [NameCollision] to notify the name collisions
+     * Flow of [LegacyNameCollision] to notify the name collisions
      */
     val collisionsFlow = _collisionsFlow.asStateFlow()
 

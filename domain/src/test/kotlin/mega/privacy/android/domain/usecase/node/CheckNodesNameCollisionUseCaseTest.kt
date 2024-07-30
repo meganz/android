@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.NodeRepository
@@ -63,7 +63,7 @@ internal class CheckNodesNameCollisionUseCaseTest {
         whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
         whenever(getRootNodeUseCase()).thenReturn(null)
         assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
-            NodeNameCollisionResult(nodes, emptyMap(), NodeNameCollisionType.RESTORE)
+            NodeNameCollisionsResult(nodes, emptyMap(), NodeNameCollisionType.RESTORE)
         )
     }
 
@@ -74,7 +74,7 @@ internal class CheckNodesNameCollisionUseCaseTest {
         whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
         whenever(getNodeByHandleUseCase(any(), any())).thenReturn(null)
         assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
-            NodeNameCollisionResult(nodes, emptyMap(), NodeNameCollisionType.RESTORE)
+            NodeNameCollisionsResult(nodes, emptyMap(), NodeNameCollisionType.RESTORE)
         )
     }
 
@@ -86,7 +86,7 @@ internal class CheckNodesNameCollisionUseCaseTest {
         whenever(getNodeByHandleUseCase(any(), any())).thenReturn(mock<FileNode>())
         whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(true)
         assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
-            NodeNameCollisionResult(nodes, emptyMap(), NodeNameCollisionType.RESTORE)
+            NodeNameCollisionsResult(nodes, emptyMap(), NodeNameCollisionType.RESTORE)
         )
     }
 
@@ -120,7 +120,7 @@ internal class CheckNodesNameCollisionUseCaseTest {
         whenever(getChildNodeUseCase(NodeId(101L), currentNode.name)).thenReturn(conflictNode)
 
         assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
-            NodeNameCollisionResult(
+            NodeNameCollisionsResult(
                 mapOf(1L to 100L, 3L to 102L),
                 mapOf(
                     2L to NodeNameCollision.Default(

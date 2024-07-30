@@ -37,7 +37,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogListener
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
@@ -481,7 +481,7 @@ class FileInfoActivity : BaseActivity() {
             }
 
             is FileInfoOneOffViewEvent.CollisionDetected -> {
-                val list = ArrayList<NameCollision>()
+                val list = ArrayList<LegacyNameCollision>()
                 list.add(event.collision)
                 nameCollisionActivityContract?.launch(list)
             }

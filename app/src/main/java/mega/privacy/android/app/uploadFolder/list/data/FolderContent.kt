@@ -2,7 +2,7 @@ package mega.privacy.android.app.uploadFolder.list.data
 
 import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 
 /**
  * View item which represents a Folder Content, related to upload folders, at UI level.
@@ -41,7 +41,7 @@ sealed class FolderContent(val id: Long) {
         var isSelected: Boolean = false,
         val uri: Uri,
     ) : FolderContent(uri.hashCode().toLong()) {
-        var nameCollision: NameCollision? = null
+        var nameCollision: LegacyNameCollision? = null
 
         override fun getSectionTitle(): String = name.substring(0, 1)
     }

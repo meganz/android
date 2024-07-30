@@ -46,7 +46,7 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -84,7 +84,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -322,7 +322,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 }
 
                 EventEffect(
-                    event = nodeActionState.nodeNameCollisionResult,
+                    event = nodeActionState.nodeNameCollisionsResult,
                     onConsumed = nodeActionsViewModel::markHandleNodeNameCollisionResult,
                     action = {
                         handleNodesNameCollisionResult(it)
@@ -652,7 +652,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         )
     }
 
-    private fun handleNodesNameCollisionResult(result: NodeNameCollisionResult) {
+    private fun handleNodesNameCollisionResult(result: NodeNameCollisionsResult) {
         if (result.conflictNodes.isNotEmpty()) {
             nameCollisionActivityContract
                 .launch(
@@ -661,9 +661,9 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             when (result.type) {
                                 NodeNameCollisionType.RESTORE,
                                 NodeNameCollisionType.MOVE,
-                                -> NameCollision.Movement.fromNodeNameCollision(it)
+                                -> LegacyNameCollision.Movement.fromNodeNameCollision(it)
 
-                                NodeNameCollisionType.COPY -> NameCollision.Copy.fromNodeNameCollision(
+                                NodeNameCollisionType.COPY -> LegacyNameCollision.Copy.fromNodeNameCollision(
                                     it
                                 )
                             }

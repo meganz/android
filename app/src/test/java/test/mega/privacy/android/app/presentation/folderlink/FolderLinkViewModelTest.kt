@@ -22,7 +22,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -676,7 +676,7 @@ class FolderLinkViewModelTest {
     fun `test that non-conflict nodes are copied when checkNameCollision is invoked`() = runTest {
         val nodeMap = mapOf(Pair(1234L, 2345L), Pair(234L, 2345L))
         whenever(checkNodesNameCollisionUseCase(nodeMap, NodeNameCollisionType.COPY)).thenReturn(
-            NodeNameCollisionResult(
+            NodeNameCollisionsResult(
                 noConflictNodes = nodeMap,
                 conflictNodes = emptyMap(),
                 type = NodeNameCollisionType.COPY

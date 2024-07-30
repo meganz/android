@@ -46,8 +46,8 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
-import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollision.Upload.Companion.getUploadCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision.Upload.Companion.getUploadCollision
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
@@ -440,7 +440,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         }
     }
 
-    private fun handleNodesNameCollisionResult(conflictNodes: List<NameCollision>) {
+    private fun handleNodesNameCollisionResult(conflictNodes: List<LegacyNameCollision>) {
         if (conflictNodes.isNotEmpty()) {
             dismissAlertDialogIfExists(statusDialog)
             nameCollisionActivityContract?.launch(ArrayList(conflictNodes))

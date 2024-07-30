@@ -39,7 +39,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -1056,7 +1056,7 @@ internal class FileInfoViewModelTest {
             )
         ).thenReturn(
             NodeNameCollisionWithActionResult(
-                collisionResult = NodeNameCollisionResult(
+                collisionResult = NodeNameCollisionsResult(
                     noConflictNodes = emptyMap(),
                     conflictNodes = mapOf(
                         nodeId.longValue to NodeNameCollision.Default(
@@ -1086,7 +1086,7 @@ internal class FileInfoViewModelTest {
             )
         ).thenReturn(
             NodeNameCollisionWithActionResult(
-                collisionResult = NodeNameCollisionResult(
+                collisionResult = NodeNameCollisionsResult(
                     noConflictNodes = emptyMap(),
                     conflictNodes = mapOf(
                         nodeId.longValue to NodeNameCollision.Default(
@@ -1116,7 +1116,7 @@ internal class FileInfoViewModelTest {
             )
         ).thenReturn(
             NodeNameCollisionWithActionResult(
-                collisionResult = NodeNameCollisionResult(
+                collisionResult = NodeNameCollisionsResult(
                     noConflictNodes = emptyMap(),
                     conflictNodes = emptyMap(),
                     type = NodeNameCollisionType.COPY
@@ -1137,7 +1137,7 @@ internal class FileInfoViewModelTest {
             )
         ).thenReturn(
             NodeNameCollisionWithActionResult(
-                collisionResult = NodeNameCollisionResult(
+                collisionResult = NodeNameCollisionsResult(
                     noConflictNodes = emptyMap(),
                     conflictNodes = emptyMap(),
                     type = NodeNameCollisionType.MOVE
@@ -1158,7 +1158,7 @@ internal class FileInfoViewModelTest {
             )
         ).thenReturn(
             NodeNameCollisionWithActionResult(
-                collisionResult = NodeNameCollisionResult(
+                collisionResult = NodeNameCollisionsResult(
                     noConflictNodes = emptyMap(),
                     conflictNodes = emptyMap(),
                     type = NodeNameCollisionType.COPY
@@ -1179,7 +1179,7 @@ internal class FileInfoViewModelTest {
             )
         ).thenReturn(
             NodeNameCollisionWithActionResult(
-                collisionResult = NodeNameCollisionResult(
+                collisionResult = NodeNameCollisionsResult(
                     noConflictNodes = emptyMap(),
                     conflictNodes = emptyMap(),
                     type = NodeNameCollisionType.MOVE

@@ -1,6 +1,6 @@
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import org.junit.Test
@@ -10,7 +10,7 @@ class NodeNameCollisionWithActionResultTest {
     @Test
     fun `test firstNodeCollisionOrNull returns null when there is no collisions`() {
         val collisionResult =
-            NodeNameCollisionResult(emptyMap(), emptyMap(), NodeNameCollisionType.RESTORE)
+            NodeNameCollisionsResult(emptyMap(), emptyMap(), NodeNameCollisionType.RESTORE)
         val actionResult = NodeNameCollisionWithActionResult(collisionResult)
 
         assertThat(actionResult.firstNodeCollisionOrNull).isNull()
@@ -32,7 +32,7 @@ class NodeNameCollisionWithActionResultTest {
             )
         )
         val collisionResult =
-            NodeNameCollisionResult(emptyMap(), conflictNodes, NodeNameCollisionType.COPY)
+            NodeNameCollisionsResult(emptyMap(), conflictNodes, NodeNameCollisionType.COPY)
         val actionResult = NodeNameCollisionWithActionResult(collisionResult)
         assertThat(actionResult.firstNodeCollisionOrNull).isInstanceOf(NodeNameCollision.Default::class.java)
     }
@@ -53,7 +53,7 @@ class NodeNameCollisionWithActionResultTest {
             )
         )
         val collisionResult =
-            NodeNameCollisionResult(emptyMap(), conflictNodes, NodeNameCollisionType.RESTORE)
+            NodeNameCollisionsResult(emptyMap(), conflictNodes, NodeNameCollisionType.RESTORE)
         val actionResult = NodeNameCollisionWithActionResult(collisionResult)
 
         assertThat(actionResult.firstChatNodeCollisionOrNull).isNull()
@@ -77,7 +77,7 @@ class NodeNameCollisionWithActionResultTest {
             )
         )
         val collisionResult =
-            NodeNameCollisionResult(emptyMap(), conflictNodes, NodeNameCollisionType.MOVE)
+            NodeNameCollisionsResult(emptyMap(), conflictNodes, NodeNameCollisionType.MOVE)
         val actionResult = NodeNameCollisionWithActionResult(collisionResult)
 
         assertThat(actionResult.firstChatNodeCollisionOrNull).isInstanceOf(NodeNameCollision.Chat::class.java)

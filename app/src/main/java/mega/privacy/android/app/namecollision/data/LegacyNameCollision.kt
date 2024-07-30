@@ -22,7 +22,7 @@ import java.io.Serializable
  * @constructor Create empty Name collision
  */
 @Deprecated("Use domain's NodeNameCollision")
-sealed class NameCollision : Serializable {
+sealed class LegacyNameCollision : Serializable {
     abstract val collisionHandle: Long
     abstract val name: String
     abstract val size: Long?
@@ -56,15 +56,15 @@ sealed class NameCollision : Serializable {
         override val lastModified: Long,
         override val parentHandle: Long?,
         override val isFile: Boolean = true,
-    ) : NameCollision() {
+    ) : LegacyNameCollision() {
 
         companion object {
 
             /**
-             * Gets a [NameCollision.Upload] from a [File].
+             * Gets a [LegacyNameCollision.Upload] from a [File].
              *
              * @param collisionHandle   The node handle with which there is a name collision.
-             * @param file              The file from which the [NameCollision.Upload] will be get.
+             * @param file              The file from which the [LegacyNameCollision.Upload] will be get.
              * @param parentHandle      The parent handle of the node in which the file has to be uploaded.
              */
             @JvmStatic
@@ -85,10 +85,10 @@ sealed class NameCollision : Serializable {
                 )
 
             /**
-             * Gets a [NameCollision.Upload] from a [ShareInfo].
+             * Gets a [LegacyNameCollision.Upload] from a [ShareInfo].
              *
              * @param collisionHandle   The node handle with which there is a name collision.
-             * @param shareInfo         The file from which the [NameCollision.Upload] will be get.
+             * @param shareInfo         The file from which the [LegacyNameCollision.Upload] will be get.
              * @param parentHandle      The parent handle of the node in which the file has to be uploaded.
              */
             @JvmStatic
@@ -108,7 +108,7 @@ sealed class NameCollision : Serializable {
             /**
              * Get upload collision
              *
-             * @param collision The [FileNameCollision] from which the [NameCollision.Upload] will be get.
+             * @param collision The [FileNameCollision] from which the [LegacyNameCollision.Upload] will be get.
              * @return
              */
             @JvmStatic
@@ -154,15 +154,15 @@ sealed class NameCollision : Serializable {
         override val parentHandle: Long,
         override val isFile: Boolean,
         val serializedNode: String? = null,
-    ) : NameCollision() {
+    ) : LegacyNameCollision() {
 
         companion object {
 
             /**
-             * Gets a [NameCollision.Copy] from a [MegaNode].
+             * Gets a [LegacyNameCollision.Copy] from a [MegaNode].
              *
              * @param collisionHandle   The node handle with which there is a name collision.
-             * @param node              The node from which the [NameCollision.Copy] will be get.
+             * @param node              The node from which the [LegacyNameCollision.Copy] will be get.
              * @param parentHandle      The parent handle of the node in which the file has to be copied.
              */
             @JvmStatic
@@ -187,7 +187,7 @@ sealed class NameCollision : Serializable {
                 )
 
             /**
-             * Temporary mapper to create get [NameCollision] from domain module's [NodeNameCollision]
+             * Temporary mapper to create get [LegacyNameCollision] from domain module's [NodeNameCollision]
              * Should be removed when [GetNameCollisionResultUseCase] is refactored
              */
             @JvmStatic
@@ -236,18 +236,18 @@ sealed class NameCollision : Serializable {
         override val lastModified: Long,
         override val parentHandle: Long,
         override val isFile: Boolean = true,
-    ) : NameCollision() {
+    ) : LegacyNameCollision() {
 
         companion object {
 
             /**
-             * Gets a [NameCollision.Import] from a [MegaNode].
+             * Gets a [LegacyNameCollision.Import] from a [MegaNode].
              *
              * @param collisionHandle   The node handle with which there is a name collision.
              * @property nodeHandle     The node handle of the node to import.
              * @property chatId         The chat identifier where is the node to import.
              * @property messageId      The message identifier where is the node to import.
-             * @param node              The node from which the [NameCollision.Import] will be get.
+             * @param node              The node from which the [LegacyNameCollision.Import] will be get.
              * @param parentHandle      The parent handle of the node in which the file has to be copied.
              */
             @JvmStatic
@@ -270,7 +270,7 @@ sealed class NameCollision : Serializable {
                 )
 
             /**
-             * Temporary mapper to create a [NameCollision] from domain module's [NodeNameCollision]
+             * Temporary mapper to create a [LegacyNameCollision] from domain module's [NodeNameCollision]
              * Should be removed when [GetNameCollisionResultUseCase] is refactored
              */
             @JvmStatic
@@ -316,15 +316,15 @@ sealed class NameCollision : Serializable {
         override val lastModified: Long,
         override val parentHandle: Long,
         override val isFile: Boolean,
-    ) : NameCollision() {
+    ) : LegacyNameCollision() {
 
         companion object {
 
             /**
-             * Gets a [NameCollision.Movement] from a [MegaNode].
+             * Gets a [LegacyNameCollision.Movement] from a [MegaNode].
              *
              * @param collisionHandle   The node handle with which there is a name collision.
-             * @param node              The node from which the [NameCollision.Movement] will be get.
+             * @param node              The node from which the [LegacyNameCollision.Movement] will be get.
              * @param parentHandle      The parent handle of the node in which the file has to be moved.
              */
             @JvmStatic
@@ -347,7 +347,7 @@ sealed class NameCollision : Serializable {
             )
 
             /**
-             * Temporary mapper to create a [NameCollision] from domain module's [NodeNameCollision]
+             * Temporary mapper to create a [LegacyNameCollision] from domain module's [NodeNameCollision]
              * Should be removed when [GetNameCollisionResultUseCase] is refactored
              */
             @JvmStatic
@@ -369,31 +369,31 @@ sealed class NameCollision : Serializable {
 }
 
 /**
- * Temporary mapper to create a [NameCollision.Import] from domain module's [NodeNameCollision]
+ * Temporary mapper to create a [LegacyNameCollision.Import] from domain module's [NodeNameCollision]
  * Should be removed when [GetNameCollisionResultUseCase] is refactored
  */
-fun NodeNameCollision.Chat.toLegacyImport() = NameCollision.Import.fromNodeNameCollision(this)
+fun NodeNameCollision.Chat.toLegacyImport() = LegacyNameCollision.Import.fromNodeNameCollision(this)
 
 /**
- * Temporary mapper to create a [NameCollision.Movement] from domain module's [NodeNameCollision]
+ * Temporary mapper to create a [LegacyNameCollision.Movement] from domain module's [NodeNameCollision]
  * Should be removed when [GetNameCollisionResultUseCase] is refactored
  */
-fun NodeNameCollision.toLegacyMove() = NameCollision.Movement.fromNodeNameCollision(this)
+fun NodeNameCollision.toLegacyMove() = LegacyNameCollision.Movement.fromNodeNameCollision(this)
 
 /**
- * Temporary mapper to create a [NameCollision.Copy] from domain module's [NodeNameCollision]
+ * Temporary mapper to create a [LegacyNameCollision.Copy] from domain module's [NodeNameCollision]
  * Should be removed when [GetNameCollisionResultUseCase] is refactored
  */
-fun NodeNameCollision.toLegacyCopy() = NameCollision.Copy.fromNodeNameCollision(this)
+fun NodeNameCollision.toLegacyCopy() = LegacyNameCollision.Copy.fromNodeNameCollision(this)
 
 
 /**
- * Temporary mapper to create a domain module's [mega.privacy.android.domain.entity.node.NameCollision] from app module's [NameCollision]
+ * Temporary mapper to create a domain module's [mega.privacy.android.domain.entity.node.NameCollision] from app module's [LegacyNameCollision]
  * Should be removed when all features are refactored
  */
-fun NameCollision.toDomainEntity(): mega.privacy.android.domain.entity.node.NameCollision =
+fun LegacyNameCollision.toDomainEntity(): mega.privacy.android.domain.entity.node.NameCollision =
     when (this) {
-        is NameCollision.Copy -> NodeNameCollision.Default(
+        is LegacyNameCollision.Copy -> NodeNameCollision.Default(
             collisionHandle = collisionHandle,
             nodeHandle = nodeHandle,
             name = name,
@@ -408,7 +408,7 @@ fun NameCollision.toDomainEntity(): mega.privacy.android.domain.entity.node.Name
             type = NodeNameCollisionType.COPY
         )
 
-        is NameCollision.Movement -> NodeNameCollision.Default(
+        is LegacyNameCollision.Movement -> NodeNameCollision.Default(
             collisionHandle = collisionHandle,
             nodeHandle = nodeHandle,
             name = name,
@@ -423,7 +423,7 @@ fun NameCollision.toDomainEntity(): mega.privacy.android.domain.entity.node.Name
             type = NodeNameCollisionType.MOVE
         )
 
-        is NameCollision.Import -> NodeNameCollision.Chat(
+        is LegacyNameCollision.Import -> NodeNameCollision.Chat(
             collisionHandle = collisionHandle,
             nodeHandle = nodeHandle,
             name = name,
@@ -439,7 +439,7 @@ fun NameCollision.toDomainEntity(): mega.privacy.android.domain.entity.node.Name
             messageId = messageId
         )
 
-        is NameCollision.Upload -> FileNameCollision(
+        is LegacyNameCollision.Upload -> FileNameCollision(
             collisionHandle = collisionHandle,
             name = name,
             size = size ?: 0L,

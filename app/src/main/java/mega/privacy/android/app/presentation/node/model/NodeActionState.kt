@@ -6,7 +6,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.ShareData
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
@@ -14,7 +14,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  *
  * @property selectedNodes Selected nodes
  * @property error Error
- * @property nodeNameCollisionResult Node name collision result
+ * @property nodeNameCollisionsResult Node name collision result
  * @property showForeignNodeDialog Show foreign node dialog
  * @property showQuotaDialog Show quota dialog
  * @property accessPermissionIcon Access permission icon
@@ -29,7 +29,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 data class NodeActionState(
     val selectedNodes: List<TypedNode> = emptyList(),
     val error: StateEventWithContent<Throwable> = consumed(),
-    val nodeNameCollisionResult: StateEventWithContent<NodeNameCollisionResult> = consumed(),
+    val nodeNameCollisionsResult: StateEventWithContent<NodeNameCollisionsResult> = consumed(),
     val showForeignNodeDialog: StateEvent = consumed,
     val showQuotaDialog: StateEventWithContent<Boolean> = consumed(),
     val accessPermissionIcon: Int? = null,

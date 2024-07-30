@@ -7,7 +7,7 @@ import mega.privacy.android.app.presentation.node.view.ToolbarMenuItem
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.MoveRequestResult
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -29,7 +29,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property emptyState empty state to be shown on UI
  * @property toolbarMenuItems list of [ToolbarMenuItem] to be shown on toolbar
  * @property selectedNodes selected nodes
- * @property nodeNameCollisionResult result of node name collision
+ * @property nodeNameCollisionsResult result of node name collision
  * @property moveRequestResult result of move request
  * @property navigationLevel list of parent handles
  * @property resetScroll to reset scroll position
@@ -51,7 +51,7 @@ data class SearchActivityState(
     val emptyState: Pair<Int, String>? = null,
     val toolbarMenuItems: List<ToolbarMenuItem> = emptyList(),
     val nodeSourceType: NodeSourceType = NodeSourceType.OTHER,
-    val nodeNameCollisionResult: NodeNameCollisionResult? = null,
+    val nodeNameCollisionsResult: NodeNameCollisionsResult? = null,
     val moveRequestResult: Result<MoveRequestResult>? = null,
     val navigationLevel: List<Pair<Long, String>> = emptyList(),
     val resetScroll: Boolean = false,

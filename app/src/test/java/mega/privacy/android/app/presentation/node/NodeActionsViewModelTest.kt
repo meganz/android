@@ -32,7 +32,7 @@ import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -145,7 +145,7 @@ class NodeActionsViewModelTest {
                 type = NodeNameCollisionType.MOVE,
             ),
         ).thenReturn(
-            NodeNameCollisionResult(
+            NodeNameCollisionsResult(
                 noConflictNodes = emptyMap(),
                 conflictNodes = emptyMap(),
                 type = NodeNameCollisionType.MOVE
@@ -159,14 +159,14 @@ class NodeActionsViewModelTest {
         )
         viewModel.state.test {
             val stateOne = awaitItem()
-            Truth.assertThat(stateOne.nodeNameCollisionResult).isInstanceOf(
+            Truth.assertThat(stateOne.nodeNameCollisionsResult).isInstanceOf(
                 StateEventWithContentTriggered::class.java
             )
         }
         viewModel.markHandleNodeNameCollisionResult()
         viewModel.state.test {
             val stateTwo = awaitItem()
-            Truth.assertThat(stateTwo.nodeNameCollisionResult).isInstanceOf(
+            Truth.assertThat(stateTwo.nodeNameCollisionsResult).isInstanceOf(
                 StateEventWithContentConsumed::class.java
             )
         }

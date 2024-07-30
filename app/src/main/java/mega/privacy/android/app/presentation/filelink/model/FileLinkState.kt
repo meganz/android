@@ -4,7 +4,7 @@ import android.content.Intent
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -47,7 +47,7 @@ data class FileLinkState(
     val serializedData: String? = null,
     val iconResource: Int? = null,
     val askForDecryptionDialog: Boolean = false,
-    val collision: NameCollision? = null,
+    val collision: LegacyNameCollision? = null,
     val copySuccess: Boolean = false,
     val fetchPublicNodeError: PublicNodeException? = null,
     val jobInProgressState: FileLinkJobInProgressState? = FileLinkJobInProgressState.InitialLoading,

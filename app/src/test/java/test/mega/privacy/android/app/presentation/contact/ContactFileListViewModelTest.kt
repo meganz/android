@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -132,7 +132,7 @@ internal class ContactFileListViewModelTest {
     fun `test that moveRequestResult updated correctly when calling copyOrMoveNodes failed`(type: NodeNameCollisionType) =
         runTest {
             initTestClass()
-            val nameCollisionResult = NodeNameCollisionResult(
+            val nameCollisionResult = NodeNameCollisionsResult(
                 noConflictNodes = mapOf(pair = Pair(1L, 100L)),
                 conflictNodes = mapOf(Pair(2L, nodeNameCollision)),
                 type = type
@@ -176,7 +176,7 @@ internal class ContactFileListViewModelTest {
             whenever(
                 copyNodesUseCase(mapOf(Pair(1L, 100L)))
             ).thenReturn(result)
-            val nameCollisionResult = NodeNameCollisionResult(
+            val nameCollisionResult = NodeNameCollisionsResult(
                 noConflictNodes = mapOf(pair = Pair(1L, 100L)),
                 conflictNodes = mapOf(Pair(2L, nodeNameCollision)),
                 type = type
@@ -206,7 +206,7 @@ internal class ContactFileListViewModelTest {
     ) =
         runTest {
             initTestClass()
-            val nameCollisionResult = NodeNameCollisionResult(
+            val nameCollisionResult = NodeNameCollisionsResult(
                 noConflictNodes = mapOf(pair = Pair(1L, 100L)),
                 conflictNodes = mapOf(Pair(2L, nodeNameCollision)),
                 type = type
@@ -240,7 +240,7 @@ internal class ContactFileListViewModelTest {
             initTestClass()
             val result = mock<MoveRequestResult.GeneralMovement>()
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
-            val nameCollisionResult = NodeNameCollisionResult(
+            val nameCollisionResult = NodeNameCollisionsResult(
                 noConflictNodes = mapOf(pair = Pair(1L, 100L)),
                 conflictNodes = mapOf(Pair(2L, nodeNameCollision)),
                 type = type

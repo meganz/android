@@ -57,7 +57,7 @@ import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -1053,7 +1053,7 @@ class ManagerViewModelTest {
                 on { handle }.thenReturn(1L)
                 on { restoreHandle }.thenReturn(100L)
             }
-            val result = mock<NodeNameCollisionResult>()
+            val result = mock<NodeNameCollisionsResult>()
             whenever(
                 checkNodesNameCollisionUseCase(
                     mapOf(node.handle to node.restoreHandle),
@@ -1066,7 +1066,7 @@ class ManagerViewModelTest {
                 assertThat(state.restoreNodeResult).isNull()
                 underTest.checkRestoreNodesNameCollision(listOf(node))
                 val updatedState = awaitItem()
-                assertThat(updatedState.nodeNameCollisionResult).isNotNull()
+                assertThat(updatedState.nodeNameCollisionsResult).isNotNull()
             }
         }
 
@@ -1130,7 +1130,7 @@ class ManagerViewModelTest {
             testScheduler.advanceUntilIdle()
             val nodes = listOf(1L, 2L)
             val targetNode = 100L
-            val result = mock<NodeNameCollisionResult>()
+            val result = mock<NodeNameCollisionsResult>()
             whenever(
                 checkNodesNameCollisionUseCase(
                     mapOf(1L to 100L, 2L to 100L),
@@ -1140,10 +1140,10 @@ class ManagerViewModelTest {
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.nodeNameCollisionResult).isNull()
+                assertThat(state.nodeNameCollisionsResult).isNull()
                 underTest.checkNodesNameCollision(nodes, targetNode, NodeNameCollisionType.MOVE)
                 val updatedState = awaitItem()
-                assertThat(updatedState.nodeNameCollisionResult).isNotNull()
+                assertThat(updatedState.nodeNameCollisionsResult).isNotNull()
             }
         }
 

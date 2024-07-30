@@ -8,7 +8,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -96,7 +96,7 @@ class NodeAttachmentHistoryViewModelTest {
             val messageIds = mutableListOf(456L, 789L)
             val newNodeParent = 321L
             val result = NodeNameCollisionWithActionResult(
-                collisionResult = NodeNameCollisionResult(
+                collisionResult = NodeNameCollisionsResult(
                     conflictNodes = mapOf(
                         1L to NodeNameCollision.Chat(
                             collisionHandle = 1L,

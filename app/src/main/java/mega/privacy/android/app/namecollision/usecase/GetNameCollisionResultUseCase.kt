@@ -11,7 +11,7 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
 import mega.privacy.android.app.usecase.GetNodeUseCase
@@ -49,10 +49,10 @@ class GetNameCollisionResultUseCase @Inject constructor(
     /**
      * Gets all the required info for present a name collision.
      *
-     * @param collision [NameCollision] from which the complete info has to be get.
+     * @param collision [LegacyNameCollision] from which the complete info has to be get.
      * @return Flowable with the recovered info.
      */
-    fun get(collision: NameCollision): Flowable<NameCollisionResult> =
+    fun get(collision: LegacyNameCollision): Flowable<NameCollisionResult> =
         Flowable.create({ emitter ->
             val nameCollisionResult = NameCollisionResult(nameCollision = collision)
             val collisionNode = getNodeUseCase.get(collision.collisionHandle).blockingGetOrNull()
@@ -83,13 +83,13 @@ class GetNameCollisionResultUseCase @Inject constructor(
                 emitter.onNext(nameCollisionResult)
 
                 val handle = when {
-                    collision is NameCollision.Copy && collision.isFile -> collision.nodeHandle
-                    collision is NameCollision.Movement && collision.isFile -> collision.nodeHandle
+                    collision is LegacyNameCollision.Copy && collision.isFile -> collision.nodeHandle
+                    collision is LegacyNameCollision.Movement && collision.isFile -> collision.nodeHandle
                     else -> null
                 }
 
                 val nodes =
-                    if (collision is NameCollision.Import) {
+                    if (collision is LegacyNameCollision.Import) {
                         getChatMessageUseCase.getChatNodes(collision.chatId, collision.messageId)
                             .blockingGetOrNull()
                     } else {
@@ -123,7 +123,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
                                 if (thumbnailRequests == 0) emitter.onComplete()
                             }
                     }
-                } else if (collision is NameCollision.Import) {
+                } else if (collision is LegacyNameCollision.Import) {
                     if (nodes != null) {
                         for (node in nodes) {
                             if (node.handle == collision.nodeHandle) {
@@ -179,10 +179,10 @@ class GetNameCollisionResultUseCase @Inject constructor(
     /**
      * Gets all the required info for present a list of name collisions.
      *
-     * @param collisions    List of [NameCollision] from which the complete info has to be get.
+     * @param collisions    List of [LegacyNameCollision] from which the complete info has to be get.
      * @return Flowable with the recovered info.
      */
-    fun get(collisions: List<NameCollision>): Flowable<MutableList<NameCollisionResult>> =
+    fun get(collisions: List<LegacyNameCollision>): Flowable<MutableList<NameCollisionResult>> =
         Flowable.create({ emitter ->
             val collisionsResult = mutableListOf<NameCollisionResult>()
             for ((i, collision) in collisions.withIndex()) {
@@ -208,17 +208,17 @@ class GetNameCollisionResultUseCase @Inject constructor(
         }, BackpressureStrategy.LATEST)
 
     /**
-     * Reorders a list of [NameCollision] for presenting first files, then folders.
+     * Reorders a list of [LegacyNameCollision] for presenting first files, then folders.
      *
      * @param collisions    List to reorder.
      * @return Single with the reordered list.
      */
     @Deprecated("Use ReorderNodeNameCollisionsUseCase")
-    fun reorder(collisions: List<NameCollision>): Single<Triple<MutableList<NameCollision>, Int, Int>> =
+    fun reorder(collisions: List<LegacyNameCollision>): Single<Triple<MutableList<LegacyNameCollision>, Int, Int>> =
         Single.create { emitter ->
-            val fileCollisions = mutableListOf<NameCollision>()
-            val folderCollisions = mutableListOf<NameCollision>()
-            val reorderedCollisions = mutableListOf<NameCollision>()
+            val fileCollisions = mutableListOf<LegacyNameCollision>()
+            val folderCollisions = mutableListOf<LegacyNameCollision>()
+            val reorderedCollisions = mutableListOf<LegacyNameCollision>()
 
             for (collision in collisions) {
                 if (collision.isFile) {
@@ -305,10 +305,10 @@ class GetNameCollisionResultUseCase @Inject constructor(
      * Gets the name for rename a collision item in case the user wants to rename it.
      * Before returning the new name, always check if there is another collision with it.
      *
-     * @param collision [NameCollision] from which the rename name has to be get.
+     * @param collision [LegacyNameCollision] from which the rename name has to be get.
      * @return Single with the rename name.
      */
-    private fun getRenameName(collision: NameCollision): Single<String> =
+    private fun getRenameName(collision: LegacyNameCollision): Single<String> =
         Single.create { emitter ->
             val parentNode =
                 if (collision.parentHandle == INVALID_HANDLE) megaApi.rootNode

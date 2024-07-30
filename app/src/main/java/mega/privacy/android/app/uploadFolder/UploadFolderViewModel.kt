@@ -27,7 +27,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -76,7 +76,7 @@ class UploadFolderViewModel @Inject constructor(
     private val currentFolder: MutableLiveData<FolderContent.Data> = MutableLiveData()
     private val folderItems: MutableLiveData<MutableList<FolderContent>> = MutableLiveData()
     private val selectedItems: MutableLiveData<MutableList<Int>> = MutableLiveData()
-    private val collisions: MutableLiveData<ArrayList<NameCollision>> = MutableLiveData()
+    private val collisions: MutableLiveData<ArrayList<LegacyNameCollision>> = MutableLiveData()
     private val actionResult: MutableLiveData<String?> = MutableLiveData()
 
     private lateinit var parentFolder: String
@@ -94,7 +94,7 @@ class UploadFolderViewModel @Inject constructor(
     fun getCurrentFolder(): LiveData<FolderContent.Data> = currentFolder
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
-    fun getCollisions(): LiveData<ArrayList<NameCollision>> = collisions
+    fun getCollisions(): LiveData<ArrayList<LegacyNameCollision>> = collisions
     fun onActionResult(): LiveData<String?> = actionResult
 
     /**
@@ -387,7 +387,7 @@ class UploadFolderViewModel @Inject constructor(
                 )
             }.onSuccess { fileCollisions ->
                 collisions.value = ArrayList(fileCollisions.map {
-                    NameCollision.Upload.getUploadCollision(it)
+                    LegacyNameCollision.Upload.getUploadCollision(it)
                 })
                 pendingUploads.addAll(files)
             }.onFailure {

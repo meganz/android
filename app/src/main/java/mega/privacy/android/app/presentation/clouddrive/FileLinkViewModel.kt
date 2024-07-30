@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
@@ -218,7 +218,7 @@ class FileLinkViewModel @Inject constructor(
             if (result.noConflictNodes.isNotEmpty()) {
                 copy(targetHandle)
             } else if (result.conflictNodes.isNotEmpty()) {
-                val collision = NameCollision.Copy.fromNodeNameCollision(result.conflictNodes[0])
+                val collision = LegacyNameCollision.Copy.fromNodeNameCollision(result.conflictNodes[0])
                 _state.update {
                     it.copy(collision = collision, jobInProgressState = null)
                 }

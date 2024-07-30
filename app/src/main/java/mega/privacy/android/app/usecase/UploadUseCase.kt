@@ -10,7 +10,7 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
 import mega.privacy.android.app.presentation.extensions.getState
@@ -146,7 +146,7 @@ class UploadUseCase @Inject constructor(
     ): Completable =
         upload(
             context,
-            (collisionResult.nameCollision as NameCollision.Upload).absolutePath,
+            (collisionResult.nameCollision as LegacyNameCollision.Upload).absolutePath,
             if (rename) collisionResult.renameName!! else collisionResult.nameCollision.name,
             collisionResult.nameCollision.lastModified,
             collisionResult.nameCollision.parentHandle

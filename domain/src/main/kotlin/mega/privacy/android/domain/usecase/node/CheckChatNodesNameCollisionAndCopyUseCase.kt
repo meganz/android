@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -71,7 +71,7 @@ class CheckChatNodesNameCollisionAndCopyUseCase @Inject constructor(
             }
         }
 
-        val collisionResult = NodeNameCollisionResult(
+        val collisionResult = NodeNameCollisionsResult(
             noConflictNodes = noConflictNodes,
             conflictNodes = conflictNodes,
             type = NodeNameCollisionType.COPY

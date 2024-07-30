@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -285,7 +285,7 @@ class FolderLinkViewModel @Inject constructor(
             if (result.conflictNodes.isNotEmpty()) {
                 _state.update {
                     it.copy(collisions = result.conflictNodes.values.map { item ->
-                        NameCollision.Copy.fromNodeNameCollision(item)
+                        LegacyNameCollision.Copy.fromNodeNameCollision(item)
                     })
                 }
             }

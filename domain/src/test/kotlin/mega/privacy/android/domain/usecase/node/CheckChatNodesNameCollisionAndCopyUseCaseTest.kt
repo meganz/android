@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
@@ -78,7 +78,7 @@ internal class CheckChatNodesNameCollisionAndCopyUseCaseTest {
             whenever(getChatFileUseCase(1, 2, 0)).thenReturn(chatNode)
             whenever(getRootNodeUseCase()).thenReturn(null)
             assertThat(underTest(1, listOf(2), newNodeParent).collisionResult).isEqualTo(
-                NodeNameCollisionResult(
+                NodeNameCollisionsResult(
                     mapOf(123L to INVALID_NODE_HANDLE),
                     emptyMap(),
                     NodeNameCollisionType.COPY
@@ -102,7 +102,7 @@ internal class CheckChatNodesNameCollisionAndCopyUseCaseTest {
             val result = underTest(1, listOf(2), newNodeParent)
 
             assertThat(result.collisionResult).isEqualTo(
-                NodeNameCollisionResult(
+                NodeNameCollisionsResult(
                     mapOf(123L to 456L),
                     emptyMap(),
                     NodeNameCollisionType.COPY
@@ -146,7 +146,7 @@ internal class CheckChatNodesNameCollisionAndCopyUseCaseTest {
             val result = underTest(1, listOf(2, 3), newNodeParent)
 
             assertThat(result.collisionResult).isEqualTo(
-                NodeNameCollisionResult(
+                NodeNameCollisionsResult(
                     noConflictNodes = mapOf(123L to 456L),
                     conflictNodes = mapOf(
                         345L to NodeNameCollision.Chat(

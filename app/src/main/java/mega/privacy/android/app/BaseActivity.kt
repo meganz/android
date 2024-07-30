@@ -55,7 +55,7 @@ import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
@@ -214,7 +214,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     lateinit var pauseAllTransfersUseCase: PauseAllTransfersUseCase
 
     @JvmField
-    var nameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollision>>? = null
+    var nameCollisionActivityContract: ActivityResultLauncher<ArrayList<LegacyNameCollision>>? = null
     protected val billingViewModel by viewModels<BillingViewModel>()
     protected val adsViewModel: AdsViewModel by viewModels()
     private val viewModel by viewModels<BaseViewModel>()

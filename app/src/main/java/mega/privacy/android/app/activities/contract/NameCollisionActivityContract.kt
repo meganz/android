@@ -7,15 +7,15 @@ import androidx.activity.result.contract.ActivityResultContract
 import mega.privacy.android.app.namecollision.NameCollisionActivity.Companion.MESSAGE_RESULT
 import mega.privacy.android.app.namecollision.NameCollisionActivity.Companion.getIntentForList
 import mega.privacy.android.app.namecollision.NameCollisionActivity.Companion.getIntentForSingleItem
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 
 /**
  * A contract to start NameCollisionActivity and manage its result.
  */
-class NameCollisionActivityContract : ActivityResultContract<ArrayList<NameCollision>, String?>() {
+class NameCollisionActivityContract : ActivityResultContract<ArrayList<LegacyNameCollision>, String?>() {
 
     @Suppress("UNCHECKED_CAST")
-    override fun createIntent(context: Context, input: ArrayList<NameCollision>): Intent =
+    override fun createIntent(context: Context, input: ArrayList<LegacyNameCollision>): Intent =
         if (input.size == 1) {
             getIntentForSingleItem(context, input[0])
         } else {

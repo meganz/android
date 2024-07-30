@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.contactinfo.model
 
 import android.graphics.Bitmap
 import mega.privacy.android.app.R
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -62,7 +62,7 @@ data class ContactInfoUiState(
     val isStorageOverQuota: Boolean = false,
     val isNodeUpdated: Boolean = false,
     val isCopyInProgress: Boolean = false,
-    val nameCollisions: List<NameCollision> = emptyList(),
+    val nameCollisions: List<LegacyNameCollision> = emptyList(),
     val copyError: Throwable? = null,
     val inShares: List<UnTypedNode> = emptyList(),
     val shouldInitiateCall: Boolean = false,

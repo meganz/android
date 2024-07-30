@@ -30,7 +30,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.ExportListener
-import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.namecollision.data.toLegacyCopy
 import mega.privacy.android.app.namecollision.data.toLegacyImport
 import mega.privacy.android.app.namecollision.data.toLegacyMove
@@ -155,7 +155,7 @@ class TextEditorViewModel @Inject constructor(
     private val pagination: MutableLiveData<Pagination> = MutableLiveData()
     private val snackBarMessage = SingleLiveEvent<Int>()
     private val fatalError = SingleLiveEvent<Unit>()
-    private val collision = SingleLiveEvent<NameCollision>()
+    private val collision = SingleLiveEvent<LegacyNameCollision>()
     private val throwable = SingleLiveEvent<Throwable>()
 
     private var needsReadContent = false
@@ -194,7 +194,7 @@ class TextEditorViewModel @Inject constructor(
 
     fun onSnackBarMessage(): LiveData<Int> = snackBarMessage
 
-    fun getCollision(): LiveData<NameCollision> = collision
+    fun getCollision(): LiveData<LegacyNameCollision> = collision
 
     fun onExceptionThrown(): LiveData<Throwable> = throwable
 
@@ -651,7 +651,7 @@ class TextEditorViewModel @Inject constructor(
                 )
             }.onSuccess { fileCollisions ->
                 fileCollisions.map {
-                    NameCollision.Upload.getUploadCollision(it)
+                    LegacyNameCollision.Upload.getUploadCollision(it)
                 }.firstOrNull()?.let {
                     collision.value = it
                 } ?: uploadFile(activity, fromHome, tempFile, parentHandle)

@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.domain.entity.node.MultipleNodesRestoreResult
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -51,7 +51,7 @@ class CheckNodesNameCollisionWithActionUseCaseTest {
             val nodes = mapOf(1L to 2L)
             val noConflictNodes = mapOf(1L to 2L)
             whenever(checkNodesNameCollisionUseCase(nodes, NodeNameCollisionType.COPY)).thenReturn(
-                NodeNameCollisionResult(
+                NodeNameCollisionsResult(
                     noConflictNodes = noConflictNodes,
                     conflictNodes = emptyMap(),
                     type = NodeNameCollisionType.COPY
@@ -70,7 +70,7 @@ class CheckNodesNameCollisionWithActionUseCaseTest {
             val nodes = mapOf(1L to 2L)
             val noConflictNodes = mapOf(1L to 2L)
             whenever(checkNodesNameCollisionUseCase(nodes, NodeNameCollisionType.MOVE)).thenReturn(
-                NodeNameCollisionResult(
+                NodeNameCollisionsResult(
                     noConflictNodes = noConflictNodes,
                     conflictNodes = emptyMap(),
                     type = NodeNameCollisionType.MOVE
@@ -94,7 +94,7 @@ class CheckNodesNameCollisionWithActionUseCaseTest {
                     NodeNameCollisionType.RESTORE
                 )
             ).thenReturn(
-                NodeNameCollisionResult(
+                NodeNameCollisionsResult(
                     noConflictNodes = noConflictNodes,
                     conflictNodes = emptyMap(),
                     type = NodeNameCollisionType.RESTORE
@@ -118,7 +118,7 @@ class CheckNodesNameCollisionWithActionUseCaseTest {
                     NodeNameCollisionType.COPY
                 )
             ).thenReturn(
-                NodeNameCollisionResult(
+                NodeNameCollisionsResult(
                     noConflictNodes = emptyMap(),
                     conflictNodes = mapOf(1L to mock<NodeNameCollision.Default>()),
                     type = NodeNameCollisionType.COPY

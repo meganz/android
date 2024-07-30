@@ -6,7 +6,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.node.view.BottomSheetMenuItem
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @property node
  * @property actions
  * @property error
- * @property nodeNameCollisionResult
+ * @property nodeNameCollisionsResult
  * @property showForeignNodeDialog
  * @property showQuotaDialog
  * @property accessPermissionIcon
@@ -32,7 +32,7 @@ data class NodeBottomSheetState(
     val node: TypedNode? = null,
     val actions: List<BottomSheetMenuItem> = emptyList(),
     val error: StateEventWithContent<Throwable> = consumed(),
-    val nodeNameCollisionResult: StateEventWithContent<NodeNameCollisionResult> = consumed(),
+    val nodeNameCollisionsResult: StateEventWithContent<NodeNameCollisionsResult> = consumed(),
     val showForeignNodeDialog: StateEvent = consumed,
     val showQuotaDialog: StateEventWithContent<Boolean> = consumed(),
     val accessPermissionIcon: Int? = null,
