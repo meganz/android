@@ -15,7 +15,6 @@ data class ImagePreviewState(
     val isCurrentImageNodeAvailableOffline: Boolean = false,
     val showAppBar: Boolean = true,
     val inFullScreenMode: Boolean = false,
-    val transferMessage: String = "",
     val resultMessage: String = "",
     val copyMoveException: Throwable? = null,
     val nameCollision: LegacyNameCollision? = null,

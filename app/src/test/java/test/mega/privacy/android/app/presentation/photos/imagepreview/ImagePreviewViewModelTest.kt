@@ -46,7 +46,6 @@ import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -72,7 +71,6 @@ class ImagePreviewViewModelTest {
     private val addImageTypeUseCase: AddImageTypeUseCase = mock()
     private val getImageUseCase: GetImageUseCase = mock()
     private val getImageFromFileUseCase: GetImageFromFileUseCase = mock()
-    private val areTransfersPausedUseCase: AreTransfersPausedUseCase = mock()
     private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase =
         mock()
     private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase =
@@ -110,7 +108,6 @@ class ImagePreviewViewModelTest {
         addImageTypeUseCase,
         getImageUseCase,
         getImageFromFileUseCase,
-        areTransfersPausedUseCase,
         checkNodesNameCollisionWithActionUseCase,
         checkChatNodesNameCollisionAndCopyUseCase,
         addFavouritesUseCase,
@@ -142,7 +139,6 @@ class ImagePreviewViewModelTest {
             addImageTypeUseCase = addImageTypeUseCase,
             getImageUseCase = getImageUseCase,
             getImageFromFileUseCase = getImageFromFileUseCase,
-            areTransfersPausedUseCase = areTransfersPausedUseCase,
             checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             checkNodesNameCollisionWithActionUseCase = checkNodesNameCollisionWithActionUseCase,
             addFavouritesUseCase = addFavouritesUseCase,

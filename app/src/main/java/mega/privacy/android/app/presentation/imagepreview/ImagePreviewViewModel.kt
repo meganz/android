@@ -66,7 +66,6 @@ import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -83,7 +82,6 @@ class ImagePreviewViewModel @Inject constructor(
     private val addImageTypeUseCase: AddImageTypeUseCase,
     private val getImageUseCase: GetImageUseCase,
     private val getImageFromFileUseCase: GetImageFromFileUseCase,
-    private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
     private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase,
     private val addFavouritesUseCase: AddFavouritesUseCase,
@@ -417,12 +415,6 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
-    fun setTransferMessage(message: String) {
-        _state.update { it.copy(transferMessage = message) }
-    }
-
-    fun clearTransferMessage() = _state.update { it.copy(transferMessage = "") }
-
     fun setResultMessage(message: String) =
         _state.update { it.copy(resultMessage = message) }
 
@@ -439,19 +431,15 @@ class ImagePreviewViewModel @Inject constructor(
     /**
      * Check if transfers are paused.
      */
-    fun executeTransfer(transferMessage: String, downloadForPreview: Boolean = false) {
+    fun executeTransfer(downloadForPreview: Boolean = false) {
         viewModelScope.launch {
-            if (areTransfersPausedUseCase()) {
-                setTransferMessage(transferMessage)
-            } else {
-                triggerDownloadEvent(
-                    imageNode = _state.value.currentImageNode,
-                ) {
-                    if (downloadForPreview) {
-                        TransferTriggerEvent.StartDownloadForPreview(it)
-                    } else {
-                        TransferTriggerEvent.StartDownloadNode(listOf(it))
-                    }
+            triggerDownloadEvent(
+                imageNode = _state.value.currentImageNode,
+            ) {
+                if (downloadForPreview) {
+                    TransferTriggerEvent.StartDownloadForPreview(it)
+                } else {
+                    TransferTriggerEvent.StartDownloadNode(listOf(it))
                 }
             }
         }

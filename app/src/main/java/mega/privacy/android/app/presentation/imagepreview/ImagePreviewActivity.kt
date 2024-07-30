@@ -232,9 +232,9 @@ class ImagePreviewActivity : BaseActivity() {
         )
     }
 
-    private fun saveNodeToDevice(imageNode: ImageNode) {
+    private fun saveNodeToDevice() {
         Analytics.tracker.trackEvent(PhotoPreviewSaveToDeviceMenuToolbarEvent)
-        viewModel.executeTransfer(transferMessage = getString(R.string.resume_paused_transfers_text))
+        viewModel.executeTransfer()
     }
 
     private fun importNode(imageNode: ImageNode) {
@@ -366,10 +366,7 @@ class ImagePreviewActivity : BaseActivity() {
      *
      */
     private fun saveNodeByOpenWith() {
-        viewModel.executeTransfer(
-            transferMessage = getString(R.string.resume_paused_transfers_text),
-            downloadForPreview = true,
-        )
+        viewModel.executeTransfer(downloadForPreview = true)
     }
 
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {

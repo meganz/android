@@ -109,7 +109,7 @@ internal fun ImagePreviewScreen(
     onClickFavourite: (ImageNode) -> Unit = {},
     onClickLabel: (ImageNode) -> Unit = {},
     onClickOpenWith: (ImageNode) -> Unit = {},
-    onClickSaveToDevice: (ImageNode) -> Unit = {},
+    onClickSaveToDevice: () -> Unit = {},
     onClickImport: (ImageNode) -> Unit = {},
     onSwitchAvailableOffline: ((checked: Boolean, ImageNode) -> Unit)? = null,
     onClickGetLink: (ImageNode) -> Unit = {},
@@ -181,15 +181,6 @@ internal fun ImagePreviewScreen(
                     viewModel.setCurrentImageNode(it)
                     viewModel.setCurrentImageNodeAvailableOffline(it)
                 }
-            }
-        }
-
-        if (viewState.transferMessage.isNotEmpty()) {
-            LaunchedEffect(Unit) {
-                scaffoldState.snackbarHostState.showSnackbar(
-                    message = viewState.transferMessage,
-                )
-                viewModel.clearTransferMessage()
             }
         }
 
@@ -324,7 +315,7 @@ internal fun ImagePreviewScreen(
                                 onClickBack = onClickBack,
                                 onClickSlideshow = onClickSlideshow,
                                 onClickForward = { onClickSendTo(imageNode) },
-                                onClickSaveToDevice = { onClickSaveToDevice(imageNode) },
+                                onClickSaveToDevice = onClickSaveToDevice,
                                 onClickGetLink = { onClickGetLink(imageNode) },
                                 onClickMagnifier = {
                                     coroutineScope.launch {
@@ -414,7 +405,7 @@ internal fun ImagePreviewScreen(
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickSaveToDevice = {
-                        onClickSaveToDevice(currentImageNode)
+                        onClickSaveToDevice()
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickImport = {
