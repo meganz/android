@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">Не удалось прочитать расположение синхронизации. Убедитесь, что расположение папки доступно и предоставлены права доступа к нему.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Произошла неизвестная ошибка. Обратитесь в поддержку.</string>
+    <string name="general_sync_message_unknown_error">Произошла неизвестная ошибка. Напишите на support@mega.nz.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
