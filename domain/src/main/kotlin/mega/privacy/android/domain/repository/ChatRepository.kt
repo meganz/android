@@ -596,21 +596,6 @@ interface ChatRepository {
     suspend fun getPendingMessages(chatId: Long): List<PendingMessage>
 
     /**
-     * Updates a pending message.
-     *
-     * @param idMessage   Identifier of the pending message.
-     * @param transferTag Identifier of the transfer.
-     * @param nodeHandle  Handle of the node already uploaded.
-     * @param state       State of the pending message.
-     */
-    suspend fun updatePendingMessage(
-        idMessage: Long,
-        transferTag: Int,
-        nodeHandle: String?,
-        state: Int,
-    )
-
-    /**
      * Create Ephemeral++ account
      *
      * This kind of account allows to join chat links and to keep the session in the device

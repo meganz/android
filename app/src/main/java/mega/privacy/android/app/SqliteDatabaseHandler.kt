@@ -12,10 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.logging.LegacyLoggingSettings
-import mega.privacy.android.app.main.megachat.ChatItemPreferences
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.LegacyDatabaseMigration
@@ -29,7 +26,6 @@ import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.chat.PendingMessage
@@ -42,8 +38,6 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
-import java.io.File
-import java.util.Locale
 import javax.inject.Inject
 
 
@@ -499,19 +493,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun setChatItemPreferences(chatPrefs: ChatItemPreferences) {
-        val values = ContentValues().apply {
-            put(KEY_CHAT_HANDLE, encrypt(chatPrefs.chatHandle))
-            put(KEY_CHAT_ITEM_NOTIFICATIONS, "")
-            put(KEY_CHAT_ITEM_RINGTONE, "")
-            put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, "")
-            put(KEY_CHAT_ITEM_WRITTEN_TEXT, encrypt(chatPrefs.writtenText))
-            put(KEY_CHAT_ITEM_EDITED_MSG_ID, encrypt(chatPrefs.editedMsgId))
-        }
-
-        writableDatabase.insert(TABLE_CHAT_ITEMS, SQLiteDatabase.CONFLICT_NONE, values)
-    }
-
     override fun setWrittenTextItem(handle: String?, text: String?, editedMsgId: String?): Int {
         Timber.d("setWrittenTextItem: %s %s", text, handle)
         val values = ContentValues().apply {
@@ -529,30 +510,6 @@ class SqliteDatabaseHandler @Inject constructor(
             "$KEY_CHAT_HANDLE = '${encrypt(handle)}'",
             emptyArray()
         )
-    }
-
-    override fun findChatPreferencesByHandle(handle: String?): ChatItemPreferences? {
-        Timber.d("findChatPreferencesByHandle: %s", handle)
-        var prefs: ChatItemPreferences?
-        val selectQuery =
-            "SELECT * FROM $TABLE_CHAT_ITEMS WHERE $KEY_CHAT_HANDLE = '${encrypt(handle)}'"
-        Timber.d("QUERY: %s", selectQuery)
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val chatHandle = decrypt(cursor.getString(1))
-                    val writtenText = decrypt(cursor.getString(5))
-                    val editedMsg = decrypt(cursor.getString(6))
-                    prefs = if (!TextUtil.isTextEmpty(editedMsg))
-                        ChatItemPreferences(chatHandle, writtenText, editedMsg)
-                    else ChatItemPreferences(chatHandle, writtenText)
-                    return prefs
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return null
     }
 
     /**
@@ -847,76 +804,6 @@ class SqliteDatabaseHandler @Inject constructor(
     override fun findContactByEmail(mail: String?): Contact? =
         runBlocking { megaLocalRoomGateway.getContactByEmail(mail) }
 
-    override fun setOfflineFile(offline: MegaOffline): Long {
-        Timber.d("setOfflineFile: %s", offline.handle)
-        val values = ContentValues()
-        val checkInsert: MegaOffline? = findByHandle(offline.handle)
-        if (checkInsert == null) {
-            values.put(KEY_OFF_HANDLE, encrypt(offline.handle))
-            values.put(KEY_OFF_PATH, encrypt(offline.path))
-            values.put(KEY_OFF_NAME, encrypt(offline.name))
-            values.put(KEY_OFF_PARENT, offline.parentId)
-            values.put(KEY_OFF_TYPE, encrypt(offline.type))
-            values.put(KEY_OFF_INCOMING, offline.origin)
-            values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.handleIncoming))
-            values.put(KEY_OFF_LAST_MODIFIED_TIME, System.currentTimeMillis())
-            return writableDatabase.insert(TABLE_OFFLINE, SQLiteDatabase.CONFLICT_NONE, values)
-        }
-        return -1
-    }
-
-    override fun setOfflineFileOld(offline: MegaOffline): Long {
-        val values = ContentValues()
-        val checkInsert: MegaOffline? = findByHandle(offline.handle)
-        if (checkInsert == null) {
-            values.put(KEY_OFF_HANDLE, offline.handle)
-            values.put(KEY_OFF_PATH, offline.path)
-            values.put(KEY_OFF_NAME, offline.name)
-            values.put(KEY_OFF_PARENT, offline.parentId)
-            values.put(KEY_OFF_TYPE, offline.type)
-            values.put(KEY_OFF_INCOMING, offline.origin)
-            values.put(KEY_OFF_HANDLE_INCOMING, offline.handleIncoming)
-            return writableDatabase.insert(TABLE_OFFLINE, SQLiteDatabase.CONFLICT_NONE, values)
-        }
-        return -1
-    }
-
-    override val offlineFiles: ArrayList<MegaOffline>
-        get() {
-            val listOffline = ArrayList<MegaOffline>()
-            val selectQuery = "SELECT * FROM $TABLE_OFFLINE"
-            try {
-                readableDatabase.query(selectQuery).use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        do {
-                            val id = cursor.getString(0).toInt()
-                            val handle = decrypt(cursor.getString(1))
-                            val path = decrypt(cursor.getString(2))
-                            val name = decrypt(cursor.getString(3))
-                            val parent = cursor.getInt(4)
-                            val type = decrypt(cursor.getString(5))
-                            val incoming = cursor.getInt(6)
-                            val handleIncoming = decrypt(cursor.getString(7))
-                            val offline = MegaOffline(
-                                id,
-                                handle.toString(),
-                                path.toString(),
-                                name.toString(),
-                                parent,
-                                type,
-                                incoming,
-                                handleIncoming.toString()
-                            )
-                            listOffline.add(offline)
-                        } while (cursor.moveToNext())
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return listOffline
-        }
-
     override fun exists(handle: Long): Boolean {
         //Get the foreign key of the node
         val selectQuery =
@@ -1050,90 +937,6 @@ class SqliteDatabaseHandler @Inject constructor(
 
     override fun removeById(id: Int): Int {
         return writableDatabase.delete(TABLE_OFFLINE, "$KEY_ID=$id", emptyArray())
-    }
-
-    override fun findByPath(path: String?): ArrayList<MegaOffline> {
-        val listOffline = ArrayList<MegaOffline>()
-        //Get the foreign key of the node
-        val selectQuery =
-            "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_PATH = '${encrypt(path)}'"
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    do {
-                        val _id = cursor.getString(0).toInt()
-                        val _handle = decrypt(cursor.getString(1))
-                        val _path = decrypt(cursor.getString(2))
-                        val _name = decrypt(cursor.getString(3))
-                        val _parent = cursor.getInt(4)
-                        val _type = decrypt(cursor.getString(5))
-                        val _incoming = cursor.getInt(6)
-                        val _handleIncoming = decrypt(cursor.getString(7))
-                        listOffline.add(
-                            MegaOffline(
-                                _id,
-                                _handle.toString(),
-                                _path.toString(),
-                                _name.toString(),
-                                _parent,
-                                _type,
-                                _incoming,
-                                _handleIncoming.toString()
-                            )
-                        )
-                    } while (cursor.moveToNext())
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-            crashReporter.log("Exception loading offline node: ${e.message}")
-        }
-        return listOffline
-    }
-
-    override fun findbyPathAndName(path: String?, name: String?): MegaOffline? {
-        val selectQuery =
-            "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_PATH = '${encrypt(path)}'AND $KEY_OFF_NAME = '${
-                encrypt(name)
-            }'"
-        var offline: MegaOffline? = null
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    do {
-                        val _id = cursor.getString(0).toInt()
-                        val _handle = decrypt(cursor.getString(1))
-                        val _path = decrypt(cursor.getString(2))
-                        val _name = decrypt(cursor.getString(3))
-                        val _parent = cursor.getInt(4)
-                        val _type = decrypt(cursor.getString(5))
-                        val _incoming = cursor.getInt(6)
-                        val _handleIncoming = decrypt(cursor.getString(7))
-                        offline = MegaOffline(
-                            _id,
-                            _handle.toString(),
-                            _path.toString(),
-                            _name.toString(),
-                            _parent,
-                            _type,
-                            _incoming,
-                            _handleIncoming.toString()
-                        )
-                    } while (cursor.moveToNext())
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return offline
-    }
-
-    override fun deleteOfflineFile(mOff: MegaOffline): Int {
-        return writableDatabase.delete(
-            TABLE_OFFLINE,
-            "$KEY_OFF_HANDLE = ?",
-            arrayOf(encrypt(mOff.handle.toString()))
-        )
     }
 
     override fun setFirstTime(firstTime: Boolean) {
@@ -1919,93 +1722,6 @@ class SqliteDatabaseHandler @Inject constructor(
         legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
-    override fun clearOffline() {
-        writableDatabase.execSQL("DELETE TABLE IF EXISTS $TABLE_OFFLINE")
-    }
-
-    /**
-     * Adds a pending message.
-     *
-     * @param message Pending message to add.
-     * @param state   State of the pending message.
-     * @return The identifier of the pending message.
-     */
-    override fun addPendingMessage(message: PendingMessage): Long {
-        return addPendingMessage(message, PendingMessageState.PREPARING.value)
-    }
-
-    /**
-     * Adds a pending message.
-     *
-     * @param message Pending message to add.
-     * @return The identifier of the pending message.
-     */
-    override fun addPendingMessage(
-        message: PendingMessage,
-        state: Int,
-    ): Long {
-        val values = ContentValues()
-        values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(message.chatId.toString()))
-        values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(message.uploadTimestamp.toString()))
-        values.put(KEY_PENDING_MSG_FILE_PATH, encrypt(message.filePath))
-        values.put(KEY_PENDING_MSG_FINGERPRINT, encrypt(message.fingerprint))
-        values.put(KEY_PENDING_MSG_NAME, encrypt(message.name))
-        values.put(KEY_PENDING_MSG_TRANSFER_TAG, Constants.INVALID_ID)
-        values.put(KEY_PENDING_MSG_STATE, state)
-        return writableDatabase.insert(
-            TABLE_PENDING_MSG_SINGLE,
-            SQLiteDatabase.CONFLICT_NONE,
-            values
-        )
-    }
-
-    override fun findPendingMessageById(messageId: Long): PendingMessage? {
-        Timber.d("findPendingMessageById")
-        var pendMsg: PendingMessage? = null
-        val selectQuery =
-            "SELECT * FROM $TABLE_PENDING_MSG_SINGLE WHERE $KEY_ID ='$messageId'"
-        Timber.d("QUERY: %s", selectQuery)
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val chatId = decrypt(cursor.getString(1))!!.toLong()
-                    val timestamp = decrypt(cursor.getString(2))!!
-                        .toLong()
-                    val idKarereString = decrypt(cursor.getString(3))
-                    var idTempKarere: Long = -1
-                    if (idKarereString != null && !idKarereString.isEmpty()) {
-                        idTempKarere = idKarereString.toLong()
-                    }
-                    val filePath = decrypt(cursor.getString(4))
-                    val name = decrypt(cursor.getString(5))
-                    val nodeHandleString = decrypt(cursor.getString(6))
-                    var nodeHandle: Long = -1
-                    if (!nodeHandleString.isNullOrEmpty()) {
-                        nodeHandle = nodeHandleString.toLong()
-                    }
-                    val fingerPrint = decrypt(cursor.getString(7))
-                    val transferTag = cursor.getInt(8)
-                    val state = cursor.getInt(9)
-                    pendMsg = PendingMessage(
-                        messageId,
-                        chatId,
-                        timestamp,
-                        idTempKarere,
-                        filePath.orEmpty(),
-                        fingerPrint,
-                        name,
-                        nodeHandle,
-                        transferTag,
-                        state
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return pendMsg
-    }
-
     /**
      * Updates a pending message.
      *
@@ -2066,23 +1782,6 @@ class SqliteDatabaseHandler @Inject constructor(
         )
     }
 
-    override fun updatePendingMessageOnAttach(idMessage: Long, temporalId: String?, state: Int) {
-        val values = ContentValues()
-        Timber.d("ID of my pending message to update: %s", temporalId)
-        values.put(KEY_PENDING_MSG_TEMP_KARERE, encrypt(temporalId))
-        values.put(KEY_PENDING_MSG_STATE, state)
-        val where = "$KEY_ID=$idMessage"
-        val rows =
-            writableDatabase.update(
-                TABLE_PENDING_MSG_SINGLE,
-                SQLiteDatabase.CONFLICT_REPLACE,
-                values,
-                where,
-                emptyArray()
-            )
-        Timber.d("Rows updated: %s", rows)
-    }
-
     override fun findPendingMessagesNotSent(idChat: Long): ArrayList<AndroidMegaChatMessage> {
         Timber.d("findPendingMessagesNotSent")
         val pendMsgs = ArrayList<AndroidMegaChatMessage>()
@@ -2140,27 +1839,6 @@ class SqliteDatabaseHandler @Inject constructor(
         return pendMsgs
     }
 
-    override fun findPendingMessageByIdTempKarere(idTemp: Long): Long {
-        Timber.d("findPendingMessageById: %s", idTemp)
-        val idPend = "$idTemp"
-        var id: Long = -1
-        val selectQuery =
-            "SELECT * FROM $TABLE_PENDING_MSG_SINGLE WHERE $KEY_PENDING_MSG_TEMP_KARERE = '${
-                encrypt(idPend)
-            }'"
-        Timber.d("QUERY: %s", selectQuery)
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    id = cursor.getLong(0)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return id
-    }
-
     override fun removeSentPendingMessages() {
         Timber.d("removeSentPendingMessages")
         writableDatabase.delete(
@@ -2177,10 +1855,6 @@ class SqliteDatabaseHandler @Inject constructor(
             "$KEY_PENDING_MSG_ID_CHAT = '${encrypt(idChat.toString())}'",
             emptyArray()
         )
-    }
-
-    override fun removePendingMessageById(idMsg: Long) {
-        writableDatabase.delete(TABLE_PENDING_MSG_SINGLE, "$KEY_ID=$idMsg", emptyArray())
     }
 
     override val autoPlayEnabled: String?
@@ -2221,121 +1895,6 @@ class SqliteDatabaseHandler @Inject constructor(
             }
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override suspend fun getOfflineInformationList(
-        nodePath: String,
-        searchQuery: String?,
-    ): List<Offline> {
-        return if (!searchQuery.isNullOrEmpty()) {
-            searchOfflineInformationByQuery(nodePath, searchQuery)
-        } else {
-            searchOfflineInformationByPath(nodePath)
-        }
-    }
-
-    /**
-     * Search [Offline] by path
-     *
-     * @param nodePath
-     * @return list of [Offline]
-     */
-    private fun searchOfflineInformationByPath(nodePath: String): List<Offline> {
-        val offlineList = mutableListOf<Offline>()
-        //Get the foreign key of the node
-        val selectQuery =
-            "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_PATH = '${encrypt(nodePath)}'"
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    do {
-                        val id = cursor.getString(0).toInt()
-                        val handle = decrypt(cursor.getString(1))
-                        val path = decrypt(cursor.getString(2))
-                        val name = decrypt(cursor.getString(3))
-                        val parent = cursor.getInt(4)
-                        val type = decrypt(cursor.getString(5))
-                        val incoming = cursor.getInt(6)
-                        val handleIncoming = decrypt(cursor.getString(7))
-                        offlineList.add(
-                            Offline(
-                                id,
-                                handle.toString(),
-                                path.toString(),
-                                name.toString(),
-                                parent,
-                                type,
-                                incoming,
-                                handleIncoming.toString()
-                            )
-                        )
-                    } while (cursor.moveToNext())
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return offlineList
-    }
-
-    /**
-     * Search [Offline] by query
-     *
-     * @param path
-     * @param searchQuery
-     * @return list of [Offline]
-     */
-    private fun searchOfflineInformationByQuery(
-        path: String,
-        searchQuery: String,
-    ): List<Offline> {
-        val offlineList = mutableListOf<Offline>()
-        val nodes = findByPath(path)
-        for (node in nodes) {
-            if (node.isFolder) {
-                offlineList.addAll(
-                    searchOfflineInformationByQuery(
-                        getChildPath(node),
-                        searchQuery
-                    )
-                )
-            }
-
-            if (node.name.lowercase(Locale.ROOT).contains(searchQuery.lowercase(Locale.ROOT)) &&
-                FileUtil.isFileAvailable(
-                    OfflineUtils.getOfflineFile(
-                        MegaApplication.getInstance(),
-                        node
-                    )
-                )
-            ) {
-                offlineList.add(
-                    Offline(
-                        node.id,
-                        node.handle,
-                        node.path,
-                        node.name,
-                        node.parentId,
-                        node.type,
-                        node.origin,
-                        node.handleIncoming
-                    )
-                )
-            }
-        }
-        return offlineList
-    }
-
-    /**
-     * Get  path of the node
-     * @param offline : [MegaOffline]
-     */
-    private fun getChildPath(offline: MegaOffline): String {
-        return if (offline.path.endsWith(File.separator)) {
-            offline.path + offline.name + File.separator
-        } else {
-            offline.path + File.separator + offline.name + File.separator
         }
     }
 

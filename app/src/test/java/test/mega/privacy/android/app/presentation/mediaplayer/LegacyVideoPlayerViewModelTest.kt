@@ -87,7 +87,6 @@ internal class LegacyVideoPlayerViewModelTest {
             context = mock(),
             mediaPlayerGateway = mock(),
             ioDispatcher = UnconfinedTestDispatcher(),
-            offlineThumbnailFileWrapper = mock(),
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             playlistItemMapper = mock(),
             trackPlaybackPositionUseCase = mock(),

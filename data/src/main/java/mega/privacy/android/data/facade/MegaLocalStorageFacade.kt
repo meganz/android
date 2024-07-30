@@ -4,7 +4,6 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
-import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_FAV_ASC
@@ -162,20 +161,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun clearChatSettings() = dbHandler.clearChatSettings()
 
-    override suspend fun loadOfflineNodes(
-        path: String,
-        searchQuery: String?,
-    ): List<Offline> = dbHandler.getOfflineInformationList(path, searchQuery)
-
     override suspend fun findPendingMessagesNotSent(chatId: Long) =
         dbHandler.findPendingMessagesNotSent(chatId)
-
-    override suspend fun updatePendingMessage(
-        idMessage: Long,
-        transferTag: Int,
-        nodeHandle: String?,
-        state: Int,
-    ) = dbHandler.updatePendingMessage(idMessage, transferTag, nodeHandle, state)
 
     override suspend fun setTransferQueueStatus(isPause: Boolean) {
         dbHandler.transferQueueStatus = isPause

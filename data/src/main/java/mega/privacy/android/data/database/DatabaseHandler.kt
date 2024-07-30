@@ -5,7 +5,6 @@ import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -124,6 +123,7 @@ interface DatabaseHandler {
     fun setLastPublicHandleTimeStamp()
     fun setInvalidateSdkCache(invalidateSdkCache: Boolean)
     fun clearCredentials()
+
     @Deprecated("Call to ClearEphemeralCredentialsUseCase instead")
     fun clearEphemeral()
     fun clearPreferences()
@@ -132,7 +132,6 @@ interface DatabaseHandler {
     fun clearNonContacts()
     fun clearChatItems()
     fun clearChatSettings()
-    fun clearOffline()
 
     /**
      * Updates a pending message.
@@ -160,28 +159,12 @@ interface DatabaseHandler {
      * @param state       State of the pending message.
      */
     fun updatePendingMessage(idMessage: Long, transferTag: Int, nodeHandle: String?, state: Int)
-    fun updatePendingMessageOnAttach(idMessage: Long, temporalId: String?, state: Int)
-    fun findPendingMessageByIdTempKarere(idTemp: Long): Long
     fun removeSentPendingMessages()
     fun removePendingMessageByChatId(idChat: Long)
-    fun removePendingMessageById(idMsg: Long)
     fun setAutoPlayEnabled(enabled: String)
     fun findNonContactByHandle(handle: String): NonContactInfo?
     fun findContactByHandle(handleParam: Long): Contact?
     fun findContactByEmail(mail: String?): Contact?
-
-    /**
-     * Get list of [Offline]
-     *
-     * @param nodePath
-     * @param searchQuery
-     *
-     * @return List of [Offline]
-     */
-    suspend fun getOfflineInformationList(
-        nodePath: String,
-        searchQuery: String?,
-    ): List<Offline>
 
     /**
      * Gets pending messages.

@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
@@ -34,7 +33,6 @@ import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.T
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.playlist.finalizeItem
 import mega.privacy.android.app.mediaplayer.playlist.updateNodeName
-import mega.privacy.android.app.presentation.extensions.parcelableArrayList
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
@@ -46,7 +44,6 @@ import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE
@@ -76,9 +73,7 @@ import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getUriForFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.MegaNodeUtil.isInRootLinksLevel
-import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
-import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
@@ -147,7 +142,6 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(UnstableApi::class)
 class AudioPlayerServiceViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -672,55 +666,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }.onFailure {
             Timber.e(it)
         }
-    }
-
-    /**
-     * Build play sources by node OfflineNodes
-     *
-     * @param intent Intent
-     * @param firstPlayHandle the index of first playing item
-     */
-    @Deprecated("Should be removed when legacy Offline feature is removed")
-    private fun buildPlaylistFromLegacyOfflineNodes(
-        intent: Intent,
-        firstPlayHandle: Long,
-    ) {
-        intent.parcelableArrayList<MegaOffline>(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
-            ?.let { offlineFiles ->
-                playlistItems.clear()
-
-                val mediaItems = mutableListOf<MediaItem>()
-                var firstPlayIndex = 0
-
-                offlineFiles.filter {
-                    getOfflineFile(context, it).let { file ->
-                        isFileAvailable(file) && file.isFile && filterByNodeName(it.name)
-                    }
-                }.mapIndexed { currentIndex, megaOffline ->
-                    mediaItems.add(
-                        mediaItemFromFile(getOfflineFile(context, megaOffline), megaOffline.handle)
-                    )
-                    if (megaOffline.handle.toLong() == firstPlayHandle) {
-                        firstPlayIndex = currentIndex
-                    }
-
-                    playlistItemMapper(
-                        megaOffline.handle.toLong(),
-                        megaOffline.name,
-                        offlineThumbnailFileWrapper.getThumbnailFile(context, megaOffline),
-                        currentIndex,
-                        TYPE_NEXT,
-                        megaOffline.getSize(context),
-                        0.seconds,
-                        MimeTypeList.typeForName(megaOffline.name).extension
-                    )
-                        .let { playlistItem ->
-                            playlistItems.add(playlistItem)
-                        }
-                }
-
-                updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
-            }
     }
 
     /**

@@ -107,7 +107,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.ThumbnailUtils
-import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -185,7 +184,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     @VideoPlayer private val mediaPlayerGateway: MediaPlayerGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val playlistItemMapper: PlaylistItemMapper,
     private val trackPlaybackPositionUseCase: TrackPlaybackPositionUseCase,
@@ -1046,58 +1044,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         }.onFailure {
             Timber.e(it)
         }
-    }
-
-    /**
-     * Build play sources by node OfflineNodes
-     *
-     * @param intent Intent
-     * @param firstPlayHandle the index of first playing item
-     */
-    @Deprecated("Should be removed when legacy Offline feature is removed")
-    private fun buildPlaylistFromLegacyOfflineNodes(
-        intent: Intent,
-        firstPlayHandle: Long,
-    ) {
-        intent.parcelableArrayList<MegaOffline>(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
-            ?.let { offlineFiles ->
-                playlistItems.clear()
-
-                val mediaItems = mutableListOf<MediaItem>()
-                var firstPlayIndex = 0
-
-                offlineFiles.filter {
-                    getOfflineFile(context, it).let { file ->
-                        FileUtil.isFileAvailable(file) && file.isFile && filterByNodeName(it.name)
-                    }
-                }.mapIndexed { currentIndex, megaOffline ->
-                    mediaItems.add(
-                        mediaItemFromFile(
-                            getOfflineFile(context, megaOffline),
-                            megaOffline.handle
-                        )
-                    )
-                    if (megaOffline.handle.toLong() == firstPlayHandle) {
-                        firstPlayIndex = currentIndex
-                    }
-
-                    playlistItemMapper(
-                        megaOffline.handle.toLong(),
-                        megaOffline.name,
-                        offlineThumbnailFileWrapper.getThumbnailFile(context, megaOffline),
-                        currentIndex,
-                        TYPE_NEXT,
-                        megaOffline.getSize(context),
-                        0.seconds,
-                        MimeTypeList.typeForName(megaOffline.name).extension
-                    )
-                        .let { playlistItem ->
-                            playlistItems.add(playlistItem)
-                        }
-                }
-
-                updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
-            }
     }
 
     /**

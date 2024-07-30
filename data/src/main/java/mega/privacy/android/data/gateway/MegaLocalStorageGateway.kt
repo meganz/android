@@ -4,7 +4,6 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.settings.ChatSettings
 
 /**
@@ -254,39 +253,12 @@ interface MegaLocalStorageGateway {
     suspend fun clearChatSettings()
 
     /**
-     * Load offline nodes
-     *
-     * @param path
-     * @param searchQuery
-     * @return List of [Offline]
-     */
-    suspend fun loadOfflineNodes(
-        path: String,
-        searchQuery: String?,
-    ): List<Offline>
-
-    /**
      * Gets pending messages.
      *
      * @param chatId Chat identifier from which the messages has to be get.
      * @return A list of [AndroidMegaChatMessage].
      */
     suspend fun findPendingMessagesNotSent(chatId: Long): List<AndroidMegaChatMessage>
-
-    /**
-     * Updates a pending message.
-     *
-     * @param idMessage   Identifier of the pending message.
-     * @param transferTag Identifier of the transfer.
-     * @param nodeHandle  Handle of the node already uploaded.
-     * @param state       State of the pending message.
-     */
-    suspend fun updatePendingMessage(
-        idMessage: Long,
-        transferTag: Int,
-        nodeHandle: String?,
-        state: Int,
-    )
 
     /**
      * Set transfer queue status

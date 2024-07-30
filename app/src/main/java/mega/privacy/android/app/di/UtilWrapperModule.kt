@@ -11,21 +11,18 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapperImpl
 import mega.privacy.android.app.utils.wrapper.CameraEnumeratorWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
-import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.SetLogoutFlagWrapperImpl
@@ -72,17 +69,6 @@ abstract class UtilWrapperModule {
         @Provides
         fun provideFetchNodeWrapper(megaApiGateway: MegaApiGateway): FetchNodeWrapper =
             FetchNodeWrapper(megaApiGateway::getMegaNodeByHandle)
-
-        @Provides
-        fun provideGetOfflineThumbnailFileWrapper(megaApiGateway: MegaApiGateway): GetOfflineThumbnailFileWrapper {
-            return object : GetOfflineThumbnailFileWrapper {
-                override fun getThumbnailFile(context: Context, node: MegaOffline) =
-                    OfflineUtils.getThumbnailFile(context, node, megaApiGateway)
-
-                override fun getThumbnailFile(context: Context, handle: String) =
-                    OfflineUtils.getThumbnailFile(context, handle, megaApiGateway)
-            }
-        }
 
         /**
          * provide Avatar Wrapper
