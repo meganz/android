@@ -1,11 +1,15 @@
 package mega.privacy.android.app.presentation.chat
 
+import android.content.Context
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.chat.model.MediaPlayerOpenedErrorState
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
@@ -15,6 +19,9 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import nz.mega.sdk.MegaChatMessage
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,6 +30,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -32,6 +40,8 @@ class NodeAttachmentHistoryViewModelTest {
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase =
         mock()
+    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase = mock()
+    private val megaNavigator: MegaNavigator = mock()
 
     private lateinit var viewModel: NodeAttachmentHistoryViewModel
 
@@ -41,6 +51,8 @@ class NodeAttachmentHistoryViewModelTest {
             checkChatNodesNameCollisionAndCopyUseCase,
             monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase,
+            getNodeContentUriByHandleUseCase,
+            megaNavigator
         )
     }
 
@@ -48,7 +60,9 @@ class NodeAttachmentHistoryViewModelTest {
     fun resetMocks() = reset(
         monitorStorageStateEventUseCase,
         isConnectedToInternetUseCase,
-        checkChatNodesNameCollisionAndCopyUseCase
+        checkChatNodesNameCollisionAndCopyUseCase,
+        getNodeContentUriByHandleUseCase,
+        megaNavigator
     )
 
     @Test
@@ -128,5 +142,78 @@ class NodeAttachmentHistoryViewModelTest {
             viewModel.importChatNodes(chatId, messageIds, newNodeParent)
 
             assertThat(viewModel.collisionsFlow.value).hasSize(1)
+        }
+
+    @Test
+    fun `test that getNodeContentUriByHandleUseCase and openMediaPlayerActivityFromChat functions are invoked as expected`() =
+        runTest {
+            val paramHandle = 1L
+            val paramMessage = mock<MegaChatMessage> {
+                on { msgId }.thenReturn(2L)
+            }
+            val paramChatId = 3L
+            val paramName = "name"
+            val paramContext = mock<Context>()
+            val paramPosition = 1
+            val nodeContentUri = NodeContentUri.RemoteContentUri("uri", false)
+
+            whenever(getNodeContentUriByHandleUseCase(any())).thenReturn(nodeContentUri)
+            viewModel.openMediaPlayer(
+                context = paramContext,
+                handle = paramHandle,
+                message = paramMessage,
+                chatId = paramChatId,
+                name = paramName,
+                position = paramPosition
+            )
+            verify(getNodeContentUriByHandleUseCase).invoke(paramHandle)
+            verify(megaNavigator).openMediaPlayerActivityFromChat(
+                paramContext,
+                nodeContentUri,
+                paramHandle,
+                paramMessage.msgId,
+                paramChatId,
+                paramName
+            )
+        }
+
+    @Test
+    fun `test that state updates correctly when an exception is thrown`() =
+        runTest {
+            val paramHandle = 1L
+            val paramMessage = mock<MegaChatMessage> {
+                on { msgId }.thenReturn(2L)
+            }
+            val paramChatId = 3L
+            val paramName = "name"
+            val paramContext = mock<Context>()
+            val paramPosition = 1
+            whenever(getNodeContentUriByHandleUseCase(any())).thenThrow(IllegalStateException())
+            viewModel.openMediaPlayer(
+                context = paramContext,
+                handle = paramHandle,
+                message = paramMessage,
+                chatId = paramChatId,
+                name = paramName,
+                position = paramPosition
+            )
+            viewModel.mediaPlayerOpenedErrorFlow.test {
+                val actual = awaitItem()
+                assertThat(actual?.message).isEqualTo(paramMessage)
+                assertThat(actual?.position).isEqualTo(paramPosition)
+                assertThat(actual?.error).isInstanceOf(IllegalStateException::class.java)
+            }
+        }
+
+    @Test
+    fun `test that MediaPlayerOpenedErrorFlow is updated correctly `() =
+        runTest {
+            val expectedErrorState = mock<MediaPlayerOpenedErrorState>()
+            viewModel.updateMediaPlayerOpenedError(expectedErrorState)
+            viewModel.mediaPlayerOpenedErrorFlow.test {
+                assertThat(awaitItem()).isEqualTo(expectedErrorState)
+                viewModel.updateMediaPlayerOpenedError(null)
+                assertThat(awaitItem()).isNull()
+            }
         }
 }

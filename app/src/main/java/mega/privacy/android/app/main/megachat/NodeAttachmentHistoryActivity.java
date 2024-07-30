@@ -12,7 +12,6 @@ import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PRO
 import static mega.privacy.android.app.utils.Constants.FORWARD_ONLY_OPTION;
 import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
 import static mega.privacy.android.app.utils.Constants.ID_MESSAGES;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
@@ -22,7 +21,6 @@ import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.Util.changeToolBarElevation;
-import static mega.privacy.android.app.utils.Util.getMediaIntent;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -390,6 +388,14 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             }
             return Unit.INSTANCE;
         });
+
+        ViewExtensionsKt.collectFlow(this, viewModel.getMediaPlayerOpenedErrorFlow(), Lifecycle.State.STARTED, errorState -> {
+            if (errorState == null) return Unit.INSTANCE;
+            Timber.w("No available Intent");
+            showNodeAttachmentBottomSheet(errorState.getMessage(), errorState.getPosition());
+            viewModel.updateMediaPlayerOpenedError(null);
+            return Unit.INSTANCE;
+        });
     }
 
     private void addStartDownloadTransferView() {
@@ -538,98 +544,14 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                 showNodeAttachmentBottomSheet(m, position);
                             }
                         } else if (MimeTypeList.typeForName(node.getName()).isVideoMimeType() || MimeTypeList.typeForName(node.getName()).isAudio()) {
-                            Timber.d("isFile:isVideoReproducibleOrIsAudio");
-                            String mimeType = MimeTypeList.typeForName(node.getName()).getType();
-                            Timber.d("FILE HANDLE: %d, TYPE: %s", node.getHandle(), mimeType);
-
-                            Intent mediaIntent;
-                            boolean internalIntent;
-                            boolean opusFile = false;
-                            if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported() || MimeTypeList.typeForName(node.getName()).isAudioNotSupported()) {
-                                mediaIntent = new Intent(Intent.ACTION_VIEW);
-                                internalIntent = false;
-                                String[] s = node.getName().split("\\.");
-                                if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) {
-                                    opusFile = true;
-                                }
-                            } else {
-                                Timber.d("setIntentToAudioVideoPlayer");
-                                mediaIntent = getMediaIntent(this, node.getName());
-                                internalIntent = true;
-                            }
-
-                            mediaIntent.putExtra("adapterType", FROM_CHAT);
-                            mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
-                            mediaIntent.putExtra("msgId", m.getMsgId());
-                            mediaIntent.putExtra("chatId", chatId);
-
-                            mediaIntent.putExtra("FILENAME", node.getName());
-
-                            String localPath = getLocalFile(node);
-
-                            if (localPath != null) {
-                                File mediaFile = new File(localPath);
-                                if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                                    Timber.d("FileProviderOption");
-                                    Uri mediaFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, mediaFile);
-                                    if (mediaFileUri == null) {
-                                        Timber.e("ERROR: NULL media file Uri");
-                                        showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
-                                    } else {
-                                        mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
-                                    }
-                                } else {
-                                    Uri mediaFileUri = Uri.fromFile(mediaFile);
-                                    if (mediaFileUri == null) {
-                                        Timber.e("ERROR :NULL media file Uri");
-                                        showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
-                                    } else {
-                                        mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
-                                    }
-                                }
-                                mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            } else {
-                                Timber.w("Local Path NULL");
-                                if (viewModel.isOnline()) {
-                                    if (megaApi.httpServerIsRunning() == 0) {
-                                        megaApi.httpServerStart();
-                                        mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
-                                    } else {
-                                        Timber.w("ERROR: HTTP server already running");
-                                    }
-
-                                    String url = megaApi.httpServerGetLocalLink(node);
-                                    if (url != null) {
-                                        Uri parsedUri = Uri.parse(url);
-                                        if (parsedUri != null) {
-                                            mediaIntent.setDataAndType(parsedUri, mimeType);
-                                        } else {
-                                            Timber.e("ERROR: HTTP server get local link");
-                                            showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
-                                        }
-                                    } else {
-                                        Timber.e("ERROR: HTTP server get local link");
-                                        showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
-                                    }
-                                } else {
-                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem) + ". " + getString(R.string.no_network_connection_on_play_file));
-                                }
-                            }
-                            mediaIntent.putExtra("HANDLE", node.getHandle());
-                            if (opusFile) {
-                                mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
-                            }
-                            if (internalIntent) {
-                                startActivity(mediaIntent);
-                            } else {
-                                Timber.d("External Intent");
-                                if (isIntentAvailable(this, mediaIntent)) {
-                                    startActivity(mediaIntent);
-                                } else {
-                                    Timber.w("No available Intent");
-                                    showNodeAttachmentBottomSheet(m, position);
-                                }
-                            }
+                            viewModel.openMediaPlayer(
+                                    this,
+                                    node.getHandle(),
+                                    m,
+                                    chatId,
+                                    node.getName(),
+                                    position
+                            );
                         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
                             Timber.d("isFile:isPdf");
                             String mimeType = MimeTypeList.typeForName(node.getName()).getType();

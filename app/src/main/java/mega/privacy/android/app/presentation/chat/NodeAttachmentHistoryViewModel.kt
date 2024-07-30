@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.chat
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.namecollision.data.toLegacyImport
+import mega.privacy.android.app.presentation.chat.model.MediaPlayerOpenedErrorState
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.extensions.getState
@@ -18,6 +20,9 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import nz.mega.sdk.MegaChatMessage
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,6 +35,8 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
     private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
+    private val megaNavigator: MegaNavigator,
 ) : ViewModel() {
 
     private val _copyResultFlow = MutableStateFlow<CopyRequestState?>(null)
@@ -38,6 +45,12 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
      * Flow of [CopyRequestState] to notify the result of the copy operation.
      */
     val copyResultFlow = _copyResultFlow.asStateFlow()
+    private val _mediaPlayerOpenedErrorFlow = MutableStateFlow<MediaPlayerOpenedErrorState?>(null)
+
+    /**
+     * Flow of [MediaPlayerOpenedErrorState] to notify the error when opening the media player.
+     */
+    val mediaPlayerOpenedErrorFlow = _mediaPlayerOpenedErrorFlow.asStateFlow()
 
     private val _collisionsFlow = MutableStateFlow<List<LegacyNameCollision>>(emptyList())
 
@@ -115,4 +128,52 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Update the [MediaPlayerOpenedErrorState] value
+     *
+     * @param value [MediaPlayerOpenedErrorState]
+     */
+    fun updateMediaPlayerOpenedError(value: MediaPlayerOpenedErrorState?) =
+        _mediaPlayerOpenedErrorFlow.update { value }
+
+    /**
+     * Open media player
+     *
+     * @param context Context
+     * @param handle node handle
+     * @param message [MegaChatMessage]
+     * @param chatId chat ID
+     * @param name node name
+     */
+    fun openMediaPlayer(
+        context: Context,
+        handle: Long,
+        message: MegaChatMessage,
+        chatId: Long,
+        name: String,
+        position: Int,
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                val nodeContentUri = getNodeContentUriByHandleUseCase(handle)
+                megaNavigator.openMediaPlayerActivityFromChat(
+                    context = context,
+                    contentUri = nodeContentUri,
+                    handle = handle,
+                    messageId = message.msgId,
+                    chatId = chatId,
+                    name = name
+                )
+            }.recover { throwable ->
+                Timber.e(throwable)
+                updateMediaPlayerOpenedError(
+                    MediaPlayerOpenedErrorState(
+                        message = message,
+                        position = position,
+                        error = throwable
+                    )
+                )
+            }
+        }
+    }
 }

@@ -338,6 +338,30 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(intent)
     }
 
+    override suspend fun openMediaPlayerActivityFromChat(
+        context: Context,
+        contentUri: NodeContentUri,
+        handle: Long,
+        messageId: Long,
+        chatId: Long,
+        name: String
+    ) {
+        val fileType = getFileTypeInfoByNameUseCase(name)
+        val intent = getIntent(context, fileType).apply {
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
+            putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
+            putExtra(INTENT_EXTRA_KEY_MSG_ID, messageId)
+            putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
+            putExtra(INTENT_EXTRA_KEY_FILE_NAME, name)
+            putExtra(INTENT_EXTRA_KEY_HANDLE, handle)
+        }
+
+        val mimeType =
+            if (fileType.extension == "opus") "audio/*" else fileType.mimeType
+        nodeContentUriIntentMapper(intent, contentUri, mimeType, fileType.isSupported)
+        context.startActivity(intent)
+    }
+
     override suspend fun openMediaPlayerActivity(
         context: Context,
         contentUri: NodeContentUri,

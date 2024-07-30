@@ -146,7 +146,7 @@ interface AppNavigator {
         isFolderLink: Boolean = false,
         isMediaQueueAvailable: Boolean = true,
         searchedItems: List<Long>? = null,
-        mediaQueueTitle: String? = null
+        mediaQueueTitle: String? = null,
     )
 
     /**
@@ -189,6 +189,23 @@ interface AppNavigator {
         contentUri: NodeContentUri,
         message: NodeAttachmentMessage,
         fileNode: FileNode,
+    )
+
+    /**
+     * Open media player from Chat
+     *
+     * @param context Context
+     * @param contentUri [NodeContentUri]
+     * @param message [NodeAttachmentMessage]
+     * @param fileNode [FileNode]
+     */
+    suspend fun openMediaPlayerActivityFromChat(
+        context: Context,
+        contentUri: NodeContentUri,
+        handle: Long,
+        messageId: Long,
+        chatId: Long,
+        name: String,
     )
 
     /**
