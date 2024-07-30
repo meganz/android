@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
@@ -123,6 +124,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @SuppressWarnings("deprecation")
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityVersionsFileBinding.inflate(layoutInflater)
 

@@ -21,6 +21,7 @@ import android.widget.Button
 import android.widget.CheckedTextView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
@@ -211,6 +212,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         Timber.d("onCreate")
 

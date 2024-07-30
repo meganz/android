@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -27,6 +29,7 @@ internal fun CancellationInstructionsView(
 ) {
 
     MegaScaffold(
+        modifier = Modifier.systemBarsPadding(),
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,

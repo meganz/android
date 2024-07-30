@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -41,6 +42,7 @@ internal fun CancelAccountPlanView(
 
     Column(
         modifier = Modifier
+            .systemBarsPadding()
             .fillMaxWidth()
             .verticalScroll(scrollState)
             .padding(

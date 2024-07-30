@@ -41,6 +41,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.Scrollable
@@ -172,6 +173,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     private var originalNameTextSize: Float = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)

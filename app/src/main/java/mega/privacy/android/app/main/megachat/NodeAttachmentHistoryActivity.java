@@ -50,6 +50,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
@@ -194,6 +195,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Timber.d("onCreate");
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(NodeAttachmentHistoryViewModel.class);

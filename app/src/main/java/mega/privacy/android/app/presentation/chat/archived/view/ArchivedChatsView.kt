@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.chat.archived.view
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
@@ -28,11 +29,11 @@ import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.chat.archived.model.ArchivedChatsState
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.chat.list.view.ChatListView
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 
 /**
  * Archived chats view
@@ -63,6 +64,7 @@ fun ArchivedChatsView(
     val hideSheet = { scope.launch { sheetState.hide() } }
 
     ModalBottomSheetLayout(
+        modifier = Modifier.systemBarsPadding(),
         sheetState = sheetState,
         sheetContent = {
             val item = sheetItem

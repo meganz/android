@@ -30,7 +30,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
@@ -52,6 +52,7 @@ import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityPdfviewerBinding
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -196,8 +197,18 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     override fun shouldSetStatusBarTextColor() = false
 
+    /**
+     * Attach base context
+     *
+     */
+    override fun attachBaseContext(newBase: Context?) {
+        delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
+        super.attachBaseContext(newBase)
+    }
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         if (intent == null) {
             Timber.w("Intent null")
@@ -216,10 +227,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         }
 
         with(window) {
-            navigationBarColor = ContextCompat.getColor(this@PdfViewerActivity, R.color.black)
-            statusBarColor = ContextCompat.getColor(this@PdfViewerActivity, R.color.black)
             addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
 
         registerReceiver(
@@ -606,7 +614,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         dragToExit.runEnterAnimation(intent, pdfView) { animationStart: Boolean ->
             if (animationStart) {
                 if (supportActionBar?.isShowing == true) {
-                    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     toolbarPdfViewer.animate().translationY(-220f).setDuration(0)
                         .withEndAction { supportActionBar?.hide() }.start()
                     pdfViewerLayoutBottom.animate().translationY(220f).setDuration(0)

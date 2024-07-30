@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.chat.archived
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
@@ -11,10 +12,10 @@ import mega.privacy.android.app.presentation.chat.archived.view.ArchivedChatsVie
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
 
 /**
@@ -35,6 +36,7 @@ class ArchivedChatsActivity : AppCompatActivity() {
     private val viewModel: ArchivedChatsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)

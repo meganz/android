@@ -5,6 +5,7 @@ import android.content.Intent.ACTION_VIEW
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
@@ -58,6 +59,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
     private val viewModel: CancelAccountPlanViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         val accountType = intent.getStringExtra(EXTRA_ACCOUNT_TYPE)?.let { AccountType.valueOf(it) }

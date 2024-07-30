@@ -8,6 +8,7 @@ import android.graphics.drawable.Animatable
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -98,6 +99,7 @@ class NameCollisionActivity : PasscodeActivity() {
     private val noElevationColor by lazy { ContextCompat.getColor(this, R.color.dark_grey) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
             @Suppress("UNCHECKED_CAST")

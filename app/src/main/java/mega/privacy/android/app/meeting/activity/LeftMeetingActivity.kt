@@ -2,36 +2,32 @@ package mega.privacy.android.app.meeting.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.ActivityGuestLeaveMeetingBinding
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.meeting.LeftMeetingViewModel
-import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import nz.mega.sdk.MegaChatCall
 
 class LeftMeetingActivity : BaseActivity() {
     private lateinit var binding: ActivityGuestLeaveMeetingBinding
     private val viewModel by viewModels<LeftMeetingViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
 
         binding = ActivityGuestLeaveMeetingBinding.inflate(layoutInflater)
