@@ -462,7 +462,7 @@ pipeline {
                             rolloutPercentage: '0',
                             additionalVersionCodes: '487,233140859',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOLS_FILE}",
-//                            recentChangeList: common.getRecentChangeList(RELEASE_NOTES_CONTENT),
+                            recentChangeList: common.getRecentChangeList(RELEASE_NOTES_CONTENT),
                             releaseName: common.readAppVersion1()
                 }
             }
