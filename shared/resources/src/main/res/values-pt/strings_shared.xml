@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">Não foi possível ler a localização da sincronização. Verifique se o local está acessível e se as permissões para a localização da pasta foram concedidas.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Ocorreu um erro desconhecido - entre em contato com o Suporte.</string>
+    <string name="general_sync_message_unknown_error">Ocorreu um erro desconhecido - entre em contato com support@mega.nz.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Algo deu errado.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
@@ -285,7 +285,7 @@
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">Agora não</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
-    <string name="account_confirm_email_misspelled_email_description">Se você errou ao digitar o seu e-mail, corrija e pressione [A]Reenviar[/A].</string>
+    <string name="account_confirm_email_misspelled_email_description">Se você errou ao digitar o seu email, corrija e pressione [A]Reenviar[/A].</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">A sincronização foi pausada porque o seu plano do MEGA já não tem armazenamento disponível</string>
     <!-- Title of the insufficient storage error action -->
@@ -373,7 +373,7 @@
     <!-- Message of the synced folder list empty state for free accounts -->
     <string name="device_center_sync_list_empty_state_message_free_account">Mantenha a sua informação sincronizada e atualizada fazendo o upgrade a um dos nossos planos Pro.</string>
     <!-- "Upgrade now" label for a button, menu entry, etc -->
-    <string name="general_upgrade_now_label">Upgrade</string>
+    <string name="general_upgrade_now_label">Fazer upgrade</string>
     <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_title">Fazer o upgrade a Pro</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
@@ -395,7 +395,7 @@
     <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
     <string name="sync_error_dialog_free_user">As suas sincronizações foram pausadas: sincronizar é um recurso dos planos Pro.</string>
     <!-- The error dialog confirm action text -->
-    <string name="sync_error_dialog_free_user_confirm_action">Ok</string>
+    <string name="sync_error_dialog_free_user_confirm_action">OK</string>
     <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
     <string name="sync_error_banner_free_user">A sincronização foi pausada porque o seu plano Pro do MEGA foi cancelado. Faça upgrade para continuar sincronizando.</string>
     <!-- Hidden items -->
@@ -437,15 +437,15 @@
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Recurso</string>
     <!-- Column header indicating features available with the free plan -->
-    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <string name="account_cancel_account_screen_plan_free_plan">Grátis</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Armazenamento</string>
-    <!-- Storage amount available in the free plan -->
-    <string name="account_cancel_account_screen_plan_free_storage">20&#160;GB</string>
+    <!-- Storage amount available in the free plan. %1s represents the amount of storage in GB. -->
+    <string name="account_cancel_account_screen_plan_free_storage">%1s&#160;GB</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Transferência</string>
     <!-- Transfer limit in the free plan -->
-    <string name="account_cancel_account_screen_plan_free_limited_transfer">Limitado</string>
+    <string name="account_cancel_account_screen_plan_free_limited_transfer">Limitada</string>
     <!-- Feature indicating password protection for links, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_password_protected_links">Links protegidos por senha</string>
     <!-- Feature indicating expiry dates for links, available in the pro plan -->
@@ -456,8 +456,8 @@
     <string name="account_cancel_account_screen_plan_rewind">Retroceder</string>
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">Até 30 dias (somente visualização)</string>
-    <!-- Rewind duration available in the current plan -->
-    <string name="account_cancel_account_screen_plan_rewind_current">Até 180 dias</string>
+    <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
+    <string name="account_cancel_account_screen_plan_rewind_current">Até %1s dias</string>
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
@@ -465,13 +465,13 @@
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Até 1 hora</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
-    <string name="cancel_account_plan_call_meeting_duration_pro">ILIMITADO</string>
+    <string name="cancel_account_plan_call_meeting_duration_pro">Ilimitada</string>
     <!-- Row label for call and meeting participants in the comparison table -->
     <string name="account_cancel_account_plan_call_meeting_participants">Participantes em reuniões e chamadas</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Até 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
-    <string name="account_cancel_account_pro_plan_call_meeting_participants">ILIMITADO</string>
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">Ilimitado</string>
     <!-- Button label to keep the current pro plan -->
     <string name="account_cancel_account_plan_keep_pro_plan">Manter o plano %1s</string>
     <!-- Button label to continue with the cancellation -->
@@ -495,15 +495,15 @@
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
     <string name="account_cancellation_instructions_ios_device">Em um dispositivo iOS</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
-    <string name="account_cancellation_instructions_open_settings">1. Acesse o aplicativo das Configurações.</string>
+    <string name="account_cancellation_instructions_open_settings">1. Acesse o aplicativo das [A]Configurações[/A].</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
     <string name="account_cancellation_instructions_tap_on_name">2. Pressione o seu nome.</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
-    <string name="account_cancellation_instructions_select_subscriptions">3. Pressione Assinaturas.</string>
+    <string name="account_cancellation_instructions_select_subscriptions">3. Pressione [A]Assinaturas[/A].</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
     <string name="account_cancellation_instructions_select_mega_subscription">4. Selecione a sua assinatura do MEGA.</string>
     <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
-    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Pressionar Cancelar assinatura.</string>
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Pressione [A]Cancelar assinatura[/A].</string>
     <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
     <string name="account_cancellation_instructions_detailed_instructions">[A]Veja aqui[/A] instruções detalhadas sobre como cancelar a sua assinatura em um computador ou outro dispositivo.</string>
     <!-- Title shown when needing to cancel the subscription using a web browser -->
@@ -541,7 +541,7 @@
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_cancel_subscription">4. Pressione [A]Cancelar assinatura[/A].</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
-    <string name="sync_no_network_state">Não há conexão à Internet</string>
+    <string name="sync_no_network_state">Não há conexão à internet</string>
     <!-- Menu option to create a new folder in the file manager -->
     <string name="general_menu_create_new_folder">Criar nova pasta</string>
     <!-- Create new folder dialog title -->
@@ -558,4 +558,6 @@
     <string name="create_new_folder_dialog_error_existing_folder">Já existe uma pasta com o mesmo nome</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">Os seguintes caracteres não são permitidos: %1$s</string>
+    <!-- Sync settings section title-->
+    <string name="settings_section_sync">Sincronizar</string>
 </resources>

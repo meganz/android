@@ -4913,7 +4913,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">배터리가 %1$d%% 이하이기 대문에 업로드를 일시정지 하였습니다</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">카메라 업로드가 작동을 멈추었습니다. 해결하려면 카메라 업로드를 재활성화 하세요. 만약 문제가 계속되면, support&#64;mega.nz으로 연락하세요.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
@@ -5099,5 +5099,5 @@
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">위치</string>
     <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">No location information</string>
+    <string name="file_properties_info_map_location_no_location_info">위치 정보 없음</string>
 </resources>

@@ -5337,5 +5337,5 @@
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">Locatie</string>
     <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">No location information</string>
+    <string name="file_properties_info_map_location_no_location_info">Geen lokatie informatie</string>
 </resources>

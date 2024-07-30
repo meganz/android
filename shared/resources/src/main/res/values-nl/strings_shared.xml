@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">Kan de synchronisatielocatie niet lezen. Controleer of de locatie toegankelijk is en of er machtigingen voor de maplocatie zijn verleend.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Er is een onbekende fout opgetreden. Neem contact op met de klantenservice.</string>
+    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact support@mega.nz.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Er is iets misgegaan.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
@@ -432,8 +432,8 @@
     <string name="account_cancel_account_screen_plan_free_plan">Free</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Opslag</string>
-    <!-- Storage amount available in the free plan -->
-    <string name="account_cancel_account_screen_plan_free_storage">20 &#160; GB</string>
+    <!-- Storage amount available in the free plan. %1s represents the amount of storage in GB. -->
+    <string name="account_cancel_account_screen_plan_free_storage">%1s&#160; GB</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Overdracht</string>
     <!-- Transfer limit in the free plan -->
@@ -448,8 +448,8 @@
     <string name="account_cancel_account_screen_plan_rewind">Terugspoelen</string>
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">Tot 30 dagen (alleen weergeven)</string>
-    <!-- Rewind duration available in the current plan -->
-    <string name="account_cancel_account_screen_plan_rewind_current">Tot op 180 dagen</string>
+    <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
+    <string name="account_cancel_account_screen_plan_rewind_current">Tot %1s dagen</string>
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
@@ -457,13 +457,13 @@
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Tot 1 uur</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
-    <string name="cancel_account_plan_call_meeting_duration_pro">ONBEPERKT</string>
+    <string name="cancel_account_plan_call_meeting_duration_pro">Onbeperkt</string>
     <!-- Row label for call and meeting participants in the comparison table -->
     <string name="account_cancel_account_plan_call_meeting_participants">Deelnemers aan de oproep en vergadering</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Tot 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
-    <string name="account_cancel_account_pro_plan_call_meeting_participants">ONBEPERKT</string>
+    <string name="account_cancel_account_pro_plan_call_meeting_participants">Onbeperkt</string>
     <!-- Button label to keep the current pro plan -->
     <string name="account_cancel_account_plan_keep_pro_plan">%1s behouden</string>
     <!-- Button label to continue with the cancellation -->
@@ -487,15 +487,15 @@
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
     <string name="account_cancellation_instructions_ios_device">Op een iOS-apparaat</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
-    <string name="account_cancellation_instructions_open_settings">1. Open de Instellingen-applicatie.</string>
+    <string name="account_cancellation_instructions_open_settings">1. Open het [A]Instellingen[/A] applicatie.</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
     <string name="account_cancellation_instructions_tap_on_name">2. tik op uw naam.</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
-    <string name="account_cancellation_instructions_select_subscriptions">3. Tik op Abonnementen.</string>
+    <string name="account_cancellation_instructions_select_subscriptions">3. Tik [A]Abonnementen[/A].</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
     <string name="account_cancellation_instructions_select_mega_subscription">4. tik op uw MEGA-abonnement.</string>
     <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
-    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. tik op Abonnement annuleren.</string>
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tik [A]Abonnement opzeggen[/A].</string>
     <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
     <string name="account_cancellation_instructions_detailed_instructions">[A]Tik hier[/A] voor gedetailleerde instructies voor het opzeggen van uw abonnement op een computer of ander apparaat.</string>
     <!-- Title shown when needing to cancel the subscription using a web browser -->
@@ -550,4 +550,6 @@
     <string name="create_new_folder_dialog_error_existing_folder">Er is al een map met dezelfde naam</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">De volgende tekens zijn niet toegestaan: %1$s</string>
+    <!-- Sync settings section title-->
+    <string name="settings_section_sync">Synchroniseren</string>
 </resources>

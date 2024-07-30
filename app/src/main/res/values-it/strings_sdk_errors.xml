@@ -13,7 +13,7 @@
     <!-- Label to show that a SDK operation has failed permanently. -->
     <string name="api_efailed">Fallito permanentemente</string>
     <!-- Error shown when terms of service are breached during download. -->
-    <string name="api_etoomany_ec_download">Termini di servizio violati</string>
+    <string name="api_etoomany_ec_download">Termini di Servizio violati</string>
     <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
     <string name="api_etoomay">Troppe connessioni simultanee o trasferimenti</string>
     <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
