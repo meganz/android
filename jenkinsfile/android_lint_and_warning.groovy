@@ -1,8 +1,6 @@
 /**
  * The purpose of this script is to collect lint reports (And later build warnings) and send them to slack
  */
-import groovy.json.JsonSlurperClassic
-
 BUILD_STEP = ""
 
 GMS_APK_BUILD_LOG = "gms_build.log"
@@ -62,7 +60,7 @@ pipeline {
         success {
             script {
                 def successSlackMessage = "Android Lint report: \n" +
-                        buildLintSummaryTable()
+                        buildLintSummaryTable(LINT_REPORT_SUMMARY_MAP)
                 slackSend channel: "#android_lint_and_build_warnings", color: "good", message: successSlackMessage
                 slackSend channel: "#mobile-dev-team", color: "good", message: successSlackMessage
 
@@ -143,7 +141,7 @@ pipeline {
 
                     script {
                         MODULE_LIST.each { module ->
-                            LINT_REPORT_SUMMARY_MAP.put(module, lintSummary(module))
+                            LINT_REPORT_SUMMARY_MAP.put(module, generateLintSummary(module))
                         }
                     }
                 }
@@ -155,15 +153,10 @@ pipeline {
 /**
  * Returns a Markdown table-formatted String that holds all the Lint Results for available modules
  *
- * @param jsonLintReportLink A String that contains a link to all Lint Results
- *
+ * @param lintReportSummaryMap a Map of all Modules with their corresponding Lint Results
  * @return a Markdown table-formatted String
  */
-String buildLintSummaryTable() {
-
-    // Declare a JsonSlurperClassic object
-    def jsonSlurperClassic = new JsonSlurperClassic()
-
+String buildLintSummaryTable(Map lintReportSummaryMap) {
     def table = [
             ["Module name", "Fatal", "Error", "Warning", "Information", "Error Message"]
     ]
@@ -171,18 +164,17 @@ String buildLintSummaryTable() {
     // Iterate through all the values in LINT_REPORT_SUMMARY_MAP and add a row per module
     // The standard method of iterating a map returns an error when used with a Jenkins pipeline,
     // which is why the map iteration is set up in this manner
-    for (def key in LINT_REPORT_SUMMARY_MAP.keySet()) {
-        // Parse the JSON String received from lint_report.py into a Map
-        def jsonObject = jsonSlurperClassic.parseText(LINT_REPORT_SUMMARY_MAP[key])
+    for (def key in lintReportSummaryMap.keySet()) {
+        def lintJsonContent = lintReportSummaryMap[key]
 
         table.add(
                 [
                         "$key",
-                        "$jsonObject.fatalCount",
-                        "$jsonObject.errorCount",
-                        "$jsonObject.warningCount",
-                        "$jsonObject.informationCount",
-                        "$jsonObject.errorMessage"
+                        "$lintJsonContent.fatalCount",
+                        "$lintJsonContent.errorCount",
+                        "$lintJsonContent.warningCount",
+                        "$lintJsonContent.informationCount",
+                        "$lintJsonContent.errorMessage"
                 ]
         )
 
@@ -207,30 +199,22 @@ String buildLintSummaryTable() {
 }
 
 /**
- * Executes lint_report.py in order to parse the Lint Results and create a Lint Summary
+ * Executes a specific Gradle Task to parse the raw Lint Results and returns a Lint Summary
  *
  * @param module The name of the module (e.g. app, domain, sdk)
- * @return The Lint Summary Report of the given module from lint_report.py. Here's a sample return value:
+ * @return A List containing the module's Lint Summary.
+ * Here's a Sample Result:
  *
- * {"fatalCount": 10, "errorCount": 20, "warningCount": 30, "informationCount": 40, "errorMessage": ""}
+ * [errorCount:20, errorMessage:None, fatalCount:10, informationCount:40, warningCount:30]
  */
-String lintSummary(String module) {
-    summary = sh(
-            script: "python3 ${WORKSPACE}/jenkinsfile/lint_report.py $WORKSPACE/${module}/build/reports/lint-results.xml",
-            returnStdout: true).trim()
-    // If summary is empty, return a String with 0 counts and a "No lint results found" error message
-    if (!summary) summary = '{"fatalCount": "0", "errorCount": "0", "warningCount": "0", "informationCount": "0", "errorMessage": "No lint results found"}'
-    print("lintSummary($module) = $summary")
-    return summary
-}
+def generateLintSummary(String module) {
+    def targetFile = "${module}_processed-lint-results.json"
+    sh "./gradlew generateLintReport --lint-results $WORKSPACE/${module}/build/reports/lint-results.xml --target-file ${targetFile}"
+    def lintJsonFile = readFile(targetFile)
+    def lintJsonContent = new HashMap(new groovy.json.JsonSlurper().parseText(lintJsonFile))
+    print("lintSummary($module) = ${lintJsonContent}")
 
-/**
- * check if a certain value is defined by checking the tag value
- * @param value value of tag
- * @return true if tag has a value. false if tag is null or zero length
- */
-static boolean isDefined(String value) {
-    return value != null && !value.isEmpty()
+    return lintJsonContent
 }
 
 /**

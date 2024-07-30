@@ -1,5 +1,3 @@
-import groovy.json.JsonSlurperClassic
-
 @Library('jenkins-android-shared-lib') _
 
 BUILD_STEP = ""
@@ -156,7 +154,7 @@ pipeline {
                                 "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
                                 "**Build Warnings:**\n" + getBuildWarnings() + "\n\n"
 
-                        String coverageMessage = buildLintSummaryTable(JSON_LINT_REPORT_LINK) + "\n\n" +
+                        String coverageMessage = buildLintSummaryTable(JSON_LINT_REPORT_LINK, LINT_REPORT_SUMMARY_MAP) + "\n\n" +
                                 COVERAGE_SUMMARY
 
                         // Create the String to be posted as a comment in Gitlab
@@ -353,13 +351,13 @@ pipeline {
                                 }
 
                                 MODULE_LIST.each { module ->
-                                    def lintResult = lintSummary(module)
-                                    checkFatalError(lintResult)
-                                    LINT_REPORT_SUMMARY_MAP.put(module, lintResult)
+                                    def lintJsonContent = generateLintSummary(module)
+                                    checkFatalErrors(lintJsonContent)
+                                    LINT_REPORT_SUMMARY_MAP.put(module, lintJsonContent)
                                 }
                                 archiveLintReports()
 
-                                JSON_LINT_REPORT_LINK = common.uploadFileToArtifactory(LINT_REPORT_ARCHIVE)
+                                this.JSON_LINT_REPORT_LINK = common.uploadFileToArtifactory(LINT_REPORT_ARCHIVE)
                             }
                         }
                     }
@@ -383,13 +381,12 @@ pipeline {
  * Returns a Markdown table-formatted String that holds all the Lint Results for available modules
  *
  * @param jsonLintReportLink A String that contains a link to all Lint Results
+ * @param lintReportSummaryMap a Map of all Modules with their corresponding Lint Results
  *
  * @return a Markdown table-formatted String
  */
-String buildLintSummaryTable(String jsonLintReportLink) {
+String buildLintSummaryTable(String jsonLintReportLink, Map lintReportSummaryMap) {
     println("Entering buildLintSummaryTable()")
-    // Declare a JsonSlurperClassic object
-    def jsonSlurperClassic = new JsonSlurperClassic()
 
     // Declare the initial value for the Table String
     String tableStr = "| Module | Fatal | Error | Warning | Information | Error Message |\n" +
@@ -401,20 +398,19 @@ String buildLintSummaryTable(String jsonLintReportLink) {
     // Iterate through all the values in LINT_REPORT_SUMMARY_MAP and add a row per module
     // The standard method of iterating a map returns an error when used with a Jenkins pipeline,
     // which is why the map iteration is set up in this manner
-    for (def key in LINT_REPORT_SUMMARY_MAP.keySet()) {
-        // Parse the JSON String received from lint_report.py into a Map
-        def jsonObject = jsonSlurperClassic.parseText(LINT_REPORT_SUMMARY_MAP[key])
+    for (def key in lintReportSummaryMap.keySet()) {
+        def lintJsonContent = lintReportSummaryMap[key]
 
         // Add a new row to the table
         tableStr += "| **$key** " +
-                "| $jsonObject.fatalCount " +
-                "| $jsonObject.errorCount " +
-                "| $jsonObject.warningCount " +
-                "| $jsonObject.informationCount " +
-                "| $jsonObject.errorMessage |\n"
-        fatalCount += jsonObject.fatalCount as int
-        errorCount += jsonObject.errorCount as int
-        warningCount += jsonObject.warningCount as int
+                "| $lintJsonContent.fatalCount " +
+                "| $lintJsonContent.errorCount " +
+                "| $lintJsonContent.warningCount " +
+                "| $lintJsonContent.informationCount " +
+                "| $lintJsonContent.errorMessage |\n"
+        fatalCount += lintJsonContent.fatalCount as int
+        errorCount += lintJsonContent.errorCount as int
+        warningCount += lintJsonContent.warningCount as int
     }
 
     // Create Summary to be returned after iterating through all modules
@@ -464,7 +460,7 @@ String getBuildWarnings() {
     return result
 }
 
-String wrapBuildWarnings(String rawWarning) {
+static String wrapBuildWarnings(String rawWarning) {
     if (rawWarning == null || rawWarning.isEmpty()) {
         return ""
     } else {
@@ -473,21 +469,22 @@ String wrapBuildWarnings(String rawWarning) {
 }
 
 /**
- * Executes lint_report.py in order to parse the Lint Results and create a Lint Summary
+ * Executes a specific Gradle Task to parse the raw Lint Results and returns a Lint Summary
  *
  * @param module The name of the module (e.g. app, domain, sdk)
- * @return The Lint Summary Report of the given module from lint_report.py. Here's a sample return value:
+ * @return A List containing the module's Lint Summary.
+ * Here's a Sample Result:
  *
- * {"fatalCount": 10, "errorCount": 20, "warningCount": 30, "informationCount": 40, "errorMessage": ""}
+ * [errorCount:20, errorMessage:None, fatalCount:10, informationCount:40, warningCount:30]
  */
-String lintSummary(String module) {
-    summary = sh(
-            script: "python3 ${WORKSPACE}/jenkinsfile/lint_report.py $WORKSPACE/${module}/build/reports/lint-results.xml",
-            returnStdout: true).trim()
-    // If summary is empty, return a String with 0 counts and a "No lint results found" error message
-    if (!summary) summary = '{"fatalCount": "0", "errorCount": "0", "warningCount": "0", "informationCount": "0", "errorMessage": "No lint results found"}'
-    print("lintSummary($module) = $summary")
-    return summary
+def generateLintSummary(String module) {
+    def targetFile = "${module}_processed-lint-results.json"
+    sh "./gradlew generateLintReport --lint-results $WORKSPACE/${module}/build/reports/lint-results.xml --target-file ${targetFile}"
+    def lintJsonFile = readFile(targetFile)
+    def lintJsonContent = new HashMap(new groovy.json.JsonSlurper().parseText(lintJsonFile))
+    print("lintSummary($module) = ${lintJsonContent}")
+
+    return lintJsonContent
 }
 
 /**
@@ -553,11 +550,18 @@ def unitTestArchiveLink(String reportPath, String archiveTargetName) {
     return result
 }
 
-def checkFatalError(String lintResult) {
-    println("Check if there are Fatal Lint errors. $lintResult")
-    def jsonSlurperClassic = new JsonSlurperClassic()
-    def jsonObject = jsonSlurperClassic.parseText(lintResult)
-    def fatalCount = jsonObject.fatalCount as int
+/**
+ * Checks if the specific module has any Fatal Errors or not. The Pipeline automatically fails if
+ * at least one Fatal Error was found
+ *
+ * @param lintJsonContent A List containing the module's Lint Summary.
+ * Here's a Sample Result:
+ *
+ * [errorCount:20, errorMessage:None, fatalCount:10, informationCount:40, warningCount:30]
+ */
+def checkFatalErrors(def lintJsonContent) {
+    println("Check if there are Fatal Lint errors. ${lintJsonContent}")
+    def fatalCount = lintJsonContent.fatalCount as int
     if (fatalCount > 0) {
         util.failPipeline("!!!!!!!! There are ${fatalCount} fatal lint errors. Build is failing.")
     }
