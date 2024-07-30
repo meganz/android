@@ -327,6 +327,7 @@ interface ChatRepository {
      * @param count     The number of requested messages to load (Range 1 - 256)
      *
      * @return The source of the messages that is going to be fetched. The possible values are:
+     *   - ChatHistoryLoadStatus::INVALID_CHAT: there's no available chat with the given chatId
      *   - ChatHistoryLoadStatus::ERROR: history has to be fetched from server, but we are not logged in yet
      *   - ChatHistoryLoadStatus::NONE: there's no more history available (not even in the server)
      *   - ChatHistoryLoadStatus::LOCAL: messages will be fetched locally (RAM or DB)

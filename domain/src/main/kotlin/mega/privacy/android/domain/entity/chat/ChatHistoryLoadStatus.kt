@@ -6,6 +6,11 @@ package mega.privacy.android.domain.entity.chat
 enum class ChatHistoryLoadStatus {
 
     /**
+     *  There's no chat with the given chatId
+     */
+    INVALID_CHAT,
+
+    /**
      * History has to be fetched from server, but we are not logged in yet
      */
     ERROR,

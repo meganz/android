@@ -1175,13 +1175,13 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 isLoadingHistory = false;
             } else {
                 Timber.d("Less Number Received");
-                if ((stateHistory != MegaChatApi.SOURCE_NONE) && (stateHistory != MegaChatApi.SOURCE_ERROR)) {
+                if ((stateHistory != MegaChatApi.SOURCE_NONE) && (stateHistory != MegaChatApi.SOURCE_ERROR) && stateHistory != MegaChatApi.SOURCE_INVALID_CHAT) {
                     Timber.d("But more history exists --> loadAttachments");
                     isLoadingHistory = true;
                     stateHistory = megaChatApi.loadAttachments(chatId, NUMBER_MESSAGES_TO_LOAD);
                     Timber.d("New state of history: %s", stateHistory);
                     getMoreHistory = false;
-                    if (stateHistory == MegaChatApi.SOURCE_NONE || stateHistory == MegaChatApi.SOURCE_ERROR) {
+                    if (stateHistory == MegaChatApi.SOURCE_NONE || stateHistory == MegaChatApi.SOURCE_ERROR || stateHistory == MegaChatApi.SOURCE_INVALID_CHAT) {
                         fullHistoryReceivedOnLoad();
                         isLoadingHistory = false;
                     }

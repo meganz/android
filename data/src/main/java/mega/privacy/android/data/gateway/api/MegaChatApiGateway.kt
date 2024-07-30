@@ -1001,6 +1001,7 @@ interface MegaChatApiGateway {
      * @param count The number of requested messages to load (Range 1 - 256)
      *
      * @return Return the source of the messages that is going to be fetched. The possible values are:
+     *   - MegaChatApi::SOURCE_INVALID_CHAT = -2: not available chat with the given chatId
      *   - MegaChatApi::SOURCE_ERROR = -1: history has to be fetched from server, but we are not logged in yet
      *   - MegaChatApi::SOURCE_NONE = 0: there's no more history available (not even in the server)
      *   - MegaChatApi::SOURCE_LOCAL: messages will be fetched locally (RAM or DB)

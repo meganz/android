@@ -13,6 +13,7 @@ internal class ChatHistoryLoadStatusMapper @Inject constructor() {
      * Map chat history load status to [ChatHistoryLoadStatus]
      */
     operator fun invoke(source: Int): ChatHistoryLoadStatus = when (source) {
+        MegaChatApi.SOURCE_INVALID_CHAT -> ChatHistoryLoadStatus.INVALID_CHAT
         MegaChatApi.SOURCE_ERROR -> ChatHistoryLoadStatus.ERROR
         MegaChatApi.SOURCE_NONE -> ChatHistoryLoadStatus.NONE
         MegaChatApi.SOURCE_LOCAL -> ChatHistoryLoadStatus.LOCAL

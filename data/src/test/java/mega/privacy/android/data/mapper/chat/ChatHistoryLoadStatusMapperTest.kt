@@ -24,6 +24,7 @@ internal class ChatHistoryLoadStatusMapperTest {
 
     @TestFactory
     fun `test that the mapping is correct`() = listOf(
+        MegaChatApi.SOURCE_INVALID_CHAT to ChatHistoryLoadStatus.INVALID_CHAT,
         MegaChatApi.SOURCE_ERROR to ChatHistoryLoadStatus.ERROR,
         MegaChatApi.SOURCE_NONE to ChatHistoryLoadStatus.NONE,
         MegaChatApi.SOURCE_LOCAL to ChatHistoryLoadStatus.LOCAL,
