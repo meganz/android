@@ -279,8 +279,12 @@ private fun StartTransferComponent(
             showPromptSaveDestinationDialog = it
         }
     )
+
     MinimumTimeVisibility(visible = uiState.jobInProgressState is StartTransferJobInProgress.ScanningTransfers) {
-        TransferInProgressDialog(onCancelConfirmed = onCancelledConfirmed)
+        TransferInProgressDialog(
+            (uiState.jobInProgressState as? StartTransferJobInProgress.ScanningTransfers),
+            onCancelConfirmed = onCancelledConfirmed,
+        )
     }
     if (showOfflineAlertDialog) {
         MegaAlertDialog(

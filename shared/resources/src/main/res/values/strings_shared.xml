@@ -552,4 +552,25 @@
     <string name="general_invalid_characters_defined">The following characters are not allowed: %1$s</string>
     <!-- Sync settings section title-->
     <string name="settings_section_sync">Sync</string>
+    <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
+    <string name="transfers_scanning_folders_dialog_creating_folders_title">Creating folders&#8230;</string>
+    <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Starting transfers&#8230;</string>
+    <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
+    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Don’t close the app. If you close, transfers not yet queued will be lost.</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
+        <item quantity="one">Found 1 folder and %1$d file.</item>
+        <item quantity="other">Found 1 folder and %1$d files.</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders -->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
+        <item quantity="one">Found %1$d folders and %2$d file.</item>
+        <item quantity="other">Found %1$d folders and %2$d files.</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is creating the folders -->
+    <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
+        <item quantity="one">%1$d/%2$d folder</item>
+        <item quantity="other">%1$d/%2$d folders</item>
+    </plurals>
 </resources>

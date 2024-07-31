@@ -1,18 +1,22 @@
 package test.mega.privacy.android.app.presentation.transfers.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.transfers.view.dialog.CONFIRM_CANCEL_TAG
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.view.dialog.PROGRESS_TAG
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
+import mega.privacy.android.domain.entity.transfer.TransferStage
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import test.mega.privacy.android.app.fromPluralId
 import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
@@ -23,46 +27,138 @@ class TransferInProgressDialogTest {
     @Test
     fun `test that progress dialog is showed when first composed`() {
         composeTestRule.setContent {
-            TransferInProgressDialog(onCancelConfirmed = {})
+            TransferInProgressDialog(
+                StartTransferJobInProgress.ScanningTransfers(
+                    TransferStage.STAGE_NONE
+                )
+            ) {}
         }
         composeTestRule.onNodeWithTag(PROGRESS_TAG).assertExists()
-    }
-
-    @Test
-    fun `test that confirm dialog is not showed when first composed`() {
-        composeTestRule.setContent {
-            TransferInProgressDialog(onCancelConfirmed = {})
-        }
-        composeTestRule.onNodeWithTag(CONFIRM_CANCEL_TAG).assertDoesNotExist()
-    }
-
-    @Test
-    fun `test that confirm dialog is showed when cancel button is clicked`() {
-        composeTestRule.setContent {
-            TransferInProgressDialog(onCancelConfirmed = {})
-        }
-        composeTestRule.onNodeWithText(R.string.cancel_transfers).performClick()
-        composeTestRule.onNodeWithTag(CONFIRM_CANCEL_TAG).assertExists()
-    }
-
-    @Test
-    fun `test that confirm dialog is dismissed when dismiss button is clicked`() {
-        composeTestRule.setContent {
-            TransferInProgressDialog(onCancelConfirmed = {})
-        }
-        composeTestRule.onNodeWithText(R.string.cancel_transfers).performClick()
-        composeTestRule.onNodeWithText(R.string.general_dismiss).performClick()
-        composeTestRule.onNodeWithTag(CONFIRM_CANCEL_TAG).assertDoesNotExist()
     }
 
     @Test
     fun `test that on confirm canceled is triggered when cancel is clicked`() {
         val lambdaMock = mock<() -> Unit>()
         composeTestRule.setContent {
-            TransferInProgressDialog(onCancelConfirmed = lambdaMock)
+            TransferInProgressDialog(
+                StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_NONE),
+                onCancelConfirmed = lambdaMock
+            )
         }
         composeTestRule.onNodeWithText(R.string.cancel_transfers).performClick()
-        composeTestRule.onNodeWithText(R.string.button_proceed).performClick()
         verify(lambdaMock).invoke()
+    }
+
+    @Test
+    fun `test that the correct title is shown when stage is none`() {
+        composeTestRule.setContent {
+            TransferInProgressDialog(
+                StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_NONE)
+            ) {}
+        }
+        composeTestRule.onNodeWithText(R.string.scanning_transfers).assertExists()
+    }
+
+    @Test
+    fun `test that the correct title is shown when stage is scanning`() {
+        composeTestRule.setContent {
+            TransferInProgressDialog(
+                StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_SCANNING)
+            ) {}
+        }
+        composeTestRule.onNodeWithText(R.string.scanning_transfers).assertExists()
+    }
+
+    @Test
+    fun `test that the correct title is shown when stage is creating tree`() {
+        composeTestRule.setContent {
+            TransferInProgressDialog(
+                StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_CREATING_TREE)
+            ) {}
+        }
+        composeTestRule.onNodeWithText(sharedR.string.transfers_scanning_folders_dialog_creating_folders_title)
+            .assertExists()
+    }
+
+    @Test
+    fun `test that the correct title is shown when stage is creating tree and all folders are created`() {
+        composeTestRule.setContent {
+            TransferInProgressDialog(
+                StartTransferJobInProgress.ScanningTransfers(
+                    TransferStage.STAGE_CREATING_TREE,
+                    folderCount = 10,
+                    createdFolderCount = 10
+                )
+            ) {}
+        }
+        composeTestRule.onNodeWithText(sharedR.string.transfers_scanning_folders_dialog_starting_transfers_title)
+            .assertExists()
+    }
+
+    @Test
+    fun `test that the correct title is shown when stage is transferring files`() {
+        composeTestRule.setContent {
+            TransferInProgressDialog(
+                StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_TRANSFERRING_FILES)
+            ) {}
+        }
+        composeTestRule.onNodeWithText(sharedR.string.transfers_scanning_folders_dialog_starting_transfers_title)
+            .assertExists()
+    }
+
+    @Test
+    fun `test that the correct subtitle is shown when stage is none`() {
+        composeTestRule.setContent {
+            TransferInProgressDialog(
+                StartTransferJobInProgress.ScanningTransfers(
+                    TransferStage.STAGE_NONE,
+                    folderCount = 1,
+                    fileCount = 1
+                )
+            ) {}
+        }
+        composeTestRule.onNodeWithText(sharedR.string.transfers_scanning_folders_dialog_cancel_info_subtitle)
+            .assertExists()
+    }
+
+    @Test
+    fun `test that the correct subtitle is shown when stage is scanning`() {
+        composeTestRule.setContent {
+            TransferInProgressDialog(
+                StartTransferJobInProgress.ScanningTransfers(
+                    TransferStage.STAGE_SCANNING,
+                    folderCount = 1,
+                    fileCount = 2,
+                )
+            ) {}
+        }
+        composeTestRule.onNodeWithText(
+            substring = true,
+            text = fromPluralId(
+                sharedR.plurals.transfers_scanning_folders_dialog_scanning_folder_subtitle, 2
+            ),
+        ).assertExists()
+    }
+
+    @Test
+    fun `test that the correct subtitle is shown when stage is creating tree`() {
+        composeTestRule.setContent {
+            TransferInProgressDialog(
+                StartTransferJobInProgress.ScanningTransfers(
+                    TransferStage.STAGE_CREATING_TREE,
+                    folderCount = 5,
+                    createdFolderCount = 2,
+                )
+            ) {}
+        }
+        composeTestRule.onNodeWithText(
+            substring = true,
+            text = fromPluralId(
+                sharedR.plurals.transfers_scanning_folders_dialog_creating_folders_subtitle,
+                1,
+                2,
+                5,
+            ),
+        ).assertExists()
     }
 }

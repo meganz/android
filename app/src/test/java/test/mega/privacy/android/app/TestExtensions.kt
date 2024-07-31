@@ -29,6 +29,10 @@ internal fun SemanticsNodeInteractionsProvider.onNodeWithPlural(
     @PluralsRes id: Int, quantity: Int,
 ) = onNodeWithText(fromPluralId(id = id, quantity))
 
+internal fun SemanticsNodeInteractionsProvider.onNodeWithPlural(
+    @PluralsRes id: Int, quantity: Int, vararg args: Any,
+) = onNodeWithText(fromPluralId(id = id, quantity, args))
+
 internal fun fromId(@StringRes id: Int) =
     InstrumentationRegistry.getInstrumentation().targetContext.getString(id)
 
@@ -38,6 +42,13 @@ internal fun fromId(@StringRes id: Int, vararg args: Any) =
 internal fun fromPluralId(@PluralsRes id: Int, quantity: Int) =
     InstrumentationRegistry.getInstrumentation().targetContext.resources
         .getQuantityString(id, quantity, quantity)
+
+internal fun fromPluralId(
+    @PluralsRes id: Int,
+    quantity: Int,
+    vararg args: Any,
+) = InstrumentationRegistry.getInstrumentation().targetContext.resources
+    .getQuantityString(id, quantity, *args)
 
 internal fun hasBackgroundColor(color: Color): SemanticsMatcher = SemanticsMatcher(
     "${SemanticsProperties.Text.name} has a background color of '$color'"
