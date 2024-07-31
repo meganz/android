@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.contact.invite
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
@@ -22,15 +23,18 @@ class InviteContactActivityV2 : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                Timber.d("onBackPressed")
+                val psaWebBrowser = psaWebBrowser
+                if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
+                finish()
+            }
+        })
+
         supportFragmentManager.commit {
             replace(android.R.id.content, InviteContactFragment())
         }
-    }
-
-    override fun onBackPressed() {
-        Timber.d("onBackPressed")
-        val psaWebBrowser = psaWebBrowser
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
-        finish()
     }
 }
