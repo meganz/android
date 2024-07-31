@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.asFlowable
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
@@ -51,8 +52,8 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChange
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChangeType
+import mega.privacy.android.app.usecase.call.AmIAloneOnAnyCallUseCase
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
-import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase.NumParticipantsChangesResult
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
@@ -74,6 +75,7 @@ import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSession
 import mega.privacy.android.domain.entity.call.ChatSessionChanges
 import mega.privacy.android.domain.entity.call.ChatSessionStatus
+import mega.privacy.android.domain.entity.call.ParticipantsCountChange
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
@@ -205,6 +207,7 @@ class InMeetingViewModel @Inject constructor(
     private val setChatTitleUseCase: SetChatTitleUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
+    private val amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
     @ApplicationContext private val context: Context,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -391,7 +394,8 @@ class InMeetingViewModel @Inject constructor(
             )
             .addTo(composite)
 
-        getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
+        amIAloneOnAnyCallUseCase()
+            .asFlowable(viewModelScope.coroutineContext)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -905,7 +909,7 @@ class InMeetingViewModel @Inject constructor(
      * @param call [ChatCall]
      * @return NumParticipantsChangesResult
      */
-    private fun checkIfIAmTheOnlyOneOnTheCall(call: ChatCall): NumParticipantsChangesResult {
+    private fun checkIfIAmTheOnlyOneOnTheCall(call: ChatCall): ParticipantsCountChange {
         var waitingForOthers = false
         var onlyMeInTheCall = false
         if (isOneToOneCall().not()) {
@@ -918,7 +922,7 @@ class InMeetingViewModel @Inject constructor(
             }
         }
 
-        return NumParticipantsChangesResult(
+        return ParticipantsCountChange(
             call.chatId,
             onlyMeInTheCall,
             waitingForOthers,

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx3.asFlowable
 import kotlinx.coroutines.rx3.rxFlowable
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
@@ -30,16 +31,16 @@ import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.domain.entity.CallsSoundNotifications
-import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import mega.privacy.android.domain.entity.call.ChatSessionTermCode
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorCallsReconnectingStatusUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorCallsReconnectingStatusUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -63,6 +64,7 @@ class MonitorCallSoundsUseCase @Inject constructor(
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
+    private val amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
@@ -165,7 +167,8 @@ class MonitorCallSoundsUseCase @Inject constructor(
                 }
             }
 
-            getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
+            amIAloneOnAnyCallUseCase()
+                .asFlowable(sharingScope.coroutineContext)
                 .subscribeBy(
                     onNext = { (chatId, onlyMeInTheCall, waitingForOthers) ->
                         removeWaitingForOthersCountDownTimer()

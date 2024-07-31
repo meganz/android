@@ -10,19 +10,17 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
-import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.CallCompositionChanges
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatCall
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -31,7 +29,6 @@ import javax.inject.Inject
  */
 class GetParticipantsChangesUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
-    private val getCallUseCase: GetCallUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
@@ -65,122 +62,6 @@ class GetParticipantsChangesUseCase @Inject constructor(
         val typeChange: Int,
         val peers: ArrayList<Long>?,
     )
-
-    /**
-     * Num participants changes result
-     *
-     * @property chatId        Chat ID of the call
-     * @property onlyMeInTheCall    True, if I'm the only one in the call. False, if there are more participants.
-     * @property waitingForOthers True, if I'm waiting for others participants. False, otherwise.
-     * @property isReceivedChange True, if the changes is received. False, if no change has been received.
-     */
-    data class NumParticipantsChangesResult(
-        val chatId: Long,
-        val onlyMeInTheCall: Boolean,
-        val waitingForOthers: Boolean,
-        var isReceivedChange: Boolean,
-    )
-
-    /**
-     * Method to check if I am alone on any call and whether it is because I am waiting for others or because everyone has dropped out of the call.
-     */
-    fun checkIfIAmAloneOnAnyCall(): Flowable<NumParticipantsChangesResult> =
-        Flowable.create({ emitter ->
-            getCallUseCase.getCallsInProgressAndOnHold().let { calls ->
-                for (call in calls) {
-                    val result: NumParticipantsChangesResult = checkIfIAmAloneOnSpecificCall(call)
-                    result.isReceivedChange = false
-                    emitter.onNext(result)
-                }
-            }
-
-            sharingScope.launch {
-                monitorChatCallUpdatesUseCase()
-                    .catch { Timber.e(it) }
-                    .collectLatest { call ->
-                        withContext(mainImmediateDispatcher) {
-                            call.changes?.apply {
-                                Timber.d("Monitor chat call updated, changes $this")
-                                if (call.status == ChatCallStatus.InProgress || call.status == ChatCallStatus.Joining) {
-                                    emitter.onNext(checkIfIAmAloneOnSpecificCall(call))
-                                } else if (call.status != ChatCallStatus.Destroyed && call.status != ChatCallStatus.UserNoPresent && call.status != ChatCallStatus.TerminatingUserParticipation) {
-                                    emitter.onNext(
-                                        NumParticipantsChangesResult(
-                                            call.chatId,
-                                            onlyMeInTheCall = false,
-                                            waitingForOthers = false,
-                                            isReceivedChange = true
-                                        )
-                                    )
-
-                                }
-                            }
-                        }
-                    }
-            }
-        }, BackpressureStrategy.LATEST)
-
-    /**
-     * Method to check if I am alone on a specific call and whether it is because I am waiting for others or because everyone has dropped out of the call
-     *
-     * @param call MegaChatCall
-     * @return NumParticipantsChangesResult
-     */
-    fun checkIfIAmAloneOnSpecificCall(call: MegaChatCall): NumParticipantsChangesResult {
-        var waitingForOthers = false
-        var onlyMeInTheCall = false
-        megaChatApi.getChatRoom(call.chatid)?.let { chat ->
-            val isOneToOneCall = !chat.isGroup && !chat.isMeeting
-            if (!isOneToOneCall) {
-                call.peeridParticipants?.let { list ->
-                    onlyMeInTheCall =
-                        list.size().toInt() == 1 && list.get(0) == megaChatApi.myUserHandle
-
-                    waitingForOthers = onlyMeInTheCall &&
-                            MegaApplication.getChatManagement().isRequestSent(call.callId)
-                }
-            }
-        }
-
-        return NumParticipantsChangesResult(
-            call.chatid,
-            onlyMeInTheCall,
-            waitingForOthers,
-            isReceivedChange = true
-        )
-    }
-
-    /**
-     * Method to check if I am alone on a specific call and whether it is because I am waiting for others or because everyone has dropped out of the call
-     *
-     * @param call MegaChatCall
-     * @return NumParticipantsChangesResult
-     */
-    private fun checkIfIAmAloneOnSpecificCall(call: ChatCall): NumParticipantsChangesResult {
-        var waitingForOthers = false
-        var onlyMeInTheCall = false
-        runCatching {
-            megaChatApi.getChatRoom(call.chatId)?.let { chat ->
-                val isOneToOneCall = !chat.isGroup && !chat.isMeeting
-                if (!isOneToOneCall) {
-                    call.peerIdParticipants?.let { list ->
-                        onlyMeInTheCall =
-                            list.size == 1 && list[0] == megaChatApi.myUserHandle
-
-                        waitingForOthers = onlyMeInTheCall &&
-                                MegaApplication.getChatManagement().isRequestSent(call.callId)
-                    }
-                }
-            }
-        }
-
-        return NumParticipantsChangesResult(
-            call.chatId,
-            onlyMeInTheCall,
-            waitingForOthers,
-            isReceivedChange = true
-        )
-    }
 
     /**
      * Method to get local audio changes
