@@ -1624,7 +1624,7 @@ class MeetingActivityViewModel @Inject constructor(
                     if (call == null) {
                         finishMeetingActivity()
                     } else {
-                        chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
+                        chatManagement.setSpeakerStatus(call.chatId, speakerAudio)
                         chatManagement.setRequestSentCall(call.callId, false)
                         CallUtil.clearIncomingCallNotification(call.callId)
 
@@ -1663,7 +1663,7 @@ class MeetingActivityViewModel @Inject constructor(
      * @param list MegaHandleList with the call ID
      * @return True, if the meeting is finished. False, if not.
      */
-    fun isMeetingEnded(list: List<Long>?): Boolean =
+    private fun isMeetingEnded(list: List<Long>?): Boolean =
         list == null || list[0] == MEGACHAT_INVALID_HANDLE
 
     /**

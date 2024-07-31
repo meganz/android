@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomState
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
@@ -43,11 +44,15 @@ import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
+import mega.privacy.android.domain.usecase.login.ChatLogoutUseCase
+import mega.privacy.android.domain.usecase.meeting.JoinMeetingAsGuestUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.waitingroom.IsValidWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.mobile.analytics.event.WaitingRoomTimeoutEvent
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -86,6 +91,8 @@ class WaitingRoomViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getScheduleMeetingDataUseCase: GetScheduleMeetingDataUseCase,
     private val timestampMapper: ChatRoomTimestampMapper,
+    private val chatLogoutUseCase: ChatLogoutUseCase,
+    private val joinPublicChatUseCase: JoinPublicChatUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
@@ -93,6 +100,7 @@ class WaitingRoomViewModel @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
+    private val joinMeetingAsGuestUseCase: JoinMeetingAsGuestUseCase,
     private val getChatLocalVideoUpdatesUseCase: GetChatLocalVideoUpdatesUseCase,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val startVideoDeviceUseCase: StartVideoDeviceUseCase,
@@ -101,10 +109,11 @@ class WaitingRoomViewModel @Inject constructor(
     private val joinGuestChatCallUseCase: JoinGuestChatCallUseCase,
     private val checkChatLinkUseCase: CheckChatLinkUseCase,
     private val isUserLoggedIn: IsUserLoggedIn,
+    private val chatManagement: ChatManagement,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
-    private val openChatLinkUseCase: OpenChatLinkUseCase
+    private val openChatLinkUseCase: OpenChatLinkUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(WaitingRoomState())
@@ -155,7 +164,6 @@ class WaitingRoomViewModel @Inject constructor(
     fun loadMeetingDetails(chatId: Long?, chatLink: String?) {
         viewModelScope.launch {
             val userLoggedIn = isUserLoggedIn()
-
             _state.update {
                 it.copy(
                     chatId = chatId ?: -1L,
@@ -241,6 +249,15 @@ class WaitingRoomViewModel @Inject constructor(
     }
 
     /**
+     * Method to know if a meeting has ended
+     *
+     * @param list MegaHandleList with the call ID
+     * @return True, if the meeting is finished. False, if not.
+     */
+    private fun isMeetingEnded(list: List<Long>?): Boolean =
+        list == null || list[0] == MEGACHAT_INVALID_HANDLE
+
+    /**
      * Retrieve Chat Room link details
      */
     private fun retrieveChatLinkDetails() {
@@ -252,6 +269,7 @@ class WaitingRoomViewModel @Inject constructor(
             }.onSuccess { chatRequest ->
                 _state.update {
                     it.copy(
+                        finish = isMeetingEnded(chatRequest.handleList),
                         chatId = requireNotNull(chatRequest.chatHandle),
                         title = chatRequest.text,
                     )
@@ -270,7 +288,16 @@ class WaitingRoomViewModel @Inject constructor(
             monitorChatCallUpdatesUseCase()
                 .filter { it.chatId == _state.value.chatId }
                 .distinctUntilChanged()
-                .collectLatest { it.updateUiState() }
+                .collectLatest {
+                    it.changes?.apply {
+                        Timber.d("Changes in call: $this")
+                        when {
+                            contains(ChatCallChanges.Status) -> {
+                                it.updateUiState()
+                            }
+                        }
+                    }
+                }
         }
     }
 
@@ -362,6 +389,7 @@ class WaitingRoomViewModel @Inject constructor(
      * Update UI state based on the provided [ChatCall]
      */
     private fun ChatCall.updateUiState() {
+        Timber.d("Call status: $status")
         when {
             hasTimeoutExpired() -> {
                 Analytics.tracker.trackEvent(WaitingRoomTimeoutEvent)
@@ -416,8 +444,7 @@ class WaitingRoomViewModel @Inject constructor(
      * Check if [ChatCall] should be answered
      */
     private fun ChatCall.shouldBeAnswered(): Boolean =
-        shouldAnswerCall.get() && !_state.value.guestMode
-                && (status == ChatCallStatus.WaitingRoom || status == ChatCallStatus.UserNoPresent)
+        shouldAnswerCall.get() && !_state.value.guestMode && status == ChatCallStatus.UserNoPresent
 
     /**
      * Check if [ChatCall] has started
@@ -506,7 +533,90 @@ class WaitingRoomViewModel @Inject constructor(
             )
         }
 
-        joinCurrentCall()
+        retrieveChatLinkDetails()
+        state.value.chatLink?.let { link ->
+            joinMeetingAsGuest(link, firstName, lastName)
+
+        }
+    }
+
+    /**
+     * Control when join a meeting as a guest
+     *
+     * @param meetingLink   Meeting link
+     * @param firstName     Guest first name
+     * @param lastName      Guest last name
+     */
+    private fun joinMeetingAsGuest(meetingLink: String, firstName: String, lastName: String) {
+        viewModelScope.launch {
+            runCatching {
+                joinMeetingAsGuestUseCase(meetingLink, firstName, lastName)
+            }.onSuccess {
+                chatManagement
+                    .setOpeningMeetingLink(
+                        state.value.chatId,
+                        true
+                    )
+                autoJoinPublicChat()
+            }.onFailure { exception ->
+                Timber.e(exception)
+                chatLogout()
+            }
+        }
+    }
+
+    /**
+     * Auto join public chat
+     */
+    private fun autoJoinPublicChat() {
+        if (!chatManagement.isAlreadyJoining(state.value.chatId)) {
+            chatManagement.addJoiningChatId(state.value.chatId)
+            viewModelScope.launch {
+                runCatching {
+                    joinPublicChatUseCase(state.value.chatId)
+                }.onSuccess {
+                    chatManagement.removeJoiningChatId(state.value.chatId)
+                    chatManagement.broadcastJoinedSuccessfully()
+                    _state.update { it.copy(guestMode = false) }
+                    setChatVideoDevice()
+                    retrieveMeetingDetails()
+                    retrieveCallDetails()
+                    retrieveUserAvatar()
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                    chatManagement.removeJoiningChatId(state.value.chatId)
+                    _state.update {
+                        it.copy(
+                            finish = true,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+    Chat logout
+     */
+    private fun chatLogout() {
+        viewModelScope.launch {
+            runCatching {
+                chatLogoutUseCase()
+            }.onSuccess {
+                _state.update {
+                    it.copy(
+                        finish = true,
+                    )
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+                _state.update {
+                    it.copy(
+                        finish = true,
+                    )
+                }
+            }
+        }
     }
 
     /**
@@ -518,33 +628,20 @@ class WaitingRoomViewModel @Inject constructor(
         viewModelScope.launch {
             val currentState = _state.value
             val cameraEnabled = currentState.cameraEnabled
-            val guestMode = currentState.guestMode
-
             runCatching {
-                if (guestMode) _state.update { it.copy(guestMode = false) }
                 if (cameraEnabled) enableCamera(false).join()
+                openChatLinkUseCase(
+                    chatLink = requireNotNull(currentState.chatLink)
+                )
 
-                if (guestMode) {
-                    joinGuestChatCallUseCase(
-                        chatLink = requireNotNull(currentState.chatLink),
-                        firstName = requireNotNull(currentState.guestFirstName),
-                        lastName = requireNotNull(currentState.guestLastName),
-                    )
-                } else {
-                    openChatLinkUseCase(
-                        chatLink = requireNotNull(currentState.chatLink)
-                    )
-                }
             }.onSuccess {
                 if (cameraEnabled) enableCamera(true)
-
                 setChatVideoDevice()
                 retrieveMeetingDetails()
                 retrieveCallDetails()
                 retrieveUserAvatar()
             }.onFailure { exception ->
                 Timber.e(exception)
-                if (guestMode) _state.update { it.copy(guestMode = true) }
             }
         }
     }

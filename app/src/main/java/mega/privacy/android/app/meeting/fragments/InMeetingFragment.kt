@@ -864,14 +864,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.joinedAsGuest }
+            .distinctUntilChanged()) { joinedAsGuest ->
+            if (joinedAsGuest) {
+                inMeetingViewModel.onJoinedAsGuestConsumed()
+                controlWhenJoinedAChat(inMeetingViewModel.state.value.currentChatId)
+            }
+        }
+
+
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
             if (state.shouldFinish) {
                 finishActivity()
-            }
-
-            if (state.joinedAsGuest) {
-                inMeetingViewModel.onJoinedAsGuestConsumed()
-                controlWhenJoinedAChat(state.currentChatId)
             }
 
             if (state.error != null) {
@@ -2936,14 +2940,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun answerCallAfterJoin() {
-        val call = inMeetingViewModel.getCall()
-        if (call == null) {
-            Timber.d("Call is null")
-            isWaitingForAnswerCall = true
-        } else {
+        inMeetingViewModel.getCall()?.let {
             isWaitingForAnswerCall = false
             Timber.d("Joined to chat, answer call")
             answerCall()
+        } ?: run {
+            Timber.d("Call is null")
+            isWaitingForAnswerCall = true
         }
     }
 

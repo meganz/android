@@ -10,6 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.meeting.view.WaitingRoomView
@@ -54,21 +56,28 @@ class WaitingRoomActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent { MainComposeView() }
 
-        collectFlow(viewModel.state) { uiState ->
-            when {
-                uiState.joinCall ->
+        collectFlow(viewModel.state.map { it.joinCall }
+            .distinctUntilChanged()) {
+            if (it) {
+                viewModel.state.value.run {
                     launchCallScreen(
-                        chatId = uiState.chatId,
-                        chatLink = uiState.chatLink,
-                        micEnabled = uiState.micEnabled,
-                        cameraEnabled = uiState.cameraEnabled,
-                        speakerEnabled = uiState.speakerEnabled,
-                        guestFirstName = uiState.guestFirstName,
-                        guestLastName = uiState.guestLastName,
+                        chatId = chatId,
+                        chatLink = chatLink,
+                        micEnabled = micEnabled,
+                        cameraEnabled = cameraEnabled,
+                        speakerEnabled = speakerEnabled,
+                        guestFirstName = guestFirstName,
+                        guestLastName = guestLastName,
                     )
+                }
+            }
+        }
 
-                uiState.finish ->
-                    finish()
+        collectFlow(viewModel.state.map { it.finish }
+            .distinctUntilChanged()) {
+            if (it) {
+                Timber.d("Finish Waiting room")
+                finish()
             }
         }
 
