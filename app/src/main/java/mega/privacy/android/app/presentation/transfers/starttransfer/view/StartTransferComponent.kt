@@ -250,9 +250,6 @@ private fun StartTransferComponent(
                 is StartTransferEvent.Message ->
                     consumeMessage(it, snackBarHostState, context)
 
-                is StartTransferEvent.MessagePlural ->
-                    consumeMessage(it, snackBarHostState, context)
-
                 StartTransferEvent.NotConnected -> {
                     showOfflineAlertDialog = true
                 }
@@ -474,17 +471,6 @@ private suspend fun consumeMessage(
             context
         )
     }
-}
-
-private suspend fun consumeMessage(
-    event: StartTransferEvent.MessagePlural,
-    snackBarHostState: SnackbarHostState,
-    context: Context,
-) {
-    //show snack bar
-    snackBarHostState.showSnackbar(
-        context.resources.getQuantityString(event.message, event.quantity, event.quantity)
-    )
 }
 
 private fun consumeMessageAction(

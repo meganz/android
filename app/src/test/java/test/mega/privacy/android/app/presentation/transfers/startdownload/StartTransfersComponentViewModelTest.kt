@@ -8,7 +8,6 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -38,7 +37,6 @@ import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorActiveTransferFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.ShouldAskForResumeTransfersUseCase
@@ -99,7 +97,6 @@ class StartTransfersComponentViewModelTest {
         mock<SaveDoNotPromptToSaveDestinationUseCase>()
     private val setStorageDownloadAskAlwaysUseCase = mock<SetStorageDownloadAskAlwaysUseCase>()
     private val setStorageDownloadLocationUseCase = mock<SetStorageDownloadLocationUseCase>()
-    private val monitorActiveTransferFinishedUseCase = mock<MonitorActiveTransferFinishedUseCase>()
     private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
     private val shouldAskForResumeTransfersUseCase = mock<ShouldAskForResumeTransfersUseCase>()
     private val setAskedResumeTransfersUseCase = mock<SetAskedResumeTransfersUseCase>()
@@ -147,7 +144,6 @@ class StartTransfersComponentViewModelTest {
             saveDoNotPromptToSaveDestinationUseCase = saveDoNotPromptToSaveDestinationUseCase,
             setStorageDownloadAskAlwaysUseCase = setStorageDownloadAskAlwaysUseCase,
             setStorageDownloadLocationUseCase = setStorageDownloadLocationUseCase,
-            monitorActiveTransferFinishedUseCase = monitorActiveTransferFinishedUseCase,
             sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
             shouldAskForResumeTransfersUseCase = shouldAskForResumeTransfersUseCase,
             setAskedResumeTransfersUseCase = setAskedResumeTransfersUseCase,
@@ -179,7 +175,6 @@ class StartTransfersComponentViewModelTest {
             saveDoNotPromptToSaveDestinationUseCase,
             setStorageDownloadAskAlwaysUseCase,
             setStorageDownloadLocationUseCase,
-            monitorActiveTransferFinishedUseCase,
             sendChatAttachmentsUseCase,
             shouldAskForResumeTransfersUseCase,
             setAskedResumeTransfersUseCase,
@@ -196,7 +191,6 @@ class StartTransfersComponentViewModelTest {
 
     private fun initialStub() {
         whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
-        whenever(monitorActiveTransferFinishedUseCase(any())).thenReturn(MutableSharedFlow())
         whenever(startDownloadsWithWorkerUseCase(any(), any(), any())).thenReturn(emptyFlow())
         whenever(
             startUploadWithWorkerUseCase(
@@ -463,30 +457,6 @@ class StartTransfersComponentViewModelTest {
         }
 
     @Test
-    fun `test that finish downloading event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartDownloadNode`() =
-        runTest {
-            val monitorActiveTransferFinishedFlow = MutableSharedFlow<Int>()
-            setup()
-            commonStub()
-            whenever(monitorActiveTransferFinishedUseCase(any()))
-                .thenReturn(monitorActiveTransferFinishedFlow)
-
-            underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(listOf(mock()))) //to set lastTriggerEvent to StartDownloadNode
-            underTest.onResume(mock())
-            underTest.uiState.test {
-                val finished = 2
-                awaitItem() //current value doesn't matter
-                monitorActiveTransferFinishedFlow.emit(finished)
-                val expected =
-                    triggered(StartTransferEvent.MessagePlural.FinishDownloading(finished))
-
-                val actual = awaitItem().oneOffViewEvent
-
-                assertThat(actual).isEqualTo(expected)
-            }
-        }
-
-    @Test
     fun `test that paused transfers event is emitted when shouldAskForResumeTransfersUseCase is true and start a chat upload`() =
         runTest {
             commonStub()
@@ -582,30 +552,6 @@ class StartTransfersComponentViewModelTest {
             assertCurrentEventIsEqualTo(StartTransferEvent.Message.NotSufficientSpace)
         }
 
-    @Test
-    fun `test that finish uploading event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartUploadFiles`() =
-        runTest {
-            val monitorActiveTransferFinishedFlow = MutableSharedFlow<Int>()
-            setup()
-            commonStub()
-            whenever(monitorActiveTransferFinishedUseCase(any()))
-                .thenReturn(monitorActiveTransferFinishedFlow)
-
-            underTest.startTransfer(startUploadFilesEvent) //to set lastTriggerEvent to StartUpload
-            underTest.onResume(mock())
-            underTest.uiState.test {
-                val finished = 1
-                awaitItem() //current value doesn't matter
-                monitorActiveTransferFinishedFlow.emit(finished)
-                val expected =
-                    triggered(StartTransferEvent.MessagePlural.FinishUploading(finished))
-
-                val actual = awaitItem().oneOffViewEvent
-
-                assertThat(actual).isEqualTo(expected)
-            }
-        }
-
     @ParameterizedTest(name = "when start upload finishes with {0}, then {1} is emitted")
     @MethodSource("provideUploadParameters")
     fun `test that a specific StartUpload is emitted`(
@@ -621,24 +567,20 @@ class StartTransfersComponentViewModelTest {
     }
 
     @Test
-    fun `test that finish uploading event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartUploadTextFile`() =
+    fun `test that failed text file upload event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartUploadTextFile`() =
         runTest {
-            val monitorActiveTransferFinishedFlow = MutableSharedFlow<Int>()
             setup()
             commonStub()
-            whenever(monitorActiveTransferFinishedUseCase(any()))
-                .thenReturn(monitorActiveTransferFinishedFlow)
+            stubStartUpload(flow {
+                throw (RuntimeException())
+            })
 
-            underTest.startTransfer(startUploadTextFileEvent) //to set lastTriggerEvent to StartUpload
+            underTest.startTransfer(startUploadTextFileEvent)
             underTest.onResume(mock())
             underTest.uiState.test {
-                val finished = 1
-                awaitItem() //current value doesn't matter
-                monitorActiveTransferFinishedFlow.emit(finished)
                 val expected =
                     triggered(
-                        StartTransferEvent.Message.FinishTextFileUpload(
-                            isSuccess = true,
+                        StartTransferEvent.Message.FailedTextFileUpload(
                             isEditMode = startUploadTextFileEvent.isEditMode,
                             isCloudFile = startUploadTextFileEvent.fromHomePage
                         )
