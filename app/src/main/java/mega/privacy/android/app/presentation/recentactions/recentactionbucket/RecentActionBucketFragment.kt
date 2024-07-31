@@ -403,7 +403,7 @@ class RecentActionBucketFragment : Fragment() {
         index: Int,
         node: MegaNode,
     ) = viewLifecycleOwner.lifecycleScope.launch {
-        val handles = getNodesHandles(true)
+        val handles = getNodesHandles(true).toLongArray()
         val nodeIds = if (handles.isNotEmpty()) handles else longArrayOf(node.handle)
         val menuOptionSource = if (megaApi.getRootParentNode(node).isInShare) {
             ImagePreviewMenuSource.SHARED_ITEMS
