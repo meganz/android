@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.contact.invite
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
@@ -19,6 +20,7 @@ class InviteContactActivityV2 : BaseActivity() {
      * Called when the activity is starting.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         supportFragmentManager.commit {
             replace(android.R.id.content, InviteContactFragment())

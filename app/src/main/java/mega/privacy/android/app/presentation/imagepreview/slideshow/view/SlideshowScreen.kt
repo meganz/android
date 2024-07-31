@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -53,17 +54,14 @@ import mega.privacy.android.app.R.drawable
 import mega.privacy.android.app.R.string
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowViewModel
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.SettingOptionsMenuAction
-import mega.privacy.android.app.presentation.imagepreview.slideshow.view.PhotoBox
-import mega.privacy.android.app.presentation.imagepreview.slideshow.view.PhotoState
-import mega.privacy.android.app.presentation.imagepreview.slideshow.view.rememberPhotoState
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
-import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
 import mega.privacy.mobile.analytics.event.SlideShowScreenEvent
 import timber.log.Timber
 
@@ -107,6 +105,7 @@ fun SlideshowScreen(
             LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
         Scaffold(
+            modifier = Modifier.systemBarsPadding(),
             scaffoldState = scaffoldState,
             topBar = {
                 if (!isPlaying) {

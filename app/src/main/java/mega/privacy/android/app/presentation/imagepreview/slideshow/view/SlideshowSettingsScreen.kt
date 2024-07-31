@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.imagepreview.slideshow.view
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -22,6 +23,7 @@ fun SlideshowSettingScreen(
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
             MegaAppBar(
