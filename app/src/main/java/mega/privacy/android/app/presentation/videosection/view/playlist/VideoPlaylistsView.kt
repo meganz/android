@@ -75,6 +75,7 @@ internal fun VideoPlaylistsView(
     onCreateDialogPositiveButtonClicked: (String) -> Unit,
     onRenameDialogPositiveButtonClicked: (playlistID: NodeId, newTitle: String) -> Unit,
     onDeleteDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit,
+    onDeleteDialogNegativeButtonClicked: () -> Unit,
     onDeletePlaylistsDialogPositiveButtonClicked: () -> Unit,
     setInputValidity: (Boolean) -> Unit,
     onClick: (item: VideoPlaylistUIEntity, index: Int) -> Unit,
@@ -236,6 +237,7 @@ internal fun VideoPlaylistsView(
                     },
                     onDismiss = {
                         updateShowDeleteVideoPlaylist(false)
+                        onDeleteDialogNegativeButtonClicked()
                         clickedItem = -1
                     }
                 )
@@ -421,7 +423,8 @@ private fun VideoPlaylistsViewPreview() {
             onDeleteDialogPositiveButtonClicked = {},
             onDeletedMessageShown = {},
             setInputValidity = {},
-            onDeletePlaylistsDialogPositiveButtonClicked = {}
+            onDeletePlaylistsDialogPositiveButtonClicked = {},
+            onDeleteDialogNegativeButtonClicked = {}
         )
     }
 }
@@ -450,7 +453,8 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
             onDeleteDialogPositiveButtonClicked = {},
             setInputValidity = {},
             onDeletedMessageShown = {},
-            onDeletePlaylistsDialogPositiveButtonClicked = {}
+            onDeletePlaylistsDialogPositiveButtonClicked = {},
+            onDeleteDialogNegativeButtonClicked = {}
         )
     }
 }

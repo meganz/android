@@ -54,6 +54,7 @@ class VideoPlaylistsViewTest {
         errorMessage: Int? = null,
         onLongClick: ((item: VideoPlaylistUIEntity, index: Int) -> Unit) = { _, _ -> },
         onDeletePlaylistsDialogPositiveButtonClicked: () -> Unit = {},
+        onDeleteDialogNegativeButtonClicked: () -> Unit = {}
     ) {
         composeTestRule.setContent {
             VideoPlaylistsView(
@@ -79,7 +80,8 @@ class VideoPlaylistsViewTest {
                 deletedVideoPlaylistTitles = deletedVideoPlaylistTitles,
                 onDeleteDialogPositiveButtonClicked = onDeleteDialogPositiveButtonClicked,
                 onRenameDialogPositiveButtonClicked = onRenameDialogPositiveButtonClicked,
-                onDeletePlaylistsDialogPositiveButtonClicked = onDeletePlaylistsDialogPositiveButtonClicked
+                onDeletePlaylistsDialogPositiveButtonClicked = onDeletePlaylistsDialogPositiveButtonClicked,
+                onDeleteDialogNegativeButtonClicked = onDeleteDialogNegativeButtonClicked
             )
         }
     }
