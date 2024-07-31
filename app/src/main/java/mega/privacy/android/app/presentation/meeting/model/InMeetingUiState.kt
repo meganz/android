@@ -3,14 +3,15 @@ package mega.privacy.android.app.presentation.meeting.model
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.AnotherCallType
 import mega.privacy.android.domain.entity.call.CallOnHoldType
 import mega.privacy.android.domain.entity.call.CallUIStatusType
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSession
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
+import timber.log.Timber
 
 /**
  * In meeting UI state
@@ -185,6 +186,7 @@ data class InMeetingUiState(
      */
     fun getSessionByClientId(clientId: Long): ChatSession? {
         call?.apply {
+            Timber.d("Call $call and Sessions $sessionsClientId")
             return sessionByClientId[clientId]
         }
 

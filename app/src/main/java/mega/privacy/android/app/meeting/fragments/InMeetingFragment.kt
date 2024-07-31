@@ -183,9 +183,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var swapCameraMenuItem: MenuItem? = null
     private var gridViewMenuItem: MenuItem? = null
     private var speakerViewMenuItem: MenuItem? = null
-
-    private var micIsEnable = false
-    private var camIsEnable = false
     private var speakerIsEnable = false
     private var isManualModeView = false
     private var isWaitingForAnswerCall = false
@@ -224,11 +221,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private var countDownTimerToEndCall: CountDownTimer? = null
 
+    private var orientation: Int = Configuration.ORIENTATION_PORTRAIT
+
     val inMeetingViewModel: InMeetingViewModel by activityViewModels()
 
     private val enableOrDisableLocalVideoObserver = Observer<Boolean> { shouldBeEnabled ->
         val chatId = inMeetingViewModel.getChatId()
-        if (chatId != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null && shouldBeEnabled != camIsEnable) {
+        if (chatId != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null && shouldBeEnabled != sharedModel.micLiveData.value) {
             MegaApplication.getChatManagement().isDisablingLocalVideo = true
             sharedModel.clickCamera(shouldBeEnabled)
         }
@@ -516,10 +515,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         return binding.root
     }
 
+    private fun updateCurrentOrientation() {
+        orientation = resources.configuration.orientation
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Timber.d("In the meeting fragment")
-
+        updateCurrentOrientation()
         blink = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
 
         initViewModel()
@@ -672,10 +675,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             MEETING_ACTION_IN -> {
                 if (arguments?.getBoolean(MeetingActivity.MEETING_AUDIO_ENABLE, false) == true) {
-                    sharedModel.clickMic(micIsEnable)
+                    Timber.d("Action in with audio enable")
+                    sharedModel.clickMic(true)
                 }
                 if (arguments?.getBoolean(MeetingActivity.MEETING_VIDEO_ENABLE, false) == true) {
-                    sharedModel.clickCamera(camIsEnable)
+                    Timber.d("Action in with camera enable")
+                    sharedModel.clickCamera(true)
                 }
                 if (arguments?.getBoolean(MeetingActivity.MEETING_SPEAKER_ENABLE, false) == true) {
                     sharedModel.clickSpeaker()
@@ -699,38 +704,44 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     @Suppress("DEPRECATION")
     override fun onConfigurationChanged(newConfig: Configuration) {
+        Timber.d("onConfigurationChanged called")
         super.onConfigurationChanged(newConfig)
         val outMetrics = DisplayMetrics()
         val display = meetingActivity.windowManager.defaultDisplay
         display.getMetrics(outMetrics)
-        bottomFloatingPanelViewHolder?.updateWidth(newConfig.orientation, outMetrics.widthPixels)
+        if (inMeetingViewModel.state.value.isInPipMode.not()) {
+            bottomFloatingPanelViewHolder?.updateWidth(
+                newConfig.orientation,
+                outMetrics.widthPixels
+            )
 
-        floatingWindowFragment?.let {
-            if (it.isAdded) {
-                it.updateOrientation()
+            floatingWindowFragment?.let {
+                if (it.isAdded) {
+                    it.updateOrientation()
+                }
             }
-        }
 
-        individualCallFragment?.let {
-            if (it.isAdded) {
-                it.updateOrientation()
+            individualCallFragment?.let {
+                if (it.isAdded) {
+                    it.updateOrientation()
+                }
             }
-        }
 
-        floatingWindowContainer.let {
-            Timber.d("Update floating window layout")
-            val menuLayoutParams = it.layoutParams as ViewGroup.MarginLayoutParams
-            menuLayoutParams.setMargins(0, 0, 0, Util.dp2px(125f, outMetrics))
-            it.layoutParams = menuLayoutParams
-            onConfigurationChangedOfFloatingWindow(outMetrics)
-        }
+            floatingWindowContainer.let {
+                Timber.d("Update floating window layout")
+                val menuLayoutParams = it.layoutParams as ViewGroup.MarginLayoutParams
+                menuLayoutParams.setMargins(0, 0, 0, Util.dp2px(125f, outMetrics))
+                it.layoutParams = menuLayoutParams
+                onConfigurationChangedOfFloatingWindow(outMetrics)
+            }
 
-        gridViewCallFragment?.let {
-            if (it.isAdded) {
-                it.updateLayout(
-                    outMetrics.widthPixels,
-                    outMetrics.heightPixels
-                )
+            gridViewCallFragment?.let {
+                if (it.isAdded) {
+                    it.updateLayout(
+                        outMetrics.widthPixels,
+                        outMetrics.heightPixels
+                    )
+                }
             }
         }
     }
@@ -998,7 +1009,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             sharedModel.setSpeakerView(isSpeakerMode = state.callUIStatus == CallUIStatusType.SpeakerView)
 
-            if (state.showEndMeetingAsHostBottomPanel) {
+            if (state.showEndMeetingAsHostBottomPanel && state.isInPipMode.not()) {
                 if (endMeetingAsModeratorDialog == null) {
                     endMeetingAsModeratorDialog = EndMeetingAsModeratorBottomSheetDialogFragment()
                     endMeetingAsModeratorDialog?.run {
@@ -1156,6 +1167,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             when {
                 showedEndMeetingBottomPanel &&
                         floatingBottomSheet.isVisible -> {
+                    Timber.d("floatingBottomSheet visibility is setting false")
                     floatingBottomSheet.isVisible = false
                 }
 
@@ -1173,6 +1185,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             when {
                 showedCallOptionsBottomPanel &&
                         floatingBottomSheet.isVisible -> {
+                    Timber.d("floatingBottomSheet visibility is setting false")
                     floatingBottomSheet.isVisible = false
                 }
 
@@ -1195,6 +1208,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             when {
                 state.shouldParticipantInCallListBeShown -> {
                     if (floatingBottomSheet.isShown.not()) {
+                        Timber.d("floatingBottomSheet.isShown = ${floatingBottomSheet.isShown}")
                         onPageClick()
                     }
                     sharedModel.showParticipantsList(shouldBeShown = false)
@@ -1276,6 +1290,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.isInPipMode }) {
+            checkChildFragments()
+            Timber.d("Currently Picture in Picture Mode is $it")
+        }
     }
 
     /**
@@ -1304,9 +1323,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun setRecIndicatorVisibility() {
         with(callRecordingViewModel.state.value) {
-            binding.recIndicator.visibility =
-                if (isSessionOnRecording && !toolbar.isVisible && !floatingBottomSheet.isVisible) View.VISIBLE
-                else View.GONE
+            if (inMeetingViewModel.state.value.isInPipMode.not()) {
+                binding.recIndicator.visibility =
+                    if (isSessionOnRecording && !toolbar.isVisible && !floatingBottomSheet.isVisible) View.VISIBLE
+                    else View.GONE
+            }
         }
     }
 
@@ -1333,19 +1354,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         collectFlows()
 
         sharedModel.micLiveData.observe(viewLifecycleOwner) {
-            if (micIsEnable != it) {
-                Timber.d("Mic status has changed to $it")
-                micIsEnable = it
-                updateLocalAudio(it)
-            }
+            updateLocalAudio(it)
         }
 
         sharedModel.cameraLiveData.observe(viewLifecycleOwner) {
-            if (camIsEnable != it) {
-                Timber.d("Camera status has changed to $it")
-                camIsEnable = it
-                updateLocalVideo(it)
-            }
+            updateLocalVideo(it)
         }
 
         sharedModel.speakerLiveData.observe(viewLifecycleOwner) {
@@ -1601,12 +1614,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onPictureInPictureModeChanged(isInPictureInPictureMode)
         if (inMeetingViewModel.state.value.isPictureInPictureFeatureFlagEnabled) {
             inMeetingViewModel.updateIsInPipMode(isInPipMode = isInPictureInPictureMode)
-            checkChildFragments()
-            Timber.d("Currently Picture in Picture Mode is $isInPictureInPictureMode")
         }
     }
 
     fun onPageClick() {
+        Timber.d("onPageClick")
         // If the tips is showing or bottom is fully expanded, can not hide the toolbar and panel
         if (bottomFloatingPanelViewHolder?.isPopWindowShowing() == true
             || bottomFloatingPanelViewHolder?.getState() == BottomSheetBehavior.STATE_EXPANDED
@@ -1615,12 +1627,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         // Prevent fast tapping.
         if (System.currentTimeMillis() - lastTouch < TAP_THRESHOLD) return
 
+        Timber.d("banner should be shown $bannerShouldBeShown")
+
         toolbar.fadeInOut(dy = TOOLBAR_DY, toTop = true)
 
         if (bannerShouldBeShown) {
             bannerMuteLayout.fadeInOut(dy = FLOATING_BOTTOM_SHEET_DY, toTop = true)
         }
-
         floatingBottomSheet.fadeInOut(dy = FLOATING_BOTTOM_SHEET_DY, toTop = false)
 
         @Suppress("DEPRECATION")
@@ -1646,20 +1659,23 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param outMetrics display metrics
      */
     private fun onConfigurationChangedOfFloatingWindow(outMetrics: DisplayMetrics) {
+        val currentOrientation =
+            resources.configuration.orientation
+        if (orientation == currentOrientation) return
+        updateCurrentOrientation()
         inMeetingViewModel.state.value.run {
-            if (!isInPipMode) {
-                floatingWindowContainer.post {
-                    previousY = -1f
-                    val dx = outMetrics.widthPixels - floatingWindowContainer.width
-                    var dy = outMetrics.heightPixels - floatingWindowContainer.height
+            Timber.d("onConfigurationChangedOfFloatingWindow with $outMetrics isInPip $isInPipMode")
+            floatingWindowContainer.post {
+                previousY = -1f
+                val dx = outMetrics.widthPixels - floatingWindowContainer.width
+                var dy = outMetrics.heightPixels - floatingWindowContainer.height
 
-                    if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder?.getState() && floatingBottomSheet.isVisible) {
-                        dy = floatingBottomSheet.top - floatingWindowContainer.height
-                    }
-                    Timber.d("Moved X: $dx, Y: $dy")
-                    floatingWindowContainer.moveX(dx.toFloat())
-                    floatingWindowContainer.moveY(dy.toFloat())
+                if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder?.getState() && floatingBottomSheet.isVisible) {
+                    dy = floatingBottomSheet.top - floatingWindowContainer.height
                 }
+                Timber.d("Moved X: $dx, Y: $dy")
+                floatingWindowContainer.moveX(dx.toFloat())
+                floatingWindowContainer.moveY(dy.toFloat())
             }
         }
     }
@@ -1674,6 +1690,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bTop: Boolean = false,
         bBottom: Boolean = true,
     ) {
+        if (inMeetingViewModel.state.value.isInPipMode) return
         var isIntersect: Boolean
         var isIntersectPreviously: Boolean
 
@@ -2351,6 +2368,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         //Observer the participant List
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
+            Timber.d("Shared model mic ${sharedModel.micLiveData.value} and cam ${sharedModel.cameraLiveData.value}")
             participants?.let {
                 bottomFloatingPanelViewHolder?.setParticipantsPanel(
                     it.toMutableList(),
@@ -2488,9 +2506,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to disable the local camera
      */
     private fun disableCamera() {
-        if (camIsEnable) {
+        if (sharedModel.cameraLiveData.value == true) {
             sharedModel.clickCamera(false)
-            camIsEnable = false
         }
     }
 
@@ -2899,8 +2916,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method that updates the microphone and camera values
      */
     private fun updateMicAndCam() {
-        camIsEnable = sharedModel.cameraLiveData.value ?: false
-        micIsEnable = sharedModel.micLiveData.value ?: false
+        Timber.d("cam on ${sharedModel.cameraLiveData.value} and mic on ${sharedModel.micLiveData.value}")
+        val camIsEnable = sharedModel.cameraLiveData.value ?: false
+        val micIsEnable = sharedModel.micLiveData.value ?: false
         bottomFloatingPanelViewHolder?.updateCamIcon(camIsEnable)
         bottomFloatingPanelViewHolder?.updateMicIcon(micIsEnable)
         updateParticipantsBottomPanel()
@@ -2954,13 +2972,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to answer the call
      */
     private fun answerCall() {
-        var audio = micIsEnable
+        var audio = sharedModel.micLiveData.value ?: false
         if (audio) {
             audio =
                 PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
         }
 
-        var video = camIsEnable
+        var video = sharedModel.cameraLiveData.value ?: false
         if (video) {
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
         }
@@ -2975,13 +2993,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to start the call
      */
     private fun startCall() {
-        var audio = micIsEnable
+        var audio = sharedModel.micLiveData.value ?: false
         if (audio) {
             audio =
                 PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
         }
 
-        var video = camIsEnable
+        var video = sharedModel.cameraLiveData.value ?: false
         if (video) {
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
         }

@@ -708,8 +708,7 @@ class InMeetingViewModel @Inject constructor(
                                         }
                                     }
 
-                                    if (showReconnectingBanner.value || !isOnline()
-                                    ) {
+                                    if (showReconnectingBanner.value || !isOnline()) {
                                         Timber.d("Back from reconnecting")
                                     } else {
                                         Timber.d("Change in call composition, review the UI")
@@ -2194,10 +2193,15 @@ class InMeetingViewModel @Inject constructor(
                         return it
                     }
             }
-
         }
-
         return null
+    }
+
+    /**
+     * Method to get the first participant in the list, who will be the new speaker
+     */
+    fun getOwnParticipant(): Participant? {
+        return participants.value?.firstOrNull { it.isMe }
     }
 
     /**

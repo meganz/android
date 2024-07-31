@@ -1259,21 +1259,12 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
-     * Method for setting a name for the meeting
-     *
-     * @param name The name
-     */
-    fun setMeetingsName(name: String) =
-        _state.update {
-            it.copy(meetingName = name)
-        }
-
-    /**
      * Response of clicking mic fab
      *
      * @param shouldAudioBeEnabled True, if audio should be enabled. False, otherwise
      */
     fun clickMic(shouldAudioBeEnabled: Boolean) {
+        Timber.d("click mic shouldAudioBeEnabled: $shouldAudioBeEnabled")
         // Check audio permission. If haven't been granted, ask for the permission and return
         if (!_recordAudioGranted.value) {
             _recordAudioPermissionCheck.value = true
@@ -1331,6 +1322,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun enableDeviceCamera(enable: Boolean, isReleasingVideo: Boolean) =
         viewModelScope.launch {
+            Timber.d("Enable device camera: $enable and isReleasingVideo: $isReleasingVideo")
             runCatching {
                 startVideoDeviceUseCase(enable)
             }.onFailure { exception ->
@@ -1349,6 +1341,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun enableVideo(enable: Boolean) {
         state.value.currentCall?.apply {
+            Timber.d("Enable video: $enable and has Local Video $hasLocalVideo")
             if (enable && hasLocalVideo) {
                 return
             }
@@ -1375,6 +1368,10 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun enableAudio(enable: Boolean) {
         state.value.currentCall?.apply {
+            Timber.d("Enable audio: $enable and has Local Audio $hasLocalAudio")
+            if (enable && hasLocalAudio) {
+                return
+            }
             viewModelScope.launch {
                 runCatching {
                     enableOrDisableAudioUseCase(chatId, enable)

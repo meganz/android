@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.databinding.PictureInPictureCallFragmentBinding
+import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSessionStatus
@@ -78,7 +79,7 @@ class PictureInPictureCallFragment : MeetingBaseFragment() {
         }
         Timber.d("Chat ID $chatId")
         collectFlows()
-        checkInitialUI()
+        checkParticipantsUI()
     }
 
     private fun collectFlows() {
@@ -113,36 +114,64 @@ class PictureInPictureCallFragment : MeetingBaseFragment() {
             .distinctUntilChanged()) { session ->
             Timber.d("Check changes in HiRes video $session")
             session?.apply {
-                val participant =
-                    inMeetingViewModel.getParticipant(session.peerId, session.clientId)
-                Timber.d("Participant $participant")
-
-                participant?.also { currentActiveParticipant ->
-                    if (this@PictureInPictureCallFragment.clientId != currentActiveParticipant.clientId) {
-                        removeChatVideoListener()
-                    }
-                    this@PictureInPictureCallFragment.clientId = currentActiveParticipant.clientId
-                    currentActiveParticipant.avatar?.let {
-                        avatarImageView.setImageBitmap(it)
-                    }
-                    checkUI()
-                }
+                checkParticipantsUI()
             }
+        }
+
+        inMeetingViewModel.participants.observe(viewLifecycleOwner) {
+            checkParticipantsUI()
         }
     }
 
-    private fun checkInitialUI() {
-        Timber.d("Call ${inMeetingViewModel.getCall()}")
-        val session =
-            inMeetingViewModel.state.value.changesInStatusInSession
-        Timber.d("Current Session $session")
-        session?.also { currentSession ->
-            this@PictureInPictureCallFragment.clientId = currentSession.clientId
-            inMeetingViewModel.getAvatarBitmap(currentSession.peerId)?.let {
-                avatarImageView.setImageBitmap(it)
+    private fun getCurrentParticipant(): Participant? {
+        val participant =
+            inMeetingViewModel.getCurrentSpeakerParticipant()
+                ?.takeIf { it.clientId != -1L }
+                ?: inMeetingViewModel.getFirstParticipant(-1, -1)
+        Timber.d("Participant $participant")
+        return participant
+    }
+
+    private fun checkParticipantsUI() {
+        val participant = getCurrentParticipant()
+        participant?.also { currentActiveParticipant ->
+            Timber.d("previousClientId $clientId and new client Id ${currentActiveParticipant.clientId}")
+            if (this@PictureInPictureCallFragment.clientId != currentActiveParticipant.clientId) {
+                removeChatVideoListener()
+                this@PictureInPictureCallFragment.clientId =
+                    currentActiveParticipant.clientId
+                currentActiveParticipant.avatar?.let {
+                    Timber.d("Setting Avatar of client id ${currentActiveParticipant.clientId}")
+                    avatarImageView.setImageBitmap(it)
+                }
             }
-            inMeetingViewModel.requestHiResVideo(currentSession, this.chatId)
             checkUI()
+        } ?: run {
+            closeVideo()
+            hideAvatar()
+            inMeetingViewModel.getCall()?.run {
+                Timber.d("Chat Session $sessionsClientId and number of participants $numParticipants hasLocalVideo $hasLocalVideo")
+                // need to render only the local video or avatar
+                if (hasLocalVideo) {
+                    this@PictureInPictureCallFragment.clientId = -1
+                    videoListener = IndividualCallVideoListener(
+                        videoTextureView,
+                        resources.displayMetrics,
+                        -1,
+                        isFloatingWindow = false
+                    )
+                    sharedModel.addLocalVideo(chatId, videoListener)
+                    videoTextureView.visibility = View.VISIBLE
+                } else {
+                    this@PictureInPictureCallFragment.clientId = -1
+                    inMeetingViewModel.state.value.myUserHandle?.let { peerId ->
+                        inMeetingViewModel.getAvatarBitmap(peerId)?.let {
+                            avatarImageView.setImageBitmap(it)
+                            avatarImageView.visibility = View.VISIBLE
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -199,14 +228,12 @@ class PictureInPictureCallFragment : MeetingBaseFragment() {
         Timber.d("UI video off")
         showAvatar()
         closeVideo()
-        showCallOnHoldIcon()
     }
 
     /**
      * Method to show the Avatar
      */
     private fun showAvatar() {
-
         Timber.d("Show avatar")
         avatarImageView.isVisible = true
     }
@@ -218,23 +245,6 @@ class PictureInPictureCallFragment : MeetingBaseFragment() {
         Timber.d("Close video of $clientId")
         videoTextureView.isVisible = false
         removeChatVideoListener()
-    }
-
-    /**
-     * Method to control the Call on hold icon visibility
-     */
-    private fun showCallOnHoldIcon() {
-        val isCallOnHold = inMeetingViewModel.state.value.isCallOnHold == true
-        val isSessionOnHold = inMeetingViewModel.state.value.isSessionOnHold == true
-
-        if (isCallOnHold || isSessionOnHold) {
-            avatarImageView.alpha = 0.5f
-            return
-        }
-
-        Timber.d("Hide on hold icon")
-        avatarImageView.alpha = 1f
-
     }
 
     /**
@@ -278,6 +288,7 @@ class PictureInPictureCallFragment : MeetingBaseFragment() {
      * Method for activating the video
      */
     private fun activateVideo() {
+        Timber.d("Activate video of $clientId")
         inMeetingViewModel.getSessionByClientId(clientId)?.also {
             Timber.d("ChatSession $it of client id $clientId")
             if (!it.canReceiveVideoHiRes && it.isHiResVideo) {

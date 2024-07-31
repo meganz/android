@@ -31,17 +31,18 @@ import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
 import mega.privacy.android.domain.entity.featureflag.Flag
-import mega.privacy.android.domain.entity.call.ChatCallStatus
-import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CallRepository
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -571,6 +572,7 @@ internal class CallRepositoryImpl @Inject constructor(
     override suspend fun enableAudio(
         chatId: Long,
     ): ChatRequest = withContext(dispatcher) {
+        Timber.d("enable Audio")
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getChatRequestListener(
                 methodName = "enableAudio",
@@ -589,6 +591,7 @@ internal class CallRepositoryImpl @Inject constructor(
     override suspend fun disableAudio(
         chatId: Long,
     ): ChatRequest = withContext(dispatcher) {
+        Timber.d("disable Audio")
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getChatRequestListener(
                 methodName = "disableAudio",

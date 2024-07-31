@@ -189,7 +189,6 @@ class MeetingActivity : PasscodeActivity() {
     private fun initializePictureInPictureParams() {
         if (isSystemPipEnabledAndAvailable()) {
             pipBuilderParams = PictureInPictureParams.Builder()
-            pipBuilderParams.setAspectRatio(Rational(PIP_WIDTH_RATIO, PIP_HEIGHT_RATIO))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 pipBuilderParams.setSeamlessResizeEnabled(false)
             }
@@ -233,6 +232,13 @@ class MeetingActivity : PasscodeActivity() {
     private fun enterPipModeIfPossible(): Boolean {
         if (isSystemPipEnabledAndAvailable() && meetingViewModel.state.value.isPictureInPictureFeatureFlagEnabled) {
             return try {
+                val rationale =
+                    if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        Rational(PIP_WIDTH_RATIO, PIP_HEIGHT_RATIO)
+                    } else {
+                        Rational(PIP_HEIGHT_RATIO, PIP_WIDTH_RATIO)
+                    }
+                pipBuilderParams.setAspectRatio(rationale)
                 enterPictureInPictureMode(pipBuilderParams.build())
                 true
             } catch (e: Exception) {
@@ -241,10 +247,6 @@ class MeetingActivity : PasscodeActivity() {
             }
         }
         return false
-    }
-
-    private fun isInPipMode(): Boolean {
-        return isSystemPipEnabledAndAvailable() && isInPictureInPictureMode
     }
 
     override fun onNewIntent(newIntent: Intent) {

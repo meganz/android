@@ -607,11 +607,5 @@ class BottomFloatingPanelViewHolder(
 
         private const val INDICATOR_COLOR_START = 0x4F
         private const val INDICATOR_COLOR_END = 0xBD
-
-        private const val FAB_LABEL_COLOR_DARK_MODE = 0xE2
-        private const val FAB_LABEL_COLOR_START_LIGHT_MODE = 0xFF
-        private const val FAB_LABEL_COLOR_END_LIGHT_MODE = 0x21
-        private const val FAB_TINT_COLOR_START = 0.0F
-        private const val FAB_TINT_COLOR_END = 1.0F
     }
 }
