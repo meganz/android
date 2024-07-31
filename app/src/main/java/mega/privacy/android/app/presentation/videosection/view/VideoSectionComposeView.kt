@@ -134,10 +134,8 @@ internal fun VideoSectionComposeView(
                                 videoSectionViewModel.clearAllSelectedVideoPlaylists()
                             }
 
-                        is VideoSectionMenuAction.VideoSectionRemoveAction -> {
+                        is VideoSectionMenuAction.VideoSectionRemoveAction ->
                             showDeleteVideoPlaylist = true
-                            videoSectionViewModel.clearAllSelectedVideoPlaylists()
-                        }
 
                         else -> onMenuAction(action)
                     }
@@ -244,7 +242,8 @@ internal fun VideoSectionComposeView(
                             }
                         videoSectionViewModel.removeVideoPlaylists(removedPlaylists)
                         onDeleteDialogButtonClicked()
-                    }
+                    },
+                    onDeleteDialogNegativeButtonClicked = videoSectionViewModel::clearAllSelectedVideoPlaylists
                 )
             },
             selectedTab = tabState.selectedTab,
