@@ -47,6 +47,7 @@ import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
  * @param imeAction       [ImeAction]
  * @param keyboardActions [KeyboardActions]
  * @param modifier        [Modifier]
+ * @param textFieldModifier [Modifier]
  * @param text            Typed text.
  * @param errorText       Error to show if any.
  * @param keyboardType Specifies the type of keys available for the Keyboard (e.g. Text, Number)
@@ -57,6 +58,7 @@ fun GenericTextField(
     text: String,
     onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    textFieldModifier: Modifier = Modifier,
     placeholder: String = "",
     errorText: String? = null,
     singleLine: Boolean = true,
@@ -84,7 +86,7 @@ fun GenericTextField(
         BasicTextField(
             value = text,
             onValueChange = onTextChange,
-            modifier = Modifier
+            modifier = textFieldModifier
                 .testTag(GENERIC_TEXT_FIELD_TEXT_TAG)
                 .background(Color.Transparent)
                 .indicatorLine(true, isError, interactionSource, colors)

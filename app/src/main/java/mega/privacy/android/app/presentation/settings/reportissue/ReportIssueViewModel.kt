@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.reportissue
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -48,13 +49,13 @@ class ReportIssueViewModel @Inject constructor(
 
     private val description = savedStateHandle.getStateFlow(
         viewModelScope,
-        Companion.descriptionKey,
+        DESCRIPTION_KEY,
         ""
     )
 
     private val includeLogs = savedStateHandle.getStateFlow(
         viewModelScope,
-        Companion.includeLogsKey,
+        INCLUDE_LOGS_KEY,
         false
     )
 
@@ -74,7 +75,7 @@ class ReportIssueViewModel @Inject constructor(
                     { state: ReportIssueUiState ->
                         state.copy(
                             description = it,
-                            canSubmit = it.isNotEmpty()
+                            canSubmit = it.isNotBlank()
                         )
                     }
                 },
@@ -94,6 +95,11 @@ class ReportIssueViewModel @Inject constructor(
      */
     fun setDescription(newDescription: String) {
         description.update { newDescription }
+        _uiState.update {
+            it.copy(
+                error = null
+            )
+        }
     }
 
     /**
@@ -111,6 +117,14 @@ class ReportIssueViewModel @Inject constructor(
      */
     fun submit() {
         if (isConnected.value) {
+            if (uiState.value.description.length < MINIMUM_CHARACTERS) {
+                _uiState.update {
+                    it.copy(
+                        error = sharedR.string.report_issue_error_minimum_characters
+                    )
+                }
+                return
+            }
             if (submitReportJob?.isActive != true) {
                 submitReportJob = viewModelScope.launch {
                     try {
@@ -169,8 +183,8 @@ class ReportIssueViewModel @Inject constructor(
     }
 
     companion object {
-        internal val descriptionKey = "DESCRIPTION"
-        internal val includeLogsKey = "INCLUDE_LOGS"
+        internal const val DESCRIPTION_KEY = "DESCRIPTION"
+        internal const val INCLUDE_LOGS_KEY = "INCLUDE_LOGS"
+        private const val MINIMUM_CHARACTERS = 10
     }
-
 }

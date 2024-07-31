@@ -50,6 +50,12 @@ interface MenuActionWithIcon : MenuAction {
      */
     @Composable
     fun getIconPainter(): Painter
+
+    /**
+     * If icon should be highlighted
+     */
+    val highlightIcon: Boolean
+        get() = false
 }
 
 /**

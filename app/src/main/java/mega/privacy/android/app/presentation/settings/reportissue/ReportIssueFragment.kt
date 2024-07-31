@@ -65,15 +65,15 @@ class ReportIssueFragment : Fragment() {
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         val valid = viewModel.uiState.value.canSubmit
-        menu.findItem(R.id.menu_report_issue_submit)?.let {
-            it.isEnabled = valid
-            it.icon?.alpha = if (valid) 255 else 125
+        val color = context?.getColor(if (valid) R.color.teal_300 else R.color.color_icon_disabled)
+        menu.findItem(R.id.menu_report_issue_submit)?.let { menuItem ->
+            menuItem.isEnabled = valid
+            color?.let { menuItem.icon?.setTint(it) }
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.report_issue_submit_action, menu)
-        menu.findItem(R.id.menu_report_issue_submit)?.icon?.setTint(requireContext().getColor(com.google.android.material.R.color.design_default_color_secondary))
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -83,10 +83,12 @@ class ReportIssueFragment : Fragment() {
                 viewModel.submit()
                 true
             }
+
             android.R.id.home -> {
                 activity?.onBackPressedDispatcher?.onBackPressed()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -111,10 +113,17 @@ class ReportIssueFragment : Fragment() {
     }
 
     private fun finishWithResult(result: SubmitIssueResult) {
-        tag?.let {
-            setFragmentResult(it,
-                bundleOf(ReportIssueFragment::class.java.name to result.getResultString(
-                    requireContext())))
+        tag?.let { tag ->
+            context?.let { context ->
+                setFragmentResult(
+                    tag,
+                    bundleOf(
+                        ReportIssueFragment::class.java.name to result.getResultString(
+                            context
+                        )
+                    )
+                )
+            }
         }
         parentFragmentManager.popBackStack()
     }

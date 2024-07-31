@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.login.reportissue.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueContentUiState
 import mega.privacy.android.domain.entity.support.SupportEmailTicket
 
 /**
@@ -16,9 +17,10 @@ import mega.privacy.android.domain.entity.support.SupportEmailTicket
  * @constructor Create empty Report issue state
  */
 data class ReportIssueViaEmailUiState(
-    val description: String = "",
-    val includeLogs: Boolean = false,
-    val canSubmit: Boolean = false,
-    val error: Int? = null,
+    override val description: String = "",
+    override val includeLogsVisible: Boolean = true,
+    override val includeLogs: Boolean = false,
+    override val canSubmit: Boolean = false,
+    override val error: Int? = null,
     val sendEmailEvent: StateEventWithContent<SupportEmailTicket> = consumed(),
-)
+) : ReportIssueContentUiState

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login.reportissue
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.reportissue.model.ReportIssueViaEmailUiState
 import mega.privacy.android.domain.usecase.support.CreateSupportTicketEmailUseCase
 import timber.log.Timber
@@ -39,7 +39,7 @@ class ReportIssueViaEmailViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 description = newDescription,
-                canSubmit = newDescription.isNotBlank(),
+                canSubmit = newDescription.length >= MINIMUM_CHARACTERS,
                 error = null
             )
         }
@@ -54,7 +54,7 @@ class ReportIssueViaEmailViewModel @Inject constructor(
             if (!uiState.value.canSubmit) {
                 _uiState.update {
                     it.copy(
-                        error = R.string.settings_help_report_issue_description_label
+                        error = sharedR.string.report_issue_error_minimum_characters
                     )
                 }
                 return@launch
@@ -100,4 +100,7 @@ class ReportIssueViaEmailViewModel @Inject constructor(
         }
     }
 
+    companion object {
+        private const val MINIMUM_CHARACTERS = 10
+    }
 }

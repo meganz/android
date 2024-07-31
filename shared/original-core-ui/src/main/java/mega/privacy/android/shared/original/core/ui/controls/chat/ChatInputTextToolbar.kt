@@ -211,7 +211,7 @@ fun ChatInputTextToolbar(
                                 }
                                 isInputExpanded = false
                             }),
-                        painter = painterResource(id = R.drawable.ic_send),
+                        painter = painterResource(id = R.drawable.ic_send_horizontal),
                         contentDescription = "Send icon",
                         tint = MegaOriginalTheme.colors.icon.accent
                     )

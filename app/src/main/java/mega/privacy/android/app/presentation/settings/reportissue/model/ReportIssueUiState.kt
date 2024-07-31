@@ -3,19 +3,16 @@ package mega.privacy.android.app.presentation.settings.reportissue.model
 /**
  * Report issue state
  *
- * @property description content of the description text field
- * @property includeLogs checked state of the include logs toggle
- * @property canSubmit validation result
- * @property error string resource id for on screen error
  * @property result string resource id for result text
  * @property uploadProgress progress of the log upload
  * @constructor Create empty Report issue state
  */
 data class ReportIssueUiState(
-    val description: String = "",
-    val includeLogs: Boolean = false,
-    val canSubmit: Boolean = false,
-    val error: Int? = null,
+    override val description: String = "",
+    override val includeLogsVisible: Boolean = true,
+    override val includeLogs: Boolean = false,
+    override val canSubmit: Boolean = false,
+    override val error: Int? = null,
     val result: SubmitIssueResult? = null,
     val uploadProgress: Float? = null,
-)
+) : ReportIssueContentUiState

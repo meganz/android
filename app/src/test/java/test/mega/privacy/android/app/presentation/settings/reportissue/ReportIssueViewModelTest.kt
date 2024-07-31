@@ -90,6 +90,7 @@ class ReportIssueViewModelTest {
         underTest.uiState.test {
             val initial = awaitItem()
             assertThat(initial.description).isEmpty()
+            assertThat(initial.includeLogsVisible).isTrue()
             assertThat(initial.includeLogs).isFalse()
             assertThat(initial.canSubmit).isFalse()
         }
@@ -98,8 +99,8 @@ class ReportIssueViewModelTest {
     @Test
     fun `test that saved state values are returned`() = runTest {
         val expectedDescription = "A saved description"
-        savedStateHandle.set(ReportIssueViewModel.descriptionKey, expectedDescription)
-        savedStateHandle.set(ReportIssueViewModel.includeLogsKey, true)
+        savedStateHandle[ReportIssueViewModel.DESCRIPTION_KEY] = expectedDescription
+        savedStateHandle[ReportIssueViewModel.INCLUDE_LOGS_KEY] = true
         initViewModel()
 
         underTest.uiState.filter {
@@ -138,7 +139,7 @@ class ReportIssueViewModelTest {
         underTest.uiState.map { it.canSubmit }.distinctUntilChanged()
             .test {
                 assertThat(awaitItem()).isFalse()
-                underTest.setDescription("Not empty")
+                underTest.setDescription("Not blank")
                 assertThat(awaitItem()).isTrue()
             }
     }
@@ -188,6 +189,7 @@ class ReportIssueViewModelTest {
         runTest {
             whenever(submitIssueUseCase(any())).thenReturn(emptyFlow())
             initViewModel()
+            underTest.setDescription("A long enough description")
             scheduler.advanceUntilIdle()
             underTest.uiState.map { it.result }.distinctUntilChanged()
                 .test {
@@ -209,6 +211,7 @@ class ReportIssueViewModelTest {
                 }
 
                 initViewModel()
+                underTest.setDescription("A long enough description")
                 scheduler.advanceUntilIdle()
                 underTest.uiState.map { it.result }.distinctUntilChanged()
                     .test {
@@ -238,6 +241,7 @@ class ReportIssueViewModelTest {
     fun `test that upload progress from 0 to 100 is returned`() = runTest {
         whenever(submitIssueUseCase(any())).thenReturn(getProgressFlow())
         initViewModel()
+        underTest.setDescription("A long enough description")
         scheduler.advanceUntilIdle()
         underTest.uiState.mapNotNull { it.uploadProgress }.distinctUntilChanged()
             .test {
@@ -256,6 +260,7 @@ class ReportIssueViewModelTest {
             })
 
         initViewModel()
+        underTest.setDescription("A long enough description")
         scheduler.advanceUntilIdle()
         underTest.uiState.mapNotNull { it.uploadProgress }.distinctUntilChanged()
             .test {
@@ -274,6 +279,7 @@ class ReportIssueViewModelTest {
         )
 
         initViewModel()
+        underTest.setDescription("A long enough description")
         scheduler.advanceUntilIdle()
 
         underTest.uiState.map { it.result }.distinctUntilChanged()
@@ -294,6 +300,7 @@ class ReportIssueViewModelTest {
         )
 
         initViewModel()
+        underTest.setDescription("A long enough description")
         scheduler.advanceUntilIdle()
         underTest.uiState.map { it.uploadProgress == null }.distinctUntilChanged().test {
             assertThat(awaitItem()).isTrue()

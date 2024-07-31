@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.menus
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -29,7 +30,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.icon.pack.R as IconPackR
 import com.google.android.material.R
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarColors
 import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
@@ -55,7 +55,7 @@ fun MenuActions(
 ) {
     val sortedActions = actions.sortedBy { it.orderInCategory }
     val visible = sortedActions
-        .filterIsInstance(MenuActionWithIcon::class.java)
+        .filterIsInstance<MenuActionWithIcon>()
         .take(maxActionsToShow)
     visible.forEach {
         IconButtonForAction(
@@ -117,6 +117,7 @@ private fun IconButtonForAction(
         onClick = { onActionClick(menuAction) },
         modifier = Modifier.testTag(menuAction.testTag),
         enabled = enabled,
+        highlightIconColor = menuAction.highlightIcon,
     )
 }
 
@@ -132,6 +133,7 @@ private fun IconButtonForAction(
         onClick = { onActionClick() },
         modifier = Modifier.testTag(menuAction.testTag),
         enabled = enabled,
+        highlightIconColor = menuAction.highlightIcon,
     )
 }
 
@@ -227,6 +229,7 @@ private fun IconButtonWithTooltip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    highlightIconColor: Boolean = false,
 ) {
     Box(modifier = modifier) {
         val showTooltip = remember { mutableStateOf(false) }
@@ -250,7 +253,11 @@ private fun IconButtonWithTooltip(
             Icon(
                 painter = iconPainter,
                 contentDescription = description,
-                tint = if (enabled) LocalMegaAppBarColors.current.iconsTintColor else MegaOriginalTheme.colors.icon.disabled,
+                tint = when {
+                    enabled && highlightIconColor -> MegaOriginalTheme.colors.icon.accent
+                    enabled -> LocalMegaAppBarColors.current.iconsTintColor
+                    else -> MegaOriginalTheme.colors.icon.disabled
+                }
             )
         }
         Tooltip(showTooltip, description)

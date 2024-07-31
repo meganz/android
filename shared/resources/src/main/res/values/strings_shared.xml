@@ -594,4 +594,8 @@
     </plurals>
     <!-- Label for the file info information screen no tags label -->
     <string name="file_info_information_no_tags_label">No tags</string>
+    <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
+    <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
+    <!-- placeholder message for report issue-->
+    <string name="report_issue_description_placeholder_message">Describe the issue with at least 10 characters</string>
 </resources>
