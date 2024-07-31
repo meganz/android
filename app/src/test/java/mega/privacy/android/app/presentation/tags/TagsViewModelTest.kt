@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.tags
 
 import androidx.lifecycle.SavedStateHandle
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -11,6 +13,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
+import mega.privacy.android.domain.usecase.node.GetAllNodeTagsUseCase
 import mega.privacy.android.domain.usecase.node.ManageNodeTagUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -31,6 +34,7 @@ class TagsViewModelTest {
     private val manageNodeTagUseCase = mock<ManageNodeTagUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val monitorNodeUpdatesById = mock<MonitorNodeUpdatesById>()
+    private val getAllNodeTagsUseCase = mock<GetAllNodeTagsUseCase>()
     private val tagsValidationMessageMapper = mock<TagsValidationMessageMapper>()
     private lateinit var stateHandle: SavedStateHandle
     private lateinit var underTest: TagsViewModel
@@ -45,7 +49,8 @@ class TagsViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             monitorNodeUpdatesById = monitorNodeUpdatesById,
             tagsValidationMessageMapper = tagsValidationMessageMapper,
-            stateHandle = stateHandle
+            stateHandle = stateHandle,
+            getAllNodeTagsUseCase = getAllNodeTagsUseCase
         )
     }
 
@@ -62,6 +67,7 @@ class TagsViewModelTest {
     @Test
     fun `test that getNodeByHandle update uiState with nodeHandle and tags`() = runTest {
         whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
+        whenever(getAllNodeTagsUseCase("")).thenReturn(listOf("tag1", "tag2"))
         val node = mock<TypedNode> {
             on { id } doReturn NodeId(123L)
             on { name } doReturn "tags"
@@ -69,21 +75,21 @@ class TagsViewModelTest {
         }
         whenever(getNodeByIdUseCase(NodeId(123L))).thenReturn(node)
         val nodeId = NodeId(123L)
-        underTest.getNodeByHandle(nodeId)
+        underTest.getNodeTags(nodeId)
         val uiState = underTest.uiState.value
         assertThat(uiState.tags).containsExactly("tag1", "tag2")
     }
 
     @Test
-    fun `test that getNodeByHandle log error when getNodeByIdUseCase fails`() = runTest {
+    fun `test that getNodeByHandle logs an error when getNodeByIdUseCase fails`() = runTest {
         whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
         whenever(getNodeByIdUseCase(NodeId(123L))).thenThrow(RuntimeException())
         val nodeHandle = NodeId(123L)
-        underTest.getNodeByHandle(nodeHandle)
+        underTest.getNodeTags(nodeHandle)
     }
 
     @Test
-    fun `test that addNodeTag update node tags`() = runTest {
+    fun `test that addNodeTag updates the node tags`() = runTest {
         whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
         whenever(manageNodeTagUseCase(NodeId(123L), newTag = "new tag")).thenReturn(Unit)
         underTest.addNodeTag("new tag")
@@ -99,21 +105,42 @@ class TagsViewModelTest {
 
 
     @Test
-    fun `test monitorNodeUpdatesById updates node`() = runTest {
+    fun `test that monitorNodeUpdatesById updates the node`() = runTest {
         whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(
             flowOf(listOf(NodeChanges.Tags))
         )
-        underTest.getNodeByHandle(NodeId(123L))
+        underTest.getNodeTags(NodeId(123L))
         verify(getNodeByIdUseCase, times(2)).invoke(NodeId(123L))
     }
 
     @Test
-    fun `test that removeTag update node tags`() = runTest {
+    fun `test that removeTag updates the node tags`() = runTest {
+        val node = mock<TypedNode> {
+            on { id } doReturn NodeId(123L)
+            on { name } doReturn "tags"
+            on { tags } doReturn listOf("tag1", "tag2", "old tag")
+        }
         whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
-        whenever(manageNodeTagUseCase(NodeId(123L), oldTag = "old tag", newTag = null)).thenReturn(
-            Unit
-        )
-        underTest.removeTag("old tag")
+        whenever(manageNodeTagUseCase(NodeId(123L), oldTag = "old tag", newTag = null))
+            .thenReturn(Unit)
+        whenever(getNodeByIdUseCase(NodeId(123L))).thenReturn(node)
+        underTest.getNodeTags(NodeId(123L))
+        underTest.addOrRemoveTag("old tag")
         verify(manageNodeTagUseCase).invoke(NodeId(123L), oldTag = "old tag", newTag = null)
     }
+
+    @Test
+    fun `test that consumeInfoMessage updates the informationMessage`() = runTest {
+        underTest.consumeInfoMessage()
+        assertThat(underTest.uiState.value.informationMessage).isInstanceOf(
+            StateEventWithContentConsumed::class.java
+        )
+    }
+
+    @Test
+    fun `test that consumeMaxTagsError shows the max tags error`() = runTest {
+        underTest.consumeMaxTagsError()
+        assertThat(underTest.uiState.value.showMaxTagsError).isEqualTo(consumed)
+    }
+
 }

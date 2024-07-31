@@ -2,7 +2,7 @@ package mega.privacy.android.shared.original.core.ui.controls.chip
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FilterChip
@@ -64,7 +64,9 @@ fun MegaChip(
                         .leadingIconColor(selected, enabled).value
                 ) {
                     Icon(
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .size(18.dp),
                         imageVector = ImageVector.vectorResource(id = it),
                         contentDescription = "Leading icon",
                     )
@@ -95,7 +97,7 @@ fun MegaChip(
                     .contentColor(selected, enabled).value,
             ) {
                 Text(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier,
                     text = text,
                     textAlign = TextAlign.Center
                 )

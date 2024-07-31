@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,10 +24,11 @@ class TagsScreenTest {
             TagsScreen(
                 addNodeTag = {},
                 consumeInfoMessage = {},
-                validateTagName = { _ -> true },
+                validateTagName = { _ -> },
                 onBackPressed = {},
                 uiState = TagsUiState(),
-                removeTag = { _ -> }
+                addOrRemoveTag = { _ -> },
+                consumeMaxTagsError = {},
             )
         }
 
@@ -47,10 +49,11 @@ class TagsScreenTest {
             TagsScreen(
                 addNodeTag = {},
                 consumeInfoMessage = {},
-                validateTagName = { _ -> true },
+                validateTagName = { _ -> },
                 onBackPressed = {},
-                uiState = TagsUiState(tags = listOf("tag1", "tag2")),
-                removeTag = { _ -> }
+                uiState = TagsUiState(tags = persistentListOf("tag1", "tag2")),
+                addOrRemoveTag = { _ -> },
+                consumeMaxTagsError = {}
             )
         }
 

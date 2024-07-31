@@ -19,10 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +30,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
+import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
@@ -49,7 +46,6 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.NodeInfoTagsAddedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoTagsRemovedEvent
-import java.util.Locale
 
 /**
  * Tags screen composable.
@@ -59,16 +55,14 @@ import java.util.Locale
 fun TagsScreen(
     addNodeTag: (String) -> Unit,
     consumeInfoMessage: () -> Unit,
-    validateTagName: (String) -> Boolean,
-    removeTag: (String) -> Unit,
+    validateTagName: (String) -> Unit,
+    addOrRemoveTag: (String) -> Unit,
     onBackPressed: () -> Unit,
+    consumeMaxTagsError: () -> Unit,
     uiState: TagsUiState,
 ) {
     val scaffoldState = rememberScaffoldState()
     val context = LocalContext.current
-    EventEffect(event = uiState.informationMessage, onConsumed = consumeInfoMessage) { info ->
-        scaffoldState.snackbarHostState.showSnackbar(info.getInfo(context))
-    }
     MegaScaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -88,13 +82,24 @@ fun TagsScreen(
             )
         },
     ) { paddingValues ->
+        EventEffect(event = uiState.informationMessage, onConsumed = consumeInfoMessage) { info ->
+            scaffoldState.snackbarHostState.showSnackbar(info.getInfo(context))
+        }
+        EventEffect(event = uiState.showMaxTagsError, onConsumed = { consumeMaxTagsError() }) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = context.getString(
+                    sharedR.string.add_tags_error_max_tags,
+                    TagsActivity.MAX_TAGS_PER_NODE
+                )
+            )
+        }
         TagsContent(
             modifier = Modifier
                 .padding(paddingValues)
                 .testTag(TAGS_SCREEN_CONTENTS_LABEL),
             addNodeTag = addNodeTag,
             validateTagName = validateTagName,
-            removeTag = removeTag,
+            addOrRemoveTag = addOrRemoveTag,
             uiState = uiState,
         )
     }
@@ -104,17 +109,15 @@ fun TagsScreen(
 @Composable
 private fun TagsContent(
     addNodeTag: (String) -> Unit,
-    validateTagName: (String) -> Boolean,
-    removeTag: (String) -> Unit,
+    validateTagName: (String) -> Unit,
+    addOrRemoveTag: (String) -> Unit,
     uiState: TagsUiState,
     modifier: Modifier = Modifier,
 ) {
-    var tag by rememberSaveable { mutableStateOf("") }
 
     fun addTag() {
-        if (tag.isNotBlank() && uiState.isError.not()) {
-            addNodeTag(tag)
-            tag = ""
+        if (uiState.searchText.isNotBlank() && uiState.isError.not()) {
+            addNodeTag(uiState.searchText)
             Analytics.tracker.trackEvent(NodeInfoTagsAddedEvent)
         }
     }
@@ -135,7 +138,7 @@ private fun TagsContent(
             modifier = Modifier
                 .padding(bottom = 4.dp),
             visualTransformation = PrefixTransformation("#"),
-            value = tag,
+            value = uiState.searchText,
             imeAction = ImeAction.Done,
             supportingText = uiState.message,
             keyboardActions = KeyboardActions(
@@ -143,17 +146,23 @@ private fun TagsContent(
             ),
             showError = uiState.isError,
             onValueChange = {
-                tag = it.removePrefix("#").lowercase(Locale.ROOT)
-                validateTagName(tag)
+                validateTagName(it)
             },
             showUnderline = true,
         )
 
-        if (tag.isNotBlank() && uiState.isError.not() && uiState.tags.contains(tag).not()) {
+        if (
+            uiState.searchText.isNotBlank() &&
+            uiState.isError.not() &&
+            uiState.tags.contains(uiState.searchText).not()
+        ) {
             TextMegaButton(
                 modifier = Modifier.testTag(TAGS_SCREEN_ADD_TAGS_BUTTON),
                 contentPadding = PaddingValues(vertical = 8.dp),
-                text = stringResource(id = sharedR.string.add_tags_button_label_add, tag),
+                text = stringResource(
+                    id = sharedR.string.add_tags_button_label_add,
+                    uiState.searchText
+                ),
                 onClick = ::addTag,
                 textAlign = TextAlign.Start
             )
@@ -176,17 +185,18 @@ private fun TagsContent(
                 .verticalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            repeat(uiState.tags.size) { tag ->
+            uiState.tags.forEach { tag ->
+                val isSelected = uiState.nodeTags.contains(tag)
                 MegaChip(
                     modifier = Modifier.testTag(TAGS_SCREEN_TAG_CHIP),
-                    selected = true,
-                    text = "#${uiState.tags[tag]}",
+                    selected = isSelected,
+                    text = "#$tag",
                     enabled = true,
                     onClick = {
-                        removeTag(uiState.tags[tag])
+                        addOrRemoveTag(tag)
                         Analytics.tracker.trackEvent(NodeInfoTagsRemovedEvent)
                     },
-                    leadingIcon = CoreR.drawable.ic_filter_selected,
+                    leadingIcon = if (isSelected) CoreR.drawable.ic_filter_selected else null,
                 )
             }
         }
@@ -201,9 +211,13 @@ private fun TagsScreenPreview() {
             addNodeTag = {},
             consumeInfoMessage = {},
             validateTagName = { it.isNotEmpty() },
+            addOrRemoveTag = {},
             onBackPressed = {},
-            removeTag = {},
-            uiState = TagsUiState(tags = listOf("tag1", "tag2"))
+            consumeMaxTagsError = {},
+            uiState = TagsUiState(
+                tags = persistentListOf("tag1", "tag2"),
+                nodeTags = persistentListOf("tag1")
+            ),
         )
     }
 }
