@@ -13,10 +13,4 @@ import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 data class TransferManagementUiState(
     val transfersInfo: TransfersInfo = TransfersInfo(),
     val hideTransfersWidget: Boolean = false,
-) {
-    /**
-     * Determines if widget should be visible, active and not hidden
-     */
-    val widgetVisible =
-        transfersInfo.status != TransfersStatus.NotTransferring && !hideTransfersWidget
-}
+)

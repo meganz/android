@@ -245,14 +245,15 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             .semantics { testTagsAsResourceId = true },
                         scaffoldState = scaffoldState,
                         floatingActionButton = {
-                            TransfersWidgetViewAnimated(
-                                transfersInfo = transferState.transfersInfo,
-                                visible = transferState.widgetVisible,
-                                onClick = ::transfersWidgetClicked,
-                                modifier = Modifier
-                                    .navigationBarsPadding()
-                                    .testTag(SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG)
-                            )
+                            if (!transferState.hideTransfersWidget) {
+                                TransfersWidgetViewAnimated(
+                                    transfersInfo = transferState.transfersInfo,
+                                    onClick = ::transfersWidgetClicked,
+                                    modifier = Modifier
+                                        .navigationBarsPadding()
+                                        .testTag(SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG)
+                                )
+                            }
                         },
                     ) { padding ->
                         ConstraintLayout(

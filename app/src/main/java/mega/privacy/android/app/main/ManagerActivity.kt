@@ -961,7 +961,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         addNodeAttachmentView()
         findViewById<ComposeView>(R.id.transfers_widget).setTransfersWidgetContent(
             transfersInfoFlow = transfersManagementViewModel.state.map { it.transfersInfo },
-            visibleFlow = transfersManagementViewModel.state.map { it.widgetVisible },
+            hideFlow = transfersManagementViewModel.state.map { it.hideTransfersWidget },
             onClick = this::onTransfersWidgetClick
         )
         setInitialViewProperties()

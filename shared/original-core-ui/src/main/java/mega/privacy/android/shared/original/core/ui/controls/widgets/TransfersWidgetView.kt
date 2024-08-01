@@ -19,7 +19,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -34,22 +40,26 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Sets a transfers widget as the content of this ComposeView.
  *
  * @param transfersInfoFlow a flow with the info to update the widget
- * @param visibleFlow a flow to show or hide the widget
+ * @param hideFlow a flow to hide the widget regardless of [transfersInfoFlow]
  */
 fun ComposeView.setTransfersWidgetContent(
     transfersInfoFlow: Flow<TransfersInfo>,
-    visibleFlow: Flow<Boolean>,
+    hideFlow: Flow<Boolean>,
     onClick: () -> Unit,
 ) {
 
@@ -58,15 +68,16 @@ fun ComposeView.setTransfersWidgetContent(
         val transfersInfo by transfersInfoFlow.collectAsStateWithLifecycle(
             TransfersInfo()
         )
-        val widgetVisible by visibleFlow.collectAsStateWithLifecycle(
-            false
+        val widgetHide by hideFlow.collectAsStateWithLifecycle(
+            true
         )
         OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-            TransfersWidgetViewAnimated(
-                transfersInfo = transfersInfo,
-                visible = widgetVisible,
-                onClick = onClick,
-            )
+            if (!widgetHide) {
+                TransfersWidgetViewAnimated(
+                    transfersInfo = transfersInfo,
+                    onClick = onClick,
+                )
+            }
         }
     }
 }
@@ -77,33 +88,56 @@ fun ComposeView.setTransfersWidgetContent(
 @Composable
 fun TransfersWidgetViewAnimated(
     transfersInfo: TransfersInfo,
-    visible: Boolean,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-) = AnimatedVisibility(
-    visible = visible,
-    enter = scaleIn(animationSpecs, initialScale = animationScale) + fadeIn(
-        animationSpecs
-    ),
-    exit = scaleOut(animationSpecs, targetScale = animationScale) + fadeOut(
-        animationSpecs
-    ),
-    modifier = modifier,
+    onClick: () -> Unit,
 ) {
-    TransfersWidgetView(
-        transfersInfo = transfersInfo,
-        onClick = onClick,
-    )
+    val coroutineScope = rememberCoroutineScope()
+    var previousStatus by remember { mutableStateOf(TransfersStatus.NotTransferring) }
+    var justCompleted by remember(transfersInfo.status) {
+        mutableStateOf(
+            transfersInfo.status == TransfersStatus.NotTransferring
+                    && previousStatus == TransfersStatus.Transferring
+        )
+    }
+    LaunchedEffect(justCompleted) {
+        if (justCompleted) {
+            coroutineScope.launch {
+                delay(4.seconds - animationDuration.milliseconds)
+                justCompleted = false
+            }
+        }
+    }
+
+    SideEffect {
+        previousStatus = transfersInfo.status
+    }
+
+    AnimatedVisibility(
+        visible = transfersInfo.status != TransfersStatus.NotTransferring || justCompleted,
+        enter = scaleIn(animationSpecs, initialScale = animationScale) + fadeIn(animationSpecs),
+        exit = scaleOut(animationSpecs, targetScale = animationScale) + fadeOut(animationSpecs),
+        modifier = modifier,
+    ) {
+        TransfersWidgetView(
+            transfersInfo = transfersInfo,
+            completed = justCompleted,
+            onClick = onClick,
+        )
+    }
 }
 
 /**
  * Widget to show current transfers progress
  */
+/**
+ * Widget to show current transfers progress
+ */
 @Composable
-fun TransfersWidgetView(
+internal fun TransfersWidgetView(
     transfersInfo: TransfersInfo,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    completed: Boolean = false,
+    onClick: () -> Unit,
 ) {
     FloatingActionButton(
         onClick = onClick,
@@ -114,8 +148,8 @@ fun TransfersWidgetView(
     ) {
 
         val progressBackgroundColor = MegaOriginalTheme.colors.background.surface3
-        val progressColor = transfersInfo.progressColor()
-        val progressArc = transfersInfo.completedProgress * 360f
+        val progressColor = progressColor(transfersInfo, completed)
+        val progressArc = if (completed) 360f else transfersInfo.completedProgress * 360f
         Canvas(modifier = Modifier.size(diameter.dp)) {
             //background
             drawCircle(
@@ -144,14 +178,14 @@ fun TransfersWidgetView(
             contentScale = ContentScale.None,
         )
         // status icon
-        transfersInfo.statusIconRes()?.let {
+        statusIconRes(transfersInfo, completed)?.let {
             Box(
                 modifier = Modifier.size(diameter.dp),
                 contentAlignment = Alignment.TopEnd,
             ) {
                 Icon(
                     painter = painterResource(id = it),
-                    contentDescription = transfersInfo.status.name,
+                    contentDescription = if (completed) "Completed" else transfersInfo.status.name,
                     modifier = Modifier
                         .padding(5.dp)
                         .size(16.dp)
@@ -169,19 +203,27 @@ fun TransfersWidgetView(
 }
 
 @Composable
-private fun TransfersInfo.progressColor() = when (status) {
-    TransfersStatus.OverQuota -> MegaOriginalTheme.colors.support.warning
-    TransfersStatus.TransferError -> MegaOriginalTheme.colors.support.error
-    else -> MegaOriginalTheme.colors.icon.secondary
-}
+private fun progressColor(transfersInfo: TransfersInfo, justCompleted: Boolean) =
+    if (justCompleted) MegaOriginalTheme.colors.support.success
+    else with(transfersInfo) {
+        when (status) {
+            TransfersStatus.OverQuota -> MegaOriginalTheme.colors.support.warning
+            TransfersStatus.TransferError -> MegaOriginalTheme.colors.support.error
+            else -> MegaOriginalTheme.colors.icon.secondary
+        }
+    }
 
 @DrawableRes
-private fun TransfersInfo.statusIconRes() = when (status) {
-    TransfersStatus.Paused -> iconPackR.drawable.ic_pause_circle_small_regular_solid
-    TransfersStatus.OverQuota -> iconPackR.drawable.ic_alert_triangle_small_regular_solid
-    TransfersStatus.TransferError -> iconPackR.drawable.ic_alert_circle_small_regular_solid
-    else -> null
-}
+private fun statusIconRes(transfersInfo: TransfersInfo, justCompleted: Boolean) =
+    if (justCompleted) iconPackR.drawable.ic_check_circle_small_regular_solid
+    else with(transfersInfo) {
+        when (status) {
+            TransfersStatus.Paused -> iconPackR.drawable.ic_pause_circle_small_regular_solid
+            TransfersStatus.OverQuota -> iconPackR.drawable.ic_alert_triangle_small_regular_solid
+            TransfersStatus.TransferError -> iconPackR.drawable.ic_alert_circle_small_regular_solid
+            else -> null
+        }
+    }
 
 private const val diameter = 56f
 private const val thickness = diameter / 25f
@@ -209,46 +251,52 @@ internal const val TAG_TRANSFERS_WIDGET = "transfers_widget_view:button:floating
 @CombinedThemePreviews
 @Composable
 private fun TransfersWidgetPreview(
-    @PreviewParameter(TransfersWidgetPreviewProvider::class) parameter: TransfersInfo,
+    @PreviewParameter(TransfersWidgetPreviewProvider::class) parameter: Pair<TransfersInfo, Boolean>,
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        TransfersWidgetView(parameter, onClick = {})
+        TransfersWidgetView(parameter.first, completed = parameter.second) {}
     }
 }
 
 private class TransfersWidgetPreviewProvider :
-    PreviewParameterProvider<TransfersInfo> {
-    override val values: Sequence<TransfersInfo>
+    PreviewParameterProvider<Pair<TransfersInfo, Boolean>> {
+    override val values: Sequence<Pair<TransfersInfo, Boolean>>
         get() = listOf(
             TransfersInfo(
                 status = TransfersStatus.Transferring,
                 totalSizeAlreadyTransferred = 3,
                 totalSizeToTransfer = 10,
                 uploading = true
-            ),
+            ) to false,
             TransfersInfo(
                 status = TransfersStatus.Transferring,
                 totalSizeAlreadyTransferred = 4,
                 totalSizeToTransfer = 10,
                 uploading = false
-            ),
+            ) to false,
             TransfersInfo(
                 status = TransfersStatus.Paused,
                 totalSizeAlreadyTransferred = 5,
                 totalSizeToTransfer = 10,
                 uploading = true
-            ),
+            ) to false,
             TransfersInfo(
                 status = TransfersStatus.OverQuota,
                 totalSizeAlreadyTransferred = 6,
                 totalSizeToTransfer = 10,
                 uploading = false
-            ),
+            ) to false,
             TransfersInfo(
                 status = TransfersStatus.TransferError,
                 totalSizeAlreadyTransferred = 7,
                 totalSizeToTransfer = 10,
                 uploading = true
-            ),
+            ) to false,
+            TransfersInfo(
+                status = TransfersStatus.NotTransferring,
+                totalSizeAlreadyTransferred = 10,
+                totalSizeToTransfer = 10,
+                uploading = false
+            ) to true,
         ).asSequence()
 }

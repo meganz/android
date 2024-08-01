@@ -144,11 +144,12 @@ internal fun FileLinkView(
             }
         },
         floatingActionButton = {
-            TransfersWidgetViewAnimated(
-                transfersInfo = transferState.transfersInfo,
-                visible = transferState.widgetVisible,
-                onClick = onTransferWidgetClick,
-            )
+            if(!transferState.hideTransfersWidget) {
+                TransfersWidgetViewAnimated(
+                    transfersInfo = transferState.transfersInfo,
+                    onClick = onTransferWidgetClick,
+                )
+            }
         },
         headerSpacerHeight = if (viewState.iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp,
         modifier = modifier,

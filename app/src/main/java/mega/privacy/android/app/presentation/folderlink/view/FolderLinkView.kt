@@ -220,11 +220,12 @@ internal fun FolderLinkView(
             }
         },
         floatingActionButton = {
-            TransfersWidgetViewAnimated(
-                transfersInfo = transferState.transfersInfo,
-                visible = transferState.widgetVisible,
-                onClick = onTransferWidgetClick,
-            )
+            if (!transferState.hideTransfersWidget) {
+                TransfersWidgetViewAnimated(
+                    transfersInfo = transferState.transfersInfo,
+                    onClick = onTransferWidgetClick,
+                )
+            }
         }
     ) {
         if (state.nodesList.isEmpty()) {
