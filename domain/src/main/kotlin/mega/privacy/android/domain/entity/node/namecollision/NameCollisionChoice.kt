@@ -6,4 +6,4 @@ import kotlinx.serialization.Serializable
  * Enum class for defining the type of resolution for a collision.
  */
 @Serializable
-enum class NodeNameCollisionChoice { REPLACE_UPDATE_MERGE, CANCEL, RENAME }
+enum class NameCollisionChoice { REPLACE_UPDATE_MERGE, CANCEL, RENAME }

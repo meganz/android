@@ -3,6 +3,7 @@ package mega.privacy.android.app.namecollision.data
 import android.net.Uri
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 
 /**
  * Data class containing all the required to present a name collision for an upload, copy or movement.

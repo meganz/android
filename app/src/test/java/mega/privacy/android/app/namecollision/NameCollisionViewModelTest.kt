@@ -11,20 +11,24 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.namecollision.LegacyNameCollisionViewModel
-import mega.privacy.android.app.namecollision.data.NameCollisionChoice
+import mega.privacy.android.app.namecollision.NameCollisionViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
+import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
+import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionResultUseCase
+import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionsResultUseCase
+import mega.privacy.android.domain.usecase.node.namecollision.ReorderNodeNameCollisionsUseCase
+import mega.privacy.android.domain.usecase.node.namecollision.UpdateNodeNameCollisionsResultUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -45,8 +49,8 @@ import test.mega.privacy.android.app.extensions.withCoroutineExceptions
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(value = [InstantExecutorExtension::class, TestSchedulerExtension::class])
-internal class LegacyLegacyNameCollisionViewModelTest {
-    private lateinit var underTest: LegacyNameCollisionViewModel
+internal class NameCollisionViewModelTest {
+    private lateinit var underTest: NameCollisionViewModel
 
     private val getFileVersionsOption = mock<GetFileVersionsOption>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
@@ -54,11 +58,18 @@ internal class LegacyLegacyNameCollisionViewModelTest {
     private val copyCollidedNodeUseCase = mock<CopyCollidedNodeUseCase>()
     private val copyRequestMessageMapper = mock<CopyRequestMessageMapper>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getNodeNameCollisionResultUseCase: GetNodeNameCollisionResultUseCase = mock()
+    private val getNodeNameCollisionsResultUseCase: GetNodeNameCollisionsResultUseCase = mock()
+    private val reorderNodeNameCollisionsUseCase: ReorderNodeNameCollisionsUseCase = mock()
+    private val updateNodeNameCollisionsResultUseCase: UpdateNodeNameCollisionsResultUseCase = mock()
 
     private fun initUnderTest() {
-        underTest = LegacyNameCollisionViewModel(
+        underTest = NameCollisionViewModel(
             getFileVersionsOption = getFileVersionsOption,
-            getNameCollisionResultUseCase = mock(),
+            getNodeNameCollisionResultUseCase = getNodeNameCollisionResultUseCase,
+            getNodeNameCollisionsResultUseCase = getNodeNameCollisionsResultUseCase,
+            reorderNodeNameCollisionsUseCase = reorderNodeNameCollisionsUseCase,
+            updateNodeNameCollisionsResultUseCase = updateNodeNameCollisionsResultUseCase,
             uploadUseCase = mock(),
             copyCollidedNodesUseCase = copyCollidedNodesUseCase,
             copyCollidedNodeUseCase = copyCollidedNodeUseCase,

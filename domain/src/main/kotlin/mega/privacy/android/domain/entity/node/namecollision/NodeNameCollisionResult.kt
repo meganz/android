@@ -18,5 +18,5 @@ data class NodeNameCollisionResult(
     val collisionThumbnail: UriPath? = null,
     val renameName: String? = null,
     val thumbnail: UriPath? = null,
-    var choice: NodeNameCollisionChoice? = null,
+    var choice: NameCollisionChoice? = null,
 )

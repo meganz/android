@@ -5,7 +5,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import kotlinx.coroutines.rx3.rxSingle
 import mega.privacy.android.app.ShareInfo
-import mega.privacy.android.app.namecollision.data.NameCollisionChoice
+import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.uploadFolder.DocumentEntityDataMapper
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent

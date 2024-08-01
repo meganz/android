@@ -28,7 +28,7 @@ import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVA
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.LegacyNameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionChoice
+import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent

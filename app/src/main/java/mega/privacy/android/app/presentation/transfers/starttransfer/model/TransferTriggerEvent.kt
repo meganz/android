@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
 import android.net.Uri
 import androidx.core.net.toUri
-import mega.privacy.android.app.namecollision.data.NameCollisionChoice
+import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.TransferType
