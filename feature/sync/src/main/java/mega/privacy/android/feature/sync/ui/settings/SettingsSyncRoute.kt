@@ -8,11 +8,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -20,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.ui.model.SyncOption
+import mega.privacy.android.feature.sync.ui.views.ClearSyncDebrisDialog
 import mega.privacy.android.feature.sync.ui.views.SyncOptionsDialog
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -35,8 +38,11 @@ internal fun SettingsSyncRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     SettingSyncScreen(
         uiState = uiState,
+        syncDebrisCleared = {
+            viewModel.handleAction(SettingsSyncAction.ClearDebrisClicked)
+        },
         syncOptionSelected = { selectedOption ->
-            viewModel.setSyncByWiFi(selectedOption)
+            viewModel.handleAction(SettingsSyncAction.SyncOptionSelected(selectedOption))
         }
     )
 }
@@ -44,11 +50,13 @@ internal fun SettingsSyncRoute(
 @Composable
 private fun SettingSyncScreen(
     uiState: SettingsSyncUiState,
+    syncDebrisCleared: () -> Unit,
     syncOptionSelected: (SyncOption) -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var showSyncOptionsDialog by rememberSaveable { mutableStateOf(false) }
+    var showClearSyncDebrisDialog by rememberSaveable { mutableStateOf(false) }
 
     MegaScaffold(
         scaffoldState = scaffoldState,
@@ -73,6 +81,12 @@ private fun SettingSyncScreen(
                     syncOptionsClicked = {
                         showSyncOptionsDialog = true
                     },
+                )
+                SyncDebrisView(
+                    size = uiState.syncDebrisSizeInBytes ?: 0,
+                    clearDebrisClicked = {
+                        showClearSyncDebrisDialog = true
+                    }
                 )
             }
         }
@@ -102,6 +116,23 @@ private fun SettingSyncScreen(
                 showSyncOptionsDialog = false
             },
         )
+    }
+    if (showClearSyncDebrisDialog) {
+        ClearSyncDebrisDialog(
+            onDismiss = {
+                showClearSyncDebrisDialog = false
+            },
+            onConfirm = {
+                syncDebrisCleared()
+                showClearSyncDebrisDialog = false
+            }
+        )
+    }
+    val context = LocalContext.current
+    LaunchedEffect(key1 = uiState.snackbarMessage) {
+        uiState.snackbarMessage?.let { message ->
+            scaffoldState.snackbarHostState.showSnackbar(context.resources.getString(message))
+        }
     }
 }
 

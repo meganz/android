@@ -10,6 +10,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.feature.sync.data.gateway.SyncDebrisGateway
+import mega.privacy.android.feature.sync.data.gateway.SyncDebrisGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.SyncPreferencesDatastore
@@ -22,10 +24,12 @@ import mega.privacy.android.feature.sync.data.gateway.UserPausedSyncGateway
 import mega.privacy.android.feature.sync.data.gateway.UserPausedSyncGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStore
 import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStoreName
+import mega.privacy.android.feature.sync.data.repository.SyncDebrisRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncNewFolderParamsRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncPreferencesRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncSolvedIssuesRepositoryImpl
+import mega.privacy.android.feature.sync.domain.repository.SyncDebrisRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncNewFolderParamsRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncPreferencesRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
@@ -55,6 +59,10 @@ internal interface SyncDataModule {
 
     @Binds
     @Singleton
+    fun bindSyncDebrisRepository(implementation: SyncDebrisRepositoryImpl): SyncDebrisRepository
+
+    @Binds
+    @Singleton
     fun bindSyncGateway(implementation: SyncGatewayImpl): SyncGateway
 
     @Binds
@@ -72,6 +80,10 @@ internal interface SyncDataModule {
     @Binds
     @Singleton
     fun bindUserPausedSyncGateway(implementation: UserPausedSyncGatewayImpl): UserPausedSyncGateway
+
+    @Binds
+    @Singleton
+    fun bindSyncDebrisGateway(implementation: SyncDebrisGatewayImpl): SyncDebrisGateway
 
     companion object {
         @Provides

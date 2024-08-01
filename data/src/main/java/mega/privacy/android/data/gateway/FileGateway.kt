@@ -372,4 +372,12 @@ interface FileGateway {
         source: Uri,
         destination: DocumentFile,
     )
+
+    /**
+     * Find file/folder in a specific directory (not recursive)
+     * @param directoryPath the directory to find the file in. The file should be the direct child of this directory
+     * @param fileNameToFind the name of the file to find
+     * @return the file if found, null otherwise
+     */
+    suspend fun findFileInDirectory(directoryPath: String, fileNameToFind: String): File?
 }

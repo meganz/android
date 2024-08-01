@@ -655,6 +655,9 @@ internal class FileFacade @Inject constructor(
         return fileName
     }
 
+    override suspend fun findFileInDirectory(directoryPath: String, fileNameToFind: String): File? =
+        File(directoryPath).listFiles()?.toList()?.find { it.name == fileNameToFind }
+
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val PHOTO_DIR = "MEGA Photos"
