@@ -36,7 +36,7 @@ import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
-import mega.privacy.android.app.namecollision.NameCollisionActivity
+import mega.privacy.android.app.namecollision.LegacyNameCollisionActivity
 import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
@@ -413,7 +413,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
             viewModel.proceedWithUpload(this)
         } else {
             collisionsForResult.launch(
-                NameCollisionActivity.getIntentForFolderUpload(
+                LegacyNameCollisionActivity.getIntentForFolderUpload(
                     this,
                     collisions = collisions
                 )

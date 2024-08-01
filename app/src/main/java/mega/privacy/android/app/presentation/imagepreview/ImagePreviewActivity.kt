@@ -160,7 +160,7 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun manageNameCollision(nameCollision: LegacyNameCollision?) {
         nameCollision ?: return
-        nameCollisionActivityContract?.launch(arrayListOf(nameCollision))
+        legacyNameCollisionActivityContract?.launch(arrayListOf(nameCollision))
         viewModel.onNameCollisionConsumed()
     }
 

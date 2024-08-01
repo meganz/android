@@ -182,7 +182,7 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                 }
 
                 it.collision != null -> {
-                    nameCollisionActivityContract?.launch(arrayListOf(it.collision))
+                    legacyNameCollisionActivityContract?.launch(arrayListOf(it.collision))
                     viewModel.resetCollision()
                 }
 

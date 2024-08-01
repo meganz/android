@@ -483,7 +483,7 @@ class FileInfoActivity : BaseActivity() {
             is FileInfoOneOffViewEvent.CollisionDetected -> {
                 val list = ArrayList<LegacyNameCollision>()
                 list.add(event.collision)
-                nameCollisionActivityContract?.launch(list)
+                legacyNameCollisionActivityContract?.launch(list)
             }
 
             is FileInfoOneOffViewEvent.Finished -> {

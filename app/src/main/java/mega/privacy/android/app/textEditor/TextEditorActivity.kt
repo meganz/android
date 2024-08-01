@@ -682,7 +682,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             showSnackbar(getString(message))
         }
         viewModel.getCollision().observe(this) { collision ->
-            nameCollisionActivityContract?.launch(arrayListOf(collision))
+            legacyNameCollisionActivityContract?.launch(arrayListOf(collision))
         }
         viewModel.onExceptionThrown().observe(this, ::manageException)
         viewModel.onFatalError().observe(this) {

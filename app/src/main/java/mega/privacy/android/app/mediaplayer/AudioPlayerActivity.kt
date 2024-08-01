@@ -263,7 +263,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private fun setupObserver() {
         with(viewModel) {
             getCollision().observe(this@AudioPlayerActivity) { collision ->
-                nameCollisionActivityContract?.launch(arrayListOf(collision))
+                legacyNameCollisionActivityContract?.launch(arrayListOf(collision))
             }
 
             onSnackbarMessage().observe(this@AudioPlayerActivity) { message ->

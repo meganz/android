@@ -169,7 +169,7 @@ class QRCodeComposeActivity : PasscodeActivity() {
     }
 
     private fun showCollision(collision: LegacyNameCollision) {
-        nameCollisionActivityContract?.launch(arrayListOf(collision))
+        legacyNameCollisionActivityContract?.launch(arrayListOf(collision))
     }
 }
 

@@ -440,7 +440,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
     private fun setupObserver() {
         with(viewModel) {
             getCollision().observe(this@LegacyVideoPlayerActivity) { collision ->
-                nameCollisionActivityContract?.launch(arrayListOf(collision))
+                legacyNameCollisionActivityContract?.launch(arrayListOf(collision))
             }
 
             onSnackbarMessage().observe(this@LegacyVideoPlayerActivity) { message ->

@@ -36,7 +36,7 @@ import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.activities.contract.LegacyNameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
@@ -630,8 +630,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     }
 
     private fun setupObservers() {
-        nameCollisionActivityContract =
-            registerForActivityResult(NameCollisionActivityContract()) { result: String? ->
+        legacyNameCollisionActivityContract =
+            registerForActivityResult(LegacyNameCollisionActivityContract()) { result: String? ->
                 backToCloud(
                     if (result != null) parentHandle else INVALID_HANDLE,
                     0,
@@ -1657,7 +1657,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         collisions.map {
                             getUploadCollision(it)
                         }.let {
-                            nameCollisionActivityContract?.launch(ArrayList(it))
+                            legacyNameCollisionActivityContract?.launch(ArrayList(it))
                         }
                     }
                     val collidedSharesPath = collisions.map { it.path.value }.toSet()
@@ -1956,7 +1956,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 collisions.map {
                     getUploadCollision(it)
                 }.firstOrNull()?.let {
-                    nameCollisionActivityContract?.launch(arrayListOf(it))
+                    legacyNameCollisionActivityContract?.launch(arrayListOf(it))
                 } ?: uploadFile(file)
             }.onFailure {
                 Timber.e(it, "Cannot check name collisions")

@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.activities.contract.LegacyNameCollisionActivityContract
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -103,7 +103,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                     mediaDiscoveryViewModel.state.collect {
                         if (it.collisions.isNotEmpty()) {
                             AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
-                            nameCollisionActivityContract?.launch(ArrayList(it.collisions))
+                            legacyNameCollisionActivityContract?.launch(ArrayList(it.collisions))
                             mediaDiscoveryViewModel.resetLaunchCollisionActivity()
                         } else if (it.copyResultText != null || it.copyThrowable != null) {
                             showCopyResult(it.copyResultText, it.copyThrowable)
@@ -129,8 +129,8 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
 
 
     private fun setupLauncher() {
-        nameCollisionActivityContract =
-            registerForActivityResult(NameCollisionActivityContract()) { result: String? ->
+        legacyNameCollisionActivityContract =
+            registerForActivityResult(LegacyNameCollisionActivityContract()) { result: String? ->
                 result?.let {
                     showSnackbar(
                         this@MediaDiscoveryActivity,

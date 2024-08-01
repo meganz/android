@@ -169,7 +169,6 @@ import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
-import mega.privacy.android.app.presentation.cancelaccountplan.CancelAccountPlanActivity
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
 import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserActionListener
@@ -290,7 +289,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
@@ -2050,7 +2048,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun handleNodesNameCollisionResult(result: NodeNameCollisionsResult) {
         if (result.conflictNodes.isNotEmpty()) {
-            nameCollisionActivityContract
+            legacyNameCollisionActivityContract
                 ?.launch(ArrayList(result.conflictNodes.values.map {
                     when (result.type) {
                         NodeNameCollisionType.RESTORE,
@@ -6185,7 +6183,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 collisions.map {
                     getUploadCollision(it)
                 }.firstOrNull()?.let {
-                    nameCollisionActivityContract?.launch(arrayListOf(it))
+                    legacyNameCollisionActivityContract?.launch(arrayListOf(it))
                 } ?: uploadFile(file, parentHandle)
             }.onFailure { throwable: Throwable? ->
                 Timber.e(throwable)
@@ -6491,7 +6489,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     collisions.map {
                         getUploadCollision(it)
                     }.let {
-                        nameCollisionActivityContract?.launch(ArrayList(it))
+                        legacyNameCollisionActivityContract?.launch(ArrayList(it))
                     }
                 }
                 val collidedSharesPath = collisions.map { it.path.value }.toSet()
@@ -6677,7 +6675,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 collisions.map {
                     getUploadCollision(it)
                 }.firstOrNull()?.let {
-                    nameCollisionActivityContract?.launch(arrayListOf(it))
+                    legacyNameCollisionActivityContract?.launch(arrayListOf(it))
                 } ?: uploadFile(file, parentHandle)
             }.onFailure { throwable: Throwable? ->
                 Timber.e(throwable)

@@ -391,7 +391,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 }
                 if (nameCollision != null) {
                     dismissAlertDialogIfExists(statusDialog)
-                    nameCollisionActivityContract?.launch(arrayListOf(nameCollision))
+                    legacyNameCollisionActivityContract?.launch(arrayListOf(nameCollision))
                 }
                 if (pdfStreamData != null) {
                     try {

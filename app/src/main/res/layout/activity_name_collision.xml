@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical"
     android:background="?android:colorBackground"
-    tools:context=".namecollision.NameCollisionActivity">
+    tools:context=".namecollision.LegacyNameCollisionActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"

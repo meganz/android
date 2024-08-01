@@ -52,7 +52,8 @@ import java.io.File
 /**
  * Activity for showing name collisions and resolving them as per user's choices.
  */
-class NameCollisionActivity : PasscodeActivity() {
+@Deprecated("Use NameCollisionActivity instead")
+class LegacyNameCollisionActivity : PasscodeActivity() {
 
     companion object {
 
@@ -67,7 +68,7 @@ class NameCollisionActivity : PasscodeActivity() {
             context: Context,
             collisions: ArrayList<LegacyNameCollision>,
         ): Intent =
-            Intent(context, NameCollisionActivity::class.java).apply {
+            Intent(context, LegacyNameCollisionActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_COLLISION_RESULTS, collisions)
             }
 
@@ -83,12 +84,12 @@ class NameCollisionActivity : PasscodeActivity() {
             context: Context,
             collision: LegacyNameCollision,
         ): Intent =
-            Intent(context, NameCollisionActivity::class.java).apply {
+            Intent(context, LegacyNameCollisionActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT, collision)
             }
     }
 
-    private val viewModel: NameCollisionViewModel by viewModels()
+    private val viewModel: LegacyNameCollisionViewModel by viewModels()
 
     private lateinit var binding: ActivityNameCollisionBinding
 
@@ -167,7 +168,7 @@ class NameCollisionActivity : PasscodeActivity() {
 
             binding.toolbar.elevation = if (showElevation) elevation else 0F
 
-            if (Util.isDarkMode(this@NameCollisionActivity)) {
+            if (Util.isDarkMode(this@LegacyNameCollisionActivity)) {
                 val color = if (showElevation) elevationColor else noElevationColor
                 window.statusBarColor = color
                 binding.toolbar.setBackgroundColor(color)
@@ -177,7 +178,7 @@ class NameCollisionActivity : PasscodeActivity() {
         binding.learnMore.setOnClickListener {
             startActivity(
                 Intent(
-                    this@NameCollisionActivity,
+                    this@LegacyNameCollisionActivity,
                     WebViewActivity::class.java
                 ).apply { data = LEARN_MORE_URI.toUri() })
         }
@@ -291,7 +292,7 @@ class NameCollisionActivity : PasscodeActivity() {
             this.name.text = name
             size.text = if (isFile) getSizeString(
                 collision.size ?: 0,
-                this@NameCollisionActivity
+                this@LegacyNameCollisionActivity
             ) else getFolderContentString(collision)
             date.text = formatLongDateTime(
                 if (collision is LegacyNameCollision.Upload) collision.lastModified / 1000
@@ -352,7 +353,7 @@ class NameCollisionActivity : PasscodeActivity() {
             size.text =
                 if (isFile) getSizeString(
                     collisionResult.collisionSize ?: 0,
-                    this@NameCollisionActivity
+                    this@LegacyNameCollisionActivity
                 )
                 else collisionResult.collisionFolderContent
             date.text = formatLongDateTime(collisionResult.collisionLastModified ?: 0)

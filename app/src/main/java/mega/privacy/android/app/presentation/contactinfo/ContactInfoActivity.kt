@@ -978,7 +978,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun handleNodesNameCollisionResult(conflictNodes: List<LegacyNameCollision>) {
         if (conflictNodes.isNotEmpty()) {
             statusDialog?.dismiss()
-            nameCollisionActivityContract?.launch(ArrayList(conflictNodes))
+            legacyNameCollisionActivityContract?.launch(ArrayList(conflictNodes))
         }
     }
 

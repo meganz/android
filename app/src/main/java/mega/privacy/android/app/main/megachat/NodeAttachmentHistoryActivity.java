@@ -384,8 +384,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             if (collisions == null) return Unit.INSTANCE;
             dismissAlertDialogIfExists(statusDialog);
 
-            if (!collisions.isEmpty() && nameCollisionActivityContract != null) {
-                nameCollisionActivityContract.launch(new ArrayList<>(collisions));
+            if (!collisions.isEmpty() && legacyNameCollisionActivityContract != null) {
+                legacyNameCollisionActivityContract.launch(new ArrayList<>(collisions));
                 viewModel.nodeCollisionsConsumed();
             }
             return Unit.INSTANCE;

@@ -680,7 +680,7 @@
             android:label="@string/start_screen_setting"
             android:launchMode="singleTop" />
         <activity
-            android:name=".namecollision.NameCollisionActivity"
+            android:name=".namecollision.LegacyNameCollisionActivity"
             android:label="@string/title_duplicated_items"
             android:launchMode="singleTop"
             android:theme="@style/Theme.Mega.FullScreen.Viewer" />

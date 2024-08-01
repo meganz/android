@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.namecollision.NameCollisionViewModel
+import mega.privacy.android.app.namecollision.LegacyNameCollisionViewModel
 import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -45,8 +45,8 @@ import test.mega.privacy.android.app.extensions.withCoroutineExceptions
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(value = [InstantExecutorExtension::class, TestSchedulerExtension::class])
-internal class LegacyNameCollisionViewModelTest {
-    private lateinit var underTest: NameCollisionViewModel
+internal class LegacyLegacyNameCollisionViewModelTest {
+    private lateinit var underTest: LegacyNameCollisionViewModel
 
     private val getFileVersionsOption = mock<GetFileVersionsOption>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
@@ -56,7 +56,7 @@ internal class LegacyNameCollisionViewModelTest {
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private fun initUnderTest() {
-        underTest = NameCollisionViewModel(
+        underTest = LegacyNameCollisionViewModel(
             getFileVersionsOption = getFileVersionsOption,
             getNameCollisionResultUseCase = mock(),
             uploadUseCase = mock(),

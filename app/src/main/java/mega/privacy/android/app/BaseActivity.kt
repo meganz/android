@@ -39,7 +39,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.activities.contract.LegacyNameCollisionActivityContract
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.AutoPlayInfo
@@ -144,7 +144,7 @@ import javax.inject.Inject
  * @property transfersManagement            [TransfersManagement]
  * @property loggingSettings                [LegacyLoggingSettings]
  * @property composite                      [CompositeDisposable]
- * @property nameCollisionActivityContract  [NameCollisionActivityContract]
+ * @property legacyNameCollisionActivityContract  [LegacyNameCollisionActivityContract]
  * @property app                            [MegaApplication]
  * @property outMetrics                     [DisplayMetrics]
  * @property isResumeTransfersWarningShown  True if the warning should be shown, false otherwise.
@@ -214,7 +214,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     lateinit var pauseAllTransfersUseCase: PauseAllTransfersUseCase
 
     @JvmField
-    var nameCollisionActivityContract: ActivityResultLauncher<ArrayList<LegacyNameCollision>>? = null
+    var legacyNameCollisionActivityContract: ActivityResultLauncher<ArrayList<LegacyNameCollision>>? = null
     protected val billingViewModel by viewModels<BillingViewModel>()
     protected val adsViewModel: AdsViewModel by viewModels()
     private val viewModel by viewModels<BaseViewModel>()
@@ -375,8 +375,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        nameCollisionActivityContract =
-            registerForActivityResult(NameCollisionActivityContract()) { result: String? ->
+        legacyNameCollisionActivityContract =
+            registerForActivityResult(LegacyNameCollisionActivityContract()) { result: String? ->
                 if (result != null) {
                     showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE)
                 }

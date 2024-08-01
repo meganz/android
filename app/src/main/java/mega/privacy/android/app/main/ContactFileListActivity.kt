@@ -443,7 +443,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     private fun handleNodesNameCollisionResult(conflictNodes: List<LegacyNameCollision>) {
         if (conflictNodes.isNotEmpty()) {
             dismissAlertDialogIfExists(statusDialog)
-            nameCollisionActivityContract?.launch(ArrayList(conflictNodes))
+            legacyNameCollisionActivityContract?.launch(ArrayList(conflictNodes))
         }
     }
 
@@ -645,7 +645,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                                 getUploadCollision(it)
                             }.firstOrNull()
                             if (collision != null) {
-                                nameCollisionActivityContract?.launch(arrayListOf(collision))
+                                legacyNameCollisionActivityContract?.launch(arrayListOf(collision))
                             } else {
                                 applicationScope.launch uploadCoroutine@{
                                     if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
@@ -748,7 +748,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                     collisions.map {
                         getUploadCollision(it)
                     }.let {
-                        nameCollisionActivityContract?.launch(ArrayList(it))
+                        legacyNameCollisionActivityContract?.launch(ArrayList(it))
                     }
                 }
                 val collidedSharesPath = collisions.map { it.path.value }.toSet()

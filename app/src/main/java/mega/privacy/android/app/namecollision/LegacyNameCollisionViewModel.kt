@@ -58,14 +58,15 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * ViewModel which manages data of [NameCollisionActivity]
+ * ViewModel which manages data of [LegacyNameCollisionActivity]
  *
  * @property getNameCollisionResultUseCase  Required for getting all the needed info for present a collision.
  * @property uploadUseCase                  Required for uploading files.
  * @property uiState                        NameCollisionUiState.
  */
+@Deprecated("Use NameCollisionViewModel instead")
 @HiltViewModel
-class NameCollisionViewModel @Inject constructor(
+class LegacyNameCollisionViewModel @Inject constructor(
     private val getFileVersionsOption: GetFileVersionsOption,
     private val getNameCollisionResultUseCase: GetNameCollisionResultUseCase,
     private val uploadUseCase: UploadUseCase,

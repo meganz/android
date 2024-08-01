@@ -38,7 +38,7 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.activities.contract.LegacyNameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -147,8 +147,8 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
-    private val nameCollisionActivityContract =
-        registerForActivityResult(NameCollisionActivityContract()) { result: String? ->
+    private val legacyNameCollisionActivityContract =
+        registerForActivityResult(LegacyNameCollisionActivityContract()) { result: String? ->
             if (result != null) {
                 lifecycleScope.launch {
                     snackbarHostState.showSnackbar(result)
@@ -654,7 +654,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
     private fun handleNodesNameCollisionResult(result: NodeNameCollisionsResult) {
         if (result.conflictNodes.isNotEmpty()) {
-            nameCollisionActivityContract
+            legacyNameCollisionActivityContract
                 .launch(
                     ArrayList(
                         result.conflictNodes.values.map {
