@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -70,6 +71,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.CopyrightFragment
 import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumSummary
+import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumLink
+import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
@@ -77,10 +82,6 @@ import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
-import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.AlbumLink
-import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.mobile.analytics.event.MultipleAlbumLinksScreenEvent
 
 private typealias ImageDownloader = (photo: Photo, callback: (Boolean) -> Unit) -> Unit
@@ -136,6 +137,7 @@ fun AlbumGetMultipleLinksScreen(
     val albumSummaries = state.albumsSummaries
 
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         scaffoldState = scaffoldState,
         topBar = {
             AlbumGetMultipleLinksTopBar(

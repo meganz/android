@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
@@ -38,55 +39,74 @@ fun NotificationsPermissionView(
     onNotNowClicked: () -> Unit,
     onGrantAccessClicked: () -> Unit,
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier
+            .systemBarsPadding()
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         val isPortrait =
             LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
 
         Spacer(modifier = Modifier.size(if (isPortrait) 120.dp else 20.dp))
 
-        Image(modifier = Modifier.requiredSize(120.dp),
+        Image(
+            modifier = Modifier.requiredSize(120.dp),
             painter = painterResource(id = R.drawable.ic_notifications_permission),
-            contentDescription = "Notifications permissions image")
+            contentDescription = "Notifications permissions image"
+        )
 
         Spacer(modifier = Modifier.size(if (isPortrait) 48.dp else 24.dp))
 
-        Text(modifier = Modifier.padding(horizontal = 24.dp),
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
             style = MaterialTheme.typography.h6,
             fontWeight = FontWeight.Medium,
             color = colorResource(id = R.color.grey_087_white_087),
-            text = stringResource(id = R.string.permissions_notifications_title))
+            text = stringResource(id = R.string.permissions_notifications_title)
+        )
 
         Spacer(modifier = Modifier.size(if (isPortrait) 16.dp else 8.dp))
 
-        Text(modifier = Modifier.padding(horizontal = 24.dp),
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
             fontFamily = FontFamily.SansSerif,
             fontSize = 16.sp,
             color = colorResource(id = R.color.grey_054_white_054),
             textAlign = TextAlign.Center,
-            text = stringResource(id = R.string.permissions_notifications_description))
+            text = stringResource(id = R.string.permissions_notifications_description)
+        )
 
         Spacer(modifier = Modifier.size(if (isPortrait) 124.dp else 24.dp))
 
         Row(modifier = Modifier.padding(horizontal = 24.dp)) {
-            TextButton(onClick = onNotNowClicked,
+            TextButton(
+                onClick = onNotNowClicked,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Transparent,
-                    contentColor = colorResource(id = R.color.teal_300_teal_200))) {
-                Text(style = MaterialTheme.typography.button,
-                    text = stringResource(id = R.string.permissions_not_now_button))
+                    contentColor = colorResource(id = R.color.teal_300_teal_200)
+                )
+            ) {
+                Text(
+                    style = MaterialTheme.typography.button,
+                    text = stringResource(id = R.string.permissions_not_now_button)
+                )
             }
 
             Spacer(modifier = Modifier.size(16.dp))
 
-            TextButton(onClick = onGrantAccessClicked,
+            TextButton(
+                onClick = onGrantAccessClicked,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = colorResource(id = R.color.teal_300_teal_200),
-                    contentColor = colorResource(id = R.color.white_087_dark_grey))) {
-                Text(style = MaterialTheme.typography.button,
-                    text = stringResource(id = R.string.button_continue))
+                    contentColor = colorResource(id = R.color.white_087_dark_grey)
+                )
+            ) {
+                Text(
+                    style = MaterialTheme.typography.button,
+                    text = stringResource(id = R.string.button_continue)
+                )
             }
         }
 

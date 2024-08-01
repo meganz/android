@@ -1,10 +1,13 @@
 package mega.privacy.android.app.presentation.meeting
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.core.net.toUri
@@ -49,10 +52,16 @@ class WaitingRoomActivity : AppCompatActivity() {
         intent.getStringExtra(EXTRA_CHAT_LINK)
     }
 
+    override fun attachBaseContext(newBase: Context?) {
+        delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
+        super.attachBaseContext(newBase)
+    }
+
     /**
      * Perform Activity initialization
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent { MainComposeView() }
 

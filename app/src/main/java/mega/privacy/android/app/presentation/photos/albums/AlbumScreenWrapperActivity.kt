@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
@@ -22,9 +23,9 @@ import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumC
 import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
-import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
+import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -60,6 +61,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
     lateinit var imagePreviewProvider: ImagePreviewProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {

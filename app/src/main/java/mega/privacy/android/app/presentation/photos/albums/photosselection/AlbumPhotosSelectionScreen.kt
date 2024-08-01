@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -55,6 +56,10 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
@@ -63,10 +68,6 @@ import mega.privacy.android.shared.original.core.ui.theme.teal_300
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.photos.Album
-import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.mobile.analytics.event.AddItemsToExistingAlbumFABEvent
 import mega.privacy.mobile.analytics.event.AddItemsToNewAlbumFABEvent
 import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionAllLocationsButtonEvent
@@ -127,6 +128,7 @@ fun AlbumPhotosSelectionScreen(
     )
 
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         topBar = {
             AlbumPhotosSelectionHeader(
                 album = state.album,

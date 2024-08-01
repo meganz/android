@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +30,6 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.mobile.analytics.event.EditMeetingMaxDurationReachedEvent
 import mega.privacy.mobile.analytics.event.EditSingleOccurrenceMeetingMaxDurationReachedEvent
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
@@ -60,6 +60,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
      * Perform Activity initialization
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         collectFlows()

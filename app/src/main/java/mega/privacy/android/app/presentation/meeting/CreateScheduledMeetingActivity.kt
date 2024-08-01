@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -95,6 +96,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
      * Perform Activity initialization
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         collectFlows()

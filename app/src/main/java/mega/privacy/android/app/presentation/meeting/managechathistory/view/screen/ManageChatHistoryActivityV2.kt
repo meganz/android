@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.managechathistory.view.screen
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,6 +21,7 @@ class ManageChatHistoryActivityV2 : FragmentActivity() {
      * Called when the activity is starting.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         if (intent == null || intent.extras == null) {

@@ -21,6 +21,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.main.ManagerActivity
@@ -147,6 +148,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         url = intent.dataString
         Timber.d("Original url: $url")

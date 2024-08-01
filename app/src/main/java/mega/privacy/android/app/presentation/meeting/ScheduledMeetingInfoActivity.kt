@@ -9,6 +9,7 @@ import android.widget.CheckedTextView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -111,6 +112,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      * Perform Activity initialization
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         collectFlows()

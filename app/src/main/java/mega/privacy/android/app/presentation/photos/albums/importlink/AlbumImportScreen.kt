@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,6 +69,10 @@ import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
+import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
@@ -82,10 +87,6 @@ import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
-import mega.privacy.android.domain.entity.photos.Album
-import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
-import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.mobile.analytics.event.AlbumImportInputDecryptionKeyDialogEvent
 import mega.privacy.mobile.analytics.event.AlbumImportSaveToCloudDriveButtonEvent
 import mega.privacy.mobile.analytics.event.AlbumImportSaveToDeviceButtonEvent
@@ -207,6 +208,7 @@ internal fun AlbumImportScreen(
     }
 
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         scaffoldState = scaffoldState,
         topBar = {
             AlbumImportTopBar(

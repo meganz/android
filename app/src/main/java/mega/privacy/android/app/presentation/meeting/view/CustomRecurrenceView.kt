@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
@@ -58,10 +59,6 @@ import mega.privacy.android.app.presentation.extensions.meeting.StringId
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.CustomRecurrenceState
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.DropdownOccurrenceType
 import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
@@ -73,6 +70,10 @@ import mega.privacy.android.legacy.core.ui.controls.chips.TextButtonChip
 import mega.privacy.android.legacy.core.ui.controls.chips.TextButtonWithIconChip
 import mega.privacy.android.legacy.core.ui.controls.chips.TextFieldChip
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import java.time.ZonedDateTime
 
 /**
@@ -101,6 +102,7 @@ internal fun CustomRecurrenceView(
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         scaffoldState = scaffoldState,
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->

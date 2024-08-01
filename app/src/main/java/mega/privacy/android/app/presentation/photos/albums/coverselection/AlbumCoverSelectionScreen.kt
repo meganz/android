@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,12 +31,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.teal_200
@@ -43,8 +46,6 @@ import mega.privacy.android.shared.original.core.ui.theme.teal_200_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.teal_300
 import mega.privacy.android.shared.original.core.ui.theme.teal_300_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.white
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.photos.Photo
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -64,6 +65,7 @@ fun AlbumCoverSelectionScreen(
     )
 
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         topBar = {
             AlbumCoverSelectionHeader(
                 onBackClicked = onBackClicked,
