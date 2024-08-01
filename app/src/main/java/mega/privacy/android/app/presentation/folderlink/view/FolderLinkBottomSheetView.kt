@@ -17,7 +17,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -34,18 +33,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
+import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -56,12 +56,13 @@ internal fun FolderLinkBottomSheetView(
     showImport: Boolean,
     onImportClicked: (NodeUIItem<TypedNode>?) -> Unit,
     onSaveToDeviceClicked: (NodeUIItem<TypedNode>?) -> Unit,
+    content: @Composable () -> Unit,
 ) {
     val fileIcon = MimeTypeList.typeForName(nodeUIItem?.node?.name).iconResourceId
-    ModalBottomSheetLayout(
-        sheetState = modalSheetState,
+    BottomSheet(
+        modalSheetState = modalSheetState,
         scrimColor = black.copy(alpha = 0.32f),
-        sheetContent = {
+        sheetBody = {
             BottomSheetContent(
                 modalSheetState = modalSheetState,
                 coroutineScope = coroutineScope,
@@ -71,8 +72,9 @@ internal fun FolderLinkBottomSheetView(
                 onSaveToDeviceClicked = onSaveToDeviceClicked,
                 icon = fileIcon
             )
-        }
-    ) {}
+        },
+        content = content
+    )
 }
 
 @OptIn(ExperimentalMaterialApi::class)

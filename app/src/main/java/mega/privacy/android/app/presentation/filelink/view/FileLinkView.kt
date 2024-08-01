@@ -144,7 +144,7 @@ internal fun FileLinkView(
             }
         },
         floatingActionButton = {
-            if(!transferState.hideTransfersWidget) {
+            if (!transferState.hideTransfersWidget) {
                 TransfersWidgetViewAnimated(
                     transfersInfo = transferState.transfersInfo,
                     onClick = onTransferWidgetClick,

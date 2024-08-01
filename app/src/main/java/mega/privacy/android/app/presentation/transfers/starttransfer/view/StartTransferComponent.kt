@@ -35,6 +35,8 @@ import com.google.accompanist.permissions.shouldShowRationale
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -382,6 +384,7 @@ private suspend fun consumeFinishProcessing(
     context: Context,
     transferTriggerEvent: TransferTriggerEvent?,
 ) {
+    var delayed = false
     when (event.exception) {
         null -> {
             val message = when {
@@ -390,6 +393,8 @@ private suspend fun consumeFinishProcessing(
                 }
 
                 event.totalAlreadyDownloaded == 0 -> {
+                    // Delayed to avoid showing the snackbar and the transfers widget just at the same time because it sometimes causes a flick animation
+                    delayed = true
                     context.resources.getQuantityString(
                         R.plurals.download_started,
                         event.totalNodes,
@@ -437,7 +442,16 @@ private suspend fun consumeFinishProcessing(
                     ).toString()
                 }
             }
-            snackBarHostState.showSnackbar(message)
+            if (delayed) {
+                coroutineScope {
+                    launch {
+                        delay(100)
+                        snackBarHostState.showSnackbar(message)
+                    }
+                }
+            } else {
+                snackBarHostState.showSnackbar(message)
+            }
         }
 
         is QuotaExceededMegaException -> {

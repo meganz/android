@@ -76,6 +76,7 @@ fun ComposeView.setTransfersWidgetContent(
                 TransfersWidgetViewAnimated(
                     transfersInfo = transfersInfo,
                     onClick = onClick,
+                    modifier = Modifier.padding(bottom = 16.dp, end = 16.dp, start = 16.dp),
                 )
             }
         }
@@ -142,8 +143,7 @@ internal fun TransfersWidgetView(
     FloatingActionButton(
         onClick = onClick,
         modifier = modifier
-            .testTag(TAG_TRANSFERS_WIDGET)
-            .padding(bottom = 16.dp, end = 16.dp, start = 16.dp),
+            .testTag(TAG_TRANSFERS_WIDGET),
         backgroundColor = MegaOriginalTheme.colors.background.surface1,
     ) {
 
