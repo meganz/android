@@ -43,7 +43,6 @@ import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.GetUserEmailListener
-import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
@@ -1097,15 +1096,6 @@ class InMeetingViewModel @Inject constructor(
         chatId != MEGACHAT_INVALID_HANDLE && _state.value.currentChatId == chatId
 
     /**
-     * Method to know if it is the same call
-     *
-     * @param callId call ID
-     * @return True, if it is the same. False, otherwise
-     */
-    fun isSameCall(callId: Long): Boolean =
-        state.value.call?.let { it.callId == callId } ?: run { false }
-
-    /**
      * Method to set a call
      *
      * @param chatId chat ID
@@ -1222,12 +1212,6 @@ class InMeetingViewModel @Inject constructor(
      *
      */
     fun getSessionOneToOneCall(): ChatSession? = state.value.getSession
-
-    /**
-     * Method to know if the session of a participant in one to one is on hold
-     *
-     */
-    fun isSessionOnHold(): Boolean = state.value.isSessionOnHold ?: false
 
     /**
      * Get the [ChatSession] of a participant
@@ -1569,75 +1553,6 @@ class InMeetingViewModel @Inject constructor(
     fun isNecessaryToShowSwapCameraOption(): Boolean =
         state.value.call?.let { it.status != ChatCallStatus.Connecting && it.hasLocalVideo && !it.isOnHold }
             ?: run { false }
-
-    /**
-     * Start chat call
-     *
-     * @param enableVideo The video should be enabled
-     * @param enableAudio The audio should be enabled
-     * @return Chat id
-     */
-    fun startMeeting(
-        enableVideo: Boolean,
-        enableAudio: Boolean,
-    ): LiveData<Long> {
-        val chatIdResult = MutableLiveData<Long>()
-        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
-            Timber.d("The chat exists")
-            if (CallUtil.isStatusConnected(
-                    MegaApplication.getInstance().applicationContext,
-                    it.chatId
-                )
-            ) {
-                megaChatApiGateway.getChatCall(_state.value.currentChatId)?.let { call ->
-                    Timber.d("There is a call, open it")
-                    chatIdResult.value = call.chatid
-                    CallUtil.openMeetingInProgress(
-                        MegaApplication.getInstance().applicationContext,
-                        _state.value.currentChatId,
-                        true,
-                        passcodeManagement
-                    )
-
-                    return chatIdResult
-                }
-
-                Timber.d("Chat status is connected")
-                MegaApplication.isWaitingForCall = false
-
-                viewModelScope.launch {
-                    runCatching {
-                        setChatVideoInDeviceUseCase()
-                        startCallUseCase(
-                            chatId = _state.value.currentChatId,
-                            audio = enableAudio,
-                            video = enableVideo
-                        )
-                    }.onFailure { exception ->
-                        Timber.e(exception)
-                    }.onSuccess { call ->
-                        call?.apply {
-                            chatManagement.setSpeakerStatus(chatId, hasLocalVideo)
-                            if (isOutgoing) {
-                                chatManagement.setRequestSentCall(callId, isRequestSent = true)
-                            }
-
-                            chatIdResult.value = chatId
-                        }
-                    }
-                }
-            }
-            return chatIdResult
-        }
-
-        Timber.d("The chat doesn't exists")
-        inMeetingRepository.createMeeting(
-            _state.value.chatTitle,
-            CreateGroupChatWithPublicLink()
-        )
-
-        return chatIdResult
-    }
 
 
     /**
@@ -2479,7 +2394,9 @@ class InMeetingViewModel @Inject constructor(
             runCatching {
                 setIgnoredCallUseCase(_state.value.currentChatId)
             }.onSuccess {
-                Timber.d("Call was ignored")
+                if (it) {
+                    Timber.d("Call was ignored")
+                }
             }.onFailure { exception ->
                 Timber.e(exception)
             }
@@ -2686,7 +2603,7 @@ class InMeetingViewModel @Inject constructor(
         participants.value?.let { listParticipants ->
             val iterator = listParticipants.iterator()
             iterator.forEach { participant ->
-                getSessionByClientId(participant.clientId)?.let { session ->
+                getSessionByClientId(participant.clientId)?.let { _ ->
                     if (state.value.callUIStatus == CallUIStatusType.SpeakerView && participant.hasHiRes && !participant.isScreenShared) {
                         Timber.d("Change to low resolution, clientID ${participant.clientId}")
                         participant.videoListener?.let {
@@ -2821,22 +2738,13 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return num of participants
      */
-    fun numParticipants(): Int {
+    private fun numParticipants(): Int {
         participants.value?.size?.let { numParticipants ->
             return numParticipants
         }
 
         return 0
     }
-
-    /**
-     * Method to open chat preview when joining as a guest
-     *
-     * @param link The link to the chat room or the meeting
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface) =
-        inMeetingRepository.openChatPreview(link, listener)
 
     /**
      * Method to join a chat group

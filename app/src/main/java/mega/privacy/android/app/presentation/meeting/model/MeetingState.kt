@@ -71,6 +71,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property showLowerHandButtonInSnackbar              True, show lower hand button. False, show view button.
  * @property isPictureInPictureFeatureFlagEnabled       True, if Picture in Picture feature flag enabled. False, otherwise.
  * @property isInPipMode                                True, if is in Picture in Picture mode. False, otherwise.
+ * @property startedMeetingChatId                       Chat id of the meeting started
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -127,8 +128,9 @@ data class MeetingState(
     val showLowerHandButtonInSnackbar: Boolean = false,
     val isPictureInPictureFeatureFlagEnabled: Boolean = false,
     val isInPipMode: Boolean = false,
-    val callEndedDueToTooManyParticipants:Boolean = false,
-    ) {
+    val callEndedDueToTooManyParticipants: Boolean = false,
+    val startedMeetingChatId: Long? = null,
+) {
 
     /**
      * Check if waiting room is opened

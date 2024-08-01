@@ -857,15 +857,30 @@ internal class CallRepositoryImpl @Inject constructor(
                 ?.let(flagMapper::invoke)
         }
 
-    override suspend fun setIgnoredCall(chatId: Long): ChatRequest = withContext(dispatcher) {
+    override suspend fun setIgnoredCall(chatId: Long): Boolean =
+        withContext(dispatcher) {
+            megaChatApiGateway.setIgnoredCall(
+                chatId
+            )
+        }
+
+    override suspend fun createMeeting(
+        title: String,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
+    ): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
             val callback = continuation.getChatRequestListener(
-                methodName = "setIgnoredCall",
+                methodName = "createMeeting",
                 chatRequestMapper::invoke
             )
 
-            megaChatApiGateway.setIgnoredCall(
-                chatId,
+            megaChatApiGateway.createMeeting(
+                title,
+                speakRequest,
+                waitingRoom,
+                openInvite,
                 callback
             )
 

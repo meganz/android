@@ -11,7 +11,6 @@ object EventConstants {
     const val EVENT_OUTGOING_CALL = "outgoing_call"
     const val EVENT_ENTER_IN_MEETING = "enter_in_meeting"
     const val EVENT_AUDIO_OUTPUT_CHANGE = "audio_output_change"
-    const val EVENT_MEETING_CREATED = "meeting_created"
     const val EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE = "enable_or_disable_local_video_change"
     const val EVENT_UPDATE_WAITING_FOR_OTHERS = "update_waiting_for_others"
 

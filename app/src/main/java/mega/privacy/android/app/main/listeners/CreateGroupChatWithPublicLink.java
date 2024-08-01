@@ -1,13 +1,6 @@
 package mega.privacy.android.app.main.listeners;
 
-
-import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED;
-
 import android.content.Context;
-import android.util.Pair;
-
-import com.jeremyliao.liveeventbus.LiveEventBus;
-
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity;
 import nz.mega.sdk.MegaChatApiJava;
@@ -26,9 +19,6 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
         this.title = title;
     }
 
-    public CreateGroupChatWithPublicLink() {
-    }
-
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -45,10 +35,7 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
 
         if (request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                if (request.getNumber() == 1) {
-                    Timber.d("Meeting created");
-                    LiveEventBus.get(EVENT_MEETING_CREATED, Long.class).post(request.getChatHandle());
-                } else {
+                if (request.getNumber() != 1) {
                     Timber.d("Chat created - get link");
                     api.createChatLink(request.getChatHandle(), this);
                 }
@@ -60,9 +47,7 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
                 }
             }
         } else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_HANDLE) {
-            Pair<Long, String> chatAndLink = Pair.create(request.getChatHandle(), request.getText());
-
-            if (request.getFlag() == false) {
+            if (!request.getFlag()) {
                 if (request.getNumRetry() == 1) {
                     Timber.d("Chat link exported");
 

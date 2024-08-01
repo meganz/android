@@ -1031,6 +1031,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.startedMeetingChatId }
+            .distinctUntilChanged()) {
+            it?.let { chatId ->
+                checkCallStarted(chatId)
+            }
+        }
+
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.callId }
             .distinctUntilChanged()) { callId ->
             callId?.run {
@@ -3026,10 +3033,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
         }
 
-        inMeetingViewModel.startMeeting(video, audio)
-            .observe(viewLifecycleOwner) { chatIdResult ->
-                checkCallStarted(chatIdResult)
-            }
+        sharedModel.startOrCreateMeeting(
+            title = inMeetingViewModel.state.value.chatTitle,
+            video = video,
+            audio = audio
+        )
     }
 
     override fun onErrorJoinedChat(chatId: Long, userHandle: Long, error: Int) {

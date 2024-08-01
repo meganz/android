@@ -10,6 +10,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityRepository
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantMapper
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.call.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
+import mega.privacy.android.domain.usecase.call.CreateMeetingUseCase
 import mega.privacy.android.domain.usecase.call.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
@@ -52,6 +54,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdate
 import mega.privacy.android.domain.usecase.meeting.MuteAllPeersUseCase
 import mega.privacy.android.domain.usecase.meeting.MutePeersUseCase
 import mega.privacy.android.domain.usecase.call.RingIndividualInACallUseCase
+import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -121,6 +124,9 @@ class MeetingActivityViewModelTest {
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock()
     private val enableOrDisableVideoUseCase: EnableOrDisableVideoUseCase = mock()
     private val enableOrDisableAudioUseCase: EnableOrDisableAudioUseCase = mock()
+    private val createMeetingUseCase: CreateMeetingUseCase = mock()
+    private val startCallUseCase: StartCallUseCase = mock()
+    private val passcodeManagement: PasscodeManagement = mock()
 
     private val context: Context = mock()
 
@@ -179,6 +185,9 @@ class MeetingActivityViewModelTest {
             getFeatureFlagValueUseCase,
             getMyUserHandleUseCase,
             startVideoDeviceUseCase,
+            createMeetingUseCase,
+            startCallUseCase,
+            passcodeManagement,
             monitorCallEndedUseCase,
             enableOrDisableAudioUseCase,
             enableOrDisableVideoUseCase,
@@ -238,6 +247,9 @@ class MeetingActivityViewModelTest {
             enableOrDisableVideoUseCase = enableOrDisableVideoUseCase,
             startVideoDeviceUseCase = startVideoDeviceUseCase,
             monitorCallEndedUseCase = monitorCallEndedUseCase,
+            createMeetingUseCase = createMeetingUseCase,
+            startCallUseCase = startCallUseCase,
+            passcodeManagement = passcodeManagement,
         )
     }
 

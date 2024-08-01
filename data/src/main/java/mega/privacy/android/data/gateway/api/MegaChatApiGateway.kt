@@ -2000,5 +2000,22 @@ interface MegaChatApiGateway {
      * @param chatId MegaChatHandle that identifies the chat room
      * @return true if call can be marked as ignored, otherwise return false.
      */
-    fun setIgnoredCall(chatId: Long, listener: MegaChatRequestListenerInterface)
+    suspend fun setIgnoredCall(chatId: Long): Boolean
+
+    /**
+     * Create meeting
+     *
+     * @param title         Meeting title
+     * @param speakRequest  Speak request enable
+     * @param waitingRoom   Waiting room enable
+     * @param openInvite    Open invite enable
+     * @param listener      MegaChatRequestListener to track this request. This is an optional parameter
+     */
+    fun createMeeting(
+        title: String,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
 }

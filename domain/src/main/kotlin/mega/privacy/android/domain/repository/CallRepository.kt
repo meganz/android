@@ -560,5 +560,21 @@ interface CallRepository {
      */
     suspend fun setIgnoredCall(
         chatId: Long,
+    ): Boolean
+
+    /**
+     * Create meeting
+     *
+     * @param title         Meeting title
+     * @param speakRequest  Speak request enable
+     * @param waitingRoom   Waiting room enable
+     * @param openInvite    Open invite enable
+     * @return                 [ChatRequest]
+     */
+    suspend fun createMeeting(
+        title: String,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
     ): ChatRequest
 }

@@ -64,6 +64,7 @@ import timber.log.Timber
  * @property changesInLowResInSession               [ChatSession] with changes in low resolution video
  * @property changesInStatusInSession               [ChatSession] with changes in status
  * @property shouldCheckChildFragments              True, if should update fragments. False, if not.
+ * @property callAnsweredInAnotherClient            True, if the call was answered in another client.
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -116,7 +117,6 @@ data class InMeetingUiState(
     val shouldCheckChildFragments: Boolean = false,
     val callAnsweredInAnotherClient: Boolean = false,
 ) {
-
     /**
      * Check if it's one to one call
      * @return True, if it's one to one call. False, if it's a group call or a meeting.

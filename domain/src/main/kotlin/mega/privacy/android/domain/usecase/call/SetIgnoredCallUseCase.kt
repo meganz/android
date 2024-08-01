@@ -18,7 +18,7 @@ class SetIgnoredCallUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         chatId: Long,
-    ): ChatRequest = callRepository.setIgnoredCall(
+    ): Boolean = callRepository.setIgnoredCall(
         chatId,
     )
 }

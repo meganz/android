@@ -899,7 +899,15 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override suspend fun getChatPresenceConfig(): MegaChatPresenceConfig? = chatApi.presenceConfig
 
-    override fun setIgnoredCall(chatId: Long, listener: MegaChatRequestListenerInterface) {
-        chatApi.setIgnoredCall(chatId)
+    override suspend fun setIgnoredCall(chatId: Long): Boolean = chatApi.setIgnoredCall(chatId)
+
+    override fun createMeeting(
+        title: String,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        chatApi.createMeeting(title, speakRequest, waitingRoom, openInvite, listener)
     }
 }
