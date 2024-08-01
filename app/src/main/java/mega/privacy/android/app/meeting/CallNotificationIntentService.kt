@@ -14,8 +14,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener.OnCallHungUpCallback
-import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
-import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener.OnCallOnHoldCallback
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification
@@ -29,6 +27,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartScheduledMeetingUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -54,10 +53,11 @@ import javax.inject.Inject
  * @property megaChatApi                            [MegaApiAndroid]
  * @property app                                    [MegaApplication]
  * @property megaChatApiGateway                     [MegaChatApiGateway]
+ * @property holdChatCallUseCase                    [HoldChatCallUseCase]
  */
 @AndroidEntryPoint
 class CallNotificationIntentService : Service(),
-    OnCallHungUpCallback, OnCallOnHoldCallback {
+    OnCallHungUpCallback {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
@@ -76,6 +76,9 @@ class CallNotificationIntentService : Service(),
 
     @Inject
     lateinit var getChatRoomUseCase: GetChatRoomUseCase
+
+    @Inject
+    lateinit var holdChatCallUseCase: HoldChatCallUseCase
 
     @Inject
     lateinit var notificationManager: NotificationManagerCompat
@@ -231,15 +234,33 @@ class CallNotificationIntentService : Service(),
                     Timber.d("Answering incoming call ...")
                     answerCall(chatIdIncomingCall)
                 } else {
-                    Timber.d("Putting the current call on hold...")
-                    megaChatApi.setCallOnHold(
-                        chatIdCurrentCall,
-                        true,
-                        SetCallOnHoldListener(this, this)
-                    )
+                    Timber.d("Set the current call on hold...")
+                    setCallOnHold(chatIdCurrentCall)
                 }
 
                 else -> throw IllegalArgumentException("Unsupported action: $action")
+            }
+        }
+    }
+
+    /**
+     * Set call on hold
+     *
+     * @param currentChatId Chat id
+     */
+    private fun setCallOnHold(currentChatId: Long) {
+        coroutineScope.launch {
+            runCatching {
+                holdChatCallUseCase(chatId = currentChatId, setOnHold = true)
+            }.onSuccess {
+                it?.apply {
+                    if (chatIdCurrentCall == chatId && isOnHold) {
+                        Timber.d("Current call on hold. Answering incoming call ...")
+                        answerCall(chatIdIncomingCall)
+                    }
+                }
+            }.onFailure { error ->
+                Timber.e(error)
             }
         }
     }
@@ -325,19 +346,6 @@ class CallNotificationIntentService : Service(),
             stopSelf()
         } else if (callId == callIdCurrentCall) {
             Timber.d("Current call hung up. Answering incoming call ...")
-            answerCall(chatIdIncomingCall)
-        }
-    }
-
-    /**
-     * Put call on hold
-     *
-     * @param chatId The chat id.
-     * @param isOnHold True, if should be on hold, false otherwise.
-     */
-    override fun onCallOnHold(chatId: Long, isOnHold: Boolean) {
-        if (chatIdCurrentCall == chatId && isOnHold) {
-            Timber.d("Current call on hold. Answering incoming call ...")
             answerCall(chatIdIncomingCall)
         }
     }
