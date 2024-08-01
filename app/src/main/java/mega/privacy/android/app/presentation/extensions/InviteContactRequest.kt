@@ -11,8 +11,9 @@ internal val InviteContactRequest.dialogTitle: Int
 
 internal val InviteContactRequest.dialogContent: Int
     get() = when (this) {
-        InviteContactRequest.Sent -> R.string.invite_sent_text
-        InviteContactRequest.AlreadyContact, InviteContactRequest.AlreadySent -> R.string.invite_not_sent_text_already_contact
+        InviteContactRequest.Sent -> R.string.context_contact_request_sent
+        InviteContactRequest.AlreadyContact -> R.string.context_contact_already_exists
+        InviteContactRequest.AlreadySent -> R.string.invite_not_sent_already_sent
         InviteContactRequest.InvalidEmail -> R.string.error_own_email_as_contact
         else -> R.string.invite_not_sent_text_error
     }
@@ -25,6 +26,6 @@ internal val InviteContactRequest.success: Boolean
 
 internal val InviteContactRequest.printEmail: Boolean
     get() = when (this) {
-        InviteContactRequest.AlreadyContact -> true
+        InviteContactRequest.Sent, InviteContactRequest.AlreadyContact, InviteContactRequest.AlreadySent -> true
         else -> false
     }
