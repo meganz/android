@@ -258,21 +258,43 @@ class WaitingRoomViewModel @Inject constructor(
         list == null || list[0] == MEGACHAT_INVALID_HANDLE
 
     /**
+     * Method to know if a meeting has ended
+     *
+     * @param state [ChatCallStatus]
+     * @return True, if the meeting is finished. False, if not.
+     */
+    private fun isMeetingEnded(state: ChatCallStatus?): Boolean =
+        state == null || state == ChatCallStatus.Destroyed
+
+    /**
      * Retrieve Chat Room link details
      */
-    private fun retrieveChatLinkDetails() {
+    private fun retrieveChatLinkDetails(
+        shouldJoinMeetingAsGuest: Boolean = false,
+    ) {
         viewModelScope.launch {
             runCatching {
                 checkChatLinkUseCase(
                     chatLink = requireNotNull(_state.value.chatLink)
                 ).also { requireNotNull(it.chatHandle) }
             }.onSuccess { chatRequest ->
+                val isMeetingEnded = isMeetingEnded(chatRequest.handleList)
                 _state.update {
                     it.copy(
-                        finish = isMeetingEnded(chatRequest.handleList),
+                        isMeetingEnded = isMeetingEnded,
                         chatId = requireNotNull(chatRequest.chatHandle),
                         title = chatRequest.text,
                     )
+                }
+
+                if (shouldJoinMeetingAsGuest) {
+                    state.value.chatLink?.let { link ->
+                        state.value.guestFirstName?.let { firstName ->
+                            state.value.guestLastName?.let { lastName ->
+                                joinMeetingAsGuest(link, firstName, lastName)
+                            }
+                        }
+                    }
                 }
             }.onFailure { exception ->
                 Timber.e(exception)
@@ -288,12 +310,17 @@ class WaitingRoomViewModel @Inject constructor(
             monitorChatCallUpdatesUseCase()
                 .filter { it.chatId == _state.value.chatId }
                 .distinctUntilChanged()
-                .collectLatest {
-                    it.changes?.apply {
+                .collectLatest { call ->
+                    call.changes?.apply {
                         Timber.d("Changes in call: $this")
                         when {
                             contains(ChatCallChanges.Status) -> {
-                                it.updateUiState()
+                                _state.update {
+                                    it.copy(
+                                        isMeetingEnded = isMeetingEnded(call.status),
+                                    )
+                                }
+                                call.updateUiState()
                             }
                         }
                     }
@@ -464,8 +491,10 @@ class WaitingRoomViewModel @Inject constructor(
     private fun answerChatCall() {
         viewModelScope.launch {
             runCatching {
-                val state = state.value
-                answerChatCallUseCase(state.chatId, state.cameraEnabled, state.micEnabled)
+                state.value.run {
+                    answerChatCallUseCase(this.chatId, this.cameraEnabled, this.micEnabled)
+                }
+
             }.onSuccess { call ->
                 call?.updateUiState()
             }.onFailure { error ->
@@ -533,11 +562,9 @@ class WaitingRoomViewModel @Inject constructor(
             )
         }
 
-        retrieveChatLinkDetails()
-        state.value.chatLink?.let { link ->
-            joinMeetingAsGuest(link, firstName, lastName)
-
-        }
+        retrieveChatLinkDetails(
+            shouldJoinMeetingAsGuest = true
+        )
     }
 
     /**

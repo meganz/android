@@ -672,20 +672,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 updateMicAndCam()
                 controlWhenJoinedAChat(inMeetingViewModel.getChatId())
             }
-
-            MEETING_ACTION_IN -> {
-                if (arguments?.getBoolean(MeetingActivity.MEETING_AUDIO_ENABLE, false) == true) {
-                    Timber.d("Action in with audio enable")
-                    sharedModel.clickMic(true)
-                }
-                if (arguments?.getBoolean(MeetingActivity.MEETING_VIDEO_ENABLE, false) == true) {
-                    Timber.d("Action in with camera enable")
-                    sharedModel.clickCamera(true)
-                }
-                if (arguments?.getBoolean(MeetingActivity.MEETING_SPEAKER_ENABLE, false) == true) {
-                    sharedModel.clickSpeaker()
-                }
-            }
         }
     }
 
@@ -1042,6 +1028,38 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .distinctUntilChanged()) {
             if (it.isNotEmpty()) {
                 updateParticipantsWithHandRaised(it)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.callId }
+            .distinctUntilChanged()) { callId ->
+            callId?.run {
+                if (args.action == MEETING_ACTION_IN) {
+                    if (arguments?.getBoolean(
+                            MeetingActivity.MEETING_AUDIO_ENABLE,
+                            false
+                        ) == true
+                    ) {
+                        Timber.d("Action in with audio enable")
+                        sharedModel.clickMic(true)
+                    }
+                    if (arguments?.getBoolean(
+                            MeetingActivity.MEETING_VIDEO_ENABLE,
+                            false
+                        ) == true
+                    ) {
+                        Timber.d("Action in with camera enable")
+                        sharedModel.clickCamera(true)
+                    }
+                    if (arguments?.getBoolean(
+                            MeetingActivity.MEETING_SPEAKER_ENABLE,
+                            false
+                        ) == true
+                    ) {
+                        Timber.d("Action in with speaker enable")
+                        sharedModel.clickSpeaker()
+                    }
+                }
             }
         }
 

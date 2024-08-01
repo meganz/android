@@ -90,6 +90,11 @@ class WaitingRoomActivity : AppCompatActivity() {
             }
         }
 
+        collectFlow(viewModel.state.map { it.isMeetingEnded }
+            .distinctUntilChanged()) {
+            Timber.d("Is meeting ended $it ")
+        }
+
         if (savedInstanceState == null) {
             viewModel.loadMeetingDetails(chatId, chatPublicLink)
         }

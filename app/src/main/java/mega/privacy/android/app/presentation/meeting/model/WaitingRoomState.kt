@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.model
 
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
+import mega.privacy.android.app.presentation.meeting.WaitingRoomViewModel
 
 /**
  * Data class defining the state of [WaitingRoomViewModel]
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.chat.ChatAvatarItem
  * @property inactiveHostDialog         Flag to show Inactive Host Dialog
  * @property joinCall                   Flag to open the screen and join the call.
  * @property finish                     Flag to finish current screen.
+ * @property isMeetingEnded             True, if the meeting is ended. False, if it's in progress.
  **/
 data class WaitingRoomState(
     val chatId: Long = -1L,
@@ -43,4 +45,5 @@ data class WaitingRoomState(
     val inactiveHostDialog: Boolean = false,
     val joinCall: Boolean = false,
     val finish: Boolean = false,
+    val isMeetingEnded: Boolean = false,
 )
