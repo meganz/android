@@ -45,7 +45,6 @@ internal class DefaultRecentActionsRepository @Inject constructor(
                     megaApiGateway.copyBucketList(it.recentActions)
                 }
                 megaApiGateway.getRecentActionsAsync(DAYS, MAX_NODES, listener)
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
             recentActionsMapper(result)
         }

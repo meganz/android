@@ -258,9 +258,6 @@ internal class DefaultNotificationsRepository @Inject constructor(
 
             megaApiGateway.getPushNotificationSettings(listener)
 
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
 
         _pushNotificationSettings.value =
@@ -280,9 +277,6 @@ internal class DefaultNotificationsRepository @Inject constructor(
 
                 megaApiGateway.setPushNotificationSettings(settings, listener)
 
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
 
             _pushNotificationSettings.value =
@@ -326,9 +320,6 @@ internal class DefaultNotificationsRepository @Inject constructor(
                     }
                 )
                 notificationsGateway.getNotifications(listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -339,9 +330,6 @@ internal class DefaultNotificationsRepository @Inject constructor(
                     it.number
                 }
                 notificationsGateway.setLastReadNotification(notificationId, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -367,9 +355,6 @@ internal class DefaultNotificationsRepository @Inject constructor(
                     }
                 )
                 notificationsGateway.getLastReadNotificationId(listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 }

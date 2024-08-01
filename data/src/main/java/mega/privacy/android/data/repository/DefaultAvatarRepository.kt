@@ -97,7 +97,6 @@ internal class DefaultAvatarRepository @Inject constructor(
                 avatarFile
             }
 
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             megaApiGateway.getUserAvatar(
                 user,
                 avatarFile.absolutePath,
@@ -164,7 +163,6 @@ internal class DefaultAvatarRepository @Inject constructor(
                     file.absolutePath,
                     listener,
                 )
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -199,7 +197,6 @@ internal class DefaultAvatarRepository @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("setAvatar") {}
             megaApiGateway.setAvatar(filePath, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
         megaApiGateway.myUser?.let { user ->
             deleteAvatarFile(user)

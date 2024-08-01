@@ -71,9 +71,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                 return@getRequestListener countryCallingCodeMapper(it.megaStringListMap)
             }
             megaApiGateway.getCountryCallingCodes(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
+
         }
     }
 
@@ -134,9 +132,6 @@ internal class DefaultVerificationRepository @Inject constructor(
                     listener = listener,
                     reVerifyingWhitelisted = false,
                 )
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -155,9 +150,7 @@ internal class DefaultVerificationRepository @Inject constructor(
             )
 
             megaApiGateway.resetSmsVerifiedPhoneNumber(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
+
         }
     }
 
@@ -239,9 +232,7 @@ internal class DefaultVerificationRepository @Inject constructor(
             )
 
             megaApiGateway.verifyPhoneNumber(pin, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
+
         }
     }
 

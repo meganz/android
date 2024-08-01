@@ -74,9 +74,6 @@ internal class RemotePreferencesRepositoryImpl @Inject constructor(
                     listener = listener
                 )
 
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -97,9 +94,6 @@ internal class RemotePreferencesRepositoryImpl @Inject constructor(
                     listener = listener
                 )
 
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 }

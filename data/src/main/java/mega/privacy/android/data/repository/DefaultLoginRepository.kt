@@ -118,9 +118,6 @@ internal class DefaultLoginRepository @Inject constructor(
                     session,
                     listener
                 )
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
             megaApiFolderGateway.setAccountAuth(megaApiGateway.getAccountAuth())
         }
@@ -133,9 +130,6 @@ internal class DefaultLoginRepository @Inject constructor(
                 val listener =
                     continuation.getRequestListener("fetchNodes") { onFetchNodesFinish(continuation) }
                 megaApiGateway.fetchNodes(listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
     }
@@ -161,9 +155,6 @@ internal class DefaultLoginRepository @Inject constructor(
 
             megaApiGateway.localLogout(listener)
 
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -173,9 +164,6 @@ internal class DefaultLoginRepository @Inject constructor(
 
             megaApiGateway.logout(listener)
 
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
         credentialsPreferencesGateway.clear()
     }
@@ -286,7 +274,7 @@ internal class DefaultLoginRepository @Inject constructor(
             )
 
             loginRequest.invoke(listener)
-            awaitClose { megaApiGateway.removeRequestListener(listener) }
+            awaitClose()
         }.onEach {
             if (it == LoginStatus.LoginSucceed) {
                 megaApiFolderGateway.setAccountAuth(megaApiGateway.getAccountAuth())
@@ -355,7 +343,7 @@ internal class DefaultLoginRepository @Inject constructor(
         )
 
         megaApiGateway.fetchNodes(listener)
-        awaitClose { megaApiGateway.removeRequestListener(listener) }
+        awaitClose()
     }.flowOn(ioDispatcher)
 
     override fun monitorFetchNodesFinish() = appEventGateway.monitorFetchNodesFinish()
@@ -379,9 +367,6 @@ internal class DefaultLoginRepository @Inject constructor(
                         }
                     })
                 megaApiGateway.shouldShowPasswordReminderDialog(atLogin, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -394,9 +379,6 @@ internal class DefaultLoginRepository @Inject constructor(
                     continuation.resumeWith(Result.success(link))
                 }
                 megaApiGateway.getSessionTransferURL(path, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
     }
@@ -408,9 +390,6 @@ internal class DefaultLoginRepository @Inject constructor(
                     it.email
                 }
                 megaApiGateway.resendSignupLink(email, fullName, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 

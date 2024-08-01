@@ -43,7 +43,6 @@ internal class DefaultSupportRepository @Inject constructor(
                     }
                 )
                 megaApi.createSupportTicket(ticketContent, listener)
-                continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
             }
         }
 

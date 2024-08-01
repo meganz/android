@@ -60,9 +60,6 @@ class LegacyPublicAlbumPhotoNodeProvider @Inject constructor(
                     continuation.resume(Unit)
                 }
 
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
     }

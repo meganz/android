@@ -199,9 +199,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 },
             )
             megaApiGateway.getAccountDetails(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
         // Legacy support, will remove completely once refactor to flow done
         myAccountInfoFacade.handleAccountDetail(request)
@@ -224,7 +221,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 megaApiGateway.accountEmail,
                 listener
             )
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -337,9 +333,6 @@ internal class DefaultAccountRepository @Inject constructor(
                     }
                 )
                 megaApiGateway.getPricing(listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -400,9 +393,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 },
             )
             megaApiGateway.getSpecificAccountDetails(storage, transfer, pro, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
         myAccountInfoFacade.handleAccountDetail(request)
         handleAccountDetail(request)
@@ -424,9 +414,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 },
             )
             megaApiGateway.getExtendedAccountDetails(sessions, purchases, transactions, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
         myAccountInfoFacade.handleAccountDetail(request)
         handleAccountDetail(request)
@@ -475,9 +462,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             )
             megaApiGateway.contactLinkCreate(renew, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -501,9 +485,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             )
             megaApiGateway.contactLinkDelete(handle, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -523,9 +504,6 @@ internal class DefaultAccountRepository @Inject constructor(
                         }
                     })
                 megaApiGateway.getAccountAchievements(listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -619,9 +597,6 @@ internal class DefaultAccountRepository @Inject constructor(
             )
 
             megaApiGateway.changeEmail(email, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -654,9 +629,6 @@ internal class DefaultAccountRepository @Inject constructor(
 
             megaApiGateway.querySignupLink(signupLink, listener)
 
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -739,9 +711,6 @@ internal class DefaultAccountRepository @Inject constructor(
             val listener =
                 continuation.getRequestListener("changePassword") { it.newPassword == newPassword }
             megaApiGateway.changePassword(newPassword, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -754,9 +723,6 @@ internal class DefaultAccountRepository @Inject constructor(
             val listener =
                 continuation.getRequestListener("resetPasswordFromLink") { it.email.isNotBlank() }
             megaApiGateway.resetPasswordFromLink(link, newPassword, masterKey, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -816,9 +782,6 @@ internal class DefaultAccountRepository @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("is2FAEnabled") { it.flag }
             megaApiGateway.multiFactorAuthEnabled(megaApiGateway.accountEmail, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -888,9 +851,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 },
             )
             block(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -900,9 +860,6 @@ internal class DefaultAccountRepository @Inject constructor(
             val listener =
                 continuation.getRequestListener("upgradeSecurity") { return@getRequestListener }
             megaApiGateway.upgradeSecurity(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -958,7 +915,6 @@ internal class DefaultAccountRepository @Inject constructor(
             val listener =
                 continuation.getRequestListener("getUserAlias") { request -> request.name }
             megaApiGateway.getUserAlias(userHandle = handle, listener = listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -1009,7 +965,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             )
             megaApiGateway.getUserData(listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -1040,7 +995,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             )
             megaApiGateway.getCookieSettings(listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -1062,7 +1016,6 @@ internal class DefaultAccountRepository @Inject constructor(
                     }
                 )
                 megaApiGateway.setCookieSettings(cookieDecimal, listener)
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -1090,9 +1043,6 @@ internal class DefaultAccountRepository @Inject constructor(
             )
             // INVALID_HANDLE is used to kill all other active Sessions except the current Session
             megaApiGateway.killSession(megaApiGateway.getInvalidHandle(), listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -1131,9 +1081,6 @@ internal class DefaultAccountRepository @Inject constructor(
                     }
                 )
                 megaApiGateway.confirmCancelAccount(cancellationLink, accountPassword, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -1185,9 +1132,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             )
             megaApiGateway.confirmChangeEmail(changeEmailLink, accountPassword, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -1210,9 +1154,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             )
             megaApiGateway.getUserData(listener = listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener = listener)
-            }
         }
     }
 
@@ -1282,9 +1223,6 @@ internal class DefaultAccountRepository @Inject constructor(
                     }
                 )
                 megaApiGateway.queryCancelLink(accountCancellationLink, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -1323,9 +1261,6 @@ internal class DefaultAccountRepository @Inject constructor(
                     }
                 )
                 megaApiGateway.queryChangeEmailLink(changeEmailLink, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -1335,9 +1270,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 it.email
             }
             megaApiGateway.cancelCreateAccount(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -1353,9 +1285,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 },
             )
             megaApiGateway.getAccountDetails(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
         val accountDetails = request.megaAccountDetails
         return@withContext accountDetails.storageUsed
@@ -1373,9 +1302,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 },
             )
             megaApiGateway.getAccountDetails(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
         val accountDetails = request.megaAccountDetails
         return@withContext accountDetails.storageMax

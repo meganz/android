@@ -906,9 +906,9 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
 
     /**
-     * Shows the choosen fragment.
+     * Shows the chosen fragment.
      *
-     * @param fragment The choosen fragment.
+     * @param fragment The chosen fragment.
      */
     fun chooseFragment(fragment: Int) {
         importFragmentSelected = fragment

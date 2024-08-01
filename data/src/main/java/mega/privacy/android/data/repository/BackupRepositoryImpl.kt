@@ -59,9 +59,7 @@ internal class BackupRepositoryImpl @Inject constructor(
                 attributeIdentifier = MegaApiJava.USER_ATTR_DEVICE_NAMES,
                 listener = listener,
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
+
         }
     }
 
@@ -74,9 +72,6 @@ internal class BackupRepositoryImpl @Inject constructor(
                 deviceId = deviceId,
                 listener = listener,
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -91,9 +86,6 @@ internal class BackupRepositoryImpl @Inject constructor(
                     deviceName = deviceName,
                     listener = listener,
                 )
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -103,9 +95,6 @@ internal class BackupRepositoryImpl @Inject constructor(
                 backupInfoListMapper(it.megaBackupInfoList)
             }
             megaApiGateway.getBackupInfo(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -130,9 +119,6 @@ internal class BackupRepositoryImpl @Inject constructor(
                 subState = MegaError.API_OK,
                 listener = listener
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -159,9 +145,6 @@ internal class BackupRepositoryImpl @Inject constructor(
                 subState = MegaError.API_OK,
                 listener = listener,
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 

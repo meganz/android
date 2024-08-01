@@ -277,9 +277,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("cancelAllUploadTransfers") {}
             megaApiGateway.cancelAllUploadTransfers(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -363,9 +360,6 @@ internal class DefaultTransfersRepository @Inject constructor(
                 transferTag = transferTag,
                 listener = listener
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -400,7 +394,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("cancelTransfersByType") {}
             megaApiGateway.cancelTransfers(direction, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
 
     override fun monitorFailedTransfer(): Flow<Boolean> = appEventGateway.monitorFailedTransfer()
@@ -416,7 +409,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("moveTransferToFirstByTag") { }
             megaApiGateway.moveTransferToFirstByTag(transferTag, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -424,7 +416,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("moveTransferToLastByTag") { }
             megaApiGateway.moveTransferToLastByTag(transferTag, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -433,7 +424,6 @@ internal class DefaultTransfersRepository @Inject constructor(
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getRequestListener("moveTransferBeforeByTag") { }
                 megaApiGateway.moveTransferBeforeByTag(transferTag, prevTransferTag, listener)
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -609,7 +599,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         val isPauseResponse = suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("pauseTransfers") { it.flag }
             megaApiGateway.pauseTransfers(isPause, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
 
         monitorPausedTransfers.emit(isPauseResponse)
@@ -663,7 +652,6 @@ internal class DefaultTransfersRepository @Inject constructor(
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getRequestListener("pauseTransferByTag") { it.flag }
                 megaApiGateway.pauseTransferByTag(transferTag, isPause, listener)
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 

@@ -33,9 +33,6 @@ internal class ThumbnailFromServerMapper @Inject constructor(
                     val listener =
                         continuation.getRequestListener("ThumbnailFromServerMapper") { thumbnailPath }
                     megaApiGateway.getThumbnail(megaNode, thumbnailPath, listener)
-                    continuation.invokeOnCancellation {
-                        megaApiGateway.removeRequestListener(listener)
-                    }
                 }
             }
         }

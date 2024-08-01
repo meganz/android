@@ -362,7 +362,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                 name = newName,
                 listener = listener
             )
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -401,9 +400,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                     continuation.resumeWith(Result.success(listOf()))
                 }
 
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -427,9 +423,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                 continuation.resumeWith(Result.success(0))
             }
 
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -466,9 +459,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                 listener = listener,
             )
 
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -504,9 +494,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                     continuation.resume(listOf())
                 }
 
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
     }
@@ -590,9 +577,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                 continuation.resume(0)
             }
 
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -632,9 +616,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                     listener = listener,
                 )
 
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -664,9 +645,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                     continuation.resume(listOf())
                 }
 
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -735,9 +713,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                     listener = listener,
                 )
 
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 

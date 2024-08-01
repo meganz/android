@@ -258,9 +258,6 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
                 getInvalidHandle(),
                 listener
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -277,9 +274,6 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
                 secondaryHandle,
                 listener
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -323,9 +317,6 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
                 MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER,
                 listener
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
         return@withContext request?.let { megaRequest ->
             var primaryHandle = getInvalidHandle()
@@ -356,9 +347,6 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
                     val listener =
                         continuation.getRequestListener("renameNode") { return@getRequestListener }
                     megaApiGateway.renameNode(it, newName, listener)
-                    continuation.invokeOnCancellation {
-                        megaApiGateway.removeRequestListener(listener)
-                    }
                 }
             }
         }
@@ -412,9 +400,6 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
                 lastNode = lastNode,
                 listener = listener,
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -439,9 +424,6 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
                 lastNode = lastNode,
                 listener = listener
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -477,9 +459,6 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
                 subState = SUB_STATE_NO_CHANGE,
                 listener = listener,
             )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -494,9 +473,6 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
                     return@getRequestListener
                 }
                 megaApiGateway.setCoordinates(nodeId, latitude, longitude, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -517,9 +493,6 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
                 },
             )
             megaApiGateway.removeBackup(backupId, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 

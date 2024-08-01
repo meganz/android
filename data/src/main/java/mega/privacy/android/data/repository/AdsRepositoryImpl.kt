@@ -35,9 +35,7 @@ internal class AdsRepositoryImpl @Inject constructor(
             val listener = continuation.getRequestListener("fetchAds") { request ->
                 adDetailsMapper(request.megaStringMap)
             }
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
+
             adsGateway.fetchAds(
                 adFlags = MegaApiJava.ADS_DEFAULT,
                 adUnits = adUnits,

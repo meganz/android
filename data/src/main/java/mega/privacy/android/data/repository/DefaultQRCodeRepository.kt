@@ -48,9 +48,6 @@ internal class DefaultQRCodeRepository @Inject constructor(
                     }
                 )
                 megaApiGateway.getContactLink(handle, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
 
             scannedContactLinkResultMapper(

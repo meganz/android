@@ -181,7 +181,6 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                     type = MegaSet.SET_TYPE_PLAYLIST,
                     listener = listener
                 )
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -200,7 +199,6 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                         listener = listener,
                     )
                 }
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -224,11 +222,6 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                             listener = listener,
                         )
                     }
-                    continuation.invokeOnCancellation {
-                        megaApiGateway.removeRequestListener(
-                            listener
-                        )
-                    }
                 }
             }
         }
@@ -249,7 +242,6 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                         listener = listener
                     )
                 }
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -269,7 +261,6 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                         listener = listener
                     )
                 }
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -287,7 +278,6 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                     name = newTitle,
                     listener = listener
                 )
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 

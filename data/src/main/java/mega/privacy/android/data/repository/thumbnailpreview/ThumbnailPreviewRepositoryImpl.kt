@@ -65,7 +65,6 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
                             thumbnail
                         }
                         megaApi.getThumbnail(node, thumbnail.absolutePath, listener)
-                        continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
                     }
                 }
             }
@@ -81,9 +80,6 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
                                 thumbnail
                             }
                         megaApiFolder.getThumbnail(node, thumbnail.absolutePath, listener)
-                        continuation.invokeOnCancellation {
-                            megaApiFolder.removeRequestListener(listener)
-                        }
                     }
                 }
             }
@@ -119,9 +115,6 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
                                 preview
                             }
                             megaApi.getPreview(node, preview.absolutePath, listener)
-                            continuation.invokeOnCancellation {
-                                megaApi.removeRequestListener(listener)
-                            }
                         }
                     }
                 }
@@ -195,8 +188,6 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
                     getThumbnailPath(thumbnailFolderPath, node),
                     listener
                 )
-
-                continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
             }
         }
     }
@@ -221,7 +212,6 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
                     listener
                 )
 
-                continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
             }
         }
     }
@@ -301,7 +291,6 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
                 suspendCancellableCoroutine { continuation ->
                     val listener = continuation.getRequestListener("setThumbnail") {}
                     megaApi.setThumbnail(it, srcFilePath, listener)
-                    continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
                 }
             } ?: Unit
         }
@@ -312,7 +301,6 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
                 suspendCancellableCoroutine { continuation ->
                     val listener = continuation.getRequestListener("setPreview") {}
                     megaApi.setPreview(it, srcFilePath, listener)
-                    continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
                 }
             } ?: Unit
         }

@@ -113,9 +113,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                     val listener =
                         continuation.getRequestListener("getThumbnailFromMegaApi") { it.nodeHandle }
                     megaApi.getThumbnail(node = node, thumbnailFilePath = path, listener = listener)
-                    continuation.invokeOnCancellation {
-                        megaApi.removeRequestListener(listener)
-                    }
                 }
             }
         }
@@ -131,9 +128,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                         thumbnailFilePath = path,
                         listener = listener
                     )
-                    continuation.invokeOnCancellation {
-                        megaApi.removeRequestListener(listener)
-                    }
                 }
             }
         }

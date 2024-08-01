@@ -33,9 +33,6 @@ internal class PreviewFromServerMapper @Inject constructor(
                     val listener =
                         continuation.getRequestListener("PreviewFromServerMapper") { previewPath }
                     megaApiGateway.getPreview(megaNode, previewPath, listener)
-                    continuation.invokeOnCancellation {
-                        megaApiGateway.removeRequestListener(listener)
-                    }
                 }
             }
         }

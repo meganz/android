@@ -93,7 +93,6 @@ internal class FileLinkRepositoryImpl @Inject constructor(
                     it.text
                 }
                 megaApiGateway.encryptLinkWithPassword(link, password, listener)
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -130,8 +129,5 @@ internal class FileLinkRepositoryImpl @Inject constructor(
                 }
             )
             megaApiGateway.getPublicNode(nodeFileLink, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
 }

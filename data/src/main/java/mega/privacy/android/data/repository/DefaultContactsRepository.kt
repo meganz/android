@@ -269,7 +269,6 @@ internal class DefaultContactsRepository @Inject constructor(
                 avatarFileName,
                 listener
             )
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -284,7 +283,6 @@ internal class DefaultContactsRepository @Inject constructor(
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getRequestListener("getUserEmail") { it.email }
                 megaApiGateway.getUserEmail(handle, listener)
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -307,7 +305,6 @@ internal class DefaultContactsRepository @Inject constructor(
                     type = MegaApiJava.USER_ATTR_FIRSTNAME,
                     listener = listener
                 )
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }.also { request ->
                 megaLocalRoomGateway.updateContactFistNameByHandle(handle, request.text)
                 if (shouldNotify) {
@@ -335,7 +332,6 @@ internal class DefaultContactsRepository @Inject constructor(
                     type = MegaApiJava.USER_ATTR_LASTNAME,
                     listener = listener
                 )
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }.also { request ->
                 megaLocalRoomGateway.updateContactLastNameByHandle(handle, request.text)
                 if (shouldNotify) {
@@ -474,7 +470,6 @@ internal class DefaultContactsRepository @Inject constructor(
                     listener = listener
                 )
             } ?: continuation.resumeWith(Result.failure(NullPointerException("myUser null")))
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }.getDecodedAliases()
             .also {
                 updateContactsNickname(megaApiGateway.getContacts(), it)
@@ -633,7 +628,6 @@ internal class DefaultContactsRepository @Inject constructor(
                 listener
             )
 
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -644,9 +638,6 @@ internal class DefaultContactsRepository @Inject constructor(
                     it.text.orEmpty()
                 }
                 megaApiGateway.getUserAttribute(attribute, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -676,7 +667,6 @@ internal class DefaultContactsRepository @Inject constructor(
                 value,
                 listener,
             )
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }.also {
             block(it)
         }
@@ -720,7 +710,6 @@ internal class DefaultContactsRepository @Inject constructor(
                 return@getRequestListener it.email
             }
             megaApiGateway.getUserEmail(handle, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }.also {
             megaLocalRoomGateway.updateContactMailByHandle(handle, it)
         }
@@ -755,7 +744,6 @@ internal class DefaultContactsRepository @Inject constructor(
                 name = name,
                 listener = listener
             )
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }.also {
             megaLocalRoomGateway.updateContactNicknameByHandle(userHandle, it)
         }
@@ -766,7 +754,6 @@ internal class DefaultContactsRepository @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("removeContact") { true }
             megaApiGateway.removeContact(contact, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -814,9 +801,6 @@ internal class DefaultContactsRepository @Inject constructor(
                         action = contactRequestActionMapper(contactRequestAction),
                         listener = listener,
                     )
-                    continuation.invokeOnCancellation {
-                        megaApiGateway.removeRequestListener(listener)
-                    }
                 }
             } ?: Timber.e("Not a received contact request")
         }
@@ -840,9 +824,6 @@ internal class DefaultContactsRepository @Inject constructor(
                         action = contactRequestActionMapper(contactRequestAction),
                         listener = listener
                     )
-                    continuation.invokeOnCancellation {
-                        megaApiGateway.removeRequestListener(listener)
-                    }
                 }
             } ?: Timber.e("Not a sent contact request")
         }
@@ -896,7 +877,6 @@ internal class DefaultContactsRepository @Inject constructor(
                 },
             )
             megaApiGateway.getContactLink(userHandle, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
         val isContact = !result.email.isNullOrBlank() && megaApiGateway.getContacts()
             .any { contact -> result.email == contact.email && contact.visibility == MegaUser.VISIBILITY_VISIBLE }

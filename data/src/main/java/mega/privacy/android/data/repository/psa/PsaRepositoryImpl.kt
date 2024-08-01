@@ -31,9 +31,6 @@ internal class PsaRepositoryImpl @Inject constructor(
                 psaMapper(it)
             }
             megaApiGateway.getPsa(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 

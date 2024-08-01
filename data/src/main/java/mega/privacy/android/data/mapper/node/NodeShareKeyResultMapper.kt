@@ -37,9 +37,6 @@ internal class NodeShareKeyResultMapper @Inject constructor(
                         accessPermissionIntMapper(permission),
                         listener,
                     )
-                    continuation.invokeOnCancellation {
-                        megaApiGateway.removeRequestListener(listener)
-                    }
                 }
             }
         }

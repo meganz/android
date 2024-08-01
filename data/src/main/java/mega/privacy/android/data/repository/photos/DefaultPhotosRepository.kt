@@ -711,10 +711,6 @@ internal class DefaultPhotosRepository @Inject constructor(
                     value = valueToPut,
                     listener = listener
                 )
-
-                continuation.invokeOnCancellation {
-                    megaApiFacade.removeRequestListener(listener)
-                }
             }
         }
 
@@ -741,10 +737,6 @@ internal class DefaultPhotosRepository @Inject constructor(
                 MegaApiJava.USER_ATTR_CC_PREFS,
                 listener
             )
-
-            continuation.invokeOnCancellation {
-                megaApiFacade.removeRequestListener(listener)
-            }
         }
         request?.let {
             request.megaStringMap
@@ -767,9 +759,6 @@ internal class DefaultPhotosRepository @Inject constructor(
                 }
             )
             megaApiFacade.getPublicNode(nodeFileLink, listener)
-            continuation.invokeOnCancellation {
-                megaApiFacade.removeRequestListener(listener)
-            }
         }
 
     override suspend fun fetchImageNode(
@@ -961,10 +950,6 @@ internal class DefaultPhotosRepository @Inject constructor(
                 value = newPrefs,
                 listener = listener,
             )
-
-            continuation.invokeOnCancellation {
-                megaApiFacade.removeRequestListener(listener)
-            }
         }
     }
 

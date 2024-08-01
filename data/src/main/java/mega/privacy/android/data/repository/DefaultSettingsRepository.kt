@@ -422,9 +422,6 @@ internal class DefaultSettingsRepository @Inject constructor(
                 return@getRequestListener
             }
             megaApiGateway.setFileVersionsOption(enabled.not(), listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -450,7 +447,6 @@ internal class DefaultSettingsRepository @Inject constructor(
                 onRequestFinish = onEnableMultiFactorAuthRequestFinished(continuation)
             )
             megaApiGateway.enableMultiFactorAuth(pin, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -473,7 +469,6 @@ internal class DefaultSettingsRepository @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("getMultiFactorAuthCode") { it.text }
             megaApiGateway.getMultiFactorAuthCode(listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -485,7 +480,6 @@ internal class DefaultSettingsRepository @Inject constructor(
                 )
             )
             megaApiGateway.isMasterKeyExported(listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -569,9 +563,6 @@ internal class DefaultSettingsRepository @Inject constructor(
                 listener = listener,
             )
 
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -600,9 +591,6 @@ internal class DefaultSettingsRepository @Inject constructor(
                 listener = listener,
             )
 
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
 
         request?.megaStringMap

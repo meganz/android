@@ -84,9 +84,6 @@ internal class DefaultBillingRepository @Inject constructor(
                 },
             )
             megaApiGateway.getPaymentMethods(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -96,9 +93,6 @@ internal class DefaultBillingRepository @Inject constructor(
                 pricingMapper(it.pricing, it.currency)
             }
             megaApiGateway.getPricing(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -108,9 +102,6 @@ internal class DefaultBillingRepository @Inject constructor(
                 it.number
             }
             megaApiGateway.creditCardQuerySubscriptions(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -133,9 +124,6 @@ internal class DefaultBillingRepository @Inject constructor(
             val listener =
                 continuation.getRequestListener(methodName = "cancelSubscriptions") { true }
             megaApiGateway.creditCardQuerySubscriptions(listener = listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener = listener)
-            }
         }
     }
 

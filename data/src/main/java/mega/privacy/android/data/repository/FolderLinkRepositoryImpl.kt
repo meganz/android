@@ -79,9 +79,6 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
                 }
             )
             megaApiFolderGateway.fetchNodes(listener)
-            continuation.invokeOnCancellation {
-                megaApiFolderGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -100,9 +97,6 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
                 }
             )
             megaApiFolderGateway.loginToFolder(folderLink, listener)
-            continuation.invokeOnCancellation {
-                megaApiFolderGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -152,9 +146,6 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
                 }
 
                 megaApiFolderGateway.getPublicLinkInformation(folderLink, listener)
-                continuation.invokeOnCancellation {
-                    megaApiFolderGateway.removeRequestListener(listener)
-                }
             }
         }
 

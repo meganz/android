@@ -98,9 +98,6 @@ internal class ImageRepositoryImpl @Inject constructor(
                 }
             )
             megaApiGateway.getPublicNode(nodeFileLink, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
 
     private fun getChatMegaNode(chatRoomId: Long, chatMessageId: Long): MegaNode? {

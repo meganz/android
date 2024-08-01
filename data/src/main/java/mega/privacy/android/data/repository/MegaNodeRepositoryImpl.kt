@@ -95,7 +95,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
                 newNodeName = newNodeName,
                 listener = listener
             )
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -220,9 +219,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             val listener =
                 continuation.getRequestListener("createShareKey") { return@getRequestListener }
             megaApiGateway.openShareDialog(megaNode, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 

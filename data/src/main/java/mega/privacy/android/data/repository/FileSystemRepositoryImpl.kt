@@ -226,9 +226,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                 }
             }
             megaApiGateway.setMyChatFilesFolder(nodeHandle, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -245,9 +242,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                 }
                 megaApiGateway.getMyChatFilesFolder(listener)
 
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
             }
         }.getOrElse {
             //if error is API_ENOENT it means folder is not set, not an actual error. Otherwise re-throw the error
@@ -304,9 +298,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                 }
             )
             megaApiGateway.getFileVersionsOption(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 

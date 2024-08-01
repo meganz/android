@@ -971,9 +971,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 listener = listener,
             )
 
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -1096,9 +1093,6 @@ internal class ChatRepositoryImpl @Inject constructor(
 
             megaApiGateway.isGeolocationEnabled(listener)
 
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -1106,7 +1100,6 @@ internal class ChatRepositoryImpl @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("enableGeolocation") { }
             megaApiGateway.enableGeolocation(listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -1151,7 +1144,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 }
             )
             megaApiGateway.shouldShowRichLinkWarning(listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -1170,7 +1162,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 }
             )
             megaApiGateway.isRichPreviewsEnabled(listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -1186,7 +1177,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                     value
                 }
                 megaApiGateway.setRichLinkWarningCounterValue(value, listener)
-                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
 
@@ -1203,7 +1193,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 }
             }
             megaApiGateway.enableRichPreviews(enable, listener)
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
