@@ -511,6 +511,7 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
+            android:taskAffinity=".call"
             android:supportsPictureInPicture="true"
             android:windowSoftInputMode="adjustResize" />
         <activity

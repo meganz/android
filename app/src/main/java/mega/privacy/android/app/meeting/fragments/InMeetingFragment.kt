@@ -1902,13 +1902,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun hideOrShowHelperViews(shouldHide: Boolean) {
         val visibility = if (shouldHide) View.GONE else View.VISIBLE
-        toolbar.visibility = visibility
         binding.selfFeedFloatingWindowContainer.visibility = visibility
         binding.meetingContainer.visibility = visibility
-        binding.bottomFloatingPanel.meetingActionButtons.visibility = visibility
-        binding.bottomFloatingPanel.backgroundMask.visibility = visibility
-        binding.bottomFloatingPanel.participantsComposeView.visibility = visibility
-        binding.bottomFloatingPanel.indicator.visibility = visibility
+        binding.hostLeaveCallDialogComposeView.visibility = visibility
+        if (shouldHide.not()) {
+            binding.hostLeaveCallDialogComposeView.bringToFront()
+        }
+        binding.snackbarComposeView.visibility = visibility
+        binding.moreOptionsListComposeView.visibility = visibility
+        toolbar.visibility = visibility
+        binding.bottomFloatingPanel.root.visibility = visibility
         if (shouldHide.not()) {
             removePictureInPictureFragment()
         }
@@ -1983,6 +1986,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
 
             initLocal(chatId)
+            Timber.d("Floating BottomSheet visible ${floatingBottomSheet.isVisible}")
         }
     }
 
@@ -2549,7 +2553,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param isCamOn True, if the camera is switched on. False, if the camera is switched off
      */
     private fun updateLocalVideo(isCamOn: Boolean) {
-        Timber.d("Local audio or video changes")
+        Timber.d("Update Local Video $isCamOn")
         inMeetingViewModel.getCall()?.apply {
             val isVideoOn: Boolean = inMeetingViewModel.state.value.hasLocalVideo
             if (!MegaApplication.getChatManagement().isInTemporaryState) {

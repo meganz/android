@@ -279,6 +279,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         Timber.d("Check the current UI status")
         inMeetingViewModel.getCall()?.let {
             if (inMeetingViewModel.isMe(peerId)) {
+                Timber.d("call status ${it.status}")
                 if (it.status == ChatCallStatus.InProgress && it.hasLocalVideo) {
                     Timber.d("Check if local video should be on")
                     checkVideoOn(peerId, clientId)

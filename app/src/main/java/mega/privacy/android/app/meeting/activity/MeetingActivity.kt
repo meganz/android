@@ -412,6 +412,7 @@ class MeetingActivity : PasscodeActivity() {
 
     private fun initIntent() {
         intent?.let {
+            Timber.d("Intent action: $it")
             val chatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
                 meetingViewModel.updateChatRoomId(chatId)
                 chatId
