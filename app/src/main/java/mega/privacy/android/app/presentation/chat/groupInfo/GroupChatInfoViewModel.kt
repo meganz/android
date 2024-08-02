@@ -26,22 +26,21 @@ import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.openMeetingWithAudioOrVideo
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
-import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
+import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
-import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
-import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaChatRoom
@@ -51,7 +50,7 @@ import javax.inject.Inject
 /**
  * GroupChatInfoActivity view model.
  *
- * @property setOpenInvite                                  [SetOpenInvite]
+ * @property setOpenInviteWithChatIdUseCase                 [SetOpenInviteWithChatIdUseCase]
  * @property startCallUseCase                               [StartCallUseCase]
  * @property passcodeManagement                             [PasscodeManagement]
  * @property chatApiGateway                                 [MegaChatApiGateway]
@@ -67,7 +66,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class GroupChatInfoViewModel @Inject constructor(
-    private val setOpenInvite: SetOpenInvite,
+    private val setOpenInviteWithChatIdUseCase: SetOpenInviteWithChatIdUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val startCallUseCase: StartCallUseCase,
     private val passcodeManagement: PasscodeManagement,
@@ -170,7 +169,7 @@ class GroupChatInfoViewModel @Inject constructor(
         if (isConnected.value) {
             viewModelScope.launch {
                 runCatching {
-                    setOpenInvite(chatId)
+                    setOpenInviteWithChatIdUseCase(chatId)
                 }.onFailure { exception ->
                     Timber.e(exception)
                     _state.update { it.copy(error = R.string.general_text_error) }

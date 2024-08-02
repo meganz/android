@@ -23,9 +23,19 @@ import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
-import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.call.AllowUsersJoinCallUseCase
+import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
+import mega.privacy.android.domain.usecase.call.CreateMeetingUseCase
+import mega.privacy.android.domain.usecase.call.GetCallIdsOfOthersCallsUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.call.MonitorCallEndedUseCase
+import mega.privacy.android.domain.usecase.call.RingIndividualInACallUseCase
+import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
@@ -37,24 +47,14 @@ import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCas
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
-import mega.privacy.android.domain.usecase.call.AllowUsersJoinCallUseCase
-import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
-import mega.privacy.android.domain.usecase.call.CreateMeetingUseCase
-import mega.privacy.android.domain.usecase.call.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
-import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.call.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MuteAllPeersUseCase
 import mega.privacy.android.domain.usecase.meeting.MutePeersUseCase
-import mega.privacy.android.domain.usecase.call.RingIndividualInACallUseCase
-import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -92,7 +92,7 @@ class MeetingActivityViewModelTest {
     private val getChatRoomUseCase: GetChatRoomUseCase = mock()
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase = mock()
     private val queryChatLink: QueryChatLink = mock()
-    private val setOpenInvite: SetOpenInvite = mock()
+    private val setOpenInviteWithChatIdUseCase: SetOpenInviteWithChatIdUseCase = mock()
     private val chatParticipantMapper: ChatParticipantMapper = mock()
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase = mock()
     private val createChatLinkUseCase: CreateChatLinkUseCase = mock()
@@ -158,7 +158,7 @@ class MeetingActivityViewModelTest {
             getChatRoomUseCase,
             monitorChatRoomUpdatesUseCase,
             queryChatLink,
-            setOpenInvite,
+            setOpenInviteWithChatIdUseCase,
             chatParticipantMapper,
             isEphemeralPlusPlusUseCase,
             createChatLinkUseCase,
@@ -216,7 +216,7 @@ class MeetingActivityViewModelTest {
             getChatRoomUseCase = getChatRoomUseCase,
             monitorChatRoomUpdatesUseCase = monitorChatRoomUpdatesUseCase,
             queryChatLink = queryChatLink,
-            setOpenInvite = setOpenInvite,
+            setOpenInviteWithChatIdUseCase = setOpenInviteWithChatIdUseCase,
             chatParticipantMapper = chatParticipantMapper,
             isEphemeralPlusPlusUseCase = isEphemeralPlusPlusUseCase,
             createChatLinkUseCase = createChatLinkUseCase,

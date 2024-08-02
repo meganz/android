@@ -35,13 +35,13 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
-import mega.privacy.android.domain.entity.call.ChatCallChanges
-import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -51,20 +51,20 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RemoveFromChat
-import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
+import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
-import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
-import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -84,7 +84,7 @@ import javax.inject.Inject
  * @property leaveChatUseCase                               [LeaveChatUseCase]
  * @property removeFromChat                                 [RemoveFromChat]
  * @property inviteContactWithEmailUseCase                  [InviteContactWithEmailUseCase]
- * @property setOpenInvite                                  [SetOpenInvite]
+ * @property setOpenInviteWithChatIdUseCase                 [SetOpenInviteWithChatIdUseCase]
  * @property updateChatPermissionsUseCase                   [UpdateChatPermissionsUseCase]
  * @property getPublicChatToPrivate                         [SetPublicChatToPrivate]
  * @property passcodeManagement                             [PasscodeManagement]
@@ -116,7 +116,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val leaveChatUseCase: LeaveChatUseCase,
     private val removeFromChat: RemoveFromChat,
     private val inviteContactWithEmailUseCase: InviteContactWithEmailUseCase,
-    private val setOpenInvite: SetOpenInvite,
+    private val setOpenInviteWithChatIdUseCase: SetOpenInviteWithChatIdUseCase,
     private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase,
     private val getPublicChatToPrivate: SetPublicChatToPrivate,
     private val passcodeManagement: PasscodeManagement,
@@ -968,7 +968,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             Timber.d("Update option Allow non-host add participants to the chat room")
             viewModelScope.launch {
                 runCatching {
-                    setOpenInvite(uiState.value.chatId)
+                    setOpenInviteWithChatIdUseCase(uiState.value.chatId)
                 }.onFailure { exception ->
                     Timber.e(exception)
                     triggerSnackbarMessage(

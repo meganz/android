@@ -14,17 +14,17 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.call.ChatCall
-import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
+import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
-import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
-import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.After
@@ -46,7 +46,7 @@ class GroupChatInfoViewModelTest {
 
     private lateinit var underTest: GroupChatInfoViewModel
 
-    private val setOpenInvite: SetOpenInvite = mock()
+    private val setOpenInviteWithChatIdUseCase: SetOpenInviteWithChatIdUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val startCallUseCase: StartCallUseCase = mock()
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
@@ -85,7 +85,7 @@ class GroupChatInfoViewModelTest {
 
     private fun initializeViewModel() {
         underTest = GroupChatInfoViewModel(
-            setOpenInvite = setOpenInvite,
+            setOpenInviteWithChatIdUseCase = setOpenInviteWithChatIdUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             startCallUseCase = startCallUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
@@ -160,7 +160,7 @@ class GroupChatInfoViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
         reset(
-            setOpenInvite,
+            setOpenInviteWithChatIdUseCase,
             monitorConnectivityUseCase,
             startCallUseCase,
             get1On1ChatIdUseCase,

@@ -43,7 +43,6 @@ import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.QueryChatLink
-import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
@@ -82,7 +81,7 @@ import javax.inject.Inject
  * @property deviceGateway                              [DeviceGateway]
  * @property getStringFromStringResMapper               [GetStringFromStringResMapper]
  * @property getPluralStringFromStringResMapper         [GetPluralStringFromStringResMapper]
- * @property setOpenInvite                              [SetOpenInvite]
+ * @property setOpenInviteUseCase                       [SetOpenInviteUseCase]
  * @property queryChatLink                              [QueryChatLink]
  * @property removeParticipantFromChat                  [RemoveParticipantFromChatUseCase]
  * @property inviteParticipantToChat                    [InviteParticipantToChatUseCase]

@@ -83,7 +83,7 @@ import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
-import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.call.AllowUsersJoinCallUseCase
@@ -145,7 +145,7 @@ import javax.inject.Inject
  * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
  * @property getChatRoomUseCase                             [GetChatRoomUseCase]
  * @property getChatCallUseCase                             [GetChatCallUseCase]
- * @property setOpenInvite                                  [SetOpenInvite]
+ * @property setOpenInviteWithChatIdUseCase                 [SetOpenInviteWithChatIdUseCase]
  * @property chatParticipantMapper                          [ChatParticipantMapper]
  * @property monitorChatRoomUpdatesUseCase                  [MonitorChatRoomUpdatesUseCase]
  * @property queryChatLink                                  [QueryChatLink]
@@ -190,7 +190,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
     private val queryChatLink: QueryChatLink,
-    private val setOpenInvite: SetOpenInvite,
+    private val setOpenInviteWithChatIdUseCase: SetOpenInviteWithChatIdUseCase,
     private val chatParticipantMapper: ChatParticipantMapper,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     private val createChatLinkUseCase: CreateChatLinkUseCase,
@@ -2022,7 +2022,7 @@ class MeetingActivityViewModel @Inject constructor(
         }
         viewModelScope.launch {
             runCatching {
-                setOpenInvite(state.value.chatId)
+                setOpenInviteWithChatIdUseCase(state.value.chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
             }.onSuccess { isAllowAddParticipantsEnabled ->
